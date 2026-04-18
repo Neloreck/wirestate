@@ -1,0 +1,10 @@
+{
+  "name": "dreamstate-cli",
+  "private": true,
+  "devDependencies": {
+    "colors": "^1.4.0",
+    "ncp": "^2.0.0",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0"
+  }
+}

@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createScopedObserverTree rendering should match snapshot 1`] = `
+<div>
+  <Dreamstate.ScopedProvider
+    ManagerClass={[Function]}
+    dependencies={
+      Array [
+        [Function],
+        [Function],
+        [Function],
+      ]
+    }
+    scope={null}
+  >
+    <Dreamstate.ScopedProvider
+      ManagerClass={[Function]}
+      dependencies={
+        Array [
+          [Function],
+          [Function],
+          [Function],
+        ]
+      }
+      scope={null}
+    >
+      <Dreamstate.ScopedProvider
+        ManagerClass={[Function]}
+        dependencies={
+          Array [
+            [Function],
+            [Function],
+            [Function],
+          ]
+        }
+        scope={null}
+      >
+        <div>
+          bottom
+        </div>
+      </Dreamstate.ScopedProvider>
+    </Dreamstate.ScopedProvider>
+  </Dreamstate.ScopedProvider>
+</div>
+`;

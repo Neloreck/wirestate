@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getReactContext method functionality should supply default value if manager is not provided 1`] = `
+<div>
+  {"first":"unknown","second":-1}
+</div>
+`;
+
+exports[`getReactContext method functionality should supply null value if manager is not provided 1`] = `
+<div>
+  null
+</div>
+`;

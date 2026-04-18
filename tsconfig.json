@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./",
+    "downlevelIteration": true,
+    "emitDecoratorMetadata": false,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "jsx": "react",
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "resolveJsonModule": true,
+    "rootDir": "./",
+    "sourceMap": true,
+    "strict": true,
+    "target": "es5",
+    "types": [
+      "node",
+      "jest"
+    ]
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "src/"
+  ]
+}
