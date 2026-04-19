@@ -2,4 +2,4 @@ packages:
 
   - 'cli/'
   - 'src/'
-  - 'src/dreamstate'
+  - 'src/wirestate'

@@ -1,5 +1,0 @@
-export enum ESignal {
-  NUMBER_SIGNAL = "NUMBER",
-  STRING_SIGNAL = "STRING_SIGNAL",
-  EMPTY_SIGNAL = "EMPTY_SIGNAL",
-}

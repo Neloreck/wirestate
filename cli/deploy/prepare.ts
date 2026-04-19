@@ -27,7 +27,7 @@ const ASSETS: IAssetsDescription = {
     destination: path.resolve(PKG_ROOT, "CHANGELOG.md"),
   },
   PACKAGE: {
-    source: path.resolve(SRC_PATH, "dreamstate/package.json"),
+    source: path.resolve(SRC_PATH, "wirestate/package.json"),
     destination: path.resolve(PKG_ROOT, "package.json"),
   },
   ESM: {

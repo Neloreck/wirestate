@@ -2,4 +2,4 @@
  * 'https://github.com/Neloreck/wirestate'
  */
 
-// todo: Export esm build here.
+// todo: Export lib deps.

@@ -1,0 +1,43 @@
+{
+  "name": "wirestate",
+  "version": "0.1.0",
+  "description": "Store management library based on mobx and inversify",
+  "sideEffects": false,
+  "author": "Syrotenko Igor",
+  "homepage": "https://github.com/neloreck/wirestate#readme",
+  "license": "MIT",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "module": "./esm/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neloreck/wirestate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/neloreck/wirestate/issues"
+  },
+  "keywords": [
+    "class-based",
+    "context",
+    "declarative",
+    "management",
+    "manager",
+    "mobx",
+    "react",
+    "inversify",
+    "ioc",
+    "di",
+    "dependency-injection",
+    "state",
+    "store",
+    "typescript"
+  ],
+  "dependencies": {
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "inversify": ">=8.0.0",
+    "mobx": ">=6.0.0",
+    "mobx-react-lite": ">=4.0.0"
+  }
+}

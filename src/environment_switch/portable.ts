@@ -1,2 +1,2 @@
-export * from "@/dreamstate/index";
-export * from "@/dreamstate/test-utils";
+export * from "@/wirestate/index";
+export * from "@/wirestate/test-utils";

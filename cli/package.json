@@ -1,5 +1,5 @@
 {
-  "name": "dreamstate-cli",
+  "name": "wirestate-cli",
   "private": true,
   "devDependencies": {
     "colors": "^1.4.0",

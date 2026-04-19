@@ -1,4 +1,4 @@
-import { TAnyValue } from "@/dreamstate/types";
+import { TAnyValue } from "@/wirestate/types";
 
 export interface ILogger {
   info(...args: Array<TAnyValue>): void;
