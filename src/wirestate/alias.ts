@@ -1,7 +1,14 @@
 import { LazyServiceIdentifier, type ServiceIdentifier } from "inversify";
 import { action, computed, observable } from "mobx";
 
-export { Container, inject as Inject, injectable as Injectable, type ServiceIdentifier } from "inversify";
+export {
+  Container,
+  inject as Inject,
+  injectable as Injectable,
+  type ServiceIdentifier,
+  bindingTypeValues as BindingType,
+  bindingScopeValues as ScopeBindingType,
+} from "inversify";
 export {
   autorun,
   flow,

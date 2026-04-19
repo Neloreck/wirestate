@@ -5,6 +5,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { Application } from "@/application/Application";
+import { GLOBAL_CONFIG } from "@/core/id";
 import {
   CounterService,
   type ICounterInitialState,
@@ -20,10 +21,19 @@ import {
 
 // [*] Pass IOC check - separation of container and services provision.
 const ServicesProvider: ServicesProvider = createServicesProvider(
-  [CounterService, ThemeService, LoggerService],
+  [
+    CounterService,
+    ThemeService,
+    LoggerService,
+    // [*] Pass DI check - allow injecting static values / configs.
+    {
+      id: GLOBAL_CONFIG,
+      value: { first: 1, second: 2, third: null, random: Math.random() },
+    },
+  ],
   {
     // [*] Pass DI check - force init for required services.
-    activate: [LoggerService],
+    activate: [GLOBAL_CONFIG, LoggerService],
   },
 );
 

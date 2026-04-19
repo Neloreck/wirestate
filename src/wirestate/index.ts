@@ -3,7 +3,9 @@
  */
 
 export * from "@/wirestate/alias";
-export { bindService } from "@/wirestate/core/container/bind-service";
+export { bindConstant } from "@/wirestate/core/container/bind/bind-constant";
+export { bindEntry } from "@/wirestate/core/container/bind/bind-entry";
+export { bindService } from "@/wirestate/core/container/bind/bind-service";
 export { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
 export { emitSignal } from "@/wirestate/core/container/emit-signal";
 export { query } from "@/wirestate/core/container/query";
@@ -32,6 +34,7 @@ export {
   TInitialStateEntry as InitialStateEntry,
   TInitialStateKey as InitialStateKey,
 } from "@/wirestate/types/initial-state";
+export { IInjectableDescriptor as InjectableDescriptor } from "@/wirestate/types/privision";
 export {
   TQueryHandler as QueryHandler,
   TQueryResponder as QueryResponder,

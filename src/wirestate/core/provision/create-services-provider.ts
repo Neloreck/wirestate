@@ -1,15 +1,18 @@
+import { type ServiceIdentifier } from "inversify";
 import { type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { bindService } from "@/wirestate/core/container/bind-service";
+import { bindEntry } from "@/wirestate/core/container/bind/bind-entry";
+import { getEntryToken } from "@/wirestate/core/container/bind/get-entry-token";
 import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { applyInitialState } from "@/wirestate/core/initial-state/apply-initial-state";
 import { type IIocContext, IocContext } from "@/wirestate/core/provision/ioc-context";
 import type { Optional, TAnyObject } from "@/wirestate/types/general";
 import type { TInitialStateEntries } from "@/wirestate/types/initial-state";
+import type { IInjectableDescriptor } from "@/wirestate/types/privision";
 import type { TServiceClass } from "@/wirestate/types/services";
 
 /**
@@ -47,30 +50,32 @@ export interface ICreateIocProviderOptions {
   /**
    * Services to resolve immediately on mount.
    */
-  readonly activate?: ReadonlyArray<TServiceClass>;
+  readonly activate?: ReadonlyArray<ServiceIdentifier>;
 }
 
 /**
  * Creates a component that manages service lifetimes for its subtree.
  *
- * @param services - service classes to bind
+ * @param entries - service classes or injectable descriptors to bind
  * @param options - provider configuration
  * @returns service provider component
  */
 export function createServicesProvider(
-  services: ReadonlyArray<TServiceClass>,
+  entries: ReadonlyArray<TServiceClass | IInjectableDescriptor>,
   options: ICreateIocProviderOptions = {}
 ) {
-  dbg.info(prefix(__filename), "Creating services provider:", { services, options });
+  dbg.info(prefix(__filename), "Creating services provider:", { services: entries, options });
 
   const { activate } = options;
 
   if (activate && activate.length > 0) {
+    const entryTokens: ReadonlyArray<ServiceIdentifier> = entries.map(getEntryToken);
+
     for (const eager of activate) {
-      if (!services.includes(eager)) {
+      if (!entryTokens.includes(eager)) {
         throw new WirestateError(
           ERROR_CODE_VALIDATION_ERROR,
-          `createServicesProvider: '${eager.name}' is listed in 'activate' but was not provided in 'services'.`
+          `createServicesProvider: '${String(eager)}' is listed in 'activate' but was not provided in 'entries'.`
         );
       }
     }
@@ -94,7 +99,7 @@ export function createServicesProvider(
       dbg.info(prefix(__filename), "Providing services on first render:", {
         container: iocContext.container,
         revision: iocContext.revision,
-        services,
+        services: entries,
         initialPropsSnapshot,
         activate,
       });
@@ -103,10 +108,8 @@ export function createServicesProvider(
       // todo: Conditional apply, merge or so.
       applyInitialState(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
 
-      for (const ServiceClass of services) {
-        bindService(iocContext.container, ServiceClass, ServiceClass, {
-          isWithBindingCheck: true,
-        });
+      for (const entry of entries) {
+        bindEntry(iocContext.container, entry, true);
       }
 
       if (activate) {
@@ -114,13 +117,13 @@ export function createServicesProvider(
           iocContext.container.get(eager);
         }
       }
-    }, services);
+    }, entries);
 
     useEffect(() => {
       dbg.info(prefix(__filename), "Providing services on mount:", {
         container: iocContext.container,
         revision: iocContext.revision,
-        services,
+        entries,
         initialPropsSnapshot,
         activate,
       });
@@ -131,14 +134,14 @@ export function createServicesProvider(
       // todo: Conditional apply, merge or so.
       applyInitialState(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
 
-      for (const ServiceClass of services) {
-        if (!iocContext.container.isBound(ServiceClass)) {
+      for (const entry of entries) {
+        const token: ServiceIdentifier = getEntryToken(entry);
+
+        if (!iocContext.container.isBound(token)) {
           didRebind = true;
         }
 
-        bindService(iocContext.container, ServiceClass, ServiceClass, {
-          isWithBindingCheck: true,
-        });
+        bindEntry(iocContext.container, entry, true);
       }
 
       if (activate) {
@@ -156,13 +159,15 @@ export function createServicesProvider(
         dbg.info(prefix(__filename), "Unprovision services on unmount:", {
           container: iocContext.container,
           revision: iocContext.revision,
-          services,
+          entries,
         });
 
         // Unbind in reverse order to respect dependencies during onDeactivated.
-        for (const service of services) {
-          if (iocContext.container.isBound(service)) {
-            iocContext.container.unbind(service);
+        for (const entry of entries) {
+          const token: ServiceIdentifier = getEntryToken(entry);
+
+          if (iocContext.container.isBound(token)) {
+            iocContext.container.unbind(token);
           }
         }
 
@@ -170,14 +175,14 @@ export function createServicesProvider(
         // todo: Conditional apply, remove linked keys separately or so, leave stored state as is.
         applyInitialState(iocContext.container, {}, []);
       };
-    }, services);
+    }, entries);
 
     return props.children;
   }
 
   ServicesProviderComponent.displayName = "ServicesProvider";
 
-  dbg.info(prefix(__filename), "Created services provider:", { ServicesProviderComponent, services, options });
+  dbg.info(prefix(__filename), "Created services provider:", { ServicesProviderComponent, entries, options });
 
   return ServicesProviderComponent;
 }

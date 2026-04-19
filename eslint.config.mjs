@@ -209,7 +209,6 @@ export default [
           prev: ["const", "let", "var"],
         },
       ],
-      quotes: ["error", "double"],
       "react/prop-types": "off",
       "react/react-in-jsx-scope": "off",
       semi: "error",

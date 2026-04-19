@@ -1,3 +1,4 @@
+import { GLOBAL_CONFIG } from "@/core/id";
 import { EGlobalQuery } from "@/core/queries";
 import { CounterService } from "@/core/services/counter/CounterService";
 import { ThemeService } from "@/core/services/theme/ThemeService";
@@ -5,6 +6,7 @@ import { EGlobalSignal } from "@/core/signals";
 import {
   AbstractService,
   Action,
+  Inject,
   Injectable,
   makeObservable,
   OnQuery,
@@ -29,10 +31,18 @@ export class LoggerService extends AbstractService {
 
   private nextId: number = 1;
 
-  public constructor() {
+  public constructor(
+    @Inject(GLOBAL_CONFIG)
+    protected readonly globalConfig: object,
+  ) {
     super();
 
     makeObservable(this);
+
+    console.info(
+      `[${this.constructor.name}] constructing with constant global config:`,
+      globalConfig,
+    );
   }
 
   public override onActivated(): void {
@@ -89,6 +99,7 @@ export class LoggerService extends AbstractService {
       this.getService(LoggerService),
       this.getService(ThemeService),
       this.getService(CounterService),
+      this.getService(GLOBAL_CONFIG),
     );
   }
 

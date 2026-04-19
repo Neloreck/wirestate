@@ -59,7 +59,7 @@ const createPortableConfig = (env, isDebug) => ({
       projectRoot: WS_ROOT,
     }),
     clear({
-      targets: [PORTABLE_ROOT],
+      targets: [isDebug ? PORTABLE_DEBUG_ROOT : PORTABLE_ROOT],
     }),
   ],
 });

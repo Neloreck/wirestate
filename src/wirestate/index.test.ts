@@ -6,6 +6,8 @@ describe("Library exported API", () => {
     "Action",
     "Computed",
     "Container",
+    "BindingType",
+    "ScopeBindingType",
     "DeepObservable",
     "Inject",
     "Injectable",
@@ -23,6 +25,8 @@ describe("Library exported API", () => {
     "observer",
     "runInAction",
     // Core.
+    "bindConstant",
+    "bindEntry",
     "bindService",
     "createIocContainer",
     "emitSignal",
@@ -48,6 +52,7 @@ describe("Library exported API", () => {
     "InitialStateEntries",
     "InitialStateEntry",
     "InitialStateKey",
+    "InjectableDescriptor",
     "QueryHandler",
     "QueryResponder",
     "QueryType",
@@ -148,16 +153,16 @@ describe("Library exported API", () => {
       const cjsCorePath = path.resolve(__dirname, "../environment_switch/cjs_core.js");
       const cjsCoreContent = fs.readFileSync(cjsCorePath, "utf8");
 
-      expect(cjsCoreContent).toContain("require(\"./cjs/production/index.js\")");
-      expect(cjsCoreContent).toContain("require(\"./cjs/development/index.js\")");
+      expect(cjsCoreContent).toContain(`require("./cjs/production/index.js")`);
+      expect(cjsCoreContent).toContain(`require("./cjs/development/index.js")`);
     });
 
     it("cjs_utils.js should point to existing files in target/pkg (if built)", () => {
       const cjsUtilsPath = path.resolve(__dirname, "../environment_switch/cjs_utils.js");
       const cjsUtilsContent = fs.readFileSync(cjsUtilsPath, "utf8");
 
-      expect(cjsUtilsContent).toContain("require(\"./cjs/production/test-utils.js\")");
-      expect(cjsUtilsContent).toContain("require(\"./cjs/development/test-utils.js\")");
+      expect(cjsUtilsContent).toContain(`require("./cjs/production/test-utils.js")`);
+      expect(cjsUtilsContent).toContain(`require("./cjs/development/test-utils.js")`);
     });
   });
 });
