@@ -1,5 +1,5 @@
-import { SIGNAL_HANDLER_METADATA } from '../registry';
-import type { ISignalHandlerMetadata } from '../types/signals';
+import { SIGNAL_HANDLER_METADATA } from "../registry";
+import type { ISignalHandlerMetadata } from "../types/signals";
 
 /**
  * Retrieves `@OnSignal` metadata from the class hierarchy.
@@ -16,7 +16,7 @@ export function getSignalHandlerMetadata(
 
   // Traverse prototype chain up to Object/Function
   while (
-    typeof ctor === 'function' &&
+    typeof ctor === "function" &&
     ctor !== Object &&
     ctor !== Function.prototype
   ) {

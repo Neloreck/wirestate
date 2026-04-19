@@ -1,19 +1,19 @@
-import { Container, type Newable, type ServiceIdentifier } from 'inversify';
+import { Container, type Newable, type ServiceIdentifier } from "inversify";
 
-import { getQueryHandlerMetadata } from '../queries/getQueryHandlerMetadata';
-import { QueryBus } from '../queries/QueryBus';
+import { getQueryHandlerMetadata } from "../queries/getQueryHandlerMetadata";
+import { QueryBus } from "../queries/QueryBus";
 import {
   CONTAINER_REFS_BY_SERVICE,
   QUERY_BUS_TOKEN,
   QUERY_UNREGISTERS_BY_SERVICE,
   SIGNAL_BUS_TOKEN,
   SIGNAL_UNSUBSCRIBERS_BY_SERVICE,
-} from '../registry';
-import { AbstractService } from '../service/AbstractService';
-import { buildSignalDispatcher } from '../signals/buildSignalDispatcher';
-import type { SignalBus } from '../signals/SignalBus';
-import type { TQueryHandler, TQueryUnregister } from '../types/queries';
-import type { TSignalHandler } from '../types/signals';
+} from "../registry";
+import { AbstractService } from "../service/AbstractService";
+import { buildSignalDispatcher } from "../signals/buildSignalDispatcher";
+import type { SignalBus } from "../signals/SignalBus";
+import type { TQueryHandler, TQueryUnregister } from "../types/queries";
+import type { TSignalHandler } from "../types/signals";
 
 /**
  * Registers an AbstractService in the container with activation/deactivation logic.
@@ -62,7 +62,7 @@ export function bindService<T extends AbstractService>(
         meta.methodName
       ];
 
-      if (typeof method !== 'function') {
+      if (typeof method !== "function") {
         continue;
       }
 
@@ -79,10 +79,10 @@ export function bindService<T extends AbstractService>(
     // Fire-and-forget any async init so we stay synchronous from the
     // container's point of view. Services that need strict async
     // bootstrapping can await their initialization elsewhere.
-    if (result && typeof (result as Promise<void>).then === 'function') {
+    if (result && typeof (result as Promise<void>).then === "function") {
       (result as Promise<void>).catch((error) => {
         console.error(
-          '[ioc] onActivated rejected for',
+          "[ioc] onActivated rejected for",
           ServiceClass.name,
           error,
         );
@@ -173,7 +173,7 @@ export function _detachQueryUnregs(service: AbstractService): void {
     try {
       unreg();
     } catch (error) {
-      console.error('[ioc] query unregister threw:', error);
+      console.error("[ioc] query unregister threw:", error);
     }
   }
 

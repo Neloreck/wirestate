@@ -1,6 +1,6 @@
-import { useContext } from 'react';
+import { useContext } from "react";
 
-import { type IIocContext, IocContext } from './IocContext';
+import { type IIocContext, IocContext } from "./IocContext";
 
 /**
  * Returns the full IoC context.
@@ -12,7 +12,7 @@ export function useIocContext(): IIocContext {
 
   if (!value) {
     throw new Error(
-      '[ioc] useContainer() must be called inside an <IocProvider>.',
+      "[ioc] useContainer() must be called inside an <IocProvider>.",
     );
   }
 

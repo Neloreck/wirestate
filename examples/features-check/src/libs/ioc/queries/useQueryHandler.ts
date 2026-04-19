@@ -1,10 +1,10 @@
-import { Container } from 'inversify';
-import { useEffect, useRef } from 'react';
+import { Container } from "inversify";
+import { useEffect, useRef } from "react";
 
-import { useContainer } from '../provision/useContainer';
-import type { QueryBus } from '../queries/QueryBus';
-import { QUERY_BUS_TOKEN } from '../registry';
-import type { TQueryHandler, TQueryType } from '../types/queries';
+import { useContainer } from "../provision/useContainer";
+import type { QueryBus } from "../queries/QueryBus";
+import { QUERY_BUS_TOKEN } from "../registry";
+import type { TQueryHandler, TQueryType } from "../types/queries";
 
 /**
  * Registers a query handler for the component's lifetime.

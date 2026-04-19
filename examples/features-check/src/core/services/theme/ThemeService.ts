@@ -1,5 +1,5 @@
-import type { Theme } from '@/application/types';
-import { EGlobalSignal } from '@/core/signals';
+import type { Theme } from "@/application/types";
+import { EGlobalSignal } from "@/core/signals";
 import {
   AbstractService,
   Action,
@@ -8,12 +8,12 @@ import {
   Injectable,
   makeObservable,
   Observable,
-} from '@/libs/ioc';
+} from "@/libs/ioc";
 
 @Injectable()
 export class ThemeService extends AbstractService {
   @Observable()
-  public theme: Theme = 'light';
+  public theme: Theme = "light";
 
   public constructor(
     @Inject(INITIAL_STATE)
@@ -42,7 +42,7 @@ export class ThemeService extends AbstractService {
 
   @Action()
   public toggle(): void {
-    this.theme = this.theme === 'light' ? 'dark' : 'light';
+    this.theme = this.theme === "light" ? "dark" : "light";
 
     this.emitSignal({
       type: EGlobalSignal.THEME_TOGGLED,

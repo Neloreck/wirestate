@@ -1,36 +1,36 @@
-import { Container } from 'inversify';
+import { Container } from "inversify";
 
-import type { AbstractService } from './service/AbstractService';
-import type { IQueryHandlerMetadata, TQueryUnregister } from './types/queries';
-import type { TSignalUnsubscribe } from './types/signals';
-import type { ISignalHandlerMetadata } from './types/signals';
+import type { AbstractService } from "./service/AbstractService";
+import type { IQueryHandlerMetadata, TQueryUnregister } from "./types/queries";
+import type { TSignalUnsubscribe } from "./types/signals";
+import type { ISignalHandlerMetadata } from "./types/signals";
 
 /**
  * Token for the container-scoped signal bus.
  */
 export const SIGNAL_BUS_TOKEN: unique symbol = Symbol.for(
-  '@wirestate/signal-bus',
+  "@wirestate/signal-bus",
 );
 
 /**
  * Token for the container-scoped query bus.
  */
 export const QUERY_BUS_TOKEN: unique symbol = Symbol.for(
-  '@wirestate/query-bus',
+  "@wirestate/query-bus",
 );
 
 /**
  * Token for the container-scoped initial-state map.
  */
 export const INITIAL_STATE_TOKEN: unique symbol = Symbol.for(
-  '@wirestate/initial-state',
+  "@wirestate/initial-state",
 );
 
 /**
  * Token for the container-scoped shared initial-state object.
  */
 export const INITIAL_STATE_SHARED_TOKEN: unique symbol = Symbol.for(
-  '@wirestate/initial-state/shared',
+  "@wirestate/initial-state/shared",
 );
 
 /**

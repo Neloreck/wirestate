@@ -1,4 +1,4 @@
-import { useIocContext } from './useIocContext';
+import { useIocContext } from "./useIocContext";
 
 /**
  * Returns the current container revision.

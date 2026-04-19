@@ -1,10 +1,10 @@
-import { Container } from 'inversify';
-import { useEffect, useMemo, useRef } from 'react';
+import { Container } from "inversify";
+import { useEffect, useMemo, useRef } from "react";
 
-import { useIocContext } from '../provision/useIocContext';
-import { SIGNAL_BUS_TOKEN } from '../registry';
-import { SignalBus } from '../signals/SignalBus';
-import type { TSignalHandler, TSignalType } from '../types/signals';
+import { useIocContext } from "../provision/useIocContext";
+import { SIGNAL_BUS_TOKEN } from "../registry";
+import { SignalBus } from "../signals/SignalBus";
+import type { TSignalHandler, TSignalType } from "../types/signals";
 
 export function useSignal(handler: TSignalHandler): void;
 export function useSignal(
@@ -25,8 +25,8 @@ export function useSignal(
   const container: Container = useIocContext().container;
 
   const isFilter: boolean =
-    typeof typeOrHandler === 'string' ||
-    typeof typeOrHandler === 'symbol' ||
+    typeof typeOrHandler === "string" ||
+    typeof typeOrHandler === "symbol" ||
     Array.isArray(typeOrHandler);
 
   const activeHandler = isFilter

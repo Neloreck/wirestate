@@ -1,5 +1,5 @@
-import { QUERY_HANDLER_METADATA } from '../registry';
-import type { TQueryType } from '../types/queries';
+import { QUERY_HANDLER_METADATA } from "../registry";
+import type { TQueryType } from "../types/queries";
 
 /**
  * Decorator for service methods that respond to a query.

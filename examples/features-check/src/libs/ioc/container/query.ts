@@ -1,8 +1,8 @@
-import { type Container } from 'inversify';
+import { type Container } from "inversify";
 
-import { QueryBus } from '../queries/QueryBus';
-import { QUERY_BUS_TOKEN } from '../registry';
-import type { TQueryType } from '../types/queries';
+import { QueryBus } from "../queries/QueryBus";
+import { QUERY_BUS_TOKEN } from "../registry";
+import type { TQueryType } from "../types/queries";
 
 /**
  * Dispatches a query on the provided container.

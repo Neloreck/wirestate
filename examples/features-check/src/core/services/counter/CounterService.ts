@@ -1,6 +1,6 @@
-import type { Optional } from '@/application/types';
-import { LoggerService } from '@/core/services/logging/LoggerService';
-import { EGlobalSignal } from '@/core/signals';
+import type { Optional } from "@/application/types";
+import { LoggerService } from "@/core/services/logging/LoggerService";
+import { EGlobalSignal } from "@/core/signals";
 import {
   AbstractService,
   Action,
@@ -12,13 +12,13 @@ import {
   Observable,
   OnQuery,
   OnSignal,
-} from '@/libs/ioc';
+} from "@/libs/ioc";
 
 import {
   ECounterServiceQuery,
   type ICounterSnapshot,
   type ICounterSummary,
-} from './CounterService.query';
+} from "./CounterService.query";
 
 export interface ICounterInitialState {
   readonly count?: number;
@@ -70,11 +70,11 @@ export class CounterService extends AbstractService {
     );
 
     if (initialState) {
-      if (typeof initialState.count === 'number') {
+      if (typeof initialState.count === "number") {
         this.count = initialState.count;
       }
 
-      if (typeof initialState.lastIncrementAt === 'number') {
+      if (typeof initialState.lastIncrementAt === "number") {
         this.lastIncrementAt = initialState.lastIncrementAt;
       }
     }

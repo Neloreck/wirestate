@@ -1,11 +1,11 @@
-import type { Signal } from '@/libs/ioc';
+import type { Signal } from "@/libs/ioc";
 
 export enum EGlobalSignal {
-  COUNTER_INCREMENTED = 'counter/incremented',
-  COUNTER_RESET = 'counter/reset',
-  THEME_TOGGLED = 'theme/toggled',
-  USER_PINGED = 'user/pinged',
-  DUMP = 'generic/dump',
+  COUNTER_INCREMENTED = "counter/incremented",
+  COUNTER_RESET = "counter/reset",
+  THEME_TOGGLED = "theme/toggled",
+  USER_PINGED = "user/pinged",
+  DUMP = "generic/dump",
 }
 
 export interface CounterIncrementedSignal extends Signal {
@@ -19,7 +19,7 @@ export interface CounterResetSignal extends Signal {
 
 export interface ThemeToggledSignal extends Signal {
   type: EGlobalSignal.THEME_TOGGLED;
-  payload: { theme: 'light' | 'dark' };
+  payload: { theme: "light" | "dark" };
 }
 
 export interface UserPingedSignal extends Signal {

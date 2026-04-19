@@ -1,8 +1,8 @@
-import type { Optional } from '@/application/types';
+import type { Optional } from "@/application/types";
 
 export enum ECounterServiceQuery {
-  GET_COUNTER_SUMMARY = 'counter/summary',
-  FETCH_COUNTER_SNAPSHOT = 'counter/snapshot',
+  GET_COUNTER_SUMMARY = "counter/summary",
+  FETCH_COUNTER_SNAPSHOT = "counter/snapshot",
 }
 
 export interface ICounterSummary {

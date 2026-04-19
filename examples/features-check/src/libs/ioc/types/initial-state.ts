@@ -1,4 +1,4 @@
-import type { TServiceClass } from './services';
+import type { TServiceClass } from "./services";
 
 /**
  * Lookup key for service seeds.

@@ -1,5 +1,5 @@
-import { QUERY_HANDLER_METADATA } from '../registry';
-import type { IQueryHandlerMetadata } from '../types/queries';
+import { QUERY_HANDLER_METADATA } from "../registry";
+import type { IQueryHandlerMetadata } from "../types/queries";
 
 /**
  * Retrieves `@OnQuery` metadata from the class hierarchy.
@@ -16,7 +16,7 @@ export function getQueryHandlerMetadata(
 
   // Traverse prototype chain up to Object/Function
   while (
-    typeof ctor === 'function' &&
+    typeof ctor === "function" &&
     ctor !== Object &&
     ctor !== Function.prototype
   ) {

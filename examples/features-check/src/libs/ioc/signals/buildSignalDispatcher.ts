@@ -1,6 +1,6 @@
-import { AbstractService } from '../service/AbstractService';
-import { getSignalHandlerMetadata } from '../signals/getSignalHandlerMetadata';
-import type { ISignalDispatchEntry, TSignalHandler } from '../types/signals';
+import { AbstractService } from "../service/AbstractService";
+import { getSignalHandlerMetadata } from "../signals/getSignalHandlerMetadata";
+import type { ISignalDispatchEntry, TSignalHandler } from "../types/signals";
 
 /**
  * Composes service signal handlers into a single dispatcher.
@@ -15,7 +15,7 @@ export function buildSignalDispatcher(
   const entries: Array<ISignalDispatchEntry> = [];
 
   // Register catch-all hook if present.
-  if (typeof instance.onSignal === 'function') {
+  if (typeof instance.onSignal === "function") {
     entries.push({
       types: null,
       handler: (signal) => instance.onSignal?.(signal),
@@ -28,7 +28,7 @@ export function buildSignalDispatcher(
       meta.methodName
     ];
 
-    if (typeof method !== 'function') {
+    if (typeof method !== "function") {
       continue;
     }
 

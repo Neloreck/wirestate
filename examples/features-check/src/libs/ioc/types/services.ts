@@ -1,6 +1,6 @@
-import { type Newable } from 'inversify';
+import { type Newable } from "inversify";
 
-import { AbstractService } from '../service/AbstractService';
+import { AbstractService } from "../service/AbstractService";
 
 /**
  * Service constructor.

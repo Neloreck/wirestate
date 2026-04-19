@@ -1,18 +1,18 @@
-import { type Container, type ServiceIdentifier } from 'inversify';
+import { type Container, type ServiceIdentifier } from "inversify";
 
-import { InitialState } from '../initial-state/InitialState';
-import { QueryBus } from '../queries/QueryBus';
+import { InitialState } from "../initial-state/InitialState";
+import { QueryBus } from "../queries/QueryBus";
 import {
   CONTAINER_REFS_BY_SERVICE,
   INITIAL_STATE_TOKEN,
   QUERY_BUS_TOKEN,
   SIGNAL_BUS_TOKEN,
-} from '../registry';
-import type { SignalBus } from '../signals/SignalBus';
-import type { TAnyObject } from '../types/general';
-import type { TInitialStateKey } from '../types/initial-state';
-import type { TQueryType } from '../types/queries';
-import type { ISignal, TSignalType } from '../types/signals';
+} from "../registry";
+import type { SignalBus } from "../signals/SignalBus";
+import type { TAnyObject } from "../types/general";
+import type { TInitialStateKey } from "../types/initial-state";
+import type { TQueryType } from "../types/queries";
+import type { ISignal, TSignalType } from "../types/signals";
 
 /**
  * Base class for services.
@@ -33,8 +33,8 @@ export abstract class AbstractService {
 
     if (!ref) {
       throw new Error(
-        '[ioc] BaseService.container accessed before activation. ' +
-          'Ensure service is bound via bindService() and resolved by the container.',
+        "[ioc] BaseService.container accessed before activation. " +
+          "Ensure service is bound via bindService() and resolved by the container.",
       );
     }
 

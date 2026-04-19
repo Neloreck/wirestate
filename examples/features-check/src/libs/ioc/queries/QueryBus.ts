@@ -2,7 +2,7 @@ import type {
   TQueryHandler,
   TQueryType,
   TQueryUnregister,
-} from '../types/queries';
+} from "../types/queries";
 
 /**
  * Dispatches queries to handlers.

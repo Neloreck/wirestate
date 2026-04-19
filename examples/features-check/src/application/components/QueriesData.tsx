@@ -1,22 +1,22 @@
-import './QueriesData.css';
+import "./QueriesData.css";
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState } from "react";
 
-import type { Optional, Theme } from '@/application/types';
-import { EGlobalQuery } from '@/core/queries';
+import type { Optional, Theme } from "@/application/types";
+import { EGlobalQuery } from "@/core/queries";
 import {
   ECounterServiceQuery,
   type ICounterSnapshot,
   type ICounterSummary,
-} from '@/core/services/counter';
-import { ThemeService } from '@/core/services/theme';
+} from "@/core/services/counter";
+import { ThemeService } from "@/core/services/theme";
 import {
   observer,
   useQueryCaller,
   useQueryHandler,
   useService,
   useSyncQueryCaller,
-} from '@/libs/ioc';
+} from "@/libs/ioc";
 
 export const QueriesData = observer(() => {
   const [snapshot, setSnapshot] = useState<Optional<ICounterSnapshot>>(null);
@@ -52,26 +52,26 @@ export const QueriesData = observer(() => {
 
   return (
     <section>
-      <div className={'query-controls'}>
-        <button className={'counter ghost'} onClick={onPullSummary}>
+      <div className={"query-controls"}>
+        <button className={"counter ghost"} onClick={onPullSummary}>
           Query summary (sync)
         </button>
 
-        <button className={'counter ghost'} onClick={onFetchSnapshot}>
+        <button className={"counter ghost"} onClick={onFetchSnapshot}>
           Fetch snapshot (async)
         </button>
       </div>
 
       {summary ? (
-        <p className={'query-result'}>
-          Summary — count: <strong>{summary.count}</strong>, parity:{' '}
-          <strong>{summary.isEven ? 'even' : 'odd'}</strong>
+        <p className={"query-result"}>
+          Summary — count: <strong>{summary.count}</strong>, parity:{" "}
+          <strong>{summary.isEven ? "even" : "odd"}</strong>
         </p>
       ) : null}
 
       {snapshot ? (
-        <p className={'query-result'}>
-          Snapshot — count: <strong>{snapshot.count}</strong>, fetched at:{' '}
+        <p className={"query-result"}>
+          Snapshot — count: <strong>{snapshot.count}</strong>, fetched at:{" "}
           <strong>{new Date(snapshot.fetchedAt).toLocaleTimeString()}</strong>
         </p>
       ) : null}

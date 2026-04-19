@@ -1,6 +1,6 @@
-import { Container } from 'inversify';
+import { Container } from "inversify";
 
-import { useIocContext } from './useIocContext';
+import { useIocContext } from "./useIocContext";
 
 /**
  * Returns the active IoC container.

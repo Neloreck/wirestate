@@ -26,7 +26,7 @@ export type TSignalUnsubscribe = () => void;
  * @internal
  */
 export interface ISignalDispatchEntry {
-  readonly types: ReadonlyArray<ISignal['type']> | null;
+  readonly types: ReadonlyArray<ISignal["type"]> | null;
   readonly handler: TSignalHandler;
 }
 

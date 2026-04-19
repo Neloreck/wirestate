@@ -1,10 +1,10 @@
-import { Container } from 'inversify';
-import { useCallback } from 'react';
+import { Container } from "inversify";
+import { useCallback } from "react";
 
-import { useContainer } from '../provision/useContainer';
-import type { QueryBus } from '../queries/QueryBus';
-import { QUERY_BUS_TOKEN } from '../registry';
-import type { TQueryType } from '../types/queries';
+import { useContainer } from "../provision/useContainer";
+import type { QueryBus } from "../queries/QueryBus";
+import { QUERY_BUS_TOKEN } from "../registry";
+import type { TQueryType } from "../types/queries";
 
 /**
  * Returns a stable function to dispatch synchronous queries.

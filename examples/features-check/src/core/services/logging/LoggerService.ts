@@ -1,7 +1,7 @@
-import { EGlobalQuery } from '@/core/queries';
-import { CounterService } from '@/core/services/counter/CounterService';
-import { ThemeService } from '@/core/services/theme/ThemeService';
-import { EGlobalSignal } from '@/core/signals';
+import { EGlobalQuery } from "@/core/queries";
+import { CounterService } from "@/core/services/counter/CounterService";
+import { ThemeService } from "@/core/services/theme/ThemeService";
+import { EGlobalSignal } from "@/core/signals";
 import {
   AbstractService,
   Action,
@@ -11,7 +11,7 @@ import {
   OnSignal,
   ShallowObservable,
   type Signal,
-} from '@/libs/ioc';
+} from "@/libs/ioc";
 
 export interface ILogEntry {
   readonly id: number;
@@ -63,7 +63,7 @@ export class LoggerService extends AbstractService {
     const entry: ILogEntry = {
       id: this.nextId++,
       type:
-        typeof signal.type === 'symbol' ? signal.type.toString() : signal.type,
+        typeof signal.type === "symbol" ? signal.type.toString() : signal.type,
       payload: signal.payload,
       at: Date.now(),
     };
@@ -78,7 +78,7 @@ export class LoggerService extends AbstractService {
   }
 
   public log(...args: Array<unknown>): void {
-    window.console.log('[log]', ...args);
+    window.console.log("[log]", ...args);
   }
 
   @OnSignal(EGlobalSignal.DUMP)

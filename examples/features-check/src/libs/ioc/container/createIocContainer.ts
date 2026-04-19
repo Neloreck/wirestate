@@ -1,14 +1,14 @@
-import { Container } from 'inversify';
+import { Container } from "inversify";
 
-import { InitialState } from '../initial-state/InitialState';
-import { QueryBus } from '../queries/QueryBus';
+import { InitialState } from "../initial-state/InitialState";
+import { QueryBus } from "../queries/QueryBus";
 import {
   INITIAL_STATE_SHARED_TOKEN,
   INITIAL_STATE_TOKEN,
   QUERY_BUS_TOKEN,
   SIGNAL_BUS_TOKEN,
-} from '../registry';
-import { SignalBus } from '../signals/SignalBus';
+} from "../registry";
+import { SignalBus } from "../signals/SignalBus";
 
 export interface ICreateIocContainerOptions {
   /**
@@ -26,7 +26,7 @@ export function createIocContainer(
   options: ICreateIocContainerOptions = {},
 ): Container {
   const container: Container = new Container({
-    defaultScope: 'Singleton',
+    defaultScope: "Singleton",
     parent: options.parent,
   });
 

@@ -1,10 +1,10 @@
-import type { Container } from 'inversify';
+import type { Container } from "inversify";
 import {
   type Context,
   createContext,
   type Dispatch,
   type SetStateAction,
-} from 'react';
+} from "react";
 
 /**
  * React context value.
@@ -31,4 +31,4 @@ export interface IIocContext {
 export const IocContext: Context<IIocContext | null> =
   createContext<IIocContext | null>(null);
 
-IocContext.displayName = 'IocContext';
+IocContext.displayName = "IocContext";

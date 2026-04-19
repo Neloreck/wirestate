@@ -1,4 +1,4 @@
-'use no memo';
+"use no memo";
 
 import {
   type FC,
@@ -7,14 +7,14 @@ import {
   useEffect,
   useMemo,
   useState,
-} from 'react';
+} from "react";
 
-import { bindService } from '../container/bindService';
-import { applyInitialState } from '../initial-state/applyInitialState';
-import type { TAnyObject } from '../types/general';
-import type { TInitialStateEntries } from '../types/initial-state';
-import type { TServiceClass } from '../types/services';
-import { type IIocContext, IocContext } from './IocContext';
+import { bindService } from "../container/bindService";
+import { applyInitialState } from "../initial-state/applyInitialState";
+import type { TAnyObject } from "../types/general";
+import type { TInitialStateEntries } from "../types/initial-state";
+import type { TServiceClass } from "../types/services";
+import { type IIocContext, IocContext } from "./IocContext";
 
 /**
  * Props for the component returned by {@link createServicesProvider}.
@@ -78,7 +78,7 @@ export function createServicesProvider(
 
     if (!iocContext) {
       throw new Error(
-        '[ioc] <ServicesProvider> must be rendered inside an <IocProvider>.',
+        "[ioc] <ServicesProvider> must be rendered inside an <IocProvider>.",
       );
     }
 
@@ -156,7 +156,7 @@ export function createServicesProvider(
     return props.children;
   }
 
-  ServicesProviderComponent.displayName = 'ServicesProvider';
+  ServicesProviderComponent.displayName = "ServicesProvider";
 
   return ServicesProviderComponent;
 }

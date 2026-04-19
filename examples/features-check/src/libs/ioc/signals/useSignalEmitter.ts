@@ -1,10 +1,10 @@
-import { Container } from 'inversify';
-import { useCallback } from 'react';
+import { Container } from "inversify";
+import { useCallback } from "react";
 
-import { useIocContext } from '../provision/useIocContext';
-import { SIGNAL_BUS_TOKEN } from '../registry';
-import { SignalBus } from '../signals/SignalBus';
-import type { ISignal, TSignalEmitter } from '../types/signals';
+import { useIocContext } from "../provision/useIocContext";
+import { SIGNAL_BUS_TOKEN } from "../registry";
+import { SignalBus } from "../signals/SignalBus";
+import type { ISignal, TSignalEmitter } from "../types/signals";
 
 /**
  * Returns a stable function to emit signals.

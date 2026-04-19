@@ -1,10 +1,10 @@
-'use no memo';
+"use no memo";
 
-import type { Container } from 'inversify';
-import { type FC, type ReactNode, useMemo, useState } from 'react';
+import type { Container } from "inversify";
+import { type FC, type ReactNode, useMemo, useState } from "react";
 
-import { createIocContainer } from '../container/createIocContainer';
-import { type IIocContext, IocContext } from './IocContext';
+import { createIocContainer } from "../container/createIocContainer";
+import { type IIocContext, IocContext } from "./IocContext";
 
 /**
  * Props for {@link IocProvider}.
@@ -41,7 +41,7 @@ export const IocProvider: FC<IocProviderProps> = ({
 
   if (!container) {
     throw new Error(
-      '[ioc] IocProvider failed to resolve a container instance.',
+      "[ioc] IocProvider failed to resolve a container instance.",
     );
   }
 

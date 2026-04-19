@@ -1,9 +1,9 @@
-import type { TAnyObject } from '@/libs/ioc/types/general';
+import type { TAnyObject } from "@/libs/ioc/types/general";
 
 import type {
   TInitialStateEntries,
   TInitialStateKey,
-} from '../types/initial-state';
+} from "../types/initial-state";
 
 /**
  * Container-scoped storage for service seeds.

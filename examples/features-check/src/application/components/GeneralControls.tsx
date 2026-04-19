@@ -1,16 +1,16 @@
-import './GeneralControls.css';
+import "./GeneralControls.css";
 
-import { useCallback } from 'react';
+import { useCallback } from "react";
 
-import { CounterService } from '@/core/services/counter';
-import { ThemeService } from '@/core/services/theme';
-import { EGlobalSignal } from '@/core/signals';
+import { CounterService } from "@/core/services/counter";
+import { ThemeService } from "@/core/services/theme";
+import { EGlobalSignal } from "@/core/signals";
 import {
   observer,
   type SignalEmitter,
   useService,
   useSignalEmitter,
-} from '@/libs/ioc';
+} from "@/libs/ioc";
 
 export const GeneralControls = observer(() => {
   const counterService: CounterService = useService(CounterService);
@@ -34,39 +34,39 @@ export const GeneralControls = observer(() => {
   }, [emitSignal]);
 
   return (
-    <div className={'general-controls'}>
+    <div className={"general-controls"}>
       <div>
         <h2>Wirestate Playground</h2>
         <p>mobx observables + inversify container + custom signals/queries</p>
       </div>
 
-      <div className={'counter-row'}>
+      <div className={"counter-row"}>
         <button
-          className={'counter'}
+          className={"counter"}
           onClick={() => counterService.increment()}
         >
           Count is {counterService.count} (
-          {counterService.isEven ? 'even' : 'odd'})
+          {counterService.isEven ? "even" : "odd"})
         </button>
         <button
-          className={'counter ghost'}
+          className={"counter ghost"}
           onClick={() => counterService.reset()}
         >
           Reset
         </button>
 
         <button
-          className={'counter ghost'}
+          className={"counter ghost"}
           onClick={() => themeService.toggle()}
         >
           Theme: {themeService.theme}
         </button>
 
-        <button className={'counter ghost'} onClick={() => onUserPinged()}>
+        <button className={"counter ghost"} onClick={() => onUserPinged()}>
           Ping (signal)
         </button>
 
-        <button className={'counter ghost'} onClick={() => onDumpData()}>
+        <button className={"counter ghost"} onClick={() => onDumpData()}>
           Dump services
         </button>
       </div>

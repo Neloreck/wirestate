@@ -2,7 +2,7 @@ import type {
   ISignal,
   TSignalHandler,
   TSignalUnsubscribe,
-} from '../types/signals';
+} from "../types/signals";
 
 /**
  * Dispatches signals to subscribers.
@@ -25,7 +25,7 @@ export class SignalBus {
         handler(signal);
       } catch (error) {
         // Prevent one failing listener from stalling the entire bus.
-        console.error('[ioc] Signal handler threw:', error);
+        console.error("[ioc] Signal handler threw:", error);
       }
     }
   }
