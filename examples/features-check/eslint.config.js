@@ -3,9 +3,9 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import eslintConfigPrettier from "eslint-config-prettier";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
-import simpleImportSort from "eslint-plugin-simple-import-sort";
 import globals from "globals";
 import tseslint from "typescript-eslint";
+import _import from "eslint-plugin-import";
 
 export default defineConfig([
   globalIgnores(["dist", "**/wirestate.js", "**/wirestate.d.ts"]),
@@ -19,12 +19,36 @@ export default defineConfig([
       eslintConfigPrettier,
     ],
     plugins: {
-      "simple-import-sort": simpleImportSort,
+      import: _import,
     },
     rules: {
-      "simple-import-sort/imports": "error",
-      "simple-import-sort/exports": "error",
       semi: ["error", "always"],
+      "import/default": "off",
+      "import/no-unresolved": "off",
+      "import/order": [
+        "error",
+        {
+          alphabetize: {
+            caseInsensitive: true,
+            order: "asc",
+          },
+          groups: ["builtin", "external", "parent", "sibling", "index"],
+          "newlines-between": "always",
+          pathGroups: [
+            {
+              group: "external",
+              pattern: "@/macroses/**",
+              position: "after",
+            },
+            {
+              group: "external",
+              pattern: "@/**",
+              position: "after",
+            },
+          ],
+          pathGroupsExcludedImportTypes: ["builtin"],
+        },
+      ],
     },
     languageOptions: {
       ecmaVersion: 2020,
