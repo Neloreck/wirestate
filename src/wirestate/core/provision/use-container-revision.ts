@@ -1,4 +1,4 @@
-import { useIocContext } from "./useIocContext";
+import { useIocContext } from "@/wirestate/core/provision/use-ioc-context";
 
 /**
  * Returns the current container revision.

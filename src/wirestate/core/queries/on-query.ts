@@ -1,3 +1,6 @@
+import { log } from "@/macroses/log.macro";
+import { prefix } from "@/macroses/prefix.macro";
+
 import { QUERY_HANDLER_METADATA } from "@/wirestate/core/registry";
 import type { TQueryType } from "@/wirestate/types/queries";
 
@@ -9,12 +12,20 @@ import type { TQueryType } from "@/wirestate/types/queries";
  */
 export function OnQuery(type: TQueryType): MethodDecorator {
   return (target, propertyKey) => {
-    const ctor = target.constructor;
-    let list = QUERY_HANDLER_METADATA.get(ctor);
+    log.info(prefix(__filename), "Attaching OnQuery metadata:", {
+      name: target.constructor.name,
+      type,
+      propertyKey,
+      target,
+      constructor: target.constructor,
+    });
+
+    const constructor = target.constructor;
+    let list = QUERY_HANDLER_METADATA.get(constructor);
 
     if (!list) {
       list = [];
-      QUERY_HANDLER_METADATA.set(ctor, list);
+      QUERY_HANDLER_METADATA.set(constructor, list);
     }
 
     // Register handler metadata for prototype-based retrieval.

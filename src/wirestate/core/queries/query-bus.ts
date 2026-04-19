@@ -58,6 +58,8 @@ export class QueryBus {
    * @returns query result
    *
    * @throws if no handler is registered
+   *
+   * todo: Return null or standardized query response object, avoid throwing.
    */
   public query<R = unknown, D = unknown>(type: TQueryType, data?: D): R | Promise<R> {
     const stack = this.handlers.get(type);

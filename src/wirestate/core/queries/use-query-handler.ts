@@ -1,11 +1,10 @@
 import { Container } from "inversify";
 import { useEffect, useRef } from "react";
 
-import { useContainer } from "@/wirestate/core/provision/useContainer";
+import { useContainer } from "@/wirestate/core/provision/use-container";
+import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
 import type { TQueryHandler, TQueryType } from "@/wirestate/types/queries";
-
-import type { QueryBus } from "./QueryBus";
 
 /**
  * Registers a query handler for the component's lifetime.

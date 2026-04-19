@@ -1,11 +1,10 @@
 import { Container } from "inversify";
 import { useEffect, useMemo, useRef } from "react";
 
-import { useIocContext } from "@/wirestate/core/provision/useIocContext";
+import { useIocContext } from "@/wirestate/core/provision/use-ioc-context";
 import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
+import { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import type { TSignalHandler, TSignalType } from "@/wirestate/types/signals";
-
-import { SignalBus } from "./SignalBus";
 
 export function useSignal(handler: TSignalHandler): void;
 export function useSignal(type: TSignalType | ReadonlyArray<TSignalType>, handler: TSignalHandler): void;

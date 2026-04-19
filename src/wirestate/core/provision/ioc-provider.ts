@@ -1,9 +1,10 @@
 import { Container } from "inversify";
 import { createElement, type FC, type ReactNode, useMemo, useState } from "react";
 
-import { createIocContainer } from "@/wirestate/core/container/createIocContainer";
-
-import { type IIocContext, IocContext } from "./IocContext";
+import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
+import { ERROR_CODE_FAILED_TO_RESOLVE } from "@/wirestate/core/error/error-code";
+import { WirestateError } from "@/wirestate/core/error/wirestate-error";
+import { type IIocContext, IocContext } from "@/wirestate/core/provision/ioc-context";
 
 /**
  * Props for {@link IocProvider}.
@@ -30,14 +31,13 @@ export interface IIocProviderProps {
 export const IocProvider: FC<IIocProviderProps> = ({ container: externalContainer, children }) => {
   // Incremented on binding changes to invalidate descendant caches (e.g., useService).
   const [revision, setRevision] = useState<number>(0);
-
   // Lazy initialize owned container if no external container is provided.
   const [ownedContainer] = useState<Container | null>(() => (externalContainer ? null : createIocContainer()));
 
   const container = externalContainer ?? ownedContainer;
 
   if (!container) {
-    throw new Error("[ioc] IocProvider failed to resolve a container instance.");
+    throw new WirestateError(ERROR_CODE_FAILED_TO_RESOLVE, "[ioc] IocProvider failed to resolve a container instance.");
   }
 
   // Context value is stable unless the container or revision changes.

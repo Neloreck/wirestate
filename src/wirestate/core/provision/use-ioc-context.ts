@@ -2,8 +2,7 @@ import { useContext } from "react";
 
 import { ERROR_CODE_INVALID_CONTEXT } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
-
-import { type IIocContext, IocContext } from "./IocContext";
+import { type IIocContext, IocContext } from "@/wirestate/core/provision/ioc-context";
 
 /**
  * Returns the full IoC context.

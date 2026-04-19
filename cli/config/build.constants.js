@@ -16,6 +16,7 @@ export const PKG_ROOT = path.resolve(TARGET_ROOT, "./pkg");
 export const DIST_ROOT = path.resolve(TARGET_ROOT, "./dist");
 export const ESM_ROOT = path.resolve(DIST_ROOT, "./esm");
 export const PORTABLE_ROOT = path.resolve(DIST_ROOT, "./portable");
+export const PORTABLE_DEBUG_ROOT = path.resolve(DIST_ROOT, "./portable-debug");
 export const CJS_ROOT = path.resolve(DIST_ROOT, "./cjs");
 export const TYPES_ROOT = path.resolve(DIST_ROOT, "./dts");
 export const STATS_ROOT = path.resolve(DIST_ROOT, "./stats");

@@ -3,8 +3,8 @@ import { Container, type Newable, type ServiceIdentifier } from "inversify";
 import { log } from "@/macroses/log.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { getQueryHandlerMetadata } from "@/wirestate/core/queries/getQueryHandlerMetadata";
-import { QueryBus } from "@/wirestate/core/queries/QueryBus";
+import { getQueryHandlerMetadata } from "@/wirestate/core/queries/get-query-handler-metadata";
+import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import {
   CONTAINER_REFS_BY_SERVICE,
   QUERY_BUS_TOKEN,
@@ -13,8 +13,8 @@ import {
   SIGNAL_UNSUBSCRIBERS_BY_SERVICE,
 } from "@/wirestate/core/registry";
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
-import { buildSignalDispatcher } from "@/wirestate/core/signals/buildSignalDispatcher";
-import type { SignalBus } from "@/wirestate/core/signals/SignalBus";
+import { buildSignalDispatcher } from "@/wirestate/core/signals/build-signal-dispatcher";
+import type { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import type { TQueryHandler, TQueryUnregister } from "@/wirestate/types/queries";
 import type { TSignalHandler } from "@/wirestate/types/signals";
 
@@ -35,15 +35,23 @@ export function bindService<T extends AbstractService>(
   isWithBindingCheck?: boolean,
   isWithIgnoreLifecycle?: boolean
 ): void {
-  log.info(prefix(__filename), "Providing services on mount:", {
-    container,
+  log.info(prefix(__filename), "Binding service:", {
+    name: ServiceClass.name,
     token,
     ServiceClass,
     isWithBindingCheck,
     isWithIgnoreLifecycle,
+    container,
   });
 
   if (isWithBindingCheck && container.isBound(token)) {
+    log.info(prefix(__filename), "Skip binding service on mount, bound already:", {
+      name: ServiceClass.name,
+      container,
+      token,
+      ServiceClass,
+    });
+
     return;
   }
 
@@ -58,7 +66,16 @@ export function bindService<T extends AbstractService>(
     return;
   }
 
-  whenBind.onActivation((_ctx, instance) => {
+  whenBind.onActivation((ctx, instance) => {
+    log.info(prefix(__filename), "Activating service:", {
+      name: ServiceClass.name,
+      ctx,
+      container,
+      token,
+      ServiceClass,
+      instance,
+    });
+
     CONTAINER_REFS_BY_SERVICE.set(instance, container);
 
     // Compose all signal listeners (the catch-all `onSignal` hook plus every
@@ -102,6 +119,14 @@ export function bindService<T extends AbstractService>(
   });
 
   whenBind.onDeactivation((instance) => {
+    log.info(prefix(__filename), "Deactivating service:", {
+      name: ServiceClass.name,
+      container,
+      token,
+      ServiceClass,
+      instance,
+    });
+
     // Flip the public disposal flag first so any async work already in
     // flight (fetches awaiting in @Action methods, scheduled reactions,
     // etc.) can short-circuit before it mutates the about-to-die instance.

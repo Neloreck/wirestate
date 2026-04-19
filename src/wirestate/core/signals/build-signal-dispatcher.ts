@@ -1,7 +1,9 @@
-import { AbstractService } from "@/wirestate/core/service/abstract-service";
-import type { ISignalDispatchEntry, TSignalHandler } from "@/wirestate/types/signals";
+import { log } from "@/macroses/log.macro";
+import { prefix } from "@/macroses/prefix.macro";
 
-import { getSignalHandlerMetadata } from "./getSignalHandlerMetadata";
+import { AbstractService } from "@/wirestate/core/service/abstract-service";
+import { getSignalHandlerMetadata } from "@/wirestate/core/signals/get-signal-handler-metadata";
+import type { ISignalDispatchEntry, TSignalHandler } from "@/wirestate/types/signals";
 
 /**
  * Composes service signal handlers into a single dispatcher.
@@ -11,6 +13,8 @@ import { getSignalHandlerMetadata } from "./getSignalHandlerMetadata";
  * @internal
  */
 export function buildSignalDispatcher(instance: AbstractService): TSignalHandler | null {
+  log.info(prefix(__filename), "Build signal dispatcher for:", { name: instance.constructor.name, instance });
+
   const entries: Array<ISignalDispatchEntry> = [];
 
   // Register catch-all hook if present.
@@ -38,6 +42,12 @@ export function buildSignalDispatcher(instance: AbstractService): TSignalHandler
   if (entries.length === 0) {
     return null;
   }
+
+  log.info(prefix(__filename), "Built signal dispatcher for:", {
+    name: instance.constructor.name,
+    instance,
+    entries,
+  });
 
   return (signal) => {
     // Fan out signals to all matching handlers.

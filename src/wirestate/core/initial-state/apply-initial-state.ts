@@ -1,10 +1,11 @@
 import type { Container } from "inversify";
 
+import { log } from "@/macroses/log.macro";
+
+import { InitialState } from "@/wirestate/core/initial-state/initial-state";
 import { INITIAL_STATE_SHARED_TOKEN, INITIAL_STATE_TOKEN } from "@/wirestate/core/registry";
 import type { TAnyObject } from "@/wirestate/types/general";
 import type { TInitialStateEntries } from "@/wirestate/types/initial-state";
-
-import { InitialState } from "./InitialState";
 
 /**
  * Binds or rebinds an {@link InitialState} to the container.
@@ -19,13 +20,17 @@ export function applyInitialState(
   bound: TInitialStateEntries = []
 ): void {
   // We create a fresh map on every application to ensure container isolation and snapshot stability.
-  const next: InitialState = new InitialState(shared, bound);
+  const nextInitialState: InitialState = new InitialState(shared, bound);
 
   if (container.isBound(INITIAL_STATE_TOKEN)) {
-    container.rebind<InitialState>(INITIAL_STATE_TOKEN).toConstantValue(next);
-    container.rebind<TAnyObject>(INITIAL_STATE_SHARED_TOKEN).toConstantValue(next.getShared());
+    log.info("Rebinding initial state for container:", { nextInitialState, container });
+
+    container.rebind<InitialState>(INITIAL_STATE_TOKEN).toConstantValue(nextInitialState);
+    container.rebind<TAnyObject>(INITIAL_STATE_SHARED_TOKEN).toConstantValue(nextInitialState.getShared());
   } else {
-    container.bind<InitialState>(INITIAL_STATE_TOKEN).toConstantValue(next);
-    container.bind<TAnyObject>(INITIAL_STATE_SHARED_TOKEN).toConstantValue(next.getShared());
+    log.info("Binding initial state for container:", { nextInitialState, container });
+
+    container.bind<InitialState>(INITIAL_STATE_TOKEN).toConstantValue(nextInitialState);
+    container.bind<TAnyObject>(INITIAL_STATE_SHARED_TOKEN).toConstantValue(nextInitialState.getShared());
   }
 }

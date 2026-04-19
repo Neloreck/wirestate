@@ -1,6 +1,6 @@
 import { Container, ServiceIdentifier } from "inversify";
 
-import { createIocContainer } from "@/wirestate/core/container/createIocContainer";
+import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { mockBindService } from "@/wirestate/test-utils/mock-bind-service";

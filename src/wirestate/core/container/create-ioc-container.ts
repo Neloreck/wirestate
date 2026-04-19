@@ -1,14 +1,17 @@
 import { Container } from "inversify";
 
-import { InitialState } from "@/wirestate/core/initial-state/InitialState";
-import { QueryBus } from "@/wirestate/core/queries/QueryBus";
+import { log } from "@/macroses/log.macro";
+import { prefix } from "@/macroses/prefix.macro";
+
+import { InitialState } from "@/wirestate/core/initial-state/initial-state";
+import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import {
   INITIAL_STATE_SHARED_TOKEN,
   INITIAL_STATE_TOKEN,
   QUERY_BUS_TOKEN,
   SIGNAL_BUS_TOKEN,
 } from "@/wirestate/core/registry";
-import { SignalBus } from "@/wirestate/core/signals/SignalBus";
+import { SignalBus } from "@/wirestate/core/signals/signal-bus";
 
 export interface ICreateIocContainerOptions {
   /**
@@ -24,6 +27,8 @@ export interface ICreateIocContainerOptions {
  * @returns new IoC container
  */
 export function createIocContainer(options: ICreateIocContainerOptions = {}): Container {
+  log.info(prefix(__filename), "Creating IOC container:", { options });
+
   const container: Container = new Container({
     defaultScope: "Singleton",
     parent: options.parent,
@@ -35,6 +40,8 @@ export function createIocContainer(options: ICreateIocContainerOptions = {}): Co
   container.bind(QUERY_BUS_TOKEN).toConstantValue(new QueryBus());
   container.bind(INITIAL_STATE_TOKEN).toConstantValue(new InitialState());
   container.bind(INITIAL_STATE_SHARED_TOKEN).toConstantValue(initialState.getShared());
+
+  log.info(prefix(__filename), "Created IOC container:", { container, options, initialState });
 
   return container;
 }

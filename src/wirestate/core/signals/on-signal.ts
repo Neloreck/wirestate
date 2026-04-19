@@ -1,4 +1,9 @@
-import { SIGNAL_HANDLER_METADATA } from "@/wirestate/core/registry";
+import { type } from "@testing-library/user-event/dist/type";
+
+import { log } from "@/macroses/log.macro";
+import { prefix } from "@/macroses/prefix.macro";
+
+import { QUERY_HANDLER_METADATA, SIGNAL_HANDLER_METADATA } from "@/wirestate/core/registry";
 import type { TSignalType } from "@/wirestate/types/signals";
 
 /**
@@ -17,12 +22,20 @@ export function OnSignal(types?: TSignalType | ReadonlyArray<TSignalType>): Meth
         : [types as TSignalType];
 
   return (target, propertyKey) => {
-    const ctor = target.constructor;
-    let list = SIGNAL_HANDLER_METADATA.get(ctor);
+    log.info(prefix(__filename), "Attaching OnSignal metadata:", {
+      name: target.constructor.name,
+      types,
+      propertyKey,
+      target,
+      constructor: target.constructor,
+    });
+
+    const constructor = target.constructor;
+    let list = SIGNAL_HANDLER_METADATA.get(constructor);
 
     if (!list) {
       list = [];
-      SIGNAL_HANDLER_METADATA.set(ctor, list);
+      SIGNAL_HANDLER_METADATA.set(constructor, list);
     }
 
     // Register handler metadata for prototype-based retrieval.

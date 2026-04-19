@@ -1,11 +1,13 @@
 import { Container } from "inversify";
 import { useCallback } from "react";
 
-import { useIocContext } from "@/wirestate/core/provision/useIocContext";
-import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
-import type { ISignal, TSignalEmitter } from "@/wirestate/types/signals";
+import { log } from "@/macroses/log.macro";
+import { prefix } from "@/macroses/prefix.macro";
 
-import { SignalBus } from "./SignalBus";
+import { useIocContext } from "@/wirestate/core/provision/use-ioc-context";
+import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
+import { SignalBus } from "@/wirestate/core/signals/signal-bus";
+import type { ISignal, TSignalEmitter } from "@/wirestate/types/signals";
 
 /**
  * Returns a stable function to emit signals.
@@ -17,6 +19,11 @@ export function useSignalEmitter(): TSignalEmitter {
 
   return useCallback(
     (signal: ISignal) => {
+      log.info(prefix(__filename), "Emit signal:", {
+        type: signal?.type,
+        signal,
+      });
+
       container.get<SignalBus>(SIGNAL_BUS_TOKEN).emit(signal);
     },
     [container]

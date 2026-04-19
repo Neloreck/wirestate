@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 
-import { useIocContext } from "./useIocContext";
+import { useIocContext } from "@/wirestate/core/provision/use-ioc-context";
 
 /**
  * Returns the active IoC container.

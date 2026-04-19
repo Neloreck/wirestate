@@ -3,7 +3,7 @@ import { Container } from "inversify";
 
 import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
 import { GenericService } from "@/fixtures/services/generic-service";
-import { useIocContext } from "@/wirestate/core/provision/useIocContext";
+import { useIocContext } from "@/wirestate/core/provision/use-ioc-context";
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
 import { useService } from "@/wirestate/core/service/use-service";
 import { mockContainer } from "@/wirestate/test-utils/mock-container";
