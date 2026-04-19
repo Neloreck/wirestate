@@ -1,3 +1,6 @@
+import { dbg } from "@/macroses/dbg.macro";
+import { prefix } from "@/macroses/prefix.macro";
+
 import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
 import type { ISignal, TSignalHandler, TSignalUnsubscribe } from "@/wirestate/types/signals";
 
@@ -6,7 +9,7 @@ import type { ISignal, TSignalHandler, TSignalUnsubscribe } from "@/wirestate/ty
  * Scoped to a container under {@link SIGNAL_BUS_TOKEN}.
  */
 export class SignalBus {
-  private readonly handlers = new Set<TSignalHandler>();
+  private readonly handlers: Set<TSignalHandler> = new Set();
 
   /**
    * Broadcasts a signal to all subscribers.
@@ -15,14 +18,14 @@ export class SignalBus {
    */
   public emit<S extends ISignal>(signal: S): void {
     // Snapshot prevents concurrent modification errors if handlers sub/unsub during emit.
-    const snapshot = Array.from(this.handlers);
+    const snapshot: Array<TSignalHandler> = Array.from(this.handlers);
 
     for (const handler of snapshot) {
       try {
         handler(signal);
       } catch (error) {
         // Prevent one failing listener from stalling the entire bus.
-        console.error("[ioc] Signal handler threw:", error);
+        console.error("[wirestate] Signal handler threw:", error);
       }
     }
   }
@@ -35,9 +38,19 @@ export class SignalBus {
    * @returns unsubscribe function
    */
   public subscribe(handler: TSignalHandler): TSignalUnsubscribe {
+    dbg.info(prefix(__filename), "Adding signal subscription:", {
+      handler,
+      bus: this,
+    });
+
     this.handlers.add(handler);
 
     return () => {
+      dbg.info(prefix(__filename), "Removing signal subscription:", {
+        handler,
+        bus: this,
+      });
+
       this.handlers.delete(handler);
     };
   }

@@ -2,8 +2,8 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { SIGNAL_HANDLER_METADATA } from "@/wirestate/core/registry";
-import type { Optional } from "@/wirestate/types/general";
-import type { TSignalType } from "@/wirestate/types/signals";
+import type { Maybe, Optional } from "@/wirestate/types/general";
+import type { ISignalHandlerMetadata, TSignalType } from "@/wirestate/types/signals";
 
 /**
  * Decorator for service methods that respond to signals.
@@ -30,7 +30,8 @@ export function OnSignal(types?: TSignalType | ReadonlyArray<TSignalType>): Meth
     });
 
     const constructor = target.constructor;
-    let list = SIGNAL_HANDLER_METADATA.get(constructor);
+
+    let list: Maybe<Array<ISignalHandlerMetadata>> = SIGNAL_HANDLER_METADATA.get(constructor);
 
     if (!list) {
       list = [];

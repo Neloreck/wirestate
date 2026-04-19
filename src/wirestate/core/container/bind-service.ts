@@ -111,7 +111,7 @@ export function bindService<T extends AbstractService>(
     // bootstrapping can await their initialization elsewhere.
     if (result && typeof (result as Promise<void>).then === "function") {
       (result as Promise<void>).catch((error) => {
-        console.error("[ioc] onActivated rejected for:", ServiceClass.name, error);
+        console.error("[wirestate] onActivated rejected for:", ServiceClass.name, error);
       });
     }
 
@@ -150,15 +150,11 @@ export function bindService<T extends AbstractService>(
  * @internal
  */
 export function _attachSignalSub(service: AbstractService, handler: TSignalHandler): void {
-  const bus = CONTAINER_REFS_BY_SERVICE.get(service)?.get<SignalBus>(SIGNAL_BUS_TOKEN);
+  const bus: Maybe<SignalBus> = CONTAINER_REFS_BY_SERVICE.get(service)?.get<SignalBus>(SIGNAL_BUS_TOKEN);
 
-  if (!bus) {
-    return;
+  if (bus) {
+    SIGNAL_UNSUBSCRIBERS_BY_SERVICE.set(service, bus.subscribe(handler));
   }
-
-  const unsub = bus.subscribe(handler);
-
-  SIGNAL_UNSUBSCRIBERS_BY_SERVICE.set(service, unsub);
 }
 
 /**
@@ -168,10 +164,10 @@ export function _attachSignalSub(service: AbstractService, handler: TSignalHandl
  * @internal
  */
 export function _detachSignalSub(service: AbstractService): void {
-  const unsub: Maybe<TSignalUnsubscribe> = SIGNAL_UNSUBSCRIBERS_BY_SERVICE.get(service);
+  const unsubscribe: Maybe<TSignalUnsubscribe> = SIGNAL_UNSUBSCRIBERS_BY_SERVICE.get(service);
 
-  if (unsub) {
-    unsub();
+  if (unsubscribe) {
+    unsubscribe();
     SIGNAL_UNSUBSCRIBERS_BY_SERVICE.delete(service);
   }
 }
@@ -184,7 +180,7 @@ export function _detachSignalSub(service: AbstractService): void {
  * @internal
  */
 export function _attachQueryUnreg(service: AbstractService, unregister: TQueryUnregister): void {
-  let list = QUERY_UNREGISTERS_BY_SERVICE.get(service);
+  let list: Maybe<Array<TQueryUnregister>> = QUERY_UNREGISTERS_BY_SERVICE.get(service);
 
   if (!list) {
     list = [];
@@ -201,17 +197,17 @@ export function _attachQueryUnreg(service: AbstractService, unregister: TQueryUn
  * @internal
  */
 export function _detachQueryUnregs(service: AbstractService): void {
-  const list = QUERY_UNREGISTERS_BY_SERVICE.get(service);
+  const list: Maybe<Array<TQueryUnregister>> = QUERY_UNREGISTERS_BY_SERVICE.get(service);
 
   if (!list) {
     return;
   }
 
-  for (const unreg of list) {
+  for (const unregister of list) {
     try {
-      unreg();
+      unregister();
     } catch (error) {
-      console.error("[ioc] query unregister threw:", error);
+      console.error("[wirestate] query unregister threw:", error);
     }
   }
 

@@ -2,6 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { SIGNAL_HANDLER_METADATA } from "@/wirestate/core/registry";
+import { Maybe } from "@/wirestate/types/general";
 import type { ISignalHandlerMetadata } from "@/wirestate/types/signals";
 
 /**
@@ -15,18 +16,19 @@ import type { ISignalHandlerMetadata } from "@/wirestate/types/signals";
 export function getSignalHandlerMetadata(instance: object): ReadonlyArray<ISignalHandlerMetadata> {
   dbg.info(prefix(__filename), "Retrieving signal handler metadata:", { name: instance.constructor.name, instance });
 
+  let constructor: unknown = instance.constructor;
+
   const chain: Array<Array<ISignalHandlerMetadata>> = [];
-  let ctor: unknown = instance.constructor;
 
   // Traverse prototype chain up to Object/Function
-  while (typeof ctor === "function" && ctor !== Object && ctor !== Function.prototype) {
-    const own = SIGNAL_HANDLER_METADATA.get(ctor as object);
+  while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
+    const own: Maybe<Array<ISignalHandlerMetadata>> = SIGNAL_HANDLER_METADATA.get(constructor as object);
 
     if (own && own.length > 0) {
       chain.push(own);
     }
 
-    ctor = Object.getPrototypeOf(ctor);
+    constructor = Object.getPrototypeOf(constructor);
   }
 
   dbg.info(prefix(__filename), "Retrieved signal handler metadata:", {

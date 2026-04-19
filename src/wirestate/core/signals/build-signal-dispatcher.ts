@@ -18,7 +18,7 @@ export function buildSignalDispatcher(instance: AbstractService): Optional<TSign
 
   const entries: Array<ISignalDispatchEntry> = [];
 
-  // Register catch-all hook if present.
+  // Register catch-all hook if present on children function.
   if (typeof instance.onSignal === "function") {
     entries.push({
       types: null,
@@ -30,32 +30,36 @@ export function buildSignalDispatcher(instance: AbstractService): Optional<TSign
   for (const meta of getSignalHandlerMetadata(instance)) {
     const method = (instance as unknown as Record<string | symbol, unknown>)[meta.methodName];
 
-    if (typeof method !== "function") {
-      continue;
+    if (typeof method === "function") {
+      entries.push({
+        types: meta.types,
+        handler: (method as TSignalHandler).bind(instance),
+      });
     }
-
-    entries.push({
-      types: meta.types,
-      handler: (method as TSignalHandler).bind(instance),
-    });
   }
 
-  if (entries.length === 0) {
+  if (entries.length) {
+    dbg.info(prefix(__filename), "Built signal dispatcher for:", {
+      name: instance.constructor.name,
+      instance,
+      entries,
+    });
+
+    return (signal) => {
+      // Fan out signals to all matching handlers.
+      for (const entry of entries) {
+        if (entry.types === null || entry.types.includes(signal.type)) {
+          entry.handler(signal);
+        }
+      }
+    };
+  } else {
+    dbg.info(prefix(__filename), "Skip bulding signal dispatcher for:", {
+      name: instance.constructor.name,
+      instance,
+      entries,
+    });
+
     return null;
   }
-
-  dbg.info(prefix(__filename), "Built signal dispatcher for:", {
-    name: instance.constructor.name,
-    instance,
-    entries,
-  });
-
-  return (signal) => {
-    // Fan out signals to all matching handlers.
-    for (const entry of entries) {
-      if (entry.types === null || entry.types.includes(signal.type)) {
-        entry.handler(signal);
-      }
-    }
-  };
 }

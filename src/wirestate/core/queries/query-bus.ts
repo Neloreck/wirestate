@@ -1,7 +1,10 @@
+import { dbg } from "@/macroses/dbg.macro";
+import { prefix } from "@/macroses/prefix.macro";
+
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
-import type { MaybePromise } from "@/wirestate/types/general";
+import type { Maybe, MaybePromise } from "@/wirestate/types/general";
 import type { TQueryHandler, TQueryType, TQueryUnregister } from "@/wirestate/types/queries";
 
 /**
@@ -13,7 +16,7 @@ export class QueryBus {
    * Internal handler storage.
    * Uses a stack for each query type to support shadowing (e.g., component-level vs service-level).
    */
-  private readonly handlers = new Map<TQueryType, TQueryHandler[]>();
+  private readonly handlers: Map<TQueryType, Array<TQueryHandler>> = new Map();
 
   /**
    * Registers a query handler.
@@ -24,7 +27,13 @@ export class QueryBus {
    * @returns unregister function
    */
   public register<D = unknown, R = unknown>(type: TQueryType, handler: TQueryHandler<D, R>): TQueryUnregister {
-    let stack = this.handlers.get(type);
+    dbg.info(prefix(__filename), "Registering query handler:", {
+      type,
+      handler,
+      bus: this,
+    });
+
+    let stack: Maybe<Array<TQueryHandler>> = this.handlers.get(type);
 
     if (!stack) {
       stack = [];
@@ -34,19 +43,25 @@ export class QueryBus {
     stack.push(handler as TQueryHandler);
 
     return () => {
-      const current = this.handlers.get(type);
+      dbg.info(prefix(__filename), "Unregistering query handler:", {
+        type,
+        handler,
+        bus: this,
+      });
+
+      const current: Maybe<Array<TQueryHandler>> = this.handlers.get(type);
 
       if (!current) {
         return;
       }
 
-      const idx = current.indexOf(handler as TQueryHandler);
+      const index: number = current.indexOf(handler as TQueryHandler);
 
-      if (idx >= 0) {
-        current.splice(idx, 1);
+      if (index >= 0) {
+        current.splice(index, 1);
       }
 
-      // Cleanup empty stacks to keep the Map small.
+      // Clean empty stacks.
       if (current.length === 0) {
         this.handlers.delete(type);
       }
@@ -61,24 +76,21 @@ export class QueryBus {
    * @returns query result
    *
    * @throws if no handler is registered
-   *
-   * todo: Return null or standardized query response object, avoid throwing.
    */
   public query<R = unknown, D = unknown>(type: TQueryType, data?: D): MaybePromise<R> {
-    const stack = this.handlers.get(type);
+    const stack: Maybe<Array<TQueryHandler>> = this.handlers.get(type);
 
-    // todo: Return null or standardized query response object, avoid throwing.
-    if (!stack || stack.length === 0) {
-      throw new WirestateError(
-        ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER,
-        `No query handler registered in container for type: '${String(type)}'.`
-      );
+    // Always use the top of the stack (most recent registration) if handlers are available.
+    if (stack?.length) {
+      return (stack[stack.length - 1] as TQueryHandler<D, R>)(data as D);
     }
 
-    // Always use the top of the stack (most recent registration).
-    const top = stack[stack.length - 1] as TQueryHandler<D, R>;
-
-    return top(data as D);
+    // todo: Return null or standardized query response object, avoid throwing.
+    // todo: Or add optional query method for separate approach where it is important to query without exceptions.
+    throw new WirestateError(
+      ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER,
+      `No query handler registered in container for type: '${String(type)}'.`
+    );
   }
 
   /**
@@ -88,9 +100,9 @@ export class QueryBus {
    * @returns true if handler exists
    */
   public has(type: TQueryType): boolean {
-    const stack = this.handlers.get(type);
+    const stack: Maybe<Array<TQueryHandler>> = this.handlers.get(type);
 
-    return stack !== undefined && stack.length > 0;
+    return Boolean(stack && stack.length);
   }
 
   /**

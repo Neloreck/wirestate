@@ -2,6 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { QUERY_HANDLER_METADATA } from "@/wirestate/core/registry";
+import type { Maybe } from "@/wirestate/types/general";
 import type { IQueryHandlerMetadata } from "@/wirestate/types/queries";
 
 /**
@@ -15,12 +16,13 @@ import type { IQueryHandlerMetadata } from "@/wirestate/types/queries";
 export function getQueryHandlerMetadata(instance: object): ReadonlyArray<IQueryHandlerMetadata> {
   dbg.info(prefix(__filename), "Resolving instance query metadata:", { name: instance.constructor.name, instance });
 
-  const chain: Array<Array<IQueryHandlerMetadata>> = [];
   let constructor: unknown = instance.constructor;
+
+  const chain: Array<Array<IQueryHandlerMetadata>> = [];
 
   // Traverse prototype chain up to Object/Function
   while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
-    const own = QUERY_HANDLER_METADATA.get(constructor as object);
+    const own: Maybe<Array<IQueryHandlerMetadata>> = QUERY_HANDLER_METADATA.get(constructor as object);
 
     if (own && own.length > 0) {
       chain.push(own);

@@ -1,7 +1,7 @@
 import { Container } from "inversify";
-import { useEffect, useMemo, useRef } from "react";
+import { MutableRefObject, useEffect, useMemo, useRef } from "react";
 
-import { useIocContext } from "@/wirestate/core/provision/use-ioc-context";
+import { useContainer } from "@/wirestate/core/provision/use-container";
 import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
 import { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import type { Maybe, Optional } from "@/wirestate/types/general";
@@ -20,27 +20,27 @@ export function useSignal(
   typeOrHandler: TSignalType | ReadonlyArray<TSignalType> | TSignalHandler,
   maybeHandler?: TSignalHandler
 ): void {
-  const container: Container = useIocContext().container;
+  const container: Container = useContainer();
+
+  // todo: Possibility to simplify via separation of useSignals / useSignal functions or narrowing down logics here.
 
   const isFilter: boolean =
     typeof typeOrHandler === "string" || typeof typeOrHandler === "symbol" || Array.isArray(typeOrHandler);
 
-  const activeHandler = isFilter ? maybeHandler : (typeOrHandler as TSignalHandler);
+  const activeHandler: Maybe<TSignalHandler> = isFilter ? maybeHandler : (typeOrHandler as TSignalHandler);
+
+  const handlerRef: MutableRefObject<Maybe<TSignalHandler>> = useRef<Maybe<TSignalHandler>>(activeHandler);
 
   // Normalize filter to array for efficient inclusion check during emit.
-  const types = useMemo<Optional<ReadonlyArray<TSignalType>>>(() => {
+  const types: Optional<ReadonlyArray<TSignalType>> = useMemo(() => {
     if (!isFilter) {
       return null;
     }
 
-    if (Array.isArray(typeOrHandler)) {
-      return typeOrHandler as ReadonlyArray<TSignalType>;
-    }
-
-    return [typeOrHandler as TSignalType];
+    return Array.isArray(typeOrHandler)
+      ? (typeOrHandler as ReadonlyArray<TSignalType>)
+      : [typeOrHandler as TSignalType];
   }, [typeOrHandler, isFilter]);
-
-  const handlerRef = useRef<Maybe<TSignalHandler>>(activeHandler);
 
   // Sync handler into ref to avoid re-subscriptions on closure changes.
   useEffect(() => {
@@ -48,7 +48,7 @@ export function useSignal(
   });
 
   useEffect(() => {
-    const bus = container.get<SignalBus>(SIGNAL_BUS_TOKEN);
+    const bus: SignalBus = container.get<SignalBus>(SIGNAL_BUS_TOKEN);
 
     return bus.subscribe((signal) => {
       if (types !== null && !types.includes(signal.type)) {

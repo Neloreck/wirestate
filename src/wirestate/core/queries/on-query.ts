@@ -2,7 +2,8 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { QUERY_HANDLER_METADATA } from "@/wirestate/core/registry";
-import type { TQueryType } from "@/wirestate/types/queries";
+import type { Maybe } from "@/wirestate/types/general";
+import type { IQueryHandlerMetadata, TQueryType } from "@/wirestate/types/queries";
 
 /**
  * Decorator for service methods that respond to a query.
@@ -21,7 +22,8 @@ export function OnQuery(type: TQueryType): MethodDecorator {
     });
 
     const constructor = target.constructor;
-    let list = QUERY_HANDLER_METADATA.get(constructor);
+
+    let list: Maybe<Array<IQueryHandlerMetadata>> = QUERY_HANDLER_METADATA.get(constructor);
 
     if (!list) {
       list = [];
