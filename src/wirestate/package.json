@@ -1,6 +1,6 @@
 {
   "name": "wirestate",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Store management library based on mobx and inversify",
   "sideEffects": false,
   "author": "Syrotenko Igor",
@@ -32,8 +32,7 @@
     "store",
     "typescript"
   ],
-  "dependencies": {
-  },
+  "dependencies": {},
   "peerDependencies": {
     "react": ">=16.8.0",
     "inversify": ">=8.0.0",
