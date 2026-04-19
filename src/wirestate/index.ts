@@ -13,7 +13,7 @@ export {
   createServicesProvider,
   ServicesProvider,
   IServicesProviderProps as ServicesProviderProps,
-} from "@/wirestate/core/provision/createServicesProvider";
+} from "@/wirestate/core/provision/create-services-provider";
 export { IocProvider } from "@/wirestate/core/provision/IocProvider";
 export { useContainer } from "@/wirestate/core/provision/useContainer";
 export { useContainerRevision } from "@/wirestate/core/provision/useContainerRevision";

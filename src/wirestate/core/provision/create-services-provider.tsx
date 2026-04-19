@@ -1,5 +1,8 @@
 import { type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 
+import { log } from "@/macroses/log.macro";
+import { prefix } from "@/macroses/prefix.macro";
+
 import { bindService } from "@/wirestate/core/container/bindService";
 import { applyInitialState } from "@/wirestate/core/initial-state/applyInitialState";
 import type { TAnyObject } from "@/wirestate/types/general";
@@ -76,9 +79,9 @@ export function createServicesProvider(
     // useState lazy initializer ensures it only runs once.
     const [initialPropsSnapshot] = useState<IServicesProviderProps>(() => props);
 
-    // Bind services synchronously on first render so descendants can resolve them immediately.
-    // deps: services array (supports HMR/dynamic service lists).
     useMemo(() => {
+      log.info(prefix(__filename), "Providing services on first render:", services);
+
       // Seed must be applied BEFORE binding so @Inject(INITIAL_STATE_TOKEN) works during activation.
       applyInitialState(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
 
@@ -94,6 +97,8 @@ export function createServicesProvider(
     }, services);
 
     useEffect(() => {
+      log.info(prefix(__filename), "Providing services on mount:", services);
+
       // Re-apply state and re-bind if container was reset (e.g. StrictMode remount or HMR).
       let didRebind: boolean = false;
 
@@ -119,6 +124,8 @@ export function createServicesProvider(
       }
 
       return () => {
+        log.info(prefix(__filename), "Unprovision services on unmount:", services);
+
         // Unbind in reverse order to respect dependencies during onDeactivated.
         for (const service of services) {
           if (iocContext.container.isBound(service)) {

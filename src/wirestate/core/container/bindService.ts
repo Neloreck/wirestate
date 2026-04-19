@@ -1,5 +1,8 @@
 import { Container, type Newable, type ServiceIdentifier } from "inversify";
 
+import { log } from "@/macroses/log.macro";
+import { prefix } from "@/macroses/prefix.macro";
+
 import { getQueryHandlerMetadata } from "@/wirestate/core/queries/getQueryHandlerMetadata";
 import { QueryBus } from "@/wirestate/core/queries/QueryBus";
 import {
@@ -32,6 +35,14 @@ export function bindService<T extends AbstractService>(
   isWithBindingCheck?: boolean,
   isWithIgnoreLifecycle?: boolean
 ): void {
+  log.info(prefix(__filename), "Providing services on mount:", {
+    container,
+    token,
+    ServiceClass,
+    isWithBindingCheck,
+    isWithIgnoreLifecycle,
+  });
+
   if (isWithBindingCheck && container.isBound(token)) {
     return;
   }

@@ -20,23 +20,32 @@ import {
 
 import { BABEL_CONFIG } from "./babel.modern.config";
 
-const createPortableConfig = (env) => ({
+const isLoggingEnabled = process.env.LIB_DEBUG_LOGGING === "true" || process.env.LIB_DEBUG_LOGGING === "1";
+
+const createPortableConfig = (env, name) => ({
   external: ["react", "mobx", "mobx-react-lite", "inversify", "tslib"],
   input: PORTABLE_ENTRY,
   output: {
     compact: env === EEnvironment.PRODUCTION,
-    file: path.resolve(PORTABLE_ROOT, "wirestate.js"),
+    file: path.resolve(PORTABLE_ROOT, name),
     preserveModules: false,
     sourcemap: false,
     format: "es",
     banner: "'use no memo';",
   },
   plugins: [
+    babel({
+      ...BABEL_CONFIG,
+      babelHelpers: "bundled",
+      skipPreflightCheck: true,
+      include: ["src/**/*"],
+      extensions: [".ts", ".tsx", ".js", ".jsx"],
+    }),
     commonjs(),
-    babel({ ...BABEL_CONFIG, babelHelpers: "bundled" }),
     replace({
       preventAssignment: true,
       IS_DEV: env !== EEnvironment.PRODUCTION,
+      __filename: (id) => `"${path.relative(WS_ROOT, id)}"`,
     }),
     typescript({
       sourceMap: false,
@@ -54,10 +63,10 @@ const createPortableConfig = (env) => ({
   ],
 });
 
-const createPortableDtsConfig = (env) => ({
+const createPortableDtsConfig = (env, name) => ({
   input: [PORTABLE_ENTRY],
   output: {
-    file: path.resolve(PORTABLE_ROOT, "wirestate.d.ts"),
+    file: path.resolve(PORTABLE_ROOT, name),
     format: "es",
   },
   plugins: [
@@ -71,4 +80,7 @@ const createPortableDtsConfig = (env) => ({
   ],
 });
 
-export default [createPortableDtsConfig(EEnvironment.PRODUCTION), createPortableConfig(EEnvironment.PRODUCTION)];
+export default [
+  createPortableDtsConfig(EEnvironment.PRODUCTION, isLoggingEnabled ? "wirestate.debug.d.ts" : "wirestate.d.ts"),
+  createPortableConfig(EEnvironment.PRODUCTION, isLoggingEnabled ? "wirestate.debug.js" : "wirestate.js"),
+];

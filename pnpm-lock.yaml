@@ -203,6 +203,9 @@ importers:
       react-dom:
         specifier: ^16.14.0
         version: 16.14.0(react@16.14.0)
+      rollup-plugin-clear:
+        specifier: ^2.0.7
+        version: 2.0.7
 
   src/wirestate:
     dependencies:

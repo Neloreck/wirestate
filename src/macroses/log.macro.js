@@ -2,23 +2,31 @@ const { createMacro } = require("babel-plugin-macros");
 
 function log({ references, babel }) {
   const { types } = babel;
-  const { log } = references;
+  const { log: logRefs } = references;
 
-  log.forEach((reference) => {
+  const isLoggingEnabled = process.env.LIB_DEBUG_LOGGING === "true" || process.env.LIB_DEBUG_LOGGING === "1";
+
+  if (!logRefs) {
+    return;
+  }
+
+  logRefs.forEach((reference) => {
     if (types.isMemberExpression(reference.parentPath)) {
       const expression = reference.parentPath.parentPath;
 
-      const method = reference.parent.property.name;
-      const args = expression.node.arguments;
+      if (isLoggingEnabled) {
+        const method = reference.parent.property.name;
+        const args = expression.node.arguments;
 
-      const logStatement = types.expressionStatement(
-        types.callExpression(types.memberExpression(types.identifier("console"), types.identifier(method)), [
-          types.stringLiteral("[DS]"),
-          ...args,
-        ])
-      );
+        const logStatement = types.callExpression(
+          types.memberExpression(types.identifier("console"), types.identifier(method)),
+          [types.stringLiteral("[WS]"), ...args]
+        );
 
-      expression.replaceWith(logStatement);
+        expression.replaceWith(logStatement);
+      } else {
+        expression.remove();
+      }
     } else {
       throw new Error(
         "Logging macro call is not member expression, you should access console methods from logging object."
