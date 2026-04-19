@@ -10,6 +10,7 @@
 - [ ] Query data contract review - whether query responses should be boxed in object or 
   queryOptional methods should be introduced to work without exceptions
 - [ ] More generic declaration of bindings to support scopes and async factories
+- [ ] useOptionalInjection without exceptions?
 - [ ] Proper re-export from mobx and inversify
 - [ ] More test-utils, testing examples for real apps
 - [ ] Add tests and increase coverage to at least 75%
