@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 
-import type { AbstractService } from "@/wirestate/core/service/AbstractService";
+import type { AbstractService } from "@/wirestate/core/service/abstract-service";
 
 import type { IQueryHandlerMetadata, TQueryUnregister } from "../types/queries";
 import type { TSignalUnsubscribe, ISignalHandlerMetadata } from "../types/signals";

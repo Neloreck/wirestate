@@ -22,7 +22,7 @@ export { useQueryCaller } from "@/wirestate/core/queries/useQueryCaller";
 export { useQueryHandler } from "@/wirestate/core/queries/useQueryHandler";
 export { useSyncQueryCaller } from "@/wirestate/core/queries/useSyncQueryCaller";
 export { INITIAL_STATE_SHARED_TOKEN as INITIAL_STATE } from "@/wirestate/core/registry";
-export { AbstractService } from "@/wirestate/core/service/AbstractService";
+export { AbstractService } from "@/wirestate/core/service/abstract-service";
 export { useService } from "@/wirestate/core/service/useService";
 export { OnSignal } from "@/wirestate/core/signals/OnSignal";
 export { useSignal } from "@/wirestate/core/signals/useSignal";

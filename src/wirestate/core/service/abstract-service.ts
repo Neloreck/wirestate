@@ -1,5 +1,7 @@
 import { type Container, type ServiceIdentifier } from "inversify";
 
+import { ERROR_CODE_ACCESS_BEFORE_ACTIVATION } from "@/wirestate/core/error/error-code";
+import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { InitialState } from "@/wirestate/core/initial-state/InitialState";
 import { QueryBus } from "@/wirestate/core/queries/QueryBus";
 import {
@@ -31,16 +33,19 @@ export abstract class AbstractService {
    * @returns active container
    */
   protected getContainer(): Container {
-    const ref = CONTAINER_REFS_BY_SERVICE.get(this);
+    const ref: Container | undefined = CONTAINER_REFS_BY_SERVICE.get(this);
 
-    if (!ref) {
-      throw new Error(
-        "[ioc] BaseService.container accessed before activation. " +
-          "Ensure service is bound via bindService() and resolved by the container."
+    if (ref) {
+      return ref;
+    } else {
+      // Usually means that the service was not instantiated / bound within the provider.
+      // Or it was created in the test environment without usage of proper mocking utils.
+      throw new WirestateError(
+        ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
+        "AbstractService::container accessed before activation. " +
+          "Ensure service is bound to container and is properly resolved."
       );
     }
-
-    return ref;
   }
 
   /**
@@ -60,8 +65,7 @@ export abstract class AbstractService {
    * @param signal - signal to emit
    */
   protected emitSignal<P, T extends TSignalType = TSignalType>(signal: ISignal<P, T>): void {
-    this.getContainer().get<SignalBus>(SIGNAL_BUS_TOKEN)
-      .emit(signal);
+    this.getContainer().get<SignalBus>(SIGNAL_BUS_TOKEN).emit(signal);
   }
 
   /**
@@ -72,8 +76,7 @@ export abstract class AbstractService {
    * @returns query result
    */
   protected queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): R | Promise<R> {
-    return this.getContainer().get<QueryBus>(QUERY_BUS_TOKEN)
-      .query<R, D>(type, data);
+    return this.getContainer().get<QueryBus>(QUERY_BUS_TOKEN).query<R, D>(type, data);
   }
 
   protected getInitialState<T>(): T;

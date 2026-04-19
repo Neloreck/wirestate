@@ -9,7 +9,7 @@ import {
   SIGNAL_BUS_TOKEN,
   SIGNAL_UNSUBSCRIBERS_BY_SERVICE,
 } from "@/wirestate/core/registry";
-import { AbstractService } from "@/wirestate/core/service/AbstractService";
+import { AbstractService } from "@/wirestate/core/service/abstract-service";
 import { buildSignalDispatcher } from "@/wirestate/core/signals/buildSignalDispatcher";
 import type { SignalBus } from "@/wirestate/core/signals/SignalBus";
 import type { TQueryHandler, TQueryUnregister } from "@/wirestate/types/queries";
@@ -22,26 +22,32 @@ import type { TSignalHandler } from "@/wirestate/types/signals";
  * @param container - target Inversify container
  * @param token - service identifier
  * @param ServiceClass - service constructor
- * @param isOnceBind - if true, skips binding if the token is already bound
+ * @param isWithBindingCheck - if true, skips binding if the token is already bound
+ * @param isWithIgnoreLifecycle - if true, skips lifecycle hooks (activation, deactivation)
  */
 export function bindService<T extends AbstractService>(
   container: Container,
   token: ServiceIdentifier<T>,
   ServiceClass: Newable<T>,
-  isOnceBind?: boolean
+  isWithBindingCheck?: boolean,
+  isWithIgnoreLifecycle?: boolean
 ): void {
-  if (isOnceBind && container.isBound(token)) {
+  if (isWithBindingCheck && container.isBound(token)) {
     return;
   }
-
-  container.bind<T>(token).to(ServiceClass)
-    .inSingletonScope();
 
   // Inversify's fluent binding API only allows a single `.onActivation` /
   // `.onDeactivation` call per chain, so we register them on the container
   // itself instead — this also works correctly if a later call rebinds the
   // same token.
-  container.onActivation<T>(token, (_ctx, instance) => {
+
+  const whenBind = container.bind<T>(token).to(ServiceClass).inSingletonScope();
+
+  if (isWithIgnoreLifecycle) {
+    return;
+  }
+
+  whenBind.onActivation((_ctx, instance) => {
     CONTAINER_REFS_BY_SERVICE.set(instance, container);
 
     // Compose all signal listeners (the catch-all `onSignal` hook plus every
@@ -84,7 +90,7 @@ export function bindService<T extends AbstractService>(
     return instance;
   });
 
-  container.onDeactivation<T>(token, (instance) => {
+  whenBind.onDeactivation((instance) => {
     // Flip the public disposal flag first so any async work already in
     // flight (fetches awaiting in @Action methods, scheduled reactions,
     // etc.) can short-circuit before it mutates the about-to-die instance.

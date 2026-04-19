@@ -148,7 +148,6 @@ export default [
           code: 120,
         },
       ],
-      "newline-per-chained-call": ["error"],
       "no-constructor-return": "error",
       "no-duplicate-imports": "error",
       "no-multi-spaces": "error",
