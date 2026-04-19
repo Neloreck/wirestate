@@ -1,0 +1,9 @@
+.query-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.query-result {
+  margin: 4px;
+}
