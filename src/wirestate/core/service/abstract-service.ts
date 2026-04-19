@@ -3,7 +3,10 @@ import { type Container, type ServiceIdentifier } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ERROR_CODE_ACCESS_BEFORE_ACTIVATION } from "@/wirestate/core/error/error-code";
+import {
+  ERROR_CODE_ACCESS_AFTER_DISPOSAL,
+  ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
+} from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { InitialState } from "@/wirestate/core/initial-state/initial-state";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
@@ -41,13 +44,24 @@ export abstract class AbstractService {
     if (ref) {
       return ref;
     } else {
-      // Usually means that the service was not instantiated / bound within the provider.
-      // Or it was created in the test environment without usage of proper mocking utils.
-      throw new WirestateError(
-        ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
-        "AbstractService::container accessed before activation. " +
-          "Ensure service is bound to container and is properly resolved."
-      );
+      if (this.IS_DISPOSED) {
+        // This error means that the service was used after deactivation.
+        // Usually it happens if async code is executed after the service was disposed,
+        // or ref service ref was saved somewhere with incorrect memoization.
+        throw new WirestateError(
+          ERROR_CODE_ACCESS_AFTER_DISPOSAL,
+          "AbstractService::container accessed after deactivation. " +
+            "Ensure service is properly disposed and MobX refs are observing latest services."
+        );
+      } else {
+        // Usually means that the service was not instantiated / bound within the provider.
+        // Or it was created in the test environment without usage of proper mocking utils.
+        throw new WirestateError(
+          ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
+          "AbstractService::container accessed before activation. " +
+            "Ensure service is bound to container and is properly resolved."
+        );
+      }
     }
   }
 

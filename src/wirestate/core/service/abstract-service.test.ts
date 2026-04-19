@@ -5,9 +5,12 @@ import { mockContainer } from "@/wirestate/test-utils/mock-container";
 import { mockService } from "@/wirestate/test-utils/mock-service";
 
 describe("AbstractService", () => {
-  const illegalAccessError =
+  const illegalBeforeAccessError =
     "AbstractService::container accessed before activation. " +
     "Ensure service is bound to container and is properly resolved.";
+  const illegalAfterAccessError =
+    "AbstractService::container accessed after deactivation. " +
+    "Ensure service is properly disposed and MobX refs are observing latest services.";
 
   it("should initialise generic services with correct state without container", () => {
     const service = new GenericService();
@@ -15,11 +18,11 @@ describe("AbstractService", () => {
     expect(service).toBeInstanceOf(AbstractService);
     expect(service.IS_DISPOSED).toBe(false);
     expect(service.onSignal).toBeUndefined();
-    expect(() => service.testGetContainer()).toThrow(illegalAccessError);
-    expect(() => service.testResolveService()).toThrow(illegalAccessError);
-    expect(() => service.testGetInitialState()).toThrow(illegalAccessError);
-    expect(() => service.testEmitSignal()).toThrow(illegalAccessError);
-    expect(() => service.testQueryData()).toThrow(illegalAccessError);
+    expect(() => service.testGetContainer()).toThrow(illegalBeforeAccessError);
+    expect(() => service.testResolveService()).toThrow(illegalBeforeAccessError);
+    expect(() => service.testGetInitialState()).toThrow(illegalBeforeAccessError);
+    expect(() => service.testEmitSignal()).toThrow(illegalBeforeAccessError);
+    expect(() => service.testQueryData()).toThrow(illegalBeforeAccessError);
   });
 
   it("should initialise generic services with correct state within container", () => {
@@ -32,10 +35,29 @@ describe("AbstractService", () => {
     expect(service.IS_DISPOSED).toBe(false);
     expect(service.isActivated).toBe(true);
     expect(service.onSignal).toBeUndefined();
-    expect(() => service.testGetContainer()).not.toThrow(illegalAccessError);
-    expect(() => service.testResolveService()).not.toThrow(illegalAccessError);
-    expect(() => service.testGetInitialState()).not.toThrow(illegalAccessError);
-    expect(() => service.testEmitSignal()).not.toThrow(illegalAccessError);
-    expect(() => service.testQueryData()).not.toThrow(illegalAccessError);
+    expect(() => service.testGetContainer()).not.toThrow(illegalBeforeAccessError);
+    expect(() => service.testResolveService()).not.toThrow(illegalBeforeAccessError);
+    expect(() => service.testGetInitialState()).not.toThrow(illegalBeforeAccessError);
+    expect(() => service.testEmitSignal()).not.toThrow(illegalBeforeAccessError);
+    expect(() => service.testQueryData()).not.toThrow(illegalBeforeAccessError);
+  });
+
+  it("should throw errors after disposal (container actions)", () => {
+    const container = mockContainer();
+    const service = mockService(GenericService, container);
+
+    mockBindService(container, GenericService);
+
+    container.unbind(GenericService);
+
+    expect(service).toBeInstanceOf(AbstractService);
+    expect(service.IS_DISPOSED).toBe(true);
+    expect(service.isActivated).toBe(false);
+    expect(service.onSignal).toBeUndefined();
+    expect(() => service.testGetContainer()).toThrow(illegalAfterAccessError);
+    expect(() => service.testResolveService()).toThrow(illegalAfterAccessError);
+    expect(() => service.testGetInitialState()).toThrow(illegalAfterAccessError);
+    expect(() => service.testEmitSignal()).toThrow(illegalAfterAccessError);
+    expect(() => service.testQueryData()).toThrow(illegalAfterAccessError);
   });
 });

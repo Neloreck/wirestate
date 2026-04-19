@@ -9,6 +9,10 @@ export class GenericService extends AbstractService {
     this.isActivated = true;
   }
 
+  public onDeactivated(): void {
+    this.isActivated = false;
+  }
+
   public testResolveService(): GenericService {
     return this.resolve(GenericService);
   }

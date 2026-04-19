@@ -1,3 +1,7 @@
+## 0.3.0
+
+- Correctly notify about IS_DISPOSED after deactivation of services
+
 ## 0.2.0
 
 - Activate and deactivate services in stack ordering

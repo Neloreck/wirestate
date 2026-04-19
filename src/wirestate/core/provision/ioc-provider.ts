@@ -1,5 +1,5 @@
 import { Container } from "inversify";
-import { createElement, type FC, type ReactNode, useMemo, useState } from "react";
+import { createElement, PropsWithChildren, useMemo, useState } from "react";
 
 import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
 import { ERROR_CODE_FAILED_TO_RESOLVE } from "@/wirestate/core/error/error-code";
@@ -10,15 +10,11 @@ import type { Optional } from "@/wirestate/types/general";
 /**
  * Props for {@link IocProvider}.
  */
-export interface IIocProviderProps {
+export interface IIocProviderProps extends PropsWithChildren<unknown> {
   /**
    * External container instance. If omitted, a new container is created.
    */
   readonly container?: Container;
-  /**
-   * Components to wrap.
-   */
-  readonly children: ReactNode;
 }
 
 /**
@@ -29,7 +25,7 @@ export interface IIocProviderProps {
  * @param props.children - components to wrap
  * @returns provider element
  */
-export const IocProvider: FC<IIocProviderProps> = ({ container: externalContainer, children }) => {
+export function IocProvider({ container: externalContainer, children }: IIocProviderProps) {
   // Incremented on binding changes to invalidate descendant caches (e.g., useInjection).
   const [revision, setRevision] = useState<number>(0);
   // Lazy initialize owned container if no external container is provided.
@@ -45,4 +41,4 @@ export const IocProvider: FC<IIocProviderProps> = ({ container: externalContaine
   const value: IIocContext = useMemo<IIocContext>(() => ({ container, revision, setRevision }), [container, revision]);
 
   return createElement(IocContext.Provider, { value }, children);
-};
+}

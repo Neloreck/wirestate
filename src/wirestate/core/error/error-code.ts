@@ -8,3 +8,4 @@ export const ERROR_CODE_FAILED_TO_RESOLVE: number = 100;
 export const ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER: number = 101;
 
 export const ERROR_CODE_ACCESS_BEFORE_ACTIVATION: number = 200;
+export const ERROR_CODE_ACCESS_AFTER_DISPOSAL: number = 201;

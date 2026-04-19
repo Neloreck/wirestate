@@ -1,5 +1,5 @@
 import { Container } from "inversify";
-import { ReactNode } from "react";
+import { createElement, ReactNode } from "react";
 
 import { IocProvider } from "@/wirestate/core/provision/ioc-provider";
 import { mockContainer } from "@/wirestate/test-utils/mock-container";
@@ -12,5 +12,5 @@ import { mockContainer } from "@/wirestate/test-utils/mock-container";
  * @returns wrapped components
  */
 export function withIocProvider(children: ReactNode, container: Container = mockContainer()) {
-  return <IocProvider container={container}>{children}</IocProvider>;
+  return createElement(IocProvider, { container }, children);
 }
