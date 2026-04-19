@@ -3,8 +3,8 @@
  */
 
 export * from "@/wirestate/alias";
-export { bindConstant } from "@/wirestate/core/container/bind/bind-constant";
 export { bindEntry } from "@/wirestate/core/container/bind/bind-entry";
+export { bindConstant } from "@/wirestate/core/container/bind/bind-constant";
 export { bindService } from "@/wirestate/core/container/bind/bind-service";
 export { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
 export { emitSignal } from "@/wirestate/core/container/emit-signal";
