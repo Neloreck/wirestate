@@ -37,7 +37,7 @@ export class CounterService extends AbstractService {
     @Inject(LoggerService)
     private readonly loggerService: LoggerService,
     @Inject(INITIAL_STATE)
-    readonly initialState: object,
+    protected readonly initialState: object,
   ) {
     super();
 
@@ -114,7 +114,7 @@ export class CounterService extends AbstractService {
     this.increment();
   }
 
-  /**
+  /*
    * Synchronous query handler. Any caller — another service, a React
    * component via `useQueryCaller`, or `query()` from bootstrap — can pull
    * a fresh summary on demand.
@@ -132,7 +132,7 @@ export class CounterService extends AbstractService {
     };
   }
 
-  /**
+  /*
    * Async query handler — simulates a network round-trip. Callers can
    * simply `await` the return of `queryData` / `useQueryCaller` without
    * caring whether the responder is sync or async.

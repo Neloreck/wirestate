@@ -33,6 +33,7 @@ export const QueriesData = observer(() => {
     const value: ICounterSummary = querySyncData<ICounterSummary>(
       ECounterServiceQuery.GET_COUNTER_SUMMARY,
     );
+
     setSummary(value);
   }, [querySyncData]);
 
@@ -41,6 +42,7 @@ export const QueriesData = observer(() => {
     const value: ICounterSnapshot = await queryData<ICounterSnapshot>(
       ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT,
     );
+
     setSnapshot(value);
   }, [queryData]);
 

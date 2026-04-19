@@ -209,15 +209,7 @@ export default [
       ],
       quotes: ["error", "double"],
       "react/prop-types": "off",
-      "react/jsx-tag-spacing": [
-        "error",
-        {
-          closingSlash: "never",
-          beforeSelfClosing: "never",
-          afterOpening: "never",
-          beforeClosing: "never",
-        },
-      ],
+      "react/react-in-jsx-scope": "off",
       semi: "error",
       "space-before-function-paren": [
         "error",

@@ -17,7 +17,7 @@ export class ThemeService extends AbstractService {
 
   public constructor(
     @Inject(INITIAL_STATE)
-    readonly initialState: object,
+    protected readonly initialState: object,
   ) {
     super();
 

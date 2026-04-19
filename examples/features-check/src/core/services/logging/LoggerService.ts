@@ -61,7 +61,7 @@ export class LoggerService extends AbstractService {
   @Action()
   private saveSignalLogEntry(signal: Signal): void {
     const entry: ILogEntry = {
-      id: this.nextId++,
+      id: this.nextId ++,
       type:
         typeof signal.type === "symbol" ? signal.type.toString() : signal.type,
       payload: signal.payload,

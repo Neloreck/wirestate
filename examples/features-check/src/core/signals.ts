@@ -8,21 +8,21 @@ export enum EGlobalSignal {
   DUMP = "generic/dump",
 }
 
-export interface CounterIncrementedSignal extends Signal {
+export interface ICounterIncrementedSignal extends Signal {
   type: EGlobalSignal.COUNTER_INCREMENTED;
   payload: { count: number };
 }
 
-export interface CounterResetSignal extends Signal {
+export interface ICounterResetSignal extends Signal {
   type: EGlobalSignal.COUNTER_RESET;
 }
 
-export interface ThemeToggledSignal extends Signal {
+export interface IThemeToggledSignal extends Signal {
   type: EGlobalSignal.THEME_TOGGLED;
   payload: { theme: "light" | "dark" };
 }
 
-export interface UserPingedSignal extends Signal {
+export interface IUserPingedSignal extends Signal {
   type: EGlobalSignal.USER_PINGED;
   payload: { at: number };
 }
