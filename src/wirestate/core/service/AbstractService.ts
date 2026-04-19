@@ -17,7 +17,6 @@ import type { ISignal, TSignalType } from "@/wirestate/types/signals";
 /**
  * Base class for services.
  */
-@injectable()
 export abstract class AbstractService {
   /**
    * Disposal flag.

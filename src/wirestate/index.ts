@@ -2,7 +2,7 @@
  * 'https://github.com/Neloreck/wirestate'
  */
 
-export * from "@/wirestate/core/alias";
+export * from "@/wirestate/alias";
 export { bindService } from "@/wirestate/core/container/bindService";
 export { createIocContainer } from "@/wirestate/core/container/createIocContainer";
 export { emitSignal } from "@/wirestate/core/container/emitSignal";
