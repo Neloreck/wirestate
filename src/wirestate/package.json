@@ -1,6 +1,6 @@
 {
   "name": "wirestate",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Store management library based on mobx and inversify",
   "sideEffects": false,
   "author": "Syrotenko Igor",
