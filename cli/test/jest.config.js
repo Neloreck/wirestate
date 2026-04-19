@@ -9,6 +9,10 @@ module.exports = {
   transform: {
     "^.+\\.[t|j]sx?$": ["babel-jest", { configFile: path.resolve(__dirname, "babel.test.config.js") }],
   },
+  transformIgnorePatterns: ["node_modules/.pnpm/(?!inversify|@inversifyjs)"],
+  moduleNameMapper: {
+    "^reflect-metadata/lite$": "reflect-metadata/ReflectLite.js",
+  },
   testEnvironment: "jsdom",
   globals: {
     IS_DEV: true,

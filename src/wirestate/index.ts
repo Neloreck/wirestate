@@ -11,8 +11,8 @@ export { applyInitialState } from "@/wirestate/core/initial-state/applyInitialSt
 export { InitialState } from "@/wirestate/core/initial-state/InitialState";
 export {
   createServicesProvider,
-  type ServicesProvider,
-  type IServicesProviderProps as ServicesProviderProps,
+  ServicesProvider,
+  IServicesProviderProps as ServicesProviderProps,
 } from "@/wirestate/core/provision/createServicesProvider";
 export { IocProvider } from "@/wirestate/core/provision/IocProvider";
 export { useContainer } from "@/wirestate/core/provision/useContainer";
@@ -27,19 +27,19 @@ export { useService } from "@/wirestate/core/service/useService";
 export { OnSignal } from "@/wirestate/core/signals/OnSignal";
 export { useSignal } from "@/wirestate/core/signals/useSignal";
 export { useSignalEmitter } from "@/wirestate/core/signals/useSignalEmitter";
-export type {
+export {
   TInitialStateEntries as InitialStateEntries,
   TInitialStateEntry as InitialStateEntry,
   TInitialStateKey as InitialStateKey,
 } from "@/wirestate/types/initial-state";
-export type {
+export {
   TQueryHandler as QueryHandler,
   TQueryResponder as QueryResponder,
   TQueryType as QueryType,
   TQueryUnregister as QueryUnregister,
 } from "@/wirestate/types/queries";
-export type { TServiceClass as ServiceClass } from "@/wirestate/types/services";
-export type {
+export { TServiceClass as ServiceClass } from "@/wirestate/types/services";
+export {
   ISignal as Signal,
   TSignalEmitter as SignalEmitter,
   TSignalHandler as SignalHandler,
