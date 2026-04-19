@@ -16,6 +16,12 @@ export function mockBindService<T extends AbstractService>(
   const { token, skipLifecycle } = options;
 
   return token
-    ? bindService(container, token as ServiceIdentifier<T>, ServiceClass, false, skipLifecycle)
-    : bindService(container, ServiceClass, ServiceClass, false, skipLifecycle);
+    ? bindService(container, token as ServiceIdentifier<T>, ServiceClass, {
+        isWithBindingCheck: false,
+        isWithIgnoreLifecycle: skipLifecycle,
+      })
+    : bindService(container, ServiceClass, ServiceClass, {
+        isWithBindingCheck: false,
+        isWithIgnoreLifecycle: skipLifecycle,
+      });
 }

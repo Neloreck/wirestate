@@ -15,9 +15,14 @@ import {
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
 import { buildSignalDispatcher } from "@/wirestate/core/signals/build-signal-dispatcher";
 import type { SignalBus } from "@/wirestate/core/signals/signal-bus";
-import { Maybe, Optional } from "@/wirestate/types/general";
+import { Maybe, MaybePromise, Optional } from "@/wirestate/types/general";
 import type { TQueryHandler, TQueryUnregister } from "@/wirestate/types/queries";
 import type { TSignalHandler, TSignalUnsubscribe } from "@/wirestate/types/signals";
+
+export interface IBindServiceOptions {
+  isWithBindingCheck?: boolean;
+  isWithIgnoreLifecycle?: boolean;
+}
 
 /**
  * Registers an AbstractService in the container with activation/deactivation logic.
@@ -26,26 +31,23 @@ import type { TSignalHandler, TSignalUnsubscribe } from "@/wirestate/types/signa
  * @param container - target Inversify container
  * @param token - service identifier
  * @param ServiceClass - service constructor
- * @param isWithBindingCheck - if true, skips binding if the token is already bound
- * @param isWithIgnoreLifecycle - if true, skips lifecycle hooks (activation, deactivation)
+ * @param options - options object to control binding flow
  */
 export function bindService<T extends AbstractService>(
   container: Container,
   token: ServiceIdentifier<T>,
   ServiceClass: Newable<T>,
-  isWithBindingCheck?: boolean,
-  isWithIgnoreLifecycle?: boolean
+  options: IBindServiceOptions
 ): void {
   dbg.info(prefix(__filename), "Binding service:", {
     name: ServiceClass.name,
     token,
     ServiceClass,
-    isWithBindingCheck,
-    isWithIgnoreLifecycle,
+    options,
     container,
   });
 
-  if (isWithBindingCheck && container.isBound(token)) {
+  if (options?.isWithBindingCheck && container.isBound(token)) {
     dbg.info(prefix(__filename), "Skip binding service on mount, bound already:", {
       name: ServiceClass.name,
       container,
@@ -62,7 +64,7 @@ export function bindService<T extends AbstractService>(
   // same token.
   const whenBind: BindWhenOnFluentSyntax<T> = container.bind<T>(token).to(ServiceClass).inSingletonScope();
 
-  if (isWithIgnoreLifecycle) {
+  if (options?.isWithIgnoreLifecycle) {
     return;
   }
 
@@ -104,7 +106,7 @@ export function bindService<T extends AbstractService>(
       _attachQueryUnreg(instance, unregister);
     }
 
-    const result = instance.onActivated();
+    const result: MaybePromise<void> = instance.onActivated() as MaybePromise<void>;
 
     // Fire-and-forget any async init so we stay synchronous from the
     // container's point of view. Services that need strict async

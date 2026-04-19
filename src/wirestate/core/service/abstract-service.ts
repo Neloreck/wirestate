@@ -120,13 +120,13 @@ export abstract class AbstractService {
    * Lifecycle hook: runs after activation.
    * Override for initialization.
    */
-  public onActivated(): MaybePromise<void> {}
+  public onActivated(): void {}
 
   /**
    * Lifecycle hook: runs before deactivation.
    * Override for cleanup.
    */
-  public onDeactivated(): MaybePromise<void> {}
+  public onDeactivated(): void {}
 
   /**
    * Catch-all signal handler.

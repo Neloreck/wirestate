@@ -122,13 +122,6 @@ export default [
           pathGroupsExcludedImportTypes: ["builtin"],
         },
       ],
-      indent: [
-        "error",
-        2,
-        {
-          SwitchCase: 1,
-        },
-      ],
       "jsdoc/tag-lines": [
         "error",
         "any",

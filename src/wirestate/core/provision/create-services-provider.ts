@@ -104,7 +104,9 @@ export function createServicesProvider(
       applyInitialState(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
 
       for (const ServiceClass of services) {
-        bindService(iocContext.container, ServiceClass, ServiceClass, true);
+        bindService(iocContext.container, ServiceClass, ServiceClass, {
+          isWithBindingCheck: true,
+        });
       }
 
       if (activate) {
@@ -134,7 +136,9 @@ export function createServicesProvider(
           didRebind = true;
         }
 
-        bindService(iocContext.container, ServiceClass, ServiceClass, true);
+        bindService(iocContext.container, ServiceClass, ServiceClass, {
+          isWithBindingCheck: true,
+        });
       }
 
       if (activate) {
