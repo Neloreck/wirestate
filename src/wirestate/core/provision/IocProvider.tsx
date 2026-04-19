@@ -1,5 +1,3 @@
-"use no memo";
-
 import type { Container } from "inversify";
 import { type FC, type ReactNode, useMemo, useState } from "react";
 

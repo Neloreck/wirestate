@@ -9,11 +9,11 @@
     "experimentalDecorators": true,
     "jsx": "react",
     "lib": [
-      "es2017",
+      "es2022",
       "dom"
     ],
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noImplicitAny": true,
     "paths": {
       "@/*": [
@@ -24,7 +24,7 @@
     "rootDir": "./",
     "sourceMap": true,
     "strict": true,
-    "target": "es5",
+    "target": "es2022",
     "types": [
       "node",
       "jest"

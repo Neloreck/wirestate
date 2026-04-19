@@ -21,7 +21,7 @@ import {
 import { BABEL_CONFIG } from "./babel.modern.config";
 
 const createPortableConfig = (env) => ({
-  external: ["react", "shallow-equal"],
+  external: ["react", "mobx", "mobx-react-lite", "inversify", "tslib"],
   input: PORTABLE_ENTRY,
   output: {
     compact: env === EEnvironment.PRODUCTION,

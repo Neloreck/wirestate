@@ -1,4 +1,3 @@
-"use no memo";
 
 import { type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 

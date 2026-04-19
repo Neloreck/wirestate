@@ -38,6 +38,7 @@
     "react": ">=16.8.0",
     "inversify": ">=8.0.0",
     "mobx": ">=6.0.0",
-    "mobx-react-lite": ">=4.0.0"
+    "mobx-react-lite": ">=4.0.0",
+    "tslib": ">=2.5.0"
   }
 }

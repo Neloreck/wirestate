@@ -13,7 +13,7 @@ import { CORE_ENTRY, ESM_ROOT, TS_BUILD_CONFIG, EEnvironment, WS_ROOT, STATS_ROO
 import { BABEL_CONFIG } from "./babel.modern.config";
 
 const createEsmConfig = (env) => ({
-  external: ["react", "shallow-equal", "tslib"],
+  external: ["react", "inversify", "mobx", "mobx-react-lite", "tslib"],
   input: CORE_ENTRY,
   output: {
     compact: env === EEnvironment.PRODUCTION,
