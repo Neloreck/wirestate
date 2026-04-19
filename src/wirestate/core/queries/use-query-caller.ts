@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 import { useCallback } from "react";
 
-import { log } from "@/macroses/log.macro";
+import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { useContainer } from "@/wirestate/core/provision/use-container";
@@ -19,7 +19,7 @@ export function useQueryCaller() {
 
   return useCallback(
     <R = unknown, D = unknown>(type: TQueryType, data?: D) => {
-      log.info(prefix(__filename), "Query data:", {
+      dbg.info(prefix(__filename), "Query data:", {
         type,
         data,
       });

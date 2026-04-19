@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 import { useCallback } from "react";
 
-import { log } from "@/macroses/log.macro";
+import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { useIocContext } from "@/wirestate/core/provision/use-ioc-context";
@@ -19,7 +19,7 @@ export function useSignalEmitter(): TSignalEmitter {
 
   return useCallback(
     (signal: ISignal) => {
-      log.info(prefix(__filename), "Emit signal:", {
+      dbg.info(prefix(__filename), "Emit signal:", {
         type: signal?.type,
         signal,
       });

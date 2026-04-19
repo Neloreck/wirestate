@@ -1,6 +1,6 @@
 import { type Container, type ServiceIdentifier } from "inversify";
 
-import { log } from "@/macroses/log.macro";
+import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_ACCESS_BEFORE_ACTIVATION } from "@/wirestate/core/error/error-code";
@@ -59,7 +59,7 @@ export abstract class AbstractService {
    * @returns resolved service instance
    */
   protected getService<T>(serviceId: ServiceIdentifier<T>): T {
-    log.info(prefix(__filename), "Lazy getService:", {
+    dbg.info(prefix(__filename), "Lazy getService:", {
       name: (serviceId as TAnyObject)?.name ?? serviceId,
       key: serviceId,
     });
@@ -73,7 +73,7 @@ export abstract class AbstractService {
    * @param signal - signal to emit
    */
   protected emitSignal<P, T extends TSignalType = TSignalType>(signal: ISignal<P, T>): void {
-    log.info(prefix(__filename), "Emit signal:", {
+    dbg.info(prefix(__filename), "Emit signal:", {
       name: this.constructor.name,
       type: signal?.type,
       signal,
@@ -91,7 +91,7 @@ export abstract class AbstractService {
    * @returns query result
    */
   protected queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): R | Promise<R> {
-    log.info(prefix(__filename), "Query data:", { name: this.constructor.name, type, data, from: this.constructor });
+    dbg.info(prefix(__filename), "Query data:", { name: this.constructor.name, type, data, from: this.constructor });
 
     return this.getContainer().get<QueryBus>(QUERY_BUS_TOKEN).query<R, D>(type, data);
   }
@@ -107,7 +107,7 @@ export abstract class AbstractService {
    * @returns seed data or null if missing
    */
   protected getInitialState<T extends TAnyObject>(ServiceClass?: TInitialStateKey): T | null {
-    log.info(prefix(__filename), "Get initial state for key:", {
+    dbg.info(prefix(__filename), "Get initial state for key:", {
       key: (ServiceClass as TAnyObject)?.name ?? ServiceClass,
     });
 

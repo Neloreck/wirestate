@@ -1,8 +1,8 @@
-import { log } from "@/macroses/log.macro";
+import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { SIGNAL_HANDLER_METADATA } from "@/wirestate/core/registry";
-import type { ISignalDispatchEntry, ISignalHandlerMetadata } from "@/wirestate/types/signals";
+import type { ISignalHandlerMetadata } from "@/wirestate/types/signals";
 
 /**
  * Retrieves `@OnSignal` metadata from the class hierarchy.
@@ -13,7 +13,7 @@ import type { ISignalDispatchEntry, ISignalHandlerMetadata } from "@/wirestate/t
  * @internal
  */
 export function getSignalHandlerMetadata(instance: object): ReadonlyArray<ISignalHandlerMetadata> {
-  log.info(prefix(__filename), "Retrieving signal handler metadata:", { name: instance.constructor.name, instance });
+  dbg.info(prefix(__filename), "Retrieving signal handler metadata:", { name: instance.constructor.name, instance });
 
   const chain: Array<Array<ISignalHandlerMetadata>> = [];
   let ctor: unknown = instance.constructor;
@@ -29,7 +29,7 @@ export function getSignalHandlerMetadata(instance: object): ReadonlyArray<ISigna
     ctor = Object.getPrototypeOf(ctor);
   }
 
-  log.info(prefix(__filename), "Retrieved signal handler metadata:", {
+  dbg.info(prefix(__filename), "Retrieved signal handler metadata:", {
     name: instance.constructor.name,
     chain,
     instance,

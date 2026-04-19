@@ -1,6 +1,6 @@
 const { createMacro } = require("babel-plugin-macros");
 
-function log({ references, babel }) {
+function dbg({ references, babel }) {
   const { types } = babel;
   const { log: logRefs } = references;
 
@@ -35,4 +35,4 @@ function log({ references, babel }) {
   });
 }
 
-module.exports = createMacro(log);
+module.exports = createMacro(dbg);

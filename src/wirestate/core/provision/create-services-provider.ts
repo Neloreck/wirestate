@@ -1,6 +1,6 @@
 import { type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 
-import { log } from "@/macroses/log.macro";
+import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { bindService } from "@/wirestate/core/container/bind-service";
@@ -61,7 +61,7 @@ export function createServicesProvider(
   services: ReadonlyArray<TServiceClass>,
   options: ICreateIocProviderOptions = {}
 ) {
-  log.info(prefix(__filename), "Creating services provider:", { services, options });
+  dbg.info(prefix(__filename), "Creating services provider:", { services, options });
 
   const { activate } = options;
 
@@ -91,7 +91,7 @@ export function createServicesProvider(
     const [initialPropsSnapshot] = useState<IServicesProviderProps>(() => props);
 
     useMemo(() => {
-      log.info(prefix(__filename), "Providing services on first render:", {
+      dbg.info(prefix(__filename), "Providing services on first render:", {
         container: iocContext.container,
         revision: iocContext.revision,
         services,
@@ -114,7 +114,7 @@ export function createServicesProvider(
     }, services);
 
     useEffect(() => {
-      log.info(prefix(__filename), "Providing services on mount:", {
+      dbg.info(prefix(__filename), "Providing services on mount:", {
         container: iocContext.container,
         revision: iocContext.revision,
         services,
@@ -147,7 +147,7 @@ export function createServicesProvider(
       }
 
       return () => {
-        log.info(prefix(__filename), "Unprovision services on unmount:", {
+        dbg.info(prefix(__filename), "Unprovision services on unmount:", {
           container: iocContext.container,
           revision: iocContext.revision,
           services,
@@ -170,7 +170,7 @@ export function createServicesProvider(
 
   ServicesProviderComponent.displayName = "ServicesProvider";
 
-  log.info(prefix(__filename), "Created services provider:", { ServicesProviderComponent, services, options });
+  dbg.info(prefix(__filename), "Created services provider:", { ServicesProviderComponent, services, options });
 
   return ServicesProviderComponent;
 }

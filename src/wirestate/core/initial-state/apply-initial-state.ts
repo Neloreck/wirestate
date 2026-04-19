@@ -1,6 +1,6 @@
 import type { Container } from "inversify";
 
-import { log } from "@/macroses/log.macro";
+import { dbg } from "@/macroses/dbg.macro";
 
 import { InitialState } from "@/wirestate/core/initial-state/initial-state";
 import { INITIAL_STATE_SHARED_TOKEN, INITIAL_STATE_TOKEN } from "@/wirestate/core/registry";
@@ -23,12 +23,12 @@ export function applyInitialState(
   const nextInitialState: InitialState = new InitialState(shared, bound);
 
   if (container.isBound(INITIAL_STATE_TOKEN)) {
-    log.info("Rebinding initial state for container:", { nextInitialState, container });
+    dbg.info("Rebinding initial state for container:", { nextInitialState, container });
 
     container.rebind<InitialState>(INITIAL_STATE_TOKEN).toConstantValue(nextInitialState);
     container.rebind<TAnyObject>(INITIAL_STATE_SHARED_TOKEN).toConstantValue(nextInitialState.getShared());
   } else {
-    log.info("Binding initial state for container:", { nextInitialState, container });
+    dbg.info("Binding initial state for container:", { nextInitialState, container });
 
     container.bind<InitialState>(INITIAL_STATE_TOKEN).toConstantValue(nextInitialState);
     container.bind<TAnyObject>(INITIAL_STATE_SHARED_TOKEN).toConstantValue(nextInitialState.getShared());

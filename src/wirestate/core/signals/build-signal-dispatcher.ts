@@ -1,4 +1,4 @@
-import { log } from "@/macroses/log.macro";
+import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
@@ -13,7 +13,7 @@ import type { ISignalDispatchEntry, TSignalHandler } from "@/wirestate/types/sig
  * @internal
  */
 export function buildSignalDispatcher(instance: AbstractService): TSignalHandler | null {
-  log.info(prefix(__filename), "Build signal dispatcher for:", { name: instance.constructor.name, instance });
+  dbg.info(prefix(__filename), "Build signal dispatcher for:", { name: instance.constructor.name, instance });
 
   const entries: Array<ISignalDispatchEntry> = [];
 
@@ -43,7 +43,7 @@ export function buildSignalDispatcher(instance: AbstractService): TSignalHandler
     return null;
   }
 
-  log.info(prefix(__filename), "Built signal dispatcher for:", {
+  dbg.info(prefix(__filename), "Built signal dispatcher for:", {
     name: instance.constructor.name,
     instance,
     entries,

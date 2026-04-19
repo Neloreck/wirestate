@@ -10,4 +10,4 @@ export interface ILogger {
   debug(...args: Array<TAnyValue>): void;
 }
 
-export const log: ILogger;
+export const dbg: ILogger;

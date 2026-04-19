@@ -1,9 +1,7 @@
-import { type } from "@testing-library/user-event/dist/type";
-
-import { log } from "@/macroses/log.macro";
+import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { QUERY_HANDLER_METADATA, SIGNAL_HANDLER_METADATA } from "@/wirestate/core/registry";
+import { SIGNAL_HANDLER_METADATA } from "@/wirestate/core/registry";
 import type { TSignalType } from "@/wirestate/types/signals";
 
 /**
@@ -22,7 +20,7 @@ export function OnSignal(types?: TSignalType | ReadonlyArray<TSignalType>): Meth
         : [types as TSignalType];
 
   return (target, propertyKey) => {
-    log.info(prefix(__filename), "Attaching OnSignal metadata:", {
+    dbg.info(prefix(__filename), "Attaching OnSignal metadata:", {
       name: target.constructor.name,
       types,
       propertyKey,

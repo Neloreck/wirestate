@@ -1,6 +1,6 @@
 import { Container, type Newable, type ServiceIdentifier } from "inversify";
 
-import { log } from "@/macroses/log.macro";
+import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { getQueryHandlerMetadata } from "@/wirestate/core/queries/get-query-handler-metadata";
@@ -35,7 +35,7 @@ export function bindService<T extends AbstractService>(
   isWithBindingCheck?: boolean,
   isWithIgnoreLifecycle?: boolean
 ): void {
-  log.info(prefix(__filename), "Binding service:", {
+  dbg.info(prefix(__filename), "Binding service:", {
     name: ServiceClass.name,
     token,
     ServiceClass,
@@ -45,7 +45,7 @@ export function bindService<T extends AbstractService>(
   });
 
   if (isWithBindingCheck && container.isBound(token)) {
-    log.info(prefix(__filename), "Skip binding service on mount, bound already:", {
+    dbg.info(prefix(__filename), "Skip binding service on mount, bound already:", {
       name: ServiceClass.name,
       container,
       token,
@@ -67,7 +67,7 @@ export function bindService<T extends AbstractService>(
   }
 
   whenBind.onActivation((ctx, instance) => {
-    log.info(prefix(__filename), "Activating service:", {
+    dbg.info(prefix(__filename), "Activating service:", {
       name: ServiceClass.name,
       ctx,
       container,
@@ -119,7 +119,7 @@ export function bindService<T extends AbstractService>(
   });
 
   whenBind.onDeactivation((instance) => {
-    log.info(prefix(__filename), "Deactivating service:", {
+    dbg.info(prefix(__filename), "Deactivating service:", {
       name: ServiceClass.name,
       container,
       token,

@@ -1,6 +1,6 @@
 import { type Container } from "inversify";
 
-import { log } from "@/macroses/log.macro";
+import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
@@ -16,7 +16,7 @@ import type { TQueryType } from "@/wirestate/types/queries";
  * @returns query result
  */
 export function query<R = unknown, D = unknown>(container: Container, type: TQueryType, data?: D): R | Promise<R> {
-  log.info(prefix(__filename), "Query data:", type, data, container);
+  dbg.info(prefix(__filename), "Query data:", type, data, container);
 
   return container.get<QueryBus>(QUERY_BUS_TOKEN).query<R, D>(type, data);
 }

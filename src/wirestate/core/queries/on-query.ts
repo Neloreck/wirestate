@@ -1,4 +1,4 @@
-import { log } from "@/macroses/log.macro";
+import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { QUERY_HANDLER_METADATA } from "@/wirestate/core/registry";
@@ -12,7 +12,7 @@ import type { TQueryType } from "@/wirestate/types/queries";
  */
 export function OnQuery(type: TQueryType): MethodDecorator {
   return (target, propertyKey) => {
-    log.info(prefix(__filename), "Attaching OnQuery metadata:", {
+    dbg.info(prefix(__filename), "Attaching OnQuery metadata:", {
       name: target.constructor.name,
       type,
       propertyKey,

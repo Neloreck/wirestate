@@ -1,4 +1,4 @@
-import { log } from "@/macroses/log.macro";
+import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { QUERY_HANDLER_METADATA } from "@/wirestate/core/registry";
@@ -13,7 +13,7 @@ import type { IQueryHandlerMetadata } from "@/wirestate/types/queries";
  * @internal
  */
 export function getQueryHandlerMetadata(instance: object): ReadonlyArray<IQueryHandlerMetadata> {
-  log.info(prefix(__filename), "Resolving instance query metadata:", { name: instance.constructor.name, instance });
+  dbg.info(prefix(__filename), "Resolving instance query metadata:", { name: instance.constructor.name, instance });
 
   const chain: Array<Array<IQueryHandlerMetadata>> = [];
   let constructor: unknown = instance.constructor;
@@ -29,7 +29,7 @@ export function getQueryHandlerMetadata(instance: object): ReadonlyArray<IQueryH
     constructor = Object.getPrototypeOf(constructor);
   }
 
-  log.info(prefix(__filename), "Resolved instance query metadata:", {
+  dbg.info(prefix(__filename), "Resolved instance query metadata:", {
     name: instance.constructor.name,
     instance,
     chain,

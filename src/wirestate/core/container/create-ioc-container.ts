@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 
-import { log } from "@/macroses/log.macro";
+import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { InitialState } from "@/wirestate/core/initial-state/initial-state";
@@ -27,7 +27,7 @@ export interface ICreateIocContainerOptions {
  * @returns new IoC container
  */
 export function createIocContainer(options: ICreateIocContainerOptions = {}): Container {
-  log.info(prefix(__filename), "Creating IOC container:", { options });
+  dbg.info(prefix(__filename), "Creating IOC container:", { options });
 
   const container: Container = new Container({
     defaultScope: "Singleton",
@@ -41,7 +41,7 @@ export function createIocContainer(options: ICreateIocContainerOptions = {}): Co
   container.bind(INITIAL_STATE_TOKEN).toConstantValue(new InitialState());
   container.bind(INITIAL_STATE_SHARED_TOKEN).toConstantValue(initialState.getShared());
 
-  log.info(prefix(__filename), "Created IOC container:", { container, options, initialState });
+  dbg.info(prefix(__filename), "Created IOC container:", { container, options, initialState });
 
   return container;
 }
