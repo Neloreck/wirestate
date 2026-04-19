@@ -1,6 +1,6 @@
-import * as mobx_dist_types_decorator_fills from "mobx/dist/types/decorator_fills";
-import * as mobx_dist_internal from "mobx/dist/internal";
 import * as mobx from "mobx";
+import * as mobx_dist_internal from "mobx/dist/internal";
+import * as mobx_dist_types_decorator_fills from "mobx/dist/types/decorator_fills";
 export {
   autorun,
   flow,
@@ -11,14 +11,18 @@ export {
   makeObservable,
   runInAction,
 } from "mobx";
-import { ServiceIdentifier, Newable, Container } from "inversify";
+import {
+  Container as Container$1,
+  Newable,
+  ServiceIdentifier,
+} from "inversify";
 export {
   Container,
   inject as Inject,
   injectable as Injectable,
   ServiceIdentifier,
 } from "inversify";
-import { ReactNode, FC } from "react";
+import { FC, ReactNode } from "react";
 export { observer } from "mobx-react-lite";
 
 declare function Observable(): mobx.IObservableFactory;
@@ -114,7 +118,7 @@ declare abstract class AbstractService {
    *
    * @returns active container
    */
-  protected getContainer(): Container;
+  protected getContainer(): Container$1;
   /**
    * Resolves a sibling service.
    * Use for lazy resolution or circular dependency breaking.
@@ -169,22 +173,22 @@ declare abstract class AbstractService {
  * @param container - target Inversify container
  * @param token - service identifier
  * @param ServiceClass - service constructor
- * @param isOnceBind - if true, skips binding if the token is already bound
- * @param isIgnoreLifecycle - if true, skips lifecycle hooks (activation, deactivation)
+ * @param isWithBindingCheck - if true, skips binding if the token is already bound
+ * @param isWithIgnoreLifecycle - if true, skips lifecycle hooks (activation, deactivation)
  */
 declare function bindService<T extends AbstractService>(
-  container: Container,
+  container: Container$1,
   token: ServiceIdentifier<T>,
   ServiceClass: Newable<T>,
-  isOnceBind?: boolean,
-  isIgnoreLifecycle?: boolean,
+  isWithBindingCheck?: boolean,
+  isWithIgnoreLifecycle?: boolean,
 ): void;
 
 interface ICreateIocContainerOptions {
   /**
    * Parent container for inheritance.
    */
-  readonly parent?: Container;
+  readonly parent?: Container$1;
 }
 /**
  * Creates an IoC container with framework essentials.
@@ -194,7 +198,7 @@ interface ICreateIocContainerOptions {
  */
 declare function createIocContainer(
   options?: ICreateIocContainerOptions,
-): Container;
+): Container$1;
 
 /**
  * Emits signals from outside an AbstractService.
@@ -202,7 +206,10 @@ declare function createIocContainer(
  * @param container - inversify container
  * @param signal - signal to emit
  */
-declare function emitSignal<P>(container: Container, signal: ISignal<P>): void;
+declare function emitSignal<P>(
+  container: Container$1,
+  signal: ISignal<P>,
+): void;
 
 /**
  * Dispatches a query on the provided container.
@@ -213,7 +220,7 @@ declare function emitSignal<P>(container: Container, signal: ISignal<P>): void;
  * @returns query result
  */
 declare function query<R = unknown, D = unknown>(
-  container: Container,
+  container: Container$1,
   type: TQueryType,
   data?: D,
 ): R | Promise<R>;
@@ -228,7 +235,7 @@ type TAnyObject = Record<string, any>;
  * @param bound - targeted state entries
  */
 declare function applyInitialState(
-  container: Container,
+  container: Container$1,
   shared?: TAnyObject,
   bound?: TInitialStateEntries,
 ): void;
@@ -318,7 +325,7 @@ interface IIocProviderProps {
   /**
    * External container instance. If omitted, a new container is created.
    */
-  readonly container?: Container;
+  readonly container?: Container$1;
   /**
    * Components to wrap.
    */
@@ -339,7 +346,7 @@ declare const IocProvider: FC<IIocProviderProps>;
  *
  * @returns active Inversify container
  */
-declare function useContainer(): Container;
+declare function useContainer(): Container$1;
 
 /**
  * Returns the current container revision.
@@ -427,36 +434,68 @@ declare function useSignal(
  */
 declare function useSignalEmitter(): TSignalEmitter;
 
+interface IMockBindServiceOptions {
+  token?: ServiceIdentifier;
+  skipLifecycle?: boolean;
+}
 declare function mockBindService<T extends AbstractService>(
-  container: Container,
+  container: Container$1,
   ServiceClass: Newable<T>,
-  token?: ServiceIdentifier<T>,
+  options?: IMockBindServiceOptions,
 ): void;
 
-declare function mockContainer(): Container;
+interface IMockContainerOptions {
+  services?: Array<TServiceClass>;
+  activate?: Array<ServiceIdentifier>;
+  skipLifecycle?: boolean;
+}
+declare function mockContainer(options?: IMockContainerOptions): Container$1;
+
+interface IMockServiceOptions {
+  token?: ServiceIdentifier;
+  skipLifecycle?: boolean;
+}
+declare function mockService<T extends TServiceClass>(
+  service: T,
+  container?: Container,
+  options?: IMockServiceOptions,
+): InstanceType<T>;
+
+/**
+ * Wraps a component with IocProvider for testing.
+ *
+ * @param children - components to wrap
+ * @param container - optional custom container
+ * @returns wrapped components
+ */
+declare function withIocProvider(
+  children: ReactNode,
+  container?: Container$1,
+): JSX.Element;
 
 export {
   AbstractService,
   Action,
+  applyInitialState,
+  bindService,
   Computed,
+  createIocContainer,
+  createServicesProvider,
   DeepObservable,
+  emitSignal,
+  forwardRef,
   INITIAL_STATE_SHARED_TOKEN as INITIAL_STATE,
   InitialState,
   IocProvider,
+  mockBindService,
+  mockContainer,
+  mockService,
   Observable,
   OnQuery,
   OnSignal,
+  query,
   RefObservable,
   ShallowObservable,
-  applyInitialState,
-  bindService,
-  createIocContainer,
-  createServicesProvider,
-  emitSignal,
-  forwardRef,
-  mockBindService,
-  mockContainer,
-  query,
   useContainer,
   useContainerRevision,
   useQueryCaller,
@@ -465,6 +504,7 @@ export {
   useSignal,
   useSignalEmitter,
   useSyncQueryCaller,
+  withIocProvider,
 };
 export type {
   TInitialStateEntries as InitialStateEntries,

@@ -27,6 +27,7 @@ import {
   useCallback,
   useRef,
 } from "react";
+import { jsx } from "react/jsx-runtime";
 function Observable() {
   return observable;
 }
@@ -124,14 +125,14 @@ function bindService(
   container,
   token,
   ServiceClass,
-  isOnceBind,
-  isIgnoreLifecycle,
+  isWithBindingCheck,
+  isWithIgnoreLifecycle,
 ) {
-  if (isOnceBind && container.isBound(token)) {
+  if (isWithBindingCheck && container.isBound(token)) {
     return;
   }
   const whenBind = container.bind(token).to(ServiceClass).inSingletonScope();
-  if (isIgnoreLifecycle) {
+  if (isWithIgnoreLifecycle) {
     return;
   }
   whenBind.onActivation((_ctx, instance) => {
@@ -419,11 +420,24 @@ const IocProvider = ({ container: externalContainer, children }) => {
     children,
   );
 };
+const ERROR_CODE_GENERIC = 1;
+const ERROR_CODE_INVALID_ARGUMENTS = 2;
+const ERROR_CODE_INVALID_CONTEXT = 3;
+const ERROR_CODE_ACCESS_BEFORE_ACTIVATION = 100;
+class WirestateError extends Error {
+  name = "WirestateError";
+  constructor(code = ERROR_CODE_GENERIC, detail) {
+    super();
+    this.code = code;
+    this.message = detail || "Wirestate error.";
+  }
+}
 function useIocContext() {
   const value = useContext(IocContext);
   if (!value) {
-    throw new Error(
-      "[ioc] useContainer() must be called inside an <IocProvider>.",
+    throw new WirestateError(
+      ERROR_CODE_INVALID_CONTEXT,
+      "Trying to access IOC context from React subtree not wrapped in <IocProvider>.",
     );
   }
   return value;
@@ -472,16 +486,6 @@ function useSyncQueryCaller() {
     (type, data) => container.get(QUERY_BUS_TOKEN).query(type, data),
     [container],
   );
-}
-const ERROR_CODE_GENERIC = 1;
-const ERROR_CODE_ACCESS_BEFORE_ACTIVATION = 2;
-class WirestateError extends Error {
-  name = "WirestateError";
-  constructor(code = ERROR_CODE_GENERIC, detail) {
-    super();
-    this.code = code;
-    this.message = detail || "Wirestate error.";
-  }
 }
 class AbstractService {
   IS_DISPOSED = false;
@@ -576,13 +580,45 @@ function useSignalEmitter() {
     [container],
   );
 }
-function mockBindService(container, ServiceClass, token) {
+function mockBindService(container, ServiceClass, options = {}) {
+  const { token, skipLifecycle } = options;
   return token
-    ? bindService(container, token, ServiceClass)
-    : bindService(container, ServiceClass, ServiceClass);
+    ? bindService(container, token, ServiceClass, false, skipLifecycle)
+    : bindService(container, ServiceClass, ServiceClass, false, skipLifecycle);
 }
-function mockContainer() {
-  return createIocContainer();
+function mockContainer(options = {}) {
+  const container = createIocContainer();
+  const { activate = [], services = [] } = options;
+  if (activate.length) {
+    for (const token of options.activate ?? []) {
+      if (!services.includes(token)) {
+        throw new WirestateError(
+          ERROR_CODE_INVALID_ARGUMENTS,
+          "Provided services for activation not matching list of services to bind.",
+        );
+      }
+    }
+  }
+  for (const service of options.services ?? []) {
+    mockBindService(container, service, {
+      skipLifecycle: options.skipLifecycle,
+      token: service,
+    });
+  }
+  for (const token of options.activate ?? []) {
+    container.get(token);
+  }
+  return container;
+}
+function mockService(service, container = mockContainer(), options = {}) {
+  mockBindService(container, service, {
+    skipLifecycle: options.skipLifecycle,
+    token: options.token,
+  });
+  return container.get(service);
+}
+function withIocProvider(children, container = mockContainer()) {
+  return jsx(IocProvider, { container: container, children: children });
 }
 export {
   AbstractService,
@@ -605,6 +641,7 @@ export {
   forwardRef,
   mockBindService,
   mockContainer,
+  mockService,
   query,
   useContainer,
   useContainerRevision,
@@ -614,4 +651,5 @@ export {
   useSignal,
   useSignalEmitter,
   useSyncQueryCaller,
+  withIocProvider,
 };

@@ -23,7 +23,7 @@ const compat = new FlatCompat({
 export default [
   jsdoc.configs["flat/recommended"],
   {
-    ignores: ["target/**/*", "node_modules/**/*", "**/wirestate.js", "**/wirestate.d.ts"],
+    ignores: ["target/**/*", "node_modules/**/*"],
   },
   ...fixupConfigRules(
     compat.extends(
