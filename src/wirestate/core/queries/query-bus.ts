@@ -1,3 +1,5 @@
+import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "@/wirestate/core/error/error-code";
+import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
 import type { TQueryHandler, TQueryType, TQueryUnregister } from "@/wirestate/types/queries";
 
@@ -66,7 +68,10 @@ export class QueryBus {
 
     // todo: Return null or standardized query response object, avoid throwing.
     if (!stack || stack.length === 0) {
-      throw new Error(`[ioc] no query handler registered for type: ${String(type)}`);
+      throw new WirestateError(
+        ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER,
+        `No query handler registered in container for type: '${String(type)}'.`
+      );
     }
 
     // Always use the top of the stack (most recent registration).
