@@ -1,7 +1,12 @@
 describe("Library test utils exports", () => {
   const testUtilsRoot = require("./test-utils");
 
-  const expectedTestUtilsExports: Array<string> = ["mockContainer", "mockBindService", "mockService"];
+  const expectedTestUtilsExports: Array<string> = [
+    "mockContainer",
+    "mockBindService",
+    "mockService",
+    "withIocProvider",
+  ];
 
   const assertListIntersection = (first: Array<string>, second: Array<string>) => {
     first.forEach((it: string) => {

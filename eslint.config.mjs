@@ -48,6 +48,7 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
+        React: "writable",
       },
       parser: tsParser,
     },
@@ -218,17 +219,6 @@ export default [
         },
       ],
       "space-in-parens": ["error", "never"],
-      "space-unary-ops": [
-        "error",
-        {
-          nonwords: false,
-          overrides: {
-            "++": true,
-            "--": true,
-          },
-          words: true,
-        },
-      ],
       "spaced-comment": ["error", "always"],
       "template-tag-spacing": ["error", "never"],
       yoda: "error",

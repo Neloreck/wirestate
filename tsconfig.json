@@ -6,7 +6,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "lib": ["es2022", "dom"],
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -21,10 +21,6 @@
     "target": "es2022",
     "types": ["node", "jest"]
   },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "src/"
-  ]
+  "exclude": ["node_modules"],
+  "include": ["src/"]
 }
