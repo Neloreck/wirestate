@@ -45,7 +45,7 @@ describe("Library exported API", () => {
     "useSyncQueryCaller",
     "INITIAL_STATE",
     "AbstractService",
-    "useService",
+    "useInjection",
     "OnSignal",
     "useSignal",
     "useSignalEmitter",

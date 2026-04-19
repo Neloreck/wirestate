@@ -418,8 +418,8 @@ IocContext.displayName = "IocContext";function createServicesProvider(entries, o
       throw new WirestateError(ERROR_CODE_ACCESS_BEFORE_ACTIVATION, "AbstractService::container accessed before activation. " + "Ensure service is bound to container and is properly resolved.");
     }
   }
-  getService(serviceId) {
-    return this.getContainer().get(serviceId);
+  resolve(injectionId) {
+    return this.getContainer().get(injectionId);
   }
   emitSignal(signal) {
     this.getContainer().get(SIGNAL_BUS_TOKEN).emit(signal);
@@ -433,14 +433,14 @@ IocContext.displayName = "IocContext";function createServicesProvider(entries, o
   }
   onActivated() {}
   onDeactivated() {}
-}function useService(token) {
+}function useInjection(injectionId) {
   const {
     container,
     revision
   } = useIocContext();
   return useMemo(() => {
-    return container.get(token);
-  }, [container, revision, token]);
+    return container.get(injectionId);
+  }, [container, revision, injectionId]);
 }function OnSignal(types) {
   const normalized = types === undefined ? null : Array.isArray(types) ? [...types] : [types];
   return (target, propertyKey) => {
@@ -529,4 +529,4 @@ IocContext.displayName = "IocContext";function createServicesProvider(entries, o
     container: container,
     children: children
   });
-}export{AbstractService,Action,Computed,DeepObservable,INITIAL_STATE_SHARED_TOKEN as INITIAL_STATE,InitialState,IocProvider,Observable,OnQuery,OnSignal,RefObservable,ShallowObservable,applyInitialState,bindConstant,bindEntry,bindService,createIocContainer,createServicesProvider,emitSignal,forwardRef,mockBindService,mockContainer,mockService,query,useContainer,useContainerRevision,useQueryCaller,useQueryHandler,useService,useSignal,useSignalEmitter,useSyncQueryCaller,withIocProvider};
+}export{AbstractService,Action,Computed,DeepObservable,INITIAL_STATE_SHARED_TOKEN as INITIAL_STATE,InitialState,IocProvider,Observable,OnQuery,OnSignal,RefObservable,ShallowObservable,applyInitialState,bindConstant,bindEntry,bindService,createIocContainer,createServicesProvider,emitSignal,forwardRef,mockBindService,mockContainer,mockService,query,useContainer,useContainerRevision,useInjection,useQueryCaller,useQueryHandler,useSignal,useSignalEmitter,useSyncQueryCaller,withIocProvider};

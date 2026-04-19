@@ -30,7 +30,7 @@ export interface IIocProviderProps {
  * @returns provider element
  */
 export const IocProvider: FC<IIocProviderProps> = ({ container: externalContainer, children }) => {
-  // Incremented on binding changes to invalidate descendant caches (e.g., useService).
+  // Incremented on binding changes to invalidate descendant caches (e.g., useInjection).
   const [revision, setRevision] = useState<number>(0);
   // Lazy initialize owned container if no external container is provided.
   const [ownedContainer] = useState<Optional<Container>>(() => (externalContainer ? null : createIocContainer()));

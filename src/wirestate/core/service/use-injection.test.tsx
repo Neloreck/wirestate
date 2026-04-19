@@ -5,14 +5,14 @@ import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
 import { GenericService } from "@/fixtures/services/generic-service";
 import { useIocContext } from "@/wirestate/core/provision/use-ioc-context";
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
-import { useService } from "@/wirestate/core/service/use-service";
+import { useInjection } from "@/wirestate/core/service/use-injection";
 import { mockContainer } from "@/wirestate/test-utils/mock-container";
 import { withIocProvider } from "@/wirestate/test-utils/with-ioc-provider";
 import { TServiceClass } from "@/wirestate/types/services";
 
-describe("useService", () => {
+describe("useInjection", () => {
   const TestComponent = ({ token = GenericService as TServiceClass }) => {
-    const service = useService(token);
+    const service = useInjection(token);
 
     return <div data-testid={"service-name"}>{service.constructor.name || String(service.constructor.name)}</div>;
   };

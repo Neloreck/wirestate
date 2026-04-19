@@ -52,19 +52,19 @@ export abstract class AbstractService {
   }
 
   /**
-   * Resolves a sibling service.
+   * Resolves a sibling service or injected value.
    * Use for lazy resolution or circular dependency breaking.
    *
-   * @param serviceId - service identifier
-   * @returns resolved service instance
+   * @param injectionId - injection identifier
+   * @returns resolved injection, service instance, or generic value
    */
-  protected getService<T>(serviceId: ServiceIdentifier<T>): T {
-    dbg.info(prefix(__filename), "Lazy getService:", {
-      name: (serviceId as TAnyObject)?.name ?? serviceId,
-      key: serviceId,
+  protected resolve<T>(injectionId: ServiceIdentifier<T>): T {
+    dbg.info(prefix(__filename), "Lazy resolve:", {
+      name: (injectionId as TAnyObject)?.name ?? injectionId,
+      key: injectionId,
     });
 
-    return this.getContainer().get<T>(serviceId);
+    return this.getContainer().get<T>(injectionId);
   }
 
   /**

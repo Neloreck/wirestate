@@ -96,10 +96,10 @@ export class LoggerService extends AbstractService {
     // [*] Pass circular refs check with delayed get:
     console.info(
       `[${this.constructor.name}] dumping services:`,
-      this.getService(LoggerService),
-      this.getService(ThemeService),
-      this.getService(CounterService),
-      this.getService(GLOBAL_CONFIG),
+      this.resolve(LoggerService),
+      this.resolve(ThemeService),
+      this.resolve(CounterService),
+      this.resolve(GLOBAL_CONFIG),
     );
   }
 

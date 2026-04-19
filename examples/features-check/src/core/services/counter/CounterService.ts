@@ -87,7 +87,7 @@ export class CounterService extends AbstractService {
 
   @Action()
   public increment(): void {
-    // or this.getService(LoggerService) to avoid circular refs
+    // or this.resolve(LoggerService) to avoid circular refs
     this.loggerService.log(
       `[${this.constructor.name}][action] incrementing counter`,
     );

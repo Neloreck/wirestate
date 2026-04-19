@@ -6,6 +6,8 @@
 - Increasing test coverage
 - Error handling / custom error class
 - Allow addition of constant bindings in the IOC container
+- useService -> useInjection
+- AbstractService::getService -> AbstractService::resolve
 
 ## 0.1.1
 

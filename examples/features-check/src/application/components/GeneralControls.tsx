@@ -8,13 +8,13 @@ import { EGlobalSignal } from "@/core/signals";
 import {
   observer,
   type SignalEmitter,
-  useService,
+  useInjection,
   useSignalEmitter,
 } from "@/libs/wirestate";
 
 export const GeneralControls = observer(() => {
-  const counterService: CounterService = useService(CounterService);
-  const themeService: ThemeService = useService(ThemeService);
+  const counterService: CounterService = useInjection(CounterService);
+  const themeService: ThemeService = useInjection(ThemeService);
 
   const emitSignal: SignalEmitter = useSignalEmitter();
 

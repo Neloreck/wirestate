@@ -112,13 +112,13 @@ declare abstract class AbstractService {
      */
     protected getContainer(): Container$1;
     /**
-     * Resolves a sibling service.
+     * Resolves a sibling service or injected value.
      * Use for lazy resolution or circular dependency breaking.
      *
-     * @param serviceId - service identifier
+     * @param injectionId - service identifier
      * @returns resolved service instance
      */
-    protected getService<T>(serviceId: ServiceIdentifier<T>): T;
+    protected resolve<T>(injectionId: ServiceIdentifier<T>): T;
     /**
      * Broadcasts a signal.
      *
@@ -378,13 +378,13 @@ declare function useSyncQueryCaller(): <R = unknown, D = unknown>(type: TQueryTy
 declare const INITIAL_STATE_SHARED_TOKEN: unique symbol;
 
 /**
- * Resolves a service instance from the container.
+ * Resolves a value from the container - constant or service.
  * Automatically re-resolves if the container is reset or services are rebound.
  *
- * @param token - service identifier
- * @returns resolved service instance
+ * @param injectionId - injection identifier
+ * @returns resolved value
  */
-declare function useService<T>(token: ServiceIdentifier<T>): T;
+declare function useInjection<T>(injectionId: ServiceIdentifier<T>): T;
 
 /**
  * Decorator for service methods that respond to signals.
@@ -432,5 +432,5 @@ declare function mockService<T extends TServiceClass>(service: T, container?: Co
  */
 declare function withIocProvider(children: ReactNode, container?: Container$1): JSX.Element;
 
-export { AbstractService, Action, Computed, DeepObservable, INITIAL_STATE_SHARED_TOKEN as INITIAL_STATE, InitialState, IocProvider, Observable, OnQuery, OnSignal, RefObservable, ShallowObservable, applyInitialState, bindConstant, bindEntry, bindService, createIocContainer, createServicesProvider, emitSignal, forwardRef, mockBindService, mockContainer, mockService, query, useContainer, useContainerRevision, useQueryCaller, useQueryHandler, useService, useSignal, useSignalEmitter, useSyncQueryCaller, withIocProvider };
+export { AbstractService, Action, Computed, DeepObservable, INITIAL_STATE_SHARED_TOKEN as INITIAL_STATE, InitialState, IocProvider, Observable, OnQuery, OnSignal, RefObservable, ShallowObservable, applyInitialState, bindConstant, bindEntry, bindService, createIocContainer, createServicesProvider, emitSignal, forwardRef, mockBindService, mockContainer, mockService, query, useContainer, useContainerRevision, useInjection, useQueryCaller, useQueryHandler, useSignal, useSignalEmitter, useSyncQueryCaller, withIocProvider };
 export type { TInitialStateEntries as InitialStateEntries, TInitialStateEntry as InitialStateEntry, TInitialStateKey as InitialStateKey, IInjectableDescriptor as InjectableDescriptor, TQueryHandler as QueryHandler, TQueryResponder as QueryResponder, TQueryType as QueryType, TQueryUnregister as QueryUnregister, TServiceClass as ServiceClass, ServicesProvider, IServicesProviderProps as ServicesProviderProps, ISignal as Signal, TSignalEmitter as SignalEmitter, TSignalHandler as SignalHandler, TSignalType as SignalType, TSignalUnsubscribe as SignalUnsubscribe };

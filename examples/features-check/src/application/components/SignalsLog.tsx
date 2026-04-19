@@ -1,10 +1,10 @@
 import "./SignalsLog.css";
 
 import { LoggerService } from "@/core/services/logging";
-import { observer, useService } from "@/libs/wirestate";
+import { observer, useInjection } from "@/libs/wirestate";
 
 export const SignalsLog = observer(() => {
-  const loggerService: LoggerService = useService(LoggerService);
+  const loggerService: LoggerService = useInjection(LoggerService);
 
   return (
     <div id={"logs"}>

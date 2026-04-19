@@ -25,7 +25,7 @@ export { useQueryHandler } from "@/wirestate/core/queries/use-query-handler";
 export { useSyncQueryCaller } from "@/wirestate/core/queries/use-sync-query-caller";
 export { INITIAL_STATE_SHARED_TOKEN as INITIAL_STATE } from "@/wirestate/core/registry";
 export { AbstractService } from "@/wirestate/core/service/abstract-service";
-export { useService } from "@/wirestate/core/service/use-service";
+export { useInjection } from "@/wirestate/core/service/use-injection";
 export { OnSignal } from "@/wirestate/core/signals/on-signal";
 export { useSignal } from "@/wirestate/core/signals/use-signal";
 export { useSignalEmitter } from "@/wirestate/core/signals/use-signal-emitter";

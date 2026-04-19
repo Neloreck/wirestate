@@ -12,9 +12,9 @@ import {
 import { ThemeService } from "@/core/services/theme";
 import {
   observer,
+  useInjection,
   useQueryCaller,
   useQueryHandler,
-  useService,
   useSyncQueryCaller,
 } from "@/libs/wirestate";
 
@@ -22,7 +22,7 @@ export const QueriesData = observer(() => {
   const [snapshot, setSnapshot] = useState<Optional<ICounterSnapshot>>(null);
   const [summary, setSummary] = useState<Optional<ICounterSummary>>(null);
 
-  const themeService: ThemeService = useService(ThemeService);
+  const themeService: ThemeService = useInjection(ThemeService);
 
   // [*] Pass ability to dispatch queries from UI and get sync/async data.
   const queryData = useQueryCaller();

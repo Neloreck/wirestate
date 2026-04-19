@@ -9,8 +9,8 @@ export class GenericService extends AbstractService {
     this.isActivated = true;
   }
 
-  public testGetService() {
-    return this.getService(GenericService);
+  public testResolveService(): GenericService {
+    return this.resolve(GenericService);
   }
 
   public testGetContainer(): Container {

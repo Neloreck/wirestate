@@ -8,24 +8,24 @@ import { useIocContext } from "@/wirestate/core/provision/use-ioc-context";
 import { TAnyObject } from "@/wirestate/types/general";
 
 /**
- * Resolves a service instance from the container.
+ * Resolves a value from the container - constant or service.
  * Automatically re-resolves if the container is reset or services are rebound.
  *
- * @param token - service identifier
- * @returns resolved service instance
+ * @param injectionId - injection identifier
+ * @returns resolved value
  */
-export function useService<T>(token: ServiceIdentifier<T>): T {
+export function useInjection<T>(injectionId: ServiceIdentifier<T>): T {
   const { container, revision } = useIocContext();
 
   // Revision bump signals a container reset; force re-resolution to drop stale instances.
   return useMemo(() => {
-    dbg.info(prefix(__filename), "[useService] new service instance provision for token:", {
-      token,
-      name: (token as TAnyObject)?.name ?? token,
+    dbg.info(prefix(__filename), "[useInjection] new injection provision for token:", {
+      token: injectionId,
+      name: (injectionId as TAnyObject)?.name ?? injectionId,
       revision,
       container,
     });
 
-    return container.get<T>(token);
-  }, [container, revision, token]);
+    return container.get<T>(injectionId);
+  }, [container, revision, injectionId]);
 }

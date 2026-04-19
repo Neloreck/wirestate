@@ -20,6 +20,8 @@ import {
   AbstractService as DAbstractService,
   applyInitialState as DapplyInitialState,
   autorun as Dautorun,
+  bindConstant as DbindConstant,
+  bindEntry as DbindEntry,
   bindService as DbindService,
   createIocContainer as DcreateIocContainer,
   createServicesProvider as DcreateServicesProvider,
@@ -38,7 +40,7 @@ import {
   useContainerRevision as DuseContainerRevision,
   useQueryCaller as DuseQueryCaller,
   useQueryHandler as DuseQueryHandler,
-  useService as DuseService,
+  useInjection as DuseInjection,
   useSignal as DuseSignal,
   useSignalEmitter as DuseSignalEmitter,
   useSyncQueryCaller as DuseSyncQueryCaller,
@@ -61,6 +63,8 @@ import {
   AbstractService as PAbstractService,
   applyInitialState as PapplyInitialState,
   autorun as Pautorun,
+  bindConstant as PbindConstant,
+  bindEntry as PbindEntry,
   bindService as PbindService,
   createIocContainer as PcreateIocContainer,
   createServicesProvider as PcreateServicesProvider,
@@ -79,7 +83,7 @@ import {
   useContainerRevision as PuseContainerRevision,
   useQueryCaller as PuseQueryCaller,
   useQueryHandler as PuseQueryHandler,
-  useService as PuseService,
+  useInjection as PuseInjection,
   useSignal as PuseSignal,
   useSignalEmitter as PuseSignalEmitter,
   useSyncQueryCaller as PuseSyncQueryCaller,
@@ -102,6 +106,8 @@ export const ShallowObservable = process.env.NODE_ENV === "production" ? PShallo
 export const AbstractService = process.env.NODE_ENV === "production" ? PAbstractService : DAbstractService;
 export const applyInitialState = process.env.NODE_ENV === "production" ? PapplyInitialState : DapplyInitialState;
 export const autorun = process.env.NODE_ENV === "production" ? Pautorun : Dautorun;
+export const bindConstant = process.env.NODE_ENV === "production" ? PbindConstant : DbindConstant;
+export const bindEntry = process.env.NODE_ENV === "production" ? PbindEntry : DbindEntry;
 export const bindService = process.env.NODE_ENV === "production" ? PbindService : DbindService;
 export const createIocContainer = process.env.NODE_ENV === "production" ? PcreateIocContainer : DcreateIocContainer;
 export const createServicesProvider =
@@ -123,7 +129,7 @@ export const useContainerRevision =
   process.env.NODE_ENV === "production" ? PuseContainerRevision : DuseContainerRevision;
 export const useQueryCaller = process.env.NODE_ENV === "production" ? PuseQueryCaller : DuseQueryCaller;
 export const useQueryHandler = process.env.NODE_ENV === "production" ? PuseQueryHandler : DuseQueryHandler;
-export const useService = process.env.NODE_ENV === "production" ? PuseService : DuseService;
+export const useInjection = process.env.NODE_ENV === "production" ? PuseInjection : DuseInjection;
 export const useSignal = process.env.NODE_ENV === "production" ? PuseSignal : DuseSignal;
 export const useSignalEmitter = process.env.NODE_ENV === "production" ? PuseSignalEmitter : DuseSignalEmitter;
 export const useSyncQueryCaller = process.env.NODE_ENV === "production" ? PuseSyncQueryCaller : DuseSyncQueryCaller;

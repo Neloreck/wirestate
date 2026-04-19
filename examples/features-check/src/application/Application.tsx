@@ -5,12 +5,14 @@ import { useEffect } from "react";
 import { GeneralControls } from "@/application/components/GeneralControls";
 import { QueriesData } from "@/application/components/QueriesData";
 import { SignalsLog } from "@/application/components/SignalsLog";
+import { GLOBAL_CONFIG } from "@/core/id";
 import { ThemeService } from "@/core/services/theme";
 import { EGlobalSignal } from "@/core/signals";
-import { observer, useService, useSignal } from "@/libs/wirestate";
+import { observer, useInjection, useSignal } from "@/libs/wirestate";
 
 export const Application = observer(() => {
-  const themeService: ThemeService = useService(ThemeService);
+  const themeService: ThemeService = useInjection(ThemeService);
+  const globalConfig: object = useInjection(GLOBAL_CONFIG);
 
   // [*] Pass reactivity subscription for specific global signal in React tree.
   useSignal(EGlobalSignal.COUNTER_RESET, () => {
@@ -46,6 +48,10 @@ export const Application = observer(() => {
       </section>
 
       <br />
+
+      <section id={"global-config"} className={"application-section"}>
+        <b>GlobalConfig: {JSON.stringify(globalConfig)}</b>
+      </section>
     </>
   );
 });
