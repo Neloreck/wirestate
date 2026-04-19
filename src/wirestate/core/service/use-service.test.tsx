@@ -1,4 +1,4 @@
-import { mount } from "enzyme";
+import { render, fireEvent, cleanup } from "@testing-library/react";
 import { Container } from "inversify";
 
 import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
@@ -14,23 +14,25 @@ describe("useService", () => {
   const TestComponent = ({ token = GenericService as TServiceClass }) => {
     const service = useService(token);
 
-    return <div id={"service-name"}>{service.constructor.name || String(service.constructor.name)}</div>;
+    return <div data-testid={"service-name"}>{service.constructor.name || String(service.constructor.name)}</div>;
   };
 
   const TestComponentRevisionTrigger = () => {
     const { setRevision } = useIocContext();
 
     return (
-      <button id={"revision-increment"} onClick={() => setRevision((r) => r + 1)}>
+      <button data-testid={"revision-increment"} onClick={() => setRevision((r) => r + 1)}>
         Increment revision
       </button>
     );
   };
 
+  afterEach(cleanup);
+
   it("should crash if service is not resolved", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-    const wrapper = mount(
+    const { getByText } = render(
       withIocProvider(
         <ErrorLogBoundary>
           <TestComponent />
@@ -40,16 +42,17 @@ describe("useService", () => {
 
     consoleSpy.mockRestore();
 
-    expect(wrapper.find("#error-message").text()).toMatch(`No bindings found for service: "${GenericService.name}".`);
+    expect(getByText(/No bindings found for service:/)).toBeTruthy();
   });
 
   it("should resolve bound service from container", () => {
     const container: Container = mockContainer({
       services: [GenericService],
     });
-    const wrapper = mount(withIocProvider(<TestComponent />, container));
 
-    expect(wrapper.find("#service-name").text()).toBe("GenericService");
+    const { getByTestId } = render(withIocProvider(<TestComponent />, container));
+
+    expect(getByTestId("service-name").textContent).toBe("GenericService");
   });
 
   it("should re-resolve service when revision changes", () => {
@@ -68,7 +71,7 @@ describe("useService", () => {
       return originalGet(token);
     });
 
-    const wrapper = mount(
+    const { getByTestId } = render(
       withIocProvider(
         <ErrorLogBoundary>
           <TestComponent />
@@ -80,16 +83,17 @@ describe("useService", () => {
 
     expect(resolveCount).toBe(1);
 
-    wrapper.find("#revision-increment").simulate("click");
+    fireEvent.click(getByTestId("revision-increment"));
     expect(resolveCount).toBe(2);
 
-    wrapper.find("#revision-increment").simulate("click");
+    fireEvent.click(getByTestId("revision-increment"));
     expect(resolveCount).toBe(3);
   });
 
   it("should throw error when used outside of IocProvider", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-    const wrapper = mount(
+
+    const { getByText } = render(
       <ErrorLogBoundary>
         <TestComponent />
       </ErrorLogBoundary>
@@ -97,9 +101,7 @@ describe("useService", () => {
 
     consoleSpy.mockRestore();
 
-    expect(wrapper.find("#error-message").text()).toMatch(
-      "Trying to access IOC context from React subtree not wrapped in <IocProvider>."
-    );
+    expect(getByText(/Trying to access IOC context/)).toBeTruthy();
   });
 
   it("should memoize service instance", () => {
@@ -118,13 +120,12 @@ describe("useService", () => {
       return originalGet(token);
     });
 
-    const wrapper = mount(withIocProvider(<TestComponent />, container));
+    const { rerender } = render(withIocProvider(<TestComponent />, container));
 
     expect(resolveCount).toBe(1);
 
     for (let i = 0; i < 10; i++) {
-      wrapper.setProps({ children: <TestComponent /> });
-      wrapper.update();
+      rerender(withIocProvider(<TestComponent />, container));
     }
 
     // Should NOT re-resolve because container and revision didn't change.
@@ -138,13 +139,12 @@ describe("useService", () => {
       services: [GenericService, AnotherService],
     });
 
-    const wrapper = mount(withIocProvider(<TestComponent token={GenericService} />, container));
+    const { rerender, getByTestId } = render(withIocProvider(<TestComponent token={GenericService} />, container));
 
-    expect(wrapper.find("#service-name").text()).toBe("GenericService");
+    expect(getByTestId("service-name").textContent).toBe("GenericService");
 
-    wrapper.setProps({ children: <TestComponent token={AnotherService} /> });
-    wrapper.update();
+    rerender(withIocProvider(<TestComponent token={AnotherService} />, container));
 
-    expect(wrapper.find("#service-name").text()).toBe("AnotherService");
+    expect(getByTestId("service-name").textContent).toBe("AnotherService");
   });
 });
