@@ -1,4 +1,4 @@
-import { type Container, injectable, type ServiceIdentifier } from "inversify";
+import { type Container, type ServiceIdentifier } from "inversify";
 
 import { InitialState } from "@/wirestate/core/initial-state/InitialState";
 import { QueryBus } from "@/wirestate/core/queries/QueryBus";
