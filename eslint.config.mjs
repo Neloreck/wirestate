@@ -134,6 +134,7 @@ export default [
       "jsdoc/require-param-type": "off",
       "jsdoc/require-returns-type": "off",
       "jsdoc/require-property-type": "off",
+      "jsdoc/require-throws-type": "off",
       "jsdoc/no-undefined-types": "off",
       "key-spacing": [
         "error",

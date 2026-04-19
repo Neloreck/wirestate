@@ -32,7 +32,7 @@ export interface ISignalDispatchEntry {
 }
 
 /**
- * Metadata for @OnSignal decorated methods.
+ * Metadata for OnSignal decorated methods.
  *
  * @internal
  */
