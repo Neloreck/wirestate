@@ -1,6 +1,7 @@
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
+import type { MaybePromise } from "@/wirestate/types/general";
 import type { TQueryHandler, TQueryType, TQueryUnregister } from "@/wirestate/types/queries";
 
 /**
@@ -63,7 +64,7 @@ export class QueryBus {
    *
    * todo: Return null or standardized query response object, avoid throwing.
    */
-  public query<R = unknown, D = unknown>(type: TQueryType, data?: D): R | Promise<R> {
+  public query<R = unknown, D = unknown>(type: TQueryType, data?: D): MaybePromise<R> {
     const stack = this.handlers.get(type);
 
     // todo: Return null or standardized query response object, avoid throwing.

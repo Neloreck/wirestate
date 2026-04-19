@@ -1,4 +1,4 @@
-import { Container, type Newable, type ServiceIdentifier } from "inversify";
+import { BindWhenOnFluentSyntax, Container, type Newable, type ServiceIdentifier } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -15,8 +15,9 @@ import {
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
 import { buildSignalDispatcher } from "@/wirestate/core/signals/build-signal-dispatcher";
 import type { SignalBus } from "@/wirestate/core/signals/signal-bus";
+import { Maybe, Optional } from "@/wirestate/types/general";
 import type { TQueryHandler, TQueryUnregister } from "@/wirestate/types/queries";
-import type { TSignalHandler } from "@/wirestate/types/signals";
+import type { TSignalHandler, TSignalUnsubscribe } from "@/wirestate/types/signals";
 
 /**
  * Registers an AbstractService in the container with activation/deactivation logic.
@@ -59,8 +60,7 @@ export function bindService<T extends AbstractService>(
   // `.onDeactivation` call per chain, so we register them on the container
   // itself instead — this also works correctly if a later call rebinds the
   // same token.
-
-  const whenBind = container.bind<T>(token).to(ServiceClass).inSingletonScope();
+  const whenBind: BindWhenOnFluentSyntax<T> = container.bind<T>(token).to(ServiceClass).inSingletonScope();
 
   if (isWithIgnoreLifecycle) {
     return;
@@ -81,7 +81,7 @@ export function bindService<T extends AbstractService>(
     // Compose all signal listeners (the catch-all `onSignal` hook plus every
     // `@OnSignal`-decorated method) into a single bus subscription so we only
     // pay one Set lookup per emitted signal.
-    const dispatcher = buildSignalDispatcher(instance);
+    const dispatcher: Optional<TSignalHandler> = buildSignalDispatcher(instance);
 
     if (dispatcher) {
       _attachSignalSub(instance, dispatcher);
@@ -168,7 +168,7 @@ export function _attachSignalSub(service: AbstractService, handler: TSignalHandl
  * @internal
  */
 export function _detachSignalSub(service: AbstractService): void {
-  const unsub = SIGNAL_UNSUBSCRIBERS_BY_SERVICE.get(service);
+  const unsub: Maybe<TSignalUnsubscribe> = SIGNAL_UNSUBSCRIBERS_BY_SERVICE.get(service);
 
   if (unsub) {
     unsub();

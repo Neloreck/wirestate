@@ -2,6 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { SIGNAL_HANDLER_METADATA } from "@/wirestate/core/registry";
+import type { Optional } from "@/wirestate/types/general";
 import type { TSignalType } from "@/wirestate/types/signals";
 
 /**
@@ -12,7 +13,7 @@ import type { TSignalType } from "@/wirestate/types/signals";
  */
 export function OnSignal(types?: TSignalType | ReadonlyArray<TSignalType>): MethodDecorator {
   // Normalize types to an array or null for catch-all.
-  const normalized: ReadonlyArray<TSignalType> | null =
+  const normalized: Optional<ReadonlyArray<TSignalType>> =
     types === undefined
       ? null
       : Array.isArray(types)

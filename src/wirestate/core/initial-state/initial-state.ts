@@ -1,4 +1,4 @@
-import type { TAnyObject } from "@/wirestate/types/general";
+import type { Optional, TAnyObject } from "@/wirestate/types/general";
 import type { TInitialStateEntries, TInitialStateKey } from "@/wirestate/types/initial-state";
 
 /**
@@ -35,8 +35,8 @@ export class InitialState {
    * @param ServiceClass - service constructor
    * @returns initial state data or null if missing
    */
-  public getFor<T extends TAnyObject>(ServiceClass: TInitialStateKey): T | null {
-    return (this.boundStates.get(ServiceClass) || null) as T | null;
+  public getFor<T extends TAnyObject>(ServiceClass: TInitialStateKey): Optional<T> {
+    return (this.boundStates.get(ServiceClass) || null) as Optional<T>;
   }
 
   /**

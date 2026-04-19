@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useIocContext } from "@/wirestate/core/provision/use-ioc-context";
 import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
 import { SignalBus } from "@/wirestate/core/signals/signal-bus";
+import type { Maybe, Optional } from "@/wirestate/types/general";
 import type { TSignalHandler, TSignalType } from "@/wirestate/types/signals";
 
 export function useSignal(handler: TSignalHandler): void;
@@ -27,7 +28,7 @@ export function useSignal(
   const activeHandler = isFilter ? maybeHandler : (typeOrHandler as TSignalHandler);
 
   // Normalize filter to array for efficient inclusion check during emit.
-  const types = useMemo<ReadonlyArray<TSignalType> | null>(() => {
+  const types = useMemo<Optional<ReadonlyArray<TSignalType>>>(() => {
     if (!isFilter) {
       return null;
     }
@@ -39,7 +40,7 @@ export function useSignal(
     return [typeOrHandler as TSignalType];
   }, [typeOrHandler, isFilter]);
 
-  const handlerRef = useRef<TSignalHandler | undefined>(activeHandler);
+  const handlerRef = useRef<Maybe<TSignalHandler>>(activeHandler);
 
   // Sync handler into ref to avoid re-subscriptions on closure changes.
   useEffect(() => {

@@ -14,7 +14,7 @@ import {
   SIGNAL_BUS_TOKEN,
 } from "@/wirestate/core/registry";
 import type { SignalBus } from "@/wirestate/core/signals/signal-bus";
-import type { TAnyObject } from "@/wirestate/types/general";
+import type { Optional, TAnyObject, MaybePromise, Maybe } from "@/wirestate/types/general";
 import type { TInitialStateKey } from "@/wirestate/types/initial-state";
 import type { TQueryType } from "@/wirestate/types/queries";
 import type { ISignal, TSignalType } from "@/wirestate/types/signals";
@@ -36,7 +36,7 @@ export abstract class AbstractService {
    * @returns active container
    */
   protected getContainer(): Container {
-    const ref: Container | undefined = CONTAINER_REFS_BY_SERVICE.get(this);
+    const ref: Maybe<Container> = CONTAINER_REFS_BY_SERVICE.get(this);
 
     if (ref) {
       return ref;
@@ -90,14 +90,14 @@ export abstract class AbstractService {
    * @param data - query data
    * @returns query result
    */
-  protected queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): R | Promise<R> {
+  protected queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): MaybePromise<R> {
     dbg.info(prefix(__filename), "Query data:", { name: this.constructor.name, type, data, from: this.constructor });
 
     return this.getContainer().get<QueryBus>(QUERY_BUS_TOKEN).query<R, D>(type, data);
   }
 
   protected getInitialState<T>(): T;
-  protected getInitialState<T>(ServiceClass?: TInitialStateKey): T | null;
+  protected getInitialState<T>(ServiceClass?: TInitialStateKey): Optional<T>;
 
   /**
    * Reads initial state (seed) for the service.
@@ -106,7 +106,7 @@ export abstract class AbstractService {
    * @param ServiceClass - lookup key (defaults to current class)
    * @returns seed data or null if missing
    */
-  protected getInitialState<T extends TAnyObject>(ServiceClass?: TInitialStateKey): T | null {
+  protected getInitialState<T extends TAnyObject>(ServiceClass?: TInitialStateKey): Optional<T> {
     dbg.info(prefix(__filename), "Get initial state for key:", {
       key: (ServiceClass as TAnyObject)?.name ?? ServiceClass,
     });
@@ -120,17 +120,17 @@ export abstract class AbstractService {
    * Lifecycle hook: runs after activation.
    * Override for initialization.
    */
-  public onActivated(): void | Promise<void> {}
+  public onActivated(): MaybePromise<void> {}
 
   /**
    * Lifecycle hook: runs before deactivation.
    * Override for cleanup.
    */
-  public onDeactivated(): void | Promise<void> {}
+  public onDeactivated(): MaybePromise<void> {}
 
   /**
    * Catch-all signal handler.
-   * Subscribed automatically during service lifecycle.
+   * Subscribed automatically during the service lifecycle.
    */
   public onSignal?(signal: ISignal): void;
 }

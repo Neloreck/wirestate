@@ -1,6 +1,8 @@
 import type { Container } from "inversify";
 import { type Context, createContext, type Dispatch, type SetStateAction } from "react";
 
+import type { Optional } from "@/wirestate/types/general";
+
 /**
  * React context value.
  */
@@ -23,6 +25,6 @@ export interface IIocContext {
  * React context carrying the IoC container.
  * Internal. Use hooks to access services.
  */
-export const IocContext: Context<IIocContext | null> = createContext<IIocContext | null>(null);
+export const IocContext: Context<Optional<IIocContext>> = createContext<Optional<IIocContext>>(null);
 
 IocContext.displayName = "IocContext";

@@ -5,6 +5,7 @@ import { createIocContainer } from "@/wirestate/core/container/create-ioc-contai
 import { ERROR_CODE_FAILED_TO_RESOLVE } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { type IIocContext, IocContext } from "@/wirestate/core/provision/ioc-context";
+import type { Optional } from "@/wirestate/types/general";
 
 /**
  * Props for {@link IocProvider}.
@@ -32,7 +33,7 @@ export const IocProvider: FC<IIocProviderProps> = ({ container: externalContaine
   // Incremented on binding changes to invalidate descendant caches (e.g., useService).
   const [revision, setRevision] = useState<number>(0);
   // Lazy initialize owned container if no external container is provided.
-  const [ownedContainer] = useState<Container | null>(() => (externalContainer ? null : createIocContainer()));
+  const [ownedContainer] = useState<Optional<Container>>(() => (externalContainer ? null : createIocContainer()));
 
   const container = externalContainer ?? ownedContainer;
 

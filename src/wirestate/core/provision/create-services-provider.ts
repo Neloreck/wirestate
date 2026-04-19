@@ -8,7 +8,7 @@ import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "@/wires
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { applyInitialState } from "@/wirestate/core/initial-state/apply-initial-state";
 import { type IIocContext, IocContext } from "@/wirestate/core/provision/ioc-context";
-import type { TAnyObject } from "@/wirestate/types/general";
+import type { Optional, TAnyObject } from "@/wirestate/types/general";
 import type { TInitialStateEntries } from "@/wirestate/types/initial-state";
 import type { TServiceClass } from "@/wirestate/types/services";
 
@@ -77,7 +77,7 @@ export function createServicesProvider(
   }
 
   function ServicesProviderComponent(props: IServicesProviderProps) {
-    const iocContext: IIocContext | null = useContext(IocContext);
+    const iocContext: Optional<IIocContext> = useContext(IocContext);
 
     if (!iocContext) {
       throw new WirestateError(
