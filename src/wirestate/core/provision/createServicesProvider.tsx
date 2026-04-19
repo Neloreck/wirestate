@@ -120,9 +120,9 @@ export function createServicesProvider(
 
       return () => {
         // Unbind in reverse order to respect dependencies during onDeactivated.
-        for (let it = services.length - 1; it >= 0; it --) {
-          if (iocContext.container.isBound(services[it])) {
-            iocContext.container.unbind(services[it]);
+        for (const service of services) {
+          if (iocContext.container.isBound(service)) {
+            iocContext.container.unbind(service);
           }
         }
 
