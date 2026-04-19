@@ -30,13 +30,18 @@
 - `mobx-react-lite >= 4.0.0`
 - `inversify >= 8.0.0`
 
+## Documentation
+
+- [InversifyJS](https://inversify.io/)
+- [MobX](https://mobx.js.org/)
+- [MobX-React](https://mobx.js.org/react-integration.html)
+
 ## Quick Start
 
 ### 1. Define a Service
 
 ```typescript
-import { AbstractService, OnSignal, OnQuery } from 'wirestate';
-import { makeAutoObservable } from 'mobx';
+import { AbstractService, OnSignal, OnQuery, makeAutoObservable } from 'wirestate';
 
 export class CounterService extends AbstractService {
   public count = 0;
@@ -89,7 +94,8 @@ const CounterComponent = observer(() => {
   return (
     <div>
       <p>Count: {service.count}</p>
-      <button onClick={() => emit({ type: 'INCREMENT' })}>Increment</button>
+      <button onClick={() => service.increment()}>Increment</button>
+      <button onClick={() => emit({ type: 'INCREMENT' })}>Increment signal</button>
     </div>
   );
 });
