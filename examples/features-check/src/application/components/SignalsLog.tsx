@@ -1,7 +1,7 @@
 import "./SignalsLog.css";
 
 import { LoggerService } from "@/core/services/logging";
-import { observer, useService } from "@/libs/ioc";
+import { observer, useService } from "@/libs/wirestate";
 
 export const SignalsLog = observer(() => {
   const loggerService: LoggerService = useService(LoggerService);

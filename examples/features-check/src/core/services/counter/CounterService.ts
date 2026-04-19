@@ -12,7 +12,7 @@ import {
   Observable,
   OnQuery,
   OnSignal,
-} from "@/libs/ioc";
+} from "@/libs/wirestate";
 
 import {
   ECounterServiceQuery,

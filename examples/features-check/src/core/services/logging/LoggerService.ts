@@ -11,7 +11,7 @@ import {
   OnSignal,
   ShallowObservable,
   type Signal,
-} from "@/libs/ioc";
+} from "@/libs/wirestate";
 
 export interface ILogEntry {
   readonly id: number;

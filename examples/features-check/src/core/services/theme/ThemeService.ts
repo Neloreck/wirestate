@@ -8,7 +8,7 @@ import {
   Injectable,
   makeObservable,
   Observable,
-} from "@/libs/ioc";
+} from "@/libs/wirestate";
 
 @Injectable()
 export class ThemeService extends AbstractService {

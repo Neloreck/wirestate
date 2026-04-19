@@ -16,7 +16,7 @@ import {
   type InitialStateEntries,
   IocProvider,
   type ServicesProvider,
-} from "@/libs/ioc";
+} from "@/libs/wirestate";
 
 // [*] Pass IOC check - separation of container and services provision.
 const ServicesProvider: ServicesProvider = createServicesProvider(

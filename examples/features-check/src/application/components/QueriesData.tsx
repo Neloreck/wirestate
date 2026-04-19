@@ -16,7 +16,7 @@ import {
   useQueryHandler,
   useService,
   useSyncQueryCaller,
-} from "@/libs/ioc";
+} from "@/libs/wirestate";
 
 export const QueriesData = observer(() => {
   const [snapshot, setSnapshot] = useState<Optional<ICounterSnapshot>>(null);

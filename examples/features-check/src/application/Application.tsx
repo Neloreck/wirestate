@@ -7,7 +7,7 @@ import { QueriesData } from "@/application/components/QueriesData";
 import { SignalsLog } from "@/application/components/SignalsLog";
 import { ThemeService } from "@/core/services/theme";
 import { EGlobalSignal } from "@/core/signals";
-import { observer, useService, useSignal } from "@/libs/ioc";
+import { observer, useService, useSignal } from "@/libs/wirestate";
 
 export const Application = observer(() => {
   const themeService: ThemeService = useService(ThemeService);

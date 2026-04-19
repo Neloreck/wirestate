@@ -1,4 +1,4 @@
-import type { Signal } from "@/libs/ioc";
+import type { Signal } from "@/libs/wirestate";
 
 export enum EGlobalSignal {
   COUNTER_INCREMENTED = "counter/incremented",

@@ -10,7 +10,7 @@ import {
   type SignalEmitter,
   useService,
   useSignalEmitter,
-} from "@/libs/ioc";
+} from "@/libs/wirestate";
 
 export const GeneralControls = observer(() => {
   const counterService: CounterService = useService(CounterService);
