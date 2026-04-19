@@ -1,16 +1,18 @@
 const { createMacro } = require("babel-plugin-macros");
 
+const PREFIX = "[WS]";
+
 function dbg({ references, babel }) {
   const { types } = babel;
-  const { log: logRefs } = references;
+  const { dbg: dbgRefs } = references;
 
   const isLoggingEnabled = process.env.LIB_DEBUG_LOGGING === "true" || process.env.LIB_DEBUG_LOGGING === "1";
 
-  if (!logRefs) {
+  if (!dbgRefs) {
     return;
   }
 
-  logRefs.forEach((reference) => {
+  dbgRefs.forEach((reference) => {
     if (types.isMemberExpression(reference.parentPath)) {
       const expression = reference.parentPath.parentPath;
 
@@ -20,7 +22,7 @@ function dbg({ references, babel }) {
 
         const logStatement = types.callExpression(
           types.memberExpression(types.identifier("console"), types.identifier(method)),
-          [types.stringLiteral("[WS]"), ...args]
+          [types.stringLiteral(PREFIX), ...args]
         );
 
         expression.replaceWith(logStatement);
