@@ -1,5 +1,5 @@
-import type { Container } from "inversify";
-import { type FC, type ReactNode, useMemo, useState } from "react";
+import { Container } from "inversify";
+import { createElement, type FC, type ReactNode, useMemo, useState } from "react";
 
 import { createIocContainer } from "@/wirestate/core/container/createIocContainer";
 
@@ -8,7 +8,7 @@ import { type IIocContext, IocContext } from "./IocContext";
 /**
  * Props for {@link IocProvider}.
  */
-export interface IocProviderProps {
+export interface IIocProviderProps {
   /**
    * External container instance. If omitted, a new container is created.
    */
@@ -26,7 +26,7 @@ export interface IocProviderProps {
  * @param props.container
  * @param props.children
  */
-export const IocProvider: FC<IocProviderProps> = ({ container: externalContainer, children }) => {
+export const IocProvider: FC<IIocProviderProps> = ({ container: externalContainer, children }) => {
   // Incremented on binding changes to invalidate descendant caches (e.g., useService).
   const [revision, setRevision] = useState<number>(0);
 
@@ -40,7 +40,7 @@ export const IocProvider: FC<IocProviderProps> = ({ container: externalContainer
   }
 
   // Context value is stable unless the container or revision changes.
-  const value = useMemo<IIocContext>(() => ({ container, revision, setRevision }), [container, revision]);
+  const value: IIocContext = useMemo<IIocContext>(() => ({ container, revision, setRevision }), [container, revision]);
 
-  return <IocContext.Provider value={value}>{children}</IocContext.Provider>;
+  return createElement(IocContext.Provider, { value }, children);
 };

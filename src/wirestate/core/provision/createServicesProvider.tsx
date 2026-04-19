@@ -1,4 +1,3 @@
-
 import { type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 
 import { bindService } from "@/wirestate/core/container/bindService";

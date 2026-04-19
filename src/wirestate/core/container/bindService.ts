@@ -77,7 +77,7 @@ export function bindService<T extends AbstractService>(
     // bootstrapping can await their initialization elsewhere.
     if (result && typeof (result as Promise<void>).then === "function") {
       (result as Promise<void>).catch((error) => {
-        console.error("[ioc] onActivated rejected for", ServiceClass.name, error);
+        console.error("[ioc] onActivated rejected for:", ServiceClass.name, error);
       });
     }
 

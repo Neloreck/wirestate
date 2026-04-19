@@ -2,7 +2,12 @@ import { type Container, injectable, type ServiceIdentifier } from "inversify";
 
 import { InitialState } from "@/wirestate/core/initial-state/InitialState";
 import { QueryBus } from "@/wirestate/core/queries/QueryBus";
-import { CONTAINER_REFS_BY_SERVICE, INITIAL_STATE_TOKEN, QUERY_BUS_TOKEN, SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
+import {
+  CONTAINER_REFS_BY_SERVICE,
+  INITIAL_STATE_TOKEN,
+  QUERY_BUS_TOKEN,
+  SIGNAL_BUS_TOKEN,
+} from "@/wirestate/core/registry";
 import type { SignalBus } from "@/wirestate/core/signals/SignalBus";
 import type { TAnyObject } from "@/wirestate/types/general";
 import type { TInitialStateKey } from "@/wirestate/types/initial-state";
@@ -90,13 +95,13 @@ export abstract class AbstractService {
    * Lifecycle hook: runs after activation.
    * Override for initialization.
    */
-  public onActivated(): void {}
+  public onActivated(): void | Promise<void> {}
 
   /**
    * Lifecycle hook: runs before deactivation.
    * Override for cleanup.
    */
-  public onDeactivated(): void {}
+  public onDeactivated(): void | Promise<void> {}
 
   /**
    * Catch-all signal handler.

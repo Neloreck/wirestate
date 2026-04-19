@@ -3,3 +3,5 @@
  */
 
 // todo: Export testing utils here.
+
+export function noop(): void {}

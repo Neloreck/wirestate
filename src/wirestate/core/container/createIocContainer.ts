@@ -2,7 +2,12 @@ import { Container } from "inversify";
 
 import { InitialState } from "@/wirestate/core/initial-state/InitialState";
 import { QueryBus } from "@/wirestate/core/queries/QueryBus";
-import { INITIAL_STATE_SHARED_TOKEN, INITIAL_STATE_TOKEN, QUERY_BUS_TOKEN, SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
+import {
+  INITIAL_STATE_SHARED_TOKEN,
+  INITIAL_STATE_TOKEN,
+  QUERY_BUS_TOKEN,
+  SIGNAL_BUS_TOKEN,
+} from "@/wirestate/core/registry";
 import { SignalBus } from "@/wirestate/core/signals/SignalBus";
 
 export interface ICreateIocContainerOptions {
