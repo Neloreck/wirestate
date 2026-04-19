@@ -29,6 +29,7 @@ const createPortableConfig = (env) => ({
     preserveModules: false,
     sourcemap: false,
     format: "es",
+    banner: "'use no memo';",
   },
   plugins: [
     commonjs(),
