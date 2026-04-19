@@ -1,5 +1,4 @@
-import { Container } from "inversify";
-
+import { GenericService } from "@/fixtures/services/generic-service";
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
 import { mockBindService } from "@/wirestate/test-utils/mock-bind-service";
 import { mockContainer } from "@/wirestate/test-utils/mock-container";
@@ -9,34 +8,6 @@ describe("AbstractService", () => {
   const illegalAccessError =
     "AbstractService::container accessed before activation. " +
     "Ensure service is bound to container and is properly resolved.";
-
-  class GenericService extends AbstractService {
-    public isActivated: boolean = false;
-
-    public onActivated(): void {
-      this.isActivated = true;
-    }
-
-    public testGetService() {
-      return this.getService(GenericService);
-    }
-
-    public testGetContainer(): Container {
-      return this.getContainer();
-    }
-
-    public testGetInitialState(): Container {
-      return this.getInitialState();
-    }
-
-    public testEmitSignal(): void {
-      this.emitSignal({ type: "test", payload: 0 });
-    }
-
-    public testQueryData(): void {
-      this.queryData("TYPE", { data: 1 });
-    }
-  }
 
   it("should initialise generic services with correct state without container", () => {
     const service = new GenericService();

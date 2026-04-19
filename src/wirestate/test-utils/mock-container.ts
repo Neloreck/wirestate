@@ -1,9 +1,9 @@
 import { Container, ServiceIdentifier } from "inversify";
 
 import { createIocContainer } from "@/wirestate/core/container/createIocContainer";
-import { ERROR_CODE_GENERIC, ERROR_CODE_INVALID_ARGUMENTS } from "@/wirestate/core/error/error-code";
+import { ERROR_CODE_INVALID_ARGUMENTS } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
-import { mockBindService } from "@/wirestate/test-utils";
+import { mockBindService } from "@/wirestate/test-utils/mock-bind-service";
 import { TServiceClass } from "@/wirestate/types/services";
 
 export interface IMockContainerOptions {
