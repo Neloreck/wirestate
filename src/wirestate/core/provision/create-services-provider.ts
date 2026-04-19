@@ -100,6 +100,7 @@ export function createServicesProvider(
       });
 
       // Seed must be applied BEFORE binding so @Inject(INITIAL_STATE_TOKEN) works during activation.
+      // todo: Conditional apply, merge or so.
       applyInitialState(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
 
       for (const ServiceClass of services) {
@@ -125,6 +126,7 @@ export function createServicesProvider(
       // Re-apply state and re-bind if container was reset (e.g. StrictMode remount or HMR).
       let didRebind: boolean = false;
 
+      // todo: Conditional apply, merge or so.
       applyInitialState(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
 
       for (const ServiceClass of services) {
@@ -161,6 +163,7 @@ export function createServicesProvider(
         }
 
         // Cleanup seed to prevent memory leaks or accidental resolution in torn-down container.
+        // todo: Conditional apply, remove linked keys separately or so, leave stored state as is.
         applyInitialState(iocContext.container, {}, []);
       };
     }, services);
