@@ -16,7 +16,6 @@ import {
   OnQuery as DOnQuery,
   OnSignal as DOnSignal,
   RefObservable as DRefObservable,
-  ServicesProvider as DServicesProvider,
   ShallowObservable as DShallowObservable,
   AbstractService as DAbstractService,
   applyInitialState as DapplyInitialState,
@@ -58,7 +57,6 @@ import {
   OnQuery as POnQuery,
   OnSignal as POnSignal,
   RefObservable as PRefObservable,
-  ServicesProvider as PServicesProvider,
   ShallowObservable as PShallowObservable,
   AbstractService as PAbstractService,
   applyInitialState as PapplyInitialState,
@@ -100,7 +98,6 @@ export const Observable = process.env.NODE_ENV === "production" ? PObservable : 
 export const OnQuery = process.env.NODE_ENV === "production" ? POnQuery : DOnQuery;
 export const OnSignal = process.env.NODE_ENV === "production" ? POnSignal : DOnSignal;
 export const RefObservable = process.env.NODE_ENV === "production" ? PRefObservable : DRefObservable;
-export const ServicesProvider = process.env.NODE_ENV === "production" ? PServicesProvider : DServicesProvider;
 export const ShallowObservable = process.env.NODE_ENV === "production" ? PShallowObservable : DShallowObservable;
 export const AbstractService = process.env.NODE_ENV === "production" ? PAbstractService : DAbstractService;
 export const applyInitialState = process.env.NODE_ENV === "production" ? PapplyInitialState : DapplyInitialState;

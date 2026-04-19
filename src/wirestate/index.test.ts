@@ -1,4 +1,3 @@
-
 describe("Library exported API", () => {
   const libRoot = require("./index");
 
@@ -109,7 +108,6 @@ describe("Library exported API", () => {
         "OnQuery",
         "OnSignal",
         "RefObservable",
-        "ServicesProvider",
         "ShallowObservable",
         "AbstractService",
         "applyInitialState",
