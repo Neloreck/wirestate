@@ -1,5 +1,5 @@
-import { SIGNAL_HANDLER_METADATA } from "../registry";
-import type { ISignalHandlerMetadata } from "../types/signals";
+import { SIGNAL_HANDLER_METADATA } from "@/wirestate/core/registry";
+import type { ISignalHandlerMetadata } from "@/wirestate/types/signals";
 
 /**
  * Retrieves `@OnSignal` metadata from the class hierarchy.

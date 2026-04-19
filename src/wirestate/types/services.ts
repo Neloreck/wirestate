@@ -1,6 +1,6 @@
 import { type Newable } from "inversify";
 
-import { AbstractService } from "../service/AbstractService";
+import { AbstractService } from "@/wirestate/core/service/AbstractService";
 
 /**
  * Service constructor.

@@ -1,8 +1,8 @@
 import type { Container } from "inversify";
 
-import { INITIAL_STATE_SHARED_TOKEN, INITIAL_STATE_TOKEN } from "../registry";
-import type { TAnyObject } from "../types/general";
-import type { TInitialStateEntries } from "../types/initial-state";
+import { INITIAL_STATE_SHARED_TOKEN, INITIAL_STATE_TOKEN } from "@/wirestate/core/registry";
+import type { TAnyObject } from "@/wirestate/types/general";
+import type { TInitialStateEntries } from "@/wirestate/types/initial-state";
 
 import { InitialState } from "./InitialState";
 

@@ -1,9 +1,9 @@
 import { Container } from "inversify";
 import { useCallback } from "react";
 
-import { useContainer } from "../provision/useContainer";
-import { QUERY_BUS_TOKEN } from "../registry";
-import type { TQueryType } from "../types/queries";
+import { useContainer } from "@/wirestate/core/provision/useContainer";
+import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
+import type { TQueryType } from "@/wirestate/types/queries";
 
 import type { QueryBus } from "./QueryBus";
 

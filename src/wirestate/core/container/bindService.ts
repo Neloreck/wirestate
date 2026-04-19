@@ -1,19 +1,19 @@
 import { Container, type Newable, type ServiceIdentifier } from "inversify";
 
-import { getQueryHandlerMetadata } from "../queries/getQueryHandlerMetadata";
-import { QueryBus } from "../queries/QueryBus";
+import { getQueryHandlerMetadata } from "@/wirestate/core/queries/getQueryHandlerMetadata";
+import { QueryBus } from "@/wirestate/core/queries/QueryBus";
 import {
   CONTAINER_REFS_BY_SERVICE,
   QUERY_BUS_TOKEN,
   QUERY_UNREGISTERS_BY_SERVICE,
   SIGNAL_BUS_TOKEN,
   SIGNAL_UNSUBSCRIBERS_BY_SERVICE,
-} from "../registry";
-import { AbstractService } from "../service/AbstractService";
-import { buildSignalDispatcher } from "../signals/buildSignalDispatcher";
-import type { SignalBus } from "../signals/SignalBus";
-import type { TQueryHandler, TQueryUnregister } from "../types/queries";
-import type { TSignalHandler } from "../types/signals";
+} from "@/wirestate/core/registry";
+import { AbstractService } from "@/wirestate/core/service/AbstractService";
+import { buildSignalDispatcher } from "@/wirestate/core/signals/buildSignalDispatcher";
+import type { SignalBus } from "@/wirestate/core/signals/SignalBus";
+import type { TQueryHandler, TQueryUnregister } from "@/wirestate/types/queries";
+import type { TSignalHandler } from "@/wirestate/types/signals";
 
 /**
  * Registers an AbstractService in the container with activation/deactivation logic.

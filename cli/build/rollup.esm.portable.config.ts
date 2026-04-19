@@ -14,7 +14,7 @@ import {
   TS_PORTABLE_CONFIG,
   PORTABLE_ROOT,
   EEnvironment,
-  DS_ROOT,
+  WS_ROOT,
   STATS_ROOT,
 } from "../config/build.constants";
 
@@ -25,7 +25,7 @@ const createPortableConfig = (env) => ({
   input: PORTABLE_ENTRY,
   output: {
     compact: env === EEnvironment.PRODUCTION,
-    file: path.resolve(PORTABLE_ROOT, "dreamstate.js"),
+    file: path.resolve(PORTABLE_ROOT, "wirestate.js"),
     preserveModules: false,
     sourcemap: false,
     format: "es",
@@ -45,7 +45,7 @@ const createPortableConfig = (env) => ({
     visualizer({
       filename: path.resolve(STATS_ROOT, "ptb-stats.html"),
       gzipSize: true,
-      projectRoot: DS_ROOT,
+      projectRoot: WS_ROOT,
     }),
     clear({
       targets: [PORTABLE_ROOT],
@@ -56,7 +56,7 @@ const createPortableConfig = (env) => ({
 const createPortableDtsConfig = (env) => ({
   input: [PORTABLE_ENTRY],
   output: {
-    file: path.resolve(PORTABLE_ROOT, "dreamstate.d.ts"),
+    file: path.resolve(PORTABLE_ROOT, "wirestate.d.ts"),
     format: "es",
   },
   plugins: [

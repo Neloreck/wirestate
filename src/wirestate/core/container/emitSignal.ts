@@ -1,8 +1,8 @@
 import { type Container } from "inversify";
 
-import { SIGNAL_BUS_TOKEN } from "../registry";
-import { SignalBus } from "../signals/SignalBus";
-import type { ISignal } from "../types/signals";
+import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
+import { SignalBus } from "@/wirestate/core/signals/SignalBus";
+import type { ISignal } from "@/wirestate/types/signals";
 
 /**
  * Emits signals from outside an AbstractService.

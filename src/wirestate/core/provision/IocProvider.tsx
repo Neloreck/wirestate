@@ -3,7 +3,7 @@
 import type { Container } from "inversify";
 import { type FC, type ReactNode, useMemo, useState } from "react";
 
-import { createIocContainer } from "../container/createIocContainer";
+import { createIocContainer } from "@/wirestate/core/container/createIocContainer";
 
 import { type IIocContext, IocContext } from "./IocContext";
 

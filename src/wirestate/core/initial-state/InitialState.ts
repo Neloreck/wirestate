@@ -1,5 +1,5 @@
-import type { TAnyObject } from "@/wirestate/core/types/general";
-import type { TInitialStateEntries, TInitialStateKey } from "@/wirestate/core/types/initial-state";
+import type { TAnyObject } from "@/wirestate/types/general";
+import type { TInitialStateEntries, TInitialStateKey } from "@/wirestate/types/initial-state";
 
 /**
  * Container-scoped storage for service seeds.

@@ -1,13 +1,13 @@
 import { type Container, injectable, type ServiceIdentifier } from "inversify";
 
-import { InitialState } from "../initial-state/InitialState";
-import { QueryBus } from "../queries/QueryBus";
-import { CONTAINER_REFS_BY_SERVICE, INITIAL_STATE_TOKEN, QUERY_BUS_TOKEN, SIGNAL_BUS_TOKEN } from "../registry";
-import type { SignalBus } from "../signals/SignalBus";
-import type { TAnyObject } from "../types/general";
-import type { TInitialStateKey } from "../types/initial-state";
-import type { TQueryType } from "../types/queries";
-import type { ISignal, TSignalType } from "../types/signals";
+import { InitialState } from "@/wirestate/core/initial-state/InitialState";
+import { QueryBus } from "@/wirestate/core/queries/QueryBus";
+import { CONTAINER_REFS_BY_SERVICE, INITIAL_STATE_TOKEN, QUERY_BUS_TOKEN, SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
+import type { SignalBus } from "@/wirestate/core/signals/SignalBus";
+import type { TAnyObject } from "@/wirestate/types/general";
+import type { TInitialStateKey } from "@/wirestate/types/initial-state";
+import type { TQueryType } from "@/wirestate/types/queries";
+import type { ISignal, TSignalType } from "@/wirestate/types/signals";
 
 /**
  * Base class for services.

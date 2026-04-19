@@ -1,7 +1,7 @@
 import { type ServiceIdentifier } from "inversify";
 import { useMemo } from "react";
 
-import { useIocContext } from "../provision/useIocContext";
+import { useIocContext } from "@/wirestate/core/provision/useIocContext";
 
 /**
  * Resolves a service instance from the container.

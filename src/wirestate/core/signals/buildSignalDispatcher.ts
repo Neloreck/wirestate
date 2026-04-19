@@ -1,5 +1,5 @@
-import { AbstractService } from "../service/AbstractService";
-import type { ISignalDispatchEntry, TSignalHandler } from "../types/signals";
+import { AbstractService } from "@/wirestate/core/service/AbstractService";
+import type { ISignalDispatchEntry, TSignalHandler } from "@/wirestate/types/signals";
 
 import { getSignalHandlerMetadata } from "./getSignalHandlerMetadata";
 

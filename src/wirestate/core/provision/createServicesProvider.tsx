@@ -1,12 +1,12 @@
 "use no memo";
 
-import { type FC, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 
-import { bindService } from "../container/bindService";
-import { applyInitialState } from "../initial-state/applyInitialState";
-import type { TAnyObject } from "../types/general";
-import type { TInitialStateEntries } from "../types/initial-state";
-import type { TServiceClass } from "../types/services";
+import { bindService } from "@/wirestate/core/container/bindService";
+import { applyInitialState } from "@/wirestate/core/initial-state/applyInitialState";
+import type { TAnyObject } from "@/wirestate/types/general";
+import type { TInitialStateEntries } from "@/wirestate/types/initial-state";
+import type { TServiceClass } from "@/wirestate/types/services";
 
 import { type IIocContext, IocContext } from "./IocContext";
 
@@ -32,12 +32,12 @@ export interface IServicesProviderProps {
 /**
  * Component returned by {@link createServicesProvider}.
  */
-export type ServicesProvider = FC<IServicesProviderProps>;
+export type ServicesProvider = ReturnType<typeof createServicesProvider>;
 
 /**
  * Configuration for {@link createServicesProvider}.
  */
-export interface CreateIocProviderOptions {
+export interface ICreateIocProviderOptions {
   /**
    * Services to resolve immediately on mount.
    */
@@ -53,8 +53,8 @@ export interface CreateIocProviderOptions {
  */
 export function createServicesProvider(
   services: ReadonlyArray<TServiceClass>,
-  options: CreateIocProviderOptions = {}
-): ServicesProvider {
+  options: ICreateIocProviderOptions = {}
+) {
   const { activate } = options;
 
   if (activate && activate.length > 0) {
@@ -67,7 +67,7 @@ export function createServicesProvider(
     }
   }
 
-  function ServicesProviderComponent(props: IServicesProviderProps): ReactNode {
+  function ServicesProviderComponent(props: IServicesProviderProps) {
     const iocContext: IIocContext | null = useContext(IocContext);
 
     if (!iocContext) {

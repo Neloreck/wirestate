@@ -2,8 +2,8 @@ import { Container } from "inversify";
 
 import type { AbstractService } from "@/wirestate/core/service/AbstractService";
 
-import type { IQueryHandlerMetadata, TQueryUnregister } from "./types/queries";
-import type { TSignalUnsubscribe, ISignalHandlerMetadata } from "./types/signals";
+import type { IQueryHandlerMetadata, TQueryUnregister } from "../types/queries";
+import type { TSignalUnsubscribe, ISignalHandlerMetadata } from "../types/signals";
 
 /**
  * Token for the container-scoped signal bus.

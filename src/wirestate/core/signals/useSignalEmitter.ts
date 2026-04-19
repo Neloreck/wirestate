@@ -1,9 +1,9 @@
 import { Container } from "inversify";
 import { useCallback } from "react";
 
-import { useIocContext } from "../provision/useIocContext";
-import { SIGNAL_BUS_TOKEN } from "../registry";
-import type { ISignal, TSignalEmitter } from "../types/signals";
+import { useIocContext } from "@/wirestate/core/provision/useIocContext";
+import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
+import type { ISignal, TSignalEmitter } from "@/wirestate/types/signals";
 
 import { SignalBus } from "./SignalBus";
 

@@ -8,7 +8,7 @@ import { default as typescript } from "@rollup/plugin-typescript";
 import { default as clear } from "rollup-plugin-clear";
 import { visualizer } from "rollup-plugin-visualizer";
 
-import { CORE_ENTRY, ESM_ROOT, TS_BUILD_CONFIG, EEnvironment, DS_ROOT, STATS_ROOT } from "../config/build.constants";
+import { CORE_ENTRY, ESM_ROOT, TS_BUILD_CONFIG, EEnvironment, WS_ROOT, STATS_ROOT } from "../config/build.constants";
 
 import { BABEL_CONFIG } from "./babel.modern.config";
 
@@ -41,7 +41,7 @@ const createEsmConfig = (env) => ({
       visualizer({
         filename: path.resolve(STATS_ROOT, `esm-${env}-stats.html`),
         gzipSize: true,
-        projectRoot: DS_ROOT,
+        projectRoot: WS_ROOT,
       }),
       clear({
         targets: [path.resolve(ESM_ROOT, env)],

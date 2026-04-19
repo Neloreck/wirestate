@@ -14,7 +14,7 @@ import {
   TS_BUILD_CONFIG,
   CJS_ROOT,
   EEnvironment,
-  DS_ROOT,
+  WS_ROOT,
   STATS_ROOT,
 } from "../config/build.constants";
 
@@ -48,7 +48,7 @@ const createCjsConfig = (env) => ({
       visualizer({
         filename: path.resolve(STATS_ROOT, `cjs-${env}-stats.html`),
         gzipSize: true,
-        projectRoot: DS_ROOT,
+        projectRoot: WS_ROOT,
       }),
       clear({
         targets: [path.resolve(CJS_ROOT, env)],

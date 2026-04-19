@@ -1,4 +1,4 @@
-import type { ISignal, TSignalHandler, TSignalUnsubscribe } from "../types/signals";
+import type { ISignal, TSignalHandler, TSignalUnsubscribe } from "@/wirestate/types/signals";
 
 /**
  * Dispatches signals to subscribers.

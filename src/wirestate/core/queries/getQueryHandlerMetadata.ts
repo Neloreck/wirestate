@@ -1,5 +1,5 @@
-import { QUERY_HANDLER_METADATA } from "../registry";
-import type { IQueryHandlerMetadata } from "../types/queries";
+import { QUERY_HANDLER_METADATA } from "@/wirestate/core/registry";
+import type { IQueryHandlerMetadata } from "@/wirestate/types/queries";
 
 /**
  * Retrieves `@OnQuery` metadata from the class hierarchy.

@@ -1,4 +1,4 @@
-import type { TQueryHandler, TQueryType, TQueryUnregister } from "../types/queries";
+import type { TQueryHandler, TQueryType, TQueryUnregister } from "@/wirestate/types/queries";
 
 /**
  * Dispatches queries to handlers.

@@ -1,5 +1,5 @@
-import { SIGNAL_HANDLER_METADATA } from "../registry";
-import type { TSignalType } from "../types/signals";
+import { SIGNAL_HANDLER_METADATA } from "@/wirestate/core/registry";
+import type { TSignalType } from "@/wirestate/types/signals";
 
 /**
  * Decorator for service methods that respond to signals.
