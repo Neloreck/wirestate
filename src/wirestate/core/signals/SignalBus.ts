@@ -1,3 +1,4 @@
+import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
 import type { ISignal, TSignalHandler, TSignalUnsubscribe } from "@/wirestate/types/signals";
 
 /**
@@ -31,6 +32,7 @@ export class SignalBus {
    * Returns an unsubscribe function.
    *
    * @param handler - signal handler function
+   * @returns unsubscribe function
    */
   public subscribe(handler: TSignalHandler): TSignalUnsubscribe {
     this.handlers.add(handler);

@@ -23,8 +23,9 @@ export interface IIocProviderProps {
  * Provides an IoC container to the component tree.
  *
  * @param props - component props
- * @param props.container
- * @param props.children
+ * @param props.container - external container instance
+ * @param props.children - components to wrap
+ * @returns provider element
  */
 export const IocProvider: FC<IIocProviderProps> = ({ container: externalContainer, children }) => {
   // Incremented on binding changes to invalidate descendant caches (e.g., useService).

@@ -5,6 +5,7 @@ import type { TQueryType } from "@/wirestate/types/queries";
  * Decorator for service methods that respond to a query.
  *
  * @param type - query type identifier
+ * @returns decorator function
  */
 export function OnQuery(type: TQueryType): MethodDecorator {
   return (target, propertyKey) => {

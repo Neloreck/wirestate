@@ -21,6 +21,7 @@ export interface ICreateIocContainerOptions {
  * Creates an IoC container with framework essentials.
  *
  * @param options - container configuration
+ * @returns new IoC container
  */
 export function createIocContainer(options: ICreateIocContainerOptions = {}): Container {
   const container: Container = new Container({

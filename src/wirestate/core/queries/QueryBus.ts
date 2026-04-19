@@ -1,3 +1,4 @@
+import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
 import type { TQueryHandler, TQueryType, TQueryUnregister } from "@/wirestate/types/queries";
 
 /**
@@ -17,6 +18,7 @@ export class QueryBus {
    *
    * @param type - query type
    * @param handler - handler function
+   * @returns unregister function
    */
   public register<D = unknown, R = unknown>(type: TQueryType, handler: TQueryHandler<D, R>): TQueryUnregister {
     let stack = this.handlers.get(type);
@@ -53,6 +55,8 @@ export class QueryBus {
    *
    * @param type - query type
    * @param data - query payload
+   * @returns query result
+   *
    * @throws if no handler is registered
    */
   public query<R = unknown, D = unknown>(type: TQueryType, data?: D): R | Promise<R> {
@@ -73,6 +77,7 @@ export class QueryBus {
    * Checks if a handler is registered for the given type.
    *
    * @param type - query type
+   * @returns true if handler exists
    */
   public has(type: TQueryType): boolean {
     const stack = this.handlers.get(type);

@@ -14,6 +14,5 @@ export function useService<T>(token: ServiceIdentifier<T>): T {
   const { container, revision } = useIocContext();
 
   // Revision bump signals a container reset; force re-resolution to drop stale instances.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useMemo(() => container.get<T>(token), [container, revision, token]);
 }

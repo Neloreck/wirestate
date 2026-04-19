@@ -5,8 +5,9 @@ import type { ISignalHandlerMetadata } from "@/wirestate/types/signals";
  * Retrieves `@OnSignal` metadata from the class hierarchy.
  * Returns handlers ordered from base to derived class.
  *
- * @internal
  * @param instance - service instance
+ * @returns metadata list
+ * @internal
  */
 export function getSignalHandlerMetadata(instance: object): ReadonlyArray<ISignalHandlerMetadata> {
   const chain: Array<Array<ISignalHandlerMetadata>> = [];

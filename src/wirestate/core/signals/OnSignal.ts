@@ -5,6 +5,7 @@ import type { TSignalType } from "@/wirestate/types/signals";
  * Decorator for service methods that respond to signals.
  *
  * @param types - signal type(s) to handle. If omitted, handles all signals
+ * @returns decorator function
  */
 export function OnSignal(types?: TSignalType | ReadonlyArray<TSignalType>): MethodDecorator {
   // Normalize types to an array or null for catch-all.

@@ -27,6 +27,8 @@ export abstract class AbstractService {
   /**
    * Access the IoC container.
    * Internal. Use for on-demand resolution.
+   *
+   * @returns active container
    */
   protected getContainer(): Container {
     const ref = CONTAINER_REFS_BY_SERVICE.get(this);

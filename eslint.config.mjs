@@ -130,6 +130,10 @@ export default [
       ],
       "jsdoc/require-returns-check": "off",
       "jsdoc/require-jsdoc": "off",
+      "jsdoc/require-param-type": "off",
+      "jsdoc/require-returns-type": "off",
+      "jsdoc/require-property-type": "off",
+      "jsdoc/no-undefined-types": "off",
       "key-spacing": [
         "error",
         {

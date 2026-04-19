@@ -5,6 +5,7 @@ import { type IIocContext, IocContext } from "./IocContext";
 /**
  * Returns the full IoC context.
  *
+ * @returns active IoC context
  * @internal
  */
 export function useIocContext(): IIocContext {

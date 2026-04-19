@@ -91,7 +91,6 @@ export function createServicesProvider(
           iocContext.container.get(eager);
         }
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, services);
 
     useEffect(() => {
@@ -130,7 +129,6 @@ export function createServicesProvider(
         // Cleanup seed to prevent memory leaks or accidental resolution in torn-down container.
         applyInitialState(iocContext.container, {}, []);
       };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, services);
 
     return props.children;

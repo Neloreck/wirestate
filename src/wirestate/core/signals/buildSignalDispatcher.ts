@@ -6,9 +6,9 @@ import { getSignalHandlerMetadata } from "./getSignalHandlerMetadata";
 /**
  * Composes service signal handlers into a single dispatcher.
  *
- * @internal
  * @param instance - service instance
  * @returns signal handler or null if no handlers are declared
+ * @internal
  */
 export function buildSignalDispatcher(instance: AbstractService): TSignalHandler | null {
   const entries: Array<ISignalDispatchEntry> = [];

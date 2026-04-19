@@ -5,8 +5,9 @@ import type { IQueryHandlerMetadata } from "@/wirestate/types/queries";
  * Retrieves `@OnQuery` metadata from the class hierarchy.
  * Returns handlers ordered from base to derived class.
  *
- * @internal
  * @param instance - service instance
+ * @returns metadata list
+ * @internal
  */
 export function getQueryHandlerMetadata(instance: object): ReadonlyArray<IQueryHandlerMetadata> {
   const chain: Array<Array<IQueryHandlerMetadata>> = [];

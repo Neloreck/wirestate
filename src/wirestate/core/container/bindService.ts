@@ -103,8 +103,8 @@ export function bindService<T extends AbstractService>(
 /**
  * Attaches a signal subscription to a service.
  *
- * @param service
- * @param handler
+ * @param service - service instance
+ * @param handler - signal handler
  * @internal
  */
 export function _attachSignalSub(service: AbstractService, handler: TSignalHandler): void {
@@ -122,7 +122,7 @@ export function _attachSignalSub(service: AbstractService, handler: TSignalHandl
 /**
  * Detaches the signal subscription from a service.
  *
- * @param service
+ * @param service - service instance
  * @internal
  */
 export function _detachSignalSub(service: AbstractService): void {
@@ -137,8 +137,8 @@ export function _detachSignalSub(service: AbstractService): void {
 /**
  * Registers a query unregister function for a service.
  *
- * @param service
- * @param unregister
+ * @param service - service instance
+ * @param unregister - query unregister function
  * @internal
  */
 export function _attachQueryUnreg(service: AbstractService, unregister: TQueryUnregister): void {
@@ -155,7 +155,7 @@ export function _attachQueryUnreg(service: AbstractService, unregister: TQueryUn
 /**
  * Executes and removes all query unregister functions for a service.
  *
- * @param service
+ * @param service - service instance
  * @internal
  */
 export function _detachQueryUnregs(service: AbstractService): void {
