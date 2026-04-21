@@ -23,7 +23,7 @@ export { useOptionalQueryCaller } from "@/wirestate/core/queries/use-optional-qu
 export { useQueryHandler } from "@/wirestate/core/queries/use-query-handler";
 export { useSyncQueryCaller } from "@/wirestate/core/queries/use-sync-query-caller";
 export { useOptionalSyncQueryCaller } from "@/wirestate/core/queries/use-optional-sync-query-caller";
-export { INITIAL_STATE_TOKEN as INITIAL_STATE } from "@/wirestate/core/registry";
+export { SEED_TOKEN as SEED } from "@/wirestate/core/registry";
 export { AbstractService } from "@/wirestate/core/service/abstract-service";
 export { OnActivated } from "@/wirestate/core/service/on-activated";
 export { OnDeactivation } from "@/wirestate/core/service/on-deactivation";
@@ -35,9 +35,9 @@ export { useSignals } from "@/wirestate/core/signals/use-signals";
 export { useSignalHandler } from "@/wirestate/core/signals/use-signal-handler";
 export { useSignalEmitter } from "@/wirestate/core/signals/use-signal-emitter";
 export {
-  TInitialStateEntries as InitialStateEntries,
-  TInitialStateEntry as InitialStateEntry,
-  TInitialStateKey as InitialStateKey,
+  TSeedEntries as SeedEntries,
+  TSeedEntry as SeedEntry,
+  TSeedKey as SeedKey,
 } from "@/wirestate/types/initial-state";
 export { IInjectableDescriptor as InjectableDescriptor } from "@/wirestate/types/privision";
 export {

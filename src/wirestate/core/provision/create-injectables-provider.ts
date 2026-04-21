@@ -6,12 +6,13 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { bindEntry } from "@/wirestate/core/bind/bind-entry";
 import { getEntryToken } from "@/wirestate/core/bind/get-entry-token";
-import { applyInitialStates, removeInitialStateEntries } from "@/wirestate/core/container/apply-initial-states";
+import { applySeeds } from "@/wirestate/core/container/apply-seeds";
+import { unapplySeeds } from "@/wirestate/core/container/unapply-seeds";
 import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { type IIocContext, IocContext } from "@/wirestate/core/provision/ioc-context";
-import type { Optional, TAnyObject } from "@/wirestate/types/general";
-import type { TInitialStateEntries } from "@/wirestate/types/initial-state";
+import type { Optional } from "@/wirestate/types/general";
+import type { TSeedEntries } from "@/wirestate/types/initial-state";
 import type { IInjectableDescriptor } from "@/wirestate/types/privision";
 import type { TServiceClass } from "@/wirestate/types/services";
 
@@ -20,14 +21,10 @@ import type { TServiceClass } from "@/wirestate/types/services";
  */
 export interface IInjectablesProviderProps {
   /**
-   * Shared initial state applied to services on the first mount.
-   */
-  readonly initialState?: TAnyObject;
-  /**
-   * Targeted initial state entries applied to services on the first mount.
+   * Targeted seeds bound to specific injectables or tokens.
    * Subsequent prop changes are ignored. Use a React `key` to re-seed the tree.
    */
-  readonly initialStates?: TInitialStateEntries;
+  readonly seeds?: TSeedEntries;
   /**
    * Subtree that consumes the bound services.
    */
@@ -87,7 +84,7 @@ export function createInjectablesProvider(
       );
     }
 
-    // Snapshot initialState on mount to ensure binding stability.
+    // Snapshot props on mount to ensure binding stability.
     // useState lazy initializer ensures it only runs once.
     const [initialPropsSnapshot] = useState<IInjectablesProviderProps>(() => props);
 
@@ -101,7 +98,9 @@ export function createInjectablesProvider(
       });
 
       // Seed must be applied BEFORE binding so @Inject(INITIAL_STATE_TOKEN) works during activation.
-      applyInitialStates(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
+      if (initialPropsSnapshot.seeds) {
+        applySeeds(iocContext.container, initialPropsSnapshot.seeds);
+      }
 
       for (const entry of entries) {
         if (!iocContext.container.isBound(getEntryToken(entry))) {
@@ -128,7 +127,9 @@ export function createInjectablesProvider(
       // Re-apply state and re-bind if container was reset (e.g. StrictMode remount or HMR).
       let didRebind: boolean = false;
 
-      applyInitialStates(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
+      if (initialPropsSnapshot.seeds) {
+        applySeeds(iocContext.container, initialPropsSnapshot.seeds);
+      }
 
       for (const entry of entries) {
         if (!iocContext.container.isBound(getEntryToken(entry))) {
@@ -164,7 +165,7 @@ export function createInjectablesProvider(
         }
 
         // Remove only this provider's targeted initial state entries.
-        removeInitialStateEntries(iocContext.container, initialPropsSnapshot.initialStates);
+        unapplySeeds(iocContext.container, initialPropsSnapshot.seeds);
       };
     }, entries);
 

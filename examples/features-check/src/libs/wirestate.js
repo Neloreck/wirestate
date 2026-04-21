@@ -36,40 +36,30 @@ const ERROR_CODE_ACCESS_AFTER_DISPOSAL = 201;class WirestateError extends Error 
     this.message = detail || "Wirestate error.";
   }
 }function bindConstant(container, entry) {
-  console.info("[WS]", "[bind-constant.ts]", "Binding constant:", {
-    id: entry.id,
-    value: entry.value,
-    entry,
-    container
-  });
-  if (entry.scopeType) {
+  if (entry.scopeBindingType) {
     throw new WirestateError(ERROR_CODE_BINDING_SCOPE, "Provided unexpected binding scope for constant value.");
   }
   container.bind(entry.id).toConstantValue(entry.value);
 }function bindDynamicValue(container, entry) {
-  console.info("[WS]", "[bind-dynamic-value.ts]", "Binding constant:", {
-    entry,
-    container
-  });
   const binding = container.bind(entry.id).toDynamicValue(() => {
     if (entry.factory) {
       return entry.factory();
     }
     return entry.value;
   });
-  if (!entry.scopeType) {
+  if (!entry.scopeBindingType) {
     return;
-  } else if (entry.scopeType === bindingScopeValues.Transient) {
+  } else if (entry.scopeBindingType === bindingScopeValues.Transient) {
     binding.inTransientScope();
-  } else if (entry.scopeType === bindingScopeValues.Request) {
+  } else if (entry.scopeBindingType === bindingScopeValues.Request) {
     binding.inRequestScope();
   } else {
     binding.inSingletonScope();
   }
 }const SIGNAL_BUS_TOKEN = Symbol("@wirestate/signal-bus");
 const QUERY_BUS_TOKEN = Symbol("@wirestate/query-bus");
-const INITIAL_STATES_TOKEN = Symbol("@wirestate/initial-states");
-const INITIAL_STATE_TOKEN = Symbol("@wirestate/initial-state");
+const SEEDS_TOKEN = Symbol("@wirestate/seeds");
+const SEED_TOKEN = Symbol("@wirestate/seed");
 const QUERY_HANDLER_METADATA = new WeakMap();
 const ACTIVATED_HANDLER_METADATA = new WeakMap();
 const DEACTIVATION_HANDLER_METADATA = new WeakMap();
@@ -77,10 +67,6 @@ const SIGNAL_HANDLER_METADATA = new WeakMap();
 const CONTAINER_REFS_BY_SERVICE = new WeakMap();
 const SIGNAL_UNSUBSCRIBERS_BY_SERVICE = new WeakMap();
 const QUERY_UNREGISTERS_BY_SERVICE = new WeakMap();function getQueryHandlerMetadata(instance) {
-  console.info("[WS]", "[get-query-handler-metadata.ts]", "Resolving instance query metadata:", {
-    name: instance.constructor.name,
-    instance
-  });
   let constructor = instance.constructor;
   const chain = [];
   while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
@@ -90,17 +76,8 @@ const QUERY_UNREGISTERS_BY_SERVICE = new WeakMap();function getQueryHandlerMetad
     }
     constructor = Object.getPrototypeOf(constructor);
   }
-  console.info("[WS]", "[get-query-handler-metadata.ts]", "Resolved instance query metadata:", {
-    name: instance.constructor.name,
-    instance,
-    chain
-  });
   return chain.reverse().flat();
 }function getActivatedHandlerMetadata(instance) {
-  console.info("[WS]", "[get-activated-handler-metadata.ts]", "Resolving OnActivated metadata:", {
-    name: instance.constructor.name,
-    instance
-  });
   let constructor = instance.constructor;
   const chain = [];
   while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
@@ -110,17 +87,8 @@ const QUERY_UNREGISTERS_BY_SERVICE = new WeakMap();function getQueryHandlerMetad
     }
     constructor = Object.getPrototypeOf(constructor);
   }
-  console.info("[WS]", "[get-activated-handler-metadata.ts]", "Resolved OnActivated metadata:", {
-    name: instance.constructor.name,
-    chain,
-    instance
-  });
   return chain.reverse().flat();
 }function getDeactivationHandlerMetadata(instance) {
-  console.info("[WS]", "[get-deactivation-handler-metadata.ts]", "Resolving OnDeactivation metadata:", {
-    name: instance.constructor.name,
-    instance
-  });
   let constructor = instance.constructor;
   const chain = [];
   while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
@@ -130,17 +98,8 @@ const QUERY_UNREGISTERS_BY_SERVICE = new WeakMap();function getQueryHandlerMetad
     }
     constructor = Object.getPrototypeOf(constructor);
   }
-  console.info("[WS]", "[get-deactivation-handler-metadata.ts]", "Resolved OnDeactivation metadata:", {
-    name: instance.constructor.name,
-    chain,
-    instance
-  });
   return chain.reverse().flat();
 }function getSignalHandlerMetadata(instance) {
-  console.info("[WS]", "[get-signal-handler-metadata.ts]", "Retrieving signal handler metadata:", {
-    name: instance.constructor.name,
-    instance
-  });
   let constructor = instance.constructor;
   const chain = [];
   while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
@@ -150,17 +109,8 @@ const QUERY_UNREGISTERS_BY_SERVICE = new WeakMap();function getQueryHandlerMetad
     }
     constructor = Object.getPrototypeOf(constructor);
   }
-  console.info("[WS]", "[get-signal-handler-metadata.ts]", "Retrieved signal handler metadata:", {
-    name: instance.constructor.name,
-    chain,
-    instance
-  });
   return chain.reverse().flat();
 }function buildSignalDispatcher(instance) {
-  console.info("[WS]", "[build-signal-dispatcher.ts]", "Build signal dispatcher for:", {
-    name: instance.constructor.name,
-    instance
-  });
   const entries = [];
   if (typeof instance.onSignal === "function") {
     entries.push({
@@ -178,11 +128,6 @@ const QUERY_UNREGISTERS_BY_SERVICE = new WeakMap();function getQueryHandlerMetad
     }
   }
   if (entries.length) {
-    console.info("[WS]", "[build-signal-dispatcher.ts]", "Built signal dispatcher for:", {
-      name: instance.constructor.name,
-      instance,
-      entries
-    });
     return signal => {
       for (const entry of entries) {
         if (entry.types === null || entry.types.includes(signal.type)) {
@@ -191,32 +136,14 @@ const QUERY_UNREGISTERS_BY_SERVICE = new WeakMap();function getQueryHandlerMetad
       }
     };
   } else {
-    console.info("[WS]", "[build-signal-dispatcher.ts]", "Skip bulding signal dispatcher for:", {
-      name: instance.constructor.name,
-      instance,
-      entries
-    });
     return null;
   }
 }function bindService(container, entry, options) {
-  console.info("[WS]", "[bind-service.ts]", "Binding service:", {
-    name: entry.name,
-    entry,
-    options,
-    container
-  });
   const whenBind = container.bind(entry).to(entry).inSingletonScope();
   if (options?.isWithIgnoreLifecycle) {
     return;
   }
   whenBind.onActivation((ctx, instance) => {
-    console.info("[WS]", "[bind-service.ts]", "Activating service:", {
-      name: entry.name,
-      ctx,
-      container,
-      entry,
-      instance
-    });
     instance.IS_DISPOSED = false;
     CONTAINER_REFS_BY_SERVICE.set(instance, container);
     const dispatcher = buildSignalDispatcher(instance);
@@ -247,11 +174,6 @@ const QUERY_UNREGISTERS_BY_SERVICE = new WeakMap();function getQueryHandlerMetad
     return instance;
   });
   whenBind.onDeactivation(instance => {
-    console.info("[WS]", "[bind-service.ts]", "Deactivating service:", {
-      name: entry.name,
-      container,
-      instance
-    });
     for (const methodName of getDeactivationHandlerMetadata(instance)) {
       const method = instance[methodName];
       if (typeof method === "function") {
@@ -303,31 +225,18 @@ function _detachQueryUnregs(service) {
     bindService(container, entry);
     return;
   }
-  if (!entry.type || entry.type === bindingTypeValues.ConstantValue) {
+  if (!entry.bindingType || entry.bindingType === bindingTypeValues.ConstantValue) {
     bindConstant(container, entry);
     return;
   }
-  if (entry.type === bindingTypeValues.DynamicValue) {
-    console.info("[WS]", "[bind-entry.ts]", "Binding dynamic value entry:", {
-      entry,
-      container
-    });
+  if (entry.bindingType === bindingTypeValues.DynamicValue) {
     bindDynamicValue(container, entry);
     return;
   }
-  console.info("[WS]", "[bind-entry.ts]", "Binding entry with fallback:", {
-    entry,
-    container
-  });
   bindService(container, entry);
 }class QueryBus {
   handlers = new Map();
   register(type, handler) {
-    console.info("[WS]", "[query-bus.ts]", "Registering query handler:", {
-      type,
-      handler,
-      bus: this
-    });
     let stack = this.handlers.get(type);
     if (!stack) {
       stack = [];
@@ -335,11 +244,6 @@ function _detachQueryUnregs(service) {
     }
     stack.push(handler);
     return () => {
-      console.info("[WS]", "[query-bus.ts]", "Unregistering query handler:", {
-        type,
-        handler,
-        bus: this
-      });
       const current = this.handlers.get(type);
       if (!current) {
         return;
@@ -387,16 +291,8 @@ function _detachQueryUnregs(service) {
     }
   }
   subscribe(handler) {
-    console.info("[WS]", "[signal-bus.ts]", "Adding signal subscription:", {
-      handler,
-      bus: this
-    });
     this.handlers.add(handler);
     return () => {
-      console.info("[WS]", "[signal-bus.ts]", "Removing signal subscription:", {
-        handler,
-        bus: this
-      });
       this.handlers.delete(handler);
     };
   }
@@ -404,63 +300,35 @@ function _detachQueryUnregs(service) {
     this.handlers.clear();
   }
 }function createIocContainer(options = {}) {
-  console.info("[WS]", "[create-ioc-container.ts]", "Creating IOC container:", {
-    options
-  });
   const container = new Container({
     defaultScope: "Singleton",
     parent: options.parent
   });
   container.bind(SIGNAL_BUS_TOKEN).toConstantValue(new SignalBus());
   container.bind(QUERY_BUS_TOKEN).toConstantValue(new QueryBus());
-  container.bind(INITIAL_STATES_TOKEN).toConstantValue(new Map());
-  container.bind(INITIAL_STATE_TOKEN).toConstantValue({});
-  console.info("[WS]", "[create-ioc-container.ts]", "Created IOC container:", {
-    container,
-    options
-  });
+  container.bind(SEEDS_TOKEN).toConstantValue(new Map());
+  container.bind(SEED_TOKEN).toConstantValue({});
   return container;
 }function emitSignal(container, signal) {
-  console.info("[WS]", "[emit-signal.ts]", "Emit signal:", {
-    type: signal?.type,
-    signal,
-    container
-  });
   container.get(SIGNAL_BUS_TOKEN).emit(signal);
 }function query(container, type, data) {
-  console.info("[WS]", "[query.ts]", "Query data:", type, data, container);
   return container.get(QUERY_BUS_TOKEN).query(type, data);
 }function getEntryToken(entry) {
   return typeof entry === "function" ? entry : entry.id;
-}function applyInitialStates(container, shared = {}, bound = []) {
-  const existing = container.get(INITIAL_STATES_TOKEN);
-  console.info("[WS]", "[apply-initial-states.ts]", "Merging initial state for container:", {
-    shared,
-    bound,
-    existing,
-    container
-  });
-  for (const [key, state] of bound) {
-    existing.set(key, state);
+}function applySeeds(container, seeds) {
+  const existing = container.get(SEEDS_TOKEN);
+  if (seeds) {
+    for (const [key, state] of seeds) {
+      existing.set(key, state);
+    }
   }
-  container.rebind(INITIAL_STATE_TOKEN).toConstantValue(shared);
-}
-function removeInitialStateEntries(container, bound = []) {
-  const existing = container.get(INITIAL_STATES_TOKEN);
-  console.info("[WS]", "Removing initial state entries for container:", {
-    existing,
-    bound,
-    container
-  });
-  for (const [key] of bound) {
+}function unapplySeeds(container, seeds = []) {
+  const existing = container.get(SEEDS_TOKEN);
+  for (const [key] of seeds) {
     existing.delete(key);
   }
 }const IocContext = createContext(null);
 IocContext.displayName = "IocContext";function createInjectablesProvider(entries, options = {}) {
-  console.info("[WS]", "[create-injectables-provider.ts]", "Creating injectables provider:", {
-    services: entries,
-    options
-  });
   const {
     activate
   } = options;
@@ -479,14 +347,9 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
     }
     const [initialPropsSnapshot] = useState(() => props);
     useMemo(() => {
-      console.info("[WS]", "[create-injectables-provider.ts]", "Providing services on first render:", {
-        container: iocContext.container,
-        revision: iocContext.revision,
-        services: entries,
-        initialPropsSnapshot,
-        activate
-      });
-      applyInitialStates(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
+      if (initialPropsSnapshot.seeds) {
+        applySeeds(iocContext.container, initialPropsSnapshot.seeds);
+      }
       for (const entry of entries) {
         if (!iocContext.container.isBound(getEntryToken(entry))) {
           bindEntry(iocContext.container, entry);
@@ -499,15 +362,10 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
       }
     }, entries);
     useEffect(() => {
-      console.info("[WS]", "[create-injectables-provider.ts]", "Providing services on mount:", {
-        container: iocContext.container,
-        revision: iocContext.revision,
-        entries,
-        initialPropsSnapshot,
-        activate
-      });
       let didRebind = false;
-      applyInitialStates(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
+      if (initialPropsSnapshot.seeds) {
+        applySeeds(iocContext.container, initialPropsSnapshot.seeds);
+      }
       for (const entry of entries) {
         if (!iocContext.container.isBound(getEntryToken(entry))) {
           didRebind = true;
@@ -523,31 +381,24 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
         iocContext.setRevision(r => r + 1);
       }
       return () => {
-        console.info("[WS]", "[create-injectables-provider.ts]", "Unprovision services on unmount:", {
-          container: iocContext.container,
-          revision: iocContext.revision,
-          entries
-        });
         for (const entry of entries) {
           const token = getEntryToken(entry);
           if (iocContext.container.isBound(token)) {
             iocContext.container.unbind(token);
           }
         }
-        removeInitialStateEntries(iocContext.container, initialPropsSnapshot.initialStates);
+        unapplySeeds(iocContext.container, initialPropsSnapshot.seeds);
       };
     }, entries);
     return props.children;
   }
   InjectablesProviderComponent.displayName = "InjectablesProvider";
-  console.info("[WS]", "[create-injectables-provider.ts]", "Created injectables provider:", {
-    InjectablesProviderComponent,
-    entries,
-    options
-  });
   return InjectablesProviderComponent;
+}function applySharedSeed(container, seed) {
+  container.rebind(SEED_TOKEN).toConstantValue(seed);
 }function IocProvider({
   container: externalContainer,
+  seed,
   children
 }) {
   const [revision, setRevision] = useState(0);
@@ -561,6 +412,11 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
     revision,
     setRevision
   }), [container, revision]);
+  useEffect(() => {
+    if (seed) {
+      applySharedSeed(container, seed);
+    }
+  }, [container]);
   return createElement(IocContext.Provider, {
     value
   }, children);
@@ -576,13 +432,6 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
   return useIocContext().revision;
 }function OnQuery(type) {
   return (target, propertyKey) => {
-    console.info("[WS]", "[on-query.ts]", "Attaching OnQuery metadata:", {
-      name: target.constructor.name,
-      type,
-      propertyKey,
-      target,
-      constructor: target.constructor
-    });
     const constructor = target.constructor;
     let list = QUERY_HANDLER_METADATA.get(constructor);
     if (!list) {
@@ -597,19 +446,11 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
 }function useQueryCaller() {
   const container = useContainer();
   return useCallback((type, data) => {
-    console.info("[WS]", "[use-query-caller.ts]", "Query data:", {
-      type,
-      data
-    });
     return container.get(QUERY_BUS_TOKEN).query(type, data);
   }, [container]);
 }function useOptionalQueryCaller() {
   const container = useContainer();
   return useCallback((type, data) => {
-    console.info("[WS]", "[use-optional-query-caller.ts]", "Optional query data:", {
-      type,
-      data
-    });
     return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
   }, [container]);
 }function useQueryHandler(type, handler) {
@@ -625,19 +466,11 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
 }function useSyncQueryCaller() {
   const container = useContainer();
   return useCallback((type, data) => {
-    console.info("[WS]", "[use-sync-query-caller.ts]", "Sync query data:", {
-      type,
-      data
-    });
     return container.get(QUERY_BUS_TOKEN).query(type, data);
   }, [container]);
 }function useOptionalSyncQueryCaller() {
   const container = useContainer();
   return useCallback((type, data) => {
-    console.info("[WS]", "[use-optional-sync-query-caller.ts]", "Optional sync query data:", {
-      type,
-      data
-    });
     return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
   }, [container]);
 }class AbstractService {
@@ -655,47 +488,22 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
     }
   }
   resolve(injectionId) {
-    console.info("[WS]", "[abstract-service.ts]", "Lazy resolve:", {
-      name: injectionId?.name ?? injectionId,
-      key: injectionId
-    });
     return this.getContainer().get(injectionId);
   }
   emitSignal(signal) {
-    console.info("[WS]", "[abstract-service.ts]", "Emit signal:", {
-      name: this.constructor.name,
-      type: signal?.type,
-      signal,
-      from: this
-    });
     this.getContainer().get(SIGNAL_BUS_TOKEN).emit(signal);
   }
   queryData(type, data) {
-    console.info("[WS]", "[abstract-service.ts]", "Query data:", {
-      name: this.constructor.name,
-      type,
-      data,
-      from: this.constructor
-    });
     return this.getContainer().get(QUERY_BUS_TOKEN).query(type, data);
   }
-  getInitialState(ServiceClass) {
-    console.info("[WS]", "[abstract-service.ts]", "Get initial state for key:", {
-      key: ServiceClass?.name ?? ServiceClass
-    });
-    return ServiceClass ? this.getContainer().get(INITIAL_STATES_TOKEN).get(ServiceClass) || null : this.getContainer().get(INITIAL_STATE_TOKEN);
+  getSeed(ServiceClass) {
+    return ServiceClass ? this.getContainer().get(SEEDS_TOKEN).get(ServiceClass) || null : this.getContainer().get(SEED_TOKEN);
   }
 }function OnActivated() {
   return (target, propertyKey) => {
     if (!Object.prototype.isPrototypeOf.call(AbstractService.prototype, target)) {
       throw new WirestateError(ERROR_CODE_NOT_ABSTRACT_SERVICE, "@OnActivated: can only be applied to methods of AbstractService subclasses. " + `'${String(propertyKey)}' was applied to an incompatible class.`);
     }
-    console.info("[WS]", "[on-activated.ts]", "Attaching OnActivated metadata:", {
-      name: target.constructor.name,
-      propertyKey,
-      target,
-      constructor: target.constructor
-    });
     const constructor = target.constructor;
     let list = ACTIVATED_HANDLER_METADATA.get(constructor);
     if (!list) {
@@ -709,12 +517,6 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
     if (!Object.prototype.isPrototypeOf.call(AbstractService.prototype, target)) {
       throw new WirestateError(ERROR_CODE_NOT_ABSTRACT_SERVICE, "@OnDeactivation: can only be applied to methods of AbstractService subclasses. " + `'${String(propertyKey)}' was applied to an incompatible class.`);
     }
-    console.info("[WS]", "[on-deactivation.ts]", "Attaching OnDeactivation metadata:", {
-      name: target.constructor.name,
-      propertyKey,
-      target,
-      constructor: target.constructor
-    });
     const constructor = target.constructor;
     let list = DEACTIVATION_HANDLER_METADATA.get(constructor);
     if (!list) {
@@ -729,12 +531,6 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
     revision
   } = useIocContext();
   return useMemo(() => {
-    console.info("[WS]", "[use-injection.ts]", "New injection provision for token:", {
-      token: injectionId,
-      name: injectionId?.name ?? injectionId,
-      revision,
-      container
-    });
     return container.get(injectionId);
   }, [container, revision, injectionId]);
 }function useOptionalInjection(injectionId) {
@@ -744,33 +540,14 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
   } = useIocContext();
   return useMemo(() => {
     if (container.isBound(injectionId)) {
-      console.info("[WS]", "[use-optional-injection.ts]", "Resolving token:", {
-        token: injectionId,
-        name: injectionId?.name ?? injectionId,
-        revision,
-        container
-      });
       return container.get(injectionId);
     } else {
-      console.info("[WS]", "[use-optional-injection.ts]", "Token not bound, returning null:", {
-        token: injectionId,
-        name: injectionId?.name ?? injectionId,
-        revision,
-        container
-      });
       return null;
     }
   }, [container, revision, injectionId]);
 }function OnSignal(types) {
   const normalized = types === undefined ? null : Array.isArray(types) ? [...types] : [types];
   return (target, propertyKey) => {
-    console.info("[WS]", "[on-signal.ts]", "Attaching OnSignal metadata:", {
-      name: target.constructor.name,
-      types,
-      propertyKey,
-      target,
-      constructor: target.constructor
-    });
     const constructor = target.constructor;
     let list = SIGNAL_HANDLER_METADATA.get(constructor);
     if (!list) {
@@ -826,14 +603,9 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
 }function useSignalEmitter() {
   const container = useIocContext().container;
   return useCallback(signal => {
-    console.info("[WS]", "[use-signal-emitter.ts]", "Emit signal:", {
-      type: signal?.type,
-      signal
-    });
     container.get(SIGNAL_BUS_TOKEN).emit(signal);
   }, [container]);
 }function queryOptional(container, type, data) {
-  console.info("[WS]", "[query-optional.ts]", "Optional query data:", type, data, container);
   return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
 }function mockBindService(container, ServiceClass, options = {}) {
   const {
@@ -869,8 +641,9 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
     skipLifecycle: options.skipLifecycle
   });
   return container.get(service);
-}function withIocProvider(children, container = mockContainer()) {
+}function withIocProvider(children, container = mockContainer(), seed) {
   return createElement(IocProvider, {
-    container
+    container,
+    seed
   }, children);
-}export{AbstractService,Action,Computed,DeepObservable,INITIAL_STATE_TOKEN as INITIAL_STATE,IocProvider,Observable,OnActivated,OnDeactivation,OnQuery,OnSignal,RefObservable,ShallowObservable,bindConstant,bindEntry,bindService,createInjectablesProvider,createIocContainer,emitSignal,forwardRef,mockBindService,mockContainer,mockService,query,queryOptional,useContainer,useContainerRevision,useInjection,useOptionalInjection,useOptionalQueryCaller,useOptionalSyncQueryCaller,useQueryCaller,useQueryHandler,useSignal,useSignalEmitter,useSignalHandler,useSignals,useSyncQueryCaller,withIocProvider};
+}export{AbstractService,Action,Computed,DeepObservable,IocProvider,Observable,OnActivated,OnDeactivation,OnQuery,OnSignal,RefObservable,SEED_TOKEN as SEED,ShallowObservable,bindConstant,bindEntry,bindService,createInjectablesProvider,createIocContainer,emitSignal,forwardRef,mockBindService,mockContainer,mockService,query,queryOptional,useContainer,useContainerRevision,useInjection,useOptionalInjection,useOptionalQueryCaller,useOptionalSyncQueryCaller,useQueryCaller,useQueryHandler,useSignal,useSignalEmitter,useSignalHandler,useSignals,useSyncQueryCaller,withIocProvider};

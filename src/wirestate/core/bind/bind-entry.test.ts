@@ -20,7 +20,7 @@ describe("bindEntry", () => {
     bindEntry(container, {
       id: TOKEN,
       value: { key: "value" },
-      type: bindingTypeValues.ConstantValue,
+      bindingType: bindingTypeValues.ConstantValue,
     });
 
     expect(container.get(TOKEN)).toEqual({ key: "value" });
@@ -44,8 +44,8 @@ describe("bindEntry", () => {
     bindEntry(container, {
       id: TOKEN,
       value: null,
-      type: bindingTypeValues.DynamicValue,
-      scopeType: bindingScopeValues.Transient,
+      bindingType: bindingTypeValues.DynamicValue,
+      scopeBindingType: bindingScopeValues.Transient,
       factory: () => {
         callCount++;
 
@@ -65,7 +65,7 @@ describe("bindEntry", () => {
     bindEntry(container, {
       id: TOKEN,
       value: Math.random(),
-      type: bindingTypeValues.DynamicValue,
+      bindingType: bindingTypeValues.DynamicValue,
     });
 
     const first: number = container.get(TOKEN);

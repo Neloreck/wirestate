@@ -3,14 +3,14 @@ import { Container, injectable } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 import { createInjectablesProvider } from "@/wirestate/core/provision/create-injectables-provider";
-import { INITIAL_STATE_TOKEN, INITIAL_STATES_TOKEN } from "@/wirestate/core/registry";
+import { SEED_TOKEN, SEEDS_TOKEN } from "@/wirestate/core/registry";
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
 import { OnActivated } from "@/wirestate/core/service/on-activated";
 import { OnDeactivation } from "@/wirestate/core/service/on-deactivation";
 import { useInjection } from "@/wirestate/core/service/use-injection";
 import { mockContainer } from "@/wirestate/test-utils/mock-container";
 import { withIocProvider } from "@/wirestate/test-utils/with-ioc-provider";
-import { TInitialStateEntries } from "@/wirestate/types/initial-state";
+import { TSeedEntries } from "@/wirestate/types/initial-state";
 
 describe("createInjectablesProvider", () => {
   let firstServiceActivated: number = 0;
@@ -152,11 +152,11 @@ describe("createInjectablesProvider", () => {
     expect(firstServiceDeactivated).toBe(1);
   });
 
-  it("should accept initialState and initialStates props", () => {
+  it("should accept seeds props", () => {
     const container = mockContainer();
     const Provider = createInjectablesProvider([GenericService]);
 
-    const initialStates: TInitialStateEntries = [
+    const seeds: TSeedEntries = [
       [FirstService, { count: 5 }],
       [
         SecondService,
@@ -168,22 +168,23 @@ describe("createInjectablesProvider", () => {
 
     const { unmount } = render(
       withIocProvider(
-        <Provider initialState={{ global: true }} initialStates={initialStates}>
+        <Provider seeds={seeds}>
           <div />
         </Provider>,
-        container
+        container,
+        { global: true }
       )
     );
 
-    expect(container.get(INITIAL_STATES_TOKEN)).toEqual(new Map(initialStates));
-    expect(container.get(INITIAL_STATE_TOKEN)).toEqual({
+    expect(container.get(SEEDS_TOKEN)).toEqual(new Map(seeds));
+    expect(container.get(SEED_TOKEN)).toEqual({
       global: true,
     });
 
     unmount();
 
-    expect(container.get(INITIAL_STATES_TOKEN)).toEqual(new Map());
-    expect(container.get(INITIAL_STATE_TOKEN)).toEqual({
+    expect(container.get(SEEDS_TOKEN)).toEqual(new Map());
+    expect(container.get(SEED_TOKEN)).toEqual({
       global: true,
     });
   });

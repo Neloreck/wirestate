@@ -21,8 +21,8 @@ type TScopeBindingType = (typeof bindingScopeValues)[keyof typeof bindingScopeVa
 interface IInjectableDescriptor<T = unknown, V = unknown> {
     id: ServiceIdentifier<T>;
     value: V;
-    type?: TBindingType;
-    scopeType?: TScopeBindingType;
+    bindingType?: TBindingType;
+    scopeBindingType?: TScopeBindingType;
     /**
      * Factory function for dynamic value bindings.
      * Used when type is set to DynamicValue.
@@ -37,15 +37,15 @@ type MaybePromise<T> = T | Promise<T>;
 /**
  * Lookup key for service seeds.
  */
-type TInitialStateKey = TServiceClass | string | symbol;
+type TSeedKey = TServiceClass | string | symbol;
 /**
  * Service-to-seed mapping entry.
  */
-type TInitialStateEntry<T = unknown> = readonly [TInitialStateKey, T];
+type TSeedEntry<T = unknown> = readonly [TSeedKey, T];
 /**
  * Collection of seed entries.
  */
-type TInitialStateEntries = ReadonlyArray<TInitialStateEntry>;
+type TSeedEntries = ReadonlyArray<TSeedEntry>;
 
 /**
  * Query identifier. Use symbols for private queries.
@@ -102,34 +102,46 @@ declare abstract class AbstractService {
     /**
      * Access the IoC container.
      * Internal. Use for on-demand resolution.
+     * Available only for activated containers.
      *
      * @returns active container
+     *
+     * @throws WirestateError if service is not activated
      */
     protected getContainer(): Container$1;
     /**
      * Resolves a sibling service or injected value.
      * Use for lazy resolution or circular dependency breaking.
+     * Available only for activated containers.
      *
      * @param injectionId - injection identifier
      * @returns resolved injection, service instance, or generic value
+     *
+     * @throws WirestateError if service is not activated
      */
     protected resolve<T>(injectionId: ServiceIdentifier<T>): T;
     /**
      * Broadcasts a signal.
+     * Available only for activated containers.
      *
      * @param signal - signal to emit
+     *
+     * @throws WirestateError if service is not activated
      */
     protected emitSignal<P, T extends TSignalType = TSignalType>(signal: ISignal<P, T>): void;
     /**
      * Dispatches a query and returns the result.
+     * Available only for activated containers.
      *
      * @param type - query type
      * @param data - query data
      * @returns query result
+     *
+     * @throws WirestateError if service is not activated
      */
     protected queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): MaybePromise<R>;
-    protected getInitialState<T>(): T;
-    protected getInitialState<T>(ServiceClass?: TInitialStateKey): T;
+    protected getSeed<T>(): T;
+    protected getSeed<T>(ServiceClass?: TSeedKey): T;
     /**
      * Catch-all signal handler.
      * Subscribed automatically during the service lifecycle.
@@ -215,14 +227,10 @@ declare function query<R = unknown, D = unknown>(container: Container$1, type: T
  */
 interface IInjectablesProviderProps {
     /**
-     * Shared initial state applied to services on the first mount.
-     */
-    readonly initialState?: TAnyObject;
-    /**
-     * Targeted initial state entries applied to services on the first mount.
+     * Targeted seeds bound to specific injectables or tokens.
      * Subsequent prop changes are ignored. Use a React `key` to re-seed the tree.
      */
-    readonly initialStates?: TInitialStateEntries;
+    readonly seeds?: TSeedEntries;
     /**
      * Subtree that consumes the bound services.
      */
@@ -279,16 +287,21 @@ interface IIocProviderProps extends PropsWithChildren<unknown> {
      * External container instance. If omitted, a new container is created.
      */
     readonly container?: Container$1;
+    /**
+     * Shared seed for the container.
+     */
+    readonly seed?: TAnyObject;
 }
 /**
  * Provides an IoC container to the component tree.
  *
  * @param props - component props
  * @param props.container - external container instance
+ * @param props.seed - shared seed across the container
  * @param props.children - components to wrap
  * @returns provider element
  */
-declare function IocProvider({ container: externalContainer, children }: IIocProviderProps): react.FunctionComponentElement<react.ProviderProps<Optional<IIocContext>>>;
+declare function IocProvider({ container: externalContainer, seed, children }: IIocProviderProps): react.FunctionComponentElement<react.ProviderProps<Optional<IIocContext>>>;
 
 /**
  * Returns the active IoC container.
@@ -354,9 +367,9 @@ declare function useSyncQueryCaller(): <R = unknown, D = unknown>(type: TQueryTy
 declare function useOptionalSyncQueryCaller(): <R = unknown, D = unknown>(type: TQueryType, data?: D) => Optional<R>;
 
 /**
- * Token for the container-scoped shared initial-state object.
+ * Token for the container-scoped shared seed object.
  */
-declare const INITIAL_STATE_TOKEN: unique symbol;
+declare const SEED_TOKEN: unique symbol;
 
 /**
  * Decorator for service methods that run after activation.
@@ -462,11 +475,13 @@ declare function mockService<T extends TServiceClass>(service: T, container?: Co
  *
  * @param children - components to wrap
  * @param container - optional custom container
+ * @param seed - optional shared seed object
  * @returns wrapped components
  */
-declare function withIocProvider(children: ReactNode, container?: Container$1): react.FunctionComponentElement<{
+declare function withIocProvider(children: ReactNode, container?: Container$1, seed?: TAnyObject): react.FunctionComponentElement<{
     container: Container$1;
+    seed: TAnyObject | undefined;
 }>;
 
-export { AbstractService, Action, Computed, DeepObservable, INITIAL_STATE_TOKEN as INITIAL_STATE, IocProvider, Observable, OnActivated, OnDeactivation, OnQuery, OnSignal, RefObservable, ShallowObservable, bindConstant, bindEntry, bindService, createInjectablesProvider, createIocContainer, emitSignal, forwardRef, mockBindService, mockContainer, mockService, query, queryOptional, useContainer, useContainerRevision, useInjection, useOptionalInjection, useOptionalQueryCaller, useOptionalSyncQueryCaller, useQueryCaller, useQueryHandler, useSignal, useSignalEmitter, useSignalHandler, useSignals, useSyncQueryCaller, withIocProvider };
-export type { TInitialStateEntries as InitialStateEntries, TInitialStateEntry as InitialStateEntry, TInitialStateKey as InitialStateKey, IInjectableDescriptor as InjectableDescriptor, InjectablesProvider, IInjectablesProviderProps as InjectablesProviderProps, TQueryHandler as QueryHandler, TQueryResponder as QueryResponder, TQueryType as QueryType, TQueryUnregister as QueryUnregister, TServiceClass as ServiceClass, ISignal as Signal, TSignalEmitter as SignalEmitter, TSignalHandler as SignalHandler, TSignalType as SignalType, TSignalUnsubscribe as SignalUnsubscribe };
+export { AbstractService, Action, Computed, DeepObservable, IocProvider, Observable, OnActivated, OnDeactivation, OnQuery, OnSignal, RefObservable, SEED_TOKEN as SEED, ShallowObservable, bindConstant, bindEntry, bindService, createInjectablesProvider, createIocContainer, emitSignal, forwardRef, mockBindService, mockContainer, mockService, query, queryOptional, useContainer, useContainerRevision, useInjection, useOptionalInjection, useOptionalQueryCaller, useOptionalSyncQueryCaller, useQueryCaller, useQueryHandler, useSignal, useSignalEmitter, useSignalHandler, useSignals, useSyncQueryCaller, withIocProvider };
+export type { IInjectableDescriptor as InjectableDescriptor, InjectablesProvider, IInjectablesProviderProps as InjectablesProviderProps, TQueryHandler as QueryHandler, TQueryResponder as QueryResponder, TQueryType as QueryType, TQueryUnregister as QueryUnregister, TSeedEntries as SeedEntries, TSeedEntry as SeedEntry, TSeedKey as SeedKey, TServiceClass as ServiceClass, ISignal as Signal, TSignalEmitter as SignalEmitter, TSignalHandler as SignalHandler, TSignalType as SignalType, TSignalUnsubscribe as SignalUnsubscribe };

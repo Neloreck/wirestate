@@ -25,8 +25,8 @@ export class GenericService extends AbstractService {
     return this.getContainer();
   }
 
-  public testGetInitialState(): Container {
-    return this.getInitialState();
+  public testGetSeed(): Container {
+    return this.getSeed();
   }
 
   public testEmitSignal(): void {

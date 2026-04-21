@@ -1,4 +1,8 @@
-import { GLOBAL_CONFIG } from "@/core/id";
+import {
+  GLOBAL_CONFIG,
+  GLOBAL_DYNAMIC_CONFIG,
+  GLOBAL_NOT_EXISTING_CONFIG,
+} from "@/core/id";
 import { EGlobalQuery } from "@/core/queries";
 import { CounterService } from "@/core/services/counter/CounterService";
 import { ThemeService } from "@/core/services/theme/ThemeService";
@@ -11,6 +15,7 @@ import {
   OnActivated,
   OnDeactivation,
   OnQuery,
+  Optional,
   OnSignal,
   ShallowObservable,
   makeObservable,
@@ -29,34 +34,46 @@ export class LoggerService extends AbstractService {
   public static readonly MAX_ENTRIES: number = 25;
 
   @ShallowObservable()
-  public entries: Array<ILogEntry> = [];
+  public logs: Array<ILogEntry> = [];
 
   private nextId: number = 1;
 
   public constructor(
     @Inject(GLOBAL_CONFIG)
     protected readonly globalConfig: object,
+    @Inject(GLOBAL_DYNAMIC_CONFIG)
+    protected readonly globalDynamicConfig: object,
+    @Optional()
+    @Inject(GLOBAL_NOT_EXISTING_CONFIG)
+    protected readonly globalNotExistingConfig?: object,
   ) {
     super();
 
     makeObservable(this);
 
     console.info(
-      `[${this.constructor.name}] Constructing with constant global config:`,
-      globalConfig,
+      `[${this.constructor.name}] Constructing with constant global configs:`,
+      { globalConfig, globalDynamicConfig, globalNotExistingConfig },
     );
   }
 
   @OnActivated()
   public onActivated(): void {
     console.info(
-      `[${this.constructor.name}] Activated — listening for signals`,
+      `[${this.constructor.name}] Activated — listening for signals, seed:`,
+      this.getSeed(LoggerService),
     );
+
+    // [*] Pass safe lifecycle checks - can emit from activation.
+    this.emitSignal({ type: `activated/${this.constructor.name}` });
   }
 
   @OnDeactivation()
   public onDeactivation(): void {
     console.info(`[${this.constructor.name}] Deactivating`);
+
+    // [*] Pass safe lifecycle checks - can emit from deactivation.
+    this.emitSignal({ type: `deactivating/${this.constructor.name}` });
 
     this.clear();
   }
@@ -68,7 +85,7 @@ export class LoggerService extends AbstractService {
 
   @Action()
   public clear(): void {
-    this.entries = [];
+    this.logs = [];
     this.nextId = 1;
   }
 
@@ -82,13 +99,13 @@ export class LoggerService extends AbstractService {
       at: Date.now(),
     };
 
-    const next: Array<ILogEntry> = [entry, ...this.entries];
+    const next: Array<ILogEntry> = [entry, ...this.logs];
 
     if (next.length > LoggerService.MAX_ENTRIES) {
       next.length = LoggerService.MAX_ENTRIES;
     }
 
-    this.entries = next;
+    this.logs = next;
   }
 
   public log(...args: Array<unknown>): void {
@@ -120,6 +137,6 @@ export class LoggerService extends AbstractService {
 
   @OnQuery(EGlobalQuery.GET_RECENT_LOGS)
   public onQueryRecentLogs(data?: { limit?: number }): Array<ILogEntry> {
-    return this.entries.slice(0, data?.limit ?? 5);
+    return this.logs.slice(0, data?.limit ?? 5);
   }
 }

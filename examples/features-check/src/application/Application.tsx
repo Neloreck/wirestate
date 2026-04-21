@@ -32,11 +32,7 @@ export const Application = observer(() => {
 
   // [*] Pass reactivity subscription for specific global signal in React tree.
   useSignalHandler((signal) => {
-    console.info(
-      "[Application] Logging ALL signals:",
-      signal.type,
-      signal.payload,
-    );
+    console.info("[Application] Log * signals:", signal.type, signal.payload);
   });
 
   // [*] Pass reactivity check from service, sync DOM and state on effect.

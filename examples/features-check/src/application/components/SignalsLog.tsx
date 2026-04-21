@@ -10,12 +10,12 @@ export const SignalsLog = observer(() => {
     <div id={"logs"}>
       <h2>Signal log</h2>
       <div className={"signal-log"}>
-        {loggerService.entries.length === 0 ? (
+        {loggerService.logs.length === 0 ? (
           <div className={"signal-log__empty"}>
             No signals yet — try the buttons above.
           </div>
         ) : (
-          loggerService.entries.map((entry) => (
+          loggerService.logs.map((entry) => (
             <div key={entry.id} className={"signal-log__entry"}>
               <span className={"signal-log__type"}>{entry.type}</span>
               <span className={"signal-log__payload"}>

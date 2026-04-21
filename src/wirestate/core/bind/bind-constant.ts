@@ -21,7 +21,7 @@ export function bindConstant<T>(container: Container, entry: IInjectableDescript
     container,
   });
 
-  if (entry.scopeType) {
+  if (entry.scopeBindingType) {
     throw new WirestateError(ERROR_CODE_BINDING_SCOPE, "Provided unexpected binding scope for constant value.");
   }
 

@@ -3,12 +3,12 @@ import { EGlobalSignal } from "@/core/signals";
 import {
   AbstractService,
   Action,
-  INITIAL_STATE,
   Inject,
   Injectable,
   Observable,
   OnActivated,
   OnDeactivation,
+  SEED,
   makeObservable,
 } from "@/libs/wirestate";
 
@@ -18,16 +18,16 @@ export class ThemeService extends AbstractService {
   public theme: Theme = "light";
 
   public constructor(
-    @Inject(INITIAL_STATE)
-    protected readonly initialState: object,
+    @Inject(SEED)
+    protected readonly seed: object,
   ) {
     super();
 
     makeObservable(this);
 
     console.info(
-      `[${this.constructor.name}] Shared initial state on construction:`,
-      initialState,
+      `[${this.constructor.name}] Shared seed on construction:`,
+      seed,
     );
   }
 
@@ -37,11 +37,17 @@ export class ThemeService extends AbstractService {
       `[${this.constructor.name}] Activated with theme:`,
       this.theme,
     );
+
+    // [*] Pass safe lifecycle checks - can emit from activation.
+    this.emitSignal({ type: `activated/${this.constructor.name}` });
   }
 
   @OnDeactivation()
   public onDeactivation(): void {
     console.info(`[${this.constructor.name}] Deactivating`);
+
+    // [*] Pass safe lifecycle checks - can emit from deactivation.
+    this.emitSignal({ type: `deactivating/${this.constructor.name}` });
   }
 
   @Action()

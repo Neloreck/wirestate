@@ -11,14 +11,14 @@ import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import {
   CONTAINER_REFS_BY_SERVICE,
-  INITIAL_STATE_TOKEN,
-  INITIAL_STATES_TOKEN,
+  SEED_TOKEN,
+  SEEDS_TOKEN,
   QUERY_BUS_TOKEN,
   SIGNAL_BUS_TOKEN,
 } from "@/wirestate/core/registry";
 import type { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import type { Optional, TAnyObject, MaybePromise, Maybe } from "@/wirestate/types/general";
-import type { TInitialStateKey, TInitialStatesMap } from "@/wirestate/types/initial-state";
+import type { TSeedKey, TSeedsMap } from "@/wirestate/types/initial-state";
 import type { TQueryType } from "@/wirestate/types/queries";
 import type { ISignal, TSignalType } from "@/wirestate/types/signals";
 
@@ -37,8 +37,11 @@ export abstract class AbstractService {
   /**
    * Access the IoC container.
    * Internal. Use for on-demand resolution.
+   * Available only for activated containers.
    *
    * @returns active container
+   *
+   * @throws WirestateError if service is not activated
    */
   protected getContainer(): Container {
     const ref: Maybe<Container> = CONTAINER_REFS_BY_SERVICE.get(this);
@@ -70,9 +73,12 @@ export abstract class AbstractService {
   /**
    * Resolves a sibling service or injected value.
    * Use for lazy resolution or circular dependency breaking.
+   * Available only for activated containers.
    *
    * @param injectionId - injection identifier
    * @returns resolved injection, service instance, or generic value
+   *
+   * @throws WirestateError if service is not activated
    */
   protected resolve<T>(injectionId: ServiceIdentifier<T>): T {
     dbg.info(prefix(__filename), "Lazy resolve:", {
@@ -85,8 +91,11 @@ export abstract class AbstractService {
 
   /**
    * Broadcasts a signal.
+   * Available only for activated containers.
    *
    * @param signal - signal to emit
+   *
+   * @throws WirestateError if service is not activated
    */
   protected emitSignal<P, T extends TSignalType = TSignalType>(signal: ISignal<P, T>): void {
     dbg.info(prefix(__filename), "Emit signal:", {
@@ -101,10 +110,13 @@ export abstract class AbstractService {
 
   /**
    * Dispatches a query and returns the result.
+   * Available only for activated containers.
    *
    * @param type - query type
    * @param data - query data
    * @returns query result
+   *
+   * @throws WirestateError if service is not activated
    */
   protected queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): MaybePromise<R> {
     dbg.info(prefix(__filename), "Query data:", { name: this.constructor.name, type, data, from: this.constructor });
@@ -112,24 +124,27 @@ export abstract class AbstractService {
     return this.getContainer().get<QueryBus>(QUERY_BUS_TOKEN).query<R, D>(type, data);
   }
 
-  protected getInitialState<T>(): T;
-  protected getInitialState<T>(ServiceClass?: TInitialStateKey): T;
+  protected getSeed<T>(): T;
+  protected getSeed<T>(ServiceClass?: TSeedKey): T;
 
   /**
-   * Reads initial state (seed) for the service.
-   * Available from `onActivated` onwards.
+   * Reads seed for the provided injection.
+   * Returns shared seed if parameters are not provided.
+   * Available only for activated containers.
    *
    * @param ServiceClass - lookup key (defaults to current class)
    * @returns seed data or null if missing
+   *
+   * @throws WirestateError if service is not activated
    */
-  protected getInitialState<T extends TAnyObject>(ServiceClass?: TInitialStateKey): Optional<T> {
+  protected getSeed<T extends TAnyObject>(ServiceClass?: TSeedKey): Optional<T> {
     dbg.info(prefix(__filename), "Get initial state for key:", {
       key: (ServiceClass as TAnyObject)?.name ?? ServiceClass,
     });
 
     return ServiceClass
-      ? (this.getContainer().get<TInitialStatesMap>(INITIAL_STATES_TOKEN).get(ServiceClass) as T) || null
-      : this.getContainer().get<T>(INITIAL_STATE_TOKEN);
+      ? (this.getContainer().get<TSeedsMap>(SEEDS_TOKEN).get(ServiceClass) as T) || null
+      : this.getContainer().get<T>(SEED_TOKEN);
   }
 
   /**

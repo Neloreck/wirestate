@@ -7,8 +7,8 @@ export type TScopeBindingType = (typeof bindingScopeValues)[keyof typeof binding
 export interface IInjectableDescriptor<T = unknown, V = unknown> {
   id: ServiceIdentifier<T>;
   value: V;
-  type?: TBindingType;
-  scopeType?: TScopeBindingType;
+  bindingType?: TBindingType;
+  scopeBindingType?: TScopeBindingType;
   /**
    * Factory function for dynamic value bindings.
    * Used when type is set to DynamicValue.

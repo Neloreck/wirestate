@@ -30,13 +30,13 @@ export function bindEntry(container: Container, entry: TServiceClass | IInjectab
     return;
   }
 
-  if (!entry.type || entry.type === bindingTypeValues.ConstantValue) {
+  if (!entry.bindingType || entry.bindingType === bindingTypeValues.ConstantValue) {
     bindConstant(container, entry);
 
     return;
   }
 
-  if (entry.type === bindingTypeValues.DynamicValue) {
+  if (entry.bindingType === bindingTypeValues.DynamicValue) {
     dbg.info(prefix(__filename), "Binding dynamic value entry:", {
       entry,
       container,

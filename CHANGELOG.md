@@ -2,6 +2,9 @@
 
 - Add `OnActivated` decorator
 - Add `OnDeactivated` decorator
+- `initialState` -> `seed`
+- `type` -> `bindingType`
+- `scopeType` -> `bindingScopeType`
 
 ## 0.3.0
 

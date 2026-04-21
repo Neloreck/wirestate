@@ -25,11 +25,11 @@ export function bindDynamicValue(container: Container, entry: IInjectableDescrip
     return entry.value;
   });
 
-  if (!entry.scopeType) {
+  if (!entry.scopeBindingType) {
     return;
-  } else if (entry.scopeType === bindingScopeValues.Transient) {
+  } else if (entry.scopeBindingType === bindingScopeValues.Transient) {
     binding.inTransientScope();
-  } else if (entry.scopeType === bindingScopeValues.Request) {
+  } else if (entry.scopeBindingType === bindingScopeValues.Request) {
     binding.inRequestScope();
   } else {
     binding.inSingletonScope();

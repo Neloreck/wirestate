@@ -15,14 +15,14 @@ export const SIGNAL_BUS_TOKEN: unique symbol = Symbol("@wirestate/signal-bus");
 export const QUERY_BUS_TOKEN: unique symbol = Symbol("@wirestate/query-bus");
 
 /**
- * Token for the container-scoped initial-state map.
+ * Token for the container-scoped seeds map.
  */
-export const INITIAL_STATES_TOKEN: unique symbol = Symbol("@wirestate/initial-states");
+export const SEEDS_TOKEN: unique symbol = Symbol("@wirestate/seeds");
 
 /**
- * Token for the container-scoped shared initial-state object.
+ * Token for the container-scoped shared seed object.
  */
-export const INITIAL_STATE_TOKEN: unique symbol = Symbol("@wirestate/initial-state");
+export const SEED_TOKEN: unique symbol = Symbol("@wirestate/seed");
 
 /**
  * Map of class constructors to their declared query handlers.

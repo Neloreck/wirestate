@@ -5,7 +5,7 @@ import {
   AbstractService,
   Action,
   Computed,
-  INITIAL_STATE,
+  SEED,
   Inject,
   Injectable,
   makeObservable,
@@ -22,7 +22,7 @@ import {
   type ICounterSummary,
 } from "./CounterService.query";
 
-export interface ICounterInitialState {
+export interface ICounterSeed {
   readonly count?: number;
   readonly lastIncrementAt?: Optional<number>;
 }
@@ -38,16 +38,16 @@ export class CounterService extends AbstractService {
   public constructor(
     @Inject(LoggerService)
     private readonly loggerService: LoggerService,
-    @Inject(INITIAL_STATE)
-    protected readonly initialState: object,
+    @Inject(SEED)
+    protected readonly seed: object,
   ) {
     super();
 
     makeObservable(this);
 
     console.info(
-      `[${this.constructor.name}] Shared initial state on construction:`,
-      initialState,
+      `[${this.constructor.name}] Shared seed on construction:`,
+      seed,
     );
   }
 
@@ -55,31 +55,36 @@ export class CounterService extends AbstractService {
   public onActivated(): void {
     console.info(`[${this.constructor.name}] Activated`);
 
-    this.onSeedFromInitialState();
+    this.initializeFromSeed();
+
+    // [*] Pass safe lifecycle checks - can emit from activation.
+    this.emitSignal({ type: `activated/${this.constructor.name}` });
   }
 
   @OnDeactivation()
   public onDeactivation(): void {
     console.info(`[${this.constructor.name}] Deactivating`);
+
+    // [*] Pass safe lifecycle checks - can emit from deactivation.
+    this.emitSignal({ type: `deactivating/${this.constructor.name}` });
   }
 
   @Action()
-  private onSeedFromInitialState(): void {
-    const initialState: Optional<ICounterInitialState> =
-      this.getInitialState(CounterService);
+  private initializeFromSeed(): void {
+    const seed: Optional<ICounterSeed> = this.getSeed(CounterService);
 
     console.info(
-      `[${this.constructor.name}] Seed from initial state:`,
-      initialState,
+      `[${this.constructor.name}] Seed from current DI context:`,
+      seed,
     );
 
-    if (initialState) {
-      if (typeof initialState.count === "number") {
-        this.count = initialState.count;
+    if (seed) {
+      if (typeof seed.count === "number") {
+        this.count = seed.count;
       }
 
-      if (typeof initialState.lastIncrementAt === "number") {
-        this.lastIncrementAt = initialState.lastIncrementAt;
+      if (typeof seed.lastIncrementAt === "number") {
+        this.lastIncrementAt = seed.lastIncrementAt;
       }
     }
   }

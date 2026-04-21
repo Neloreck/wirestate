@@ -3,19 +3,19 @@ import type { TServiceClass } from "@/wirestate/types/services";
 /**
  * Lookup key for service seeds.
  */
-export type TInitialStateKey = TServiceClass | string | symbol;
+export type TSeedKey = TServiceClass | string | symbol;
 
 /**
- * Key-value map for targeted initial states.
+ * Key-value map for targeted seeds.
  */
-export type TInitialStatesMap<T = unknown> = Map<TInitialStateKey, T>;
+export type TSeedsMap<T = unknown> = Map<TSeedKey, T>;
 
 /**
  * Service-to-seed mapping entry.
  */
-export type TInitialStateEntry<T = unknown> = readonly [TInitialStateKey, T];
+export type TSeedEntry<T = unknown> = readonly [TSeedKey, T];
 
 /**
  * Collection of seed entries.
  */
-export type TInitialStateEntries = ReadonlyArray<TInitialStateEntry>;
+export type TSeedEntries = ReadonlyArray<TSeedEntry>;

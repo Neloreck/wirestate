@@ -22,7 +22,7 @@ describe("AbstractService", () => {
     expect(service.onSignal).toBeUndefined();
     expect(() => service.testGetContainer()).toThrow(illegalBeforeAccessError);
     expect(() => service.testResolveService()).toThrow(illegalBeforeAccessError);
-    expect(() => service.testGetInitialState()).toThrow(illegalBeforeAccessError);
+    expect(() => service.testGetSeed()).toThrow(illegalBeforeAccessError);
     expect(() => service.testEmitSignal()).toThrow(illegalBeforeAccessError);
     expect(() => service.testQueryData()).toThrow(illegalBeforeAccessError);
   });
@@ -39,7 +39,7 @@ describe("AbstractService", () => {
     expect(service.onSignal).toBeUndefined();
     expect(() => service.testGetContainer()).not.toThrow(illegalBeforeAccessError);
     expect(() => service.testResolveService()).not.toThrow(illegalBeforeAccessError);
-    expect(() => service.testGetInitialState()).not.toThrow(illegalBeforeAccessError);
+    expect(() => service.testGetSeed()).not.toThrow(illegalBeforeAccessError);
     expect(() => service.testEmitSignal()).not.toThrow(illegalBeforeAccessError);
     expect(() => service.testQueryData()).not.toThrow(illegalBeforeAccessError);
   });
@@ -58,7 +58,7 @@ describe("AbstractService", () => {
     expect(service.onSignal).toBeUndefined();
     expect(() => service.testGetContainer()).toThrow(illegalAfterAccessError);
     expect(() => service.testResolveService()).toThrow(illegalAfterAccessError);
-    expect(() => service.testGetInitialState()).toThrow(illegalAfterAccessError);
+    expect(() => service.testGetSeed()).toThrow(illegalAfterAccessError);
     expect(() => service.testEmitSignal()).toThrow(illegalAfterAccessError);
     expect(() => service.testQueryData()).toThrow(illegalAfterAccessError);
   });
