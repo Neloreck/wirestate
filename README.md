@@ -12,10 +12,9 @@
 ## Key Features
 
 - **Dependency Injection**: First-class support for Inversify, allowing for decoupled and testable services.
-- **Reactive State**: Seamless integration with MobX for high-performance, fine-grained updates.
+- **Reactive State**: Seamless integration with MobX.
 - **Signals**: An event-based communication system for broadcasting actions and side effects across your application.
 - **Queries**: A structured way to request data synchronously or asynchronously from your services.
-- **React Hooks**: Elegant hooks like `useInjection`, `useSignal`, and `useQueryCaller` for a modern developer experience.
 - **Service Lifecycle**: Automated activation and deactivation of services tied to your component tree.
 
 ## Install
