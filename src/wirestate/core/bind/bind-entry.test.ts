@@ -1,7 +1,7 @@
 import { bindingScopeValues, bindingTypeValues, Container } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
-import { bindEntry } from "@/wirestate/core/container/bind/bind-entry";
+import { bindEntry } from "@/wirestate/core/bind/bind-entry";
 import { mockContainer } from "@/wirestate/test-utils/mock-container";
 
 describe("bindEntry", () => {

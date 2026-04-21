@@ -1,87 +1,33 @@
-import * as mobx_dist_types_decorator_fills from "mobx/dist/types/decorator_fills";
-import * as mobx_dist_internal from "mobx/dist/internal";
-import * as mobx from "mobx";
-export {
-  autorun,
-  comparer,
-  configure,
-  flow,
-  flowResult,
-  isAction,
-  isFlow,
-  isFlowCancellationError,
-  isObservable,
-  makeAutoObservable,
-  makeObservable,
-  reaction,
-  runInAction,
-  toJS,
-  when,
-} from "mobx";
-import {
-  ServiceIdentifier,
-  bindingTypeValues,
-  bindingScopeValues,
-  Container as Container$1,
-  Newable,
-} from "inversify";
-export {
-  bindingTypeValues as BindingType,
-  Container,
-  ContainerModule,
-  inject as Inject,
-  injectable as Injectable,
-  multiInject as MultiInject,
-  named as Named,
-  optional as Optional,
-  postConstruct as PostConstruct,
-  preDestroy as PreDestroy,
-  bindingScopeValues as ScopeBindingType,
-  ServiceIdentifier,
-  tagged as Tagged,
-} from "inversify";
-import * as react from "react";
-import {
-  ReactNode,
-  ReactElement,
-  Dispatch,
-  SetStateAction,
-  PropsWithChildren,
-} from "react";
-export { observer } from "mobx-react-lite";
+import * as mobx_dist_types_decorator_fills from 'mobx/dist/types/decorator_fills';
+import * as mobx_dist_internal from 'mobx/dist/internal';
+import * as mobx from 'mobx';
+export { autorun, comparer, configure, flow, flowResult, isAction, isFlow, isFlowCancellationError, isObservable, makeAutoObservable, makeObservable, reaction, runInAction, toJS, when } from 'mobx';
+import { ServiceIdentifier, bindingTypeValues, bindingScopeValues, Container as Container$1, Newable } from 'inversify';
+export { bindingTypeValues as BindingType, Container, ContainerModule, inject as Inject, injectable as Injectable, multiInject as MultiInject, named as Named, optional as Optional, postConstruct as PostConstruct, preDestroy as PreDestroy, bindingScopeValues as ScopeBindingType, ServiceIdentifier, tagged as Tagged } from 'inversify';
+import * as react from 'react';
+import { ReactNode, ReactElement, Dispatch, SetStateAction, PropsWithChildren } from 'react';
+export { observer } from 'mobx-react-lite';
 
 declare function Observable(): mobx.IObservableFactory;
-declare function ShallowObservable(): mobx_dist_internal.Annotation &
-  PropertyDecorator &
-  mobx_dist_types_decorator_fills.ClassAccessorDecorator &
-  mobx_dist_types_decorator_fills.ClassFieldDecorator;
-declare function RefObservable(): mobx_dist_internal.Annotation &
-  PropertyDecorator &
-  mobx_dist_types_decorator_fills.ClassAccessorDecorator &
-  mobx_dist_types_decorator_fills.ClassFieldDecorator;
-declare function DeepObservable(): mobx_dist_internal.Annotation &
-  PropertyDecorator &
-  mobx_dist_types_decorator_fills.ClassAccessorDecorator &
-  mobx_dist_types_decorator_fills.ClassFieldDecorator;
+declare function ShallowObservable(): mobx_dist_internal.Annotation & PropertyDecorator & mobx_dist_types_decorator_fills.ClassAccessorDecorator & mobx_dist_types_decorator_fills.ClassFieldDecorator;
+declare function RefObservable(): mobx_dist_internal.Annotation & PropertyDecorator & mobx_dist_types_decorator_fills.ClassAccessorDecorator & mobx_dist_types_decorator_fills.ClassFieldDecorator;
+declare function DeepObservable(): mobx_dist_internal.Annotation & PropertyDecorator & mobx_dist_types_decorator_fills.ClassAccessorDecorator & mobx_dist_types_decorator_fills.ClassFieldDecorator;
 declare function Action(): mobx.IActionFactory;
 declare function Computed(): mobx.IComputedFactory;
-declare function forwardRef<TInstance = unknown>(
-  forward: () => ServiceIdentifier<TInstance>,
-): any;
+declare function forwardRef<TInstance = unknown>(forward: () => ServiceIdentifier<TInstance>): any;
 
 type TBindingType = (typeof bindingTypeValues)[keyof typeof bindingTypeValues];
-type TScopeBindingType =
-  (typeof bindingScopeValues)[keyof typeof bindingScopeValues];
+type TScopeBindingType = (typeof bindingScopeValues)[keyof typeof bindingScopeValues];
 interface IInjectableDescriptor<T = unknown, V = unknown> {
-  id: ServiceIdentifier<T>;
-  value: V;
-  type?: TBindingType;
-  scopeType?: TScopeBindingType;
-  /**
-   * Factory function for dynamic value bindings.
-   * Used when type is set to DynamicValue.
-   */
-  factory?: () => T;
+    id: ServiceIdentifier<T>;
+    value: V;
+    type?: TBindingType;
+    scopeType?: TScopeBindingType;
+    /**
+     * Factory function for dynamic value bindings.
+     * Used when type is set to DynamicValue.
+     */
+    factory?: () => T;
 }
 
 type TAnyObject = Record<string, any>;
@@ -126,8 +72,8 @@ type TSignalType = string | symbol;
  * Signal object.
  */
 interface ISignal<P = unknown, T extends TSignalType = TSignalType> {
-  readonly type: T;
-  readonly payload?: P;
+    readonly type: T;
+    readonly payload?: P;
 }
 /**
  * Signal handler signature.
@@ -146,63 +92,49 @@ type TSignalEmitter = (signal: ISignal) => void;
  * Base class for services.
  */
 declare abstract class AbstractService {
-  /**
-   * Disposal flag.
-   * Check in async actions to avoid updating unmounted services.
-   */
-  readonly IS_DISPOSED: boolean;
-  /**
-   * Access the IoC container.
-   * Internal. Use for on-demand resolution.
-   *
-   * @returns active container
-   */
-  protected getContainer(): Container$1;
-  /**
-   * Resolves a sibling service or injected value.
-   * Use for lazy resolution or circular dependency breaking.
-   *
-   * @param injectionId - injection identifier
-   * @returns resolved injection, service instance, or generic value
-   */
-  protected resolve<T>(injectionId: ServiceIdentifier<T>): T;
-  /**
-   * Broadcasts a signal.
-   *
-   * @param signal - signal to emit
-   */
-  protected emitSignal<P, T extends TSignalType = TSignalType>(
-    signal: ISignal<P, T>,
-  ): void;
-  /**
-   * Dispatches a query and returns the result.
-   *
-   * @param type - query type
-   * @param data - query data
-   * @returns query result
-   */
-  protected queryData<
-    R = unknown,
-    D = unknown,
-    T extends TQueryType = TQueryType,
-  >(type: T, data?: D): MaybePromise<R>;
-  protected getInitialState<T>(): T;
-  protected getInitialState<T>(ServiceClass?: TInitialStateKey): T;
-  /**
-   * Lifecycle hook: runs after activation.
-   * Override for initialization.
-   */
-  onActivated(): void;
-  /**
-   * Lifecycle hook: runs before deactivation.
-   * Override for cleanup.
-   */
-  onDeactivated(): void;
-  /**
-   * Catch-all signal handler.
-   * Subscribed automatically during the service lifecycle.
-   */
-  onSignal?(signal: ISignal): void;
+    /**
+     * Disposal flag.
+     * Check in async actions to avoid updating unmounted services.
+     *
+     * Before activation internally set to null, but should not be surfaced as non-boolean.
+     */
+    readonly IS_DISPOSED: boolean;
+    /**
+     * Access the IoC container.
+     * Internal. Use for on-demand resolution.
+     *
+     * @returns active container
+     */
+    protected getContainer(): Container$1;
+    /**
+     * Resolves a sibling service or injected value.
+     * Use for lazy resolution or circular dependency breaking.
+     *
+     * @param injectionId - injection identifier
+     * @returns resolved injection, service instance, or generic value
+     */
+    protected resolve<T>(injectionId: ServiceIdentifier<T>): T;
+    /**
+     * Broadcasts a signal.
+     *
+     * @param signal - signal to emit
+     */
+    protected emitSignal<P, T extends TSignalType = TSignalType>(signal: ISignal<P, T>): void;
+    /**
+     * Dispatches a query and returns the result.
+     *
+     * @param type - query type
+     * @param data - query data
+     * @returns query result
+     */
+    protected queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): MaybePromise<R>;
+    protected getInitialState<T>(): T;
+    protected getInitialState<T>(ServiceClass?: TInitialStateKey): T;
+    /**
+     * Catch-all signal handler.
+     * Subscribed automatically during the service lifecycle.
+     */
+    onSignal?(signal: ISignal): void;
 }
 
 /**
@@ -223,10 +155,7 @@ type TServiceClass<T extends AbstractService = AbstractService> = Newable<T>;
  * @param container - target IOC container to bind into
  * @param entry - entry descriptor to bind
  */
-declare function bindEntry(
-  container: Container$1,
-  entry: TServiceClass | IInjectableDescriptor,
-): void;
+declare function bindEntry(container: Container$1, entry: TServiceClass | IInjectableDescriptor): void;
 
 /**
  * Binds a constant value to a token in the container.
@@ -234,13 +163,10 @@ declare function bindEntry(
  * @param container - target Inversify container
  * @param entry - entry descriptor to bind
  */
-declare function bindConstant<T>(
-  container: Container$1,
-  entry: IInjectableDescriptor,
-): void;
+declare function bindConstant<T>(container: Container$1, entry: IInjectableDescriptor): void;
 
 interface IBindServiceOptions {
-  isWithIgnoreLifecycle?: boolean;
+    isWithIgnoreLifecycle?: boolean;
 }
 /**
  * Registers an AbstractService in the container with activation/deactivation logic.
@@ -250,17 +176,13 @@ interface IBindServiceOptions {
  * @param entry - service constructor
  * @param options - options object to control binding flow
  */
-declare function bindService<T extends AbstractService>(
-  container: Container$1,
-  entry: Newable<T>,
-  options?: IBindServiceOptions,
-): void;
+declare function bindService<T extends AbstractService>(container: Container$1, entry: Newable<T>, options?: IBindServiceOptions): void;
 
 interface ICreateIocContainerOptions {
-  /**
-   * Parent container for inheritance.
-   */
-  readonly parent?: Container$1;
+    /**
+     * Parent container for inheritance.
+     */
+    readonly parent?: Container$1;
 }
 /**
  * Creates an IoC container with framework essentials.
@@ -268,9 +190,7 @@ interface ICreateIocContainerOptions {
  * @param options - container configuration
  * @returns new IoC container
  */
-declare function createIocContainer(
-  options?: ICreateIocContainerOptions,
-): Container$1;
+declare function createIocContainer(options?: ICreateIocContainerOptions): Container$1;
 
 /**
  * Emits signals from outside an AbstractService.
@@ -278,10 +198,7 @@ declare function createIocContainer(
  * @param container - inversify container
  * @param signal - signal to emit
  */
-declare function emitSignal<P>(
-  container: Container$1,
-  signal: ISignal<P>,
-): void;
+declare function emitSignal<P>(container: Container$1, signal: ISignal<P>): void;
 
 /**
  * Dispatches a query on the provided container.
@@ -291,29 +208,25 @@ declare function emitSignal<P>(
  * @param data - query data
  * @returns query result
  */
-declare function query<R = unknown, D = unknown>(
-  container: Container$1,
-  type: TQueryType,
-  data?: D,
-): MaybePromise<R>;
+declare function query<R = unknown, D = unknown>(container: Container$1, type: TQueryType, data?: D): MaybePromise<R>;
 
 /**
  * Props for the component returned by {@link createInjectablesProvider}.
  */
 interface IInjectablesProviderProps {
-  /**
-   * Shared initial state applied to services on the first mount.
-   */
-  readonly initialState?: TAnyObject;
-  /**
-   * Targeted initial state entries applied to services on the first mount.
-   * Subsequent prop changes are ignored. Use a React `key` to re-seed the tree.
-   */
-  readonly initialStates?: TInitialStateEntries;
-  /**
-   * Subtree that consumes the bound services.
-   */
-  readonly children?: ReactNode;
+    /**
+     * Shared initial state applied to services on the first mount.
+     */
+    readonly initialState?: TAnyObject;
+    /**
+     * Targeted initial state entries applied to services on the first mount.
+     * Subsequent prop changes are ignored. Use a React `key` to re-seed the tree.
+     */
+    readonly initialStates?: TInitialStateEntries;
+    /**
+     * Subtree that consumes the bound services.
+     */
+    readonly children?: ReactNode;
 }
 /**
  * Component returned by {@link createInjectablesProvider}.
@@ -323,10 +236,10 @@ type InjectablesProvider = ReturnType<typeof createInjectablesProvider>;
  * Configuration for {@link createInjectablesProvider}.
  */
 interface ICreateInjectablesProviderOptions {
-  /**
-   * Services to resolve immediately on mount.
-   */
-  readonly activate?: ReadonlyArray<ServiceIdentifier>;
+    /**
+     * Services to resolve immediately on mount.
+     */
+    readonly activate?: ReadonlyArray<ServiceIdentifier>;
 }
 /**
  * Creates a component that manages injectable lifetimes for its subtree.
@@ -335,40 +248,37 @@ interface ICreateInjectablesProviderOptions {
  * @param options - provider configuration
  * @returns injectables provider component
  */
-declare function createInjectablesProvider(
-  entries: ReadonlyArray<TServiceClass | IInjectableDescriptor>,
-  options?: ICreateInjectablesProviderOptions,
-): {
-  (props: IInjectablesProviderProps): ReactElement;
-  displayName: string;
+declare function createInjectablesProvider(entries: ReadonlyArray<TServiceClass | IInjectableDescriptor>, options?: ICreateInjectablesProviderOptions): {
+    (props: IInjectablesProviderProps): ReactElement;
+    displayName: string;
 };
 
 /**
  * React context value.
  */
 interface IIocContext {
-  /**
-   * Inversify container.
-   */
-  readonly container: Container$1;
-  /**
-   * Revision counter for cache invalidation.
-   */
-  readonly revision: number;
-  /**
-   * Forces a revision update.
-   */
-  readonly setRevision: Dispatch<SetStateAction<number>>;
+    /**
+     * Inversify container.
+     */
+    readonly container: Container$1;
+    /**
+     * Revision counter for cache invalidation.
+     */
+    readonly revision: number;
+    /**
+     * Forces a revision update.
+     */
+    readonly setRevision: Dispatch<SetStateAction<number>>;
 }
 
 /**
  * Props for {@link IocProvider}.
  */
 interface IIocProviderProps extends PropsWithChildren<unknown> {
-  /**
-   * External container instance. If omitted, a new container is created.
-   */
-  readonly container?: Container$1;
+    /**
+     * External container instance. If omitted, a new container is created.
+     */
+    readonly container?: Container$1;
 }
 /**
  * Provides an IoC container to the component tree.
@@ -378,12 +288,7 @@ interface IIocProviderProps extends PropsWithChildren<unknown> {
  * @param props.children - components to wrap
  * @returns provider element
  */
-declare function IocProvider({
-  container: externalContainer,
-  children,
-}: IIocProviderProps): react.FunctionComponentElement<
-  react.ProviderProps<Optional<IIocContext>>
->;
+declare function IocProvider({ container: externalContainer, children }: IIocProviderProps): react.FunctionComponentElement<react.ProviderProps<Optional<IIocContext>>>;
 
 /**
  * Returns the active IoC container.
@@ -412,10 +317,7 @@ declare function OnQuery(type: TQueryType): MethodDecorator;
  *
  * @returns query dispatcher
  */
-declare function useQueryCaller(): <R = unknown, D = unknown>(
-  type: TQueryType,
-  data?: D,
-) => any;
+declare function useQueryCaller(): <R = unknown, D = unknown>(type: TQueryType, data?: D) => any;
 
 /**
  * Returns a function to dispatch optional queries on the active container.
@@ -423,10 +325,7 @@ declare function useQueryCaller(): <R = unknown, D = unknown>(
  *
  * @returns optional query dispatcher
  */
-declare function useOptionalQueryCaller(): <R = unknown, D = unknown>(
-  type: TQueryType,
-  data?: D,
-) => Optional<MaybePromise<R>>;
+declare function useOptionalQueryCaller(): <R = unknown, D = unknown>(type: TQueryType, data?: D) => Optional<MaybePromise<R>>;
 
 /**
  * Registers a query handler for the component's lifetime.
@@ -436,10 +335,7 @@ declare function useOptionalQueryCaller(): <R = unknown, D = unknown>(
  * @param type - query type
  * @param handler - query handler function
  */
-declare function useQueryHandler<RetType = unknown, D = unknown>(
-  type: TQueryType,
-  handler: TQueryHandler<D, RetType>,
-): void;
+declare function useQueryHandler<RetType = unknown, D = unknown>(type: TQueryType, handler: TQueryHandler<D, RetType>): void;
 
 /**
  * Returns a stable function to dispatch synchronous queries.
@@ -447,10 +343,7 @@ declare function useQueryHandler<RetType = unknown, D = unknown>(
  *
  * @returns sync query dispatcher
  */
-declare function useSyncQueryCaller(): <R = unknown, D = unknown>(
-  type: TQueryType,
-  data?: D,
-) => R;
+declare function useSyncQueryCaller(): <R = unknown, D = unknown>(type: TQueryType, data?: D) => R;
 
 /**
  * Returns a stable function to dispatch synchronous optional queries.
@@ -458,15 +351,28 @@ declare function useSyncQueryCaller(): <R = unknown, D = unknown>(
  *
  * @returns optional sync query dispatcher
  */
-declare function useOptionalSyncQueryCaller(): <R = unknown, D = unknown>(
-  type: TQueryType,
-  data?: D,
-) => Optional<R>;
+declare function useOptionalSyncQueryCaller(): <R = unknown, D = unknown>(type: TQueryType, data?: D) => Optional<R>;
 
 /**
  * Token for the container-scoped shared initial-state object.
  */
 declare const INITIAL_STATE_TOKEN: unique symbol;
+
+/**
+ * Decorator for service methods that run after activation.
+ * Only valid on `AbstractService` subclasses.
+ *
+ * @returns decorator function
+ */
+declare function OnActivated(): MethodDecorator;
+
+/**
+ * Decorator for service methods that run before deactivation.
+ * Only valid on `AbstractService` subclasses.
+ *
+ * @returns decorator function
+ */
+declare function OnDeactivation(): MethodDecorator;
 
 /**
  * Resolves a value from the container - constant or service.
@@ -484,9 +390,7 @@ declare function useInjection<T>(injectionId: ServiceIdentifier<T>): T;
  * @param injectionId - injection identifier
  * @returns resolved value or null
  */
-declare function useOptionalInjection<T>(
-  injectionId: ServiceIdentifier<T>,
-): Optional<T>;
+declare function useOptionalInjection<T>(injectionId: ServiceIdentifier<T>): Optional<T>;
 
 /**
  * Decorator for service methods that respond to signals.
@@ -494,9 +398,7 @@ declare function useOptionalInjection<T>(
  * @param types - signal type(s) to handle. If omitted, handles all signals
  * @returns decorator function
  */
-declare function OnSignal(
-  types?: TSignalType | ReadonlyArray<TSignalType>,
-): MethodDecorator;
+declare function OnSignal(types?: TSignalType | ReadonlyArray<TSignalType>): MethodDecorator;
 
 /**
  * Subscribes a component to signals.
@@ -512,10 +414,7 @@ declare function useSignal(type: TSignalType, handler: TSignalHandler): void;
  * @param types - signal types to filter by
  * @param handler - signal handler
  */
-declare function useSignals(
-  types: ReadonlyArray<TSignalType>,
-  handler: TSignalHandler,
-): void;
+declare function useSignals(types: ReadonlyArray<TSignalType>, handler: TSignalHandler): void;
 
 /**
  * Subscribes a component to all signals without type filtering.
@@ -539,36 +438,24 @@ declare function useSignalEmitter(): TSignalEmitter;
  * @param data - query data
  * @returns query result or null
  */
-declare function queryOptional<R = unknown, D = unknown>(
-  container: Container$1,
-  type: TQueryType,
-  data?: D,
-): MaybePromise<R> | null;
+declare function queryOptional<R = unknown, D = unknown>(container: Container$1, type: TQueryType, data?: D): MaybePromise<R> | null;
 
 interface IMockBindServiceOptions {
-  skipLifecycle?: boolean;
+    skipLifecycle?: boolean;
 }
-declare function mockBindService<T extends AbstractService>(
-  container: Container$1,
-  ServiceClass: Newable<T>,
-  options?: IMockBindServiceOptions,
-): void;
+declare function mockBindService<T extends AbstractService>(container: Container$1, ServiceClass: Newable<T>, options?: IMockBindServiceOptions): void;
 
 interface IMockContainerOptions {
-  services?: Array<TServiceClass>;
-  activate?: Array<ServiceIdentifier>;
-  skipLifecycle?: boolean;
+    services?: Array<TServiceClass>;
+    activate?: Array<ServiceIdentifier>;
+    skipLifecycle?: boolean;
 }
 declare function mockContainer(options?: IMockContainerOptions): Container$1;
 
 interface IMockServiceOptions {
-  skipLifecycle?: boolean;
+    skipLifecycle?: boolean;
 }
-declare function mockService<T extends TServiceClass>(
-  service: T,
-  container?: Container,
-  options?: IMockServiceOptions,
-): InstanceType<T>;
+declare function mockService<T extends TServiceClass>(service: T, container?: Container, options?: IMockServiceOptions): InstanceType<T>;
 
 /**
  * Wraps a component with IocProvider for testing.
@@ -577,67 +464,9 @@ declare function mockService<T extends TServiceClass>(
  * @param container - optional custom container
  * @returns wrapped components
  */
-declare function withIocProvider(
-  children: ReactNode,
-  container?: Container$1,
-): react.FunctionComponentElement<{
-  container: Container$1;
+declare function withIocProvider(children: ReactNode, container?: Container$1): react.FunctionComponentElement<{
+    container: Container$1;
 }>;
 
-export {
-  AbstractService,
-  Action,
-  Computed,
-  DeepObservable,
-  INITIAL_STATE_TOKEN as INITIAL_STATE,
-  IocProvider,
-  Observable,
-  OnQuery,
-  OnSignal,
-  RefObservable,
-  ShallowObservable,
-  bindConstant,
-  bindEntry,
-  bindService,
-  createInjectablesProvider,
-  createIocContainer,
-  emitSignal,
-  forwardRef,
-  mockBindService,
-  mockContainer,
-  mockService,
-  query,
-  queryOptional,
-  useContainer,
-  useContainerRevision,
-  useInjection,
-  useOptionalInjection,
-  useOptionalQueryCaller,
-  useOptionalSyncQueryCaller,
-  useQueryCaller,
-  useQueryHandler,
-  useSignal,
-  useSignalEmitter,
-  useSignalHandler,
-  useSignals,
-  useSyncQueryCaller,
-  withIocProvider,
-};
-export type {
-  TInitialStateEntries as InitialStateEntries,
-  TInitialStateEntry as InitialStateEntry,
-  TInitialStateKey as InitialStateKey,
-  IInjectableDescriptor as InjectableDescriptor,
-  InjectablesProvider,
-  IInjectablesProviderProps as InjectablesProviderProps,
-  TQueryHandler as QueryHandler,
-  TQueryResponder as QueryResponder,
-  TQueryType as QueryType,
-  TQueryUnregister as QueryUnregister,
-  TServiceClass as ServiceClass,
-  ISignal as Signal,
-  TSignalEmitter as SignalEmitter,
-  TSignalHandler as SignalHandler,
-  TSignalType as SignalType,
-  TSignalUnsubscribe as SignalUnsubscribe,
-};
+export { AbstractService, Action, Computed, DeepObservable, INITIAL_STATE_TOKEN as INITIAL_STATE, IocProvider, Observable, OnActivated, OnDeactivation, OnQuery, OnSignal, RefObservable, ShallowObservable, bindConstant, bindEntry, bindService, createInjectablesProvider, createIocContainer, emitSignal, forwardRef, mockBindService, mockContainer, mockService, query, queryOptional, useContainer, useContainerRevision, useInjection, useOptionalInjection, useOptionalQueryCaller, useOptionalSyncQueryCaller, useQueryCaller, useQueryHandler, useSignal, useSignalEmitter, useSignalHandler, useSignals, useSyncQueryCaller, withIocProvider };
+export type { TInitialStateEntries as InitialStateEntries, TInitialStateEntry as InitialStateEntry, TInitialStateKey as InitialStateKey, IInjectableDescriptor as InjectableDescriptor, InjectablesProvider, IInjectablesProviderProps as InjectablesProviderProps, TQueryHandler as QueryHandler, TQueryResponder as QueryResponder, TQueryType as QueryType, TQueryUnregister as QueryUnregister, TServiceClass as ServiceClass, ISignal as Signal, TSignalEmitter as SignalEmitter, TSignalHandler as SignalHandler, TSignalType as SignalType, TSignalUnsubscribe as SignalUnsubscribe };

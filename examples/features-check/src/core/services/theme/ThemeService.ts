@@ -6,8 +6,10 @@ import {
   INITIAL_STATE,
   Inject,
   Injectable,
-  makeObservable,
   Observable,
+  OnActivated,
+  OnDeactivation,
+  makeObservable,
 } from "@/libs/wirestate";
 
 @Injectable()
@@ -29,15 +31,17 @@ export class ThemeService extends AbstractService {
     );
   }
 
-  public override onActivated(): void {
+  @OnActivated()
+  public onActivated(): void {
     console.info(
       `[${this.constructor.name}] Activated with theme:`,
       this.theme,
     );
   }
 
-  public override onDeactivated(): void {
-    console.info(`[${this.constructor.name}] Deactivated`);
+  @OnDeactivation()
+  public onDeactivation(): void {
+    console.info(`[${this.constructor.name}] Deactivating`);
   }
 
   @Action()

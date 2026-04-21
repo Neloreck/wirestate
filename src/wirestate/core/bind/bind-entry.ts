@@ -4,9 +4,9 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { AbstractService } from "@/wirestate";
-import { bindConstant } from "@/wirestate/core/container/bind/bind-constant";
-import { bindDynamicValue } from "@/wirestate/core/container/bind/bind-dynamic-value";
-import { bindService } from "@/wirestate/core/container/bind/bind-service";
+import { bindConstant } from "@/wirestate/core/bind/bind-constant";
+import { bindDynamicValue } from "@/wirestate/core/bind/bind-dynamic-value";
+import { bindService } from "@/wirestate/core/bind/bind-service";
 import type { IInjectableDescriptor } from "@/wirestate/types/privision";
 import type { TServiceClass } from "@/wirestate/types/services";
 

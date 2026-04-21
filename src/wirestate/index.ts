@@ -3,9 +3,9 @@
  */
 
 export * from "@/wirestate/alias";
-export { bindEntry } from "@/wirestate/core/container/bind/bind-entry";
-export { bindConstant } from "@/wirestate/core/container/bind/bind-constant";
-export { bindService } from "@/wirestate/core/container/bind/bind-service";
+export { bindEntry } from "@/wirestate/core/bind/bind-entry";
+export { bindConstant } from "@/wirestate/core/bind/bind-constant";
+export { bindService } from "@/wirestate/core/bind/bind-service";
 export { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
 export { emitSignal } from "@/wirestate/core/container/emit-signal";
 export { query } from "@/wirestate/core/container/query";
@@ -25,6 +25,8 @@ export { useSyncQueryCaller } from "@/wirestate/core/queries/use-sync-query-call
 export { useOptionalSyncQueryCaller } from "@/wirestate/core/queries/use-optional-sync-query-caller";
 export { INITIAL_STATE_TOKEN as INITIAL_STATE } from "@/wirestate/core/registry";
 export { AbstractService } from "@/wirestate/core/service/abstract-service";
+export { OnActivated } from "@/wirestate/core/service/on-activated";
+export { OnDeactivation } from "@/wirestate/core/service/on-deactivation";
 export { useInjection } from "@/wirestate/core/service/use-injection";
 export { useOptionalInjection } from "@/wirestate/core/service/use-optional-injection";
 export { OnSignal } from "@/wirestate/core/signals/on-signal";

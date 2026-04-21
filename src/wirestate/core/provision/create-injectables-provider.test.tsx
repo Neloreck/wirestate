@@ -5,6 +5,8 @@ import { GenericService } from "@/fixtures/services/generic-service";
 import { createInjectablesProvider } from "@/wirestate/core/provision/create-injectables-provider";
 import { INITIAL_STATE_TOKEN, INITIAL_STATES_TOKEN } from "@/wirestate/core/registry";
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
+import { OnActivated } from "@/wirestate/core/service/on-activated";
+import { OnDeactivation } from "@/wirestate/core/service/on-deactivation";
 import { useInjection } from "@/wirestate/core/service/use-injection";
 import { mockContainer } from "@/wirestate/test-utils/mock-container";
 import { withIocProvider } from "@/wirestate/test-utils/with-ioc-provider";
@@ -20,11 +22,13 @@ describe("createInjectablesProvider", () => {
   class FirstService extends AbstractService {
     public value: string = "A";
 
-    public override onActivated(): void {
+    @OnActivated()
+    public activate(): void {
       firstServiceActivated += 1;
     }
 
-    public override onDeactivated(): void {
+    @OnDeactivation()
+    public deactivate(): void {
       firstServiceDeactivated += 1;
     }
   }
@@ -33,11 +37,13 @@ describe("createInjectablesProvider", () => {
   class SecondService extends AbstractService {
     public value: string = "B";
 
-    public override onActivated(): void {
+    @OnActivated()
+    public activate(): void {
       secondServiceActivated += 1;
     }
 
-    public override onDeactivated(): void {
+    @OnDeactivation()
+    public deactivate(): void {
       secondServiceDeactivated += 1;
     }
   }

@@ -29,8 +29,10 @@ export abstract class AbstractService {
   /**
    * Disposal flag.
    * Check in async actions to avoid updating unmounted services.
+   *
+   * Before activation internally set to null, but should not be surfaced as non-boolean.
    */
-  public readonly IS_DISPOSED: boolean = false;
+  public readonly IS_DISPOSED: boolean = null as unknown as boolean;
 
   /**
    * Access the IoC container.
@@ -129,18 +131,6 @@ export abstract class AbstractService {
       ? (this.getContainer().get<TInitialStatesMap>(INITIAL_STATES_TOKEN).get(ServiceClass) as T) || null
       : this.getContainer().get<T>(INITIAL_STATE_TOKEN);
   }
-
-  /**
-   * Lifecycle hook: runs after activation.
-   * Override for initialization.
-   */
-  public onActivated(): void {}
-
-  /**
-   * Lifecycle hook: runs before deactivation.
-   * Override for cleanup.
-   */
-  public onDeactivated(): void {}
 
   /**
    * Catch-all signal handler.

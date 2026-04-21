@@ -4,11 +4,11 @@ import { type ReactElement, type ReactNode, useContext, useEffect, useMemo, useS
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { bindEntry } from "@/wirestate/core/container/bind/bind-entry";
-import { getEntryToken } from "@/wirestate/core/container/bind/get-entry-token";
+import { bindEntry } from "@/wirestate/core/bind/bind-entry";
+import { getEntryToken } from "@/wirestate/core/bind/get-entry-token";
+import { applyInitialStates, removeInitialStateEntries } from "@/wirestate/core/container/apply-initial-states";
 import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
-import { applyInitialStates, removeInitialStateEntries } from "@/wirestate/core/initial-state/apply-initial-states";
 import { type IIocContext, IocContext } from "@/wirestate/core/provision/ioc-context";
 import type { Optional, TAnyObject } from "@/wirestate/types/general";
 import type { TInitialStateEntries } from "@/wirestate/types/initial-state";

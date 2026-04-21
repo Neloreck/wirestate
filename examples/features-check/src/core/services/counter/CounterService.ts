@@ -12,6 +12,8 @@ import {
   Observable,
   OnQuery,
   OnSignal,
+  OnActivated,
+  OnDeactivation,
 } from "@/libs/wirestate";
 
 import {
@@ -49,14 +51,16 @@ export class CounterService extends AbstractService {
     );
   }
 
-  public override onActivated(): void {
+  @OnActivated()
+  public onActivated(): void {
     console.info(`[${this.constructor.name}] Activated`);
 
     this.onSeedFromInitialState();
   }
 
-  public override onDeactivated(): void {
-    console.info(`[${this.constructor.name}] Deactivated`);
+  @OnDeactivation()
+  public onDeactivation(): void {
+    console.info(`[${this.constructor.name}] Deactivating`);
   }
 
   @Action()

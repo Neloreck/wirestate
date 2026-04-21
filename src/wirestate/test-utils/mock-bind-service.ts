@@ -1,6 +1,6 @@
 import { Container, type Newable } from "inversify";
 
-import { bindService } from "@/wirestate/core/container/bind/bind-service";
+import { bindService } from "@/wirestate/core/bind/bind-service";
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
 
 export interface IMockBindServiceOptions {

@@ -1,15 +1,19 @@
 import { Container } from "inversify";
 
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
+import { OnActivated } from "@/wirestate/core/service/on-activated";
+import { OnDeactivation } from "@/wirestate/core/service/on-deactivation";
 
 export class GenericService extends AbstractService {
   public isActivated: boolean = false;
 
-  public onActivated(): void {
+  @OnActivated()
+  public activate(): void {
     this.isActivated = true;
   }
 
-  public onDeactivated(): void {
+  @OnDeactivation()
+  public deactivate(): void {
     this.isActivated = false;
   }
 

@@ -1,3 +1,8 @@
+## 0.4.0
+
+- Add `OnActivated` decorator
+- Add `OnDeactivated` decorator
+
 ## 0.3.0
 
 - Rename `createServicesProvider` to `createInjectablesProvider`

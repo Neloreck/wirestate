@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
-import { applyInitialStates, removeInitialStateEntries } from "@/wirestate/core/initial-state/apply-initial-states";
+import { applyInitialStates, removeInitialStateEntries } from "@/wirestate/core/container/apply-initial-states";
 import { INITIAL_STATE_TOKEN, INITIAL_STATES_TOKEN } from "@/wirestate/core/registry";
 import { mockContainer } from "@/wirestate/test-utils/mock-container";
 import { TAnyObject } from "@/wirestate/types/general";

@@ -8,10 +8,12 @@ import {
   Action,
   Inject,
   Injectable,
-  makeObservable,
+  OnActivated,
+  OnDeactivation,
   OnQuery,
   OnSignal,
   ShallowObservable,
+  makeObservable,
   type Signal,
 } from "@/libs/wirestate";
 
@@ -45,14 +47,16 @@ export class LoggerService extends AbstractService {
     );
   }
 
-  public override onActivated(): void {
+  @OnActivated()
+  public onActivated(): void {
     console.info(
       `[${this.constructor.name}] Activated — listening for signals`,
     );
   }
 
-  public override onDeactivated(): void {
-    console.info(`[${this.constructor.name}] Deactivated`);
+  @OnDeactivation()
+  public onDeactivation(): void {
+    console.info(`[${this.constructor.name}] Deactivating`);
 
     this.clear();
   }

@@ -1,4 +1,4 @@
-import { BindWhenOnFluentSyntax, Container, type Newable, type ServiceIdentifier } from "inversify";
+import { BindWhenOnFluentSyntax, Container, type Newable } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -13,6 +13,8 @@ import {
   SIGNAL_UNSUBSCRIBERS_BY_SERVICE,
 } from "@/wirestate/core/registry";
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
+import { getActivatedHandlerMetadata } from "@/wirestate/core/service/get-activated-handler-metadata";
+import { getDeactivationHandlerMetadata } from "@/wirestate/core/service/get-deactivation-handler-metadata";
 import { buildSignalDispatcher } from "@/wirestate/core/signals/build-signal-dispatcher";
 import type { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import { Maybe, MaybePromise, Optional } from "@/wirestate/types/general";
@@ -62,6 +64,9 @@ export function bindService<T extends AbstractService>(
       instance,
     });
 
+    // Ensure flag is initialized on activation.
+    (instance as { IS_DISPOSED: boolean }).IS_DISPOSED = false;
+
     CONTAINER_REFS_BY_SERVICE.set(instance, container);
 
     // Compose all signal listeners (the catch-all `onSignal` hook plus every
@@ -90,15 +95,23 @@ export function bindService<T extends AbstractService>(
       _attachQueryUnreg(instance, unregister);
     }
 
-    const result: MaybePromise<void> = instance.onActivated() as MaybePromise<void>;
-
+    // Call every `@OnActivated`-decorated method in base-to-derived order.
     // Fire-and-forget any async init so we stay synchronous from the
-    // container's point of view. Services that need strict async
-    // bootstrapping can await their initialization elsewhere.
-    if (result && typeof (result as Promise<void>).then === "function") {
-      (result as Promise<void>).catch((error) => {
-        console.error("[wirestate] onActivated rejected for:", entry.name, error);
-      });
+    // container's point of view.
+    for (const methodName of getActivatedHandlerMetadata(instance)) {
+      const method = (instance as unknown as Record<string | symbol, unknown>)[methodName];
+
+      if (typeof method !== "function") {
+        continue;
+      }
+
+      const result: MaybePromise<void> = (method as () => MaybePromise<void>).call(instance);
+
+      if (result && typeof (result as Promise<void>).then === "function") {
+        (result as Promise<void>).catch((error) => {
+          console.error("[wirestate] @OnActivated rejected for:", entry.name, String(methodName), error);
+        });
+      }
     }
 
     return instance;
@@ -111,18 +124,24 @@ export function bindService<T extends AbstractService>(
       instance,
     });
 
+    // Call every `@OnDeactivation`-decorated method in base-to-derived order.
+    for (const methodName of getDeactivationHandlerMetadata(instance)) {
+      const method = (instance as unknown as Record<string | symbol, unknown>)[methodName];
+
+      if (typeof method === "function") {
+        (method as () => void).call(instance);
+      }
+    }
+
     // Flip the public disposal flag first so any async work already in
     // flight (fetches awaiting in @Action methods, scheduled reactions,
     // etc.) can short-circuit before it mutates the about-to-die instance.
     // The cast is the only write-site for this `readonly` field.
-    // todo: Kill signalling methods of disposed instances, unlink containers?
     (instance as { IS_DISPOSED: boolean }).IS_DISPOSED = true;
 
     _detachQueryUnregs(instance);
     _detachSignalSub(instance);
     CONTAINER_REFS_BY_SERVICE.delete(instance);
-
-    return instance.onDeactivated();
   });
 }
 

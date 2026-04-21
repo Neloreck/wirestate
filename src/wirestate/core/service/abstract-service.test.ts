@@ -1,3 +1,5 @@
+import { Container } from "inversify";
+
 import { GenericService } from "@/fixtures/services/generic-service";
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
 import { mockBindService } from "@/wirestate/test-utils/mock-bind-service";
@@ -13,10 +15,10 @@ describe("AbstractService", () => {
     "Ensure service is properly disposed and MobX refs are observing latest services.";
 
   it("should initialise generic services with correct state without container", () => {
-    const service = new GenericService();
+    const service: GenericService = new GenericService();
 
     expect(service).toBeInstanceOf(AbstractService);
-    expect(service.IS_DISPOSED).toBe(false);
+    expect(service.IS_DISPOSED).toBeNull();
     expect(service.onSignal).toBeUndefined();
     expect(() => service.testGetContainer()).toThrow(illegalBeforeAccessError);
     expect(() => service.testResolveService()).toThrow(illegalBeforeAccessError);
@@ -26,8 +28,8 @@ describe("AbstractService", () => {
   });
 
   it("should initialise generic services with correct state within container", () => {
-    const container = mockContainer();
-    const service = mockService(GenericService, container);
+    const container: Container = mockContainer();
+    const service: GenericService = mockService(GenericService, container);
 
     mockBindService(container, GenericService);
 
@@ -43,8 +45,8 @@ describe("AbstractService", () => {
   });
 
   it("should throw errors after disposal (container actions)", () => {
-    const container = mockContainer();
-    const service = mockService(GenericService, container);
+    const container: Container = mockContainer();
+    const service: GenericService = mockService(GenericService, container);
 
     mockBindService(container, GenericService);
 
