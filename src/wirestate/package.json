@@ -6,9 +6,27 @@
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/neloreck/wirestate#readme",
   "license": "MIT",
-  "main": "./index.js",
+  "main": "./cjs/development/index.js",
+  "module": "./esm/development/index.js",
   "types": "./index.d.ts",
-  "module": "./esm/index.js",
+  "exports": {
+    ".": {
+      "import": {
+        "production": "./esm/production/index.js",
+        "default": "./esm/development/index.js"
+      },
+      "require": {
+        "production": "./cjs/production/index.js",
+        "default": "./cjs/development/index.js"
+      }
+    },
+    "./test-utils": {
+      "require": {
+        "production": "./cjs/production/test-utils.js",
+        "default": "./cjs/development/test-utils.js"
+      }
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/neloreck/wirestate.git"
