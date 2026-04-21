@@ -30,10 +30,10 @@ export class GenericService extends AbstractService {
   }
 
   public testEmitSignal(): void {
-    this.emitSignal({ type: "test", payload: 0 });
+    this.emitSignal("TEST_SIGNAL", 0);
   }
 
   public testQueryData(): void {
-    this.queryData("TYPE", { data: 1 });
+    this.queryData("TEST_QUERY", { data: 1 });
   }
 }

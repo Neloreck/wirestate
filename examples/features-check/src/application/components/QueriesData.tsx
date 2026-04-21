@@ -37,6 +37,7 @@ export const QueriesData = observer(() => {
   const onPullSummary = useCallback(() => {
     const value: ICounterSummary = querySyncData<ICounterSummary>(
       ECounterServiceQuery.GET_COUNTER_SUMMARY,
+      { value: "some-data" },
     );
 
     setSummary(value);

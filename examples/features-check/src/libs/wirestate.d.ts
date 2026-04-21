@@ -71,9 +71,10 @@ type TSignalType = string | symbol;
 /**
  * Signal object.
  */
-interface ISignal<P = unknown, T extends TSignalType = TSignalType> {
+interface ISignal<P = unknown, T extends TSignalType = TSignalType, F = unknown> {
     readonly type: T;
     readonly payload?: P;
+    readonly from?: F;
 }
 /**
  * Signal handler signature.
@@ -86,7 +87,7 @@ type TSignalUnsubscribe = () => void;
 /**
  * Signal emitter signature.
  */
-type TSignalEmitter = (signal: ISignal) => void;
+type TSignalEmitter<P = unknown, T extends TSignalType = TSignalType, F = unknown> = (type: T, payload?: P, from?: F) => void;
 
 /**
  * Base class for services.
@@ -124,11 +125,12 @@ declare abstract class AbstractService {
      * Broadcasts a signal.
      * Available only for activated containers.
      *
-     * @param signal - signal to emit
-     *
+     * @param type - type of signal to emit
+     * @param payload - optional payload to send with the signal
+     * @param from - optional sender of the signal
      * @throws WirestateError if service is not activated
      */
-    protected emitSignal<P, T extends TSignalType = TSignalType>(signal: ISignal<P, T>): void;
+    protected emitSignal<P, T extends TSignalType = TSignalType>(type: T, payload?: P, from?: unknown): void;
     /**
      * Dispatches a query and returns the result.
      * Available only for activated containers.
@@ -208,9 +210,11 @@ declare function createIocContainer(options?: ICreateIocContainerOptions): Conta
  * Emits signals from outside an AbstractService.
  *
  * @param container - inversify container
- * @param signal - signal to emit
+ * @param type - signal type ot emit
+ * @param payload - signal payload
+ * @param from - optional indicator of the signal source
  */
-declare function emitSignal<P>(container: Container$1, signal: ISignal<P>): void;
+declare function emitSignal<P, T extends TSignalType>(container: Container$1, type: T, payload?: P, from?: unknown): void;
 
 /**
  * Dispatches a query on the provided container.
@@ -221,6 +225,38 @@ declare function emitSignal<P>(container: Container$1, signal: ISignal<P>): void
  * @returns query result
  */
 declare function query<R = unknown, D = unknown>(container: Container$1, type: TQueryType, data?: D): MaybePromise<R>;
+
+/**
+ * Dispatches a query on the provided container, returning null if no handler is registered.
+ *
+ * @param container - inversify container
+ * @param type - query type
+ * @param data - query data
+ * @returns query result or null
+ */
+declare function queryOptional<R = unknown, D = unknown>(container: Container$1, type: TQueryType, data?: D): MaybePromise<R> | null;
+
+/**
+ * A custom error class that contains generic error information for Wirestate-related issues.
+ *
+ * This class extends the native `Error` class and is used to represent errors specific
+ * to the Wirestate library, providing more structured error handling.
+ */
+declare class WirestateError extends Error {
+    /**
+     * Name or error class to help differentiate error class in minified environments.
+     */
+    readonly name: string;
+    /**
+     * Error code describing the issue.
+     */
+    readonly code: number;
+    /**
+     * Error message describing the issue.
+     */
+    readonly message: string;
+    constructor(code?: number, detail?: string);
+}
 
 /**
  * Props for the component returned by {@link createInjectablesProvider}.
@@ -441,17 +477,7 @@ declare function useSignalHandler(handler: TSignalHandler): void;
  *
  * @returns signal emitter
  */
-declare function useSignalEmitter(): TSignalEmitter;
-
-/**
- * Dispatches a query on the provided container, returning null if no handler is registered.
- *
- * @param container - inversify container
- * @param type - query type
- * @param data - query data
- * @returns query result or null
- */
-declare function queryOptional<R = unknown, D = unknown>(container: Container$1, type: TQueryType, data?: D): MaybePromise<R> | null;
+declare function useSignalEmitter<P = unknown, T extends TSignalType = TSignalType>(): TSignalEmitter<P, T>;
 
 interface IMockBindServiceOptions {
     skipLifecycle?: boolean;
@@ -483,5 +509,5 @@ declare function withIocProvider(children: ReactNode, container?: Container$1, s
     seed: TAnyObject | undefined;
 }>;
 
-export { AbstractService, Action, Computed, DeepObservable, IocProvider, Observable, OnActivated, OnDeactivation, OnQuery, OnSignal, RefObservable, SEED_TOKEN as SEED, ShallowObservable, bindConstant, bindEntry, bindService, createInjectablesProvider, createIocContainer, emitSignal, forwardRef, mockBindService, mockContainer, mockService, query, queryOptional, useContainer, useContainerRevision, useInjection, useOptionalInjection, useOptionalQueryCaller, useOptionalSyncQueryCaller, useQueryCaller, useQueryHandler, useSignal, useSignalEmitter, useSignalHandler, useSignals, useSyncQueryCaller, withIocProvider };
+export { AbstractService, Action, Computed, DeepObservable, IocProvider, Observable, OnActivated, OnDeactivation, OnQuery, OnSignal, RefObservable, SEED_TOKEN as SEED, ShallowObservable, WirestateError, bindConstant, bindEntry, bindService, createInjectablesProvider, createIocContainer, emitSignal, forwardRef, mockBindService, mockContainer, mockService, query, queryOptional, useContainer, useContainerRevision, useInjection, useOptionalInjection, useOptionalQueryCaller, useOptionalSyncQueryCaller, useQueryCaller, useQueryHandler, useSignal, useSignalEmitter, useSignalHandler, useSignals, useSyncQueryCaller, withIocProvider };
 export type { IInjectableDescriptor as InjectableDescriptor, InjectablesProvider, IInjectablesProviderProps as InjectablesProviderProps, TQueryHandler as QueryHandler, TQueryResponder as QueryResponder, TQueryType as QueryType, TQueryUnregister as QueryUnregister, TSeedEntries as SeedEntries, TSeedEntry as SeedEntry, TSeedKey as SeedKey, TServiceClass as ServiceClass, ISignal as Signal, TSignalEmitter as SignalEmitter, TSignalHandler as SignalHandler, TSignalType as SignalType, TSignalUnsubscribe as SignalUnsubscribe };

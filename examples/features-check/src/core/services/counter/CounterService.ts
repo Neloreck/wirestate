@@ -58,7 +58,7 @@ export class CounterService extends AbstractService {
     this.initializeFromSeed();
 
     // [*] Pass safe lifecycle checks - can emit from activation.
-    this.emitSignal({ type: `activated/${this.constructor.name}` });
+    this.emitSignal(`activated/${this.constructor.name}`);
   }
 
   @OnDeactivation()
@@ -66,7 +66,7 @@ export class CounterService extends AbstractService {
     console.info(`[${this.constructor.name}] Deactivating`);
 
     // [*] Pass safe lifecycle checks - can emit from deactivation.
-    this.emitSignal({ type: `deactivating/${this.constructor.name}` });
+    this.emitSignal(`deactivating/${this.constructor.name}`);
   }
 
   @Action()
@@ -104,10 +104,7 @@ export class CounterService extends AbstractService {
     this.count += 1;
     this.lastIncrementAt = Date.now();
 
-    this.emitSignal({
-      type: EGlobalSignal.COUNTER_INCREMENTED,
-      payload: { count: this.count },
-    });
+    this.emitSignal(EGlobalSignal.COUNTER_INCREMENTED, { count: this.count });
   }
 
   @Action()
@@ -117,7 +114,7 @@ export class CounterService extends AbstractService {
     this.count = 0;
     this.lastIncrementAt = null;
 
-    this.emitSignal({ type: EGlobalSignal.COUNTER_RESET });
+    this.emitSignal(EGlobalSignal.COUNTER_RESET);
   }
 
   @OnSignal(EGlobalSignal.USER_PINGED)
@@ -131,9 +128,10 @@ export class CounterService extends AbstractService {
    * a fresh summary on demand.
    */
   @OnQuery(ECounterServiceQuery.GET_COUNTER_SUMMARY)
-  public provideCounterSummary(): ICounterSummary {
+  public provideCounterSummary(data?: object): ICounterSummary {
     this.loggerService.log(
-      `[${this.constructor.name}][query] Fetching sync snapshot`,
+      `[${this.constructor.name}][query] Fetching sync snapshot:`,
+      data,
     );
 
     return {

@@ -93,19 +93,26 @@ export abstract class AbstractService {
    * Broadcasts a signal.
    * Available only for activated containers.
    *
-   * @param signal - signal to emit
-   *
+   * @param type - type of signal to emit
+   * @param payload - optional payload to send with the signal
+   * @param from - optional sender of the signal
    * @throws WirestateError if service is not activated
    */
-  protected emitSignal<P, T extends TSignalType = TSignalType>(signal: ISignal<P, T>): void {
+  protected emitSignal<P, T extends TSignalType = TSignalType>(type: T, payload?: P, from?: unknown): void {
     dbg.info(prefix(__filename), "Emit signal:", {
       name: this.constructor.name,
-      type: signal?.type,
-      signal,
-      from: this,
+      type: type,
+      payload,
+      from: from === undefined ? this : from,
     });
 
-    this.getContainer().get<SignalBus>(SIGNAL_BUS_TOKEN).emit(signal);
+    this.getContainer()
+      .get<SignalBus>(SIGNAL_BUS_TOKEN)
+      .emit({
+        type,
+        payload,
+        from: from === undefined ? this : from,
+      });
   }
 
   /**

@@ -5,16 +5,18 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
 import { SignalBus } from "@/wirestate/core/signals/signal-bus";
-import type { ISignal } from "@/wirestate/types/signals";
+import type { TSignalType } from "@/wirestate/types/signals";
 
 /**
  * Emits signals from outside an AbstractService.
  *
  * @param container - inversify container
- * @param signal - signal to emit
+ * @param type - signal type ot emit
+ * @param payload - signal payload
+ * @param from - optional indicator of the signal source
  */
-export function emitSignal<P>(container: Container, signal: ISignal<P>): void {
-  dbg.info(prefix(__filename), "Emit signal:", { type: signal?.type, signal, container });
+export function emitSignal<P, T extends TSignalType>(container: Container, type: T, payload?: P, from?: unknown): void {
+  dbg.info(prefix(__filename), "Emit signal:", { type: type, payload, container });
 
-  container.get<SignalBus>(SIGNAL_BUS_TOKEN).emit(signal);
+  container.get<SignalBus>(SIGNAL_BUS_TOKEN).emit({ type, payload, from });
 }

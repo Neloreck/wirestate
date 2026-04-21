@@ -20,17 +20,11 @@ export const GeneralControls = observer(() => {
 
   // [*] Pass ability to emit signals from UI.
   const onDumpData = useCallback(() => {
-    emitSignal({
-      type: EGlobalSignal.DUMP,
-      payload: { at: Date.now() },
-    });
+    emitSignal(EGlobalSignal.DUMP, { at: Date.now() });
   }, [emitSignal]);
 
   const onUserPinged = useCallback(() => {
-    emitSignal({
-      type: EGlobalSignal.USER_PINGED,
-      payload: { at: Date.now() },
-    });
+    emitSignal(EGlobalSignal.USER_PINGED, { at: Date.now() });
   }, [emitSignal]);
 
   return (

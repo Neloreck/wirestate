@@ -17,7 +17,9 @@ export const SignalsLog = observer(() => {
         ) : (
           loggerService.logs.map((entry) => (
             <div key={entry.id} className={"signal-log__entry"}>
-              <span className={"signal-log__type"}>{entry.type}</span>
+              <span className={"signal-log__type"}>
+                {JSON.stringify(entry.type)}
+              </span>
               <span className={"signal-log__payload"}>
                 {entry.payload !== undefined
                   ? JSON.stringify(entry.payload)

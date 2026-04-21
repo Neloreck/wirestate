@@ -12,9 +12,21 @@ describe("emitSignal", () => {
 
     jest.spyOn(bus, "emit").mockImplementation(jest.fn());
 
-    emitSignal(container, { type: "SOME_SIGNAL", payload: 1 });
+    emitSignal(container, "SOME_SIGNAL", 1);
 
     expect(bus.emit).toHaveBeenCalledTimes(1);
     expect(bus.emit).toHaveBeenCalledWith({ type: "SOME_SIGNAL", payload: 1 });
+  });
+
+  it("should call injected query bus methods with only type", () => {
+    const container: Container = mockContainer();
+    const bus: SignalBus = container.get(SIGNAL_BUS_TOKEN);
+
+    jest.spyOn(bus, "emit").mockImplementation(jest.fn());
+
+    emitSignal(container, "SIMPLE_SIGNAL");
+
+    expect(bus.emit).toHaveBeenCalledTimes(1);
+    expect(bus.emit).toHaveBeenCalledWith({ type: "SIMPLE_SIGNAL", payload: undefined });
   });
 });

@@ -309,10 +309,16 @@ function _detachQueryUnregs(service) {
   container.bind(SEEDS_TOKEN).toConstantValue(new Map());
   container.bind(SEED_TOKEN).toConstantValue({});
   return container;
-}function emitSignal(container, signal) {
-  container.get(SIGNAL_BUS_TOKEN).emit(signal);
+}function emitSignal(container, type, payload, from) {
+  container.get(SIGNAL_BUS_TOKEN).emit({
+    type,
+    payload,
+    from
+  });
 }function query(container, type, data) {
   return container.get(QUERY_BUS_TOKEN).query(type, data);
+}function queryOptional(container, type, data) {
+  return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
 }function getEntryToken(entry) {
   return typeof entry === "function" ? entry : entry.id;
 }function applySeeds(container, seeds) {
@@ -490,14 +496,18 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
   resolve(injectionId) {
     return this.getContainer().get(injectionId);
   }
-  emitSignal(signal) {
-    this.getContainer().get(SIGNAL_BUS_TOKEN).emit(signal);
+  emitSignal(type, payload, from) {
+    this.getContainer().get(SIGNAL_BUS_TOKEN).emit({
+      type,
+      payload,
+      from: from === undefined ? this : from
+    });
   }
   queryData(type, data) {
     return this.getContainer().get(QUERY_BUS_TOKEN).query(type, data);
   }
-  getSeed(ServiceClass) {
-    return ServiceClass ? this.getContainer().get(SEEDS_TOKEN).get(ServiceClass) || null : this.getContainer().get(SEED_TOKEN);
+  getSeed(seed) {
+    return seed ? this.getContainer().get(SEEDS_TOKEN).get(seed) || null : this.getContainer().get(SEED_TOKEN);
   }
 }function OnActivated() {
   return (target, propertyKey) => {
@@ -602,11 +612,13 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
   }, [container]);
 }function useSignalEmitter() {
   const container = useIocContext().container;
-  return useCallback(signal => {
-    container.get(SIGNAL_BUS_TOKEN).emit(signal);
+  return useCallback((type, payload, from) => {
+    container.get(SIGNAL_BUS_TOKEN).emit({
+      type,
+      payload,
+      from
+    });
   }, [container]);
-}function queryOptional(container, type, data) {
-  return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
 }function mockBindService(container, ServiceClass, options = {}) {
   const {
     skipLifecycle
@@ -646,4 +658,4 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
     container,
     seed
   }, children);
-}export{AbstractService,Action,Computed,DeepObservable,IocProvider,Observable,OnActivated,OnDeactivation,OnQuery,OnSignal,RefObservable,SEED_TOKEN as SEED,ShallowObservable,bindConstant,bindEntry,bindService,createInjectablesProvider,createIocContainer,emitSignal,forwardRef,mockBindService,mockContainer,mockService,query,queryOptional,useContainer,useContainerRevision,useInjection,useOptionalInjection,useOptionalQueryCaller,useOptionalSyncQueryCaller,useQueryCaller,useQueryHandler,useSignal,useSignalEmitter,useSignalHandler,useSignals,useSyncQueryCaller,withIocProvider};
+}export{AbstractService,Action,Computed,DeepObservable,IocProvider,Observable,OnActivated,OnDeactivation,OnQuery,OnSignal,RefObservable,SEED_TOKEN as SEED,ShallowObservable,WirestateError,bindConstant,bindEntry,bindService,createInjectablesProvider,createIocContainer,emitSignal,forwardRef,mockBindService,mockContainer,mockService,query,queryOptional,useContainer,useContainerRevision,useInjection,useOptionalInjection,useOptionalQueryCaller,useOptionalSyncQueryCaller,useQueryCaller,useQueryHandler,useSignal,useSignalEmitter,useSignalHandler,useSignals,useSyncQueryCaller,withIocProvider};

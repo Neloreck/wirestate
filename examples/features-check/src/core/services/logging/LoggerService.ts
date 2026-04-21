@@ -65,7 +65,7 @@ export class LoggerService extends AbstractService {
     );
 
     // [*] Pass safe lifecycle checks - can emit from activation.
-    this.emitSignal({ type: `activated/${this.constructor.name}` });
+    this.emitSignal(`activated/${this.constructor.name}`);
   }
 
   @OnDeactivation()
@@ -73,7 +73,7 @@ export class LoggerService extends AbstractService {
     console.info(`[${this.constructor.name}] Deactivating`);
 
     // [*] Pass safe lifecycle checks - can emit from deactivation.
-    this.emitSignal({ type: `deactivating/${this.constructor.name}` });
+    this.emitSignal(`deactivating/${this.constructor.name}`);
 
     this.clear();
   }
