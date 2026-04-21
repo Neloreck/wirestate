@@ -9,6 +9,8 @@ export { bindService } from "@/wirestate/core/bind/bind-service";
 export { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
 export { emitSignal } from "@/wirestate/core/container/emit-signal";
 export { query } from "@/wirestate/core/container/query";
+export { queryOptional } from "@/wirestate/core/container/query-optional";
+export { WirestateError } from "@/wirestate/core/error/wirestate-error";
 export {
   createInjectablesProvider,
   InjectablesProvider,
@@ -54,4 +56,3 @@ export {
   TSignalType as SignalType,
   TSignalUnsubscribe as SignalUnsubscribe,
 } from "@/wirestate/types/signals";
-export { queryOptional } from "@/wirestate/core/container/query-optional";

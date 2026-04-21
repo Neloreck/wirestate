@@ -132,18 +132,18 @@ export abstract class AbstractService {
    * Returns shared seed if parameters are not provided.
    * Available only for activated containers.
    *
-   * @param ServiceClass - lookup key (defaults to current class)
+   * @param seed - lookup key
    * @returns seed data or null if missing
    *
    * @throws WirestateError if service is not activated
    */
-  protected getSeed<T extends TAnyObject>(ServiceClass?: TSeedKey): Optional<T> {
+  protected getSeed<T extends TAnyObject>(seed?: TSeedKey): Optional<T> {
     dbg.info(prefix(__filename), "Get initial state for key:", {
-      key: (ServiceClass as TAnyObject)?.name ?? ServiceClass,
+      key: (seed as TAnyObject)?.name ?? seed,
     });
 
-    return ServiceClass
-      ? (this.getContainer().get<TSeedsMap>(SEEDS_TOKEN).get(ServiceClass) as T) || null
+    return seed
+      ? (this.getContainer().get<TSeedsMap>(SEEDS_TOKEN).get(seed) as T) || null
       : this.getContainer().get<T>(SEED_TOKEN);
   }
 

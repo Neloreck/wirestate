@@ -46,6 +46,7 @@ describe("Library exported API", () => {
     "emitSignal",
     "query",
     "queryOptional",
+    "WirestateError",
     "createInjectablesProvider",
     "InjectablesProvider",
     "InjectablesProviderProps",
