@@ -1,6 +1,13 @@
 ## 0.3.0
 
-- Correctly notify about IS_DISPOSED after deactivation of services
+- Rename `createServicesProvider` to `createInjectablesProvider`
+- Add `useSignals`, `useSignalHandler` hooks for better signal handling ergonomics
+- Add `useOptionalInjection` hook for safe resolution of optional dependencies
+- Support optional queries via `queryOptional`, `useOptionalQueryCaller`, and `useOptionalSyncQueryCaller`
+- Support merging of initial states when multiple providers co-exist
+- Add more re-exports from `mobx` and `inversify` for easier consumer usage
+- Improve test coverage, extend test utilities
+- Correctly notify about `IS_DISPOSED` after deactivation of services
 
 ## 0.2.0
 

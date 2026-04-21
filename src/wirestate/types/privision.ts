@@ -9,4 +9,9 @@ export interface IInjectableDescriptor<T = unknown, V = unknown> {
   value: V;
   type?: TBindingType;
   scopeType?: TScopeBindingType;
+  /**
+   * Factory function for dynamic value bindings.
+   * Used when type is set to DynamicValue.
+   */
+  factory?: () => T;
 }

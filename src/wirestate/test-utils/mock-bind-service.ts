@@ -1,9 +1,9 @@
-import { Container, type Newable, type ServiceIdentifier } from "inversify";
+import { Container, type Newable } from "inversify";
 
-import { AbstractService, bindService } from "@/wirestate";
+import { bindService } from "@/wirestate/core/container/bind/bind-service";
+import { AbstractService } from "@/wirestate/core/service/abstract-service";
 
 export interface IMockBindServiceOptions {
-  token?: ServiceIdentifier;
   skipLifecycle?: boolean;
 }
 
@@ -13,15 +13,9 @@ export function mockBindService<T extends AbstractService>(
   ServiceClass: Newable<T>,
   options: IMockBindServiceOptions = {}
 ): void {
-  const { token, skipLifecycle } = options;
+  const { skipLifecycle } = options;
 
-  return token
-    ? bindService(container, token as ServiceIdentifier<T>, ServiceClass, {
-        isWithBindingCheck: false,
-        isWithIgnoreLifecycle: skipLifecycle,
-      })
-    : bindService(container, ServiceClass, ServiceClass, {
-        isWithBindingCheck: false,
-        isWithIgnoreLifecycle: skipLifecycle,
-      });
+  return bindService(container, ServiceClass, {
+    isWithIgnoreLifecycle: skipLifecycle,
+  });
 }

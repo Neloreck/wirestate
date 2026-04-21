@@ -29,7 +29,7 @@ export function mockContainer(options: IMockContainerOptions = {}): Container {
   }
 
   for (const service of options.services ?? []) {
-    mockBindService(container, service, { skipLifecycle: options.skipLifecycle, token: service });
+    mockBindService(container, service, { skipLifecycle: options.skipLifecycle });
   }
 
   for (const token of options.activate ?? []) {

@@ -65,10 +65,10 @@ export class CounterService extends AbstractService {
 ### 2. Provide Services in React
 
 ```tsx
-import { IocProvider, createServicesProvider } from 'wirestate';
+import { IocProvider, createInjectablesProvider } from 'wirestate';
 import { CounterService } from './CounterService';
 
-const MainServices = createServicesProvider([CounterService]);
+const MainServices = createInjectablesProvider([CounterService]);
 
 const App = () => (
   <IocProvider>

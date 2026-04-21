@@ -94,6 +94,23 @@ export class QueryBus {
   }
 
   /**
+   * Dispatches a query to the last registered handler, returning null if no handler exists.
+   *
+   * @param type - query type
+   * @param data - query payload
+   * @returns query result or null if no handler is registered
+   */
+  public queryOptional<R = unknown, D = unknown>(type: TQueryType, data?: D): MaybePromise<R> | null {
+    const stack: Maybe<Array<TQueryHandler>> = this.handlers.get(type);
+
+    if (stack?.length) {
+      return (stack[stack.length - 1] as TQueryHandler<D, R>)(data as D);
+    }
+
+    return null;
+  }
+
+  /**
    * Checks if a handler is registered for the given type.
    *
    * @param type - query type

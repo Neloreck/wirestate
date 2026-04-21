@@ -44,28 +44,28 @@ export class CounterService extends AbstractService {
     makeObservable(this);
 
     console.info(
-      `[${this.constructor.name}] shared initial state on construction:`,
+      `[${this.constructor.name}] Shared initial state on construction:`,
       initialState,
     );
   }
 
   public override onActivated(): void {
-    console.info(`[${this.constructor.name}] activated`);
+    console.info(`[${this.constructor.name}] Activated`);
 
     this.onSeedFromInitialState();
   }
 
   public override onDeactivated(): void {
-    console.info(`[${this.constructor.name}] deactivated`);
+    console.info(`[${this.constructor.name}] Deactivated`);
   }
 
   @Action()
   private onSeedFromInitialState(): void {
     const initialState: Optional<ICounterInitialState> =
-      this.getInitialState<ICounterInitialState>(CounterService);
+      this.getInitialState(CounterService);
 
     console.info(
-      `[${this.constructor.name}] seed from initial state:`,
+      `[${this.constructor.name}] Seed from initial state:`,
       initialState,
     );
 
@@ -89,7 +89,7 @@ export class CounterService extends AbstractService {
   public increment(): void {
     // or this.resolve(LoggerService) to avoid circular refs
     this.loggerService.log(
-      `[${this.constructor.name}][action] incrementing counter`,
+      `[${this.constructor.name}][action] Incrementing counter`,
     );
 
     this.count += 1;
@@ -103,6 +103,8 @@ export class CounterService extends AbstractService {
 
   @Action()
   public reset(): void {
+    console.info(`[${this.constructor.name}] Reset counter`);
+
     this.count = 0;
     this.lastIncrementAt = null;
 
@@ -122,7 +124,7 @@ export class CounterService extends AbstractService {
   @OnQuery(ECounterServiceQuery.GET_COUNTER_SUMMARY)
   public provideCounterSummary(): ICounterSummary {
     this.loggerService.log(
-      `[${this.constructor.name}][query] fetching sync snapshot…`,
+      `[${this.constructor.name}][query] Fetching sync snapshot`,
     );
 
     return {
@@ -140,7 +142,7 @@ export class CounterService extends AbstractService {
   @OnQuery(ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT)
   public async fetchCounterSnapshot(): Promise<ICounterSnapshot> {
     this.loggerService.log(
-      `[${this.constructor.name}][query] fetching async snapshot`,
+      `[${this.constructor.name}][query] Fetching async snapshot`,
     );
 
     await new Promise((resolve) => setTimeout(resolve, 500));

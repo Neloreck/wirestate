@@ -24,20 +24,20 @@ export class ThemeService extends AbstractService {
     makeObservable(this);
 
     console.info(
-      `[${this.constructor.name}] shared initial state on construction:`,
+      `[${this.constructor.name}] Shared initial state on construction:`,
       initialState,
     );
   }
 
   public override onActivated(): void {
     console.info(
-      `[${this.constructor.name}] activated with theme:`,
+      `[${this.constructor.name}] Activated with theme:`,
       this.theme,
     );
   }
 
   public override onDeactivated(): void {
-    console.info(`[${this.constructor.name}] deactivated`);
+    console.info(`[${this.constructor.name}] Deactivated`);
   }
 
   @Action()

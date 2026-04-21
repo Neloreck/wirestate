@@ -20,7 +20,6 @@ import type { TQueryHandler, TQueryUnregister } from "@/wirestate/types/queries"
 import type { TSignalHandler, TSignalUnsubscribe } from "@/wirestate/types/signals";
 
 export interface IBindServiceOptions {
-  isWithBindingCheck?: boolean;
   isWithIgnoreLifecycle?: boolean;
 }
 
@@ -29,40 +28,26 @@ export interface IBindServiceOptions {
  * Ensures container references, signal subscriptions, and query handlers are managed correctly.
  *
  * @param container - target Inversify container
- * @param token - service identifier
- * @param ServiceClass - service constructor
+ * @param entry - service constructor
  * @param options - options object to control binding flow
  */
 export function bindService<T extends AbstractService>(
   container: Container,
-  token: ServiceIdentifier<T>,
-  ServiceClass: Newable<T>,
-  options: IBindServiceOptions
+  entry: Newable<T>,
+  options?: IBindServiceOptions
 ): void {
   dbg.info(prefix(__filename), "Binding service:", {
-    name: ServiceClass.name,
-    token,
-    ServiceClass,
+    name: entry.name,
+    entry,
     options,
     container,
   });
-
-  if (options?.isWithBindingCheck && container.isBound(token)) {
-    dbg.info(prefix(__filename), "Skip binding service on mount, bound already:", {
-      name: ServiceClass.name,
-      container,
-      token,
-      ServiceClass,
-    });
-
-    return;
-  }
 
   // Inversify's fluent binding API only allows a single `.onActivation` /
   // `.onDeactivation` call per chain, so we register them on the container
   // itself instead — this also works correctly if a later call rebinds the
   // same token.
-  const whenBind: BindWhenOnFluentSyntax<T> = container.bind<T>(token).to(ServiceClass).inSingletonScope();
+  const whenBind: BindWhenOnFluentSyntax<T> = container.bind<T>(entry).to(entry).inSingletonScope();
 
   if (options?.isWithIgnoreLifecycle) {
     return;
@@ -70,11 +55,10 @@ export function bindService<T extends AbstractService>(
 
   whenBind.onActivation((ctx, instance) => {
     dbg.info(prefix(__filename), "Activating service:", {
-      name: ServiceClass.name,
+      name: entry.name,
       ctx,
       container,
-      token,
-      ServiceClass,
+      entry,
       instance,
     });
 
@@ -113,7 +97,7 @@ export function bindService<T extends AbstractService>(
     // bootstrapping can await their initialization elsewhere.
     if (result && typeof (result as Promise<void>).then === "function") {
       (result as Promise<void>).catch((error) => {
-        console.error("[wirestate] onActivated rejected for:", ServiceClass.name, error);
+        console.error("[wirestate] onActivated rejected for:", entry.name, error);
       });
     }
 
@@ -122,10 +106,8 @@ export function bindService<T extends AbstractService>(
 
   whenBind.onDeactivation((instance) => {
     dbg.info(prefix(__filename), "Deactivating service:", {
-      name: ServiceClass.name,
+      name: entry.name,
       container,
-      token,
-      ServiceClass,
       instance,
     });
 

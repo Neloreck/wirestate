@@ -3,15 +3,16 @@ import { Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { InitialState } from "@/wirestate/core/initial-state/initial-state";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import {
-  INITIAL_STATE_SHARED_TOKEN,
   INITIAL_STATE_TOKEN,
+  INITIAL_STATES_TOKEN,
   QUERY_BUS_TOKEN,
   SIGNAL_BUS_TOKEN,
 } from "@/wirestate/core/registry";
 import { SignalBus } from "@/wirestate/core/signals/signal-bus";
+import type { TAnyObject } from "@/wirestate/types/general";
+import type { TInitialStatesMap } from "@/wirestate/types/initial-state";
 
 export interface ICreateIocContainerOptions {
   /**
@@ -34,14 +35,12 @@ export function createIocContainer(options: ICreateIocContainerOptions = {}): Co
     parent: options.parent,
   });
 
-  const initialState: InitialState = new InitialState();
-
   container.bind(SIGNAL_BUS_TOKEN).toConstantValue(new SignalBus());
   container.bind(QUERY_BUS_TOKEN).toConstantValue(new QueryBus());
-  container.bind(INITIAL_STATE_TOKEN).toConstantValue(new InitialState());
-  container.bind(INITIAL_STATE_SHARED_TOKEN).toConstantValue(initialState.getShared());
+  container.bind(INITIAL_STATES_TOKEN).toConstantValue(new Map() as TInitialStatesMap);
+  container.bind(INITIAL_STATE_TOKEN).toConstantValue({} as TAnyObject);
 
-  dbg.info(prefix(__filename), "Created IOC container:", { container, options, initialState });
+  dbg.info(prefix(__filename), "Created IOC container:", { container, options });
 
   return container;
 }

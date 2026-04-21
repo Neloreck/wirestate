@@ -14,7 +14,7 @@ describe("useInjection", () => {
   const TestComponent = ({ token = GenericService as TServiceClass }) => {
     const service = useInjection(token);
 
-    return <div data-testid={"service-name"}>{service.constructor.name || String(service.constructor.name)}</div>;
+    return <div data-testid={"injectable-name"}>{service.constructor.name || String(service.constructor.name)}</div>;
   };
 
   const TestComponentRevisionTrigger = () => {
@@ -52,7 +52,7 @@ describe("useInjection", () => {
 
     const { getByTestId } = render(withIocProvider(<TestComponent />, container));
 
-    expect(getByTestId("service-name").textContent).toBe("GenericService");
+    expect(getByTestId("injectable-name").textContent).toBe("GenericService");
   });
 
   it("should re-resolve service when revision changes", () => {
@@ -141,10 +141,10 @@ describe("useInjection", () => {
 
     const { rerender, getByTestId } = render(withIocProvider(<TestComponent token={GenericService} />, container));
 
-    expect(getByTestId("service-name").textContent).toBe("GenericService");
+    expect(getByTestId("injectable-name").textContent).toBe("GenericService");
 
     rerender(withIocProvider(<TestComponent token={AnotherService} />, container));
 
-    expect(getByTestId("service-name").textContent).toBe("AnotherService");
+    expect(getByTestId("injectable-name").textContent).toBe("AnotherService");
   });
 });

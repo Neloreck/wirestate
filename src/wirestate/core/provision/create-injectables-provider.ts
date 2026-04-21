@@ -1,5 +1,5 @@
 import { type ServiceIdentifier } from "inversify";
-import { type ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import { type ReactElement, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -8,7 +8,7 @@ import { bindEntry } from "@/wirestate/core/container/bind/bind-entry";
 import { getEntryToken } from "@/wirestate/core/container/bind/get-entry-token";
 import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
-import { applyInitialState } from "@/wirestate/core/initial-state/apply-initial-state";
+import { applyInitialStates, removeInitialStateEntries } from "@/wirestate/core/initial-state/apply-initial-states";
 import { type IIocContext, IocContext } from "@/wirestate/core/provision/ioc-context";
 import type { Optional, TAnyObject } from "@/wirestate/types/general";
 import type { TInitialStateEntries } from "@/wirestate/types/initial-state";
@@ -16,20 +16,16 @@ import type { IInjectableDescriptor } from "@/wirestate/types/privision";
 import type { TServiceClass } from "@/wirestate/types/services";
 
 /**
- * Props for the component returned by {@link createServicesProvider}.
+ * Props for the component returned by {@link createInjectablesProvider}.
  */
-export interface IServicesProviderProps {
+export interface IInjectablesProviderProps {
   /**
-   * Shared initial state applied to services on first mount.
-   *
-   *todo: probably makes more sense to store it in IOC provider and declare once
+   * Shared initial state applied to services on the first mount.
    */
   readonly initialState?: TAnyObject;
   /**
-   * Initial state applied to services on first mount.
+   * Targeted initial state entries applied to services on the first mount.
    * Subsequent prop changes are ignored. Use a React `key` to re-seed the tree.
-   *
-   * todo: probably makes more sense to store it in IOC provider and declare once
    */
   readonly initialStates?: TInitialStateEntries;
   /**
@@ -39,14 +35,14 @@ export interface IServicesProviderProps {
 }
 
 /**
- * Component returned by {@link createServicesProvider}.
+ * Component returned by {@link createInjectablesProvider}.
  */
-export type ServicesProvider = ReturnType<typeof createServicesProvider>;
+export type InjectablesProvider = ReturnType<typeof createInjectablesProvider>;
 
 /**
- * Configuration for {@link createServicesProvider}.
+ * Configuration for {@link createInjectablesProvider}.
  */
-export interface ICreateIocProviderOptions {
+export interface ICreateInjectablesProviderOptions {
   /**
    * Services to resolve immediately on mount.
    */
@@ -54,17 +50,17 @@ export interface ICreateIocProviderOptions {
 }
 
 /**
- * Creates a component that manages service lifetimes for its subtree.
+ * Creates a component that manages injectable lifetimes for its subtree.
  *
  * @param entries - service classes or injectable descriptors to bind
  * @param options - provider configuration
- * @returns service provider component
+ * @returns injectables provider component
  */
-export function createServicesProvider(
+export function createInjectablesProvider(
   entries: ReadonlyArray<TServiceClass | IInjectableDescriptor>,
-  options: ICreateIocProviderOptions = {}
+  options: ICreateInjectablesProviderOptions = {}
 ) {
-  dbg.info(prefix(__filename), "Creating services provider:", { services: entries, options });
+  dbg.info(prefix(__filename), "Creating injectables provider:", { services: entries, options });
 
   const { activate } = options;
 
@@ -75,25 +71,25 @@ export function createServicesProvider(
       if (!entryTokens.includes(eager)) {
         throw new WirestateError(
           ERROR_CODE_VALIDATION_ERROR,
-          `createServicesProvider: '${String(eager)}' is listed in 'activate' but was not provided in 'entries'.`
+          `createInjectablesProvider: '${String(eager)}' is listed in 'activate' but was not provided in 'entries'.`
         );
       }
     }
   }
 
-  function ServicesProviderComponent(props: IServicesProviderProps) {
+  function InjectablesProviderComponent(props: IInjectablesProviderProps) {
     const iocContext: Optional<IIocContext> = useContext(IocContext);
 
     if (!iocContext) {
       throw new WirestateError(
         ERROR_CODE_INVALID_CONTEXT,
-        "<ServicesProvider> must be rendered inside an <IocProvider> React subtree."
+        "<InjectablesProvider> must be rendered inside an <IocProvider> React subtree."
       );
     }
 
     // Snapshot initialState on mount to ensure binding stability.
     // useState lazy initializer ensures it only runs once.
-    const [initialPropsSnapshot] = useState<IServicesProviderProps>(() => props);
+    const [initialPropsSnapshot] = useState<IInjectablesProviderProps>(() => props);
 
     useMemo(() => {
       dbg.info(prefix(__filename), "Providing services on first render:", {
@@ -105,11 +101,12 @@ export function createServicesProvider(
       });
 
       // Seed must be applied BEFORE binding so @Inject(INITIAL_STATE_TOKEN) works during activation.
-      // todo: Conditional apply, merge or so.
-      applyInitialState(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
+      applyInitialStates(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
 
       for (const entry of entries) {
-        bindEntry(iocContext.container, entry, true);
+        if (!iocContext.container.isBound(getEntryToken(entry))) {
+          bindEntry(iocContext.container, entry);
+        }
       }
 
       if (activate) {
@@ -131,17 +128,13 @@ export function createServicesProvider(
       // Re-apply state and re-bind if container was reset (e.g. StrictMode remount or HMR).
       let didRebind: boolean = false;
 
-      // todo: Conditional apply, merge or so.
-      applyInitialState(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
+      applyInitialStates(iocContext.container, initialPropsSnapshot.initialState, initialPropsSnapshot.initialStates);
 
       for (const entry of entries) {
-        const token: ServiceIdentifier = getEntryToken(entry);
-
-        if (!iocContext.container.isBound(token)) {
+        if (!iocContext.container.isBound(getEntryToken(entry))) {
           didRebind = true;
+          bindEntry(iocContext.container, entry);
         }
-
-        bindEntry(iocContext.container, entry, true);
       }
 
       if (activate) {
@@ -150,8 +143,8 @@ export function createServicesProvider(
         }
       }
 
+      // Increment revision to invalidate stale injection caches.
       if (didRebind) {
-        // Increment revision to invalidate stale useService caches.
         iocContext.setRevision((r) => r + 1);
       }
 
@@ -162,7 +155,6 @@ export function createServicesProvider(
           entries,
         });
 
-        // Unbind in reverse order to respect dependencies during onDeactivated.
         for (const entry of entries) {
           const token: ServiceIdentifier = getEntryToken(entry);
 
@@ -171,18 +163,17 @@ export function createServicesProvider(
           }
         }
 
-        // Cleanup seed to prevent memory leaks or accidental resolution in torn-down container.
-        // todo: Conditional apply, remove linked keys separately or so, leave stored state as is.
-        applyInitialState(iocContext.container, {}, []);
+        // Remove only this provider's targeted initial state entries.
+        removeInitialStateEntries(iocContext.container, initialPropsSnapshot.initialStates);
       };
     }, entries);
 
-    return props.children;
+    return props.children as ReactElement;
   }
 
-  ServicesProviderComponent.displayName = "ServicesProvider";
+  InjectablesProviderComponent.displayName = "InjectablesProvider";
 
-  dbg.info(prefix(__filename), "Created services provider:", { ServicesProviderComponent, entries, options });
+  dbg.info(prefix(__filename), "Created injectables provider:", { InjectablesProviderComponent, entries, options });
 
-  return ServicesProviderComponent;
+  return InjectablesProviderComponent;
 }

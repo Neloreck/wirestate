@@ -40,19 +40,19 @@ export class LoggerService extends AbstractService {
     makeObservable(this);
 
     console.info(
-      `[${this.constructor.name}] constructing with constant global config:`,
+      `[${this.constructor.name}] Constructing with constant global config:`,
       globalConfig,
     );
   }
 
   public override onActivated(): void {
     console.info(
-      `[${this.constructor.name}] activated — listening for signals`,
+      `[${this.constructor.name}] Activated — listening for signals`,
     );
   }
 
   public override onDeactivated(): void {
-    console.info(`[${this.constructor.name}] deactivated`);
+    console.info(`[${this.constructor.name}] Deactivated`);
 
     this.clear();
   }
@@ -95,7 +95,7 @@ export class LoggerService extends AbstractService {
   public onDump(): void {
     // [*] Pass circular refs check with delayed get:
     console.info(
-      `[${this.constructor.name}] dumping services:`,
+      `[${this.constructor.name}] Dumping services:`,
       this.resolve(LoggerService),
       this.resolve(ThemeService),
       this.resolve(CounterService),
@@ -107,9 +107,9 @@ export class LoggerService extends AbstractService {
     /* [*] Pass extensive check - allow multiple signals passing here in array: */
     EGlobalSignal.COUNTER_RESET,
   ])
-  public onResetOrDump(signal: Signal): void {
+  public onReset(signal: Signal): void {
     this.log(
-      `[${this.constructor.name}] observed lifecycle signal:`,
+      `[${this.constructor.name}] Observed [onReset] signal:`,
       signal.type,
     );
   }

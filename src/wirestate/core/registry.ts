@@ -1,9 +1,8 @@
 import { Container } from "inversify";
 
+import type { IQueryHandlerMetadata, TQueryUnregister } from "@/wirestate//types/queries";
+import type { TSignalUnsubscribe, ISignalHandlerMetadata } from "@/wirestate//types/signals";
 import type { AbstractService } from "@/wirestate/core/service/abstract-service";
-
-import type { IQueryHandlerMetadata, TQueryUnregister } from "../types/queries";
-import type { TSignalUnsubscribe, ISignalHandlerMetadata } from "../types/signals";
 
 /**
  * Token for the container-scoped signal bus.
@@ -18,22 +17,22 @@ export const QUERY_BUS_TOKEN: unique symbol = Symbol.for("@wirestate/query-bus")
 /**
  * Token for the container-scoped initial-state map.
  */
-export const INITIAL_STATE_TOKEN: unique symbol = Symbol.for("@wirestate/initial-state");
+export const INITIAL_STATES_TOKEN: unique symbol = Symbol.for("@wirestate/initial-states");
 
 /**
  * Token for the container-scoped shared initial-state object.
  */
-export const INITIAL_STATE_SHARED_TOKEN: unique symbol = Symbol.for("@wirestate/initial-state/shared");
+export const INITIAL_STATE_TOKEN: unique symbol = Symbol.for("@wirestate/initial-state");
 
 /**
  * Map of class constructors to their declared query handlers.
- * Inherited via prototype chain at resolve time.
+ * Inherited via a prototype chain at resolve time.
  */
 export const QUERY_HANDLER_METADATA: WeakMap<object, Array<IQueryHandlerMetadata>> = new WeakMap();
 
 /**
- * Map of class constructors to their declared signal handlers.
- * Inherited via prototype chain at resolve time.
+ * Map of class constructors for their declared signal handlers.
+ * Inherited via a prototype chain at resolve time.
  */
 export const SIGNAL_HANDLER_METADATA: WeakMap<object, Array<ISignalHandlerMetadata>> = new WeakMap();
 

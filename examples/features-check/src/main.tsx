@@ -13,14 +13,14 @@ import {
 import { LoggerService } from "@/core/services/logging";
 import { ThemeService } from "@/core/services/theme";
 import {
-  createServicesProvider,
+  createInjectablesProvider,
   type InitialStateEntries,
   IocProvider,
-  type ServicesProvider,
+  type InjectablesProvider,
 } from "@/libs/wirestate";
 
 // [*] Pass IOC check - separation of container and services provision.
-const ServicesProvider: ServicesProvider = createServicesProvider(
+const ServicesProvider: InjectablesProvider = createInjectablesProvider(
   [
     CounterService,
     ThemeService,

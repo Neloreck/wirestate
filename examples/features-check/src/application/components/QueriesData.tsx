@@ -9,10 +9,12 @@ import {
   type ICounterSnapshot,
   type ICounterSummary,
 } from "@/core/services/counter";
+import { LoggerService } from "@/core/services/logging";
 import { ThemeService } from "@/core/services/theme";
 import {
   observer,
   useInjection,
+  useOptionalInjection,
   useQueryCaller,
   useQueryHandler,
   useSyncQueryCaller,
@@ -23,6 +25,9 @@ export const QueriesData = observer(() => {
   const [summary, setSummary] = useState<Optional<ICounterSummary>>(null);
 
   const themeService: ThemeService = useInjection(ThemeService);
+  // [*] Pass ability to use optional injections.
+  const loggerService: Optional<LoggerService> =
+    useOptionalInjection(LoggerService);
 
   // [*] Pass ability to dispatch queries from UI and get sync/async data.
   const queryData = useQueryCaller();
@@ -44,7 +49,11 @@ export const QueriesData = observer(() => {
     );
 
     setSnapshot(value);
-  }, [queryData]);
+
+    if (loggerService) {
+      loggerService.log(`[QueriesData] Fetched snapshot:`, value);
+    }
+  }, [queryData, loggerService]);
 
   // [*] Pass ability to declare a query handler from the React tree.
   useQueryHandler<Theme>(

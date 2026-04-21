@@ -8,17 +8,17 @@ import {
   ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
 } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
-import { InitialState } from "@/wirestate/core/initial-state/initial-state";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import {
   CONTAINER_REFS_BY_SERVICE,
   INITIAL_STATE_TOKEN,
+  INITIAL_STATES_TOKEN,
   QUERY_BUS_TOKEN,
   SIGNAL_BUS_TOKEN,
 } from "@/wirestate/core/registry";
 import type { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import type { Optional, TAnyObject, MaybePromise, Maybe } from "@/wirestate/types/general";
-import type { TInitialStateKey } from "@/wirestate/types/initial-state";
+import type { TInitialStateKey, TInitialStatesMap } from "@/wirestate/types/initial-state";
 import type { TQueryType } from "@/wirestate/types/queries";
 import type { ISignal, TSignalType } from "@/wirestate/types/signals";
 
@@ -111,7 +111,7 @@ export abstract class AbstractService {
   }
 
   protected getInitialState<T>(): T;
-  protected getInitialState<T>(ServiceClass?: TInitialStateKey): Optional<T>;
+  protected getInitialState<T>(ServiceClass?: TInitialStateKey): T;
 
   /**
    * Reads initial state (seed) for the service.
@@ -125,9 +125,9 @@ export abstract class AbstractService {
       key: (ServiceClass as TAnyObject)?.name ?? ServiceClass,
     });
 
-    const initialState: InitialState = this.getContainer().get<InitialState>(INITIAL_STATE_TOKEN);
-
-    return (ServiceClass ? initialState.getFor<T>(ServiceClass) : initialState.getShared()) || null;
+    return ServiceClass
+      ? (this.getContainer().get<TInitialStatesMap>(INITIAL_STATES_TOKEN).get(ServiceClass) as T) || null
+      : this.getContainer().get<T>(INITIAL_STATE_TOKEN);
   }
 
   /**

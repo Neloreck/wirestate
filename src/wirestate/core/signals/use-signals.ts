@@ -1,5 +1,5 @@
 import { Container } from "inversify";
-import { MutableRefObject, useEffect, useRef } from "react";
+import { type MutableRefObject, useEffect, useRef } from "react";
 
 import { useContainer } from "@/wirestate/core/provision/use-container";
 import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
@@ -7,26 +7,26 @@ import { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import type { TSignalHandler, TSignalType } from "@/wirestate/types/signals";
 
 /**
- * Subscribes a component to signals.
+ * Subscribes a component to multiple signal types.
  *
- * @param type - signal type to listen to
- * @param handler - signal handler to invoke when signal is emitted
+ * @param types - signal types to filter by
+ * @param handler - signal handler
  */
-export function useSignal(type: TSignalType, handler: TSignalHandler): void {
-  const signalRef: MutableRefObject<TSignalType> = useRef(type);
+export function useSignals(types: ReadonlyArray<TSignalType>, handler: TSignalHandler): void {
+  const typesRef: MutableRefObject<ReadonlyArray<TSignalType>> = useRef(types);
   const handlerRef: MutableRefObject<TSignalHandler> = useRef(handler);
   const container: Container = useContainer();
 
   useEffect(() => {
-    signalRef.current = type;
+    typesRef.current = types;
     handlerRef.current = handler;
   });
 
   useEffect(() => {
     return container.get<SignalBus>(SIGNAL_BUS_TOKEN).subscribe((signal) => {
-      if (signal.type === signalRef.current) {
+      if (typesRef.current.includes(signal.type)) {
         handlerRef.current?.(signal);
       }
     });
-  }, [container, type]);
+  }, [container]);
 }
