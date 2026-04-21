@@ -68,15 +68,17 @@ export class CounterService extends AbstractService {
 import { IocProvider, createInjectablesProvider } from 'wirestate';
 import { CounterService } from './CounterService';
 
-const MainServices = createInjectablesProvider([CounterService]);
+const InjectablesProvider = createInjectablesProvider([CounterService]);
 
-const App = () => (
-  <IocProvider>
-    <MainServices>
-      <CounterComponent />
-    </MainServices>
-  </IocProvider>
-);
+function Application() {
+  return (
+    <IocProvider>
+      <InjectablesProvider>
+        <CounterComponent />
+      </InjectablesProvider>
+    </IocProvider>
+  );
+}
 ```
 
 ### 3. Consume in Components
