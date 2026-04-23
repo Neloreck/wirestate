@@ -20,7 +20,7 @@ type TBindingType = (typeof bindingTypeValues)[keyof typeof bindingTypeValues];
 type TScopeBindingType = (typeof bindingScopeValues)[keyof typeof bindingScopeValues];
 interface IInjectableDescriptor<T = unknown, V = unknown> {
     id: ServiceIdentifier<T>;
-    value: V;
+    value?: V;
     bindingType?: TBindingType;
     scopeBindingType?: TScopeBindingType;
     /**

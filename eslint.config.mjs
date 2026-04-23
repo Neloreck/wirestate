@@ -95,7 +95,6 @@ export default [
       camelcase: "error",
       "eol-last": ["error", "always"],
       "func-call-spacing": ["error", "never"],
-      "function-paren-newline": ["error", "multiline-arguments"],
       "import/default": "off",
       "import/no-unresolved": "off",
       "import/order": [
@@ -212,13 +211,6 @@ export default [
       "react/prop-types": "off",
       "react/react-in-jsx-scope": "off",
       semi: "error",
-      "space-before-function-paren": [
-        "error",
-        {
-          anonymous: "never",
-          named: "never",
-        },
-      ],
       "space-in-parens": ["error", "never"],
       "spaced-comment": ["error", "always"],
       "template-tag-spacing": ["error", "never"],

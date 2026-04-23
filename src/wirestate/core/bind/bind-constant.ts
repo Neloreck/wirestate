@@ -3,6 +3,7 @@ import { Container, type ServiceIdentifier } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { ScopeBindingType } from "@/wirestate";
 import { ERROR_CODE_BINDING_SCOPE } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import type { IInjectableDescriptor } from "@/wirestate/types/privision";
@@ -21,7 +22,7 @@ export function bindConstant<T>(container: Container, entry: IInjectableDescript
     container,
   });
 
-  if (entry.scopeBindingType) {
+  if (entry.scopeBindingType && entry.scopeBindingType !== ScopeBindingType.Singleton) {
     throw new WirestateError(ERROR_CODE_BINDING_SCOPE, "Provided unexpected binding scope for constant value.");
   }
 

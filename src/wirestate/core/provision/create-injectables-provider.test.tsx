@@ -2,6 +2,8 @@ import { render, cleanup } from "@testing-library/react";
 import { Container, injectable } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
+import { WirestateError } from "@/wirestate";
+import { ERROR_CODE_INVALID_CONTEXT } from "@/wirestate/core/error/error-code";
 import { createInjectablesProvider } from "@/wirestate/core/provision/create-injectables-provider";
 import { SEED_TOKEN, SEEDS_TOKEN } from "@/wirestate/core/registry";
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
@@ -187,5 +189,19 @@ describe("createInjectablesProvider", () => {
     expect(container.get(SEED_TOKEN)).toEqual({
       global: true,
     });
+  });
+
+  it("should throw if rendered outside IocProvider", () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const Provider = createInjectablesProvider([FirstService, SecondService]);
+
+    expect(() => render(<Provider>child</Provider>)).toThrow(
+      new WirestateError(
+        ERROR_CODE_INVALID_CONTEXT,
+        "<InjectablesProvider> must be rendered inside an <IocProvider> React subtree."
+      )
+    );
+
+    consoleSpy.mockRestore();
   });
 });

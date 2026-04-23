@@ -165,7 +165,9 @@ export function createInjectablesProvider(
         }
 
         // Remove only this provider's targeted initial state entries.
-        unapplySeeds(iocContext.container, initialPropsSnapshot.seeds);
+        if (initialPropsSnapshot.seeds) {
+          unapplySeeds(iocContext.container, initialPropsSnapshot.seeds);
+        }
       };
     }, entries);
 

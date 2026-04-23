@@ -6,7 +6,7 @@ export type TScopeBindingType = (typeof bindingScopeValues)[keyof typeof binding
 
 export interface IInjectableDescriptor<T = unknown, V = unknown> {
   id: ServiceIdentifier<T>;
-  value: V;
+  value?: V;
   bindingType?: TBindingType;
   scopeBindingType?: TScopeBindingType;
   /**

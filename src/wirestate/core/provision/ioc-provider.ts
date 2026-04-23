@@ -33,14 +33,14 @@ export interface IIocProviderProps extends PropsWithChildren<unknown> {
  */
 export function IocProvider({ container: externalContainer, seed, children }: IIocProviderProps) {
   // Incremented on binding changes to invalidate descendant caches (e.g., useInjection).
-  const [revision, setRevision] = useState<number>(0);
+  const [revision, setRevision] = useState<number>(1);
   // Lazy initialize owned container if no external container is provided.
   const [ownedContainer] = useState<Optional<Container>>(() => (externalContainer ? null : createIocContainer()));
 
   const container = externalContainer ?? ownedContainer;
 
   if (!container) {
-    throw new WirestateError(ERROR_CODE_FAILED_TO_RESOLVE, "[ioc] IocProvider failed to resolve a container instance.");
+    throw new WirestateError(ERROR_CODE_FAILED_TO_RESOLVE, "IocProvider failed to resolve a container instance.");
   }
 
   // Context value is stable unless the container or revision changes.

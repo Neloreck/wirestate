@@ -75,4 +75,17 @@ describe("bindEntry", () => {
     expect(typeof second).toBe("number");
     expect(first).toBe(second);
   });
+
+  it("should fall back to bindService for unknown bindingType", () => {
+    const container: Container = mockContainer();
+
+    bindEntry(container, {
+      // @ts-ignore
+      bindingType: "UNKNOWN",
+      id: GenericService,
+      value: GenericService,
+    });
+
+    expect(container.isBound(GenericService)).toBe(true);
+  });
 });

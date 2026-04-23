@@ -18,9 +18,7 @@ export function applySeeds(container: Container, seeds: TSeedEntries): void {
 
   dbg.info(prefix(__filename), "Applying seeds for container:", { seeds, existing, container });
 
-  if (seeds) {
-    for (const [key, state] of seeds) {
-      existing.set(key, state);
-    }
+  for (const [key, state] of seeds) {
+    existing.set(key, state);
   }
 }

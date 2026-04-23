@@ -53,5 +53,5 @@ export function bindEntry(container: Container, entry: TServiceClass | IInjectab
   });
 
   // Default: treat as an AbstractService descriptor (Instance binding).
-  bindService(container, entry as unknown as Newable<AbstractService>);
+  bindService(container, entry.value as unknown as Newable<AbstractService>);
 }

@@ -26,7 +26,7 @@ export const TS_BUILD_CONFIG = path.resolve(__dirname, "./tsconfig.build.json");
 export const TS_PORTABLE_CONFIG = path.resolve(__dirname, "./tsconfig.portable.json");
 
 export const CORE_ENTRY = path.resolve(WS_ROOT, "./index.ts");
-export const PORTABLE_ENTRY = path.resolve(PROJECT_ROOT, "./src/environment_switch/portable.ts");
+export const PORTABLE_ENTRY = path.resolve(PROJECT_ROOT, "./src/wirestate-portable/index.ts");
 export const TEST_UTILS_ENTRY = path.resolve(WS_ROOT, "./test-utils.ts");
 
 export const SRC_PATH = path.resolve(PROJECT_ROOT, "./src");

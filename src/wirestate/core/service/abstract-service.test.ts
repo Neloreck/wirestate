@@ -62,4 +62,12 @@ describe("AbstractService", () => {
     expect(() => service.testEmitSignal()).toThrow(illegalAfterAccessError);
     expect(() => service.testQueryData()).toThrow(illegalAfterAccessError);
   });
+
+  it("should handle seed lookup with default seed", () => {
+    const container: Container = mockContainer();
+    const service: GenericService = mockService(GenericService, container);
+
+    // Default empty seed.
+    expect(service.testGetSeed()).toEqual({});
+  });
 });

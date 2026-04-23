@@ -13,7 +13,7 @@ import { TSeedEntries, TSeedsMap } from "@/wirestate/types/initial-state";
  * @param container - target container
  * @param seeds - targeted seeds to remove
  */
-export function unapplySeeds(container: Container, seeds: TSeedEntries = []): void {
+export function unapplySeeds(container: Container, seeds: TSeedEntries): void {
   const existing: TSeedsMap = container.get(SEEDS_TOKEN);
 
   dbg.info(prefix(__filename), "Unapply seeds for container:", { existing, seeds, container });

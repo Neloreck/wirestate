@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
-import type { ISignal, TSignalHandler, TSignalUnsubscribe } from "@/wirestate/types/signals";
+import { ISignal, TSignalHandler, TSignalType, TSignalUnsubscribe } from "@/wirestate/types/signals";
 
 /**
  * Dispatches signals to subscribers.
@@ -16,7 +16,7 @@ export class SignalBus {
    *
    * @param signal - signal to emit
    */
-  public emit<S extends ISignal>(signal: S): void {
+  public emit<P = unknown, T extends TSignalType = TSignalType, F = unknown>(signal: ISignal<P, T, F>): void {
     // Snapshot prevents concurrent modification errors if handlers sub/unsub during emit.
     const snapshot: Array<TSignalHandler> = Array.from(this.handlers);
 

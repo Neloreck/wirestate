@@ -36,7 +36,7 @@ const ERROR_CODE_ACCESS_AFTER_DISPOSAL = 201;class WirestateError extends Error 
     this.message = detail || "Wirestate error.";
   }
 }function bindConstant(container, entry) {
-  if (entry.scopeBindingType) {
+  if (entry.scopeBindingType && entry.scopeBindingType !== bindingScopeValues.Singleton) {
     throw new WirestateError(ERROR_CODE_BINDING_SCOPE, "Provided unexpected binding scope for constant value.");
   }
   container.bind(entry.id).toConstantValue(entry.value);
@@ -233,7 +233,7 @@ function _detachQueryUnregs(service) {
     bindDynamicValue(container, entry);
     return;
   }
-  bindService(container, entry);
+  bindService(container, entry.value);
 }class QueryBus {
   handlers = new Map();
   register(type, handler) {
@@ -323,12 +323,10 @@ function _detachQueryUnregs(service) {
   return typeof entry === "function" ? entry : entry.id;
 }function applySeeds(container, seeds) {
   const existing = container.get(SEEDS_TOKEN);
-  if (seeds) {
-    for (const [key, state] of seeds) {
-      existing.set(key, state);
-    }
+  for (const [key, state] of seeds) {
+    existing.set(key, state);
   }
-}function unapplySeeds(container, seeds = []) {
+}function unapplySeeds(container, seeds) {
   const existing = container.get(SEEDS_TOKEN);
   for (const [key] of seeds) {
     existing.delete(key);
@@ -393,7 +391,9 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
             iocContext.container.unbind(token);
           }
         }
-        unapplySeeds(iocContext.container, initialPropsSnapshot.seeds);
+        if (initialPropsSnapshot.seeds) {
+          unapplySeeds(iocContext.container, initialPropsSnapshot.seeds);
+        }
       };
     }, entries);
     return props.children;
@@ -407,11 +407,11 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
   seed,
   children
 }) {
-  const [revision, setRevision] = useState(0);
+  const [revision, setRevision] = useState(1);
   const [ownedContainer] = useState(() => externalContainer ? null : createIocContainer());
   const container = externalContainer ?? ownedContainer;
   if (!container) {
-    throw new WirestateError(ERROR_CODE_FAILED_TO_RESOLVE, "[ioc] IocProvider failed to resolve a container instance.");
+    throw new WirestateError(ERROR_CODE_FAILED_TO_RESOLVE, "IocProvider failed to resolve a container instance.");
   }
   const value = useMemo(() => ({
     container,
