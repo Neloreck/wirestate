@@ -23,7 +23,7 @@ import type { ICommandDescriptor, TCommandType } from "@/wirestate/types/command
 import type { Optional, TAnyObject, MaybePromise, Maybe } from "@/wirestate/types/general";
 import type { TSeedKey, TSeedsMap } from "@/wirestate/types/initial-state";
 import type { TQueryType } from "@/wirestate/types/queries";
-import type { ISignal, TSignalType } from "@/wirestate/types/signals";
+import type { TSignalType } from "@/wirestate/types/signals";
 
 /**
  * Base class for services.
@@ -180,10 +180,4 @@ export abstract class AbstractService {
       ? (this.getContainer().get<TSeedsMap>(SEEDS_TOKEN).get(seed) as T) || null
       : this.getContainer().get<T>(SEED_TOKEN);
   }
-
-  /**
-   * Catch-all signal handler.
-   * Subscribed automatically during the service lifecycle.
-   */
-  public onSignal?(signal: ISignal): void;
 }

@@ -18,14 +18,6 @@ export function buildSignalDispatcher(instance: AbstractService): Optional<TSign
 
   const entries: Array<ISignalDispatchEntry> = [];
 
-  // Register catch-all hook if present on children function.
-  if (typeof instance.onSignal === "function") {
-    entries.push({
-      types: null,
-      handler: (signal) => instance.onSignal?.(signal),
-    });
-  }
-
   // Register methods decorated with @OnSignal.
   for (const meta of getSignalHandlerMetadata(instance)) {
     const method = (instance as unknown as Record<string | symbol, unknown>)[meta.methodName];

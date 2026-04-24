@@ -74,8 +74,7 @@ export function bindService<T extends AbstractService>(
 
     CONTAINER_REFS_BY_SERVICE.set(instance, container);
 
-    // Compose all signal listeners (the catch-all `onSignal` hook plus every
-    // `@OnSignal`-decorated method) into a single bus subscription so we only
+    // Compose all signal listeners into a single bus subscription so we only
     // pay one Set lookup per emitted signal.
     const dispatcher: Optional<TSignalHandler> = buildSignalDispatcher(instance);
 
