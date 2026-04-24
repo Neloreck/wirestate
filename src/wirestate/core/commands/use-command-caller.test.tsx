@@ -1,9 +1,9 @@
 import { render, cleanup } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer } from "@/wirestate";
 import { CommandBus } from "@/wirestate/core/commands/command-bus";
 import { useCommandCaller } from "@/wirestate/core/commands/use-command-caller";
+import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
 import { COMMAND_BUS_TOKEN } from "@/wirestate/core/registry";
 import { withIocProvider } from "@/wirestate/test-utils/with-ioc-provider";
 import { ECommandStatus, ICommandDescriptor, TCommandCaller } from "@/wirestate/types/commands";

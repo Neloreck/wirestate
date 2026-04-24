@@ -3,10 +3,10 @@ import { bindingTypeValues, Container, Newable } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { AbstractService } from "@/wirestate";
 import { bindConstant } from "@/wirestate/core/bind/bind-constant";
 import { bindDynamicValue } from "@/wirestate/core/bind/bind-dynamic-value";
 import { bindService } from "@/wirestate/core/bind/bind-service";
+import type { AbstractService } from "@/wirestate/core/service/abstract-service";
 import type { IInjectableDescriptor } from "@/wirestate/types/privision";
 import type { TServiceClass } from "@/wirestate/types/services";
 

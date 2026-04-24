@@ -1,6 +1,6 @@
 import { Container, type Newable } from "inversify";
 
-import { AbstractService } from "@/wirestate";
+import type { AbstractService } from "@/wirestate/core/service/abstract-service";
 
 /**
  * todo;
