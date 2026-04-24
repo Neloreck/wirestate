@@ -132,6 +132,14 @@ describe("CommandBus", () => {
     expect(bus.has("B")).toBe(false);
   });
 
+  it("should handle unregistering when stack is already empty", () => {
+    const bus: CommandBus = new CommandBus();
+    const unregister: TCommandUnregister = bus.register("TYPE", () => null);
+
+    unregister();
+    expect(() => unregister()).not.toThrow();
+  });
+
   it("should support symbol command types", async () => {
     const bus: CommandBus = new CommandBus();
     const type: unique symbol = Symbol("command");

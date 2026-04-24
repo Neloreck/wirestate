@@ -1,4 +1,4 @@
-import { MaybePromise } from "@/wirestate/types/general";
+import type { MaybePromise, Optional } from "@/wirestate/types/general";
 
 /**
  * Command identifier. Use symbols for private commands.
@@ -17,6 +17,14 @@ export type TCommandCaller<R = unknown, D = unknown, T extends TCommandType = TC
   type: T,
   data?: D
 ) => ICommandDescriptor<R>;
+
+/**
+ * Command calling function signature.
+ */
+export type TOptionalCommandCaller<R = unknown, D = unknown, T extends TCommandType = TCommandType> = (
+  type: T,
+  data?: D
+) => Optional<ICommandDescriptor<R>>;
 
 /**
  * Removes a command handler.
