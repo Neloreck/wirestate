@@ -3,9 +3,13 @@ import { BindWhenOnFluentSyntax, Container, type Newable } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { CommandBus } from "@/wirestate/core/commands/command-bus";
+import { getCommandHandlerMetadata } from "@/wirestate/core/commands/get-command-handler-metadata";
 import { getQueryHandlerMetadata } from "@/wirestate/core/queries/get-query-handler-metadata";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import {
+  COMMAND_BUS_TOKEN,
+  COMMAND_UNREGISTERS_BY_SERVICE,
   CONTAINER_REFS_BY_SERVICE,
   QUERY_BUS_TOKEN,
   QUERY_UNREGISTERS_BY_SERVICE,
@@ -17,7 +21,8 @@ import { getActivatedHandlerMetadata } from "@/wirestate/core/service/get-activa
 import { getDeactivationHandlerMetadata } from "@/wirestate/core/service/get-deactivation-handler-metadata";
 import { buildSignalDispatcher } from "@/wirestate/core/signals/build-signal-dispatcher";
 import type { SignalBus } from "@/wirestate/core/signals/signal-bus";
-import { Maybe, MaybePromise, Optional } from "@/wirestate/types/general";
+import type { TCommandHandler, TCommandUnregister } from "@/wirestate/types/commands";
+import type { Maybe, MaybePromise, Optional } from "@/wirestate/types/general";
 import type { TQueryHandler, TQueryUnregister } from "@/wirestate/types/queries";
 import type { TSignalHandler, TSignalUnsubscribe } from "@/wirestate/types/signals";
 
@@ -95,6 +100,23 @@ export function bindService<T extends AbstractService>(
       _attachQueryUnreg(instance, unregister);
     }
 
+    // Register every `@OnCommand` handler on the container's CommandBus, and
+    // remember the unregister functions so we can roll them back when the
+    // service is deactivated.
+    const commandBus: CommandBus = container.get<CommandBus>(COMMAND_BUS_TOKEN);
+
+    for (const meta of getCommandHandlerMetadata(instance)) {
+      const method: unknown = (instance as unknown as Record<string | symbol, unknown>)[meta.methodName];
+
+      if (typeof method !== "function") {
+        continue;
+      }
+
+      const unregister: TCommandUnregister = commandBus.register(meta.type, (method as TCommandHandler).bind(instance));
+
+      _attachCommandUnregister(instance, unregister);
+    }
+
     // Call every `@OnActivated`-decorated method in base-to-derived order.
     // Fire-and-forget any async init so we stay synchronous from the
     // container's point of view.
@@ -139,6 +161,7 @@ export function bindService<T extends AbstractService>(
     // The cast is the only write-site for this `readonly` field.
     (instance as { IS_DISPOSED: boolean }).IS_DISPOSED = true;
 
+    _detachCommandUnregister(instance);
     _detachQueryUnregs(instance);
     _detachSignalSub(instance);
     CONTAINER_REFS_BY_SERVICE.delete(instance);
@@ -215,4 +238,46 @@ export function _detachQueryUnregs(service: AbstractService): void {
   }
 
   QUERY_UNREGISTERS_BY_SERVICE.delete(service);
+}
+
+/**
+ * Registers a command unregister function for a service.
+ *
+ * @param service - service instance
+ * @param unregister - command unregister function
+ * @internal
+ */
+export function _attachCommandUnregister(service: AbstractService, unregister: TCommandUnregister): void {
+  let list: Maybe<Array<TCommandUnregister>> = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
+
+  if (!list) {
+    list = [];
+    COMMAND_UNREGISTERS_BY_SERVICE.set(service, list);
+  }
+
+  list.push(unregister);
+}
+
+/**
+ * Executes and removes all command unregister functions for a service.
+ *
+ * @param service - service instance
+ * @internal
+ */
+export function _detachCommandUnregister(service: AbstractService): void {
+  const list: Maybe<Array<TCommandUnregister>> = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
+
+  if (!list) {
+    return;
+  }
+
+  for (const unregister of list) {
+    try {
+      unregister();
+    } catch (error) {
+      console.error("[wirestate] command unregister threw:", error);
+    }
+  }
+
+  COMMAND_UNREGISTERS_BY_SERVICE.delete(service);
 }

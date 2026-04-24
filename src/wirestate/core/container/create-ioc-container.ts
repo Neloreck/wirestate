@@ -3,8 +3,15 @@ import { Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { CommandBus } from "@/wirestate/core/commands/command-bus";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
-import { SEED_TOKEN, SEEDS_TOKEN, QUERY_BUS_TOKEN, SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
+import {
+  COMMAND_BUS_TOKEN,
+  SEED_TOKEN,
+  SEEDS_TOKEN,
+  QUERY_BUS_TOKEN,
+  SIGNAL_BUS_TOKEN,
+} from "@/wirestate/core/registry";
 import { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import type { TAnyObject } from "@/wirestate/types/general";
 import type { TSeedsMap } from "@/wirestate/types/initial-state";
@@ -32,6 +39,7 @@ export function createIocContainer(options: ICreateIocContainerOptions = {}): Co
 
   container.bind(SIGNAL_BUS_TOKEN).toConstantValue(new SignalBus());
   container.bind(QUERY_BUS_TOKEN).toConstantValue(new QueryBus());
+  container.bind(COMMAND_BUS_TOKEN).toConstantValue(new CommandBus());
   container.bind(SEEDS_TOKEN).toConstantValue(new Map() as TSeedsMap);
   container.bind(SEED_TOKEN).toConstantValue({} as TAnyObject);
 

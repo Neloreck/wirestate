@@ -35,6 +35,39 @@ type Optional<T> = T | null;
 type MaybePromise<T> = T | Promise<T>;
 
 /**
+ * Command identifier. Use symbols for private commands.
+ */
+type TCommandType = string | symbol;
+/**
+ * Command handler signature.
+ */
+type TCommandHandler<D = unknown, R = unknown> = (data: D) => MaybePromise<R>;
+/**
+ * Command calling function signature.
+ */
+type TCommandCaller<R = unknown, D = unknown, T extends TCommandType = TCommandType> = (type: T, data?: D) => ICommandDescriptor<R>;
+/**
+ * Removes a command handler.
+ */
+type TCommandUnregister = () => void;
+/**
+ * Command execution status.
+ */
+declare enum ECommandStatus {
+    PENDING = "pending",
+    SETTLED = "settled",
+    ERROR = "error"
+}
+/**
+ * Descriptor returned by command execution.
+ * Contains the task promise, current status, and responder with result/error.
+ */
+interface ICommandDescriptor<R = unknown> {
+    readonly task: Promise<R>;
+    readonly status: ECommandStatus;
+}
+
+/**
  * Lookup key for service seeds.
  */
 type TSeedKey = TServiceClass | string | symbol;
@@ -142,6 +175,17 @@ declare abstract class AbstractService {
      * @throws WirestateError if service is not activated
      */
     protected queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): MaybePromise<R>;
+    /**
+     * Dispatches a command and returns the descriptor.
+     * Available only for activated containers.
+     *
+     * @param type - command type
+     * @param data - command data
+     * @returns command descriptor
+     *
+     * @throws WirestateError if service is not activated
+     */
+    protected executeCommand<R = unknown, D = unknown, T extends TCommandType = TCommandType>(type: T, data?: D): ICommandDescriptor<R>;
     protected getSeed<T>(): T;
     protected getSeed<T>(ServiceClass?: TSeedKey): T;
     /**
@@ -205,6 +249,26 @@ interface ICreateIocContainerOptions {
  * @returns new IoC container
  */
 declare function createIocContainer(options?: ICreateIocContainerOptions): Container$1;
+
+/**
+ * Dispatches a command on the provided container.
+ *
+ * @param container - inversify container
+ * @param type - command type
+ * @param data - command data
+ * @returns command descriptor
+ */
+declare function command<R = unknown, D = unknown, T extends TCommandType = TCommandType>(container: Container$1, type: T, data?: D): ICommandDescriptor<R>;
+
+/**
+ * Dispatches a command on the provided container, returning null if no handler is registered.
+ *
+ * @param container - inversify container
+ * @param type - command type
+ * @param data - command data
+ * @returns command descriptor or null
+ */
+declare function commandOptional<R = unknown, D = unknown, T extends TCommandType = TCommandType>(container: Container$1, type: T, data?: D): Optional<ICommandDescriptor<R>>;
 
 /**
  * Emits signals from outside an AbstractService.
@@ -352,6 +416,39 @@ declare function useContainer(): Container$1;
  * @returns revision number
  */
 declare function useContainerRevision(): number;
+
+/**
+ * Decorator for service methods that handle a command.
+ *
+ * @param type - command type identifier
+ * @returns decorator function
+ */
+declare function OnCommand(type: TCommandType): MethodDecorator;
+
+/**
+ * Returns a function to dispatch commands on the active container.
+ *
+ * @returns command dispatcher
+ */
+declare function useCommandCaller(): <R = unknown, D = unknown, T extends TCommandType = TCommandType>(type: T, data?: D) => ICommandDescriptor<R>;
+
+/**
+ * Returns a function to dispatch optional commands on the active container.
+ * Returns null instead of throwing when no handler is registered.
+ *
+ * @returns optional command dispatcher
+ */
+declare function useOptionalCommandCaller(): <R = unknown, D = unknown, T extends TCommandType = TCommandType>(type: T, data?: D) => Optional<ICommandDescriptor<R>>;
+
+/**
+ * Registers a command handler for the component's lifetime.
+ * The handler is stored in a ref to avoid manual memoization.
+ * Only one handler is active per type; newer registrations shadow older ones.
+ *
+ * @param type - command type
+ * @param handler - command handler function
+ */
+declare function useCommandHandler<R = unknown, D = unknown>(type: TCommandType, handler: TCommandHandler<D, R>): void;
 
 /**
  * Decorator for service methods that respond to a query.
@@ -509,5 +606,5 @@ declare function withIocProvider(children: ReactNode, container?: Container$1, s
     seed: TAnyObject | undefined;
 }>;
 
-export { AbstractService, Action, Computed, DeepObservable, IocProvider, Observable, OnActivated, OnDeactivation, OnQuery, OnSignal, RefObservable, SEED_TOKEN as SEED, ShallowObservable, WirestateError, bindConstant, bindEntry, bindService, createInjectablesProvider, createIocContainer, emitSignal, forwardRef, mockBindService, mockContainer, mockService, query, queryOptional, useContainer, useContainerRevision, useInjection, useOptionalInjection, useOptionalQueryCaller, useOptionalSyncQueryCaller, useQueryCaller, useQueryHandler, useSignal, useSignalEmitter, useSignalHandler, useSignals, useSyncQueryCaller, withIocProvider };
-export type { IInjectableDescriptor as InjectableDescriptor, InjectablesProvider, IInjectablesProviderProps as InjectablesProviderProps, TQueryHandler as QueryHandler, TQueryResponder as QueryResponder, TQueryType as QueryType, TQueryUnregister as QueryUnregister, TSeedEntries as SeedEntries, TSeedEntry as SeedEntry, TSeedKey as SeedKey, TServiceClass as ServiceClass, ISignal as Signal, TSignalEmitter as SignalEmitter, TSignalHandler as SignalHandler, TSignalType as SignalType, TSignalUnsubscribe as SignalUnsubscribe };
+export { AbstractService, Action, ECommandStatus as CommandStatus, Computed, DeepObservable, IocProvider, Observable, OnActivated, OnCommand, OnDeactivation, OnQuery, OnSignal, RefObservable, SEED_TOKEN as SEED, ShallowObservable, WirestateError, bindConstant, bindEntry, bindService, command, commandOptional, createInjectablesProvider, createIocContainer, emitSignal, forwardRef, mockBindService, mockContainer, mockService, query, queryOptional, useCommandCaller, useCommandHandler, useContainer, useContainerRevision, useInjection, useOptionalCommandCaller, useOptionalInjection, useOptionalQueryCaller, useOptionalSyncQueryCaller, useQueryCaller, useQueryHandler, useSignal, useSignalEmitter, useSignalHandler, useSignals, useSyncQueryCaller, withIocProvider };
+export type { TCommandCaller as CommandCaller, ICommandDescriptor as CommandDescriptor, TCommandHandler as CommandHandler, TCommandType as CommandType, TCommandUnregister as CommandUnregister, IInjectableDescriptor as InjectableDescriptor, InjectablesProvider, IInjectablesProviderProps as InjectablesProviderProps, TQueryHandler as QueryHandler, TQueryResponder as QueryResponder, TQueryType as QueryType, TQueryUnregister as QueryUnregister, TSeedEntries as SeedEntries, TSeedEntry as SeedEntry, TSeedKey as SeedKey, TServiceClass as ServiceClass, ISignal as Signal, TSignalEmitter as SignalEmitter, TSignalHandler as SignalHandler, TSignalType as SignalType, TSignalUnsubscribe as SignalUnsubscribe };

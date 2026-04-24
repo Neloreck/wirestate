@@ -3,6 +3,7 @@ import { Container } from "inversify";
 import type { IQueryHandlerMetadata, TQueryUnregister } from "@/wirestate//types/queries";
 import type { TSignalUnsubscribe, ISignalHandlerMetadata } from "@/wirestate//types/signals";
 import type { AbstractService } from "@/wirestate/core/service/abstract-service";
+import type { ICommandHandlerMetadata, TCommandUnregister } from "@/wirestate/types/commands";
 
 /**
  * Token for the container-scoped signal bus.
@@ -13,6 +14,11 @@ export const SIGNAL_BUS_TOKEN: unique symbol = Symbol("@wirestate/signal-bus");
  * Token for the container-scoped query bus.
  */
 export const QUERY_BUS_TOKEN: unique symbol = Symbol("@wirestate/query-bus");
+
+/**
+ * Token for the container-scoped command bus.
+ */
+export const COMMAND_BUS_TOKEN: unique symbol = Symbol("@wirestate/command-bus");
 
 /**
  * Token for the container-scoped seeds map.
@@ -29,6 +35,12 @@ export const SEED_TOKEN: unique symbol = Symbol("@wirestate/seed");
  * Inherited via a prototype chain at resolve time.
  */
 export const QUERY_HANDLER_METADATA: WeakMap<object, Array<IQueryHandlerMetadata>> = new WeakMap();
+
+/**
+ * Map of class constructors to their declared command handlers.
+ * Inherited via a prototype chain at resolve time.
+ */
+export const COMMAND_HANDLER_METADATA: WeakMap<object, Array<ICommandHandlerMetadata>> = new WeakMap();
 
 /**
  * Map of class constructors to their `@OnActivated`-decorated method names.
@@ -62,3 +74,8 @@ export const SIGNAL_UNSUBSCRIBERS_BY_SERVICE: WeakMap<AbstractService, TSignalUn
  * Private storage for service query unregisters.
  */
 export const QUERY_UNREGISTERS_BY_SERVICE: WeakMap<AbstractService, Array<TQueryUnregister>> = new WeakMap();
+
+/**
+ * Private storage for service command unregisters.
+ */
+export const COMMAND_UNREGISTERS_BY_SERVICE: WeakMap<AbstractService, Array<TCommandUnregister>> = new WeakMap();

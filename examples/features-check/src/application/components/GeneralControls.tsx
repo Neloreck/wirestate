@@ -2,12 +2,15 @@ import "./GeneralControls.css";
 
 import { useCallback } from "react";
 
+import { EGlobalCommand } from "@/core/commands";
 import { CounterService } from "@/core/services/counter";
 import { ThemeService } from "@/core/services/theme";
 import { EGlobalSignal } from "@/core/signals";
 import {
   observer,
+  type CommandCaller,
   type SignalEmitter,
+  useCommandCaller,
   useInjection,
   useSignalEmitter,
 } from "@/libs/wirestate";
@@ -16,13 +19,30 @@ export const GeneralControls = observer(() => {
   const counterService: CounterService = useInjection(CounterService);
   const themeService: ThemeService = useInjection(ThemeService);
 
+  const executeCommand: CommandCaller = useCommandCaller();
   const emitSignal: SignalEmitter = useSignalEmitter();
 
-  // [*] Pass ability to emit signals from UI.
+  // [*] Pass ability to call commands from UI.
   const onDumpData = useCallback(() => {
-    emitSignal(EGlobalSignal.DUMP, { at: Date.now() });
-  }, [emitSignal]);
+    const command = executeCommand(EGlobalCommand.DUMP_DATA, {
+      at: Date.now(),
+    });
 
+    // [*] Pass check - command registered and scheduled as async while descriptor creation is sync.
+    console.info("[GeneralControls] Dump data task scheduled:", {
+      status: command.status,
+    });
+
+    // [*] Pass check - command descriptor returns async task to get result.
+    command.task.then((result: unknown) => {
+      console.info("[GeneralControls] Dump data result:", {
+        result,
+        status: command.status,
+      });
+    });
+  }, [executeCommand]);
+
+  // [*] Pass ability to emit signals from UI.
   const onUserPinged = useCallback(() => {
     emitSignal(EGlobalSignal.USER_PINGED, { at: Date.now() });
   }, [emitSignal]);

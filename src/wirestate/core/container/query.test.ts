@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 
-import { query } from "@/wirestate";
+import { query } from "@/wirestate/core/container/query";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
 import { mockContainer } from "@/wirestate/test-utils";

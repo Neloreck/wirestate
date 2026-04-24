@@ -1,3 +1,5 @@
+import { CommandCaller, CommandHandler, CommandStatus, CommandType } from "@/wirestate/index";
+
 describe("Library exported API", () => {
   const libRoot = require("./index");
 
@@ -43,6 +45,8 @@ describe("Library exported API", () => {
     "bindEntry",
     "bindService",
     "createIocContainer",
+    "command",
+    "commandOptional",
     "emitSignal",
     "query",
     "queryOptional",
@@ -53,6 +57,10 @@ describe("Library exported API", () => {
     "IocProvider",
     "useContainer",
     "useContainerRevision",
+    "OnCommand",
+    "useCommandCaller",
+    "useOptionalCommandCaller",
+    "useCommandHandler",
     "OnQuery",
     "useQueryCaller",
     "useOptionalQueryCaller",
@@ -74,6 +82,12 @@ describe("Library exported API", () => {
     "SeedEntry",
     "SeedKey",
     "InjectableDescriptor",
+    "CommandStatus",
+    "CommandDescriptor",
+    "CommandHandler",
+    "CommandType",
+    "CommandUnregister",
+    "CommandCaller",
     "QueryHandler",
     "QueryResponder",
     "QueryType",

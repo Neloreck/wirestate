@@ -5,7 +5,6 @@ export enum EGlobalSignal {
   COUNTER_RESET = "counter/reset",
   THEME_TOGGLED = "theme/toggled",
   USER_PINGED = "user/pinged",
-  DUMP = "generic/dump",
 }
 
 export interface ICounterIncrementedSignal extends Signal {

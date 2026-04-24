@@ -3,6 +3,7 @@ import { type Container, type ServiceIdentifier } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { CommandBus } from "@/wirestate/core/commands/command-bus";
 import {
   ERROR_CODE_ACCESS_AFTER_DISPOSAL,
   ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
@@ -10,6 +11,7 @@ import {
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import {
+  COMMAND_BUS_TOKEN,
   CONTAINER_REFS_BY_SERVICE,
   SEED_TOKEN,
   SEEDS_TOKEN,
@@ -17,6 +19,7 @@ import {
   SIGNAL_BUS_TOKEN,
 } from "@/wirestate/core/registry";
 import type { SignalBus } from "@/wirestate/core/signals/signal-bus";
+import type { ICommandDescriptor, TCommandType } from "@/wirestate/types/commands";
 import type { Optional, TAnyObject, MaybePromise, Maybe } from "@/wirestate/types/general";
 import type { TSeedKey, TSeedsMap } from "@/wirestate/types/initial-state";
 import type { TQueryType } from "@/wirestate/types/queries";
@@ -129,6 +132,30 @@ export abstract class AbstractService {
     dbg.info(prefix(__filename), "Query data:", { name: this.constructor.name, type, data, from: this.constructor });
 
     return this.getContainer().get<QueryBus>(QUERY_BUS_TOKEN).query<R, D>(type, data);
+  }
+
+  /**
+   * Dispatches a command and returns the descriptor.
+   * Available only for activated containers.
+   *
+   * @param type - command type
+   * @param data - command data
+   * @returns command descriptor
+   *
+   * @throws WirestateError if service is not activated
+   */
+  protected executeCommand<R = unknown, D = unknown, T extends TCommandType = TCommandType>(
+    type: T,
+    data?: D
+  ): ICommandDescriptor<R> {
+    dbg.info(prefix(__filename), "Execute command:", {
+      name: this.constructor.name,
+      type,
+      data,
+      from: this.constructor,
+    });
+
+    return this.getContainer().get<CommandBus>(COMMAND_BUS_TOKEN).command<R, D>(type, data);
   }
 
   protected getSeed<T>(): T;

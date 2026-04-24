@@ -1,3 +1,4 @@
+import { EGlobalCommand } from "@/core/commands";
 import {
   GLOBAL_CONFIG,
   GLOBAL_DYNAMIC_CONFIG,
@@ -20,6 +21,7 @@ import {
   ShallowObservable,
   makeObservable,
   type Signal,
+  OnCommand,
 } from "@/libs/wirestate";
 
 export interface ILogEntry {
@@ -112,16 +114,20 @@ export class LoggerService extends AbstractService {
     window.console.log("[log]", ...args);
   }
 
-  @OnSignal(EGlobalSignal.DUMP)
-  public onDump(): void {
+  @OnCommand(EGlobalCommand.DUMP_DATA)
+  public onDump(params: unknown): object {
     // [*] Pass circular refs check with delayed get:
-    console.info(
-      `[${this.constructor.name}] Dumping services:`,
-      this.resolve(LoggerService),
-      this.resolve(ThemeService),
-      this.resolve(CounterService),
-      this.resolve(GLOBAL_CONFIG),
-    );
+    const dump = {
+      params,
+      [LoggerService.name]: this.resolve(LoggerService),
+      [ThemeService.name]: this.resolve(ThemeService),
+      [CounterService.name]: this.resolve(CounterService),
+      ["GLOBAL_CONFIG"]: this.resolve(GLOBAL_CONFIG),
+    };
+
+    console.info(`[${this.constructor.name}] Dumping data:`, dump);
+
+    return dump;
   }
 
   @OnSignal([

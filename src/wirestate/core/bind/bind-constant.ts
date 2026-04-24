@@ -3,7 +3,7 @@ import { Container, type ServiceIdentifier } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ScopeBindingType } from "@/wirestate";
+import { ScopeBindingType } from "@/wirestate/alias";
 import { ERROR_CODE_BINDING_SCOPE } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import type { IInjectableDescriptor } from "@/wirestate/types/privision";

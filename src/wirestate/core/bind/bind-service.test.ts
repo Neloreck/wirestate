@@ -1,10 +1,10 @@
 import { Container } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
-import { WirestateError } from "@/wirestate";
 import { Injectable } from "@/wirestate/alias";
 import { bindService } from "@/wirestate/core/bind/bind-service";
 import { ERROR_CODE_GENERIC } from "@/wirestate/core/error/error-code";
+import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { OnQuery } from "@/wirestate/core/queries/on-query";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import { SIGNAL_BUS_TOKEN, QUERY_BUS_TOKEN } from "@/wirestate/core/registry";

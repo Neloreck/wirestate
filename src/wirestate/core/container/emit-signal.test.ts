@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 
-import { emitSignal } from "@/wirestate";
+import { emitSignal } from "@/wirestate/core/container/emit-signal";
 import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
 import { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import { mockContainer } from "@/wirestate/test-utils";

@@ -1,5 +1,5 @@
-import { WirestateError } from "@/wirestate";
 import { ERROR_CODE_NOT_ABSTRACT_SERVICE } from "@/wirestate/core/error/error-code";
+import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { ACTIVATED_HANDLER_METADATA } from "@/wirestate/core/registry";
 import { AbstractService } from "@/wirestate/core/service/abstract-service";
 import { OnActivated } from "@/wirestate/core/service/on-activated";
