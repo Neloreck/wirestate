@@ -81,7 +81,8 @@ export class LoggerService extends AbstractService {
   }
 
   // [*] pass check - subscribe to all signals if needed, no declaration - no sub
-  public override onSignal(signal: Signal): void {
+  @OnSignal()
+  public onSignals(signal: Signal): void {
     this.saveSignalLogEntry(signal);
   }
 
