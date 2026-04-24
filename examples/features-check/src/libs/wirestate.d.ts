@@ -30,6 +30,29 @@ interface IInjectableDescriptor<T = unknown, V = unknown> {
     factory?: () => T;
 }
 
+/**
+ * Binds a single service entry to the container, dispatching to the
+ * correct binding strategy based on the descriptor's `type` field.
+ *
+ * Supports:
+ * - Service classes (function entries) - bound as singleton
+ * - Constant values - bound via `bindConstant`
+ * - Dynamic values - bound via `toDynamicValue` with optional scope
+ * - Instance bindings - bound as generic singleton service
+ *
+ * @param container - target IOC container to bind into
+ * @param entry - entry descriptor to bind
+ */
+declare function bindEntry<T extends object = object>(container: Container$1, entry: Newable<T> | IInjectableDescriptor): void;
+
+/**
+ * Binds a constant value to a token in the container.
+ *
+ * @param container - target Inversify container
+ * @param entry - entry descriptor to bind
+ */
+declare function bindConstant<T>(container: Container$1, entry: IInjectableDescriptor): void;
+
 type TAnyObject = Record<string, any>;
 type Optional<T> = T | null;
 type MaybePromise<T> = T | Promise<T>;
@@ -66,19 +89,6 @@ interface ICommandDescriptor<R = unknown> {
     readonly task: Promise<R>;
     readonly status: ECommandStatus;
 }
-
-/**
- * Lookup key for service seeds.
- */
-type TSeedKey = TServiceClass | string | symbol;
-/**
- * Service-to-seed mapping entry.
- */
-type TSeedEntry<T = unknown> = readonly [TSeedKey, T];
-/**
- * Collection of seed entries.
- */
-type TSeedEntries = ReadonlyArray<TSeedEntry>;
 
 /**
  * Query identifier. Use symbols for private queries.
@@ -122,119 +132,18 @@ type TSignalUnsubscribe = () => void;
  */
 type TSignalEmitter<P = unknown, T extends TSignalType = TSignalType, F = unknown> = (type: T, payload?: P, from?: F) => void;
 
-/**
- * Base class for services.
- */
-declare abstract class AbstractService {
-    /**
-     * Disposal flag.
-     * Check in async actions to avoid updating unmounted services.
-     *
-     * Before activation internally set to null, but should not be surfaced as non-boolean.
-     */
-    readonly IS_DISPOSED: boolean;
-    /**
-     * Access the IoC container.
-     * Internal. Use for on-demand resolution.
-     * Available only for activated containers.
-     *
-     * @returns active container
-     *
-     * @throws WirestateError if service is not activated
-     */
-    protected getContainer(): Container$1;
-    /**
-     * Resolves a sibling service or injected value.
-     * Use for lazy resolution or circular dependency breaking.
-     * Available only for activated containers.
-     *
-     * @param injectionId - injection identifier
-     * @returns resolved injection, service instance, or generic value
-     *
-     * @throws WirestateError if service is not activated
-     */
-    protected resolve<T>(injectionId: ServiceIdentifier<T>): T;
-    /**
-     * Broadcasts a signal.
-     * Available only for activated containers.
-     *
-     * @param type - type of signal to emit
-     * @param payload - optional payload to send with the signal
-     * @param from - optional sender of the signal
-     * @throws WirestateError if service is not activated
-     */
-    protected emitSignal<P, T extends TSignalType = TSignalType>(type: T, payload?: P, from?: unknown): void;
-    /**
-     * Dispatches a query and returns the result.
-     * Available only for activated containers.
-     *
-     * @param type - query type
-     * @param data - query data
-     * @returns query result
-     *
-     * @throws WirestateError if service is not activated
-     */
-    protected queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): MaybePromise<R>;
-    /**
-     * Dispatches a command and returns the descriptor.
-     * Available only for activated containers.
-     *
-     * @param type - command type
-     * @param data - command data
-     * @returns command descriptor
-     *
-     * @throws WirestateError if service is not activated
-     */
-    protected executeCommand<R = unknown, D = unknown, T extends TCommandType = TCommandType>(type: T, data?: D): ICommandDescriptor<R>;
-    protected getSeed<T>(): T;
-    protected getSeed<T>(ServiceClass?: TSeedKey): T;
-    /**
-     * Catch-all signal handler.
-     * Subscribed automatically during the service lifecycle.
-     */
-    onSignal?(signal: ISignal): void;
-}
-
-/**
- * Service constructor.
- */
-type TServiceClass<T extends AbstractService = AbstractService> = Newable<T>;
-
-/**
- * Binds a single service entry to the container, dispatching to the
- * correct binding strategy based on the descriptor's `type` field.
- *
- * Supports:
- * - Service classes (function entries) - bound as singleton AbstractService
- * - Constant values - bound via `bindConstant`
- * - Dynamic values - bound via `toDynamicValue` with optional scope
- * - Instance bindings - bound as AbstractService with optional scope
- *
- * @param container - target IOC container to bind into
- * @param entry - entry descriptor to bind
- */
-declare function bindEntry(container: Container$1, entry: TServiceClass | IInjectableDescriptor): void;
-
-/**
- * Binds a constant value to a token in the container.
- *
- * @param container - target Inversify container
- * @param entry - entry descriptor to bind
- */
-declare function bindConstant<T>(container: Container$1, entry: IInjectableDescriptor): void;
-
 interface IBindServiceOptions {
     isWithIgnoreLifecycle?: boolean;
 }
 /**
- * Registers an AbstractService in the container with activation/deactivation logic.
+ * Registers a service class in the container with activation/deactivation logic.
  * Ensures container references, signal subscriptions, and query handlers are managed correctly.
  *
  * @param container - target Inversify container
  * @param entry - service constructor
  * @param options - options object to control binding flow
  */
-declare function bindService<T extends AbstractService>(container: Container$1, entry: Newable<T>, options?: IBindServiceOptions): void;
+declare function bindService<T extends object>(container: Container$1, entry: Newable<T>, options?: IBindServiceOptions): void;
 
 interface ICreateIocContainerOptions {
     /**
@@ -271,7 +180,7 @@ declare function command<R = unknown, D = unknown, T extends TCommandType = TCom
 declare function commandOptional<R = unknown, D = unknown, T extends TCommandType = TCommandType>(container: Container$1, type: T, data?: D): Optional<ICommandDescriptor<R>>;
 
 /**
- * Emits signals from outside an AbstractService.
+ * Emits signals for container from outside scope.
  *
  * @param container - inversify container
  * @param type - signal type ot emit
@@ -323,6 +232,19 @@ declare class WirestateError extends Error {
 }
 
 /**
+ * Lookup key for service seeds.
+ */
+type TSeedKey = Newable | string | symbol;
+/**
+ * Service-to-seed mapping entry.
+ */
+type TSeedEntry<T = unknown> = readonly [TSeedKey, T];
+/**
+ * Collection of seed entries.
+ */
+type TSeedEntries = ReadonlyArray<TSeedEntry>;
+
+/**
  * Props for the component returned by {@link createInjectablesProvider}.
  */
 interface IInjectablesProviderProps {
@@ -356,7 +278,7 @@ interface ICreateInjectablesProviderOptions {
  * @param options - provider configuration
  * @returns injectables provider component
  */
-declare function createInjectablesProvider(entries: ReadonlyArray<TServiceClass | IInjectableDescriptor>, options?: ICreateInjectablesProviderOptions): {
+declare function createInjectablesProvider(entries: ReadonlyArray<Newable<object> | IInjectableDescriptor>, options?: ICreateInjectablesProviderOptions): {
     (props: IInjectablesProviderProps): ReactElement;
     displayName: string;
 };
@@ -505,8 +427,75 @@ declare function useOptionalSyncQueryCaller(): <R = unknown, D = unknown>(type: 
 declare const SEED_TOKEN: unique symbol;
 
 /**
+ * Base class for services.
+ */
+declare abstract class AbstractService {
+    /**
+     * Disposal flag.
+     * Check in async actions to avoid updating unmounted services.
+     *
+     * Before activation internally set to null, but should not be surfaced as non-boolean.
+     */
+    readonly IS_DISPOSED: boolean;
+    /**
+     * Access the IoC container.
+     * Internal. Use for on-demand resolution.
+     * Available only for activated containers.
+     *
+     * @returns active container
+     *
+     * @throws WirestateError if service is not activated
+     */
+    protected getContainer(): Container$1;
+    /**
+     * Resolves a sibling service or injected value.
+     * Use for lazy resolution or circular dependency breaking.
+     * Available only for activated containers.
+     *
+     * @param injectionId - injection identifier
+     * @returns resolved injection, service instance, or generic value
+     *
+     * @throws WirestateError if service is not activated
+     */
+    protected resolve<T>(injectionId: ServiceIdentifier<T>): T;
+    /**
+     * Broadcasts a signal.
+     * Available only for activated containers.
+     *
+     * @param type - type of signal to emit
+     * @param payload - optional payload to send with the signal
+     * @param from - optional sender of the signal
+     * @throws WirestateError if service is not activated
+     */
+    protected emitSignal<P, T extends TSignalType = TSignalType>(type: T, payload?: P, from?: unknown): void;
+    /**
+     * Dispatches a query and returns the result.
+     * Available only for activated containers.
+     *
+     * @param type - query type
+     * @param data - query data
+     * @returns query result
+     *
+     * @throws WirestateError if service is not activated
+     */
+    protected queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): MaybePromise<R>;
+    /**
+     * Dispatches a command and returns the descriptor.
+     * Available only for activated containers.
+     *
+     * @param type - command type
+     * @param data - command data
+     * @returns command descriptor
+     *
+     * @throws WirestateError if service is not activated
+     */
+    protected executeCommand<R = unknown, D = unknown, T extends TCommandType = TCommandType>(type: T, data?: D): ICommandDescriptor<R>;
+    protected getSeed<T>(): T;
+    protected getSeed<T>(ServiceClass?: TSeedKey): T;
+}
+
+/**
  * Decorator for service methods that run after activation.
- * Only valid on `AbstractService` subclasses.
  *
  * @returns decorator function
  */
@@ -514,7 +503,6 @@ declare function OnActivated(): MethodDecorator;
 
 /**
  * Decorator for service methods that run before deactivation.
- * Only valid on `AbstractService` subclasses.
  *
  * @returns decorator function
  */
@@ -579,10 +567,10 @@ declare function useSignalEmitter<P = unknown, T extends TSignalType = TSignalTy
 interface IMockBindServiceOptions {
     skipLifecycle?: boolean;
 }
-declare function mockBindService<T extends AbstractService>(container: Container$1, ServiceClass: Newable<T>, options?: IMockBindServiceOptions): void;
+declare function mockBindService<T extends object>(container: Container$1, ServiceClass: Newable<T>, options?: IMockBindServiceOptions): void;
 
 interface IMockContainerOptions {
-    services?: Array<TServiceClass>;
+    services?: Array<Newable<object>>;
     activate?: Array<ServiceIdentifier>;
     skipLifecycle?: boolean;
 }
@@ -591,7 +579,7 @@ declare function mockContainer(options?: IMockContainerOptions): Container$1;
 interface IMockServiceOptions {
     skipLifecycle?: boolean;
 }
-declare function mockService<T extends TServiceClass>(service: T, container?: Container, options?: IMockServiceOptions): InstanceType<T>;
+declare function mockService<T extends object>(service: Newable<T>, container?: Container, options?: IMockServiceOptions): T;
 
 /**
  * Wraps a component with IocProvider for testing.
@@ -607,4 +595,4 @@ declare function withIocProvider(children: ReactNode, container?: Container$1, s
 }>;
 
 export { AbstractService, Action, ECommandStatus as CommandStatus, Computed, DeepObservable, IocProvider, Observable, OnActivated, OnCommand, OnDeactivation, OnQuery, OnSignal, RefObservable, SEED_TOKEN as SEED, ShallowObservable, WirestateError, bindConstant, bindEntry, bindService, command, commandOptional, createInjectablesProvider, createIocContainer, emitSignal, forwardRef, mockBindService, mockContainer, mockService, query, queryOptional, useCommandCaller, useCommandHandler, useContainer, useContainerRevision, useInjection, useOptionalCommandCaller, useOptionalInjection, useOptionalQueryCaller, useOptionalSyncQueryCaller, useQueryCaller, useQueryHandler, useSignal, useSignalEmitter, useSignalHandler, useSignals, useSyncQueryCaller, withIocProvider };
-export type { TCommandCaller as CommandCaller, ICommandDescriptor as CommandDescriptor, TCommandHandler as CommandHandler, TCommandType as CommandType, TCommandUnregister as CommandUnregister, IInjectableDescriptor as InjectableDescriptor, InjectablesProvider, IInjectablesProviderProps as InjectablesProviderProps, TQueryHandler as QueryHandler, TQueryResponder as QueryResponder, TQueryType as QueryType, TQueryUnregister as QueryUnregister, TSeedEntries as SeedEntries, TSeedEntry as SeedEntry, TSeedKey as SeedKey, TServiceClass as ServiceClass, ISignal as Signal, TSignalEmitter as SignalEmitter, TSignalHandler as SignalHandler, TSignalType as SignalType, TSignalUnsubscribe as SignalUnsubscribe };
+export type { TCommandCaller as CommandCaller, ICommandDescriptor as CommandDescriptor, TCommandHandler as CommandHandler, TCommandType as CommandType, TCommandUnregister as CommandUnregister, IInjectableDescriptor as InjectableDescriptor, InjectablesProvider, IInjectablesProviderProps as InjectablesProviderProps, TQueryHandler as QueryHandler, TQueryResponder as QueryResponder, TQueryType as QueryType, TQueryUnregister as QueryUnregister, TSeedEntries as SeedEntries, TSeedEntry as SeedEntry, TSeedKey as SeedKey, ISignal as Signal, TSignalEmitter as SignalEmitter, TSignalHandler as SignalHandler, TSignalType as SignalType, TSignalUnsubscribe as SignalUnsubscribe };

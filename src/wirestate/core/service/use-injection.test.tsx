@@ -1,21 +1,19 @@
 import { render, fireEvent, cleanup } from "@testing-library/react";
-import { Container } from "inversify";
+import { Container, Newable } from "inversify";
 
 import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
 import { GenericService } from "@/fixtures/services/generic-service";
 import { useIocContext } from "@/wirestate/core/provision/use-ioc-context";
-import { AbstractService } from "@/wirestate/core/service/abstract-service";
 import { useInjection } from "@/wirestate/core/service/use-injection";
 import { mockContainer } from "@/wirestate/test-utils/mock-container";
 import { withIocProvider } from "@/wirestate/test-utils/with-ioc-provider";
-import { TServiceClass } from "@/wirestate/types/services";
 
 describe("useInjection", () => {
-  const TestComponent = ({ token = GenericService as TServiceClass }) => {
+  function TestComponent({ token = GenericService as Newable<object> }) {
     const service = useInjection(token);
 
     return <div data-testid={"injectable-name"}>{service.constructor.name || String(service.constructor.name)}</div>;
-  };
+  }
 
   const TestComponentRevisionTrigger = () => {
     const { setRevision } = useIocContext();
@@ -133,7 +131,7 @@ describe("useInjection", () => {
   });
 
   it("should re-resolve when token changes", () => {
-    class AnotherService extends AbstractService {}
+    class AnotherService {}
 
     const container: Container = mockContainer({
       services: [GenericService, AnotherService],

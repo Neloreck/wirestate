@@ -1,8 +1,7 @@
-import { Container } from "inversify";
+import { Container, Newable } from "inversify";
 
 import type { IQueryHandlerMetadata, TQueryUnregister } from "@/wirestate//types/queries";
 import type { TSignalUnsubscribe, ISignalHandlerMetadata } from "@/wirestate//types/signals";
-import type { AbstractService } from "@/wirestate/core/service/abstract-service";
 import type { ICommandHandlerMetadata, TCommandUnregister } from "@/wirestate/types/commands";
 
 /**
@@ -63,19 +62,19 @@ export const SIGNAL_HANDLER_METADATA: WeakMap<object, Array<ISignalHandlerMetada
 /**
  * Private storage for service-to-container references.
  */
-export const CONTAINER_REFS_BY_SERVICE: WeakMap<AbstractService, Container> = new WeakMap();
+export const CONTAINER_REFS_BY_SERVICE: WeakMap<object, Container> = new WeakMap();
 
 /**
  * Private storage for service signal unsubscribers.
  */
-export const SIGNAL_UNSUBSCRIBERS_BY_SERVICE: WeakMap<AbstractService, TSignalUnsubscribe> = new WeakMap();
+export const SIGNAL_UNSUBSCRIBERS_BY_SERVICE: WeakMap<object, TSignalUnsubscribe> = new WeakMap();
 
 /**
  * Private storage for service query unregisters.
  */
-export const QUERY_UNREGISTERS_BY_SERVICE: WeakMap<AbstractService, Array<TQueryUnregister>> = new WeakMap();
+export const QUERY_UNREGISTERS_BY_SERVICE: WeakMap<object, Array<TQueryUnregister>> = new WeakMap();
 
 /**
  * Private storage for service command unregisters.
  */
-export const COMMAND_UNREGISTERS_BY_SERVICE: WeakMap<AbstractService, Array<TCommandUnregister>> = new WeakMap();
+export const COMMAND_UNREGISTERS_BY_SERVICE: WeakMap<object, Array<TCommandUnregister>> = new WeakMap();

@@ -1,4 +1,4 @@
-import { type ServiceIdentifier } from "inversify";
+import { Newable, type ServiceIdentifier } from "inversify";
 import { type ReactElement, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -14,7 +14,6 @@ import { type IIocContext, IocContext } from "@/wirestate/core/provision/ioc-con
 import type { Optional } from "@/wirestate/types/general";
 import type { TSeedEntries } from "@/wirestate/types/initial-state";
 import type { IInjectableDescriptor } from "@/wirestate/types/privision";
-import type { TServiceClass } from "@/wirestate/types/services";
 
 /**
  * Props for the component returned by {@link createInjectablesProvider}.
@@ -54,7 +53,7 @@ export interface ICreateInjectablesProviderOptions {
  * @returns injectables provider component
  */
 export function createInjectablesProvider(
-  entries: ReadonlyArray<TServiceClass | IInjectableDescriptor>,
+  entries: ReadonlyArray<Newable<object> | IInjectableDescriptor>,
   options: ICreateInjectablesProviderOptions = {}
 ) {
   dbg.info(prefix(__filename), "Creating injectables provider:", { services: entries, options });

@@ -24,7 +24,6 @@ const ERROR_CODE_VALIDATION_ERROR = 50;
 const ERROR_CODE_INVALID_ARGUMENTS = 51;
 const ERROR_CODE_INVALID_CONTEXT = 52;
 const ERROR_CODE_BINDING_SCOPE = 53;
-const ERROR_CODE_NOT_ABSTRACT_SERVICE = 54;
 const ERROR_CODE_FAILED_TO_RESOLVE = 100;
 const ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER = 101;
 const ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER = 102;
@@ -127,12 +126,6 @@ const COMMAND_UNREGISTERS_BY_SERVICE = new WeakMap();function getCommandHandlerM
   return chain.reverse().flat();
 }function buildSignalDispatcher(instance) {
   const entries = [];
-  if (typeof instance.onSignal === "function") {
-    entries.push({
-      types: null,
-      handler: signal => instance.onSignal?.(signal)
-    });
-  }
   for (const meta of getSignalHandlerMetadata(instance)) {
     const method = instance[meta.methodName];
     if (typeof method === "function") {
@@ -655,9 +648,6 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
   }
 }function OnActivated() {
   return (target, propertyKey) => {
-    if (!Object.prototype.isPrototypeOf.call(AbstractService.prototype, target)) {
-      throw new WirestateError(ERROR_CODE_NOT_ABSTRACT_SERVICE, "@OnActivated: can only be applied to methods of AbstractService subclasses. " + `'${String(propertyKey)}' was applied to an incompatible class.`);
-    }
     const constructor = target.constructor;
     let list = ACTIVATED_HANDLER_METADATA.get(constructor);
     if (!list) {
@@ -668,9 +658,6 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
   };
 }function OnDeactivation() {
   return (target, propertyKey) => {
-    if (!Object.prototype.isPrototypeOf.call(AbstractService.prototype, target)) {
-      throw new WirestateError(ERROR_CODE_NOT_ABSTRACT_SERVICE, "@OnDeactivation: can only be applied to methods of AbstractService subclasses. " + `'${String(propertyKey)}' was applied to an incompatible class.`);
-    }
     const constructor = target.constructor;
     let list = DEACTIVATION_HANDLER_METADATA.get(constructor);
     if (!list) {

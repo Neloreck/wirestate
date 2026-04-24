@@ -1,9 +1,9 @@
-import type { TServiceClass } from "@/wirestate/types/services";
+import { Newable } from "inversify";
 
 /**
  * Lookup key for service seeds.
  */
-export type TSeedKey = TServiceClass | string | symbol;
+export type TSeedKey = Newable | string | symbol;
 
 /**
  * Key-value map for targeted seeds.

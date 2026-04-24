@@ -92,7 +92,6 @@ describe("Library exported API", () => {
     "QueryResponder",
     "QueryType",
     "QueryUnregister",
-    "ServiceClass",
     "Signal",
     "SignalEmitter",
     "SignalHandler",

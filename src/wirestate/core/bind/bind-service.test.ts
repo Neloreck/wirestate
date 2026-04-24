@@ -8,14 +8,13 @@ import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { OnQuery } from "@/wirestate/core/queries/on-query";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import { SIGNAL_BUS_TOKEN, QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
-import { AbstractService } from "@/wirestate/core/service/abstract-service";
 import { OnActivated } from "@/wirestate/core/service/on-activated";
 import { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import { mockContainer } from "@/wirestate/test-utils";
 
 describe("bindService", () => {
   @Injectable()
-  class AsyncFailService extends AbstractService {
+  class AsyncFailService {
     @OnActivated()
     public async onActivated(): Promise<void> {
       throw new Error("async-fail");
@@ -23,7 +22,7 @@ describe("bindService", () => {
   }
 
   @Injectable()
-  class CorruptedService extends AbstractService {
+  class CorruptedService {
     // @ts-ignore - Sabotage with non-function
     @OnQuery("CORRUPTED_QUERY")
     public corruptedQuery: string = "not-a-function";

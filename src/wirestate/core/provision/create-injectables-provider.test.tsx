@@ -6,7 +6,6 @@ import { ERROR_CODE_INVALID_CONTEXT } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { createInjectablesProvider } from "@/wirestate/core/provision/create-injectables-provider";
 import { SEED_TOKEN, SEEDS_TOKEN } from "@/wirestate/core/registry";
-import { AbstractService } from "@/wirestate/core/service/abstract-service";
 import { OnActivated } from "@/wirestate/core/service/on-activated";
 import { OnDeactivation } from "@/wirestate/core/service/on-deactivation";
 import { useInjection } from "@/wirestate/core/service/use-injection";
@@ -21,7 +20,7 @@ describe("createInjectablesProvider", () => {
   let secondServiceDeactivated: number = 0;
 
   @injectable()
-  class FirstService extends AbstractService {
+  class FirstService {
     public value: string = "A";
 
     @OnActivated()
@@ -36,7 +35,7 @@ describe("createInjectablesProvider", () => {
   }
 
   @injectable()
-  class SecondService extends AbstractService {
+  class SecondService {
     public value: string = "B";
 
     @OnActivated()

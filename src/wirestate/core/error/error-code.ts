@@ -4,7 +4,6 @@ export const ERROR_CODE_VALIDATION_ERROR: number = 50;
 export const ERROR_CODE_INVALID_ARGUMENTS: number = 51;
 export const ERROR_CODE_INVALID_CONTEXT: number = 52;
 export const ERROR_CODE_BINDING_SCOPE: number = 53;
-export const ERROR_CODE_NOT_ABSTRACT_SERVICE: number = 54;
 
 export const ERROR_CODE_FAILED_TO_RESOLVE: number = 100;
 export const ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER: number = 101;

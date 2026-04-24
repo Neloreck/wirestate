@@ -62,7 +62,6 @@ export {
   TQueryType as QueryType,
   TQueryUnregister as QueryUnregister,
 } from "@/wirestate/types/queries";
-export { TServiceClass as ServiceClass } from "@/wirestate/types/services";
 export {
   ISignal as Signal,
   TSignalEmitter as SignalEmitter,

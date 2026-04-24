@@ -16,7 +16,6 @@ import {
   SIGNAL_BUS_TOKEN,
   SIGNAL_UNSUBSCRIBERS_BY_SERVICE,
 } from "@/wirestate/core/registry";
-import { AbstractService } from "@/wirestate/core/service/abstract-service";
 import { getActivatedHandlerMetadata } from "@/wirestate/core/service/get-activated-handler-metadata";
 import { getDeactivationHandlerMetadata } from "@/wirestate/core/service/get-deactivation-handler-metadata";
 import { buildSignalDispatcher } from "@/wirestate/core/signals/build-signal-dispatcher";
@@ -31,14 +30,14 @@ export interface IBindServiceOptions {
 }
 
 /**
- * Registers an AbstractService in the container with activation/deactivation logic.
+ * Registers a service class in the container with activation/deactivation logic.
  * Ensures container references, signal subscriptions, and query handlers are managed correctly.
  *
  * @param container - target Inversify container
  * @param entry - service constructor
  * @param options - options object to control binding flow
  */
-export function bindService<T extends AbstractService>(
+export function bindService<T extends object>(
   container: Container,
   entry: Newable<T>,
   options?: IBindServiceOptions
@@ -174,7 +173,7 @@ export function bindService<T extends AbstractService>(
  * @param handler - signal handler
  * @internal
  */
-export function _attachSignalSub(service: AbstractService, handler: TSignalHandler): void {
+export function _attachSignalSub<T extends object>(service: T, handler: TSignalHandler): void {
   const bus: Maybe<SignalBus> = CONTAINER_REFS_BY_SERVICE.get(service)?.get<SignalBus>(SIGNAL_BUS_TOKEN);
 
   if (bus) {
@@ -188,7 +187,7 @@ export function _attachSignalSub(service: AbstractService, handler: TSignalHandl
  * @param service - service instance
  * @internal
  */
-export function _detachSignalSub(service: AbstractService): void {
+export function _detachSignalSub<T extends object>(service: T): void {
   const unsubscribe: Maybe<TSignalUnsubscribe> = SIGNAL_UNSUBSCRIBERS_BY_SERVICE.get(service);
 
   if (unsubscribe) {
@@ -204,7 +203,7 @@ export function _detachSignalSub(service: AbstractService): void {
  * @param unregister - query unregister function
  * @internal
  */
-export function _attachQueryUnreg(service: AbstractService, unregister: TQueryUnregister): void {
+export function _attachQueryUnreg<T extends object>(service: T, unregister: TQueryUnregister): void {
   let list: Maybe<Array<TQueryUnregister>> = QUERY_UNREGISTERS_BY_SERVICE.get(service);
 
   if (!list) {
@@ -221,7 +220,7 @@ export function _attachQueryUnreg(service: AbstractService, unregister: TQueryUn
  * @param service - service instance
  * @internal
  */
-export function _detachQueryUnregs(service: AbstractService): void {
+export function _detachQueryUnregs<T extends object>(service: T): void {
   const list: Maybe<Array<TQueryUnregister>> = QUERY_UNREGISTERS_BY_SERVICE.get(service);
 
   if (!list) {
@@ -246,7 +245,7 @@ export function _detachQueryUnregs(service: AbstractService): void {
  * @param unregister - command unregister function
  * @internal
  */
-export function _attachCommandUnregister(service: AbstractService, unregister: TCommandUnregister): void {
+export function _attachCommandUnregister<T extends object>(service: T, unregister: TCommandUnregister): void {
   let list: Maybe<Array<TCommandUnregister>> = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
 
   if (!list) {
@@ -263,7 +262,7 @@ export function _attachCommandUnregister(service: AbstractService, unregister: T
  * @param service - service instance
  * @internal
  */
-export function _detachCommandUnregister(service: AbstractService): void {
+export function _detachCommandUnregister<T extends object>(service: T): void {
   const list: Maybe<Array<TCommandUnregister>> = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
 
   if (!list) {

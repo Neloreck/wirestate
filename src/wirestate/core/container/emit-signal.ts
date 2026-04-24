@@ -4,11 +4,11 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
-import { SignalBus } from "@/wirestate/core/signals/signal-bus";
+import type { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import type { TSignalType } from "@/wirestate/types/signals";
 
 /**
- * Emits signals from outside an AbstractService.
+ * Emits signals for container from outside scope.
  *
  * @param container - inversify container
  * @param type - signal type ot emit

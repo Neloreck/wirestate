@@ -1,7 +1,6 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { AbstractService } from "@/wirestate/core/service/abstract-service";
 import { getSignalHandlerMetadata } from "@/wirestate/core/signals/get-signal-handler-metadata";
 import type { Optional } from "@/wirestate/types/general";
 import type { ISignalDispatchEntry, TSignalHandler } from "@/wirestate/types/signals";
@@ -13,7 +12,7 @@ import type { ISignalDispatchEntry, TSignalHandler } from "@/wirestate/types/sig
  * @returns signal handler or null if no handlers are declared
  * @internal
  */
-export function buildSignalDispatcher(instance: AbstractService): Optional<TSignalHandler> {
+export function buildSignalDispatcher<T extends object>(instance: T): Optional<TSignalHandler> {
   dbg.info(prefix(__filename), "Build signal dispatcher for:", { name: instance.constructor.name, instance });
 
   const entries: Array<ISignalDispatchEntry> = [];

@@ -6,24 +6,25 @@ import { prefix } from "@/macroses/prefix.macro";
 import { bindConstant } from "@/wirestate/core/bind/bind-constant";
 import { bindDynamicValue } from "@/wirestate/core/bind/bind-dynamic-value";
 import { bindService } from "@/wirestate/core/bind/bind-service";
-import type { AbstractService } from "@/wirestate/core/service/abstract-service";
 import type { IInjectableDescriptor } from "@/wirestate/types/privision";
-import type { TServiceClass } from "@/wirestate/types/services";
 
 /**
  * Binds a single service entry to the container, dispatching to the
  * correct binding strategy based on the descriptor's `type` field.
  *
  * Supports:
- * - Service classes (function entries) - bound as singleton AbstractService
+ * - Service classes (function entries) - bound as singleton
  * - Constant values - bound via `bindConstant`
  * - Dynamic values - bound via `toDynamicValue` with optional scope
- * - Instance bindings - bound as AbstractService with optional scope
+ * - Instance bindings - bound as generic singleton service
  *
  * @param container - target IOC container to bind into
  * @param entry - entry descriptor to bind
  */
-export function bindEntry(container: Container, entry: TServiceClass | IInjectableDescriptor): void {
+export function bindEntry<T extends object = object>(
+  container: Container,
+  entry: Newable<T> | IInjectableDescriptor
+): void {
   if (typeof entry === "function") {
     bindService(container, entry);
 
@@ -52,6 +53,6 @@ export function bindEntry(container: Container, entry: TServiceClass | IInjectab
     container,
   });
 
-  // Default: treat as an AbstractService descriptor (Instance binding).
-  bindService(container, entry.value as unknown as Newable<AbstractService>);
+  // Default: treat as class descriptor (Instance binding).
+  bindService(container, entry.value as unknown as Newable<T>);
 }

@@ -1,7 +1,6 @@
-import type { ServiceIdentifier } from "inversify";
+import type { Newable, ServiceIdentifier } from "inversify";
 
 import type { IInjectableDescriptor } from "@/wirestate/types/privision";
-import type { TServiceClass } from "@/wirestate/types/services";
 
 /**
  * Returns the container token for a service entry.
@@ -11,6 +10,6 @@ import type { TServiceClass } from "@/wirestate/types/services";
  * @param entry - entry descriptor to get service identifier for
  * @returns injectable identifier token
  */
-export function getEntryToken(entry: TServiceClass | IInjectableDescriptor): ServiceIdentifier {
+export function getEntryToken<T extends object = object>(entry: Newable<T> | IInjectableDescriptor): ServiceIdentifier {
   return typeof entry === "function" ? entry : entry.id;
 }

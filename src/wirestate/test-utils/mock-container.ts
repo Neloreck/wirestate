@@ -1,13 +1,13 @@
-import { Container, ServiceIdentifier } from "inversify";
+import { Container, Newable, ServiceIdentifier } from "inversify";
 
 import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { mockBindService } from "@/wirestate/test-utils/mock-bind-service";
-import { TServiceClass } from "@/wirestate/types/services";
 
+// todo: Correct types and support mockEntry methods, not only mock service.
 export interface IMockContainerOptions {
-  services?: Array<TServiceClass>;
+  services?: Array<Newable<object>>;
   activate?: Array<ServiceIdentifier>;
   skipLifecycle?: boolean;
 }
@@ -19,7 +19,7 @@ export function mockContainer(options: IMockContainerOptions = {}): Container {
 
   if (activate.length) {
     for (const token of options.activate ?? []) {
-      if (!services.includes(token as TServiceClass)) {
+      if (!services.includes(token as Newable<object>)) {
         throw new WirestateError(
           ERROR_CODE_INVALID_ARGUMENTS,
           "Provided services for activation not matching list of services to bind."
