@@ -1,14 +1,14 @@
 import type { Container } from "inversify";
 
-import type { IQueryHandlerMetadata, TQueryUnregister } from "@/wirestate//types/queries";
-import type { TSignalUnsubscribe, ISignalHandlerMetadata } from "@/wirestate//types/signals";
 import type { WireScope } from "@/wirestate/core/scope/wire-scope";
 import type { ICommandHandlerMetadata, TCommandUnregister } from "@/wirestate/types/commands";
+import type { TEventUnsubscriber, IEventHandlerMetadata } from "@/wirestate/types/events";
+import type { IQueryHandlerMetadata, TQueryUnregister } from "@/wirestate/types/queries";
 
 /**
- * Token for the container-scoped signal bus.
+ * Token for the container-scoped event bus.
  */
-export const SIGNAL_BUS_TOKEN: unique symbol = Symbol("@wirestate/signal-bus");
+export const EVENT_BUS_TOKEN: unique symbol = Symbol("@wirestate/event-bus");
 
 /**
  * Token for the container-scoped query bus.
@@ -55,10 +55,10 @@ export const ACTIVATED_HANDLER_METADATA: WeakMap<object, Array<string | symbol>>
 export const DEACTIVATION_HANDLER_METADATA: WeakMap<object, Array<string | symbol>> = new WeakMap();
 
 /**
- * Map of class constructors for their declared signal handlers.
+ * Map of class constructors for their declared event handlers.
  * Inherited via a prototype chain at resolve time.
  */
-export const SIGNAL_HANDLER_METADATA: WeakMap<object, Array<ISignalHandlerMetadata>> = new WeakMap();
+export const EVENT_HANDLER_METADATA: WeakMap<object, Array<IEventHandlerMetadata>> = new WeakMap();
 
 /**
  * Private storage for service-to-container references.
@@ -71,9 +71,9 @@ export const CONTAINER_REFS_BY_SERVICE: WeakMap<object, Container> = new WeakMap
 export const WIRE_SCOPES_BY_SERVICE: WeakMap<object, Array<WireScope>> = new WeakMap();
 
 /**
- * Private storage for service signal unsubscribers.
+ * Private storage for service event unsubscribers.
  */
-export const SIGNAL_UNSUBSCRIBERS_BY_SERVICE: WeakMap<object, TSignalUnsubscribe> = new WeakMap();
+export const EVENT_UNSUBSCRIBERS_BY_SERVICE: WeakMap<object, TEventUnsubscriber> = new WeakMap();
 
 /**
  * Private storage for service query unregisters.

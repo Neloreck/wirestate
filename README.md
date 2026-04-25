@@ -7,14 +7,15 @@
 
 <hr/>
 
-`wirestate` is a lightweight, scalable state management library for React, leveraging **Inversify** for Dependency Injection and **MobX** for reactivity. It provides a robust architecture for managing complex application logic through **Services**, **Signals**, and **Queries**.
+`wirestate` is a lightweight, scalable state management library for React, leveraging **Inversify** for Dependency Injection and **MobX** for reactivity. It provides a robust architecture for managing complex application logic through **Services**, **Events**, **Commands** and **Queries**.
 
 ## Key Features
 
 - **Dependency Injection**: First-class support for Inversify, allowing for decoupled and testable services.
 - **Reactive State**: Seamless integration with MobX.
-- **Signals**: An event-based communication system for broadcasting actions and side effects across your application.
+- **Events**: An event-based communication system for broadcasting actions and side effects across your application.
 - **Queries**: A structured way to request data synchronously or asynchronously from your services.
+- **Commands**: todo;
 - **Service Lifecycle**: Automated activation and deactivation of services tied to your component tree.
 
 ## Install
@@ -39,7 +40,7 @@
 ### 1. Define a Service
 
 ```typescript
-import { Observable, OnSignal, OnQuery, makeObservable } from 'wirestate';
+import { Observable, OnEvent, OnQuery, makeObservable } from 'wirestate';
 
 export class CounterService {
   @Observable()
@@ -49,7 +50,7 @@ export class CounterService {
     makeObservable(this);
   }
 
-  @OnSignal('INCREMENT')
+  @OnEvent('INCREMENT')
   public increment(): void {
     this.count++;
   }
@@ -84,18 +85,18 @@ function Application() {
 
 ```tsx
 import { observer } from 'mobx-react-lite';
-import { useInjection, useSignalEmitter } from 'wirestate';
+import { useInjection, useEventEmitter } from 'wirestate';
 import { CounterService } from './CounterService';
 
 const CounterComponent = observer(() => {
   const service = useInjection(CounterService);
-  const emit = useSignalEmitter();
+  const emit = useEventEmitter();
 
   return (
     <div>
       <p>Count: {service.count}</p>
       <button onClick={() => service.increment()}>Increment</button>
-      <button onClick={() => emit({ type: 'INCREMENT' })}>Increment signal</button>
+      <button onClick={() => emit({ type: 'INCREMENT' })}>Increment event</button>
     </div>
   );
 });

@@ -17,7 +17,7 @@ import { TAnyObject } from "@/wirestate/types/general";
 export function useInjection<T>(injectionId: ServiceIdentifier<T>): T {
   const { container, revision } = useIocContext();
 
-  // Revision bump signals a container reset; force re-resolution to drop stale instances.
+  // Revision bump causes a container reset; force re-resolution to drop stale instances.
   return useMemo(() => {
     dbg.info(prefix(__filename), "New injection provision for token:", {
       token: injectionId,

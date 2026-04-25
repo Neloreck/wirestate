@@ -1,9 +1,9 @@
-import { SignalBus } from "@/wirestate/core/signals/signal-bus";
-import { TSignalUnsubscribe } from "@/wirestate/types/signals";
+import { EventBus } from "@/wirestate/core/events/event-bus";
+import { TEventUnsubscriber } from "@/wirestate/types/events";
 
-describe("SignalBus", () => {
-  it("should emit signal to subscribed handler", () => {
-    const bus: SignalBus = new SignalBus();
+describe("EventBus", () => {
+  it("should emit event to subscribed handler", () => {
+    const bus: EventBus = new EventBus();
     const handler = jest.fn();
 
     bus.subscribe(handler);
@@ -13,7 +13,7 @@ describe("SignalBus", () => {
   });
 
   it("should support multiple subscribers", () => {
-    const bus: SignalBus = new SignalBus();
+    const bus: EventBus = new EventBus();
     const handler1 = jest.fn();
     const handler2 = jest.fn();
 
@@ -26,10 +26,10 @@ describe("SignalBus", () => {
   });
 
   it("should unsubscribe handler", () => {
-    const bus = new SignalBus();
+    const bus = new EventBus();
     const handler = jest.fn();
 
-    const unsubscribe: TSignalUnsubscribe = bus.subscribe(handler);
+    const unsubscribe: TEventUnsubscriber = bus.subscribe(handler);
 
     unsubscribe();
     bus.emit({ type: "TEST" });
@@ -40,7 +40,7 @@ describe("SignalBus", () => {
   it("should catch handler errors without affecting other handlers", () => {
     const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-    const bus: SignalBus = new SignalBus();
+    const bus: EventBus = new EventBus();
 
     const firstHandler = jest.fn();
     const secondHandler = jest.fn();
@@ -57,13 +57,13 @@ describe("SignalBus", () => {
     expect(errorHandler).toHaveBeenCalled();
     expect(secondHandler).toHaveBeenCalled();
 
-    expect(errorSpy).toHaveBeenCalledWith("[wirestate] Signal handler threw:", expect.any(Error));
+    expect(errorSpy).toHaveBeenCalledWith("[wirestate] Event handler threw:", expect.any(Error));
 
     errorSpy.mockRestore();
   });
 
   it("should clear all handlers", () => {
-    const bus: SignalBus = new SignalBus();
+    const bus: EventBus = new EventBus();
     const firstHandler = jest.fn();
     const secondHandler = jest.fn();
 

@@ -1,24 +1,24 @@
 import { render, cleanup, act } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { SIGNAL_BUS_TOKEN } from "@/wirestate/core/registry";
-import { SignalBus } from "@/wirestate/core/signals/signal-bus";
-import { useSignalHandler } from "@/wirestate/core/signals/use-signal-handler";
+import { EventBus } from "@/wirestate/core/events/event-bus";
+import { useEventsHandler } from "@/wirestate/core/events/use-events-handler";
+import { EVENT_BUS_TOKEN } from "@/wirestate/core/registry";
 import { mockContainer } from "@/wirestate/test-utils/mock-container";
 import { withIocProvider } from "@/wirestate/test-utils/with-ioc-provider";
 
-describe("useSignalHandler", () => {
+describe("useEventsHandler", () => {
   afterEach(() => {
     cleanup();
   });
 
-  it("should subscribe to all signals without filtering", () => {
+  it("should subscribe to all events without filtering", () => {
     const container: Container = mockContainer();
-    const bus: SignalBus = container.get(SIGNAL_BUS_TOKEN);
+    const bus: EventBus = container.get(EVENT_BUS_TOKEN);
     const handler = jest.fn();
 
     function TestComponent(): null {
-      useSignalHandler(handler);
+      useEventsHandler(handler);
 
       return null;
     }
@@ -37,11 +37,11 @@ describe("useSignalHandler", () => {
 
   it("should unsubscribe on unmount", () => {
     const container: Container = mockContainer();
-    const bus: SignalBus = container.get(SIGNAL_BUS_TOKEN);
+    const bus: EventBus = container.get(EVENT_BUS_TOKEN);
     const handler = jest.fn();
 
     function TestComponent() {
-      useSignalHandler(handler);
+      useEventsHandler(handler);
 
       return null;
     }

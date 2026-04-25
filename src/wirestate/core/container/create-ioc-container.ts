@@ -4,16 +4,16 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { CommandBus } from "@/wirestate/core/commands/command-bus";
+import { EventBus } from "@/wirestate/core/events/event-bus";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import {
   COMMAND_BUS_TOKEN,
   SEED_TOKEN,
   SEEDS_TOKEN,
   QUERY_BUS_TOKEN,
-  SIGNAL_BUS_TOKEN,
+  EVENT_BUS_TOKEN,
 } from "@/wirestate/core/registry";
 import { WireScope } from "@/wirestate/core/scope/wire-scope";
-import { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import type { TAnyObject } from "@/wirestate/types/general";
 import type { TSeedsMap } from "@/wirestate/types/initial-state";
 
@@ -38,7 +38,7 @@ export function createIocContainer(options: ICreateIocContainerOptions = {}): Co
     parent: options.parent,
   });
 
-  container.bind(SIGNAL_BUS_TOKEN).toConstantValue(new SignalBus());
+  container.bind(EVENT_BUS_TOKEN).toConstantValue(new EventBus());
   container.bind(QUERY_BUS_TOKEN).toConstantValue(new QueryBus());
   container.bind(COMMAND_BUS_TOKEN).toConstantValue(new CommandBus());
   container.bind(SEEDS_TOKEN).toConstantValue(new Map() as TSeedsMap);

@@ -38,7 +38,7 @@ const ERROR_CODE_ACCESS_AFTER_DISPOSAL = 201;class WirestateError extends Error 
   } else {
     binding.inSingletonScope();
   }
-}const SIGNAL_BUS_TOKEN = Symbol("@wirestate/signal-bus");
+}const EVENT_BUS_TOKEN = Symbol("@wirestate/event-bus");
 const QUERY_BUS_TOKEN = Symbol("@wirestate/query-bus");
 const COMMAND_BUS_TOKEN = Symbol("@wirestate/command-bus");
 const SEEDS_TOKEN = Symbol("@wirestate/seeds");
@@ -47,10 +47,10 @@ const QUERY_HANDLER_METADATA = new WeakMap();
 const COMMAND_HANDLER_METADATA = new WeakMap();
 const ACTIVATED_HANDLER_METADATA = new WeakMap();
 const DEACTIVATION_HANDLER_METADATA = new WeakMap();
-const SIGNAL_HANDLER_METADATA = new WeakMap();
+const EVENT_HANDLER_METADATA = new WeakMap();
 const CONTAINER_REFS_BY_SERVICE = new WeakMap();
 const WIRE_SCOPES_BY_SERVICE = new WeakMap();
-const SIGNAL_UNSUBSCRIBERS_BY_SERVICE = new WeakMap();
+const EVENT_UNSUBSCRIBERS_BY_SERVICE = new WeakMap();
 const QUERY_UNREGISTERS_BY_SERVICE = new WeakMap();
 const COMMAND_UNREGISTERS_BY_SERVICE = new WeakMap();function getCommandHandlerMetadata(instance) {
   let constructor = instance.constructor;
@@ -63,6 +63,39 @@ const COMMAND_UNREGISTERS_BY_SERVICE = new WeakMap();function getCommandHandlerM
     constructor = Object.getPrototypeOf(constructor);
   }
   return chain.reverse().flat();
+}function getEventHandlerMetadata(instance) {
+  let constructor = instance.constructor;
+  const chain = [];
+  while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
+    const own = EVENT_HANDLER_METADATA.get(constructor);
+    if (own && own.length > 0) {
+      chain.push(own);
+    }
+    constructor = Object.getPrototypeOf(constructor);
+  }
+  return chain.reverse().flat();
+}function buildEventDispatcher(instance) {
+  const entries = [];
+  for (const meta of getEventHandlerMetadata(instance)) {
+    const method = instance[meta.methodName];
+    if (typeof method === "function") {
+      entries.push({
+        types: meta.types,
+        handler: method.bind(instance)
+      });
+    }
+  }
+  if (entries.length) {
+    return event => {
+      for (const entry of entries) {
+        if (entry.types === null || entry.types.includes(event.type)) {
+          entry.handler(event);
+        }
+      }
+    };
+  } else {
+    return null;
+  }
 }function getQueryHandlerMetadata(instance) {
   let constructor = instance.constructor;
   const chain = [];
@@ -92,8 +125,8 @@ const COMMAND_UNREGISTERS_BY_SERVICE = new WeakMap();function getCommandHandlerM
   resolve(injectionId) {
     return this.getContainer().get(injectionId);
   }
-  emitSignal(type, payload, from) {
-    this.getContainer().get(SIGNAL_BUS_TOKEN).emit({
+  emitEvent(type, payload, from) {
+    this.getContainer().get(EVENT_BUS_TOKEN).emit({
       type,
       payload,
       from: from === undefined ? this : from
@@ -131,39 +164,6 @@ WireScope = __decorate([injectable(), __metadata("design:paramtypes", [Object])]
     constructor = Object.getPrototypeOf(constructor);
   }
   return chain.reverse().flat();
-}function getSignalHandlerMetadata(instance) {
-  let constructor = instance.constructor;
-  const chain = [];
-  while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
-    const own = SIGNAL_HANDLER_METADATA.get(constructor);
-    if (own && own.length > 0) {
-      chain.push(own);
-    }
-    constructor = Object.getPrototypeOf(constructor);
-  }
-  return chain.reverse().flat();
-}function buildSignalDispatcher(instance) {
-  const entries = [];
-  for (const meta of getSignalHandlerMetadata(instance)) {
-    const method = instance[meta.methodName];
-    if (typeof method === "function") {
-      entries.push({
-        types: meta.types,
-        handler: method.bind(instance)
-      });
-    }
-  }
-  if (entries.length) {
-    return signal => {
-      for (const entry of entries) {
-        if (entry.types === null || entry.types.includes(signal.type)) {
-          entry.handler(signal);
-        }
-      }
-    };
-  } else {
-    return null;
-  }
 }function bindService(container, entry, options) {
   const whenBind = container.bind(entry).to(entry).inSingletonScope();
   if (options?.isWithIgnoreLifecycle) {
@@ -173,9 +173,9 @@ WireScope = __decorate([injectable(), __metadata("design:paramtypes", [Object])]
     instance.IS_DISPOSED = false;
     CONTAINER_REFS_BY_SERVICE.set(instance, container);
     _attachWireScopes(instance, entry);
-    const dispatcher = buildSignalDispatcher(instance);
+    const dispatcher = buildEventDispatcher(instance);
     if (dispatcher) {
-      _attachSignalSub(instance, dispatcher);
+      _attachEventsSubscription(instance, dispatcher);
     }
     const queryBus = container.get(QUERY_BUS_TOKEN);
     for (const meta of getQueryHandlerMetadata(instance)) {
@@ -220,21 +220,21 @@ WireScope = __decorate([injectable(), __metadata("design:paramtypes", [Object])]
     _detachWireScopes(instance);
     _detachCommandUnregister(instance);
     _detachQueryUnregs(instance);
-    _detachSignalSub(instance);
+    _detachEventSubscription(instance);
     CONTAINER_REFS_BY_SERVICE.delete(instance);
   });
 }
-function _attachSignalSub(service, handler) {
-  const bus = CONTAINER_REFS_BY_SERVICE.get(service)?.get(SIGNAL_BUS_TOKEN);
+function _attachEventsSubscription(service, handler) {
+  const bus = CONTAINER_REFS_BY_SERVICE.get(service)?.get(EVENT_BUS_TOKEN);
   if (bus) {
-    SIGNAL_UNSUBSCRIBERS_BY_SERVICE.set(service, bus.subscribe(handler));
+    EVENT_UNSUBSCRIBERS_BY_SERVICE.set(service, bus.subscribe(handler));
   }
 }
-function _detachSignalSub(service) {
-  const unsubscribe = SIGNAL_UNSUBSCRIBERS_BY_SERVICE.get(service);
+function _detachEventSubscription(service) {
+  const unsubscribe = EVENT_UNSUBSCRIBERS_BY_SERVICE.get(service);
   if (unsubscribe) {
     unsubscribe();
-    SIGNAL_UNSUBSCRIBERS_BY_SERVICE.delete(service);
+    EVENT_UNSUBSCRIBERS_BY_SERVICE.delete(service);
   }
 }
 function _attachWireScopes(service, Service) {
@@ -419,15 +419,15 @@ function _detachCommandUnregister(service) {
   clear() {
     this.handlers.clear();
   }
-}class SignalBus {
+}class EventBus {
   handlers = new Set();
-  emit(signal) {
+  emit(event) {
     const snapshot = Array.from(this.handlers);
     for (const handler of snapshot) {
       try {
-        handler(signal);
+        handler(event);
       } catch (error) {
-        console.error("[wirestate] Signal handler threw:", error);
+        console.error("[wirestate] Event handler threw:", error);
       }
     }
   }
@@ -445,7 +445,7 @@ function _detachCommandUnregister(service) {
     defaultScope: "Singleton",
     parent: options.parent
   });
-  container.bind(SIGNAL_BUS_TOKEN).toConstantValue(new SignalBus());
+  container.bind(EVENT_BUS_TOKEN).toConstantValue(new EventBus());
   container.bind(QUERY_BUS_TOKEN).toConstantValue(new QueryBus());
   container.bind(COMMAND_BUS_TOKEN).toConstantValue(new CommandBus());
   container.bind(SEEDS_TOKEN).toConstantValue(new Map());
@@ -456,8 +456,8 @@ function _detachCommandUnregister(service) {
   return container.get(COMMAND_BUS_TOKEN).command(type, data);
 }function commandOptional(container, type, data) {
   return container.get(COMMAND_BUS_TOKEN).commandOptional(type, data);
-}function emitSignal(container, type, payload, from) {
-  container.get(SIGNAL_BUS_TOKEN).emit({
+}function emitEvent(container, type, payload, from) {
+  container.get(EVENT_BUS_TOKEN).emit({
     type,
     payload,
     from
@@ -698,36 +698,36 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
       return null;
     }
   }, [container, revision, injectionId]);
-}function OnSignal(types) {
+}function OnEvent(types) {
   const normalized = types === undefined ? null : Array.isArray(types) ? [...types] : [types];
   return (target, propertyKey) => {
     const constructor = target.constructor;
-    let list = SIGNAL_HANDLER_METADATA.get(constructor);
+    let list = EVENT_HANDLER_METADATA.get(constructor);
     if (!list) {
       list = [];
-      SIGNAL_HANDLER_METADATA.set(constructor, list);
+      EVENT_HANDLER_METADATA.set(constructor, list);
     }
     list.push({
       methodName: propertyKey,
       types: normalized
     });
   };
-}function useSignal(type, handler) {
-  const signalRef = useRef(type);
+}function useEvent(type, handler) {
+  const typeRef = useRef(type);
   const handlerRef = useRef(handler);
   const container = useContainer();
   useEffect(() => {
-    signalRef.current = type;
+    typeRef.current = type;
     handlerRef.current = handler;
   });
   useEffect(() => {
-    return container.get(SIGNAL_BUS_TOKEN).subscribe(signal => {
-      if (signal.type === signalRef.current) {
-        handlerRef.current?.(signal);
+    return container.get(EVENT_BUS_TOKEN).subscribe(event => {
+      if (event.type === typeRef.current) {
+        handlerRef.current?.(event);
       }
     });
   }, [container, type]);
-}function useSignals(types, handler) {
+}function useEvents(types, handler) {
   const typesRef = useRef(types);
   const handlerRef = useRef(handler);
   const container = useContainer();
@@ -736,27 +736,27 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
     handlerRef.current = handler;
   });
   useEffect(() => {
-    return container.get(SIGNAL_BUS_TOKEN).subscribe(signal => {
-      if (typesRef.current.includes(signal.type)) {
-        handlerRef.current?.(signal);
+    return container.get(EVENT_BUS_TOKEN).subscribe(event => {
+      if (typesRef.current.includes(event.type)) {
+        handlerRef.current?.(event);
       }
     });
   }, [container]);
-}function useSignalHandler(handler) {
+}function useEventsHandler(handler) {
   const handlerRef = useRef(handler);
   const container = useContainer();
   useEffect(() => {
     handlerRef.current = handler;
   });
   useEffect(() => {
-    return container.get(SIGNAL_BUS_TOKEN).subscribe(signal => {
-      handlerRef.current?.(signal);
+    return container.get(EVENT_BUS_TOKEN).subscribe(event => {
+      handlerRef.current?.(event);
     });
   }, [container]);
-}function useSignalEmitter() {
+}function useEventEmitter() {
   const container = useIocContext().container;
   return useCallback((type, payload, from) => {
-    container.get(SIGNAL_BUS_TOKEN).emit({
+    container.get(EVENT_BUS_TOKEN).emit({
       type,
       payload,
       from
@@ -801,4 +801,4 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
     container,
     seed
   }, children);
-}export{ECommandStatus as CommandStatus,IocProvider,OnActivated,OnCommand,OnDeactivation,OnQuery,OnSignal,SEED_TOKEN as SEED,WireScope,WirestateError,bindConstant,bindEntry,bindService,command,commandOptional,createInjectablesProvider,createIocContainer,emitSignal,forwardRef,mockBindService,mockContainer,mockService,query,queryOptional,useCommandCaller,useCommandHandler,useContainer,useContainerRevision,useInjection,useOptionalCommandCaller,useOptionalInjection,useOptionalQueryCaller,useOptionalSyncQueryCaller,useQueryCaller,useQueryHandler,useSignal,useSignalEmitter,useSignalHandler,useSignals,useSyncQueryCaller,withIocProvider};
+}export{ECommandStatus as CommandStatus,IocProvider,OnActivated,OnCommand,OnDeactivation,OnEvent,OnQuery,SEED_TOKEN as SEED,WireScope,WirestateError,bindConstant,bindEntry,bindService,command,commandOptional,createInjectablesProvider,createIocContainer,emitEvent,forwardRef,mockBindService,mockContainer,mockService,query,queryOptional,useCommandCaller,useCommandHandler,useContainer,useContainerRevision,useEvent,useEventEmitter,useEvents,useEventsHandler,useInjection,useOptionalCommandCaller,useOptionalInjection,useOptionalQueryCaller,useOptionalSyncQueryCaller,useQueryCaller,useQueryHandler,useSyncQueryCaller,withIocProvider};

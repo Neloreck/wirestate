@@ -1,4 +1,5 @@
 import { EGlobalCommand } from "@/core/commands";
+import { EGlobalEvent } from "@/core/events";
 import {
   GLOBAL_CONFIG,
   GLOBAL_DYNAMIC_CONFIG,
@@ -7,7 +8,6 @@ import {
 import { EGlobalQuery } from "@/core/queries";
 import { CounterService } from "@/core/services/counter/CounterService";
 import { ThemeService } from "@/core/services/theme/ThemeService";
-import { EGlobalSignal } from "@/core/signals";
 import {
   Inject,
   Injectable,
@@ -15,8 +15,8 @@ import {
   OnDeactivation,
   OnQuery,
   Optional,
-  OnSignal,
-  type Signal,
+  OnEvent,
+  type Event,
   OnCommand,
   WireScope,
 } from "@/libs/wirestate";
@@ -64,12 +64,12 @@ export class LoggerService {
   @OnActivated()
   public onActivated(): void {
     console.info(
-      `[${this.constructor.name}] Activated — listening for signals, seed:`,
+      `[${this.constructor.name}] Activated — listening for events, seed:`,
       this.scope.getSeed(LoggerService),
     );
 
     // [*] Pass safe lifecycle checks - can emit from activation.
-    this.scope.emitSignal(`activated/${this.constructor.name}`);
+    this.scope.emitEvent(`activated/${this.constructor.name}`);
   }
 
   @OnDeactivation()
@@ -77,15 +77,15 @@ export class LoggerService {
     console.info(`[${this.constructor.name}] Deactivating`);
 
     // [*] Pass safe lifecycle checks - can emit from deactivation.
-    this.scope.emitSignal(`deactivating/${this.constructor.name}`);
+    this.scope.emitEvent(`deactivating/${this.constructor.name}`);
 
     this.clear();
   }
 
-  // [*] pass check - subscribe to all signals if needed, no declaration - no sub
-  @OnSignal()
-  public onSignals(signal: Signal): void {
-    this.saveSignalLogEntry(signal);
+  // [*] pass check - subscribe to all events if needed, no declaration - no sub
+  @OnEvent()
+  public onEvents(event: Event): void {
+    this.saveEventLogEntry(event);
   }
 
   @Action()
@@ -95,16 +95,17 @@ export class LoggerService {
   }
 
   @Action()
-  private saveSignalLogEntry(signal: Signal): void {
-    const entry: ILogEntry = {
-      id: this.nextId++,
-      type:
-        typeof signal.type === "symbol" ? signal.type.toString() : signal.type,
-      payload: signal.payload,
-      at: Date.now(),
-    };
-
-    const next: Array<ILogEntry> = [entry, ...this.logs];
+  private saveEventLogEntry(event: Event): void {
+    const next: Array<ILogEntry> = [
+      {
+        id: this.nextId++,
+        type:
+          typeof event.type === "symbol" ? event.type.toString() : event.type,
+        payload: event.payload,
+        at: Date.now(),
+      },
+      ...this.logs,
+    ];
 
     if (next.length > LoggerService.MAX_ENTRIES) {
       next.length = LoggerService.MAX_ENTRIES;
@@ -133,14 +134,14 @@ export class LoggerService {
     return dump;
   }
 
-  @OnSignal([
-    /* [*] Pass extensive check - allow multiple signals passing here in array: */
-    EGlobalSignal.COUNTER_RESET,
+  @OnEvent([
+    /* [*] Pass extensive check - allow multiple events passing here in array: */
+    EGlobalEvent.COUNTER_RESET,
   ])
-  public onReset(signal: Signal): void {
+  public onReset(event: Event): void {
     this.log(
-      `[${this.constructor.name}] Observed [onReset] signal:`,
-      signal.type,
+      `[${this.constructor.name}] Observed [onReset] event:`,
+      event.type,
     );
   }
 

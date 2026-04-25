@@ -3,15 +3,15 @@ import "./GeneralControls.css";
 import { useCallback } from "react";
 
 import { EGlobalCommand } from "@/core/commands";
+import { EGlobalEvent } from "@/core/events";
 import { CounterService } from "@/core/services/counter";
 import { ThemeService } from "@/core/services/theme";
-import { EGlobalSignal } from "@/core/signals";
 import {
   type CommandCaller,
-  type SignalEmitter,
+  type EventEmitter,
   useCommandCaller,
   useInjection,
-  useSignalEmitter,
+  useEventEmitter,
 } from "@/libs/wirestate";
 import { observer } from "@/libs/wirestate/mobx";
 
@@ -20,7 +20,7 @@ export const GeneralControls = observer(() => {
   const themeService: ThemeService = useInjection(ThemeService);
 
   const executeCommand: CommandCaller = useCommandCaller();
-  const emitSignal: SignalEmitter = useSignalEmitter();
+  const emitEvent: EventEmitter = useEventEmitter();
 
   // [*] Pass ability to call commands from UI.
   const onDumpData = useCallback(() => {
@@ -42,16 +42,19 @@ export const GeneralControls = observer(() => {
     });
   }, [executeCommand]);
 
-  // [*] Pass ability to emit signals from UI.
+  // [*] Pass ability to emit events from UI.
   const onUserPinged = useCallback(() => {
-    emitSignal(EGlobalSignal.USER_PINGED, { at: Date.now() });
-  }, [emitSignal]);
+    emitEvent(EGlobalEvent.USER_PINGED, { at: Date.now() });
+  }, [emitEvent]);
 
   return (
     <div className={"general-controls"}>
       <div>
         <h2>Wirestate Playground</h2>
-        <p>mobx observables + inversify container + custom signals/queries</p>
+        <p>
+          mobx observables + inversify container + custom
+          events/queries/commands
+        </p>
       </div>
 
       <div className={"counter-row"}>
@@ -77,11 +80,11 @@ export const GeneralControls = observer(() => {
         </button>
 
         <button className={"counter ghost"} onClick={() => onUserPinged()}>
-          Ping (signal)
+          Ping (event)
         </button>
 
         <button className={"counter ghost"} onClick={() => onDumpData()}>
-          Dump services
+          Dump services (command)
         </button>
       </div>
     </div>

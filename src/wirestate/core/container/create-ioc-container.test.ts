@@ -3,23 +3,23 @@ import { Container } from "inversify";
 import { bindService } from "@/wirestate";
 import { CommandBus } from "@/wirestate/core/commands/command-bus";
 import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
+import { EventBus } from "@/wirestate/core/events/event-bus";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import {
-  SIGNAL_BUS_TOKEN,
+  EVENT_BUS_TOKEN,
   QUERY_BUS_TOKEN,
   COMMAND_BUS_TOKEN,
   SEEDS_TOKEN,
   SEED_TOKEN,
 } from "@/wirestate/core/registry";
 import { WireScope } from "@/wirestate/core/scope/wire-scope";
-import { SignalBus } from "@/wirestate/core/signals/signal-bus";
 
 describe("createIocContainer", () => {
   it("should create a container with default essentials", () => {
     const container: Container = createIocContainer();
 
     expect(container).toBeInstanceOf(Container);
-    expect(container.get(SIGNAL_BUS_TOKEN)).toBeInstanceOf(SignalBus);
+    expect(container.get(EVENT_BUS_TOKEN)).toBeInstanceOf(EventBus);
     expect(container.get(QUERY_BUS_TOKEN)).toBeInstanceOf(QueryBus);
     expect(container.get(COMMAND_BUS_TOKEN)).toBeInstanceOf(CommandBus);
     expect(container.get(SEEDS_TOKEN)).toBeInstanceOf(Map);
@@ -30,8 +30,8 @@ describe("createIocContainer", () => {
   it("should bind core buses as singletons by default", () => {
     const container: Container = createIocContainer();
 
-    expect(container.get(SIGNAL_BUS_TOKEN)).toBeInstanceOf(SignalBus);
-    expect(container.get(SIGNAL_BUS_TOKEN)).toBe(container.get(SIGNAL_BUS_TOKEN));
+    expect(container.get(EVENT_BUS_TOKEN)).toBeInstanceOf(EventBus);
+    expect(container.get(EVENT_BUS_TOKEN)).toBe(container.get(EVENT_BUS_TOKEN));
     expect(container.get(QUERY_BUS_TOKEN)).toBeInstanceOf(QueryBus);
     expect(container.get(QUERY_BUS_TOKEN)).toBe(container.get(QUERY_BUS_TOKEN));
     expect(container.get(COMMAND_BUS_TOKEN)).toBeInstanceOf(CommandBus);

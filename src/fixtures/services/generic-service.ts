@@ -1,21 +1,21 @@
 import { Container } from "inversify";
 
 import { Inject, Injectable } from "@/wirestate/alias";
+import { OnEvent } from "@/wirestate/core/events/on-event";
 import { OnQuery } from "@/wirestate/core/queries/on-query";
 import { WireScope } from "@/wirestate/core/scope/wire-scope";
 import { OnActivated } from "@/wirestate/core/service/on-activated";
 import { OnDeactivation } from "@/wirestate/core/service/on-deactivation";
-import { OnSignal } from "@/wirestate/core/signals/on-signal";
+import { IEvent } from "@/wirestate/types/events";
 import { Maybe } from "@/wirestate/types/general";
-import { ISignal } from "@/wirestate/types/signals";
 
 @Injectable()
 export class GenericService {
   public isActivated: boolean = false;
 
-  public isTestStringSignalReceived: boolean = false;
+  public isTestStringEventReceived: boolean = false;
 
-  public testStingSignalPayload: Maybe<string> = null;
+  public testStingEventPayload: Maybe<string> = null;
 
   public constructor(
     @Inject(WireScope)
@@ -44,8 +44,8 @@ export class GenericService {
     return this.scope.getSeed();
   }
 
-  public testEmitSignal(): void {
-    this.scope.emitSignal("TEST_SIGNAL", 0);
+  public testEmitEvent(): void {
+    this.scope.emitEvent("TEST_EVENT", 0);
   }
 
   public testQueryData(): void {
@@ -57,10 +57,10 @@ export class GenericService {
     return "query-response";
   }
 
-  @OnSignal("TEST_STRING_SIGNAL")
-  public onTestStringSignal(signal: ISignal<string>): void {
-    this.isTestStringSignalReceived = true;
-    this.testStingSignalPayload = signal.payload;
+  @OnEvent("TEST_STRING_EVENT")
+  public onTestStringEvent(event: IEvent<string>): void {
+    this.isTestStringEventReceived = true;
+    this.testStingEventPayload = event.payload;
   }
 
   @OnQuery("TEST_STRING_QUERY")

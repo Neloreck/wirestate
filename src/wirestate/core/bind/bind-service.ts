@@ -5,6 +5,8 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { CommandBus } from "@/wirestate/core/commands/command-bus";
 import { getCommandHandlerMetadata } from "@/wirestate/core/commands/get-command-handler-metadata";
+import { buildEventDispatcher } from "@/wirestate/core/events/build-event-dispatcher";
+import type { EventBus } from "@/wirestate/core/events/event-bus";
 import { getQueryHandlerMetadata } from "@/wirestate/core/queries/get-query-handler-metadata";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import {
@@ -13,19 +15,17 @@ import {
   CONTAINER_REFS_BY_SERVICE,
   QUERY_BUS_TOKEN,
   QUERY_UNREGISTERS_BY_SERVICE,
-  SIGNAL_BUS_TOKEN,
-  SIGNAL_UNSUBSCRIBERS_BY_SERVICE,
+  EVENT_BUS_TOKEN,
+  EVENT_UNSUBSCRIBERS_BY_SERVICE,
   WIRE_SCOPES_BY_SERVICE,
 } from "@/wirestate/core/registry";
 import { WireScope } from "@/wirestate/core/scope/wire-scope";
 import { getActivatedHandlerMetadata } from "@/wirestate/core/service/get-activated-handler-metadata";
 import { getDeactivationHandlerMetadata } from "@/wirestate/core/service/get-deactivation-handler-metadata";
-import { buildSignalDispatcher } from "@/wirestate/core/signals/build-signal-dispatcher";
-import type { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import type { TCommandHandler, TCommandUnregister } from "@/wirestate/types/commands";
+import type { TEventHandler, TEventUnsubscriber } from "@/wirestate/types/events";
 import type { Maybe, MaybePromise, Optional } from "@/wirestate/types/general";
 import type { TQueryHandler, TQueryUnregister } from "@/wirestate/types/queries";
-import type { TSignalHandler, TSignalUnsubscribe } from "@/wirestate/types/signals";
 
 export interface IBindServiceOptions {
   isWithIgnoreLifecycle?: boolean;
@@ -33,7 +33,7 @@ export interface IBindServiceOptions {
 
 /**
  * Registers a service class in the container with activation/deactivation logic.
- * Ensures container references, signal subscriptions, and query handlers are managed correctly.
+ * Ensures container references, event subscriptions, command and query handlers are managed correctly.
  *
  * @param container - target Inversify container
  * @param entry - service constructor
@@ -76,12 +76,12 @@ export function bindService<T extends object>(
     CONTAINER_REFS_BY_SERVICE.set(instance, container);
     _attachWireScopes(instance, entry);
 
-    // Compose all signal listeners into a single bus subscription so we only
-    // pay one Set lookup per emitted signal.
-    const dispatcher: Optional<TSignalHandler> = buildSignalDispatcher(instance);
+    // Compose all events listeners into a single bus subscription so we only
+    // pay one Set lookup per emitted event.
+    const dispatcher: Optional<TEventHandler> = buildEventDispatcher(instance);
 
     if (dispatcher) {
-      _attachSignalSub(instance, dispatcher);
+      _attachEventsSubscription(instance, dispatcher);
     }
 
     // Register every `@OnQuery` handler on the container's QueryBus, and
@@ -165,38 +165,38 @@ export function bindService<T extends object>(
     _detachWireScopes(instance);
     _detachCommandUnregister(instance);
     _detachQueryUnregs(instance);
-    _detachSignalSub(instance);
+    _detachEventSubscription(instance);
     CONTAINER_REFS_BY_SERVICE.delete(instance);
   });
 }
 
 /**
- * Attaches a signal subscription to a service.
+ * Attaches a event subscription to a service.
  *
  * @param service - service instance
- * @param handler - signal handler
+ * @param handler - event handler
  * @internal
  */
-export function _attachSignalSub<T extends object>(service: T, handler: TSignalHandler): void {
-  const bus: Maybe<SignalBus> = CONTAINER_REFS_BY_SERVICE.get(service)?.get<SignalBus>(SIGNAL_BUS_TOKEN);
+export function _attachEventsSubscription<T extends object>(service: T, handler: TEventHandler): void {
+  const bus: Maybe<EventBus> = CONTAINER_REFS_BY_SERVICE.get(service)?.get<EventBus>(EVENT_BUS_TOKEN);
 
   if (bus) {
-    SIGNAL_UNSUBSCRIBERS_BY_SERVICE.set(service, bus.subscribe(handler));
+    EVENT_UNSUBSCRIBERS_BY_SERVICE.set(service, bus.subscribe(handler));
   }
 }
 
 /**
- * Detaches the signal subscription from a service.
+ * Detaches the event subscription from a service.
  *
  * @param service - service instance
  * @internal
  */
-export function _detachSignalSub<T extends object>(service: T): void {
-  const unsubscribe: Maybe<TSignalUnsubscribe> = SIGNAL_UNSUBSCRIBERS_BY_SERVICE.get(service);
+export function _detachEventSubscription<T extends object>(service: T): void {
+  const unsubscribe: Maybe<TEventUnsubscriber> = EVENT_UNSUBSCRIBERS_BY_SERVICE.get(service);
 
   if (unsubscribe) {
     unsubscribe();
-    SIGNAL_UNSUBSCRIBERS_BY_SERVICE.delete(service);
+    EVENT_UNSUBSCRIBERS_BY_SERVICE.delete(service);
   }
 }
 
@@ -204,6 +204,8 @@ export function _detachSignalSub<T extends object>(service: T): void {
  * Reads `design:paramtypes` from the service constructor to find parameters typed as WireScope.
  * Property iteration happens only when the constructor metadata declares a WireScope
  * parameter, avoiding false positives from manually created or subclassed scopes.
+ *
+ * todo: Simplify this part.
  *
  * @param service - service instance
  * @param Service - service constructor
@@ -234,6 +236,8 @@ export function _attachWireScopes<T extends object>(service: T, Service: Newable
 /**
  * Marks all injected WireScope instances for this service as disposed and removes
  * the stored references.
+ *
+ * todo: Simplify this part.
  *
  * @param service - service instance
  * @internal

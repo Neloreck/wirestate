@@ -1,27 +1,27 @@
-import "./SignalsLog.css";
+import "./EventsLog.css";
 
 import { LoggerService } from "@/core/services/logging";
 import { useInjection } from "@/libs/wirestate";
 import { observer } from "@/libs/wirestate/mobx";
 
-export const SignalsLog = observer(() => {
+export const EventsLog = observer(() => {
   const loggerService: LoggerService = useInjection(LoggerService);
 
   return (
     <div id={"logs"}>
-      <h2>Signal log</h2>
-      <div className={"signal-log"}>
+      <h2>Events log</h2>
+      <div className={"event-log"}>
         {loggerService.logs.length === 0 ? (
-          <div className={"signal-log__empty"}>
-            No signals yet — try the buttons above.
+          <div className={"event-log__empty"}>
+            No events yet — try the buttons above.
           </div>
         ) : (
           loggerService.logs.map((entry) => (
-            <div key={entry.id} className={"signal-log__entry"}>
-              <span className={"signal-log__type"}>
+            <div key={entry.id} className={"event-log__entry"}>
+              <span className={"event-log__type"}>
                 {JSON.stringify(entry.type)}
               </span>
-              <span className={"signal-log__payload"}>
+              <span className={"event-log__payload"}>
                 {entry.payload !== undefined
                   ? JSON.stringify(entry.payload)
                   : "—"}

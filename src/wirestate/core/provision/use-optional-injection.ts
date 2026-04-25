@@ -18,7 +18,7 @@ export function useOptionalInjection<T>(injectionId: ServiceIdentifier<T>): Opti
   // todo: Add optional second param to handle cases when injection was not found.
   const { container, revision } = useIocContext();
 
-  // Revision bump signals a container reset; force re-resolution to drop stale instances.
+  // Revision bump forces a container reset; force re-resolution to drop stale instances.
   return useMemo(() => {
     if (container.isBound(injectionId)) {
       dbg.info(prefix(__filename), "Resolving token:", {

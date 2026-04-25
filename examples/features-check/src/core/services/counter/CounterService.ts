@@ -1,12 +1,12 @@
 import type { Optional } from "@/application/types";
-import { LoggerService } from "@/core/services/logging/LoggerService";
-import { EGlobalSignal } from "@/core/signals";
+import { EGlobalEvent } from "@/core/events";
+import { LoggerService } from "@/core/services/logging";
 import {
   SEED,
   Inject,
   Injectable,
   OnQuery,
-  OnSignal,
+  OnEvent,
   OnActivated,
   OnDeactivation,
   WireScope,
@@ -62,7 +62,7 @@ export class CounterService {
     this.initializeFromSeed();
 
     // [*] Pass safe lifecycle checks - can emit from activation.
-    this.scope.emitSignal(`activated/${this.constructor.name}`);
+    this.scope.emitEvent(`activated/${this.constructor.name}`);
   }
 
   @OnDeactivation()
@@ -70,7 +70,7 @@ export class CounterService {
     console.info(`[${this.constructor.name}] Deactivating`);
 
     // [*] Pass safe lifecycle checks - can emit from deactivation.
-    this.scope.emitSignal(`deactivating/${this.constructor.name}`);
+    this.scope.emitEvent(`deactivating/${this.constructor.name}`);
   }
 
   @Action()
@@ -108,7 +108,7 @@ export class CounterService {
     this.count += 1;
     this.lastIncrementAt = Date.now();
 
-    this.scope.emitSignal(EGlobalSignal.COUNTER_INCREMENTED, {
+    this.scope.emitEvent(EGlobalEvent.COUNTER_INCREMENTED, {
       count: this.count,
     });
   }
@@ -120,10 +120,10 @@ export class CounterService {
     this.count = 0;
     this.lastIncrementAt = null;
 
-    this.scope.emitSignal(EGlobalSignal.COUNTER_RESET);
+    this.scope.emitEvent(EGlobalEvent.COUNTER_RESET);
   }
 
-  @OnSignal(EGlobalSignal.USER_PINGED)
+  @OnEvent(EGlobalEvent.USER_PINGED)
   public onUserPinged(): void {
     this.increment();
   }

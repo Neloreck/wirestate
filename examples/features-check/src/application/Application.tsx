@@ -2,17 +2,17 @@ import "./Application.css";
 
 import { useEffect } from "react";
 
+import { EventsLog } from "@/application/components/EventsLog";
 import { GeneralControls } from "@/application/components/GeneralControls";
 import { QueriesData } from "@/application/components/QueriesData";
-import { SignalsLog } from "@/application/components/SignalsLog";
+import { EGlobalEvent } from "@/core/events";
 import { GLOBAL_CONFIG } from "@/core/id";
 import { ThemeService } from "@/core/services/theme";
-import { EGlobalSignal } from "@/core/signals";
 import {
   useInjection,
-  useSignal,
-  useSignalHandler,
-  useSignals,
+  useEvent,
+  useEventsHandler,
+  useEvents,
 } from "@/libs/wirestate";
 import { observer } from "@/libs/wirestate/mobx";
 
@@ -20,23 +20,23 @@ export const Application = observer(() => {
   const themeService: ThemeService = useInjection(ThemeService);
   const globalConfig: object = useInjection(GLOBAL_CONFIG);
 
-  // [*] Pass reactivity subscription for specific global signal in React tree.
-  useSignal(EGlobalSignal.COUNTER_RESET, () => {
-    console.info("[Application] Counter was reset (specific signal)");
+  // [*] Pass reactivity subscription for specific global event in React tree.
+  useEvent(EGlobalEvent.COUNTER_RESET, () => {
+    console.info("[Application] Counter was reset (specific event)");
   });
 
-  // [*] Pass reactivity subscription for specific global signals in React tree.
-  useSignals([EGlobalSignal.COUNTER_RESET], () => {
-    console.info("[Application] Counter was reset (array of signals)");
+  // [*] Pass reactivity subscription for specific global events in React tree.
+  useEvents([EGlobalEvent.COUNTER_RESET], () => {
+    console.info("[Application] Counter was reset (array of events)");
   });
 
-  // [*] Pass reactivity subscription for specific global signal in React tree.
-  useSignalHandler((signal) => {
+  // [*] Pass reactivity subscription for all events in React tree.
+  useEventsHandler((event) => {
     console.info(
-      "[Application] Log * signals:",
-      signal.type,
-      signal.payload,
-      signal.from,
+      "[Application] Log all events:",
+      event.type,
+      event.payload,
+      event.from,
     );
   });
 
@@ -53,8 +53,8 @@ export const Application = observer(() => {
 
       <br />
 
-      <section id={"signals-log"} className={"application-section"}>
-        <SignalsLog />
+      <section id={"events-log"} className={"application-section"}>
+        <EventsLog />
       </section>
 
       <br />

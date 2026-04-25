@@ -3,26 +3,26 @@ import { injectable, Container, ServiceIdentifier } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { CommandBus } from "@/wirestate/core/commands/command-bus";
+import type { CommandBus } from "@/wirestate/core/commands/command-bus";
 import {
   ERROR_CODE_ACCESS_AFTER_DISPOSAL,
   ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
 } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
-import { QueryBus } from "@/wirestate/core/queries/query-bus";
+import type { EventBus } from "@/wirestate/core/events/event-bus";
+import type { QueryBus } from "@/wirestate/core/queries/query-bus";
 import {
   COMMAND_BUS_TOKEN,
   SEED_TOKEN,
   SEEDS_TOKEN,
   QUERY_BUS_TOKEN,
-  SIGNAL_BUS_TOKEN,
+  EVENT_BUS_TOKEN,
 } from "@/wirestate/core/registry";
-import type { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import type { ICommandDescriptor, TCommandType } from "@/wirestate/types/commands";
+import type { TEventType } from "@/wirestate/types/events";
 import type { Optional, TAnyObject, MaybePromise } from "@/wirestate/types/general";
 import type { TSeedKey, TSeedsMap } from "@/wirestate/types/initial-state";
 import type { TQueryType } from "@/wirestate/types/queries";
-import type { TSignalType } from "@/wirestate/types/signals";
 
 /**
  * Injectable scope providing access to wirestate buses and seeds.
@@ -85,24 +85,24 @@ export class WireScope {
   }
 
   /**
-   * Broadcasts a signal.
+   * Broadcasts an event.
    * Available only for activated containers.
    *
-   * @param type - type of signal to emit
-   * @param payload - optional payload to send with the signal
-   * @param from - optional sender of the signal
+   * @param type - type of event to emit
+   * @param payload - optional payload to send with the event
+   * @param from - optional sender of the event
    *
    * @throws WirestateError if scope is not activated
    */
-  public emitSignal<P, T extends TSignalType = TSignalType>(type: T, payload?: P, from?: unknown): void {
-    dbg.info(prefix(__filename), "Emit signal:", {
+  public emitEvent<P, T extends TEventType = TEventType>(type: T, payload?: P, from?: unknown): void {
+    dbg.info(prefix(__filename), "Emit event:", {
       type,
       payload,
       from: from === undefined ? this : from,
     });
 
     this.getContainer()
-      .get<SignalBus>(SIGNAL_BUS_TOKEN)
+      .get<EventBus>(EVENT_BUS_TOKEN)
       .emit({
         type,
         payload,

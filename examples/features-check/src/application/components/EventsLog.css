@@ -1,4 +1,4 @@
-.signal-log {
+.event-log {
   list-style: none;
   padding: 0;
   margin: 16px 0;
@@ -11,7 +11,7 @@
   font-size: 13px;
 }
 
-.signal-log__entry {
+.event-log__entry {
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -19,16 +19,16 @@
   border-bottom: 1px solid var(--border);
 }
 
-.signal-log__entry:last-child {
+.event-log__entry:last-child {
   border-bottom: none;
 }
 
-.signal-log__type {
+.event-log__type {
   color: var(--accent);
   font-weight: 600;
 }
 
-.signal-log__payload {
+.event-log__payload {
   color: var(--text);
   text-align: right;
   overflow: hidden;
@@ -37,7 +37,7 @@
   max-width: 55%;
 }
 
-.signal-log__empty {
+.event-log__empty {
   padding: 16px;
   text-align: center;
   color: var(--text);

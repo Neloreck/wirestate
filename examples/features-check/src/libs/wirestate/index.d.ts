@@ -81,6 +81,31 @@ interface ICommandDescriptor<R = unknown> {
 }
 
 /**
+ * Event identifier.
+ */
+type TEventType = string | symbol;
+/**
+ * Event object.
+ */
+interface IEvent<P = unknown, T extends TEventType = TEventType, F = unknown> {
+    readonly type: T;
+    readonly payload?: P;
+    readonly from?: F;
+}
+/**
+ * Event handler signature.
+ */
+type TEventHandler<E extends IEvent = IEvent> = (event: E) => void;
+/**
+ * Unsubscribes from events, part of events subscription lifecycle.
+ */
+type TEventUnsubscriber = () => void;
+/**
+ * Event emitter signature.
+ */
+type TEventEmitter<P = unknown, T extends TEventType = TEventType, F = unknown> = (type: T, payload?: P, from?: F) => void;
+
+/**
  * Query identifier. Use symbols for private queries.
  */
 type TQueryType = string | symbol;
@@ -97,37 +122,12 @@ type TQueryUnregister = () => void;
  */
 type TQueryResponder<R = unknown, D = unknown> = (data?: D) => R | Promise<R>;
 
-/**
- * Signal identifier. Use symbols for private signals.
- */
-type TSignalType = string | symbol;
-/**
- * Signal object.
- */
-interface ISignal<P = unknown, T extends TSignalType = TSignalType, F = unknown> {
-    readonly type: T;
-    readonly payload?: P;
-    readonly from?: F;
-}
-/**
- * Signal handler signature.
- */
-type TSignalHandler<S extends ISignal = ISignal> = (signal: S) => void;
-/**
- * Unsubscribes from signals.
- */
-type TSignalUnsubscribe = () => void;
-/**
- * Signal emitter signature.
- */
-type TSignalEmitter<P = unknown, T extends TSignalType = TSignalType, F = unknown> = (type: T, payload?: P, from?: F) => void;
-
 interface IBindServiceOptions {
     isWithIgnoreLifecycle?: boolean;
 }
 /**
  * Registers a service class in the container with activation/deactivation logic.
- * Ensures container references, signal subscriptions, and query handlers are managed correctly.
+ * Ensures container references, event subscriptions, command and query handlers are managed correctly.
  *
  * @param container - target Inversify container
  * @param entry - service constructor
@@ -170,14 +170,14 @@ declare function command<R = unknown, D = unknown, T extends TCommandType = TCom
 declare function commandOptional<R = unknown, D = unknown, T extends TCommandType = TCommandType>(container: Container$1, type: T, data?: D): Optional<ICommandDescriptor<R>>;
 
 /**
- * Emits signals for container from outside scope.
+ * Emits events for container from outside scope.
  *
  * @param container - inversify container
- * @param type - signal type ot emit
- * @param payload - signal payload
- * @param from - optional indicator of the signal source
+ * @param type - event type ot emit
+ * @param payload - event payload
+ * @param from - optional indicator of the event source
  */
-declare function emitSignal<P, T extends TSignalType>(container: Container$1, type: T, payload?: P, from?: unknown): void;
+declare function emitEvent<P, T extends TEventType>(container: Container$1, type: T, payload?: P, from?: unknown): void;
 
 /**
  * Dispatches a query on the provided container.
@@ -444,16 +444,16 @@ declare class WireScope {
      */
     resolve<T>(injectionId: ServiceIdentifier<T>): T;
     /**
-     * Broadcasts a signal.
+     * Broadcasts an event.
      * Available only for activated containers.
      *
-     * @param type - type of signal to emit
-     * @param payload - optional payload to send with the signal
-     * @param from - optional sender of the signal
+     * @param type - type of event to emit
+     * @param payload - optional payload to send with the event
+     * @param from - optional sender of the event
      *
      * @throws WirestateError if scope is not activated
      */
-    emitSignal<P, T extends TSignalType = TSignalType>(type: T, payload?: P, from?: unknown): void;
+    emitEvent<P, T extends TEventType = TEventType>(type: T, payload?: P, from?: unknown): void;
     /**
      * Dispatches a query and returns the result.
      * Available only for activated containers.
@@ -518,42 +518,42 @@ declare function useInjection<T>(injectionId: ServiceIdentifier<T>): T;
 declare function useOptionalInjection<T>(injectionId: ServiceIdentifier<T>): Optional<T>;
 
 /**
- * Decorator for service methods that respond to signals.
+ * Decorator for service methods that respond to events.
  *
- * @param types - signal type(s) to handle. If omitted, handles all signals
+ * @param types - event type(s) to handle. If omitted, handles all events
  * @returns decorator function
  */
-declare function OnSignal(types?: TSignalType | ReadonlyArray<TSignalType>): MethodDecorator;
+declare function OnEvent(types?: TEventType | ReadonlyArray<TEventType>): MethodDecorator;
 
 /**
- * Subscribes a component to signals.
+ * Subscribes a component to events.
  *
- * @param type - signal type to listen to
- * @param handler - signal handler to invoke when signal is emitted
+ * @param type - event type to listen to
+ * @param handler - event handler to invoke when event is emitted
  */
-declare function useSignal(type: TSignalType, handler: TSignalHandler): void;
+declare function useEvent(type: TEventType, handler: TEventHandler): void;
 
 /**
- * Subscribes a component to multiple signal types.
+ * Subscribes a component to multiple event types.
  *
- * @param types - signal types to filter by
- * @param handler - signal handler
+ * @param types - event types to filter by
+ * @param handler - events handler
  */
-declare function useSignals(types: ReadonlyArray<TSignalType>, handler: TSignalHandler): void;
+declare function useEvents(types: ReadonlyArray<TEventType>, handler: TEventHandler): void;
 
 /**
- * Subscribes a component to all signals without type filtering.
+ * Subscribes a component to all events without type filtering.
  *
- * @param handler - signal handler invoked for every emitted signal
+ * @param handler - event handler invoked for every emitted event
  */
-declare function useSignalHandler(handler: TSignalHandler): void;
+declare function useEventsHandler(handler: TEventHandler): void;
 
 /**
- * Returns a stable function to emit signals.
+ * Returns a stable function to emit events.
  *
- * @returns signal emitter
+ * @returns event emitter
  */
-declare function useSignalEmitter<P = unknown, T extends TSignalType = TSignalType>(): TSignalEmitter<P, T>;
+declare function useEventEmitter<P = unknown, T extends TEventType = TEventType>(): TEventEmitter<P, T>;
 
 interface IMockBindServiceOptions {
     skipLifecycle?: boolean;
@@ -585,5 +585,5 @@ declare function withIocProvider(children: ReactNode, container?: Container$1, s
     seed: TAnyObject | undefined;
 }>;
 
-export { ECommandStatus as CommandStatus, IocProvider, OnActivated, OnCommand, OnDeactivation, OnQuery, OnSignal, SEED_TOKEN as SEED, WireScope, WirestateError, bindConstant, bindEntry, bindService, command, commandOptional, createInjectablesProvider, createIocContainer, emitSignal, forwardRef, mockBindService, mockContainer, mockService, query, queryOptional, useCommandCaller, useCommandHandler, useContainer, useContainerRevision, useInjection, useOptionalCommandCaller, useOptionalInjection, useOptionalQueryCaller, useOptionalSyncQueryCaller, useQueryCaller, useQueryHandler, useSignal, useSignalEmitter, useSignalHandler, useSignals, useSyncQueryCaller, withIocProvider };
-export type { TCommandCaller as CommandCaller, ICommandDescriptor as CommandDescriptor, TCommandHandler as CommandHandler, TCommandType as CommandType, TCommandUnregister as CommandUnregister, IInjectableDescriptor as InjectableDescriptor, InjectablesProvider, IInjectablesProviderProps as InjectablesProviderProps, TQueryHandler as QueryHandler, TQueryResponder as QueryResponder, TQueryType as QueryType, TQueryUnregister as QueryUnregister, TSeedEntries as SeedEntries, TSeedEntry as SeedEntry, TSeedKey as SeedKey, ISignal as Signal, TSignalEmitter as SignalEmitter, TSignalHandler as SignalHandler, TSignalType as SignalType, TSignalUnsubscribe as SignalUnsubscribe };
+export { ECommandStatus as CommandStatus, IocProvider, OnActivated, OnCommand, OnDeactivation, OnEvent, OnQuery, SEED_TOKEN as SEED, WireScope, WirestateError, bindConstant, bindEntry, bindService, command, commandOptional, createInjectablesProvider, createIocContainer, emitEvent, forwardRef, mockBindService, mockContainer, mockService, query, queryOptional, useCommandCaller, useCommandHandler, useContainer, useContainerRevision, useEvent, useEventEmitter, useEvents, useEventsHandler, useInjection, useOptionalCommandCaller, useOptionalInjection, useOptionalQueryCaller, useOptionalSyncQueryCaller, useQueryCaller, useQueryHandler, useSyncQueryCaller, withIocProvider };
+export type { TCommandCaller as CommandCaller, ICommandDescriptor as CommandDescriptor, TCommandHandler as CommandHandler, TCommandType as CommandType, TCommandUnregister as CommandUnregister, IEvent as Event, TEventEmitter as EventEmitter, TEventHandler as EventHandler, TEventType as EventType, TEventUnsubscriber as EventUnsubscriber, IInjectableDescriptor as InjectableDescriptor, InjectablesProvider, IInjectablesProviderProps as InjectablesProviderProps, TQueryHandler as QueryHandler, TQueryResponder as QueryResponder, TQueryType as QueryType, TQueryUnregister as QueryUnregister, TSeedEntries as SeedEntries, TSeedEntry as SeedEntry, TSeedKey as SeedKey };

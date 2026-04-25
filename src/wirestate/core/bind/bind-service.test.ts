@@ -5,11 +5,11 @@ import { Injectable } from "@/wirestate/alias";
 import { bindService } from "@/wirestate/core/bind/bind-service";
 import { ERROR_CODE_GENERIC } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
+import { EventBus } from "@/wirestate/core/events/event-bus";
 import { OnQuery } from "@/wirestate/core/queries/on-query";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
-import { SIGNAL_BUS_TOKEN, QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
+import { EVENT_BUS_TOKEN, QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
 import { OnActivated } from "@/wirestate/core/service/on-activated";
-import { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import { mockContainer } from "@/wirestate/test-utils";
 
 describe("bindService", () => {
@@ -44,10 +44,10 @@ describe("bindService", () => {
     expect(instance.isActivated).toBe(true);
     expect(instance.scope.isDisposed).toBe(false);
 
-    // Test signal from external source.
-    container.get<SignalBus>(SIGNAL_BUS_TOKEN).emit({ type: "TEST_STRING_SIGNAL", payload: "string-signal-data" });
-    expect(instance.isTestStringSignalReceived).toBe(true);
-    expect(instance.testStingSignalPayload).toBe("string-signal-data");
+    // Test event from external source.
+    container.get<EventBus>(EVENT_BUS_TOKEN).emit({ type: "TEST_STRING_EVENT", payload: "string-event-data" });
+    expect(instance.isTestStringEventReceived).toBe(true);
+    expect(instance.testStingEventPayload).toBe("string-event-data");
 
     // Test query from external source.
     expect(container.get<QueryBus>(QUERY_BUS_TOKEN).query("TEST_STRING_QUERY")).toBe("string-query-response");

@@ -9,7 +9,7 @@ export { bindService } from "@/wirestate/core/bind/bind-service";
 export { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
 export { command } from "@/wirestate/core/container/command";
 export { commandOptional } from "@/wirestate/core/container/command-optional";
-export { emitSignal } from "@/wirestate/core/container/emit-signal";
+export { emitEvent } from "@/wirestate/core/container/emit-event";
 export { query } from "@/wirestate/core/container/query";
 export { queryOptional } from "@/wirestate/core/container/query-optional";
 export { WirestateError } from "@/wirestate/core/error/wirestate-error";
@@ -32,16 +32,16 @@ export { useQueryHandler } from "@/wirestate/core/queries/use-query-handler";
 export { useSyncQueryCaller } from "@/wirestate/core/queries/use-sync-query-caller";
 export { useOptionalSyncQueryCaller } from "@/wirestate/core/queries/use-optional-sync-query-caller";
 export { SEED_TOKEN as SEED } from "@/wirestate/core/registry";
-export { WireScope } from "./core/scope/wire-scope";
+export { WireScope } from "@/wirestate/core/scope/wire-scope";
 export { OnActivated } from "@/wirestate/core/service/on-activated";
 export { OnDeactivation } from "@/wirestate/core/service/on-deactivation";
 export { useInjection } from "@/wirestate/core/provision/use-injection";
 export { useOptionalInjection } from "@/wirestate/core/provision/use-optional-injection";
-export { OnSignal } from "@/wirestate/core/signals/on-signal";
-export { useSignal } from "@/wirestate/core/signals/use-signal";
-export { useSignals } from "@/wirestate/core/signals/use-signals";
-export { useSignalHandler } from "@/wirestate/core/signals/use-signal-handler";
-export { useSignalEmitter } from "@/wirestate/core/signals/use-signal-emitter";
+export { OnEvent } from "@/wirestate/core/events/on-event";
+export { useEvent } from "@/wirestate/core/events/use-event";
+export { useEvents } from "@/wirestate/core/events/use-events";
+export { useEventsHandler } from "./core/events/use-events-handler";
+export { useEventEmitter } from "@/wirestate/core/events/use-event-emitter";
 export {
   TSeedEntries as SeedEntries,
   TSeedEntry as SeedEntry,
@@ -63,9 +63,9 @@ export {
   TQueryUnregister as QueryUnregister,
 } from "@/wirestate/types/queries";
 export {
-  ISignal as Signal,
-  TSignalEmitter as SignalEmitter,
-  TSignalHandler as SignalHandler,
-  TSignalType as SignalType,
-  TSignalUnsubscribe as SignalUnsubscribe,
-} from "@/wirestate/types/signals";
+  IEvent as Event,
+  TEventEmitter as EventEmitter,
+  TEventHandler as EventHandler,
+  TEventType as EventType,
+  TEventUnsubscriber as EventUnsubscriber,
+} from "@/wirestate/types/events";

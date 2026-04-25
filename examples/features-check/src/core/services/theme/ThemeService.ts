@@ -1,5 +1,5 @@
 import type { Theme } from "@/application/types";
-import { EGlobalSignal } from "@/core/signals";
+import { EGlobalEvent } from "@/core/events";
 import {
   Inject,
   Injectable,
@@ -37,7 +37,7 @@ export class ThemeService {
     );
 
     // [*] Pass safe lifecycle checks - can emit from activation.
-    this.scope.emitSignal(`activated/${this.constructor.name}`);
+    this.scope.emitEvent(`activated/${this.constructor.name}`);
   }
 
   @OnDeactivation()
@@ -45,13 +45,13 @@ export class ThemeService {
     console.info(`[${this.constructor.name}] Deactivating`);
 
     // [*] Pass safe lifecycle checks - can emit from deactivation.
-    this.scope.emitSignal(`deactivating/${this.constructor.name}`);
+    this.scope.emitEvent(`deactivating/${this.constructor.name}`);
   }
 
   @Action()
   public toggle(): void {
     this.theme = this.theme === "light" ? "dark" : "light";
 
-    this.scope.emitSignal(EGlobalSignal.THEME_TOGGLED, { theme: this.theme });
+    this.scope.emitEvent(EGlobalEvent.THEME_TOGGLED, { theme: this.theme });
   }
 }

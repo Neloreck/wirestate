@@ -9,7 +9,6 @@ import { GLOBAL_CONFIG, GLOBAL_DYNAMIC_CONFIG } from "@/core/id";
 import { CounterService, type ICounterSeed } from "@/core/services/counter";
 import { LoggerService } from "@/core/services/logging";
 import { ThemeService } from "@/core/services/theme";
-
 import {
   createInjectablesProvider,
   IocProvider,
@@ -17,7 +16,7 @@ import {
   type SeedEntries,
   type InjectablesProvider,
   BindingType,
-} from "./libs/wirestate";
+} from "@/libs/wirestate";
 
 // [*] Pass IOC check - separation of container and services provision.
 const ServicesProvider: InjectablesProvider = createInjectablesProvider(
