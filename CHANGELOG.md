@@ -9,6 +9,7 @@
 - Add commands module
 - Add WireScope shared class for managing of wirestate events, queries and commands
 - Remove abstract service in favor of WireScope usage
+- Signals -> events
 
 ## 0.3.0
 

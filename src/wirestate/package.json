@@ -50,12 +50,15 @@
     "store",
     "typescript"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "inversify": "^8.1.0"
+  },
   "peerDependencies": {
     "react": ">=16.8.0",
-    "inversify": ">=8.0.0",
-    "mobx": ">=6.0.0",
-    "mobx-react-lite": ">=4.0.0",
     "tslib": ">=2.5.0"
+  },
+  "optionalDependencies": {
+    "mobx": ">=6.0.0",
+    "mobx-react-lite": ">=4.0.0"
   }
 }

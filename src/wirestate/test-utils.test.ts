@@ -1,4 +1,4 @@
-describe("Library test utils exports", () => {
+describe("Library test utils exports from wirestate/test-utils", () => {
   const testUtilsRoot = require("./test-utils");
 
   const expectedTestUtilsExports: Array<string> = [

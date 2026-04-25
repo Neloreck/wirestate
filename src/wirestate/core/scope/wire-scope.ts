@@ -54,8 +54,7 @@ export class WireScope {
     if (this.isDisposed) {
       throw new WirestateError(
         ERROR_CODE_ACCESS_AFTER_DISPOSAL,
-        "WireScope::container accessed after deactivation. " +
-          "Ensure service is properly disposed and MobX refs are observing latest services."
+        "WireScope::container accessed after deactivation. Ensure service is properly disposed."
       );
     } else {
       throw new WirestateError(
