@@ -213,20 +213,24 @@ importers:
   src/wirestate:
     dependencies:
       inversify:
-        specifier: '>=8.0.0'
+        specifier: ^8.1.0
         version: 8.1.0(reflect-metadata@0.2.2)
+      react:
+        specifier: '>=16.8.0'
+        version: 16.14.0
+      reflect-metadata:
+        specifier: '>=0.2.0'
+        version: 0.2.2
+      tslib:
+        specifier: '>=2.5.0'
+        version: 2.8.1
+    optionalDependencies:
       mobx:
         specifier: '>=6.0.0'
         version: 6.15.0
       mobx-react-lite:
         specifier: '>=4.0.0'
         version: 4.1.1(mobx@6.15.0)(react-dom@16.14.0(react@16.14.0))(react@16.14.0)
-      react:
-        specifier: '>=16.8.0'
-        version: 16.14.0
-      tslib:
-        specifier: '>=2.5.0'
-        version: 2.8.1
 
 packages:
 
