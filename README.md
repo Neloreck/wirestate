@@ -39,14 +39,14 @@
 ### 1. Define a Service
 
 ```typescript
-import { AbstractService, OnSignal, OnQuery, makeAutoObservable } from 'wirestate';
+import { Observable, OnSignal, OnQuery, makeObservable } from 'wirestate';
 
-export class CounterService extends AbstractService {
+export class CounterService {
+  @Observable()
   public count: number = 0;
 
   public constructor() {
-    super();
-    makeAutoObservable(this);
+    makeObservable(this);
   }
 
   @OnSignal('INCREMENT')

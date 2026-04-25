@@ -1,4 +1,4 @@
-## 0.4.0
+## 1.0.0
 
 - Add `OnActivated` decorator
 - Add `OnDeactivated` decorator
@@ -8,6 +8,7 @@
 - Emit signal with two params instead of manually composed object, signal `from`
 - Add commands module
 - Add WireScope shared class for managing of wirestate events, queries and commands
+- Remove abstract service in favor of WireScope usage
 
 ## 0.3.0
 

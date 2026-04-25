@@ -68,7 +68,6 @@ describe("Library exported API", () => {
     "useSyncQueryCaller",
     "useOptionalSyncQueryCaller",
     "SEED",
-    "AbstractService",
     "OnActivated",
     "OnDeactivation",
     "useInjection",

@@ -15,6 +15,7 @@ import type { Optional, TAnyObject } from "@/wirestate/types/general";
  * @returns resolved value or null
  */
 export function useOptionalInjection<T>(injectionId: ServiceIdentifier<T>): Optional<T> {
+  // todo: Add optional second param to handle cases when injection was not found.
   const { container, revision } = useIocContext();
 
   // Revision bump signals a container reset; force re-resolution to drop stale instances.

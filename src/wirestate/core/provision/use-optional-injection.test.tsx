@@ -2,7 +2,7 @@ import { render, cleanup } from "@testing-library/react";
 import { Container, ServiceIdentifier } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
-import { useOptionalInjection } from "@/wirestate/core/service/use-optional-injection";
+import { useOptionalInjection } from "@/wirestate/core/provision/use-optional-injection";
 import { mockContainer } from "@/wirestate/test-utils/mock-container";
 import { withIocProvider } from "@/wirestate/test-utils/with-ioc-provider";
 import { Optional, TAnyObject } from "@/wirestate/types/general";
