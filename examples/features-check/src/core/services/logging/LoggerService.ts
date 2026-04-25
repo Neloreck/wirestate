@@ -9,7 +9,6 @@ import { CounterService } from "@/core/services/counter/CounterService";
 import { ThemeService } from "@/core/services/theme/ThemeService";
 import { EGlobalSignal } from "@/core/signals";
 import {
-  AbstractService,
   Action,
   Inject,
   Injectable,
@@ -22,6 +21,7 @@ import {
   makeObservable,
   type Signal,
   OnCommand,
+  WireScope,
 } from "@/libs/wirestate";
 
 export interface ILogEntry {
@@ -32,7 +32,7 @@ export interface ILogEntry {
 }
 
 @Injectable()
-export class LoggerService extends AbstractService {
+export class LoggerService {
   public static readonly MAX_ENTRIES: number = 25;
 
   @ShallowObservable()
@@ -41,6 +41,8 @@ export class LoggerService extends AbstractService {
   private nextId: number = 1;
 
   public constructor(
+    @Inject(WireScope)
+    private readonly scope: WireScope,
     @Inject(GLOBAL_CONFIG)
     protected readonly globalConfig: object,
     @Inject(GLOBAL_DYNAMIC_CONFIG)
@@ -49,8 +51,6 @@ export class LoggerService extends AbstractService {
     @Inject(GLOBAL_NOT_EXISTING_CONFIG)
     protected readonly globalNotExistingConfig?: object,
   ) {
-    super();
-
     makeObservable(this);
 
     console.info(
@@ -63,11 +63,11 @@ export class LoggerService extends AbstractService {
   public onActivated(): void {
     console.info(
       `[${this.constructor.name}] Activated — listening for signals, seed:`,
-      this.getSeed(LoggerService),
+      this.scope.getSeed(LoggerService),
     );
 
     // [*] Pass safe lifecycle checks - can emit from activation.
-    this.emitSignal(`activated/${this.constructor.name}`);
+    this.scope.emitSignal(`activated/${this.constructor.name}`);
   }
 
   @OnDeactivation()
@@ -75,7 +75,7 @@ export class LoggerService extends AbstractService {
     console.info(`[${this.constructor.name}] Deactivating`);
 
     // [*] Pass safe lifecycle checks - can emit from deactivation.
-    this.emitSignal(`deactivating/${this.constructor.name}`);
+    this.scope.emitSignal(`deactivating/${this.constructor.name}`);
 
     this.clear();
   }
@@ -120,10 +120,10 @@ export class LoggerService extends AbstractService {
     // [*] Pass circular refs check with delayed get:
     const dump = {
       params,
-      [LoggerService.name]: this.resolve(LoggerService),
-      [ThemeService.name]: this.resolve(ThemeService),
-      [CounterService.name]: this.resolve(CounterService),
-      ["GLOBAL_CONFIG"]: this.resolve(GLOBAL_CONFIG),
+      [LoggerService.name]: this.scope.resolve(LoggerService),
+      [ThemeService.name]: this.scope.resolve(ThemeService),
+      [CounterService.name]: this.scope.resolve(CounterService),
+      ["GLOBAL_CONFIG"]: this.scope.resolve(GLOBAL_CONFIG),
     };
 
     console.info(`[${this.constructor.name}] Dumping data:`, dump);

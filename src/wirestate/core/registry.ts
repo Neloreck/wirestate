@@ -1,7 +1,8 @@
-import { Container, Newable } from "inversify";
+import type { Container } from "inversify";
 
 import type { IQueryHandlerMetadata, TQueryUnregister } from "@/wirestate//types/queries";
 import type { TSignalUnsubscribe, ISignalHandlerMetadata } from "@/wirestate//types/signals";
+import type { WireScope } from "@/wirestate/core/scope/wire-scope";
 import type { ICommandHandlerMetadata, TCommandUnregister } from "@/wirestate/types/commands";
 
 /**
@@ -63,6 +64,11 @@ export const SIGNAL_HANDLER_METADATA: WeakMap<object, Array<ISignalHandlerMetada
  * Private storage for service-to-container references.
  */
 export const CONTAINER_REFS_BY_SERVICE: WeakMap<object, Container> = new WeakMap();
+
+/**
+ * Private storage for injected WireScope instances per service.
+ */
+export const WIRE_SCOPES_BY_SERVICE: WeakMap<object, Array<WireScope>> = new WeakMap();
 
 /**
  * Private storage for service signal unsubscribers.

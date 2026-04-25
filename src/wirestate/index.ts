@@ -33,6 +33,7 @@ export { useSyncQueryCaller } from "@/wirestate/core/queries/use-sync-query-call
 export { useOptionalSyncQueryCaller } from "@/wirestate/core/queries/use-optional-sync-query-caller";
 export { SEED_TOKEN as SEED } from "@/wirestate/core/registry";
 export { AbstractService } from "@/wirestate/core/service/abstract-service";
+export { WireScope } from "./core/scope/wire-scope";
 export { OnActivated } from "@/wirestate/core/service/on-activated";
 export { OnDeactivation } from "@/wirestate/core/service/on-deactivation";
 export { useInjection } from "@/wirestate/core/service/use-injection";

@@ -1,19 +1,26 @@
 import { Container } from "inversify";
 
+import { Inject, Injectable } from "@/wirestate/alias";
 import { OnQuery } from "@/wirestate/core/queries/on-query";
-import { AbstractService } from "@/wirestate/core/service/abstract-service";
+import { WireScope } from "@/wirestate/core/scope/wire-scope";
 import { OnActivated } from "@/wirestate/core/service/on-activated";
 import { OnDeactivation } from "@/wirestate/core/service/on-deactivation";
 import { OnSignal } from "@/wirestate/core/signals/on-signal";
 import { Maybe } from "@/wirestate/types/general";
 import { ISignal } from "@/wirestate/types/signals";
 
-export class GenericService extends AbstractService {
+@Injectable()
+export class GenericService {
   public isActivated: boolean = false;
 
   public isTestStringSignalReceived: boolean = false;
 
   public testStingSignalPayload: Maybe<string> = null;
+
+  public constructor(
+    @Inject(WireScope)
+    public readonly scope: WireScope
+  ) {}
 
   @OnActivated()
   public activate(): void {
@@ -26,23 +33,23 @@ export class GenericService extends AbstractService {
   }
 
   public testResolveService(): GenericService {
-    return this.resolve(GenericService);
+    return this.scope.resolve(GenericService);
   }
 
   public testGetContainer(): Container {
-    return this.getContainer();
+    return this.scope.getContainer();
   }
 
   public testGetSeed(): Container {
-    return this.getSeed();
+    return this.scope.getSeed();
   }
 
   public testEmitSignal(): void {
-    this.emitSignal("TEST_SIGNAL", 0);
+    this.scope.emitSignal("TEST_SIGNAL", 0);
   }
 
   public testQueryData(): void {
-    this.queryData("TEST_QUERY", { data: 1 });
+    this.scope.queryData("TEST_QUERY", { data: 1 });
   }
 
   @OnQuery("TEST_QUERY")

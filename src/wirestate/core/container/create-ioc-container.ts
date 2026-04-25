@@ -12,6 +12,7 @@ import {
   QUERY_BUS_TOKEN,
   SIGNAL_BUS_TOKEN,
 } from "@/wirestate/core/registry";
+import { WireScope } from "@/wirestate/core/scope/wire-scope";
 import { SignalBus } from "@/wirestate/core/signals/signal-bus";
 import type { TAnyObject } from "@/wirestate/types/general";
 import type { TSeedsMap } from "@/wirestate/types/initial-state";
@@ -42,6 +43,11 @@ export function createIocContainer(options: ICreateIocContainerOptions = {}): Co
   container.bind(COMMAND_BUS_TOKEN).toConstantValue(new CommandBus());
   container.bind(SEEDS_TOKEN).toConstantValue(new Map() as TSeedsMap);
   container.bind(SEED_TOKEN).toConstantValue({} as TAnyObject);
+
+  container
+    .bind(WireScope)
+    .toResolvedValue((): WireScope => new WireScope(container))
+    .inTransientScope();
 
   dbg.info(prefix(__filename), "Created IOC container:", { container, options });
 

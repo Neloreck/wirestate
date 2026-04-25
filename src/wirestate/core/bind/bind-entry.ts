@@ -20,21 +20,18 @@ import type { IInjectableDescriptor } from "@/wirestate/types/privision";
  *
  * @param container - target IOC container to bind into
  * @param entry - entry descriptor to bind
+ * @returns void
  */
 export function bindEntry<T extends object = object>(
   container: Container,
   entry: Newable<T> | IInjectableDescriptor
 ): void {
   if (typeof entry === "function") {
-    bindService(container, entry);
-
-    return;
+    return bindService(container, entry);
   }
 
   if (!entry.bindingType || entry.bindingType === bindingTypeValues.ConstantValue) {
-    bindConstant(container, entry);
-
-    return;
+    return bindConstant(container, entry);
   }
 
   if (entry.bindingType === bindingTypeValues.DynamicValue) {
@@ -43,9 +40,7 @@ export function bindEntry<T extends object = object>(
       container,
     });
 
-    bindDynamicValue(container, entry);
-
-    return;
+    return bindDynamicValue(container, entry);
   }
 
   dbg.info(prefix(__filename), "Binding entry with fallback:", {
@@ -54,5 +49,5 @@ export function bindEntry<T extends object = object>(
   });
 
   // Default: treat as class descriptor (Instance binding).
-  bindService(container, entry.value as unknown as Newable<T>);
+  return bindService(container, entry.value as unknown as Newable<T>);
 }

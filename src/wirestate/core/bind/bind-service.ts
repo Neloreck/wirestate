@@ -15,7 +15,9 @@ import {
   QUERY_UNREGISTERS_BY_SERVICE,
   SIGNAL_BUS_TOKEN,
   SIGNAL_UNSUBSCRIBERS_BY_SERVICE,
+  WIRE_SCOPES_BY_SERVICE,
 } from "@/wirestate/core/registry";
+import { WireScope } from "@/wirestate/core/scope/wire-scope";
 import { getActivatedHandlerMetadata } from "@/wirestate/core/service/get-activated-handler-metadata";
 import { getDeactivationHandlerMetadata } from "@/wirestate/core/service/get-deactivation-handler-metadata";
 import { buildSignalDispatcher } from "@/wirestate/core/signals/build-signal-dispatcher";
@@ -59,10 +61,10 @@ export function bindService<T extends object>(
     return;
   }
 
-  whenBind.onActivation((ctx, instance) => {
+  whenBind.onActivation((context, instance) => {
     dbg.info(prefix(__filename), "Activating service:", {
       name: entry.name,
-      ctx,
+      context,
       container,
       entry,
       instance,
@@ -72,6 +74,7 @@ export function bindService<T extends object>(
     (instance as { IS_DISPOSED: boolean }).IS_DISPOSED = false;
 
     CONTAINER_REFS_BY_SERVICE.set(instance, container);
+    _attachWireScopes(instance, entry);
 
     // Compose all signal listeners into a single bus subscription so we only
     // pay one Set lookup per emitted signal.
@@ -93,7 +96,7 @@ export function bindService<T extends object>(
         continue;
       }
 
-      const unregister = queryBus.register(meta.type, (method as TQueryHandler).bind(instance));
+      const unregister: TQueryUnregister = queryBus.register(meta.type, (method as TQueryHandler).bind(instance));
 
       _attachQueryUnreg(instance, unregister);
     }
@@ -146,7 +149,7 @@ export function bindService<T extends object>(
 
     // Call every `@OnDeactivation`-decorated method in base-to-derived order.
     for (const methodName of getDeactivationHandlerMetadata(instance)) {
-      const method = (instance as unknown as Record<string | symbol, unknown>)[methodName];
+      const method: unknown = (instance as unknown as Record<string | symbol, unknown>)[methodName];
 
       if (typeof method === "function") {
         (method as () => void).call(instance);
@@ -159,6 +162,7 @@ export function bindService<T extends object>(
     // The cast is the only write-site for this `readonly` field.
     (instance as { IS_DISPOSED: boolean }).IS_DISPOSED = true;
 
+    _detachWireScopes(instance);
     _detachCommandUnregister(instance);
     _detachQueryUnregs(instance);
     _detachSignalSub(instance);
@@ -194,6 +198,59 @@ export function _detachSignalSub<T extends object>(service: T): void {
     unsubscribe();
     SIGNAL_UNSUBSCRIBERS_BY_SERVICE.delete(service);
   }
+}
+
+/**
+ * Reads `design:paramtypes` from the service constructor to find parameters typed as WireScope.
+ * Property iteration happens only when the constructor metadata declares a WireScope
+ * parameter, avoiding false positives from manually created or subclassed scopes.
+ *
+ * @param service - service instance
+ * @param Service - service constructor
+ * @internal
+ */
+export function _attachWireScopes<T extends object>(service: T, Service: Newable<T>): void {
+  const paramTypes = Reflect.getMetadata("design:paramtypes", Service) as Array<unknown> | undefined;
+
+  if (!paramTypes?.some((type) => type === WireScope)) {
+    return;
+  }
+
+  const scopes: Array<WireScope> = [];
+
+  for (const key of Object.getOwnPropertyNames(service)) {
+    const value = (service as Record<string, unknown>)[key];
+
+    if ((value as object | null)?.constructor === WireScope) {
+      scopes.push(value as WireScope);
+    }
+  }
+
+  if (scopes.length > 0) {
+    WIRE_SCOPES_BY_SERVICE.set(service, scopes);
+  }
+}
+
+/**
+ * Marks all injected WireScope instances for this service as disposed and removes
+ * the stored references.
+ *
+ * @param service - service instance
+ * @internal
+ */
+export function _detachWireScopes<T extends object>(service: T): void {
+  const scopes: Maybe<Array<WireScope>> = WIRE_SCOPES_BY_SERVICE.get(service);
+
+  if (!scopes) {
+    return;
+  }
+
+  for (const scope of scopes) {
+    (scope as { isDisposed: boolean }).isDisposed = true;
+    (scope as unknown as { container: Optional<Container> }).container = null;
+  }
+
+  WIRE_SCOPES_BY_SERVICE.delete(service);
 }
 
 /**

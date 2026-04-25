@@ -42,7 +42,7 @@ describe("bindService", () => {
     const instance: GenericService = container.get(GenericService);
 
     expect(instance.isActivated).toBe(true);
-    expect(instance.IS_DISPOSED).toBe(false);
+    expect(instance.scope.isDisposed).toBe(false);
 
     // Test signal from external source.
     container.get<SignalBus>(SIGNAL_BUS_TOKEN).emit({ type: "TEST_STRING_SIGNAL", payload: "string-signal-data" });
@@ -55,7 +55,7 @@ describe("bindService", () => {
     // Test deactivation.
     container.unbind(GenericService);
     expect(instance.isActivated).toBe(false);
-    expect(instance.IS_DISPOSED).toBe(true);
+    expect(instance.scope.isDisposed).toBe(true);
 
     // Verify query handler is removed
     expect(() => container.get<QueryBus>(QUERY_BUS_TOKEN).query("TEST_QUERY")).toThrow();
@@ -69,7 +69,7 @@ describe("bindService", () => {
     const instance: GenericService = container.get(GenericService);
 
     expect(instance.isActivated).toBe(false);
-    expect(instance.IS_DISPOSED).toBeNull();
+    expect(instance.scope.isDisposed).toBe(false);
   });
 
   it("should handle async @OnActivated and catch errors", async () => {

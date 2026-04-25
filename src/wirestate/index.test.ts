@@ -73,6 +73,7 @@ describe("Library exported API", () => {
     "OnDeactivation",
     "useInjection",
     "useOptionalInjection",
+    "WireScope",
     "OnSignal",
     "useSignal",
     "useSignals",

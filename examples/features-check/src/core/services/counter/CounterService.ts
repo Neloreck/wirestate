@@ -2,7 +2,6 @@ import type { Optional } from "@/application/types";
 import { LoggerService } from "@/core/services/logging/LoggerService";
 import { EGlobalSignal } from "@/core/signals";
 import {
-  AbstractService,
   Action,
   Computed,
   SEED,
@@ -14,6 +13,7 @@ import {
   OnSignal,
   OnActivated,
   OnDeactivation,
+  WireScope,
 } from "@/libs/wirestate";
 
 import {
@@ -28,7 +28,7 @@ export interface ICounterSeed {
 }
 
 @Injectable()
-export class CounterService extends AbstractService {
+export class CounterService {
   @Observable()
   public count: number = 0;
 
@@ -36,13 +36,15 @@ export class CounterService extends AbstractService {
   public lastIncrementAt: Optional<number> = null;
 
   public constructor(
+    @Inject(WireScope)
+    private readonly scope: WireScope,
+    @Inject(WireScope)
+    public readonly scope2: WireScope,
     @Inject(LoggerService)
     private readonly loggerService: LoggerService,
     @Inject(SEED)
     protected readonly seed: object,
   ) {
-    super();
-
     makeObservable(this);
 
     console.info(
@@ -58,7 +60,7 @@ export class CounterService extends AbstractService {
     this.initializeFromSeed();
 
     // [*] Pass safe lifecycle checks - can emit from activation.
-    this.emitSignal(`activated/${this.constructor.name}`);
+    this.scope.emitSignal(`activated/${this.constructor.name}`);
   }
 
   @OnDeactivation()
@@ -66,12 +68,12 @@ export class CounterService extends AbstractService {
     console.info(`[${this.constructor.name}] Deactivating`);
 
     // [*] Pass safe lifecycle checks - can emit from deactivation.
-    this.emitSignal(`deactivating/${this.constructor.name}`);
+    this.scope.emitSignal(`deactivating/${this.constructor.name}`);
   }
 
   @Action()
   private initializeFromSeed(): void {
-    const seed: Optional<ICounterSeed> = this.getSeed(CounterService);
+    const seed: Optional<ICounterSeed> = this.scope.getSeed(CounterService);
 
     console.info(
       `[${this.constructor.name}] Seed from current DI context:`,
@@ -104,7 +106,9 @@ export class CounterService extends AbstractService {
     this.count += 1;
     this.lastIncrementAt = Date.now();
 
-    this.emitSignal(EGlobalSignal.COUNTER_INCREMENTED, { count: this.count });
+    this.scope.emitSignal(EGlobalSignal.COUNTER_INCREMENTED, {
+      count: this.count,
+    });
   }
 
   @Action()
@@ -114,7 +118,7 @@ export class CounterService extends AbstractService {
     this.count = 0;
     this.lastIncrementAt = null;
 
-    this.emitSignal(EGlobalSignal.COUNTER_RESET);
+    this.scope.emitSignal(EGlobalSignal.COUNTER_RESET);
   }
 
   @OnSignal(EGlobalSignal.USER_PINGED)

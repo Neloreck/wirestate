@@ -7,6 +7,7 @@
 - `scopeType` -> `bindingScopeType`
 - Emit signal with two params instead of manually composed object, signal `from`
 - Add commands module
+- Add WireScope shared class for managing of wirestate events, queries and commands
 
 ## 0.3.0
 

@@ -1,7 +1,6 @@
 import type { Theme } from "@/application/types";
 import { EGlobalSignal } from "@/core/signals";
 import {
-  AbstractService,
   Action,
   Inject,
   Injectable,
@@ -9,20 +8,21 @@ import {
   OnActivated,
   OnDeactivation,
   SEED,
+  WireScope,
   makeObservable,
 } from "@/libs/wirestate";
 
 @Injectable()
-export class ThemeService extends AbstractService {
+export class ThemeService {
   @Observable()
   public theme: Theme = "light";
 
   public constructor(
+    @Inject(WireScope)
+    private readonly scope: WireScope,
     @Inject(SEED)
     protected readonly seed: object,
   ) {
-    super();
-
     makeObservable(this);
 
     console.info(
@@ -39,7 +39,7 @@ export class ThemeService extends AbstractService {
     );
 
     // [*] Pass safe lifecycle checks - can emit from activation.
-    this.emitSignal(`activated/${this.constructor.name}`);
+    this.scope.emitSignal(`activated/${this.constructor.name}`);
   }
 
   @OnDeactivation()
@@ -47,13 +47,13 @@ export class ThemeService extends AbstractService {
     console.info(`[${this.constructor.name}] Deactivating`);
 
     // [*] Pass safe lifecycle checks - can emit from deactivation.
-    this.emitSignal(`deactivating/${this.constructor.name}`);
+    this.scope.emitSignal(`deactivating/${this.constructor.name}`);
   }
 
   @Action()
   public toggle(): void {
     this.theme = this.theme === "light" ? "dark" : "light";
 
-    this.emitSignal(EGlobalSignal.THEME_TOGGLED, { theme: this.theme });
+    this.scope.emitSignal(EGlobalSignal.THEME_TOGGLED, { theme: this.theme });
   }
 }
