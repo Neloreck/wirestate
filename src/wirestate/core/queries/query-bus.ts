@@ -85,8 +85,6 @@ export class QueryBus {
       return (stack[stack.length - 1] as TQueryHandler<D, R>)(data as D);
     }
 
-    // todo: Return null or standardized query response object, avoid throwing.
-    // todo: Or add optional query method for separate approach where it is important to query without exceptions.
     throw new WirestateError(
       ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER,
       `No query handler registered in container for type: '${String(type)}'.`

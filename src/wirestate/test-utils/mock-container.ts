@@ -1,25 +1,50 @@
 import { Container, Newable, ServiceIdentifier } from "inversify";
 
+import { getEntryToken } from "@/wirestate/core/bind/get-entry-token";
 import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
-import { mockBindService } from "@/wirestate/test-utils/mock-bind-service";
+import { mockBindEntry } from "@/wirestate/test-utils/mock-bind-entry";
+import type { IInjectableDescriptor } from "@/wirestate/types/privision";
 
-// todo: Correct types and support mockEntry methods, not only mock service.
+/**
+ * Options for {@link mockContainer}.
+ */
 export interface IMockContainerOptions {
-  services?: Array<Newable<object>>;
+  /**
+   * List of services or injectable descriptors to bind to the container.
+   */
+  entries?: Array<Newable<object> | IInjectableDescriptor>;
+  /**
+   * List of injection identifiers to immediately activate after binding.
+   * All identifiers must correspond to entries provided in the `services` list.
+   */
   activate?: Array<ServiceIdentifier>;
+  /**
+   * Whether to skip the activation lifecycle for all bound services.
+   * If true, `OnActivated` and `OnDeactivation` hooks will not be triggered.
+   */
   skipLifecycle?: boolean;
 }
 
+/**
+ * Creates and configures a mock IoC container for testing.
+ * This utility initializes a new container and binds the provided services or descriptors using {@link mockBindEntry}.
+ * It also supports optional immediate activation of services.
+ *
+ * @param options - configuration options for the mock container
+ * @returns a configured InversifyJS {@link Container}
+ *
+ * @throws {WirestateError} if an identifier in `activate` is not found in `services`
+ */
 export function mockContainer(options: IMockContainerOptions = {}): Container {
-  const container: Container = createIocContainer();
-
-  const { activate = [], services = [] } = options;
+  const { activate = [], entries = [], skipLifecycle } = options;
 
   if (activate.length) {
-    for (const token of options.activate ?? []) {
-      if (!services.includes(token as Newable<object>)) {
+    const serviceTokens: Array<ServiceIdentifier> = entries.map((s) => getEntryToken(s));
+
+    for (const token of activate) {
+      if (!serviceTokens.includes(token)) {
         throw new WirestateError(
           ERROR_CODE_INVALID_ARGUMENTS,
           "Provided services for activation not matching list of services to bind."
@@ -28,12 +53,14 @@ export function mockContainer(options: IMockContainerOptions = {}): Container {
     }
   }
 
-  for (const service of options.services ?? []) {
-    mockBindService(container, service, { skipLifecycle: options.skipLifecycle });
+  const container: Container = createIocContainer();
+
+  for (const it of entries) {
+    mockBindEntry(container, it, { skipLifecycle: skipLifecycle });
   }
 
-  for (const token of options.activate ?? []) {
-    container.get(token);
+  for (const it of activate) {
+    container.get(it);
   }
 
   return container;

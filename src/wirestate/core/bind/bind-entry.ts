@@ -5,8 +5,15 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { bindConstant } from "@/wirestate/core/bind/bind-constant";
 import { bindDynamicValue } from "@/wirestate/core/bind/bind-dynamic-value";
-import { bindService } from "@/wirestate/core/bind/bind-service";
+import { bindService, type IBindServiceOptions } from "@/wirestate/core/bind/bind-service";
 import type { IInjectableDescriptor } from "@/wirestate/types/privision";
+
+/**
+ * Options for {@link bindEntry}.
+ */
+export interface IBindEntryOptions extends IBindServiceOptions {
+  isWithIgnoreLifecycle?: boolean;
+}
 
 /**
  * Binds a single service entry to the container, dispatching to the
@@ -20,14 +27,16 @@ import type { IInjectableDescriptor } from "@/wirestate/types/privision";
  *
  * @param container - target IOC container to bind into
  * @param entry - entry descriptor to bind
+ * @param options - optional binding configuration
  * @returns void
  */
 export function bindEntry<T extends object = object>(
   container: Container,
-  entry: Newable<T> | IInjectableDescriptor
+  entry: Newable<T> | IInjectableDescriptor,
+  options: IBindEntryOptions = {}
 ): void {
   if (typeof entry === "function") {
-    return bindService(container, entry);
+    return bindService(container, entry, options);
   }
 
   if (!entry.bindingType || entry.bindingType === bindingTypeValues.ConstantValue) {
@@ -49,5 +58,5 @@ export function bindEntry<T extends object = object>(
   });
 
   // Default: treat as class descriptor (Instance binding).
-  return bindService(container, entry.value as unknown as Newable<T>);
+  return bindService(container, entry.value as unknown as Newable<T>, options);
 }

@@ -30,7 +30,7 @@ describe("useOptionalInjection", () => {
 
   it("should resolve bound service", () => {
     const container: Container = mockContainer({
-      services: [GenericService],
+      entries: [GenericService],
     });
 
     const { getByTestId } = render(withIocProvider(<TestComponent token={GenericService} />, container));

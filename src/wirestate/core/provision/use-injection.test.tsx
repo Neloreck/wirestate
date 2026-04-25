@@ -45,7 +45,7 @@ describe("useInjection", () => {
 
   it("should resolve bound service from container", () => {
     const container: Container = mockContainer({
-      services: [GenericService],
+      entries: [GenericService],
     });
 
     const { getByTestId } = render(withIocProvider(<TestComponent />, container));
@@ -55,7 +55,7 @@ describe("useInjection", () => {
 
   it("should re-resolve service when revision changes", () => {
     const container: Container = mockContainer({
-      services: [GenericService],
+      entries: [GenericService],
     });
 
     const originalGet = container.get.bind(container);
@@ -104,7 +104,7 @@ describe("useInjection", () => {
 
   it("should memoize service instance", () => {
     const container: Container = mockContainer({
-      services: [GenericService],
+      entries: [GenericService],
     });
 
     const originalGet = container.get.bind(container);
@@ -134,7 +134,7 @@ describe("useInjection", () => {
     class AnotherService {}
 
     const container: Container = mockContainer({
-      services: [GenericService, AnotherService],
+      entries: [GenericService, AnotherService],
     });
 
     const { rerender, getByTestId } = render(withIocProvider(<TestComponent token={GenericService} />, container));

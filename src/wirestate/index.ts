@@ -40,7 +40,7 @@ export { useOptionalInjection } from "@/wirestate/core/provision/use-optional-in
 export { OnEvent } from "@/wirestate/core/events/on-event";
 export { useEvent } from "@/wirestate/core/events/use-event";
 export { useEvents } from "@/wirestate/core/events/use-events";
-export { useEventsHandler } from "./core/events/use-events-handler";
+export { useEventsHandler } from "@/wirestate/core/events/use-events-handler";
 export { useEventEmitter } from "@/wirestate/core/events/use-event-emitter";
 export {
   TSeedEntries as SeedEntries,
