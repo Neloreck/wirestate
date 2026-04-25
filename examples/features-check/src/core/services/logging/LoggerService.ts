@@ -6,8 +6,7 @@ import {
   GLOBAL_NOT_EXISTING_CONFIG,
 } from "@/core/id";
 import { EGlobalQuery } from "@/core/queries";
-import { CounterService } from "@/core/services/counter/CounterService";
-import { ThemeService } from "@/core/services/theme/ThemeService";
+import { ThemeService } from "@/core/services/theme";
 import {
   Inject,
   Injectable,
@@ -120,12 +119,9 @@ export class LoggerService {
 
   @OnCommand(EGlobalCommand.DUMP_DATA)
   public onDump(params: unknown): object {
-    // [*] Pass circular refs check with delayed get:
     const dump = {
       params,
-      [LoggerService.name]: this.scope.resolve(LoggerService),
       [ThemeService.name]: this.scope.resolve(ThemeService),
-      [CounterService.name]: this.scope.resolve(CounterService),
       ["GLOBAL_CONFIG"]: this.scope.resolve(GLOBAL_CONFIG),
     };
 

@@ -1,5 +1,5 @@
 'use no memo';
-import {LazyServiceIdentifier,bindingScopeValues,injectable,bindingTypeValues,Container}from'inversify';export{bindingTypeValues as BindingType,Container,ContainerModule,inject as Inject,injectable as Injectable,LazyServiceIdentifier,multiInject as MultiInject,named as Named,optional as Optional,postConstruct as PostConstruct,preDestroy as PreDestroy,bindingScopeValues as ScopeBindingType,tagged as Tagged}from'inversify';import {__decorate,__metadata}from'tslib';import {createContext,useContext,useState,useMemo,useEffect,createElement,useCallback,useRef}from'react';function forwardRef(forward) {
+import {LazyServiceIdentifier,bindingScopeValues,injectable,bindingTypeValues,Container}from'inversify';export{bindingTypeValues as BindingType,Container,ContainerModule,inject as Inject,injectable as Injectable,LazyServiceIdentifier,multiInject as MultiInject,named as Named,optional as Optional,postConstruct as PostConstruct,preDestroy as PreDestroy,bindingScopeValues as ScopeBindingType,tagged as Tagged}from'inversify';import {__decorate,__metadata}from'tslib';import {createContext,useContext,useCallback,useRef,useEffect,useMemo,useState,createElement}from'react';function forwardRef(forward) {
   return new LazyServiceIdentifier(forward);
 }const ERROR_CODE_GENERIC = 1;
 const ERROR_CODE_VALIDATION_ERROR = 50;
@@ -166,16 +166,13 @@ WireScope = __decorate([injectable(), __metadata("design:paramtypes", [Object])]
   return chain.reverse().flat();
 }function bindService(container, entry, options) {
   const whenBind = container.bind(entry).to(entry).inSingletonScope();
-  if (options?.isWithIgnoreLifecycle) {
-    return;
-  }
   whenBind.onActivation((context, instance) => {
     instance.IS_DISPOSED = false;
     CONTAINER_REFS_BY_SERVICE.set(instance, container);
-    _attachWireScopes(instance, entry);
+    attachWireScopes(instance, entry);
     const dispatcher = buildEventDispatcher(instance);
     if (dispatcher) {
-      _attachEventsSubscription(instance, dispatcher);
+      attachEventsSubscription(instance, dispatcher);
     }
     const queryBus = container.get(QUERY_BUS_TOKEN);
     for (const meta of getQueryHandlerMetadata(instance)) {
@@ -184,7 +181,7 @@ WireScope = __decorate([injectable(), __metadata("design:paramtypes", [Object])]
         continue;
       }
       const unregister = queryBus.register(meta.type, method.bind(instance));
-      _attachQueryUnreg(instance, unregister);
+      attachQueryUnregister(instance, unregister);
     }
     const commandBus = container.get(COMMAND_BUS_TOKEN);
     for (const meta of getCommandHandlerMetadata(instance)) {
@@ -193,51 +190,99 @@ WireScope = __decorate([injectable(), __metadata("design:paramtypes", [Object])]
         continue;
       }
       const unregister = commandBus.register(meta.type, method.bind(instance));
-      _attachCommandUnregister(instance, unregister);
+      attachCommandUnregister(instance, unregister);
     }
-    for (const methodName of getActivatedHandlerMetadata(instance)) {
-      const method = instance[methodName];
-      if (typeof method !== "function") {
-        continue;
-      }
-      const result = method.call(instance);
-      if (result && typeof result.then === "function") {
-        result.catch(error => {
-          console.error("[wirestate] @OnActivated rejected for:", entry.name, String(methodName), error);
-        });
+    if (options?.isWithIgnoreLifecycle) ; else {
+      for (const methodName of getActivatedHandlerMetadata(instance)) {
+        const method = instance[methodName];
+        if (typeof method !== "function") {
+          continue;
+        }
+        const result = method.call(instance);
+        if (result && typeof result.then === "function") {
+          result.catch(error => {
+            console.error("[wirestate] @OnActivated rejected for:", entry.name, String(methodName), error);
+          });
+        }
       }
     }
     return instance;
   });
   whenBind.onDeactivation(instance => {
-    for (const methodName of getDeactivationHandlerMetadata(instance)) {
-      const method = instance[methodName];
-      if (typeof method === "function") {
-        method.call(instance);
+    if (options?.isWithIgnoreLifecycle) ; else {
+      for (const methodName of getDeactivationHandlerMetadata(instance)) {
+        const method = instance[methodName];
+        if (typeof method === "function") {
+          method.call(instance);
+        }
       }
     }
     instance.IS_DISPOSED = true;
-    _detachWireScopes(instance);
-    _detachCommandUnregister(instance);
-    _detachQueryUnregs(instance);
-    _detachEventSubscription(instance);
+    detachWireScopes(instance);
+    detachCommandUnregister(instance);
+    detachQueryUnregister(instance);
+    detachEventSubscription(instance);
     CONTAINER_REFS_BY_SERVICE.delete(instance);
   });
 }
-function _attachEventsSubscription(service, handler) {
+function attachEventsSubscription(service, handler) {
   const bus = CONTAINER_REFS_BY_SERVICE.get(service)?.get(EVENT_BUS_TOKEN);
   if (bus) {
     EVENT_UNSUBSCRIBERS_BY_SERVICE.set(service, bus.subscribe(handler));
   }
 }
-function _detachEventSubscription(service) {
+function detachEventSubscription(service) {
   const unsubscribe = EVENT_UNSUBSCRIBERS_BY_SERVICE.get(service);
   if (unsubscribe) {
     unsubscribe();
     EVENT_UNSUBSCRIBERS_BY_SERVICE.delete(service);
   }
 }
-function _attachWireScopes(service, Service) {
+function attachQueryUnregister(service, unregister) {
+  let list = QUERY_UNREGISTERS_BY_SERVICE.get(service);
+  if (!list) {
+    list = [];
+    QUERY_UNREGISTERS_BY_SERVICE.set(service, list);
+  }
+  list.push(unregister);
+}
+function detachQueryUnregister(service) {
+  const list = QUERY_UNREGISTERS_BY_SERVICE.get(service);
+  if (!list) {
+    return;
+  }
+  for (const unregister of list) {
+    try {
+      unregister();
+    } catch (error) {
+      console.error("[wirestate] query unregister threw:", error);
+    }
+  }
+  QUERY_UNREGISTERS_BY_SERVICE.delete(service);
+}
+function attachCommandUnregister(service, unregister) {
+  let list = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
+  if (!list) {
+    list = [];
+    COMMAND_UNREGISTERS_BY_SERVICE.set(service, list);
+  }
+  list.push(unregister);
+}
+function detachCommandUnregister(service) {
+  const list = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
+  if (!list) {
+    return;
+  }
+  for (const unregister of list) {
+    try {
+      unregister();
+    } catch (error) {
+      console.error("[wirestate] command unregister threw:", error);
+    }
+  }
+  COMMAND_UNREGISTERS_BY_SERVICE.delete(service);
+}
+function attachWireScopes(service, Service) {
   const paramTypes = Reflect.getMetadata("design:paramtypes", Service);
   if (!paramTypes?.some(type => type === WireScope)) {
     return;
@@ -253,7 +298,7 @@ function _attachWireScopes(service, Service) {
     WIRE_SCOPES_BY_SERVICE.set(service, scopes);
   }
 }
-function _detachWireScopes(service) {
+function detachWireScopes(service) {
   const scopes = WIRE_SCOPES_BY_SERVICE.get(service);
   if (!scopes) {
     return;
@@ -263,53 +308,9 @@ function _detachWireScopes(service) {
     scope.container = null;
   }
   WIRE_SCOPES_BY_SERVICE.delete(service);
-}
-function _attachQueryUnreg(service, unregister) {
-  let list = QUERY_UNREGISTERS_BY_SERVICE.get(service);
-  if (!list) {
-    list = [];
-    QUERY_UNREGISTERS_BY_SERVICE.set(service, list);
-  }
-  list.push(unregister);
-}
-function _detachQueryUnregs(service) {
-  const list = QUERY_UNREGISTERS_BY_SERVICE.get(service);
-  if (!list) {
-    return;
-  }
-  for (const unregister of list) {
-    try {
-      unregister();
-    } catch (error) {
-      console.error("[wirestate] query unregister threw:", error);
-    }
-  }
-  QUERY_UNREGISTERS_BY_SERVICE.delete(service);
-}
-function _attachCommandUnregister(service, unregister) {
-  let list = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
-  if (!list) {
-    list = [];
-    COMMAND_UNREGISTERS_BY_SERVICE.set(service, list);
-  }
-  list.push(unregister);
-}
-function _detachCommandUnregister(service) {
-  const list = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
-  if (!list) {
-    return;
-  }
-  for (const unregister of list) {
-    try {
-      unregister();
-    } catch (error) {
-      console.error("[wirestate] command unregister threw:", error);
-    }
-  }
-  COMMAND_UNREGISTERS_BY_SERVICE.delete(service);
-}function bindEntry(container, entry) {
+}function bindEntry(container, entry, options = {}) {
   if (typeof entry === "function") {
-    return bindService(container, entry);
+    return bindService(container, entry, options);
   }
   if (!entry.bindingType || entry.bindingType === bindingTypeValues.ConstantValue) {
     return bindConstant(container, entry);
@@ -317,7 +318,7 @@ function _detachCommandUnregister(service) {
   if (entry.bindingType === bindingTypeValues.DynamicValue) {
     return bindDynamicValue(container, entry);
   }
-  return bindService(container, entry.value);
+  return bindService(container, entry.value, options);
 }var ECommandStatus;
 (function (ECommandStatus) {
   ECommandStatus["PENDING"] = "pending";
@@ -375,6 +376,27 @@ function _detachCommandUnregister(service) {
   clear() {
     this.handlers.clear();
   }
+}class EventBus {
+  handlers = new Set();
+  emit(event) {
+    const snapshot = Array.from(this.handlers);
+    for (const handler of snapshot) {
+      try {
+        handler(event);
+      } catch (error) {
+        console.error("[wirestate] Event handler threw:", error);
+      }
+    }
+  }
+  subscribe(handler) {
+    this.handlers.add(handler);
+    return () => {
+      this.handlers.delete(handler);
+    };
+  }
+  clear() {
+    this.handlers.clear();
+  }
 }class QueryBus {
   handlers = new Map();
   register(type, handler) {
@@ -419,27 +441,6 @@ function _detachCommandUnregister(service) {
   clear() {
     this.handlers.clear();
   }
-}class EventBus {
-  handlers = new Set();
-  emit(event) {
-    const snapshot = Array.from(this.handlers);
-    for (const handler of snapshot) {
-      try {
-        handler(event);
-      } catch (error) {
-        console.error("[wirestate] Event handler threw:", error);
-      }
-    }
-  }
-  subscribe(handler) {
-    this.handlers.add(handler);
-    return () => {
-      this.handlers.delete(handler);
-    };
-  }
-  clear() {
-    this.handlers.clear();
-  }
 }function createIocContainer(options = {}) {
   const container = new Container({
     defaultScope: "Singleton",
@@ -466,6 +467,132 @@ function _detachCommandUnregister(service) {
   return container.get(QUERY_BUS_TOKEN).query(type, data);
 }function queryOptional(container, type, data) {
   return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
+}function OnCommand(type) {
+  return (target, propertyKey) => {
+    const constructor = target.constructor;
+    let list = COMMAND_HANDLER_METADATA.get(constructor);
+    if (!list) {
+      list = [];
+      COMMAND_HANDLER_METADATA.set(constructor, list);
+    }
+    list.push({
+      methodName: propertyKey,
+      type
+    });
+  };
+}const IocContext = createContext(null);
+IocContext.displayName = "IocContext";function useIocContext() {
+  const value = useContext(IocContext);
+  if (!value) {
+    throw new WirestateError(ERROR_CODE_INVALID_CONTEXT, "Trying to access IOC context from React subtree not wrapped in <IocProvider>.");
+  }
+  return value;
+}function useContainer() {
+  return useIocContext().container;
+}function useCommandCaller() {
+  const container = useContainer();
+  return useCallback((type, data) => {
+    return container.get(COMMAND_BUS_TOKEN).command(type, data);
+  }, [container]);
+}function useOptionalCommandCaller() {
+  const container = useContainer();
+  return useCallback((type, data) => {
+    return container.get(COMMAND_BUS_TOKEN).commandOptional(type, data);
+  }, [container]);
+}function useCommandHandler(type, handler) {
+  const container = useContainer();
+  const handlerRef = useRef(handler);
+  useEffect(() => {
+    handlerRef.current = handler;
+  });
+  useEffect(() => {
+    return container.get(COMMAND_BUS_TOKEN).register(type, data => handlerRef.current(data));
+  }, [container, type]);
+}function OnQuery(type) {
+  return (target, propertyKey) => {
+    const constructor = target.constructor;
+    let list = QUERY_HANDLER_METADATA.get(constructor);
+    if (!list) {
+      list = [];
+      QUERY_HANDLER_METADATA.set(constructor, list);
+    }
+    list.push({
+      methodName: propertyKey,
+      type
+    });
+  };
+}function useQueryCaller() {
+  const container = useContainer();
+  return useCallback((type, data) => {
+    return container.get(QUERY_BUS_TOKEN).query(type, data);
+  }, [container]);
+}function useOptionalQueryCaller() {
+  const container = useContainer();
+  return useCallback((type, data) => {
+    return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
+  }, [container]);
+}function useQueryHandler(type, handler) {
+  const container = useContainer();
+  const handlerRef = useRef(handler);
+  useEffect(() => {
+    handlerRef.current = handler;
+  });
+  useEffect(() => {
+    const bus = container.get(QUERY_BUS_TOKEN);
+    return bus.register(type, data => handlerRef.current(data));
+  }, [container, type]);
+}function useSyncQueryCaller() {
+  const container = useContainer();
+  return useCallback((type, data) => {
+    return container.get(QUERY_BUS_TOKEN).query(type, data);
+  }, [container]);
+}function useOptionalSyncQueryCaller() {
+  const container = useContainer();
+  return useCallback((type, data) => {
+    return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
+  }, [container]);
+}function OnActivated() {
+  return (target, propertyKey) => {
+    const constructor = target.constructor;
+    let list = ACTIVATED_HANDLER_METADATA.get(constructor);
+    if (!list) {
+      list = [];
+      ACTIVATED_HANDLER_METADATA.set(constructor, list);
+    }
+    list.push(propertyKey);
+  };
+}function OnDeactivation() {
+  return (target, propertyKey) => {
+    const constructor = target.constructor;
+    let list = DEACTIVATION_HANDLER_METADATA.get(constructor);
+    if (!list) {
+      list = [];
+      DEACTIVATION_HANDLER_METADATA.set(constructor, list);
+    }
+    list.push(propertyKey);
+  };
+}function useInjection(injectionId) {
+  const {
+    container,
+    revision
+  } = useIocContext();
+  return useMemo(() => {
+    return container.get(injectionId);
+  }, [container, revision, injectionId]);
+}function useOptionalInjection(injectionId, onFallback) {
+  const {
+    container,
+    revision
+  } = useIocContext();
+  return useMemo(() => {
+    if (container.isBound(injectionId)) {
+      return container.get(injectionId);
+    } else if (onFallback) {
+      return onFallback(container);
+    } else {
+      return null;
+    }
+  }, [container, revision, injectionId]);
 }function getEntryToken(entry) {
   return typeof entry === "function" ? entry : entry.id;
 }function applySeeds(container, seeds) {
@@ -478,8 +605,7 @@ function _detachCommandUnregister(service) {
   for (const [key] of seeds) {
     existing.delete(key);
   }
-}const IocContext = createContext(null);
-IocContext.displayName = "IocContext";function createInjectablesProvider(entries, options = {}) {
+}function createInjectablesProvider(entries, options = {}) {
   const {
     activate
   } = options;
@@ -573,131 +699,8 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
   return createElement(IocContext.Provider, {
     value
   }, children);
-}function useIocContext() {
-  const value = useContext(IocContext);
-  if (!value) {
-    throw new WirestateError(ERROR_CODE_INVALID_CONTEXT, "Trying to access IOC context from React subtree not wrapped in <IocProvider>.");
-  }
-  return value;
-}function useContainer() {
-  return useIocContext().container;
 }function useContainerRevision() {
   return useIocContext().revision;
-}function OnCommand(type) {
-  return (target, propertyKey) => {
-    const constructor = target.constructor;
-    let list = COMMAND_HANDLER_METADATA.get(constructor);
-    if (!list) {
-      list = [];
-      COMMAND_HANDLER_METADATA.set(constructor, list);
-    }
-    list.push({
-      methodName: propertyKey,
-      type
-    });
-  };
-}function useCommandCaller() {
-  const container = useContainer();
-  return useCallback((type, data) => {
-    return container.get(COMMAND_BUS_TOKEN).command(type, data);
-  }, [container]);
-}function useOptionalCommandCaller() {
-  const container = useContainer();
-  return useCallback((type, data) => {
-    return container.get(COMMAND_BUS_TOKEN).commandOptional(type, data);
-  }, [container]);
-}function useCommandHandler(type, handler) {
-  const container = useContainer();
-  const handlerRef = useRef(handler);
-  useEffect(() => {
-    handlerRef.current = handler;
-  });
-  useEffect(() => {
-    return container.get(COMMAND_BUS_TOKEN).register(type, data => handlerRef.current(data));
-  }, [container, type]);
-}function OnQuery(type) {
-  return (target, propertyKey) => {
-    const constructor = target.constructor;
-    let list = QUERY_HANDLER_METADATA.get(constructor);
-    if (!list) {
-      list = [];
-      QUERY_HANDLER_METADATA.set(constructor, list);
-    }
-    list.push({
-      methodName: propertyKey,
-      type
-    });
-  };
-}function useQueryCaller() {
-  const container = useContainer();
-  return useCallback((type, data) => {
-    return container.get(QUERY_BUS_TOKEN).query(type, data);
-  }, [container]);
-}function useOptionalQueryCaller() {
-  const container = useContainer();
-  return useCallback((type, data) => {
-    return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
-  }, [container]);
-}function useQueryHandler(type, handler) {
-  const container = useContainer();
-  const handlerRef = useRef(handler);
-  useEffect(() => {
-    handlerRef.current = handler;
-  });
-  useEffect(() => {
-    const bus = container.get(QUERY_BUS_TOKEN);
-    return bus.register(type, data => handlerRef.current(data));
-  }, [container, type]);
-}function useSyncQueryCaller() {
-  const container = useContainer();
-  return useCallback((type, data) => {
-    return container.get(QUERY_BUS_TOKEN).query(type, data);
-  }, [container]);
-}function useOptionalSyncQueryCaller() {
-  const container = useContainer();
-  return useCallback((type, data) => {
-    return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
-  }, [container]);
-}function OnActivated() {
-  return (target, propertyKey) => {
-    const constructor = target.constructor;
-    let list = ACTIVATED_HANDLER_METADATA.get(constructor);
-    if (!list) {
-      list = [];
-      ACTIVATED_HANDLER_METADATA.set(constructor, list);
-    }
-    list.push(propertyKey);
-  };
-}function OnDeactivation() {
-  return (target, propertyKey) => {
-    const constructor = target.constructor;
-    let list = DEACTIVATION_HANDLER_METADATA.get(constructor);
-    if (!list) {
-      list = [];
-      DEACTIVATION_HANDLER_METADATA.set(constructor, list);
-    }
-    list.push(propertyKey);
-  };
-}function useInjection(injectionId) {
-  const {
-    container,
-    revision
-  } = useIocContext();
-  return useMemo(() => {
-    return container.get(injectionId);
-  }, [container, revision, injectionId]);
-}function useOptionalInjection(injectionId) {
-  const {
-    container,
-    revision
-  } = useIocContext();
-  return useMemo(() => {
-    if (container.isBound(injectionId)) {
-      return container.get(injectionId);
-    } else {
-      return null;
-    }
-  }, [container, revision, injectionId]);
 }function OnEvent(types) {
   const normalized = types === undefined ? null : Array.isArray(types) ? [...types] : [types];
   return (target, propertyKey) => {
@@ -769,26 +772,37 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
   return bindService(container, ServiceClass, {
     isWithIgnoreLifecycle: skipLifecycle
   });
+}function mockBindEntry(container, entry, options = {}) {
+  const {
+    skipLifecycle
+  } = options;
+  return bindEntry(container, entry, {
+    isWithIgnoreLifecycle: skipLifecycle
+  });
+}function mockUnbindService(container, ServiceClass) {
+  container.unbind(ServiceClass);
 }function mockContainer(options = {}) {
-  const container = createIocContainer();
   const {
     activate = [],
-    services = []
+    entries = [],
+    skipLifecycle
   } = options;
   if (activate.length) {
-    for (const token of options.activate ?? []) {
-      if (!services.includes(token)) {
+    const serviceTokens = entries.map(s => getEntryToken(s));
+    for (const token of activate) {
+      if (!serviceTokens.includes(token)) {
         throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, "Provided services for activation not matching list of services to bind.");
       }
     }
   }
-  for (const service of options.services ?? []) {
-    mockBindService(container, service, {
-      skipLifecycle: options.skipLifecycle
+  const container = createIocContainer();
+  for (const it of entries) {
+    mockBindEntry(container, it, {
+      skipLifecycle: skipLifecycle
     });
   }
-  for (const token of options.activate ?? []) {
-    container.get(token);
+  for (const it of activate) {
+    container.get(it);
   }
   return container;
 }function mockService(service, container = mockContainer(), options = {}) {
@@ -801,4 +815,4 @@ IocContext.displayName = "IocContext";function createInjectablesProvider(entries
     container,
     seed
   }, children);
-}export{ECommandStatus as CommandStatus,IocProvider,OnActivated,OnCommand,OnDeactivation,OnEvent,OnQuery,SEED_TOKEN as SEED,WireScope,WirestateError,bindConstant,bindEntry,bindService,command,commandOptional,createInjectablesProvider,createIocContainer,emitEvent,forwardRef,mockBindService,mockContainer,mockService,query,queryOptional,useCommandCaller,useCommandHandler,useContainer,useContainerRevision,useEvent,useEventEmitter,useEvents,useEventsHandler,useInjection,useOptionalCommandCaller,useOptionalInjection,useOptionalQueryCaller,useOptionalSyncQueryCaller,useQueryCaller,useQueryHandler,useSyncQueryCaller,withIocProvider};
+}export{ECommandStatus as CommandStatus,IocProvider,OnActivated,OnCommand,OnDeactivation,OnEvent,OnQuery,SEED_TOKEN as SEED,WireScope,WirestateError,bindConstant,bindEntry,bindService,command,commandOptional,createInjectablesProvider,createIocContainer,emitEvent,forwardRef,mockBindEntry,mockBindService,mockContainer,mockService,mockUnbindService,query,queryOptional,useCommandCaller,useCommandHandler,useContainer,useContainerRevision,useEvent,useEventEmitter,useEvents,useEventsHandler,useInjection,useOptionalCommandCaller,useOptionalInjection,useOptionalQueryCaller,useOptionalSyncQueryCaller,useQueryCaller,useQueryHandler,useSyncQueryCaller,withIocProvider};

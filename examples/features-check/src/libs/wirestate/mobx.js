@@ -1,5 +1,5 @@
 'use no memo';
-import {action,computed,observable}from'mobx';export{autorun,comparer,configure,flow,flowResult,isAction,isFlow,isFlowCancellationError,isObservable,makeAutoObservable,makeObservable,reaction,runInAction,toJS,when}from'mobx';export{observer}from'mobx-react-lite';function Observable() {
+import {action,computed,observable}from'mobx';export{autorun,comparer,configure,flow,flowResult,isAction,isBoxedObservable,isComputed,isComputedProp,isFlow,isFlowCancellationError,isObservable,isObservableArray,isObservableMap,isObservableObject,isObservableProp,makeAutoObservable,makeObservable,reaction,runInAction,toJS,when}from'mobx';export{observer}from'mobx-react-lite';function Observable() {
   return observable;
 }
 function ShallowObservable() {

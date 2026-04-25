@@ -40,8 +40,6 @@ export class CounterService {
   public constructor(
     @Inject(WireScope)
     private readonly scope: WireScope,
-    @Inject(WireScope)
-    public readonly scope2: WireScope,
     @Inject(LoggerService)
     private readonly loggerService: LoggerService,
     @Inject(SEED)

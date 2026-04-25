@@ -1,7 +1,7 @@
 import * as mobx_dist_types_decorator_fills from 'mobx/dist/types/decorator_fills';
 import * as mobx_dist_internal from 'mobx/dist/internal';
 import * as mobx from 'mobx';
-export { autorun, comparer, configure, flow, flowResult, isAction, isFlow, isFlowCancellationError, isObservable, makeAutoObservable, makeObservable, reaction, runInAction, toJS, when } from 'mobx';
+export { autorun, comparer, configure, flow, flowResult, isAction, isBoxedObservable, isComputed, isComputedProp, isFlow, isFlowCancellationError, isObservable, isObservableArray, isObservableMap, isObservableObject, isObservableProp, makeAutoObservable, makeObservable, reaction, runInAction, toJS, when } from 'mobx';
 export { observer } from 'mobx-react-lite';
 
 declare function Observable(): mobx.IObservableFactory;

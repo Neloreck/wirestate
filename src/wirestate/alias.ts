@@ -17,6 +17,8 @@ export {
   LazyServiceIdentifier,
 } from "inversify";
 
-export function forwardRef<TInstance = unknown>(forward: () => ServiceIdentifier<TInstance>) {
+export function forwardRef<TInstance = unknown>(
+  forward: () => ServiceIdentifier<TInstance>
+): LazyServiceIdentifier<TInstance> {
   return new LazyServiceIdentifier(forward);
 }
