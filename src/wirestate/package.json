@@ -1,6 +1,6 @@
 {
   "name": "wirestate",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Store management library based on mobx and inversify",
   "sideEffects": false,
   "author": "Syrotenko Igor",
@@ -11,6 +11,7 @@
   "types": "./index.d.ts",
   "exports": {
     ".": {
+      "types": "./index.d.ts",
       "import": {
         "production": "./esm/production/index.js",
         "default": "./esm/development/index.js"
@@ -21,12 +22,14 @@
       }
     },
     "./test-utils": {
+      "types": "./test-utils.d.ts",
       "require": {
         "production": "./cjs/production/test-utils.js",
         "default": "./cjs/development/test-utils.js"
       }
     },
     "./mobx": {
+      "types": "./mobx.d.ts",
       "import": {
         "production": "./esm/production/mobx.js",
         "default": "./esm/development/mobx.js"
