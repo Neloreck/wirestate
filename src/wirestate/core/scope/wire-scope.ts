@@ -85,6 +85,27 @@ export class WireScope {
   }
 
   /**
+   * Resolves a sibling service or injected value.
+   * Use for lazy resolution or circular dependency breaking.
+   * Available only for activated containers.
+   *
+   * @param injectionId - injection identifier
+   * @returns resolved injection, service instance, generic value, or null if it is not bound
+   *
+   * @throws WirestateError if scope is not activated
+   */
+  public resolveOptional<T>(injectionId: ServiceIdentifier<T>): Optional<T> {
+    dbg.info(prefix(__filename), "Lazy optional resolve:", {
+      name: (injectionId as TAnyObject)?.name ?? injectionId,
+      key: injectionId,
+    });
+
+    const container: Container = this.getContainer();
+
+    return container.isBound(injectionId) ? container.get<T>(injectionId) : null;
+  }
+
+  /**
    * Broadcasts an event.
    * Available only for activated containers.
    *
@@ -127,6 +148,23 @@ export class WireScope {
   }
 
   /**
+   * Dispatches a query and returns the result.
+   * Available only for activated containers.
+   *
+   * @param type - query type
+   * @param data - query data
+   * @returns query result or null if handler is not registered
+   */
+  public queryOptionalData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(
+    type: T,
+    data?: D
+  ): Optional<MaybePromise<R>> {
+    dbg.info(prefix(__filename), "Query optional data:", { type, data });
+
+    return this.getContainer().get<QueryBus>(QUERY_BUS_TOKEN).queryOptional<R, D>(type, data);
+  }
+
+  /**
    * Dispatches a command and returns the descriptor.
    * Available only for activated containers.
    *
@@ -145,8 +183,25 @@ export class WireScope {
     return this.getContainer().get<CommandBus>(COMMAND_BUS_TOKEN).command<R, D>(type, data);
   }
 
+  /**
+   * Dispatches a command and returns the descriptor.
+   * Available only for activated containers.
+   *
+   * @param type - command type
+   * @param data - command data
+   * @returns command descriptor or null if handler is not registered
+   */
+  public executeOptionalCommand<R = unknown, D = unknown, T extends TCommandType = TCommandType>(
+    type: T,
+    data?: D
+  ): Optional<ICommandDescriptor<R>> {
+    dbg.info(prefix(__filename), "Execute command:", { type, data });
+
+    return this.getContainer().get<CommandBus>(COMMAND_BUS_TOKEN).commandOptional<R, D>(type, data);
+  }
+
   public getSeed<T>(): T;
-  public getSeed<T>(seed?: TSeedKey): T;
+  public getSeed<T>(seed?: TSeedKey): Optional<T>;
 
   /**
    * Reads seed for the provided injection.
