@@ -2,19 +2,21 @@ import type { Optional } from "@/application/types";
 import { LoggerService } from "@/core/services/logging/LoggerService";
 import { EGlobalSignal } from "@/core/signals";
 import {
-  Action,
-  Computed,
   SEED,
   Inject,
   Injectable,
-  makeObservable,
-  Observable,
   OnQuery,
   OnSignal,
   OnActivated,
   OnDeactivation,
   WireScope,
 } from "@/libs/wirestate";
+import {
+  Action,
+  Computed,
+  Observable,
+  makeObservable,
+} from "@/libs/wirestate/mobx";
 
 import {
   ECounterServiceQuery,

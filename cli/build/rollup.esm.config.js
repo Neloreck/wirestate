@@ -8,13 +8,22 @@ import { default as typescript } from "@rollup/plugin-typescript";
 import { default as clear } from "rollup-plugin-clear";
 import { visualizer } from "rollup-plugin-visualizer";
 
-import { CORE_ENTRY, ESM_ROOT, TS_BUILD_CONFIG, EEnvironment, WS_ROOT, STATS_ROOT } from "../config/build.constants";
+import {
+  CORE_ENTRY,
+  TEST_UTILS_ENTRY,
+  MOBX_ENTRY,
+  ESM_ROOT,
+  TS_BUILD_CONFIG,
+  EEnvironment,
+  WS_ROOT,
+  STATS_ROOT,
+} from "../config/build.constants";
 
 import { BABEL_CONFIG } from "./babel.modern.config";
 
 const createEsmConfig = (env) => ({
   external: ["react", "inversify", "mobx", "mobx-react-lite", "tslib"],
-  input: CORE_ENTRY,
+  input: [CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY],
   output: {
     compact: env === EEnvironment.PRODUCTION,
     dir: path.resolve(ESM_ROOT, env),

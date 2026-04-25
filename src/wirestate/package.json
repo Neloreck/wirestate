@@ -25,6 +25,16 @@
         "production": "./cjs/production/test-utils.js",
         "default": "./cjs/development/test-utils.js"
       }
+    },
+    "./mobx": {
+      "import": {
+        "production": "./esm/production/mobx.js",
+        "default": "./esm/development/mobx.js"
+      },
+      "require": {
+        "production": "./cjs/production/mobx.js",
+        "default": "./cjs/development/mobx.js"
+      }
     }
   },
   "repository": {

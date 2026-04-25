@@ -11,6 +11,7 @@ import { visualizer } from "rollup-plugin-visualizer";
 import {
   CORE_ENTRY,
   TEST_UTILS_ENTRY,
+  MOBX_ENTRY,
   TS_BUILD_CONFIG,
   CJS_ROOT,
   EEnvironment,
@@ -22,7 +23,7 @@ import { BABEL_CONFIG } from "./babel.modern.config";
 
 const createCjsConfig = (env) => ({
   external: ["react", "inversify", "mobx", "mobx-react-lite", "tslib"],
-  input: [CORE_ENTRY, TEST_UTILS_ENTRY],
+  input: [CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY],
   output: {
     chunkFileNames: "lib.js",
     compact: env === EEnvironment.PRODUCTION,

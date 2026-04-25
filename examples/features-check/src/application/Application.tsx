@@ -9,12 +9,12 @@ import { GLOBAL_CONFIG } from "@/core/id";
 import { ThemeService } from "@/core/services/theme";
 import { EGlobalSignal } from "@/core/signals";
 import {
-  observer,
   useInjection,
   useSignal,
   useSignalHandler,
   useSignals,
 } from "@/libs/wirestate";
+import { observer } from "@/libs/wirestate/mobx";
 
 export const Application = observer(() => {
   const themeService: ThemeService = useInjection(ThemeService);

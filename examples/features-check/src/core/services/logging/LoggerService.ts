@@ -9,7 +9,6 @@ import { CounterService } from "@/core/services/counter/CounterService";
 import { ThemeService } from "@/core/services/theme/ThemeService";
 import { EGlobalSignal } from "@/core/signals";
 import {
-  Action,
   Inject,
   Injectable,
   OnActivated,
@@ -17,12 +16,15 @@ import {
   OnQuery,
   Optional,
   OnSignal,
-  ShallowObservable,
-  makeObservable,
   type Signal,
   OnCommand,
   WireScope,
 } from "@/libs/wirestate";
+import {
+  Action,
+  ShallowObservable,
+  makeObservable,
+} from "@/libs/wirestate/mobx";
 
 export interface ILogEntry {
   readonly id: number;

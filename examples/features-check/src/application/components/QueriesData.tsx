@@ -12,13 +12,13 @@ import {
 import { LoggerService } from "@/core/services/logging";
 import { ThemeService } from "@/core/services/theme";
 import {
-  observer,
   useInjection,
   useOptionalInjection,
   useQueryCaller,
   useQueryHandler,
   useSyncQueryCaller,
 } from "@/libs/wirestate";
+import { observer } from "@/libs/wirestate/mobx";
 
 export const QueriesData = observer(() => {
   const [snapshot, setSnapshot] = useState<Optional<ICounterSnapshot>>(null);

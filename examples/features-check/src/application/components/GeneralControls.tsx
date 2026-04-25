@@ -7,13 +7,13 @@ import { CounterService } from "@/core/services/counter";
 import { ThemeService } from "@/core/services/theme";
 import { EGlobalSignal } from "@/core/signals";
 import {
-  observer,
   type CommandCaller,
   type SignalEmitter,
   useCommandCaller,
   useInjection,
   useSignalEmitter,
 } from "@/libs/wirestate";
+import { observer } from "@/libs/wirestate/mobx";
 
 export const GeneralControls = observer(() => {
   const counterService: CounterService = useInjection(CounterService);

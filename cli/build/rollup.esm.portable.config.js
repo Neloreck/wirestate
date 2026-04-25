@@ -11,6 +11,7 @@ import { visualizer } from "rollup-plugin-visualizer";
 import { default as tsconfig } from "../../tsconfig.json";
 import {
   PORTABLE_ENTRY,
+  MOBX_ENTRY,
   TS_PORTABLE_CONFIG,
   PORTABLE_ROOT,
   EEnvironment,
@@ -25,10 +26,17 @@ const isLoggingEnabled = process.env.LIB_DEBUG_LOGGING === "true" || process.env
 
 const createPortableConfig = (env, isDebug) => ({
   external: ["react", "mobx", "mobx-react-lite", "inversify", "tslib"],
-  input: PORTABLE_ENTRY,
+  input: [PORTABLE_ENTRY, MOBX_ENTRY],
   output: {
     compact: env === EEnvironment.PRODUCTION,
-    file: path.resolve(isDebug ? PORTABLE_DEBUG_ROOT : PORTABLE_ROOT, "wirestate.js"),
+    dir: isDebug ? PORTABLE_DEBUG_ROOT : PORTABLE_ROOT,
+    entryFileNames: (chunkInfo) => {
+      if (chunkInfo.facadeModuleId === MOBX_ENTRY) {
+        return "mobx.js";
+      }
+
+      return "wirestate.js";
+    },
     preserveModules: false,
     sourcemap: false,
     format: "es",
@@ -65,9 +73,16 @@ const createPortableConfig = (env, isDebug) => ({
 });
 
 const createPortableDtsConfig = (env, isDebug) => ({
-  input: [PORTABLE_ENTRY],
+  input: [PORTABLE_ENTRY, MOBX_ENTRY],
   output: {
-    file: path.resolve(isDebug ? PORTABLE_DEBUG_ROOT : PORTABLE_ROOT, "wirestate.d.ts"),
+    dir: isDebug ? PORTABLE_DEBUG_ROOT : PORTABLE_ROOT,
+    entryFileNames: (chunkInfo) => {
+      if (chunkInfo.facadeModuleId === MOBX_ENTRY) {
+        return "mobx.d.ts";
+      }
+
+      return "wirestate.d.ts";
+    },
     format: "es",
   },
   plugins: [

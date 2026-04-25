@@ -1,16 +1,14 @@
 import type { Theme } from "@/application/types";
 import { EGlobalSignal } from "@/core/signals";
 import {
-  Action,
   Inject,
   Injectable,
-  Observable,
   OnActivated,
   OnDeactivation,
   SEED,
   WireScope,
-  makeObservable,
 } from "@/libs/wirestate";
+import { Action, Observable, makeObservable } from "@/libs/wirestate/mobx";
 
 @Injectable()
 export class ThemeService {

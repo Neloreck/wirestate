@@ -8,7 +8,7 @@ import tseslint from "typescript-eslint";
 import _import from "eslint-plugin-import";
 
 export default defineConfig([
-  globalIgnores(["dist", "**/wirestate.js", "**/wirestate.d.ts"]),
+  globalIgnores(["dist", "**/libs/wirestate/**", "**/libs/wirestate/**"]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [
