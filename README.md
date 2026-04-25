@@ -42,20 +42,20 @@
 import { AbstractService, OnSignal, OnQuery, makeAutoObservable } from 'wirestate';
 
 export class CounterService extends AbstractService {
-  public count = 0;
+  public count: number = 0;
 
-  constructor() {
+  public constructor() {
     super();
     makeAutoObservable(this);
   }
 
   @OnSignal('INCREMENT')
-  public increment() {
+  public increment(): void {
     this.count++;
   }
 
   @OnQuery('GET_COUNT')
-  public getCount() {
+  public getCount(): number {
     return this.count;
   }
 }
