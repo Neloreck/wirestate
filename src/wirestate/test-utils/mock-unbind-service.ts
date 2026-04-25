@@ -1,11 +1,12 @@
 import { Container, type Newable } from "inversify";
 
 /**
- * todo;
+ * Unbinds a service from the IoC container.
+ * This is useful in tests to reset or override specific service registrations.
  *
- * @param container - target container to unbind service from
- * @param ServiceClass - service class to unbind
+ * @param container - the IoC container to unbind the service from
+ * @param ServiceClass - the service class to unbind
  */
-export function mockBindService<T extends object>(container: Container, ServiceClass: Newable<T>): void {
+export function mockUnbindService<T extends object>(container: Container, ServiceClass: Newable<T>): void {
   container.unbind(ServiceClass);
 }

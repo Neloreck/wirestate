@@ -4,6 +4,7 @@ describe("Library test utils exports from wirestate/test-utils", () => {
   const expectedTestUtilsExports: Array<string> = [
     "mockContainer",
     "mockBindService",
+    "mockUnbindService",
     "mockService",
     "withIocProvider",
   ];
