@@ -1,4 +1,4 @@
-import { type ServiceIdentifier } from "inversify";
+import { Container, type ServiceIdentifier } from "inversify";
 import { useMemo } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -12,29 +12,44 @@ import type { Optional, TAnyObject } from "@/wirestate/types/general";
  * Unlike {@link useInjection}, this hook does not throw when the token is not bound.
  *
  * @param injectionId - injection identifier
- * @returns resolved value or null
+ * @param onFallback - optional callback to handle cases when dependency was not resolved
+ * @returns resolved value, result of optional fallback handler or null
  */
-export function useOptionalInjection<T>(injectionId: ServiceIdentifier<T>): Optional<T> {
-  // todo: Add optional second param to handle cases when injection was not found.
+export function useOptionalInjection<T>(
+  injectionId: ServiceIdentifier<T>,
+  onFallback?: (container: Container) => T
+): Optional<T> {
   const { container, revision } = useIocContext();
 
   // Revision bump forces a container reset; force re-resolution to drop stale instances.
   return useMemo(() => {
     if (container.isBound(injectionId)) {
-      dbg.info(prefix(__filename), "Resolving token:", {
+      dbg.info(prefix(__filename), "Resolving injection:", {
         token: injectionId,
         name: (injectionId as TAnyObject)?.name ?? injectionId,
         revision,
         container,
+        onFallback,
       });
 
       return container.get<T>(injectionId);
-    } else {
-      dbg.info(prefix(__filename), "Token not bound, returning null:", {
+    } else if (onFallback) {
+      dbg.info(prefix(__filename), "Injection not found, using fallback handler:", {
         token: injectionId,
         name: (injectionId as TAnyObject)?.name ?? injectionId,
         revision,
         container,
+        onFallback,
+      });
+
+      return onFallback(container);
+    } else {
+      dbg.info(prefix(__filename), "Injection not found, returning null:", {
+        token: injectionId,
+        name: (injectionId as TAnyObject)?.name ?? injectionId,
+        revision,
+        container,
+        onFallback,
       });
 
       return null;

@@ -5,11 +5,12 @@
 - `initialState` -> `seed`
 - `type` -> `bindingType`
 - `scopeType` -> `bindingScopeType`
-- Emit signal with two params instead of manually composed object, signal `from`
+- Emit events with two params instead of manually composed object, signal `from`
 - Add commands module
 - Add WireScope shared class for managing of wirestate events, queries and commands
 - Remove abstract service in favor of WireScope usage
 - Signals -> events
+- `useOptionalInjection` -> add fallback handler
 
 ## 0.3.0
 

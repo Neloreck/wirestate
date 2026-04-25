@@ -37,4 +37,37 @@ describe("useOptionalInjection", () => {
 
     expect(getByTestId("injectable-name").textContent).toBe(GenericService.name);
   });
+
+  it("should use onFallback when token is not bound", () => {
+    const container: Container = mockContainer();
+    const token: unique symbol = Symbol("optional-token");
+
+    function FallbackComponent() {
+      const data: Optional<string> = useOptionalInjection(token, () => "fallback-value");
+
+      return <div data-testid={"result"}>{data}</div>;
+    }
+
+    const { getByTestId } = render(withIocProvider(<FallbackComponent />, container));
+
+    expect(getByTestId("result").textContent).toBe("fallback-value");
+  });
+
+  it("should provide container to onFallback", () => {
+    const container: Container = mockContainer();
+    const unboundToken: unique symbol = Symbol("unbound-token");
+    const boundToken: unique symbol = Symbol("bound-token");
+
+    container.bind(boundToken).toConstantValue("bound-value");
+
+    function FallbackComponent() {
+      const data: Optional<string> = useOptionalInjection(unboundToken, (container) => container.get(boundToken));
+
+      return <div data-testid={"result"}>{data}</div>;
+    }
+
+    const { getByTestId } = render(withIocProvider(<FallbackComponent />, container));
+
+    expect(getByTestId("result").textContent).toBe("bound-value");
+  });
 });
