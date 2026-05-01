@@ -32,6 +32,13 @@ const createEsmConfig = (env) => ({
     format: "es",
   },
   plugins: [
+    clear({
+      targets: [path.resolve(ESM_ROOT, env)],
+    }),
+    replace({
+      preventAssignment: true,
+      IS_DEV: env !== EEnvironment.PRODUCTION,
+    }),
     typescript({
       sourceMap: true,
       tsconfig: TS_BUILD_CONFIG,
@@ -42,22 +49,13 @@ const createEsmConfig = (env) => ({
     }),
     commonjs(),
     babel({ ...BABEL_CONFIG, babelHelpers: "bundled" }),
-    replace({
-      preventAssignment: true,
-      IS_DEV: env !== EEnvironment.PRODUCTION,
+    env === EEnvironment.PRODUCTION ? terser({ output: { beautify: false, comments: false } }) : null,
+    visualizer({
+      filename: path.resolve(STATS_ROOT, `esm-${env}-stats.html`),
+      gzipSize: true,
+      projectRoot: WS_ROOT,
     }),
-  ]
-    .concat(env === EEnvironment.PRODUCTION ? [terser({ output: { beautify: false, comments: false } })] : [])
-    .concat([
-      visualizer({
-        filename: path.resolve(STATS_ROOT, `esm-${env}-stats.html`),
-        gzipSize: true,
-        projectRoot: WS_ROOT,
-      }),
-      clear({
-        targets: [path.resolve(ESM_ROOT, env)],
-      }),
-    ]),
+  ].filter(Boolean),
 });
 
 export default [createEsmConfig(EEnvironment.PRODUCTION), createEsmConfig(EEnvironment.DEVELOPMENT)];

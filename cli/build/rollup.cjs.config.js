@@ -32,6 +32,13 @@ const createCjsConfig = (env) => ({
     format: "cjs",
   },
   plugins: [
+    clear({
+      targets: [path.resolve(CJS_ROOT, env)],
+    }),
+    replace({
+      preventAssignment: true,
+      IS_DEV: (env !== EEnvironment.PRODUCTION).toString(),
+    }),
     typescript({
       tsconfig: TS_BUILD_CONFIG,
       declaration: false,
@@ -40,22 +47,13 @@ const createCjsConfig = (env) => ({
     }),
     commonjs(),
     babel({ ...BABEL_CONFIG, babelHelpers: "bundled" }),
-    replace({
-      preventAssignment: true,
-      IS_DEV: (env !== EEnvironment.PRODUCTION).toString(),
+    env === EEnvironment.PRODUCTION ? terser({ output: { beautify: false, comments: false } }) : null,
+    visualizer({
+      filename: path.resolve(STATS_ROOT, `cjs-${env}-stats.html`),
+      gzipSize: true,
+      projectRoot: WS_ROOT,
     }),
-  ]
-    .concat(env === EEnvironment.PRODUCTION ? [terser({ output: { beautify: false, comments: false } })] : [])
-    .concat([
-      visualizer({
-        filename: path.resolve(STATS_ROOT, `cjs-${env}-stats.html`),
-        gzipSize: true,
-        projectRoot: WS_ROOT,
-      }),
-      clear({
-        targets: [path.resolve(CJS_ROOT, env)],
-      }),
-    ]),
+  ].filter(Boolean),
 });
 
 export default [createCjsConfig(EEnvironment.PRODUCTION), createCjsConfig(EEnvironment.DEVELOPMENT)];
