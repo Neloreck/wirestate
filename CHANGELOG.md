@@ -2,6 +2,8 @@
 
 - Add default initial state param on creation of containers
 - Explicit typing for query callers, export new types
+- For wire-scope add missing optional query/command/resolve methods
+- Add sourcemaps in lib bundles
 
 ## 0.4.0
 
