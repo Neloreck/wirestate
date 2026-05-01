@@ -326,7 +326,7 @@ function attachWireScopes<T extends object>(service: T, Service: Newable<T>): vo
   for (const key of Object.getOwnPropertyNames(service)) {
     const value = (service as Record<string, unknown>)[key];
 
-    if ((value as object | null)?.constructor === WireScope) {
+    if ((value as Optional<object>)?.constructor === WireScope) {
       scopes.push(value as WireScope);
     }
   }

@@ -1,7 +1,9 @@
 import { Component, createElement, ReactNode } from "react";
 
+import { Optional } from "@/wirestate/types/general";
+
 export class ErrorLogBoundary extends Component {
-  public state = { error: null as Error | null };
+  public state = { error: null as Optional<Error> };
 
   public componentDidCatch(error: Error): void {
     this.setState({ error });

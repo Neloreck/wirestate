@@ -4,7 +4,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
 import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
-import type { Maybe, MaybePromise } from "@/wirestate/types/general";
+import type { Maybe, MaybePromise, Optional } from "@/wirestate/types/general";
 import type { TQueryHandler, TQueryType, TQueryUnregister } from "@/wirestate/types/queries";
 
 /**
@@ -77,7 +77,7 @@ export class QueryBus {
    *
    * @throws if no handler is registered
    */
-  public query<R = unknown, D = unknown>(type: TQueryType, data?: D): MaybePromise<R> {
+  public query<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): MaybePromise<R> {
     const stack: Maybe<Array<TQueryHandler>> = this.handlers.get(type);
 
     // Always use the top of the stack (most recent registration) if handlers are available.
@@ -98,7 +98,10 @@ export class QueryBus {
    * @param data - query payload
    * @returns query result or null if no handler is registered
    */
-  public queryOptional<R = unknown, D = unknown>(type: TQueryType, data?: D): MaybePromise<R> | null {
+  public queryOptional<R = unknown, D = unknown, T extends TQueryType = TQueryType>(
+    type: T,
+    data?: D
+  ): Optional<MaybePromise<R>> {
     const stack: Maybe<Array<TQueryHandler>> = this.handlers.get(type);
 
     if (stack?.length) {

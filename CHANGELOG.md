@@ -1,3 +1,8 @@
+## 0.5.0
+
+- Add default initial state param on creation of containers
+- Explicit typing for query callers, export new types
+
 ## 0.4.0
 
 - Add `OnActivated` decorator

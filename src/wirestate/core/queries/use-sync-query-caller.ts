@@ -7,7 +7,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { useContainer } from "@/wirestate/core/provision/use-container";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
-import type { TQueryType } from "@/wirestate/types/queries";
+import type { TSyncQueryCaller, TQueryType } from "@/wirestate/types/queries";
 
 /**
  * Returns a stable function to dispatch synchronous queries.
@@ -15,18 +15,22 @@ import type { TQueryType } from "@/wirestate/types/queries";
  *
  * @returns sync query dispatcher
  */
-export function useSyncQueryCaller(): <R = unknown, D = unknown>(type: TQueryType, data?: D) => R {
+export function useSyncQueryCaller<R = unknown, D = unknown, T extends TQueryType = TQueryType>(): TSyncQueryCaller<
+  R,
+  D,
+  T
+> {
   const container: Container = useContainer();
 
   return useCallback(
-    <R = unknown, D = unknown>(type: TQueryType, data?: D) => {
+    (type: T, data?: D) => {
       dbg.info(prefix(__filename), "Sync query data:", {
         type,
         data,
       });
 
       // Access the container-scoped QueryBus and execute the query.
-      return container.get<QueryBus>(QUERY_BUS_TOKEN).query<R, D>(type, data) as R;
+      return container.get<QueryBus>(QUERY_BUS_TOKEN).query<R, D, T>(type, data) as R;
     },
 
     [container]

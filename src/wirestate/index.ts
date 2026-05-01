@@ -68,10 +68,14 @@ export {
   TCommandCaller as CommandCaller,
 } from "@/wirestate/types/commands";
 export {
+  TOptionalQueryCaller as OptionalQueryCaller,
+  TOptionalSyncQueryCaller as OptionalSyncQueryCaller,
+  TQueryCaller as QueryCaller,
   TQueryHandler as QueryHandler,
   TQueryResponder as QueryResponder,
   TQueryType as QueryType,
   TQueryUnregister as QueryUnregister,
+  TSyncQueryCaller as SyncQueryCaller,
 } from "@/wirestate/types/queries";
 export {
   IEvent as Event,

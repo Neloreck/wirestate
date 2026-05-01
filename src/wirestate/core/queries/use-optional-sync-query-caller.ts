@@ -8,7 +8,7 @@ import { useContainer } from "@/wirestate/core/provision/use-container";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
 import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
 import { Optional } from "@/wirestate/types/general";
-import type { TQueryType } from "@/wirestate/types/queries";
+import type { TOptionalSyncQueryCaller, TQueryType } from "@/wirestate/types/queries";
 
 /**
  * Returns a stable function to dispatch synchronous optional queries.
@@ -16,17 +16,21 @@ import type { TQueryType } from "@/wirestate/types/queries";
  *
  * @returns optional sync query dispatcher
  */
-export function useOptionalSyncQueryCaller(): <R = unknown, D = unknown>(type: TQueryType, data?: D) => Optional<R> {
+export function useOptionalSyncQueryCaller<
+  R = unknown,
+  D = unknown,
+  T extends TQueryType = TQueryType,
+>(): TOptionalSyncQueryCaller<R, D, T> {
   const container: Container = useContainer();
 
   return useCallback(
-    <R = unknown, D = unknown>(type: TQueryType, data?: D): Optional<R> => {
+    (type: T, data?: D): Optional<R> => {
       dbg.info(prefix(__filename), "Optional sync query data:", {
         type,
         data,
       });
 
-      return container.get<QueryBus>(QUERY_BUS_TOKEN).queryOptional<R, D>(type, data) as Optional<R>;
+      return container.get<QueryBus>(QUERY_BUS_TOKEN).queryOptional<R, D, T>(type, data) as Optional<R>;
     },
     [container]
   );
