@@ -1,5 +1,7 @@
 export type TAnyObject = Record<string, any>;
 
+export type Callable<T> = () => T;
+
 export type Optional<T> = T | null;
 
 export type Definable<T> = T | undefined;

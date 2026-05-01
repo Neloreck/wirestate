@@ -3,7 +3,7 @@ import { type Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { CommandBus } from "@/wirestate/core/commands/command-bus";
+import type { CommandBus } from "@/wirestate/core/commands/command-bus";
 import { COMMAND_BUS_TOKEN } from "@/wirestate/core/registry";
 import type { ICommandDescriptor, TCommandType } from "@/wirestate/types/commands";
 

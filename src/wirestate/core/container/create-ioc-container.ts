@@ -22,6 +22,10 @@ export interface ICreateIocContainerOptions {
    * Parent container for inheritance.
    */
   readonly parent?: Container;
+  /**
+   * Optional default seed value.
+   */
+  readonly seed?: TAnyObject;
 }
 
 /**
@@ -42,7 +46,7 @@ export function createIocContainer(options: ICreateIocContainerOptions = {}): Co
   container.bind(QUERY_BUS_TOKEN).toConstantValue(new QueryBus());
   container.bind(COMMAND_BUS_TOKEN).toConstantValue(new CommandBus());
   container.bind(SEEDS_TOKEN).toConstantValue(new Map() as TSeedsMap);
-  container.bind(SEED_TOKEN).toConstantValue({} as TAnyObject);
+  container.bind(SEED_TOKEN).toConstantValue(options.seed ?? {});
 
   container
     .bind(WireScope)
