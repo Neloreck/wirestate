@@ -3,7 +3,6 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
-import { COMMAND_BUS_TOKEN } from "@/wirestate/core/registry";
 import {
   ECommandStatus,
   type ICommandDescriptor,

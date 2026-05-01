@@ -7,6 +7,7 @@ import { useQueryCaller } from "@/wirestate/core/queries/use-query-caller";
 import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
 import { withIocProvider } from "@/wirestate/test-utils/with-ioc-provider";
 import { Optional } from "@/wirestate/types/general";
+import { TQueryCaller } from "@/wirestate/types/queries";
 
 describe("useQueryCaller", () => {
   it("should return a caller that dispatches queries", async () => {
@@ -18,7 +19,7 @@ describe("useQueryCaller", () => {
 
     jest.spyOn(bus, "query");
 
-    let caller: Optional<ReturnType<typeof useQueryCaller>> = null;
+    let caller: Optional<TQueryCaller> = null as Optional<TQueryCaller>;
 
     function TestComponent() {
       caller = useQueryCaller();
@@ -28,7 +29,7 @@ describe("useQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: string = await (caller as any)("TEST_QUERY", "some-data");
+    const result: string = await (caller as TQueryCaller<string>)("TEST_QUERY", "some-data");
 
     expect(result).toBe("some-data-result");
     expect(handler).toHaveBeenCalledWith("some-data");
@@ -41,7 +42,7 @@ describe("useQueryCaller", () => {
 
     jest.spyOn(bus, "query");
 
-    let caller: Optional<ReturnType<typeof useQueryCaller>> = null;
+    let caller: Optional<TQueryCaller> = null;
 
     function TestComponent() {
       caller = useQueryCaller();
@@ -51,7 +52,7 @@ describe("useQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    expect(() => (caller as any)("NOT_EXISTING", "data")).toThrow(
+    expect(() => (caller as TQueryCaller)("NOT_EXISTING", "data")).toThrow(
       "No query handler registered in container for type: 'NOT_EXISTING'."
     );
     expect(bus.query).toHaveBeenCalledWith("NOT_EXISTING", "data");

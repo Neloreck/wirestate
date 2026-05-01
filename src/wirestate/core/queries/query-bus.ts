@@ -3,7 +3,6 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "@/wirestate/core/error/error-code";
 import { WirestateError } from "@/wirestate/core/error/wirestate-error";
-import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
 import type { Maybe, MaybePromise, Optional } from "@/wirestate/types/general";
 import type { TQueryHandler, TQueryType, TQueryUnregister } from "@/wirestate/types/queries";
 

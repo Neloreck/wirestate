@@ -70,57 +70,9 @@ export default [
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/ban-ts-ignore": "off",
       "@typescript-eslint/explicit-member-accessibility": ["error"],
-      "@typescript-eslint/naming-convention": [
-        "error",
-        {
-          custom: {
-            match: true,
-            regex: "^I[A-Z]",
-          },
-          format: ["PascalCase"],
-          selector: "interface",
-        },
-      ],
-      "@typescript-eslint/no-empty-function": "off",
-      "@typescript-eslint/no-empty-interface": "off",
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-inferrable-types": "off",
-      "@typescript-eslint/no-non-null-assertion": "off",
-      "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-require-imports": "off",
-      "array-element-newline": ["error", "consistent"],
-      "arrow-parens": ["error", "always"],
-      "arrow-spacing": "error",
-      "brace-style": "error",
-      camelcase: "error",
-      "eol-last": ["error", "always"],
-      "func-call-spacing": ["error", "never"],
-      "import/default": "off",
+      "react/prop-types": "off",
       "import/no-unresolved": "off",
-      "import/order": [
-        "error",
-        {
-          alphabetize: {
-            caseInsensitive: true,
-            order: "asc",
-          },
-          groups: ["builtin", "external", "parent", "sibling", "index"],
-          "newlines-between": "always",
-          pathGroups: [
-            {
-              group: "external",
-              pattern: "@/macroses/**",
-              position: "after",
-            },
-            {
-              group: "external",
-              pattern: "@/**",
-              position: "after",
-            },
-          ],
-          pathGroupsExcludedImportTypes: ["builtin"],
-        },
-      ],
       "jsdoc/tag-lines": [
         "error",
         "any",
@@ -136,45 +88,6 @@ export default [
       "jsdoc/require-property-type": "off",
       "jsdoc/require-throws-type": "off",
       "jsdoc/no-undefined-types": "off",
-      "key-spacing": [
-        "error",
-        {
-          afterColon: true,
-          beforeColon: false,
-        },
-      ],
-      "keyword-spacing": "error",
-      "max-len": [
-        "error",
-        {
-          code: 120,
-        },
-      ],
-      "no-constructor-return": "error",
-      "no-duplicate-imports": "error",
-      "no-multi-spaces": "error",
-      "no-multiple-empty-lines": [
-        "error",
-        {
-          max: 1,
-          maxBOF: 1,
-        },
-      ],
-      "no-trailing-spaces": "error",
-      "object-curly-newline": [
-        "error",
-        {
-          consistent: true,
-          multiline: true,
-        },
-      ],
-      "object-curly-spacing": ["error", "always"],
-      "object-property-newline": [
-        "error",
-        {
-          allowAllPropertiesOnSameLine: true,
-        },
-      ],
       "padding-line-between-statements": [
         "error",
         {
@@ -208,13 +121,41 @@ export default [
           prev: ["const", "let", "var"],
         },
       ],
-      "react/prop-types": "off",
-      "react/react-in-jsx-scope": "off",
-      semi: "error",
-      "space-in-parens": ["error", "never"],
-      "spaced-comment": ["error", "always"],
-      "template-tag-spacing": ["error", "never"],
-      yoda: "error",
+      "@typescript-eslint/naming-convention": [
+        "error",
+        {
+          custom: {
+            match: true,
+            regex: "^I[A-Z]",
+          },
+          format: ["PascalCase"],
+          selector: "interface",
+        },
+      ],
+      "import/order": [
+        "error",
+        {
+          alphabetize: {
+            caseInsensitive: true,
+            order: "asc",
+          },
+          groups: ["builtin", "external", "parent", "sibling", "index"],
+          "newlines-between": "always",
+          pathGroups: [
+            {
+              group: "external",
+              pattern: "@/macroses/**",
+              position: "after",
+            },
+            {
+              group: "external",
+              pattern: "@/**",
+              position: "after",
+            },
+          ],
+          pathGroupsExcludedImportTypes: ["builtin"],
+        },
+      ],
     },
   },
 ];

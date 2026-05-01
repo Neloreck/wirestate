@@ -1,5 +1,3 @@
-import { CommandCaller, CommandHandler, CommandStatus, CommandType } from "@/wirestate/index";
-
 describe("Library exported API from wirestate", () => {
   const libRoot = require("./index");
 

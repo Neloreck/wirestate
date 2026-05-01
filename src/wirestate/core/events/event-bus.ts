@@ -1,7 +1,6 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { EVENT_BUS_TOKEN } from "@/wirestate/core/registry";
 import { IEvent, TEventHandler, TEventType, TEventUnsubscriber } from "@/wirestate/types/events";
 
 /**
