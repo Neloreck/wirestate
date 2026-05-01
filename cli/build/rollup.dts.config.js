@@ -11,6 +11,7 @@ export const DTS_CONFIG = {
     chunkFileNames: "lib.d.ts",
     dir: TYPES_ROOT,
     format: "es",
+    sourcemap: false,
   },
   plugins: [
     dts.default({
@@ -18,6 +19,7 @@ export const DTS_CONFIG = {
         baseUrl: tsconfig.compilerOptions.baseUrl,
         paths: tsconfig.compilerOptions.paths,
         rootDir: tsconfig.compilerOptions.rootDir,
+        sourceMap: false,
       },
     }),
     clear({

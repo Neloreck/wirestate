@@ -5,6 +5,7 @@
     "downlevelIteration": true,
     "removeComments": true,
     "pretty": true,
-    "importHelpers": false
+    "importHelpers": false,
+    "ignoreDeprecations": "6.0"
   }
 }

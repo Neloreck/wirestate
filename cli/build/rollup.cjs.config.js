@@ -28,22 +28,21 @@ const createCjsConfig = (env) => ({
     chunkFileNames: "lib.js",
     compact: env === EEnvironment.PRODUCTION,
     dir: path.resolve(CJS_ROOT, env),
-    sourcemap: false,
+    sourcemap: true,
     format: "cjs",
   },
   plugins: [
+    typescript({
+      tsconfig: TS_BUILD_CONFIG,
+      declaration: false,
+      declarationMap: false,
+      outDir: path.resolve(CJS_ROOT, env),
+    }),
     commonjs(),
     babel({ ...BABEL_CONFIG, babelHelpers: "bundled" }),
     replace({
       preventAssignment: true,
       IS_DEV: (env !== EEnvironment.PRODUCTION).toString(),
-    }),
-    typescript({
-      sourceMap: false,
-      tsconfig: TS_BUILD_CONFIG,
-      declaration: false,
-      declarationMap: false,
-      outDir: path.resolve(CJS_ROOT, env),
     }),
   ]
     .concat(env === EEnvironment.PRODUCTION ? [terser({ output: { beautify: false, comments: false } })] : [])

@@ -3,6 +3,6 @@
   "compilerOptions": {
     "target": "es5",
     "importHelpers": true,
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "6.0",
   }
 }

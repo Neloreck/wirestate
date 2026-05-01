@@ -28,23 +28,23 @@ const createEsmConfig = (env) => ({
     compact: env === EEnvironment.PRODUCTION,
     dir: path.resolve(ESM_ROOT, env),
     preserveModules: true,
-    sourcemap: false,
+    sourcemap: true,
     format: "es",
   },
   plugins: [
-    commonjs(),
-    babel({ ...BABEL_CONFIG, babelHelpers: "bundled" }),
-    replace({
-      preventAssignment: true,
-      IS_DEV: env !== EEnvironment.PRODUCTION,
-    }),
     typescript({
-      sourceMap: false,
+      sourceMap: true,
       tsconfig: TS_BUILD_CONFIG,
       pretty: env !== EEnvironment.PRODUCTION,
       declaration: false,
       declarationMap: false,
       outDir: path.resolve(ESM_ROOT, env),
+    }),
+    commonjs(),
+    babel({ ...BABEL_CONFIG, babelHelpers: "bundled" }),
+    replace({
+      preventAssignment: true,
+      IS_DEV: env !== EEnvironment.PRODUCTION,
     }),
   ]
     .concat(env === EEnvironment.PRODUCTION ? [terser({ output: { beautify: false, comments: false } })] : [])

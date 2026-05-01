@@ -38,7 +38,7 @@ const createPortableConfig = (env, isDebug) => ({
       return "wirestate.js";
     },
     preserveModules: false,
-    sourcemap: false,
+    sourcemap: true,
     format: "es",
     banner: "'use no memo';",
   },
@@ -57,7 +57,7 @@ const createPortableConfig = (env, isDebug) => ({
       __filename: (id) => `"${path.relative(WS_ROOT, id)}"`,
     }),
     typescript({
-      sourceMap: false,
+      sourceMap: true,
       tsconfig: TS_PORTABLE_CONFIG,
       declaration: false,
       declarationMap: false,
