@@ -42,6 +42,8 @@ const createCjsConfig = (env) => ({
       sourceMap: false,
       tsconfig: TS_BUILD_CONFIG,
       declaration: false,
+      declarationMap: false,
+      outDir: path.resolve(CJS_ROOT, env),
     }),
   ]
     .concat(env === EEnvironment.PRODUCTION ? [terser({ output: { beautify: false, comments: false } })] : [])

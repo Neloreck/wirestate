@@ -5,6 +5,7 @@ import { default as tsconfig } from "../../tsconfig.json";
 import { CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY, TYPES_ROOT } from "../config/build.constants";
 
 export const DTS_CONFIG = {
+  external: ["react", "inversify", "mobx", "mobx-react-lite", "tslib"],
   input: [CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY],
   output: {
     chunkFileNames: "lib.d.ts",

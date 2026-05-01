@@ -60,6 +60,8 @@ const createPortableConfig = (env, isDebug) => ({
       sourceMap: false,
       tsconfig: TS_PORTABLE_CONFIG,
       declaration: false,
+      declarationMap: false,
+      outDir: isDebug ? PORTABLE_DEBUG_ROOT : PORTABLE_ROOT,
     }),
     visualizer({
       filename: path.resolve(STATS_ROOT, "ptb-stats.html"),

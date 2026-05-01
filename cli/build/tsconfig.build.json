@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "es5",
-    "importHelpers": true
+    "importHelpers": true,
+    "ignoreDeprecations": "6.0"
   }
 }

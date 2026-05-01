@@ -43,6 +43,8 @@ const createEsmConfig = (env) => ({
       tsconfig: TS_BUILD_CONFIG,
       pretty: env !== EEnvironment.PRODUCTION,
       declaration: false,
+      declarationMap: false,
+      outDir: path.resolve(ESM_ROOT, env),
     }),
   ]
     .concat(env === EEnvironment.PRODUCTION ? [terser({ output: { beautify: false, comments: false } })] : [])
