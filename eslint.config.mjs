@@ -1,10 +1,4 @@
-import * as path from "node:path";
-import { fileURLToPath } from "node:url";
-
-import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
-import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
-import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import eslintConfigPrettier from "eslint-config-prettier";
 import _import from "eslint-plugin-import";
@@ -16,42 +10,22 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
-
 export default [
-  jsdoc.configs["flat/recommended"],
   {
     ignores: ["target/**/*", "node_modules/**/*", "examples/**/*"],
   },
-  ...fixupConfigRules(
-    compat.extends(
-      "eslint:recommended",
-      "plugin:jest/style",
-      "plugin:@typescript-eslint/eslint-recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:import/errors",
-      "plugin:import/typescript",
-      "plugin:react/recommended"
-    )
-  ),
+  jsdoc.configs["flat/recommended"],
+  js.configs.recommended,
+  jest.configs["flat/style"],
+  ...tseslint.configs.recommended,
+  _import.flatConfigs.errors,
+  _import.flatConfigs.typescript,
+  react.configs.flat.recommended,
   {
     plugins: {
-      "@typescript-eslint": fixupPluginRules(typescriptEslint),
-      jest: fixupPluginRules(jest),
-      import: fixupPluginRules(_import),
-      react: fixupPluginRules(react),
-      jsdoc,
       eslintConfigPrettier,
       reactHooks,
       reactRefresh,
-      tseslint,
     },
     languageOptions: {
       globals: {
