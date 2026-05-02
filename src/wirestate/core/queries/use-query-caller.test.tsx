@@ -29,7 +29,7 @@ describe("useQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: string = await (caller as TQueryCaller<string>)("TEST_QUERY", "some-data");
+    const result: string = await (caller as TQueryCaller)("TEST_QUERY", "some-data");
 
     expect(result).toBe("some-data-result");
     expect(handler).toHaveBeenCalledWith("some-data");
@@ -64,7 +64,7 @@ describe("useQueryCaller", () => {
 
     bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
 
-    let caller: Optional<TQueryCaller> = null as Optional<TQueryCaller<string>>;
+    let caller: Optional<TQueryCaller> = null as Optional<TQueryCaller>;
 
     function TestComponent() {
       caller = useQueryCaller();
@@ -74,7 +74,7 @@ describe("useQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: string = await (caller as TQueryCaller<string>)("ASYNC_QUERY", "value");
+    const result: string = await (caller as TQueryCaller)("ASYNC_QUERY", "value");
 
     expect(result).toBe("value-async");
   });
@@ -104,7 +104,7 @@ describe("useQueryCaller", () => {
 
     bus.register(type, () => "symbol-result");
 
-    let caller: Optional<TQueryCaller> = null as Optional<TQueryCaller<string>>;
+    let caller: Optional<TQueryCaller> = null as Optional<TQueryCaller>;
 
     function TestComponent() {
       caller = useQueryCaller();
@@ -114,6 +114,6 @@ describe("useQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    expect((caller as TQueryCaller<string>)(type)).toBe("symbol-result");
+    expect((caller as TQueryCaller)(type)).toBe("symbol-result");
   });
 });

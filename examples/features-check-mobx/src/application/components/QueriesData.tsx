@@ -12,6 +12,8 @@ import {
 import { LoggerService } from "@/core/services/logging";
 import { ThemeService } from "@/core/services/theme";
 import {
+  type QueryCaller,
+  type SyncQueryCaller,
   useInjection,
   useOptionalInjection,
   useQueryCaller,
@@ -30,8 +32,8 @@ export const QueriesData = observer(() => {
     useOptionalInjection(LoggerService);
 
   // [*] Pass ability to dispatch queries from UI and get sync/async data.
-  const queryData = useQueryCaller();
-  const querySyncData = useSyncQueryCaller();
+  const queryData: QueryCaller = useQueryCaller();
+  const querySyncData: SyncQueryCaller = useSyncQueryCaller();
 
   // [*] Pass ability to declare handler to get sync data.
   const onPullSummary = useCallback(() => {

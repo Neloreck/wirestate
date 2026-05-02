@@ -81,12 +81,6 @@ export class LoggerService {
     this.clear();
   }
 
-  // [*] pass check - subscribe to all events if needed, no declaration - no sub
-  @OnEvent()
-  public onEvents(event: Event): void {
-    this.saveEventLogEntry(event);
-  }
-
   @Action()
   public clear(): void {
     this.logs = [];
@@ -128,6 +122,12 @@ export class LoggerService {
     console.info(`[${this.constructor.name}] Dumping data:`, dump);
 
     return dump;
+  }
+
+  // [*] pass check - subscribe to all events if needed, no declaration - no sub
+  @OnEvent()
+  public onEvents(event: Event): void {
+    this.saveEventLogEntry(event);
   }
 
   @OnEvent([

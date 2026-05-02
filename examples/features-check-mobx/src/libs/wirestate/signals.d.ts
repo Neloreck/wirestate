@@ -1,6 +1,7 @@
 export {
   Model,
   ModelConstructor,
+  ReadonlySignal,
   Signal,
   action,
   batch,

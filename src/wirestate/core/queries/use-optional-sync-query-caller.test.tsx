@@ -29,7 +29,7 @@ describe("useOptionalSyncQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: Optional<string> = (caller as TOptionalSyncQueryCaller<string>)("TEST_QUERY", "some-data");
+    const result: Optional<string> = (caller as TOptionalSyncQueryCaller)("TEST_QUERY", "some-data");
 
     expect(result).toBe("some-data-result");
     expect(handler).toHaveBeenCalledWith("some-data");
@@ -51,7 +51,7 @@ describe("useOptionalSyncQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: Optional<string> = (caller as TOptionalSyncQueryCaller<string>)("NOT_EXISTING", "data");
+    const result: Optional<string> = (caller as TOptionalSyncQueryCaller)("NOT_EXISTING", "data");
 
     expect(result).toBeNull();
     expect(bus.queryOptional).toHaveBeenCalledWith("NOT_EXISTING", "data");
@@ -82,7 +82,7 @@ describe("useOptionalSyncQueryCaller", () => {
 
     bus.register(type, () => "symbol-result");
 
-    let caller: Optional<TOptionalSyncQueryCaller> = null as Optional<TOptionalSyncQueryCaller<string>>;
+    let caller: Optional<TOptionalSyncQueryCaller> = null as Optional<TOptionalSyncQueryCaller>;
 
     function TestComponent() {
       caller = useOptionalSyncQueryCaller();
@@ -92,6 +92,6 @@ describe("useOptionalSyncQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    expect((caller as TOptionalSyncQueryCaller<string>)(type)).toBe("symbol-result");
+    expect((caller as TOptionalSyncQueryCaller)(type)).toBe("symbol-result");
   });
 });

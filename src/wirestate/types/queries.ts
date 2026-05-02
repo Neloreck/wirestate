@@ -33,7 +33,7 @@ export type TQueryResponder<R = unknown, D = unknown> = (data?: D) => MaybePromi
 /**
  * Dispatches queries and returns their result as a value or promise.
  */
-export type TQueryCaller<R = unknown, D = unknown, T extends TQueryType = TQueryType> = (
+export type TQueryCaller = <R = unknown, D = unknown, T extends TQueryType = TQueryType>(
   type: T,
   data?: D
 ) => MaybePromise<R>;
@@ -41,12 +41,12 @@ export type TQueryCaller<R = unknown, D = unknown, T extends TQueryType = TQuery
 /**
  * Dispatches synchronous queries and returns their result directly.
  */
-export type TSyncQueryCaller<R = unknown, D = unknown, T extends TQueryType = TQueryType> = (type: T, data?: D) => R;
+export type TSyncQueryCaller = <R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D) => R;
 
 /**
  * Dispatches optional queries. Returns null when no handler is registered.
  */
-export type TOptionalQueryCaller<R = unknown, D = unknown, T extends TQueryType = TQueryType> = (
+export type TOptionalQueryCaller = <R = unknown, D = unknown, T extends TQueryType = TQueryType>(
   type: T,
   data?: D
 ) => Optional<MaybePromise<R>>;
@@ -54,7 +54,7 @@ export type TOptionalQueryCaller<R = unknown, D = unknown, T extends TQueryType 
 /**
  * Dispatches optional synchronous queries. Returns null when no handler is registered.
  */
-export type TOptionalSyncQueryCaller<R = unknown, D = unknown, T extends TQueryType = TQueryType> = (
+export type TOptionalSyncQueryCaller = <R = unknown, D = unknown, T extends TQueryType = TQueryType>(
   type: T,
   data?: D
 ) => Optional<R>;

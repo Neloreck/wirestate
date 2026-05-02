@@ -14,18 +14,18 @@ import type { TQueryCaller, TQueryType } from "@/wirestate/types/queries";
  *
  * @returns query dispatcher
  */
-export function useQueryCaller<R = unknown, D = unknown, T extends TQueryType = TQueryType>(): TQueryCaller<R, D, T> {
+export function useQueryCaller(): TQueryCaller {
   const container: Container = useContainer();
 
   return useCallback(
-    (type: T, data?: D) => {
+    (type: TQueryType, data?: unknown) => {
       dbg.info(prefix(__filename), "Query data:", {
         type,
         data,
       });
 
-      return container.get<QueryBus>(QUERY_BUS_TOKEN).query<R, D, T>(type, data);
+      return container.get<QueryBus>(QUERY_BUS_TOKEN).query(type, data);
     },
     [container]
-  );
+  ) as TQueryCaller;
 }

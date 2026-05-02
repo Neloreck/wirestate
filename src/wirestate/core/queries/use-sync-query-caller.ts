@@ -15,24 +15,19 @@ import type { TSyncQueryCaller, TQueryType } from "@/wirestate/types/queries";
  *
  * @returns sync query dispatcher
  */
-export function useSyncQueryCaller<R = unknown, D = unknown, T extends TQueryType = TQueryType>(): TSyncQueryCaller<
-  R,
-  D,
-  T
-> {
+export function useSyncQueryCaller(): TSyncQueryCaller {
   const container: Container = useContainer();
 
   return useCallback(
-    (type: T, data?: D) => {
+    (type: TQueryType, data?: unknown) => {
       dbg.info(prefix(__filename), "Sync query data:", {
         type,
         data,
       });
 
       // Access the container-scoped QueryBus and execute the query.
-      return container.get<QueryBus>(QUERY_BUS_TOKEN).query<R, D, T>(type, data) as R;
+      return container.get<QueryBus>(QUERY_BUS_TOKEN).query(type, data);
     },
-
     [container]
-  );
+  ) as TSyncQueryCaller;
 }

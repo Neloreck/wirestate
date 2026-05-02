@@ -29,7 +29,7 @@ describe("useSyncQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: string = (caller as TSyncQueryCaller<string>)("TEST_QUERY", "some-data");
+    const result: string = (caller as TSyncQueryCaller)("TEST_QUERY", "some-data");
 
     expect(result).toBe("some-data-result");
     expect(handler).toHaveBeenCalledWith("some-data");
@@ -83,7 +83,7 @@ describe("useSyncQueryCaller", () => {
 
     bus.register(type, () => "symbol-result");
 
-    let caller: Optional<TSyncQueryCaller> = null as Optional<TSyncQueryCaller<string>>;
+    let caller: Optional<TSyncQueryCaller> = null as Optional<TSyncQueryCaller>;
 
     function TestComponent() {
       caller = useSyncQueryCaller();
@@ -93,6 +93,6 @@ describe("useSyncQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    expect((caller as TSyncQueryCaller<string>)(type)).toBe("symbol-result");
+    expect((caller as TSyncQueryCaller)(type)).toBe("symbol-result");
   });
 });

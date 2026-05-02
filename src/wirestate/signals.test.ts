@@ -4,6 +4,7 @@ describe("Library exported API from wirestate/signals", () => {
   const expectedLibExports: Array<string> = [
     "Model",
     "ModelConstructor",
+    "ReadonlySignal",
     "Signal",
     "action",
     "batch",

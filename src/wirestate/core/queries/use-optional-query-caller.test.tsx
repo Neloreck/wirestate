@@ -29,7 +29,7 @@ describe("useOptionalQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: Optional<string> = await (caller as TOptionalQueryCaller<string>)("TEST_QUERY", "some-data");
+    const result: Optional<string> = await (caller as TOptionalQueryCaller)("TEST_QUERY", "some-data");
 
     expect(result).toBe("some-data-result");
     expect(handler).toHaveBeenCalledWith("some-data");
@@ -51,7 +51,7 @@ describe("useOptionalQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: Optional<MaybePromise<string>> = (caller as TOptionalQueryCaller<string>)("NOT_EXISTING", "data");
+    const result: Optional<MaybePromise<string>> = (caller as TOptionalQueryCaller)("NOT_EXISTING", "data");
 
     expect(result).toBeNull();
     expect(bus.queryOptional).toHaveBeenCalledWith("NOT_EXISTING", "data");
@@ -63,7 +63,7 @@ describe("useOptionalQueryCaller", () => {
 
     bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
 
-    let caller: Optional<TOptionalQueryCaller> = null as Optional<TOptionalQueryCaller<string>>;
+    let caller: Optional<TOptionalQueryCaller> = null as Optional<TOptionalQueryCaller>;
 
     function TestComponent() {
       caller = useOptionalQueryCaller();
@@ -73,7 +73,7 @@ describe("useOptionalQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: Optional<string> = await (caller as TOptionalQueryCaller<string>)("ASYNC_QUERY", "value");
+    const result: Optional<string> = await (caller as TOptionalQueryCaller)("ASYNC_QUERY", "value");
 
     expect(result).toBe("value-async");
   });
@@ -103,7 +103,7 @@ describe("useOptionalQueryCaller", () => {
 
     bus.register(type, () => "symbol-result");
 
-    let caller: Optional<TOptionalQueryCaller> = null as Optional<TOptionalQueryCaller<string>>;
+    let caller: Optional<TOptionalQueryCaller> = null as Optional<TOptionalQueryCaller>;
 
     function TestComponent() {
       caller = useOptionalQueryCaller();
@@ -113,6 +113,6 @@ describe("useOptionalQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    expect((caller as TOptionalQueryCaller<string>)(type)).toBe("symbol-result");
+    expect((caller as TOptionalQueryCaller)(type)).toBe("symbol-result");
   });
 });
