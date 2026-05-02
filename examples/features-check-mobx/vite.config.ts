@@ -15,10 +15,6 @@ export default defineConfig({
     react(),
     babel({
       presets: [reactCompilerPreset(), "@babel/preset-typescript"],
-      // Enable TypeScript-style legacy decorators so inversify (@injectable,
-      // @inject) and mobx (@observable, @action, @computed) work end-to-end.
-      // The class-properties plugin must run AFTER the decorators plugin
-      // (babel applies plugins in order), so keep decorators first.
       plugins: [
         "babel-plugin-transform-typescript-metadata",
         ["@babel/plugin-proposal-decorators", { version: "legacy" }],

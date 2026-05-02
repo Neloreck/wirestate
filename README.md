@@ -4,8 +4,10 @@
 [![language-ts](https://img.shields.io/badge/language-typescript-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/search?l=typescript)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/master/LICENSE)
 
-`wirestate` is a state management framework for React. It integrates **InversifyJS** for robust Dependency Injection 
-and **MobX** for high-performance reactivity, providing IOC/DI/indirection based architecture based on concepts of Services, Events, Commands, and Queries.
+`wirestate` is a reactivity-independent state management framework for React. It integrates **InversifyJS** for robust Dependency Injection,
+providing IOC/DI/indirection based architecture based on concepts of Services, Events, Commands, and Queries. 
+
+It optionally works with **MobX**, **Signals**, or other custom reactivity implementations.
 
 ## Architecture & Core Concepts
 
@@ -13,25 +15,37 @@ Designed for complex applications, `wirestate` enforces a clear separation of co
 
 - **Services**: Singleton-scoped logic units that hold state and business logic.
 - **Dependency Injection**: First-class InversifyJS integration for decoupled, testable code.
-- **Reactivity**: Transparent state tracking powered by MobX.
+- **Reactivity**: Independent state tracking (optional integration with MobX, Signals, etc.).
 - **Events**: Fire-and-forget communication for cross-service side effects.
 - **Commands**: Encapsulated write operations with standardized execution status (pending, settled, error).
 - **Queries**: Synchronous or asynchronous request-response patterns for data retrieval.
 - **Lifecycle Management**: Automated services provision within react tree, activation/deactivation lifecycle. 
 
-## Installation
-
-```bash
-npm install wirestate mobx mobx-react-lite reflect-metadata
-```
-
 ## Requirements
 
 - `react >= 16.8.0`
-- `mobx >= 6.0.0`
 - `reflect-metadata` (must be imported at application entry)
 
-## Quick Start
+## Installation
+
+```bash
+npm install --save wirestate reflect-metadata
+```
+
+### Additionally, for mobx
+
+```bash
+npm install --save mobx mobx-react-lite
+```
+
+### Additionally, for signals
+
+```bash
+npm install --save @preact/signals-react
+npm install --save-dev @preact/signals-react-transform
+```
+
+## Quick Start with mobx
 
 ### 1. Define a Service
 
@@ -127,6 +141,98 @@ export const CounterView = observer(() => {
     </div>
   );
 });
+```
+
+## Quick Start with signals
+
+### 1. Define a Service
+
+Services use `signal` and `computed` for state management.
+
+```typescript
+import { Injectable, Inject, WireScope, OnEvent, OnCommand, OnQuery } from 'wirestate';
+import { signal, computed, Signal, ReadonlySignal } from 'wirestate/signals';
+
+@Injectable()
+export class CounterService {
+  public readonly count: Signal<number> = signal(0);
+  public readonly isEven: ReadonlySignal<boolean> = computed(() => this.count.value % 2 === 0);
+
+  public constructor(
+    @Inject(WireScope)
+    private scope: WireScope
+  ) {}
+
+  public increment(amount: number = 1): void {
+    this.count.value += amount;
+  }
+
+  public reset(): void {
+    this.count.value = 0;
+  }
+
+  @OnCommand('INCREMENT')
+  public onIncrementCommand(amount: number = 1): void {
+    this.increment(amount);
+  }
+
+  @OnQuery('GET_TOTAL')
+  public onGetTotal(): number {
+    return this.count.value;
+  }
+
+  @OnEvent('RESET')
+  public onResetEvent(): void {
+    this.reset();
+  }
+}
+```
+
+### 2. Configure the Provider
+
+The provider configuration remains the same regardless of the reactivity implementation.
+
+```tsx
+import { IocProvider, createInjectablesProvider } from 'wirestate';
+import { CounterService } from './CounterService';
+
+const MainProvider = createInjectablesProvider([CounterService]);
+
+export function Application() {
+  return (
+    <IocProvider>
+      <MainProvider>
+        <CounterView />
+      </MainProvider>
+    </IocProvider>
+  );
+}
+```
+
+### 3. Consume in Components
+
+Access signals directly in components. Reactivity is handled by the signals transform or manual subscription.
+
+```tsx
+import { useInjection, useCommandCaller, useEventEmitter } from 'wirestate';
+import { CounterService } from './CounterService';
+
+export const CounterView = () => {
+  const service = useInjection(CounterService);
+  const call = useCommandCaller();
+  const emit = useEventEmitter();
+
+  return (
+    <div>
+      <p>Count: {service.count}</p>
+      <p>Even: {service.isEven.value ? 'Yes' : 'No'}</p>
+      <button onClick={() => service.increment(5)}>Add 1 (Method)</button>
+      <button onClick={() => call('INCREMENT', 5)}>Add 5 (Command)</button>
+      <button onClick={() => service.reset()}>Reset (Method)</button>
+      <button onClick={() => emit('RESET')}>Reset (Event)</button>
+    </div>
+  );
+};
 ```
 
 ## Advanced Usage
