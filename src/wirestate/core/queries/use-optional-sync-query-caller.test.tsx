@@ -56,4 +56,42 @@ describe("useOptionalSyncQueryCaller", () => {
     expect(result).toBeNull();
     expect(bus.queryOptional).toHaveBeenCalledWith("NOT_EXISTING", "data");
   });
+
+  it("should return a stable caller between re-renders", () => {
+    const container: Container = createIocContainer();
+    const callers: Array<TOptionalSyncQueryCaller> = [];
+
+    function TestComponent() {
+      callers.push(useOptionalSyncQueryCaller());
+
+      return null;
+    }
+
+    const { rerender } = render(withIocProvider(<TestComponent />, container));
+
+    rerender(withIocProvider(<TestComponent />, container));
+
+    expect(callers).toHaveLength(2);
+    expect(callers[0]).toBe(callers[1]);
+  });
+
+  it("should support symbol query types", () => {
+    const container: Container = createIocContainer();
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const type: unique symbol = Symbol("optional-sync-query");
+
+    bus.register(type, () => "symbol-result");
+
+    let caller: Optional<TOptionalSyncQueryCaller> = null as Optional<TOptionalSyncQueryCaller<string>>;
+
+    function TestComponent() {
+      caller = useOptionalSyncQueryCaller();
+
+      return null;
+    }
+
+    render(withIocProvider(<TestComponent />, container));
+
+    expect((caller as TOptionalSyncQueryCaller<string>)(type)).toBe("symbol-result");
+  });
 });

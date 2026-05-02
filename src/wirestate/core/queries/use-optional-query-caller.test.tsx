@@ -56,4 +56,63 @@ describe("useOptionalQueryCaller", () => {
     expect(result).toBeNull();
     expect(bus.queryOptional).toHaveBeenCalledWith("NOT_EXISTING", "data");
   });
+
+  it("should resolve async handler results", async () => {
+    const container: Container = createIocContainer();
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+
+    bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
+
+    let caller: Optional<TOptionalQueryCaller> = null as Optional<TOptionalQueryCaller<string>>;
+
+    function TestComponent() {
+      caller = useOptionalQueryCaller();
+
+      return null;
+    }
+
+    render(withIocProvider(<TestComponent />, container));
+
+    const result: Optional<string> = await (caller as TOptionalQueryCaller<string>)("ASYNC_QUERY", "value");
+
+    expect(result).toBe("value-async");
+  });
+
+  it("should return a stable caller between re-renders", () => {
+    const container: Container = createIocContainer();
+    const callers: Array<TOptionalQueryCaller> = [];
+
+    function TestComponent() {
+      callers.push(useOptionalQueryCaller());
+
+      return null;
+    }
+
+    const { rerender } = render(withIocProvider(<TestComponent />, container));
+
+    rerender(withIocProvider(<TestComponent />, container));
+
+    expect(callers).toHaveLength(2);
+    expect(callers[0]).toBe(callers[1]);
+  });
+
+  it("should support symbol query types", () => {
+    const container: Container = createIocContainer();
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const type: unique symbol = Symbol("optional-query");
+
+    bus.register(type, () => "symbol-result");
+
+    let caller: Optional<TOptionalQueryCaller> = null as Optional<TOptionalQueryCaller<string>>;
+
+    function TestComponent() {
+      caller = useOptionalQueryCaller();
+
+      return null;
+    }
+
+    render(withIocProvider(<TestComponent />, container));
+
+    expect((caller as TOptionalQueryCaller<string>)(type)).toBe("symbol-result");
+  });
 });

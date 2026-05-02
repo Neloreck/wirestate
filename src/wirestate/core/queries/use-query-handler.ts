@@ -14,22 +14,18 @@ import type { TQueryHandler, TQueryType } from "@/wirestate/types/queries";
  * @param type - query type
  * @param handler - query handler function
  */
-export function useQueryHandler<RetType = unknown, D = unknown>(
-  type: TQueryType,
-  handler: TQueryHandler<D, RetType>
+export function useQueryHandler<R = unknown, D = unknown, T extends TQueryType = TQueryType>(
+  type: T,
+  handler: TQueryHandler<D, R>
 ): void {
   const container: Container = useContainer();
-  const handlerRef = useRef<TQueryHandler<D, RetType>>(handler);
+  const handlerRef = useRef<TQueryHandler<D, R>>(handler);
 
-  // Sync ref with the latest closure on every render.
   useEffect(() => {
     handlerRef.current = handler;
   });
 
   useEffect(() => {
-    const bus = container.get<QueryBus>(QUERY_BUS_TOKEN);
-
-    // Register on mount, unregister on unmount or type change.
-    return bus.register<D, RetType>(type, (data) => handlerRef.current(data));
+    return container.get<QueryBus>(QUERY_BUS_TOKEN).register<D, R>(type, (data) => handlerRef.current(data));
   }, [container, type]);
 }

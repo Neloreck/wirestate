@@ -3,14 +3,14 @@ import { Container } from "inversify";
 import { GenericService } from "@/fixtures/services/generic-service";
 import { Injectable } from "@/wirestate/alias";
 import { bindService } from "@/wirestate/core/bind/bind-service";
-import { ERROR_CODE_GENERIC } from "@/wirestate/core/error/error-code";
-import { WirestateError } from "@/wirestate/core/error/wirestate-error";
+import { CommandBus } from "@/wirestate/core/commands/command-bus";
 import { EventBus } from "@/wirestate/core/events/event-bus";
 import { OnQuery } from "@/wirestate/core/queries/on-query";
 import { QueryBus } from "@/wirestate/core/queries/query-bus";
-import { EVENT_BUS_TOKEN, QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
+import { COMMAND_BUS_TOKEN, EVENT_BUS_TOKEN, QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
 import { OnActivated } from "@/wirestate/core/service/on-activated";
 import { mockContainer } from "@/wirestate/test-utils";
+import { ECommandStatus } from "@/wirestate/types/commands";
 
 describe("bindService", () => {
   @Injectable()
@@ -52,6 +52,13 @@ describe("bindService", () => {
     // Test query from external source.
     expect(container.get<QueryBus>(QUERY_BUS_TOKEN).query("TEST_STRING_QUERY")).toBe("string-query-response");
 
+    // Test command from external source.
+    expect(container.get<CommandBus>(COMMAND_BUS_TOKEN).command("TEST_SYNC_COMMAND", 800)).toEqual({
+      status: ECommandStatus.PENDING,
+      task: expect.any(Promise),
+    });
+    expect(await container.get<CommandBus>(COMMAND_BUS_TOKEN).command("TEST_SYNC_COMMAND", 800).task).toBe(1800);
+
     // Test deactivation.
     container.unbind(GenericService);
     expect(instance.isActivated).toBe(false);
@@ -90,26 +97,6 @@ describe("bindService", () => {
       "onActivated",
       expect.any(Error)
     );
-
-    consoleSpy.mockRestore();
-  });
-
-  it("should handle error in query unregister", async () => {
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-    const container: Container = mockContainer();
-    const queryBus: QueryBus = container.get(QUERY_BUS_TOKEN);
-
-    // Mock register to return a failing unregister
-    jest.spyOn(queryBus, "register").mockReturnValue(() => {
-      throw new WirestateError(ERROR_CODE_GENERIC, "unregister-fail");
-    });
-
-    bindService(container, GenericService);
-
-    container.get(GenericService);
-    container.unbind(GenericService);
-
-    expect(consoleSpy).toHaveBeenCalledWith("[wirestate] query unregister threw:", expect.any(WirestateError));
 
     consoleSpy.mockRestore();
   });

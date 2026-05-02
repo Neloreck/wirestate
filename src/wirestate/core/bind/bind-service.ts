@@ -251,11 +251,7 @@ function detachQueryUnregister<T extends object>(service: T): void {
   }
 
   for (const unregister of list) {
-    try {
-      unregister();
-    } catch (error) {
-      console.error("[wirestate] query unregister threw:", error);
-    }
+    unregister();
   }
 
   QUERY_UNREGISTERS_BY_SERVICE.delete(service);
@@ -293,11 +289,7 @@ function detachCommandUnregister<T extends object>(service: T): void {
   }
 
   for (const unregister of list) {
-    try {
-      unregister();
-    } catch (error) {
-      console.error("[wirestate] command unregister threw:", error);
-    }
+    unregister();
   }
 
   COMMAND_UNREGISTERS_BY_SERVICE.delete(service);

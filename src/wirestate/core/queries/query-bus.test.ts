@@ -87,6 +87,29 @@ describe("QueryBus", () => {
     expect(bus.has("B")).toBe(false);
   });
 
+  it("should not throw when calling unregister after clear", () => {
+    const bus: QueryBus = new QueryBus();
+    const unregister: TQueryUnregister = bus.register("TYPE", () => "value");
+
+    bus.clear();
+
+    expect(() => unregister()).not.toThrow();
+    expect(bus.has("TYPE")).toBe(false);
+  });
+
+  it("should not throw when calling unregister twice while other handlers remain", () => {
+    const bus: QueryBus = new QueryBus();
+
+    bus.register("TYPE", () => "first");
+
+    const unregister: TQueryUnregister = bus.register("TYPE", () => "second");
+
+    unregister();
+
+    expect(() => unregister()).not.toThrow();
+    expect(bus.query("TYPE")).toBe("first");
+  });
+
   it("should support symbol query types", () => {
     const bus: QueryBus = new QueryBus();
     const type: unique symbol = Symbol("query");
@@ -119,6 +142,27 @@ describe("QueryBus", () => {
       const result: Optional<string> = await bus.queryOptional("ASYNC");
 
       expect(result).toBe("async-value");
+    });
+
+    it("should support symbol query types", () => {
+      const bus: QueryBus = new QueryBus();
+      const type: unique symbol = Symbol("optional-query");
+
+      bus.register(type, () => "symbol-result");
+
+      expect(bus.queryOptional(type)).toBe("symbol-result");
+    });
+
+    it("should return null after unregistering last handler", () => {
+      const bus: QueryBus = new QueryBus();
+
+      const unregister: TQueryUnregister = bus.register("TYPE", () => "value");
+
+      expect(bus.queryOptional("TYPE")).toBe("value");
+
+      unregister();
+
+      expect(bus.queryOptional("TYPE")).toBeNull();
     });
   });
 });

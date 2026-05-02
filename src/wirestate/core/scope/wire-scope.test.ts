@@ -1,6 +1,8 @@
 import { Container } from "inversify";
 
+import { GenericService } from "@/fixtures/services/generic-service";
 import { CommandBus } from "@/wirestate/core/commands/command-bus";
+import { applySeeds } from "@/wirestate/core/container/apply-seeds";
 import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
 import {
   ERROR_CODE_ACCESS_AFTER_DISPOSAL,
@@ -65,12 +67,19 @@ describe("WireScope", () => {
 
     jest.spyOn(bus, "emit");
 
-    scope.emitEvent("TEST_EVENT", { data: 1 });
+    scope.emitEvent("TEST_FIRST_EVENT", { data: 1 });
+    scope.emitEvent("TEST_SECOND_EVENT", "string-data", window);
 
+    expect(bus.emit).toHaveBeenCalledTimes(2);
     expect(bus.emit).toHaveBeenCalledWith({
-      type: "TEST_EVENT",
+      type: "TEST_FIRST_EVENT",
       payload: { data: 1 },
       from: scope,
+    });
+    expect(bus.emit).toHaveBeenCalledWith({
+      type: "TEST_SECOND_EVENT",
+      payload: "string-data",
+      from: window,
     });
   });
 
@@ -82,11 +91,17 @@ describe("WireScope", () => {
     bus.register("TEST_QUERY", () => "result-from-bus");
 
     jest.spyOn(bus, "query");
+    jest.spyOn(bus, "queryOptional");
 
     const result: MaybePromise<string> = scope.queryData("TEST_QUERY", { param: 1 });
 
     expect(result).toBe("result-from-bus");
     expect(bus.query).toHaveBeenCalledWith("TEST_QUERY", { param: 1 });
+
+    const missing: Optional<unknown> = scope.queryOptionalData("MISSING_QUERY", "string-value");
+
+    expect(missing).toBeNull();
+    expect(bus.queryOptional).toHaveBeenCalledWith("MISSING_QUERY", "string-value");
   });
 
   it("should execute commands via command bus", async () => {
@@ -138,10 +153,20 @@ describe("WireScope", () => {
     expect(bus.commandOptional).toHaveBeenCalledWith("TEST_COMMAND", "second-attempt");
   });
 
-  it("should get seed from container", () => {
+  it("should get global seed from container", () => {
     const container: Container = createIocContainer({ seed: { key: "val" } });
     const scope: WireScope = new WireScope(container);
 
     expect(scope.getSeed()).toEqual({ key: "val" });
+  });
+
+  it("should get bound seed from container", () => {
+    const container: Container = createIocContainer();
+    const scope: WireScope = new WireScope(container);
+
+    applySeeds(container, [[GenericService, { a: 1, b: 2 }]]);
+
+    expect(scope.getSeed(GenericService)).toEqual({ a: 1, b: 2 });
+    expect(scope.getSeed("NOT_EXISTING")).toBeNull();
   });
 });

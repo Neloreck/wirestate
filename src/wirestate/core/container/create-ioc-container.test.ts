@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 
-import { bindService } from "@/wirestate";
+import { bindService } from "@/wirestate/core/bind/bind-service";
 import { CommandBus } from "@/wirestate/core/commands/command-bus";
 import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
 import { EventBus } from "@/wirestate/core/events/event-bus";

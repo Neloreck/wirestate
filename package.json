@@ -17,6 +17,7 @@
     "deploy": "pnpm pre-deploy && cd ./target/pkg && npm publish",
     "deploy:experimental": "pnpm pre-deploy && cd ./target/pkg && npm publish --tag experimental",
     "format": "prettier --write \"**/*.(js|ts|tsx)\" && eslint . --fix",
+    "format:check": "prettier --check \"**/*.(js|ts|tsx)\"",
     "lint": "eslint .",
     "pre-deploy": "pnpm clean && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "purge": "npx rimraf ./node_modules */node_modules */**/node_modules",

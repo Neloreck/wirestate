@@ -1,6 +1,7 @@
 import { Container } from "inversify";
 
 import { Inject, Injectable } from "@/wirestate/alias";
+import { OnCommand } from "@/wirestate/core/commands/on-command";
 import { OnEvent } from "@/wirestate/core/events/on-event";
 import { OnQuery } from "@/wirestate/core/queries/on-query";
 import { WireScope } from "@/wirestate/core/scope/wire-scope";
@@ -52,6 +53,14 @@ export class GenericService {
     this.scope.queryData("TEST_QUERY", { data: 1 });
   }
 
+  public testSendSyncCommand(): void {
+    this.scope.queryData("TEST_SYNC_COMMAND", 100);
+  }
+
+  public testSendAsyncCommand(): void {
+    this.scope.queryData("TEST_ASYNC_COMMAND", 500);
+  }
+
   @OnQuery("TEST_QUERY")
   public onTestQuery(): string {
     return "query-response";
@@ -66,5 +75,17 @@ export class GenericService {
   @OnQuery("TEST_STRING_QUERY")
   public onTestStringQuery(): string {
     return "string-query-response";
+  }
+
+  @OnCommand("TEST_SYNC_COMMAND")
+  public onTestSyncCommand(value: number): number {
+    return 1000 + value;
+  }
+
+  @OnCommand("TEST_ASYNC_COMMAND")
+  public onTestAsyncCommand(value: number): Promise<number> {
+    return new Promise((resolve) => {
+      resolve(1000 + value);
+    });
   }
 }

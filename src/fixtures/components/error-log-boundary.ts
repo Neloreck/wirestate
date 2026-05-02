@@ -11,7 +11,7 @@ export class ErrorLogBoundary extends Component {
 
   public render(): ReactNode {
     return this.state.error
-      ? createElement("div", { id: "error-message" }, this.state.error.message)
+      ? createElement("div", { id: "error-message", "data-testid": "error-message" }, this.state.error.message)
       : this.props.children;
   }
 }

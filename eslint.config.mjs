@@ -70,6 +70,7 @@ export default [
       "@typescript-eslint/ban-ts-comment": "off",
       "@typescript-eslint/ban-ts-ignore": "off",
       "@typescript-eslint/explicit-member-accessibility": ["error"],
+      "@typescript-eslint/array-type": ["error", { default: "generic" }],
       "@typescript-eslint/no-require-imports": "off",
       "react/prop-types": "off",
       "import/no-unresolved": "off",
