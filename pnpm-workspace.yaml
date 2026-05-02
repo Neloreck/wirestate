@@ -2,7 +2,6 @@ packages:
   - 'cli/'
   - 'src/'
   - 'src/wirestate'
-  -
 allowBuilds:
   core-js: true
   unrs-resolver: true
