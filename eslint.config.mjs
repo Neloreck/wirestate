@@ -18,6 +18,7 @@ import tseslint from "typescript-eslint";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 const compat = new FlatCompat({
   baseDirectory: __dirname,
   recommendedConfig: js.configs.recommended,
@@ -27,7 +28,7 @@ const compat = new FlatCompat({
 export default [
   jsdoc.configs["flat/recommended"],
   {
-    ignores: ["target/**/*", "node_modules/**/*"],
+    ignores: ["target/**/*", "node_modules/**/*", "examples/**/*"],
   },
   ...fixupConfigRules(
     compat.extends(
