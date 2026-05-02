@@ -10,19 +10,20 @@ import { visualizer } from "rollup-plugin-visualizer";
 
 import {
   CORE_ENTRY,
-  TEST_UTILS_ENTRY,
-  MOBX_ENTRY,
-  ESM_ROOT,
-  TS_BUILD_CONFIG,
   EEnvironment,
-  WS_ROOT,
+  ESM_ROOT,
+  EXTERNAL_DEPENDENCIES,
+  MOBX_ENTRY,
   STATS_ROOT,
+  TEST_UTILS_ENTRY,
+  TS_BUILD_CONFIG,
+  WS_ROOT,
 } from "../config/build.constants";
 
 import { BABEL_CONFIG } from "./babel.modern.config";
 
 const createEsmConfig = (env) => ({
-  external: ["react", "inversify", "mobx", "mobx-react-lite", "tslib"],
+  external: EXTERNAL_DEPENDENCIES,
   input: [CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY],
   output: {
     compact: env === EEnvironment.PRODUCTION,

@@ -9,20 +9,21 @@ import { default as clear } from "rollup-plugin-clear";
 import { visualizer } from "rollup-plugin-visualizer";
 
 import {
-  CORE_ENTRY,
-  TEST_UTILS_ENTRY,
-  MOBX_ENTRY,
-  TS_BUILD_CONFIG,
   CJS_ROOT,
+  CORE_ENTRY,
   EEnvironment,
-  WS_ROOT,
+  EXTERNAL_DEPENDENCIES,
+  MOBX_ENTRY,
   STATS_ROOT,
+  TEST_UTILS_ENTRY,
+  TS_BUILD_CONFIG,
+  WS_ROOT,
 } from "../config/build.constants";
 
 import { BABEL_CONFIG } from "./babel.modern.config";
 
 const createCjsConfig = (env) => ({
-  external: ["react", "inversify", "mobx", "mobx-react-lite", "tslib"],
+  external: EXTERNAL_DEPENDENCIES,
   input: [CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY],
   output: {
     chunkFileNames: "lib.js",

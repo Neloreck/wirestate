@@ -10,14 +10,15 @@ import { visualizer } from "rollup-plugin-visualizer";
 
 import { default as tsconfig } from "../../tsconfig.json";
 import {
-  PORTABLE_ENTRY,
-  MOBX_ENTRY,
-  TS_PORTABLE_CONFIG,
-  PORTABLE_ROOT,
   EEnvironment,
-  WS_ROOT,
-  STATS_ROOT,
+  EXTERNAL_DEPENDENCIES,
+  MOBX_ENTRY,
   PORTABLE_DEBUG_ROOT,
+  PORTABLE_ENTRY,
+  PORTABLE_ROOT,
+  STATS_ROOT,
+  TS_PORTABLE_CONFIG,
+  WS_ROOT,
 } from "../config/build.constants";
 
 import { BABEL_CONFIG } from "./babel.modern.config";
@@ -25,7 +26,7 @@ import { BABEL_CONFIG } from "./babel.modern.config";
 const isLoggingEnabled = process.env.LIB_DEBUG_LOGGING === "true" || process.env.LIB_DEBUG_LOGGING === "1";
 
 const createPortableConfig = (env, isDebug) => ({
-  external: ["react", "mobx", "mobx-react-lite", "inversify", "tslib"],
+  external: EXTERNAL_DEPENDENCIES,
   input: [PORTABLE_ENTRY, MOBX_ENTRY],
   output: {
     compact: env === EEnvironment.PRODUCTION,
@@ -75,6 +76,7 @@ const createPortableConfig = (env, isDebug) => ({
 });
 
 const createPortableDtsConfig = (env, isDebug) => ({
+  external: EXTERNAL_DEPENDENCIES,
   input: [PORTABLE_ENTRY, MOBX_ENTRY],
   output: {
     dir: isDebug ? PORTABLE_DEBUG_ROOT : PORTABLE_ROOT,

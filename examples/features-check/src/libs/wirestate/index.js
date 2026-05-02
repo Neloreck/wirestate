@@ -1,7 +1,41 @@
-'use no memo';
-import {LazyServiceIdentifier,bindingScopeValues,injectable,bindingTypeValues,Container}from'inversify';export{bindingTypeValues as BindingType,Container,ContainerModule,inject as Inject,injectable as Injectable,LazyServiceIdentifier,multiInject as MultiInject,named as Named,optional as Optional,postConstruct as PostConstruct,preDestroy as PreDestroy,bindingScopeValues as ScopeBindingType,tagged as Tagged}from'inversify';import {__decorate,__metadata}from'tslib';import {createContext,useContext,useCallback,useRef,useEffect,useMemo,useState,createElement}from'react';function forwardRef(forward) {
+"use no memo";
+import {
+  LazyServiceIdentifier,
+  bindingScopeValues,
+  injectable,
+  bindingTypeValues,
+  Container,
+} from "inversify";
+export {
+  bindingTypeValues as BindingType,
+  Container,
+  ContainerModule,
+  inject as Inject,
+  injectable as Injectable,
+  LazyServiceIdentifier,
+  multiInject as MultiInject,
+  named as Named,
+  optional as Optional,
+  postConstruct as PostConstruct,
+  preDestroy as PreDestroy,
+  bindingScopeValues as ScopeBindingType,
+  tagged as Tagged,
+} from "inversify";
+import { __decorate, __metadata } from "tslib";
+import {
+  createContext,
+  useContext,
+  useCallback,
+  useRef,
+  useEffect,
+  useMemo,
+  useState,
+  createElement,
+} from "react";
+function forwardRef(forward) {
   return new LazyServiceIdentifier(forward);
-}const ERROR_CODE_GENERIC = 1;
+}
+const ERROR_CODE_GENERIC = 1;
 const ERROR_CODE_VALIDATION_ERROR = 50;
 const ERROR_CODE_INVALID_ARGUMENTS = 51;
 const ERROR_CODE_INVALID_CONTEXT = 52;
@@ -10,19 +44,28 @@ const ERROR_CODE_FAILED_TO_RESOLVE = 100;
 const ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER = 101;
 const ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER = 102;
 const ERROR_CODE_ACCESS_BEFORE_ACTIVATION = 200;
-const ERROR_CODE_ACCESS_AFTER_DISPOSAL = 201;class WirestateError extends Error {
+const ERROR_CODE_ACCESS_AFTER_DISPOSAL = 201;
+class WirestateError extends Error {
   name = "WirestateError";
   constructor(code = ERROR_CODE_GENERIC, detail) {
     super();
     this.code = code;
     this.message = detail || "Wirestate error.";
   }
-}function bindConstant(container, entry) {
-  if (entry.scopeBindingType && entry.scopeBindingType !== bindingScopeValues.Singleton) {
-    throw new WirestateError(ERROR_CODE_BINDING_SCOPE, "Provided unexpected binding scope for constant value.");
+}
+function bindConstant(container, entry) {
+  if (
+    entry.scopeBindingType &&
+    entry.scopeBindingType !== bindingScopeValues.Singleton
+  ) {
+    throw new WirestateError(
+      ERROR_CODE_BINDING_SCOPE,
+      "Provided unexpected binding scope for constant value.",
+    );
   }
   container.bind(entry.id).toConstantValue(entry.value);
-}function bindDynamicValue(container, entry) {
+}
+function bindDynamicValue(container, entry) {
   const binding = container.bind(entry.id).toDynamicValue(() => {
     if (entry.factory) {
       return entry.factory();
@@ -38,7 +81,8 @@ const ERROR_CODE_ACCESS_AFTER_DISPOSAL = 201;class WirestateError extends Error 
   } else {
     binding.inSingletonScope();
   }
-}const EVENT_BUS_TOKEN = Symbol("@wirestate/event-bus");
+}
+const EVENT_BUS_TOKEN = Symbol("@wirestate/event-bus");
 const QUERY_BUS_TOKEN = Symbol("@wirestate/query-bus");
 const COMMAND_BUS_TOKEN = Symbol("@wirestate/command-bus");
 const SEEDS_TOKEN = Symbol("@wirestate/seeds");
@@ -52,10 +96,15 @@ const CONTAINER_REFS_BY_SERVICE = new WeakMap();
 const WIRE_SCOPES_BY_SERVICE = new WeakMap();
 const EVENT_UNSUBSCRIBERS_BY_SERVICE = new WeakMap();
 const QUERY_UNREGISTERS_BY_SERVICE = new WeakMap();
-const COMMAND_UNREGISTERS_BY_SERVICE = new WeakMap();function getCommandHandlerMetadata(instance) {
+const COMMAND_UNREGISTERS_BY_SERVICE = new WeakMap();
+function getCommandHandlerMetadata(instance) {
   let constructor = instance.constructor;
   const chain = [];
-  while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
+  while (
+    typeof constructor === "function" &&
+    constructor !== Object &&
+    constructor !== Function.prototype
+  ) {
     const own = COMMAND_HANDLER_METADATA.get(constructor);
     if (own && own.length > 0) {
       chain.push(own);
@@ -63,10 +112,15 @@ const COMMAND_UNREGISTERS_BY_SERVICE = new WeakMap();function getCommandHandlerM
     constructor = Object.getPrototypeOf(constructor);
   }
   return chain.reverse().flat();
-}function getEventHandlerMetadata(instance) {
+}
+function getEventHandlerMetadata(instance) {
   let constructor = instance.constructor;
   const chain = [];
-  while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
+  while (
+    typeof constructor === "function" &&
+    constructor !== Object &&
+    constructor !== Function.prototype
+  ) {
     const own = EVENT_HANDLER_METADATA.get(constructor);
     if (own && own.length > 0) {
       chain.push(own);
@@ -74,19 +128,20 @@ const COMMAND_UNREGISTERS_BY_SERVICE = new WeakMap();function getCommandHandlerM
     constructor = Object.getPrototypeOf(constructor);
   }
   return chain.reverse().flat();
-}function buildEventDispatcher(instance) {
+}
+function buildEventDispatcher(instance) {
   const entries = [];
   for (const meta of getEventHandlerMetadata(instance)) {
     const method = instance[meta.methodName];
     if (typeof method === "function") {
       entries.push({
         types: meta.types,
-        handler: method.bind(instance)
+        handler: method.bind(instance),
       });
     }
   }
   if (entries.length) {
-    return event => {
+    return (event) => {
       for (const entry of entries) {
         if (entry.types === null || entry.types.includes(event.type)) {
           entry.handler(event);
@@ -96,10 +151,15 @@ const COMMAND_UNREGISTERS_BY_SERVICE = new WeakMap();function getCommandHandlerM
   } else {
     return null;
   }
-}function getQueryHandlerMetadata(instance) {
+}
+function getQueryHandlerMetadata(instance) {
   let constructor = instance.constructor;
   const chain = [];
-  while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
+  while (
+    typeof constructor === "function" &&
+    constructor !== Object &&
+    constructor !== Function.prototype
+  ) {
     const own = QUERY_HANDLER_METADATA.get(constructor);
     if (own && own.length > 0) {
       chain.push(own);
@@ -107,7 +167,8 @@ const COMMAND_UNREGISTERS_BY_SERVICE = new WeakMap();function getCommandHandlerM
     constructor = Object.getPrototypeOf(constructor);
   }
   return chain.reverse().flat();
-}let WireScope = class WireScope {
+}
+let WireScope = class WireScope {
   isDisposed = false;
   constructor(container) {
     this.container = container;
@@ -117,35 +178,66 @@ const COMMAND_UNREGISTERS_BY_SERVICE = new WeakMap();function getCommandHandlerM
       return this.container;
     }
     if (this.isDisposed) {
-      throw new WirestateError(ERROR_CODE_ACCESS_AFTER_DISPOSAL, "WireScope::container accessed after deactivation. Ensure service is properly disposed.");
+      throw new WirestateError(
+        ERROR_CODE_ACCESS_AFTER_DISPOSAL,
+        "WireScope::container accessed after deactivation. Ensure service is properly disposed.",
+      );
     } else {
-      throw new WirestateError(ERROR_CODE_ACCESS_BEFORE_ACTIVATION, "WireScope::container accessed before activation. " + "Ensure service is bound to container and is properly resolved.");
+      throw new WirestateError(
+        ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
+        "WireScope::container accessed before activation. " +
+          "Ensure service is bound to container and is properly resolved.",
+      );
     }
   }
   resolve(injectionId) {
     return this.getContainer().get(injectionId);
   }
+  resolveOptional(injectionId) {
+    const container = this.getContainer();
+    return container.isBound(injectionId) ? container.get(injectionId) : null;
+  }
   emitEvent(type, payload, from) {
-    this.getContainer().get(EVENT_BUS_TOKEN).emit({
-      type,
-      payload,
-      from: from === undefined ? this : from
-    });
+    this.getContainer()
+      .get(EVENT_BUS_TOKEN)
+      .emit({
+        type,
+        payload,
+        from: from === undefined ? this : from,
+      });
   }
   queryData(type, data) {
     return this.getContainer().get(QUERY_BUS_TOKEN).query(type, data);
   }
+  queryOptionalData(type, data) {
+    return this.getContainer().get(QUERY_BUS_TOKEN).queryOptional(type, data);
+  }
   executeCommand(type, data) {
     return this.getContainer().get(COMMAND_BUS_TOKEN).command(type, data);
   }
+  executeOptionalCommand(type, data) {
+    return this.getContainer()
+      .get(COMMAND_BUS_TOKEN)
+      .commandOptional(type, data);
+  }
   getSeed(seed) {
-    return seed ? this.getContainer().get(SEEDS_TOKEN).get(seed) || null : this.getContainer().get(SEED_TOKEN);
+    return seed
+      ? this.getContainer().get(SEEDS_TOKEN).get(seed) || null
+      : this.getContainer().get(SEED_TOKEN);
   }
 };
-WireScope = __decorate([injectable(), __metadata("design:paramtypes", [Object])], WireScope);function getActivatedHandlerMetadata(instance) {
+WireScope = __decorate(
+  [injectable(), __metadata("design:paramtypes", [Object])],
+  WireScope,
+);
+function getActivatedHandlerMetadata(instance) {
   let constructor = instance.constructor;
   const chain = [];
-  while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
+  while (
+    typeof constructor === "function" &&
+    constructor !== Object &&
+    constructor !== Function.prototype
+  ) {
     const own = ACTIVATED_HANDLER_METADATA.get(constructor);
     if (own && own.length > 0) {
       chain.push(own);
@@ -153,10 +245,15 @@ WireScope = __decorate([injectable(), __metadata("design:paramtypes", [Object])]
     constructor = Object.getPrototypeOf(constructor);
   }
   return chain.reverse().flat();
-}function getDeactivationHandlerMetadata(instance) {
+}
+function getDeactivationHandlerMetadata(instance) {
   let constructor = instance.constructor;
   const chain = [];
-  while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
+  while (
+    typeof constructor === "function" &&
+    constructor !== Object &&
+    constructor !== Function.prototype
+  ) {
     const own = DEACTIVATION_HANDLER_METADATA.get(constructor);
     if (own && own.length > 0) {
       chain.push(own);
@@ -164,7 +261,8 @@ WireScope = __decorate([injectable(), __metadata("design:paramtypes", [Object])]
     constructor = Object.getPrototypeOf(constructor);
   }
   return chain.reverse().flat();
-}function bindService(container, entry, options) {
+}
+function bindService(container, entry, options) {
   const whenBind = container.bind(entry).to(entry).inSingletonScope();
   whenBind.onActivation((context, instance) => {
     instance.IS_DISPOSED = false;
@@ -192,7 +290,8 @@ WireScope = __decorate([injectable(), __metadata("design:paramtypes", [Object])]
       const unregister = commandBus.register(meta.type, method.bind(instance));
       attachCommandUnregister(instance, unregister);
     }
-    if (options?.isWithIgnoreLifecycle) ; else {
+    if (options?.isWithIgnoreLifecycle);
+    else {
       for (const methodName of getActivatedHandlerMetadata(instance)) {
         const method = instance[methodName];
         if (typeof method !== "function") {
@@ -200,16 +299,22 @@ WireScope = __decorate([injectable(), __metadata("design:paramtypes", [Object])]
         }
         const result = method.call(instance);
         if (result && typeof result.then === "function") {
-          result.catch(error => {
-            console.error("[wirestate] @OnActivated rejected for:", entry.name, String(methodName), error);
+          result.catch((error) => {
+            console.error(
+              "[wirestate] @OnActivated rejected for:",
+              entry.name,
+              String(methodName),
+              error,
+            );
           });
         }
       }
     }
     return instance;
   });
-  whenBind.onDeactivation(instance => {
-    if (options?.isWithIgnoreLifecycle) ; else {
+  whenBind.onDeactivation((instance) => {
+    if (options?.isWithIgnoreLifecycle);
+    else {
       for (const methodName of getDeactivationHandlerMetadata(instance)) {
         const method = instance[methodName];
         if (typeof method === "function") {
@@ -252,11 +357,7 @@ function detachQueryUnregister(service) {
     return;
   }
   for (const unregister of list) {
-    try {
-      unregister();
-    } catch (error) {
-      console.error("[wirestate] query unregister threw:", error);
-    }
+    unregister();
   }
   QUERY_UNREGISTERS_BY_SERVICE.delete(service);
 }
@@ -274,17 +375,13 @@ function detachCommandUnregister(service) {
     return;
   }
   for (const unregister of list) {
-    try {
-      unregister();
-    } catch (error) {
-      console.error("[wirestate] command unregister threw:", error);
-    }
+    unregister();
   }
   COMMAND_UNREGISTERS_BY_SERVICE.delete(service);
 }
 function attachWireScopes(service, Service) {
   const paramTypes = Reflect.getMetadata("design:paramtypes", Service);
-  if (!paramTypes?.some(type => type === WireScope)) {
+  if (!paramTypes?.some((type) => type === WireScope)) {
     return;
   }
   const scopes = [];
@@ -308,23 +405,29 @@ function detachWireScopes(service) {
     scope.container = null;
   }
   WIRE_SCOPES_BY_SERVICE.delete(service);
-}function bindEntry(container, entry, options = {}) {
+}
+function bindEntry(container, entry, options = {}) {
   if (typeof entry === "function") {
     return bindService(container, entry, options);
   }
-  if (!entry.bindingType || entry.bindingType === bindingTypeValues.ConstantValue) {
+  if (
+    !entry.bindingType ||
+    entry.bindingType === bindingTypeValues.ConstantValue
+  ) {
     return bindConstant(container, entry);
   }
   if (entry.bindingType === bindingTypeValues.DynamicValue) {
     return bindDynamicValue(container, entry);
   }
   return bindService(container, entry.value, options);
-}var ECommandStatus;
+}
+var ECommandStatus;
 (function (ECommandStatus) {
   ECommandStatus["PENDING"] = "pending";
   ECommandStatus["SETTLED"] = "settled";
   ECommandStatus["ERROR"] = "error";
-})(ECommandStatus || (ECommandStatus = {}));class CommandBus {
+})(ECommandStatus || (ECommandStatus = {}));
+class CommandBus {
   handlers = new Map();
   register(type, handler) {
     let stack = this.handlers.get(type);
@@ -350,20 +453,26 @@ function detachWireScopes(service) {
   command(type, data) {
     const stack = this.handlers.get(type);
     if (!stack?.length) {
-      throw new WirestateError(ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER, `No command handler registered in container for type: '${String(type)}'.`);
+      throw new WirestateError(
+        ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER,
+        `No command handler registered in container for type: '${String(type)}'.`,
+      );
     }
     const handler = stack[stack.length - 1];
     const descriptor = {
       task: null,
-      status: ECommandStatus.PENDING
+      status: ECommandStatus.PENDING,
     };
-    descriptor.task = Promise.resolve().then(() => handler(data)).then(result => {
-      descriptor.status = ECommandStatus.SETTLED;
-      return result;
-    }).catch(error => {
-      descriptor.status = ECommandStatus.ERROR;
-      throw error;
-    });
+    descriptor.task = Promise.resolve()
+      .then(() => handler(data))
+      .then((result) => {
+        descriptor.status = ECommandStatus.SETTLED;
+        return result;
+      })
+      .catch((error) => {
+        descriptor.status = ECommandStatus.ERROR;
+        throw error;
+      });
     return descriptor;
   }
   commandOptional(type, data) {
@@ -376,7 +485,8 @@ function detachWireScopes(service) {
   clear() {
     this.handlers.clear();
   }
-}class EventBus {
+}
+class EventBus {
   handlers = new Set();
   emit(event) {
     const snapshot = Array.from(this.handlers);
@@ -397,7 +507,8 @@ function detachWireScopes(service) {
   clear() {
     this.handlers.clear();
   }
-}class QueryBus {
+}
+class QueryBus {
   handlers = new Map();
   register(type, handler) {
     let stack = this.handlers.get(type);
@@ -425,7 +536,10 @@ function detachWireScopes(service) {
     if (stack?.length) {
       return stack[stack.length - 1](data);
     }
-    throw new WirestateError(ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER, `No query handler registered in container for type: '${String(type)}'.`);
+    throw new WirestateError(
+      ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER,
+      `No query handler registered in container for type: '${String(type)}'.`,
+    );
   }
   queryOptional(type, data) {
     const stack = this.handlers.get(type);
@@ -441,33 +555,43 @@ function detachWireScopes(service) {
   clear() {
     this.handlers.clear();
   }
-}function createIocContainer(options = {}) {
+}
+function createIocContainer(options = {}) {
   const container = new Container({
     defaultScope: "Singleton",
-    parent: options.parent
+    parent: options.parent,
   });
   container.bind(EVENT_BUS_TOKEN).toConstantValue(new EventBus());
   container.bind(QUERY_BUS_TOKEN).toConstantValue(new QueryBus());
   container.bind(COMMAND_BUS_TOKEN).toConstantValue(new CommandBus());
   container.bind(SEEDS_TOKEN).toConstantValue(new Map());
-  container.bind(SEED_TOKEN).toConstantValue({});
-  container.bind(WireScope).toResolvedValue(() => new WireScope(container)).inTransientScope();
+  container.bind(SEED_TOKEN).toConstantValue(options.seed ?? {});
+  container
+    .bind(WireScope)
+    .toResolvedValue(() => new WireScope(container))
+    .inTransientScope();
   return container;
-}function command(container, type, data) {
+}
+function command(container, type, data) {
   return container.get(COMMAND_BUS_TOKEN).command(type, data);
-}function commandOptional(container, type, data) {
+}
+function commandOptional(container, type, data) {
   return container.get(COMMAND_BUS_TOKEN).commandOptional(type, data);
-}function emitEvent(container, type, payload, from) {
+}
+function emitEvent(container, type, payload, from) {
   container.get(EVENT_BUS_TOKEN).emit({
     type,
     payload,
-    from
+    from,
   });
-}function query(container, type, data) {
+}
+function query(container, type, data) {
   return container.get(QUERY_BUS_TOKEN).query(type, data);
-}function queryOptional(container, type, data) {
+}
+function queryOptional(container, type, data) {
   return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
-}function OnCommand(type) {
+}
+function OnCommand(type) {
   return (target, propertyKey) => {
     const constructor = target.constructor;
     let list = COMMAND_HANDLER_METADATA.get(constructor);
@@ -477,38 +601,56 @@ function detachWireScopes(service) {
     }
     list.push({
       methodName: propertyKey,
-      type
+      type,
     });
   };
-}const IocContext = createContext(null);
-IocContext.displayName = "IocContext";function useIocContext() {
+}
+const IocContext = createContext(null);
+IocContext.displayName = "IocContext";
+function useIocContext() {
   const value = useContext(IocContext);
   if (!value) {
-    throw new WirestateError(ERROR_CODE_INVALID_CONTEXT, "Trying to access IOC context from React subtree not wrapped in <IocProvider>.");
+    throw new WirestateError(
+      ERROR_CODE_INVALID_CONTEXT,
+      "Trying to access IOC context from React subtree not wrapped in <IocProvider>.",
+    );
   }
   return value;
-}function useContainer() {
+}
+function useContainer() {
   return useIocContext().container;
-}function useCommandCaller() {
+}
+function useCommandCaller() {
   const container = useContainer();
-  return useCallback((type, data) => {
-    return container.get(COMMAND_BUS_TOKEN).command(type, data);
-  }, [container]);
-}function useOptionalCommandCaller() {
+  return useCallback(
+    (type, data) => {
+      return container.get(COMMAND_BUS_TOKEN).command(type, data);
+    },
+    [container],
+  );
+}
+function useOptionalCommandCaller() {
   const container = useContainer();
-  return useCallback((type, data) => {
-    return container.get(COMMAND_BUS_TOKEN).commandOptional(type, data);
-  }, [container]);
-}function useCommandHandler(type, handler) {
+  return useCallback(
+    (type, data) => {
+      return container.get(COMMAND_BUS_TOKEN).commandOptional(type, data);
+    },
+    [container],
+  );
+}
+function useCommandHandler(type, handler) {
   const container = useContainer();
   const handlerRef = useRef(handler);
   useEffect(() => {
     handlerRef.current = handler;
   });
   useEffect(() => {
-    return container.get(COMMAND_BUS_TOKEN).register(type, data => handlerRef.current(data));
+    return container
+      .get(COMMAND_BUS_TOKEN)
+      .register(type, (data) => handlerRef.current(data));
   }, [container, type]);
-}function OnQuery(type) {
+}
+function OnQuery(type) {
   return (target, propertyKey) => {
     const constructor = target.constructor;
     let list = QUERY_HANDLER_METADATA.get(constructor);
@@ -518,40 +660,59 @@ IocContext.displayName = "IocContext";function useIocContext() {
     }
     list.push({
       methodName: propertyKey,
-      type
+      type,
     });
   };
-}function useQueryCaller() {
+}
+function useQueryCaller() {
   const container = useContainer();
-  return useCallback((type, data) => {
-    return container.get(QUERY_BUS_TOKEN).query(type, data);
-  }, [container]);
-}function useOptionalQueryCaller() {
+  return useCallback(
+    (type, data) => {
+      return container.get(QUERY_BUS_TOKEN).query(type, data);
+    },
+    [container],
+  );
+}
+function useOptionalQueryCaller() {
   const container = useContainer();
-  return useCallback((type, data) => {
-    return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
-  }, [container]);
-}function useQueryHandler(type, handler) {
+  return useCallback(
+    (type, data) => {
+      return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
+    },
+    [container],
+  );
+}
+function useQueryHandler(type, handler) {
   const container = useContainer();
   const handlerRef = useRef(handler);
   useEffect(() => {
     handlerRef.current = handler;
   });
   useEffect(() => {
-    const bus = container.get(QUERY_BUS_TOKEN);
-    return bus.register(type, data => handlerRef.current(data));
+    return container
+      .get(QUERY_BUS_TOKEN)
+      .register(type, (data) => handlerRef.current(data));
   }, [container, type]);
-}function useSyncQueryCaller() {
+}
+function useSyncQueryCaller() {
   const container = useContainer();
-  return useCallback((type, data) => {
-    return container.get(QUERY_BUS_TOKEN).query(type, data);
-  }, [container]);
-}function useOptionalSyncQueryCaller() {
+  return useCallback(
+    (type, data) => {
+      return container.get(QUERY_BUS_TOKEN).query(type, data);
+    },
+    [container],
+  );
+}
+function useOptionalSyncQueryCaller() {
   const container = useContainer();
-  return useCallback((type, data) => {
-    return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
-  }, [container]);
-}function OnActivated() {
+  return useCallback(
+    (type, data) => {
+      return container.get(QUERY_BUS_TOKEN).queryOptional(type, data);
+    },
+    [container],
+  );
+}
+function OnActivated() {
   return (target, propertyKey) => {
     const constructor = target.constructor;
     let list = ACTIVATED_HANDLER_METADATA.get(constructor);
@@ -561,7 +722,8 @@ IocContext.displayName = "IocContext";function useIocContext() {
     }
     list.push(propertyKey);
   };
-}function OnDeactivation() {
+}
+function OnDeactivation() {
   return (target, propertyKey) => {
     const constructor = target.constructor;
     let list = DEACTIVATION_HANDLER_METADATA.get(constructor);
@@ -571,19 +733,15 @@ IocContext.displayName = "IocContext";function useIocContext() {
     }
     list.push(propertyKey);
   };
-}function useInjection(injectionId) {
-  const {
-    container,
-    revision
-  } = useIocContext();
+}
+function useInjection(injectionId) {
+  const { container, revision } = useIocContext();
   return useMemo(() => {
     return container.get(injectionId);
   }, [container, revision, injectionId]);
-}function useOptionalInjection(injectionId, onFallback) {
-  const {
-    container,
-    revision
-  } = useIocContext();
+}
+function useOptionalInjection(injectionId, onFallback) {
+  const { container, revision } = useIocContext();
   return useMemo(() => {
     if (container.isBound(injectionId)) {
       return container.get(injectionId);
@@ -593,34 +751,42 @@ IocContext.displayName = "IocContext";function useIocContext() {
       return null;
     }
   }, [container, revision, injectionId]);
-}function getEntryToken(entry) {
+}
+function getEntryToken(entry) {
   return typeof entry === "function" ? entry : entry.id;
-}function applySeeds(container, seeds) {
+}
+function applySeeds(container, seeds) {
   const existing = container.get(SEEDS_TOKEN);
   for (const [key, state] of seeds) {
     existing.set(key, state);
   }
-}function unapplySeeds(container, seeds) {
+}
+function unapplySeeds(container, seeds) {
   const existing = container.get(SEEDS_TOKEN);
   for (const [key] of seeds) {
     existing.delete(key);
   }
-}function createInjectablesProvider(entries, options = {}) {
-  const {
-    activate
-  } = options;
+}
+function createInjectablesProvider(entries, options = {}) {
+  const { activate } = options;
   if (activate && activate.length > 0) {
     const entryTokens = entries.map(getEntryToken);
     for (const eager of activate) {
       if (!entryTokens.includes(eager)) {
-        throw new WirestateError(ERROR_CODE_VALIDATION_ERROR, `createInjectablesProvider: '${String(eager)}' is listed in 'activate' but was not provided in 'entries'.`);
+        throw new WirestateError(
+          ERROR_CODE_VALIDATION_ERROR,
+          `createInjectablesProvider: '${String(eager)}' is listed in 'activate' but was not provided in 'entries'.`,
+        );
       }
     }
   }
   function InjectablesProviderComponent(props) {
     const iocContext = useContext(IocContext);
     if (!iocContext) {
-      throw new WirestateError(ERROR_CODE_INVALID_CONTEXT, "<InjectablesProvider> must be rendered inside an <IocProvider> React subtree.");
+      throw new WirestateError(
+        ERROR_CODE_INVALID_CONTEXT,
+        "<InjectablesProvider> must be rendered inside an <IocProvider> React subtree.",
+      );
     }
     const [initialPropsSnapshot] = useState(() => props);
     useMemo(() => {
@@ -655,7 +821,7 @@ IocContext.displayName = "IocContext";function useIocContext() {
         }
       }
       if (didRebind) {
-        iocContext.setRevision(r => r + 1);
+        iocContext.setRevision((r) => r + 1);
       }
       return () => {
         for (const entry of entries) {
@@ -673,36 +839,49 @@ IocContext.displayName = "IocContext";function useIocContext() {
   }
   InjectablesProviderComponent.displayName = "InjectablesProvider";
   return InjectablesProviderComponent;
-}function applySharedSeed(container, seed) {
+}
+function applySharedSeed(container, seed) {
   container.rebind(SEED_TOKEN).toConstantValue(seed);
-}function IocProvider({
-  container: externalContainer,
-  seed,
-  children
-}) {
+}
+function IocProvider({ container: externalContainer, seed, children }) {
   const [revision, setRevision] = useState(1);
-  const [ownedContainer] = useState(() => externalContainer ? null : createIocContainer());
+  const [ownedContainer] = useState(() =>
+    externalContainer ? null : createIocContainer(),
+  );
   const container = externalContainer ?? ownedContainer;
   if (!container) {
-    throw new WirestateError(ERROR_CODE_FAILED_TO_RESOLVE, "IocProvider failed to resolve a container instance.");
+    throw new WirestateError(
+      ERROR_CODE_FAILED_TO_RESOLVE,
+      "IocProvider failed to resolve a container instance.",
+    );
   }
-  const value = useMemo(() => ({
-    container,
-    revision,
-    setRevision
-  }), [container, revision]);
+  const value = useMemo(
+    () => ({
+      container,
+      revision,
+      setRevision,
+    }),
+    [container, revision],
+  );
   useEffect(() => {
     if (seed) {
       applySharedSeed(container, seed);
     }
   }, [container]);
-  return createElement(IocContext.Provider, {
-    value
-  }, children);
-}function useContainerRevision() {
+  return createElement(
+    IocContext.Provider,
+    {
+      value,
+    },
+    children,
+  );
+}
+function useContainerRevision() {
   return useIocContext().revision;
-}function OnEvent(types) {
-  const normalized = types === undefined ? null : Array.isArray(types) ? [...types] : [types];
+}
+function OnEvent(types) {
+  const normalized =
+    types === undefined ? null : Array.isArray(types) ? [...types] : [types];
   return (target, propertyKey) => {
     const constructor = target.constructor;
     let list = EVENT_HANDLER_METADATA.get(constructor);
@@ -712,10 +891,11 @@ IocContext.displayName = "IocContext";function useIocContext() {
     }
     list.push({
       methodName: propertyKey,
-      types: normalized
+      types: normalized,
     });
   };
-}function useEvent(type, handler) {
+}
+function useEvent(type, handler) {
   const typeRef = useRef(type);
   const handlerRef = useRef(handler);
   const container = useContainer();
@@ -724,13 +904,14 @@ IocContext.displayName = "IocContext";function useIocContext() {
     handlerRef.current = handler;
   });
   useEffect(() => {
-    return container.get(EVENT_BUS_TOKEN).subscribe(event => {
+    return container.get(EVENT_BUS_TOKEN).subscribe((event) => {
       if (event.type === typeRef.current) {
         handlerRef.current?.(event);
       }
     });
   }, [container, type]);
-}function useEvents(types, handler) {
+}
+function useEvents(types, handler) {
   const typesRef = useRef(types);
   const handlerRef = useRef(handler);
   const container = useContainer();
@@ -739,80 +920,135 @@ IocContext.displayName = "IocContext";function useIocContext() {
     handlerRef.current = handler;
   });
   useEffect(() => {
-    return container.get(EVENT_BUS_TOKEN).subscribe(event => {
+    return container.get(EVENT_BUS_TOKEN).subscribe((event) => {
       if (typesRef.current.includes(event.type)) {
         handlerRef.current?.(event);
       }
     });
   }, [container]);
-}function useEventsHandler(handler) {
+}
+function useEventsHandler(handler) {
   const handlerRef = useRef(handler);
   const container = useContainer();
   useEffect(() => {
     handlerRef.current = handler;
   });
   useEffect(() => {
-    return container.get(EVENT_BUS_TOKEN).subscribe(event => {
+    return container.get(EVENT_BUS_TOKEN).subscribe((event) => {
       handlerRef.current?.(event);
     });
   }, [container]);
-}function useEventEmitter() {
+}
+function useEventEmitter() {
   const container = useIocContext().container;
-  return useCallback((type, payload, from) => {
-    container.get(EVENT_BUS_TOKEN).emit({
-      type,
-      payload,
-      from
-    });
-  }, [container]);
-}function mockBindService(container, ServiceClass, options = {}) {
-  const {
-    skipLifecycle
-  } = options;
+  return useCallback(
+    (type, payload, from) => {
+      container.get(EVENT_BUS_TOKEN).emit({
+        type,
+        payload,
+        from,
+      });
+    },
+    [container],
+  );
+}
+function mockBindService(container, ServiceClass, options = {}) {
+  const { skipLifecycle } = options;
   return bindService(container, ServiceClass, {
-    isWithIgnoreLifecycle: skipLifecycle
+    isWithIgnoreLifecycle: skipLifecycle,
   });
-}function mockBindEntry(container, entry, options = {}) {
-  const {
-    skipLifecycle
-  } = options;
+}
+function mockBindEntry(container, entry, options = {}) {
+  const { skipLifecycle } = options;
   return bindEntry(container, entry, {
-    isWithIgnoreLifecycle: skipLifecycle
+    isWithIgnoreLifecycle: skipLifecycle,
   });
-}function mockUnbindService(container, ServiceClass) {
+}
+function mockUnbindService(container, ServiceClass) {
   container.unbind(ServiceClass);
-}function mockContainer(options = {}) {
-  const {
-    activate = [],
-    entries = [],
-    skipLifecycle
-  } = options;
+}
+function mockContainer(options = {}) {
+  const { activate = [], entries = [], skipLifecycle } = options;
   if (activate.length) {
-    const serviceTokens = entries.map(s => getEntryToken(s));
+    const serviceTokens = entries.map((s) => getEntryToken(s));
     for (const token of activate) {
       if (!serviceTokens.includes(token)) {
-        throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, "Provided services for activation not matching list of services to bind.");
+        throw new WirestateError(
+          ERROR_CODE_INVALID_ARGUMENTS,
+          "Provided services for activation not matching list of services to bind.",
+        );
       }
     }
   }
   const container = createIocContainer();
   for (const it of entries) {
     mockBindEntry(container, it, {
-      skipLifecycle: skipLifecycle
+      skipLifecycle: skipLifecycle,
     });
   }
   for (const it of activate) {
     container.get(it);
   }
   return container;
-}function mockService(service, container = mockContainer(), options = {}) {
+}
+function mockService(service, container = mockContainer(), options = {}) {
   mockBindService(container, service, {
-    skipLifecycle: options.skipLifecycle
+    skipLifecycle: options.skipLifecycle,
   });
   return container.get(service);
-}function withIocProvider(children, container = mockContainer(), seed) {
-  return createElement(IocProvider, {
-    container,
-    seed
-  }, children);
-}export{ECommandStatus as CommandStatus,IocProvider,OnActivated,OnCommand,OnDeactivation,OnEvent,OnQuery,SEED_TOKEN as SEED,WireScope,WirestateError,bindConstant,bindEntry,bindService,command,commandOptional,createInjectablesProvider,createIocContainer,emitEvent,forwardRef,mockBindEntry,mockBindService,mockContainer,mockService,mockUnbindService,query,queryOptional,useCommandCaller,useCommandHandler,useContainer,useContainerRevision,useEvent,useEventEmitter,useEvents,useEventsHandler,useInjection,useOptionalCommandCaller,useOptionalInjection,useOptionalQueryCaller,useOptionalSyncQueryCaller,useQueryCaller,useQueryHandler,useSyncQueryCaller,withIocProvider};
+}
+function withIocProvider(children, container = mockContainer(), seed) {
+  return createElement(
+    IocProvider,
+    {
+      container,
+      seed,
+    },
+    children,
+  );
+}
+export {
+  ECommandStatus as CommandStatus,
+  IocProvider,
+  OnActivated,
+  OnCommand,
+  OnDeactivation,
+  OnEvent,
+  OnQuery,
+  SEED_TOKEN as SEED,
+  WireScope,
+  WirestateError,
+  bindConstant,
+  bindEntry,
+  bindService,
+  command,
+  commandOptional,
+  createInjectablesProvider,
+  createIocContainer,
+  emitEvent,
+  forwardRef,
+  mockBindEntry,
+  mockBindService,
+  mockContainer,
+  mockService,
+  mockUnbindService,
+  query,
+  queryOptional,
+  useCommandCaller,
+  useCommandHandler,
+  useContainer,
+  useContainerRevision,
+  useEvent,
+  useEventEmitter,
+  useEvents,
+  useEventsHandler,
+  useInjection,
+  useOptionalCommandCaller,
+  useOptionalInjection,
+  useOptionalQueryCaller,
+  useOptionalSyncQueryCaller,
+  useQueryCaller,
+  useQueryHandler,
+  useSyncQueryCaller,
+  withIocProvider,
+}; //# sourceMappingURL=index.js.map

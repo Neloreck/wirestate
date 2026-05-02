@@ -1,12 +1,42 @@
-import { ServiceIdentifier, LazyServiceIdentifier, Container as Container$1, Newable, bindingTypeValues, bindingScopeValues } from 'inversify';
-export { bindingTypeValues as BindingType, Container, ContainerModule, inject as Inject, injectable as Injectable, LazyServiceIdentifier, multiInject as MultiInject, named as Named, optional as Optional, postConstruct as PostConstruct, preDestroy as PreDestroy, bindingScopeValues as ScopeBindingType, ServiceIdentifier, tagged as Tagged } from 'inversify';
-import * as react from 'react';
-import { ReactNode, ReactElement, Dispatch, SetStateAction, PropsWithChildren } from 'react';
+import {
+  ServiceIdentifier,
+  LazyServiceIdentifier,
+  Container as Container$1,
+  Newable,
+  bindingTypeValues,
+  bindingScopeValues,
+} from "inversify";
+export {
+  bindingTypeValues as BindingType,
+  Container,
+  ContainerModule,
+  inject as Inject,
+  injectable as Injectable,
+  LazyServiceIdentifier,
+  multiInject as MultiInject,
+  named as Named,
+  optional as Optional,
+  postConstruct as PostConstruct,
+  preDestroy as PreDestroy,
+  bindingScopeValues as ScopeBindingType,
+  ServiceIdentifier,
+  tagged as Tagged,
+} from "inversify";
+import * as react from "react";
+import {
+  ReactNode,
+  ReactElement,
+  Dispatch,
+  SetStateAction,
+  PropsWithChildren,
+} from "react";
 
-declare function forwardRef<TInstance = unknown>(forward: () => ServiceIdentifier<TInstance>): LazyServiceIdentifier<TInstance>;
+declare function forwardRef<TInstance = unknown>(
+  forward: () => ServiceIdentifier<TInstance>,
+): LazyServiceIdentifier<TInstance>;
 
 interface IBindServiceOptions {
-    isWithIgnoreLifecycle?: boolean;
+  isWithIgnoreLifecycle?: boolean;
 }
 /**
  * Registers a service class in the container with activation/deactivation logic.
@@ -16,27 +46,32 @@ interface IBindServiceOptions {
  * @param entry - service constructor
  * @param options - options object to control binding flow
  */
-declare function bindService<T extends object>(container: Container$1, entry: Newable<T>, options?: IBindServiceOptions): void;
+declare function bindService<T extends object>(
+  container: Container$1,
+  entry: Newable<T>,
+  options?: IBindServiceOptions,
+): void;
 
 type TBindingType = (typeof bindingTypeValues)[keyof typeof bindingTypeValues];
-type TScopeBindingType = (typeof bindingScopeValues)[keyof typeof bindingScopeValues];
+type TScopeBindingType =
+  (typeof bindingScopeValues)[keyof typeof bindingScopeValues];
 interface IInjectableDescriptor<T = unknown, V = unknown> {
-    id: ServiceIdentifier<T>;
-    value?: V;
-    bindingType?: TBindingType;
-    scopeBindingType?: TScopeBindingType;
-    /**
-     * Factory function for dynamic value bindings.
-     * Used when type is set to DynamicValue.
-     */
-    factory?: () => T;
+  id: ServiceIdentifier<T>;
+  value?: V;
+  bindingType?: TBindingType;
+  scopeBindingType?: TScopeBindingType;
+  /**
+   * Factory function for dynamic value bindings.
+   * Used when type is set to DynamicValue.
+   */
+  factory?: () => T;
 }
 
 /**
  * Options for {@link bindEntry}.
  */
 interface IBindEntryOptions extends IBindServiceOptions {
-    isWithIgnoreLifecycle?: boolean;
+  isWithIgnoreLifecycle?: boolean;
 }
 /**
  * Binds a single service entry to the container, dispatching to the
@@ -53,7 +88,11 @@ interface IBindEntryOptions extends IBindServiceOptions {
  * @param options - optional binding configuration
  * @returns void
  */
-declare function bindEntry<T extends object = object>(container: Container$1, entry: Newable<T> | IInjectableDescriptor, options?: IBindEntryOptions): void;
+declare function bindEntry<T extends object = object>(
+  container: Container$1,
+  entry: Newable<T> | IInjectableDescriptor,
+  options?: IBindEntryOptions,
+): void;
 
 /**
  * Binds a constant value to a token in the container.
@@ -61,13 +100,24 @@ declare function bindEntry<T extends object = object>(container: Container$1, en
  * @param container - target Inversify container
  * @param entry - entry descriptor to bind
  */
-declare function bindConstant<T>(container: Container$1, entry: IInjectableDescriptor): void;
+declare function bindConstant<T>(
+  container: Container$1,
+  entry: IInjectableDescriptor,
+): void;
+
+type TAnyObject = Record<string, any>;
+type Optional<T> = T | null;
+type MaybePromise<T> = T | Promise<T>;
 
 interface ICreateIocContainerOptions {
-    /**
-     * Parent container for inheritance.
-     */
-    readonly parent?: Container$1;
+  /**
+   * Parent container for inheritance.
+   */
+  readonly parent?: Container$1;
+  /**
+   * Optional default seed value.
+   */
+  readonly seed?: TAnyObject;
 }
 /**
  * Creates an IoC container with framework essentials.
@@ -75,11 +125,9 @@ interface ICreateIocContainerOptions {
  * @param options - container configuration
  * @returns new IoC container
  */
-declare function createIocContainer(options?: ICreateIocContainerOptions): Container$1;
-
-type TAnyObject = Record<string, any>;
-type Optional<T> = T | null;
-type MaybePromise<T> = T | Promise<T>;
+declare function createIocContainer(
+  options?: ICreateIocContainerOptions,
+): Container$1;
 
 /**
  * Command identifier. Use symbols for private commands.
@@ -92,7 +140,11 @@ type TCommandHandler<D = unknown, R = unknown> = (data: D) => MaybePromise<R>;
 /**
  * Command calling function signature.
  */
-type TCommandCaller<R = unknown, D = unknown, T extends TCommandType = TCommandType> = (type: T, data?: D) => ICommandDescriptor<R>;
+type TCommandCaller<
+  R = unknown,
+  D = unknown,
+  T extends TCommandType = TCommandType,
+> = (type: T, data?: D) => ICommandDescriptor<R>;
 /**
  * Removes a command handler.
  */
@@ -101,17 +153,17 @@ type TCommandUnregister = () => void;
  * Command execution status.
  */
 declare enum ECommandStatus {
-    PENDING = "pending",
-    SETTLED = "settled",
-    ERROR = "error"
+  PENDING = "pending",
+  SETTLED = "settled",
+  ERROR = "error",
 }
 /**
  * Descriptor returned by command execution.
  * Contains the task promise, current status, and responder with result/error.
  */
 interface ICommandDescriptor<R = unknown> {
-    readonly task: Promise<R>;
-    readonly status: ECommandStatus;
+  readonly task: Promise<R>;
+  readonly status: ECommandStatus;
 }
 
 /**
@@ -122,7 +174,11 @@ interface ICommandDescriptor<R = unknown> {
  * @param data - command data
  * @returns command descriptor
  */
-declare function command<R = unknown, D = unknown, T extends TCommandType = TCommandType>(container: Container$1, type: T, data?: D): ICommandDescriptor<R>;
+declare function command<
+  R = unknown,
+  D = unknown,
+  T extends TCommandType = TCommandType,
+>(container: Container$1, type: T, data?: D): ICommandDescriptor<R>;
 
 /**
  * Dispatches a command on the provided container, returning null if no handler is registered.
@@ -132,7 +188,11 @@ declare function command<R = unknown, D = unknown, T extends TCommandType = TCom
  * @param data - command data
  * @returns command descriptor or null
  */
-declare function commandOptional<R = unknown, D = unknown, T extends TCommandType = TCommandType>(container: Container$1, type: T, data?: D): Optional<ICommandDescriptor<R>>;
+declare function commandOptional<
+  R = unknown,
+  D = unknown,
+  T extends TCommandType = TCommandType,
+>(container: Container$1, type: T, data?: D): Optional<ICommandDescriptor<R>>;
 
 /**
  * Event identifier.
@@ -142,9 +202,9 @@ type TEventType = string | symbol;
  * Event object.
  */
 interface IEvent<P = unknown, T extends TEventType = TEventType, F = unknown> {
-    readonly type: T;
-    readonly payload?: P;
-    readonly from?: F;
+  readonly type: T;
+  readonly payload?: P;
+  readonly from?: F;
 }
 /**
  * Event handler signature.
@@ -157,7 +217,11 @@ type TEventUnsubscriber = () => void;
 /**
  * Event emitter signature.
  */
-type TEventEmitter<P = unknown, T extends TEventType = TEventType, F = unknown> = (type: T, payload?: P, from?: F) => void;
+type TEventEmitter<
+  P = unknown,
+  T extends TEventType = TEventType,
+  F = unknown,
+> = (type: T, payload?: P, from?: F) => void;
 
 /**
  * Emits events for container from outside scope.
@@ -167,7 +231,12 @@ type TEventEmitter<P = unknown, T extends TEventType = TEventType, F = unknown> 
  * @param payload - event payload
  * @param from - optional indicator of the event source
  */
-declare function emitEvent<P, T extends TEventType>(container: Container$1, type: T, payload?: P, from?: unknown): void;
+declare function emitEvent<P, T extends TEventType>(
+  container: Container$1,
+  type: T,
+  payload?: P,
+  from?: unknown,
+): void;
 
 /**
  * Query identifier. Use symbols for private queries.
@@ -176,7 +245,7 @@ type TQueryType = string | symbol;
 /**
  * Query handler signature.
  */
-type TQueryHandler<D = unknown, R = unknown> = (data: D) => R | Promise<R>;
+type TQueryHandler<D = unknown, R = unknown> = (data: D) => MaybePromise<R>;
 /**
  * Removes a query handler.
  */
@@ -184,7 +253,39 @@ type TQueryUnregister = () => void;
 /**
  * Public query responder signature.
  */
-type TQueryResponder<R = unknown, D = unknown> = (data?: D) => R | Promise<R>;
+type TQueryResponder<R = unknown, D = unknown> = (data?: D) => MaybePromise<R>;
+/**
+ * Dispatches queries and returns their result as a value or promise.
+ */
+type TQueryCaller<
+  R = unknown,
+  D = unknown,
+  T extends TQueryType = TQueryType,
+> = (type: T, data?: D) => MaybePromise<R>;
+/**
+ * Dispatches synchronous queries and returns their result directly.
+ */
+type TSyncQueryCaller<
+  R = unknown,
+  D = unknown,
+  T extends TQueryType = TQueryType,
+> = (type: T, data?: D) => R;
+/**
+ * Dispatches optional queries. Returns null when no handler is registered.
+ */
+type TOptionalQueryCaller<
+  R = unknown,
+  D = unknown,
+  T extends TQueryType = TQueryType,
+> = (type: T, data?: D) => Optional<MaybePromise<R>>;
+/**
+ * Dispatches optional synchronous queries. Returns null when no handler is registered.
+ */
+type TOptionalSyncQueryCaller<
+  R = unknown,
+  D = unknown,
+  T extends TQueryType = TQueryType,
+> = (type: T, data?: D) => Optional<R>;
 
 /**
  * Dispatches a query on the provided container.
@@ -194,7 +295,11 @@ type TQueryResponder<R = unknown, D = unknown> = (data?: D) => R | Promise<R>;
  * @param data - query data
  * @returns query result
  */
-declare function query<R = unknown, D = unknown>(container: Container$1, type: TQueryType, data?: D): MaybePromise<R>;
+declare function query<R = unknown, D = unknown>(
+  container: Container$1,
+  type: TQueryType,
+  data?: D,
+): MaybePromise<R>;
 
 /**
  * Dispatches a query on the provided container, returning null if no handler is registered.
@@ -204,7 +309,11 @@ declare function query<R = unknown, D = unknown>(container: Container$1, type: T
  * @param data - query data
  * @returns query result or null
  */
-declare function queryOptional<R = unknown, D = unknown>(container: Container$1, type: TQueryType, data?: D): MaybePromise<R> | null;
+declare function queryOptional<R = unknown, D = unknown>(
+  container: Container$1,
+  type: TQueryType,
+  data?: D,
+): Optional<MaybePromise<R>>;
 
 /**
  * A custom error class that contains generic error information for Wirestate-related issues.
@@ -213,19 +322,19 @@ declare function queryOptional<R = unknown, D = unknown>(container: Container$1,
  * to the Wirestate library, providing more structured error handling.
  */
 declare class WirestateError extends Error {
-    /**
-     * Name or error class to help differentiate error class in minified environments.
-     */
-    readonly name: string;
-    /**
-     * Error code describing the issue.
-     */
-    readonly code: number;
-    /**
-     * Error message describing the issue.
-     */
-    readonly message: string;
-    constructor(code?: number, detail?: string);
+  /**
+   * Name or error class to help differentiate error class in minified environments.
+   */
+  readonly name: string;
+  /**
+   * Error code describing the issue.
+   */
+  readonly code: number;
+  /**
+   * Error message describing the issue.
+   */
+  readonly message: string;
+  constructor(code?: number, detail?: string);
 }
 
 /**
@@ -241,7 +350,14 @@ declare function OnCommand(type: TCommandType): MethodDecorator;
  *
  * @returns command dispatcher
  */
-declare function useCommandCaller(): <R = unknown, D = unknown, T extends TCommandType = TCommandType>(type: T, data?: D) => ICommandDescriptor<R>;
+declare function useCommandCaller(): <
+  R = unknown,
+  D = unknown,
+  T extends TCommandType = TCommandType,
+>(
+  type: T,
+  data?: D,
+) => ICommandDescriptor<R>;
 
 /**
  * Returns a function to dispatch optional commands on the active container.
@@ -249,7 +365,14 @@ declare function useCommandCaller(): <R = unknown, D = unknown, T extends TComma
  *
  * @returns optional command dispatcher
  */
-declare function useOptionalCommandCaller(): <R = unknown, D = unknown, T extends TCommandType = TCommandType>(type: T, data?: D) => Optional<ICommandDescriptor<R>>;
+declare function useOptionalCommandCaller(): <
+  R = unknown,
+  D = unknown,
+  T extends TCommandType = TCommandType,
+>(
+  type: T,
+  data?: D,
+) => Optional<ICommandDescriptor<R>>;
 
 /**
  * Registers a command handler for the component's lifetime.
@@ -259,7 +382,10 @@ declare function useOptionalCommandCaller(): <R = unknown, D = unknown, T extend
  * @param type - command type
  * @param handler - command handler function
  */
-declare function useCommandHandler<R = unknown, D = unknown>(type: TCommandType, handler: TCommandHandler<D, R>): void;
+declare function useCommandHandler<R = unknown, D = unknown>(
+  type: TCommandType,
+  handler: TCommandHandler<D, R>,
+): void;
 
 /**
  * Decorator for service methods that respond to a query.
@@ -274,7 +400,11 @@ declare function OnQuery(type: TQueryType): MethodDecorator;
  *
  * @returns query dispatcher
  */
-declare function useQueryCaller(): <R = unknown, D = unknown>(type: TQueryType, data?: D) => any;
+declare function useQueryCaller<
+  R = unknown,
+  D = unknown,
+  T extends TQueryType = TQueryType,
+>(): TQueryCaller<R, D, T>;
 
 /**
  * Returns a function to dispatch optional queries on the active container.
@@ -282,7 +412,11 @@ declare function useQueryCaller(): <R = unknown, D = unknown>(type: TQueryType, 
  *
  * @returns optional query dispatcher
  */
-declare function useOptionalQueryCaller(): <R = unknown, D = unknown>(type: TQueryType, data?: D) => Optional<MaybePromise<R>>;
+declare function useOptionalQueryCaller<
+  R = unknown,
+  D = unknown,
+  T extends TQueryType = TQueryType,
+>(): TOptionalQueryCaller<R, D, T>;
 
 /**
  * Registers a query handler for the component's lifetime.
@@ -292,7 +426,11 @@ declare function useOptionalQueryCaller(): <R = unknown, D = unknown>(type: TQue
  * @param type - query type
  * @param handler - query handler function
  */
-declare function useQueryHandler<RetType = unknown, D = unknown>(type: TQueryType, handler: TQueryHandler<D, RetType>): void;
+declare function useQueryHandler<
+  R = unknown,
+  D = unknown,
+  T extends TQueryType = TQueryType,
+>(type: T, handler: TQueryHandler<D, R>): void;
 
 /**
  * Returns a stable function to dispatch synchronous queries.
@@ -300,7 +438,11 @@ declare function useQueryHandler<RetType = unknown, D = unknown>(type: TQueryTyp
  *
  * @returns sync query dispatcher
  */
-declare function useSyncQueryCaller(): <R = unknown, D = unknown>(type: TQueryType, data?: D) => R;
+declare function useSyncQueryCaller<
+  R = unknown,
+  D = unknown,
+  T extends TQueryType = TQueryType,
+>(): TSyncQueryCaller<R, D, T>;
 
 /**
  * Returns a stable function to dispatch synchronous optional queries.
@@ -308,7 +450,11 @@ declare function useSyncQueryCaller(): <R = unknown, D = unknown>(type: TQueryTy
  *
  * @returns optional sync query dispatcher
  */
-declare function useOptionalSyncQueryCaller(): <R = unknown, D = unknown>(type: TQueryType, data?: D) => Optional<R>;
+declare function useOptionalSyncQueryCaller<
+  R = unknown,
+  D = unknown,
+  T extends TQueryType = TQueryType,
+>(): TOptionalSyncQueryCaller<R, D, T>;
 
 /**
  * Lookup key for service seeds.
@@ -329,67 +475,115 @@ type TSeedEntries = ReadonlyArray<TSeedEntry>;
  * The scope is activated and deactivated automatically alongside its owner service.
  */
 declare class WireScope {
-    private readonly container;
-    /**
-     * Whether the scope was deactivated and disposed from the container.
-     */
-    readonly isDisposed: boolean;
-    constructor(container: Optional<Container$1>);
-    /**
-     * Access the IoC container.
-     * Available only for activated instances of scope.
-     *
-     * @returns active container
-     *
-     * @throws WirestateError if scope is not activated or already disposed
-     */
-    getContainer(): Container$1;
-    /**
-     * Resolves a sibling service or injected value.
-     * Use for lazy resolution or circular dependency breaking.
-     * Available only for activated containers.
-     *
-     * @param injectionId - injection identifier
-     * @returns resolved injection, service instance, or generic value
-     *
-     * @throws WirestateError if scope is not activated
-     */
-    resolve<T>(injectionId: ServiceIdentifier<T>): T;
-    /**
-     * Broadcasts an event.
-     * Available only for activated containers.
-     *
-     * @param type - type of event to emit
-     * @param payload - optional payload to send with the event
-     * @param from - optional sender of the event
-     *
-     * @throws WirestateError if scope is not activated
-     */
-    emitEvent<P, T extends TEventType = TEventType>(type: T, payload?: P, from?: unknown): void;
-    /**
-     * Dispatches a query and returns the result.
-     * Available only for activated containers.
-     *
-     * @param type - query type
-     * @param data - query data
-     * @returns query result
-     *
-     * @throws WirestateError if scope is not activated
-     */
-    queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): MaybePromise<R>;
-    /**
-     * Dispatches a command and returns the descriptor.
-     * Available only for activated containers.
-     *
-     * @param type - command type
-     * @param data - command data
-     * @returns command descriptor
-     *
-     * @throws WirestateError if scope is not activated
-     */
-    executeCommand<R = unknown, D = unknown, T extends TCommandType = TCommandType>(type: T, data?: D): ICommandDescriptor<R>;
-    getSeed<T>(): T;
-    getSeed<T>(seed?: TSeedKey): T;
+  private readonly container;
+  /**
+   * Whether the scope was deactivated and disposed from the container.
+   */
+  readonly isDisposed: boolean;
+  constructor(container: Optional<Container$1>);
+  /**
+   * Access the IoC container.
+   * Available only for activated instances of scope.
+   *
+   * @returns active container
+   *
+   * @throws WirestateError if scope is not activated or already disposed
+   */
+  getContainer(): Container$1;
+  /**
+   * Resolves a sibling service or injected value.
+   * Use for lazy resolution or circular dependency breaking.
+   * Available only for activated containers.
+   *
+   * @param injectionId - injection identifier
+   * @returns resolved injection, service instance, or generic value
+   *
+   * @throws WirestateError if scope is not activated
+   */
+  resolve<T>(injectionId: ServiceIdentifier<T>): T;
+  /**
+   * Resolves a sibling service or injected value.
+   * Use for lazy resolution or circular dependency breaking.
+   * Available only for activated containers.
+   *
+   * @param injectionId - injection identifier
+   * @returns resolved injection, service instance, generic value, or null if it is not bound
+   *
+   * @throws WirestateError if scope is not activated
+   */
+  resolveOptional<T>(injectionId: ServiceIdentifier<T>): Optional<T>;
+  /**
+   * Broadcasts an event.
+   * Available only for activated containers.
+   *
+   * @param type - type of event to emit
+   * @param payload - optional payload to send with the event
+   * @param from - optional sender of the event
+   *
+   * @throws WirestateError if scope is not activated
+   */
+  emitEvent<P, T extends TEventType = TEventType>(
+    type: T,
+    payload?: P,
+    from?: unknown,
+  ): void;
+  /**
+   * Dispatches a query and returns the result.
+   * Available only for activated containers.
+   *
+   * @param type - query type
+   * @param data - query data
+   * @returns query result
+   *
+   * @throws WirestateError if scope is not activated
+   */
+  queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(
+    type: T,
+    data?: D,
+  ): MaybePromise<R>;
+  /**
+   * Dispatches a query and returns the result.
+   * Available only for activated containers.
+   *
+   * @param type - query type
+   * @param data - query data
+   * @returns query result or null if handler is not registered
+   */
+  queryOptionalData<
+    R = unknown,
+    D = unknown,
+    T extends TQueryType = TQueryType,
+  >(type: T, data?: D): Optional<MaybePromise<R>>;
+  /**
+   * Dispatches a command and returns the descriptor.
+   * Available only for activated containers.
+   *
+   * @param type - command type
+   * @param data - command data
+   * @returns command descriptor
+   *
+   * @throws WirestateError if scope is not activated
+   */
+  executeCommand<
+    R = unknown,
+    D = unknown,
+    T extends TCommandType = TCommandType,
+  >(type: T, data?: D): ICommandDescriptor<R>;
+  /**
+   * Dispatches a command and returns the descriptor.
+   * Available only for activated containers.
+   *
+   * @param type - command type
+   * @param data - command data
+   * @returns command descriptor or null if handler is not registered
+   */
+  executeOptionalCommand<
+    R = unknown,
+    D = unknown,
+    T extends TCommandType = TCommandType,
+  >(type: T, data?: D): Optional<ICommandDescriptor<R>>;
+  getSeed<T>(): T;
+  getSeed<T>(seed?: TSeedKey): Optional<T>;
 }
 
 /**
@@ -428,21 +622,24 @@ declare function useInjection<T>(injectionId: ServiceIdentifier<T>): T;
  * @param onFallback - optional callback to handle cases when dependency was not resolved
  * @returns resolved value, result of optional fallback handler or null
  */
-declare function useOptionalInjection<T>(injectionId: ServiceIdentifier<T>, onFallback?: (container: Container$1) => T): Optional<T>;
+declare function useOptionalInjection<T>(
+  injectionId: ServiceIdentifier<T>,
+  onFallback?: (container: Container$1) => T,
+): Optional<T>;
 
 /**
  * Props for the component returned by {@link createInjectablesProvider}.
  */
 interface IInjectablesProviderProps {
-    /**
-     * Targeted seeds bound to specific injectables or tokens.
-     * Subsequent prop changes are ignored. Use a React `key` to re-seed the tree.
-     */
-    readonly seeds?: TSeedEntries;
-    /**
-     * Subtree that consumes the bound services.
-     */
-    readonly children?: ReactNode;
+  /**
+   * Targeted seeds bound to specific injectables or tokens.
+   * Subsequent prop changes are ignored. Use a React `key` to re-seed the tree.
+   */
+  readonly seeds?: TSeedEntries;
+  /**
+   * Subtree that consumes the bound services.
+   */
+  readonly children?: ReactNode;
 }
 /**
  * Component returned by {@link createInjectablesProvider}.
@@ -452,10 +649,10 @@ type InjectablesProvider = ReturnType<typeof createInjectablesProvider>;
  * Configuration for {@link createInjectablesProvider}.
  */
 interface ICreateInjectablesProviderOptions {
-    /**
-     * Services to resolve immediately on mount.
-     */
-    readonly activate?: ReadonlyArray<ServiceIdentifier>;
+  /**
+   * Services to resolve immediately on mount.
+   */
+  readonly activate?: ReadonlyArray<ServiceIdentifier>;
 }
 /**
  * Creates a component that manages injectable lifetimes for its subtree.
@@ -464,41 +661,44 @@ interface ICreateInjectablesProviderOptions {
  * @param options - provider configuration
  * @returns injectables provider component
  */
-declare function createInjectablesProvider(entries: ReadonlyArray<Newable<object> | IInjectableDescriptor>, options?: ICreateInjectablesProviderOptions): {
-    (props: IInjectablesProviderProps): ReactElement;
-    displayName: string;
+declare function createInjectablesProvider(
+  entries: ReadonlyArray<Newable<object> | IInjectableDescriptor>,
+  options?: ICreateInjectablesProviderOptions,
+): {
+  (props: IInjectablesProviderProps): ReactElement;
+  displayName: string;
 };
 
 /**
  * React context value.
  */
 interface IIocContext {
-    /**
-     * Inversify container.
-     */
-    readonly container: Container$1;
-    /**
-     * Revision counter for cache invalidation.
-     */
-    readonly revision: number;
-    /**
-     * Forces a revision update.
-     */
-    readonly setRevision: Dispatch<SetStateAction<number>>;
+  /**
+   * Inversify container.
+   */
+  readonly container: Container$1;
+  /**
+   * Revision counter for cache invalidation.
+   */
+  readonly revision: number;
+  /**
+   * Forces a revision update.
+   */
+  readonly setRevision: Dispatch<SetStateAction<number>>;
 }
 
 /**
  * Props for {@link IocProvider}.
  */
 interface IIocProviderProps extends PropsWithChildren<unknown> {
-    /**
-     * External container instance. If omitted, a new container is created.
-     */
-    readonly container?: Container$1;
-    /**
-     * Shared seed for the container.
-     */
-    readonly seed?: TAnyObject;
+  /**
+   * External container instance. If omitted, a new container is created.
+   */
+  readonly container?: Container$1;
+  /**
+   * Shared seed for the container.
+   */
+  readonly seed?: TAnyObject;
 }
 /**
  * Provides an IoC container to the component tree.
@@ -509,7 +709,13 @@ interface IIocProviderProps extends PropsWithChildren<unknown> {
  * @param props.children - components to wrap
  * @returns provider element
  */
-declare function IocProvider({ container: externalContainer, seed, children }: IIocProviderProps): react.FunctionComponentElement<react.ProviderProps<Optional<IIocContext>>>;
+declare function IocProvider({
+  container: externalContainer,
+  seed,
+  children,
+}: IIocProviderProps): react.FunctionComponentElement<
+  react.ProviderProps<Optional<IIocContext>>
+>;
 
 /**
  * Returns the active IoC container.
@@ -531,7 +737,9 @@ declare function useContainerRevision(): number;
  * @param types - event type(s) to handle. If omitted, handles all events
  * @returns decorator function
  */
-declare function OnEvent(types?: TEventType | ReadonlyArray<TEventType>): MethodDecorator;
+declare function OnEvent(
+  types?: TEventType | ReadonlyArray<TEventType>,
+): MethodDecorator;
 
 /**
  * Subscribes a component to events.
@@ -547,7 +755,10 @@ declare function useEvent(type: TEventType, handler: TEventHandler): void;
  * @param types - event types to filter by
  * @param handler - events handler
  */
-declare function useEvents(types: ReadonlyArray<TEventType>, handler: TEventHandler): void;
+declare function useEvents(
+  types: ReadonlyArray<TEventType>,
+  handler: TEventHandler,
+): void;
 
 /**
  * Subscribes a component to all events without type filtering.
@@ -561,17 +772,20 @@ declare function useEventsHandler(handler: TEventHandler): void;
  *
  * @returns event emitter
  */
-declare function useEventEmitter<P = unknown, T extends TEventType = TEventType>(): TEventEmitter<P, T>;
+declare function useEventEmitter<
+  P = unknown,
+  T extends TEventType = TEventType,
+>(): TEventEmitter<P, T>;
 
 /**
  * Options for {@link mockBindService}.
  */
 interface IMockBindServiceOptions {
-    /**
-     * Whether to skip the activation lifecycle for the service.
-     * If true, `OnActivated` and `OnDeactivation` hooks will not be triggered.
-     */
-    skipLifecycle?: boolean;
+  /**
+   * Whether to skip the activation lifecycle for the service.
+   * If true, `OnActivated` and `OnDeactivation` hooks will not be triggered.
+   */
+  skipLifecycle?: boolean;
 }
 /**
  * Binds a service class to the IoC container for testing purposes.
@@ -583,18 +797,22 @@ interface IMockBindServiceOptions {
  * @param options - optional binding configuration
  * @returns void
  */
-declare function mockBindService<T extends object>(container: Container$1, ServiceClass: Newable<T>, options?: IMockBindServiceOptions): void;
+declare function mockBindService<T extends object>(
+  container: Container$1,
+  ServiceClass: Newable<T>,
+  options?: IMockBindServiceOptions,
+): void;
 
 /**
  * Options for {@link mockBindEntry}.
  */
 interface IMockBindEntryOptions {
-    /**
-     * Whether to skip the activation lifecycle for the entry.
-     * If true, `OnActivated` and `OnDeactivation` hooks will not be triggered.
-     * Note: This only applies when the entry is a service class or an instance binding.
-     */
-    skipLifecycle?: boolean;
+  /**
+   * Whether to skip the activation lifecycle for the entry.
+   * If true, `OnActivated` and `OnDeactivation` hooks will not be triggered.
+   * Note: This only applies when the entry is a service class or an instance binding.
+   */
+  skipLifecycle?: boolean;
 }
 /**
  * Binds a service entry to the IoC container for testing purposes.
@@ -606,7 +824,11 @@ interface IMockBindEntryOptions {
  * @param options - optional binding configuration
  * @returns void
  */
-declare function mockBindEntry<T extends object>(container: Container$1, entry: Newable<T> | IInjectableDescriptor, options?: IMockBindEntryOptions): void;
+declare function mockBindEntry<T extends object>(
+  container: Container$1,
+  entry: Newable<T> | IInjectableDescriptor,
+  options?: IMockBindEntryOptions,
+): void;
 
 /**
  * Unbinds a service from the IoC container.
@@ -615,26 +837,29 @@ declare function mockBindEntry<T extends object>(container: Container$1, entry: 
  * @param container - the IoC container to unbind the service from
  * @param ServiceClass - the service class to unbind
  */
-declare function mockUnbindService<T extends object>(container: Container$1, ServiceClass: Newable<T>): void;
+declare function mockUnbindService<T extends object>(
+  container: Container$1,
+  ServiceClass: Newable<T>,
+): void;
 
 /**
  * Options for {@link mockContainer}.
  */
 interface IMockContainerOptions {
-    /**
-     * List of services or injectable descriptors to bind to the container.
-     */
-    entries?: Array<Newable<object> | IInjectableDescriptor>;
-    /**
-     * List of injection identifiers to immediately activate after binding.
-     * All identifiers must correspond to entries provided in the `services` list.
-     */
-    activate?: Array<ServiceIdentifier>;
-    /**
-     * Whether to skip the activation lifecycle for all bound services.
-     * If true, `OnActivated` and `OnDeactivation` hooks will not be triggered.
-     */
-    skipLifecycle?: boolean;
+  /**
+   * List of services or injectable descriptors to bind to the container.
+   */
+  entries?: Array<Newable<object> | IInjectableDescriptor>;
+  /**
+   * List of injection identifiers to immediately activate after binding.
+   * All identifiers must correspond to entries provided in the `services` list.
+   */
+  activate?: Array<ServiceIdentifier>;
+  /**
+   * Whether to skip the activation lifecycle for all bound services.
+   * If true, `OnActivated` and `OnDeactivation` hooks will not be triggered.
+   */
+  skipLifecycle?: boolean;
 }
 /**
  * Creates and configures a mock IoC container for testing.
@@ -652,10 +877,10 @@ declare function mockContainer(options?: IMockContainerOptions): Container$1;
  * Options for {@link mockService}.
  */
 interface IMockServiceOptions {
-    /**
-     * If true, skips the lifecycle hooks (e.g., OnActivated) during service binding and instantiation.
-     */
-    skipLifecycle?: boolean;
+  /**
+   * If true, skips the lifecycle hooks (e.g., OnActivated) during service binding and instantiation.
+   */
+  skipLifecycle?: boolean;
 }
 /**
  * Mocks a service by binding it to an IoC container and returning its instance.
@@ -665,7 +890,11 @@ interface IMockServiceOptions {
  * @param options - additional options for mocking
  * @returns the instantiated service instance
  */
-declare function mockService<T extends object>(service: Newable<T>, container?: Container, options?: IMockServiceOptions): T;
+declare function mockService<T extends object>(
+  service: Newable<T>,
+  container?: Container,
+  options?: IMockServiceOptions,
+): T;
 
 /**
  * Wraps a component with IocProvider for testing.
@@ -675,10 +904,83 @@ declare function mockService<T extends object>(service: Newable<T>, container?: 
  * @param seed - optional shared seed object
  * @returns wrapped components
  */
-declare function withIocProvider(children: ReactNode, container?: Container$1, seed?: TAnyObject): react.FunctionComponentElement<{
-    container: Container$1;
-    seed: TAnyObject | undefined;
+declare function withIocProvider(
+  children: ReactNode,
+  container?: Container$1,
+  seed?: TAnyObject,
+): react.FunctionComponentElement<{
+  container: Container$1;
+  seed: TAnyObject | undefined;
 }>;
 
-export { ECommandStatus as CommandStatus, IocProvider, OnActivated, OnCommand, OnDeactivation, OnEvent, OnQuery, SEED_TOKEN as SEED, WireScope, WirestateError, bindConstant, bindEntry, bindService, command, commandOptional, createInjectablesProvider, createIocContainer, emitEvent, forwardRef, mockBindEntry, mockBindService, mockContainer, mockService, mockUnbindService, query, queryOptional, useCommandCaller, useCommandHandler, useContainer, useContainerRevision, useEvent, useEventEmitter, useEvents, useEventsHandler, useInjection, useOptionalCommandCaller, useOptionalInjection, useOptionalQueryCaller, useOptionalSyncQueryCaller, useQueryCaller, useQueryHandler, useSyncQueryCaller, withIocProvider };
-export type { TCommandCaller as CommandCaller, ICommandDescriptor as CommandDescriptor, TCommandHandler as CommandHandler, TCommandType as CommandType, TCommandUnregister as CommandUnregister, IEvent as Event, TEventEmitter as EventEmitter, TEventHandler as EventHandler, TEventType as EventType, TEventUnsubscriber as EventUnsubscriber, IInjectableDescriptor as InjectableDescriptor, InjectablesProvider, IInjectablesProviderProps as InjectablesProviderProps, TQueryHandler as QueryHandler, TQueryResponder as QueryResponder, TQueryType as QueryType, TQueryUnregister as QueryUnregister, TSeedEntries as SeedEntries, TSeedEntry as SeedEntry, TSeedKey as SeedKey };
+export {
+  ECommandStatus as CommandStatus,
+  IocProvider,
+  OnActivated,
+  OnCommand,
+  OnDeactivation,
+  OnEvent,
+  OnQuery,
+  SEED_TOKEN as SEED,
+  WireScope,
+  WirestateError,
+  bindConstant,
+  bindEntry,
+  bindService,
+  command,
+  commandOptional,
+  createInjectablesProvider,
+  createIocContainer,
+  emitEvent,
+  forwardRef,
+  mockBindEntry,
+  mockBindService,
+  mockContainer,
+  mockService,
+  mockUnbindService,
+  query,
+  queryOptional,
+  useCommandCaller,
+  useCommandHandler,
+  useContainer,
+  useContainerRevision,
+  useEvent,
+  useEventEmitter,
+  useEvents,
+  useEventsHandler,
+  useInjection,
+  useOptionalCommandCaller,
+  useOptionalInjection,
+  useOptionalQueryCaller,
+  useOptionalSyncQueryCaller,
+  useQueryCaller,
+  useQueryHandler,
+  useSyncQueryCaller,
+  withIocProvider,
+};
+export type {
+  TCommandCaller as CommandCaller,
+  ICommandDescriptor as CommandDescriptor,
+  TCommandHandler as CommandHandler,
+  TCommandType as CommandType,
+  TCommandUnregister as CommandUnregister,
+  IEvent as Event,
+  TEventEmitter as EventEmitter,
+  TEventHandler as EventHandler,
+  TEventType as EventType,
+  TEventUnsubscriber as EventUnsubscriber,
+  IInjectableDescriptor as InjectableDescriptor,
+  InjectablesProvider,
+  IInjectablesProviderProps as InjectablesProviderProps,
+  TOptionalQueryCaller as OptionalQueryCaller,
+  TOptionalSyncQueryCaller as OptionalSyncQueryCaller,
+  TQueryCaller as QueryCaller,
+  TQueryHandler as QueryHandler,
+  TQueryResponder as QueryResponder,
+  TQueryType as QueryType,
+  TQueryUnregister as QueryUnregister,
+  TSeedEntries as SeedEntries,
+  TSeedEntry as SeedEntry,
+  TSeedKey as SeedKey,
+  TSyncQueryCaller as SyncQueryCaller,
+};

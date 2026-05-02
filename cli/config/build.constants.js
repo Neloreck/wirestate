@@ -8,6 +8,8 @@ export const EEnvironment = {
 export const ENV = process.env.NODE_ENV || "development";
 export const IS_PRODUCTION = ENV === "production";
 
+export const EXTERNAL_DEPENDENCIES = ["react", "inversify", "mobx", "mobx-react-lite", "tslib"];
+
 export const PROJECT_ROOT = path.resolve(__dirname, "../..");
 export const WS_ROOT = path.resolve(PROJECT_ROOT, "./src/wirestate");
 export const TARGET_ROOT = path.resolve(PROJECT_ROOT, "./target");
