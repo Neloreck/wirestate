@@ -9,7 +9,7 @@ module.exports = {
   transform: {
     "^.+\\.[t|j]sx?$": ["babel-jest", { configFile: path.resolve(__dirname, "babel.test.config.js") }],
   },
-  transformIgnorePatterns: ["node_modules/.pnpm/(?!inversify|@inversifyjs)"],
+  transformIgnorePatterns: ["node_modules/.pnpm/(?!inversify|@inversifyjs|@preact)"],
   testEnvironment: "jsdom",
   globals: {
     IS_DEV: true,

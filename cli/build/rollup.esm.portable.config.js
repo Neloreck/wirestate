@@ -16,6 +16,7 @@ import {
   PORTABLE_DEBUG_ROOT,
   PORTABLE_ENTRY,
   PORTABLE_ROOT,
+  SIGNALS_ENTRY,
   STATS_ROOT,
   TS_PORTABLE_CONFIG,
   WS_ROOT,
@@ -27,13 +28,15 @@ const isLoggingEnabled = process.env.LIB_DEBUG_LOGGING === "true" || process.env
 
 const createPortableConfig = (env, isDebug) => ({
   external: EXTERNAL_DEPENDENCIES,
-  input: [PORTABLE_ENTRY, MOBX_ENTRY],
+  input: [PORTABLE_ENTRY, MOBX_ENTRY, SIGNALS_ENTRY],
   output: {
     compact: env === EEnvironment.PRODUCTION,
     dir: isDebug ? PORTABLE_DEBUG_ROOT : PORTABLE_ROOT,
     entryFileNames: (chunkInfo) => {
       if (chunkInfo.facadeModuleId === MOBX_ENTRY) {
         return "mobx.js";
+      } else if (chunkInfo.facadeModuleId === SIGNALS_ENTRY) {
+        return "signals.js";
       }
 
       return "wirestate.js";
@@ -77,12 +80,14 @@ const createPortableConfig = (env, isDebug) => ({
 
 const createPortableDtsConfig = (env, isDebug) => ({
   external: EXTERNAL_DEPENDENCIES,
-  input: [PORTABLE_ENTRY, MOBX_ENTRY],
+  input: [PORTABLE_ENTRY, MOBX_ENTRY, SIGNALS_ENTRY],
   output: {
     dir: isDebug ? PORTABLE_DEBUG_ROOT : PORTABLE_ROOT,
     entryFileNames: (chunkInfo) => {
       if (chunkInfo.facadeModuleId === MOBX_ENTRY) {
         return "mobx.d.ts";
+      } else if (chunkInfo.facadeModuleId === SIGNALS_ENTRY) {
+        return "signals.d.ts";
       }
 
       return "wirestate.d.ts";

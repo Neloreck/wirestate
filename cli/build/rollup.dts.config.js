@@ -2,11 +2,18 @@ import { default as clear } from "rollup-plugin-clear";
 import { default as dts } from "rollup-plugin-dts";
 
 import { default as tsconfig } from "../../tsconfig.json";
-import { EXTERNAL_DEPENDENCIES, CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY, TYPES_ROOT } from "../config/build.constants";
+import {
+  EXTERNAL_DEPENDENCIES,
+  CORE_ENTRY,
+  TEST_UTILS_ENTRY,
+  MOBX_ENTRY,
+  SIGNALS_ENTRY,
+  TYPES_ROOT,
+} from "../config/build.constants";
 
 export const DTS_CONFIG = {
   external: EXTERNAL_DEPENDENCIES,
-  input: [CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY],
+  input: [CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY, SIGNALS_ENTRY],
   output: {
     chunkFileNames: "lib.d.ts",
     dir: TYPES_ROOT,

@@ -4,6 +4,7 @@
 - Explicit typing for query callers, export new types
 - For wire-scope add missing optional query/command/resolve methods
 - Add sourcemaps in lib bundles
+- Add `signals` entry for variants of storage usage without mobx
 
 ## 0.4.0
 

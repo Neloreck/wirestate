@@ -38,6 +38,17 @@
         "production": "./cjs/production/mobx.js",
         "default": "./cjs/development/mobx.js"
       }
+    },
+    "./signals": {
+      "types": "./signals.d.ts",
+      "import": {
+        "production": "./esm/production/signals.js",
+        "default": "./esm/development/signals.js"
+      },
+      "require": {
+        "production": "./cjs/production/signals.js",
+        "default": "./cjs/development/signals.js"
+      }
     }
   },
   "repository": {
@@ -72,6 +83,7 @@
     "tslib": ">=2.5.0"
   },
   "optionalDependencies": {
+    "@preact/signals-react": ">=2.0.0",
     "mobx": ">=6.0.0",
     "mobx-react-lite": ">=4.0.0"
   }

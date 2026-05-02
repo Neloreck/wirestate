@@ -14,6 +14,7 @@ import {
   ESM_ROOT,
   EXTERNAL_DEPENDENCIES,
   MOBX_ENTRY,
+  SIGNALS_ENTRY,
   STATS_ROOT,
   TEST_UTILS_ENTRY,
   TS_BUILD_CONFIG,
@@ -24,7 +25,7 @@ import { BABEL_CONFIG } from "./babel.modern.config";
 
 const createEsmConfig = (env) => ({
   external: EXTERNAL_DEPENDENCIES,
-  input: [CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY],
+  input: [CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY, SIGNALS_ENTRY],
   output: {
     compact: env === EEnvironment.PRODUCTION,
     dir: path.resolve(ESM_ROOT, env),

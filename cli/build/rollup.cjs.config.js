@@ -14,6 +14,7 @@ import {
   EEnvironment,
   EXTERNAL_DEPENDENCIES,
   MOBX_ENTRY,
+  SIGNALS_ENTRY,
   STATS_ROOT,
   TEST_UTILS_ENTRY,
   TS_BUILD_CONFIG,
@@ -24,7 +25,7 @@ import { BABEL_CONFIG } from "./babel.modern.config";
 
 const createCjsConfig = (env) => ({
   external: EXTERNAL_DEPENDENCIES,
-  input: [CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY],
+  input: [CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY, SIGNALS_ENTRY],
   output: {
     chunkFileNames: "lib.js",
     compact: env === EEnvironment.PRODUCTION,
