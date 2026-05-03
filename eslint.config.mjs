@@ -1,31 +1,31 @@
-import js from "@eslint/js";
+import jsPlugin from "@eslint/js";
 import tsParser from "@typescript-eslint/parser";
 import eslintConfigPrettier from "eslint-config-prettier";
-import _import from "eslint-plugin-import";
-import jest from "eslint-plugin-jest";
-import jsdoc from "eslint-plugin-jsdoc";
-import react from "eslint-plugin-react";
-import reactHooks from "eslint-plugin-react-hooks";
-import reactRefresh from "eslint-plugin-react-refresh";
+import importPlugin from "eslint-plugin-import";
+import jestPlugin from "eslint-plugin-jest";
+import jsdocPlugin from "eslint-plugin-jsdoc";
+import reactPlugin from "eslint-plugin-react";
+import reactHooksPlugin from "eslint-plugin-react-hooks";
+import reactRefreshPlugin from "eslint-plugin-react-refresh";
 import globals from "globals";
-import tseslint from "typescript-eslint";
+import tsEslintPlugin from "typescript-eslint";
 
 export default [
   {
     ignores: ["target/**/*", "node_modules/**/*", "examples/**/*"],
   },
-  jsdoc.configs["flat/recommended"],
-  js.configs.recommended,
-  jest.configs["flat/style"],
-  ...tseslint.configs.recommended,
-  _import.flatConfigs.errors,
-  _import.flatConfigs.typescript,
-  react.configs.flat.recommended,
+  jsdocPlugin.configs["flat/recommended"],
+  jsPlugin.configs.recommended,
+  jestPlugin.configs["flat/style"],
+  ...tsEslintPlugin.configs.recommended,
+  importPlugin.flatConfigs.errors,
+  importPlugin.flatConfigs.typescript,
+  reactPlugin.configs.flat.recommended,
   {
     plugins: {
       eslintConfigPrettier,
-      reactHooks,
-      reactRefresh,
+      reactHooks: reactHooksPlugin,
+      reactRefresh: reactRefreshPlugin,
     },
     languageOptions: {
       globals: {
