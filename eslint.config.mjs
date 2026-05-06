@@ -8,7 +8,7 @@ import reactPlugin from "eslint-plugin-react";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import reactRefreshPlugin from "eslint-plugin-react-refresh";
 import globals from "globals";
-import tsEslintPlugin from "typescript-eslint";
+import tsPlugin from "typescript-eslint";
 
 export default [
   {
@@ -17,7 +17,7 @@ export default [
   jsdocPlugin.configs["flat/recommended"],
   jsPlugin.configs.recommended,
   jestPlugin.configs["flat/style"],
-  ...tsEslintPlugin.configs.recommended,
+  ...tsPlugin.configs.recommended,
   importPlugin.flatConfigs.errors,
   importPlugin.flatConfigs.typescript,
   reactPlugin.configs.flat.recommended,

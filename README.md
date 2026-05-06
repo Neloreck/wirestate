@@ -217,7 +217,7 @@ Access signals directly in components. Reactivity is handled by the signals tran
 import { useInjection, useCommandCaller, useEventEmitter } from 'wirestate';
 import { CounterService } from './CounterService';
 
-export const CounterView = () => {
+export function CounterView() {
   const service = useInjection(CounterService);
   const call = useCommandCaller();
   const emit = useEventEmitter();
@@ -232,7 +232,7 @@ export const CounterView = () => {
       <button onClick={() => emit('RESET')}>Reset (Event)</button>
     </div>
   );
-};
+}
 ```
 
 ## Advanced Usage
