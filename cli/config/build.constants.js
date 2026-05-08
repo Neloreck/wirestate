@@ -15,6 +15,8 @@ export const EXTERNAL_DEPENDENCIES = [
   "mobx-react-lite",
   "@preact/signals-react",
   "tslib",
+  "lit",
+  "@lit/context",
 ];
 
 export const PROJECT_ROOT = path.resolve(__dirname, "../..");
