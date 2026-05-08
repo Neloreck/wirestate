@@ -1,4 +1,4 @@
-describe("Library exported API from wirestate/signals", () => {
+describe("Library exported API from wirestate/react-signals", () => {
   const libRoot = require("./index");
 
   const expectedLibExports: Array<string> = [

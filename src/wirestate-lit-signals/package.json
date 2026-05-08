@@ -1,7 +1,7 @@
 {
-  "name": "@wirestate/lit",
+  "name": "@wirestate/lit-signals",
   "version": "0.6.3",
-  "description": "Lit elements integration for wirestate",
+  "description": "Signals re-exports for wirestate lit elements",
   "sideEffects": false,
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/neloreck/wirestate#readme",
@@ -34,6 +34,7 @@
     "declarative",
     "management",
     "manager",
+    "signals",
     "lit",
     "lit-element",
     "web-components",
@@ -47,11 +48,8 @@
   ],
   "dependencies": {},
   "peerDependencies": {
-    "@wirestate/core": ">=0.6.0",
-    "lit": ">=3.0.0",
-    "@lit/context": ">=1.0.0",
-    "reflect-metadata": ">=0.2.0",
-    "tslib": ">=2.5.0"
+    "@lit-labs/signals": ">=0.2.0",
+    "signal-polyfill": ">=0.2.0"
   },
   "optionalDependencies": {}
 }

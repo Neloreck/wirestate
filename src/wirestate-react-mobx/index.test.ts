@@ -1,4 +1,4 @@
-describe("Library exported API from wirestate/mobx", () => {
+describe("Library exported API from wirestate/react-mobx", () => {
   const libRoot = require("./index");
 
   const expectedLibExports: Array<string> = [

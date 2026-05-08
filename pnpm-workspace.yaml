@@ -3,6 +3,7 @@ packages:
   - 'src/'
   - 'src/wirestate-core'
   - 'src/wirestate-lit'
+  - 'src/wirestate-lit-signals'
   - 'src/wirestate-react'
   - 'src/wirestate-react-mobx'
   - 'src/wirestate-react-signals'

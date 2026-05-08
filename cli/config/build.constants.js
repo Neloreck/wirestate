@@ -17,6 +17,8 @@ export const EXTERNAL_DEPENDENCIES = [
   "tslib",
   "lit",
   "@lit/context",
+  "@lit-labs/signals",
+  "signal-polyfill",
 ];
 
 export const PROJECT_ROOT = path.resolve(__dirname, "../..");
