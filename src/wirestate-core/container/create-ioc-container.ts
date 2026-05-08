@@ -4,6 +4,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { CommandBus } from "@/wirestate-core/commands/command-bus";
+import { WireScope } from "@/wirestate-core/container/wire-scope";
 import { EventBus } from "@/wirestate-core/events/event-bus";
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
 import {
@@ -13,7 +14,6 @@ import {
   QUERY_BUS_TOKEN,
   EVENT_BUS_TOKEN,
 } from "@/wirestate-core/registry";
-import { WireScope } from "@/wirestate-core/scope/wire-scope";
 import type { TAnyObject } from "@/wirestate-core/types/general";
 import type { TSeedsMap } from "@/wirestate-core/types/initial-state";
 

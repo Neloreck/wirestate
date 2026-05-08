@@ -5,6 +5,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { CommandBus } from "@/wirestate-core/commands/command-bus";
 import { getCommandHandlerMetadata } from "@/wirestate-core/commands/get-command-handler-metadata";
+import { WireScope } from "@/wirestate-core/container/wire-scope";
 import { buildEventDispatcher } from "@/wirestate-core/events/build-event-dispatcher";
 import type { EventBus } from "@/wirestate-core/events/event-bus";
 import { getQueryHandlerMetadata } from "@/wirestate-core/queries/get-query-handler-metadata";
@@ -19,7 +20,6 @@ import {
   EVENT_UNSUBSCRIBERS_BY_SERVICE,
   WIRE_SCOPES_BY_SERVICE,
 } from "@/wirestate-core/registry";
-import { WireScope } from "@/wirestate-core/scope/wire-scope";
 import { getActivatedHandlerMetadata } from "@/wirestate-core/service/get-activated-handler-metadata";
 import { getDeactivationHandlerMetadata } from "@/wirestate-core/service/get-deactivation-handler-metadata";
 import type { TCommandHandler, TCommandUnregister } from "@/wirestate-core/types/commands";

@@ -3,6 +3,7 @@ import { Container } from "inversify";
 import { bindService } from "@/wirestate-core/bind/bind-service";
 import { CommandBus } from "@/wirestate-core/commands/command-bus";
 import { createIocContainer } from "@/wirestate-core/container/create-ioc-container";
+import { WireScope } from "@/wirestate-core/container/wire-scope";
 import { EventBus } from "@/wirestate-core/events/event-bus";
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
 import {
@@ -12,7 +13,6 @@ import {
   SEEDS_TOKEN,
   SEED_TOKEN,
 } from "@/wirestate-core/registry";
-import { WireScope } from "@/wirestate-core/scope/wire-scope";
 
 describe("createIocContainer", () => {
   it("should create a container with default essentials", () => {

@@ -2,9 +2,9 @@ import { Container } from "inversify";
 
 import { Inject, Injectable } from "@/wirestate-core/alias";
 import { OnCommand } from "@/wirestate-core/commands/on-command";
+import { WireScope } from "@/wirestate-core/container/wire-scope";
 import { OnEvent } from "@/wirestate-core/events/on-event";
 import { OnQuery } from "@/wirestate-core/queries/on-query";
-import { WireScope } from "@/wirestate-core/scope/wire-scope";
 import { OnActivated } from "@/wirestate-core/service/on-activated";
 import { OnDeactivation } from "@/wirestate-core/service/on-deactivation";
 import { IEvent } from "@/wirestate-core/types/events";

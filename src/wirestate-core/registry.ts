@@ -1,6 +1,6 @@
 import type { Container } from "inversify";
 
-import type { WireScope } from "@/wirestate-core/scope/wire-scope";
+import type { WireScope } from "@/wirestate-core/container/wire-scope";
 import type { ICommandHandlerMetadata, TCommandUnregister } from "@/wirestate-core/types/commands";
 import type { TEventUnsubscriber, IEventHandlerMetadata } from "@/wirestate-core/types/events";
 import type { IQueryHandlerMetadata, TQueryUnregister } from "@/wirestate-core/types/queries";
