@@ -1,8 +1,7 @@
 import { render, cleanup, act } from "@testing-library/react";
-import { Container } from "inversify";
+import { Container, EventBus } from "@wirestate/core";
+import { mockContainer } from "@wirestate/core/test-utils";
 
-import { EventBus } from "@/wirestate-core";
-import { mockContainer } from "@/wirestate-core/test-utils";
 import { useEvent } from "@/wirestate-react/events/use-event";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 

@@ -11,6 +11,7 @@ export {
   tagged as Tagged,
   postConstruct as PostConstruct,
   preDestroy as PreDestroy,
+  Newable,
   type ServiceIdentifier,
   bindingTypeValues as BindingType,
   bindingScopeValues as ScopeBindingType,

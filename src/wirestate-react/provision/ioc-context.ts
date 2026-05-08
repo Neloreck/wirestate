@@ -1,4 +1,4 @@
-import type { Container } from "inversify";
+import { type Container } from "@wirestate/core";
 import { type Context, createContext, type Dispatch, type SetStateAction } from "react";
 
 import { Optional } from "@/wirestate-react/types/general";

@@ -1,10 +1,10 @@
 import { render, fireEvent, cleanup } from "@testing-library/react";
-import { Container, Newable } from "inversify";
+import { Container, Newable } from "@wirestate/core";
+import { mockContainer } from "@wirestate/core/test-utils";
 
 import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { mockContainer } from "@/wirestate-core/test-utils";
 import { useInjection } from "@/wirestate-react/provision/use-injection";
 import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";

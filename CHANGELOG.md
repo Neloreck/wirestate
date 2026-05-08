@@ -1,3 +1,7 @@
+## 0.6.0
+
+- Split wirestate as separate @wirestate packages
+
 ## 0.5.0
 
 - Add default initial state param on creation of containers

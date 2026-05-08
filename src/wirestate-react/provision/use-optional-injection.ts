@@ -1,4 +1,4 @@
-import { Container, type ServiceIdentifier } from "inversify";
+import { Container, type ServiceIdentifier } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";

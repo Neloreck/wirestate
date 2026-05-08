@@ -1,7 +1,7 @@
-import { Container } from "inversify";
+import { Container } from "@wirestate/core";
+import { mockContainer } from "@wirestate/core/test-utils";
 import { createElement, ReactNode } from "react";
 
-import { mockContainer } from "@/wirestate-core/test-utils";
 import { IocProvider } from "@/wirestate-react/provision/ioc-provider";
 
 /**

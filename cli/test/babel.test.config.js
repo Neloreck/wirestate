@@ -26,6 +26,10 @@ module.exports = {
         root: ["./"],
         alias: {
           "@": "./src",
+          "@wirestate/core": "./src/wirestate-core",
+          "@wirestate/react": "./src/wirestate-react",
+          "@wirestate/react-mobx": "./src/wirestate-react-mobx",
+          "@wirestate/react-signals": "./src/wirestate-react-signals",
         },
       },
     ],

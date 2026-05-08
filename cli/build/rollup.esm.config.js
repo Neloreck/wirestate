@@ -8,34 +8,24 @@ import { default as typescript } from "@rollup/plugin-typescript";
 import { default as clear } from "rollup-plugin-clear";
 import { visualizer } from "rollup-plugin-visualizer";
 
-import {
-  CORE_ENTRY,
-  EEnvironment,
-  ESM_ROOT,
-  EXTERNAL_DEPENDENCIES,
-  MOBX_ENTRY,
-  SIGNALS_ENTRY,
-  STATS_ROOT,
-  TEST_UTILS_ENTRY,
-  TS_BUILD_CONFIG,
-  WS_ROOT,
-} from "../config/build.constants";
+import { DIST_ROOT, EEnvironment, SRC_PATH, STATS_ROOT, TS_BUILD_CONFIG } from "../config/build.constants";
+import { PACKAGES } from "../config/packages";
 
 import { BABEL_CONFIG } from "./babel.modern.config";
 
-const createEsmConfig = (env) => ({
-  external: EXTERNAL_DEPENDENCIES,
-  input: [CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY, SIGNALS_ENTRY],
+const createPackageEsmConfig = (pkg, env) => ({
+  external: pkg.external,
+  input: pkg.entries,
   output: {
     compact: env === EEnvironment.PRODUCTION,
-    dir: path.resolve(ESM_ROOT, env),
+    dir: path.resolve(DIST_ROOT, pkg.name, "esm", env),
     preserveModules: true,
     sourcemap: true,
     format: "es",
   },
   plugins: [
     clear({
-      targets: [path.resolve(ESM_ROOT, env)],
+      targets: [path.resolve(DIST_ROOT, pkg.name, "esm", env)],
     }),
     replace({
       preventAssignment: true,
@@ -47,17 +37,20 @@ const createEsmConfig = (env) => ({
       pretty: env !== EEnvironment.PRODUCTION,
       declaration: false,
       declarationMap: false,
-      outDir: path.resolve(ESM_ROOT, env),
+      outDir: path.resolve(DIST_ROOT, pkg.name, "esm", env),
     }),
     commonjs(),
     babel({ ...BABEL_CONFIG, babelHelpers: "bundled" }),
     env === EEnvironment.PRODUCTION ? terser({ output: { beautify: false, comments: false } }) : null,
     visualizer({
-      filename: path.resolve(STATS_ROOT, `esm-${env}-stats.html`),
+      filename: path.resolve(STATS_ROOT, `${pkg.name}-esm-${env}-stats.html`),
       gzipSize: true,
-      projectRoot: WS_ROOT,
+      projectRoot: path.resolve(SRC_PATH, pkg.name),
     }),
   ].filter(Boolean),
 });
 
-export default [createEsmConfig(EEnvironment.PRODUCTION), createEsmConfig(EEnvironment.DEVELOPMENT)];
+export default PACKAGES.flatMap((pkg) => [
+  createPackageEsmConfig(pkg, EEnvironment.PRODUCTION),
+  createPackageEsmConfig(pkg, EEnvironment.DEVELOPMENT),
+]);

@@ -1,10 +1,9 @@
-import { Container } from "inversify";
+import { Container, CommandBus, CommandDescriptor, CommandType } from "@wirestate/core";
 import { useCallback } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { CommandBus, CommandDescriptor, CommandType } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**

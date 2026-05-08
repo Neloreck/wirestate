@@ -1,9 +1,8 @@
 import { render } from "@testing-library/react";
-import { Container } from "inversify";
+import { Container, SEED } from "@wirestate/core";
 
 import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
 
-import { SEED } from "@/wirestate-core";
 import { IocProvider } from "@/wirestate-react/provision/ioc-provider";
 import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
 import { AnyObject } from "@/wirestate-react/types/general";

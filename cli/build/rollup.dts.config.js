@@ -1,22 +1,18 @@
+import * as path from "path";
+
 import { default as clear } from "rollup-plugin-clear";
 import { default as dts } from "rollup-plugin-dts";
 
 import { default as tsconfig } from "../../tsconfig.json";
-import {
-  EXTERNAL_DEPENDENCIES,
-  CORE_ENTRY,
-  TEST_UTILS_ENTRY,
-  MOBX_ENTRY,
-  SIGNALS_ENTRY,
-  TYPES_ROOT,
-} from "../config/build.constants";
+import { DIST_ROOT } from "../config/build.constants";
+import { PACKAGES } from "../config/packages";
 
-export const DTS_CONFIG = {
-  external: EXTERNAL_DEPENDENCIES,
-  input: [CORE_ENTRY, TEST_UTILS_ENTRY, MOBX_ENTRY, SIGNALS_ENTRY],
+const createPackageDtsConfig = (pkg) => ({
+  external: pkg.external,
+  input: pkg.entries,
   output: {
     chunkFileNames: "lib.d.ts",
-    dir: TYPES_ROOT,
+    dir: path.resolve(DIST_ROOT, pkg.name, "dts"),
     format: "es",
     sourcemap: false,
   },
@@ -30,9 +26,9 @@ export const DTS_CONFIG = {
       },
     }),
     clear({
-      targets: [TYPES_ROOT],
+      targets: [path.resolve(DIST_ROOT, pkg.name, "dts")],
     }),
   ],
-};
+});
 
-export default [DTS_CONFIG];
+export default PACKAGES.map((pkg) => createPackageDtsConfig(pkg));

@@ -1,9 +1,3 @@
-import { Newable, type ServiceIdentifier } from "inversify";
-import { type ReactElement, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
-
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import {
   applySeeds,
   bindEntry,
@@ -12,7 +6,14 @@ import {
   unapplySeeds,
   WirestateError,
   getEntryToken,
-} from "@/wirestate-core";
+  Newable,
+  type ServiceIdentifier,
+} from "@wirestate/core";
+import { type ReactElement, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
+
+import { dbg } from "@/macroses/dbg.macro";
+import { prefix } from "@/macroses/prefix.macro";
+
 import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "@/wirestate-react/error/error-code";
 import { IIocContext, IocContext } from "@/wirestate-react/provision/ioc-context";
 import { Optional } from "@/wirestate-react/types/general";

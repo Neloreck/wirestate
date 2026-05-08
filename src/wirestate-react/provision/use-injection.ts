@@ -1,4 +1,4 @@
-import { type ServiceIdentifier } from "inversify";
+import { type ServiceIdentifier } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";

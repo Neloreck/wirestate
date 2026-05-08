@@ -1,10 +1,9 @@
-import { Container } from "inversify";
+import { Container, QueryBus, SyncQueryCaller, QueryType } from "@wirestate/core";
 import { useCallback } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { QueryBus, SyncQueryCaller, QueryType } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**

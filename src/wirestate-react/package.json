@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/react",
-  "version": "0.1.0",
+  "version": "0.6.0",
   "description": "React alias and adapters for wirestate",
   "sideEffects": false,
   "author": "Syrotenko Igor",
@@ -44,7 +44,6 @@
     "manager",
     "mobx",
     "react",
-    "inversify",
     "ioc",
     "di",
     "dependency-injection",
@@ -52,10 +51,9 @@
     "store",
     "typescript"
   ],
-  "dependencies": {
-    "inversify": "^8.1.0"
-  },
+  "dependencies": {},
   "peerDependencies": {
+    "@wirestate/core": ">=0.6.0",
     "react": ">=16.8.0",
     "reflect-metadata": ">=0.2.0",
     "tslib": ">=2.5.0"

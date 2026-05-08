@@ -11,6 +11,7 @@ describe("Library exported API from wirestate-core", () => {
     "LazyServiceIdentifier",
     "MultiInject",
     "Named",
+    "Newable",
     "Optional",
     "PostConstruct",
     "PreDestroy",

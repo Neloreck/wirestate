@@ -1,10 +1,9 @@
-import { Container } from "inversify";
+import { Container, EventBus, EventEmitter, EventType } from "@wirestate/core";
 import { useCallback } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { EventBus, EventEmitter, EventType } from "@/wirestate-core";
 import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
 
 /**

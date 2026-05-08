@@ -1,10 +1,18 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, injectable } from "inversify";
+import {
+  Container,
+  Injectable,
+  OnActivated,
+  OnDeactivation,
+  SEED,
+  SeedEntries,
+  SEEDS,
+  WirestateError,
+} from "@wirestate/core";
+import { mockContainer } from "@wirestate/core/test-utils";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { OnActivated, OnDeactivation, SEED, SeedEntries, SEEDS, WirestateError } from "@/wirestate-core";
-import { mockContainer } from "@/wirestate-core/test-utils";
 import { ERROR_CODE_INVALID_CONTEXT } from "@/wirestate-react/error/error-code";
 import { createInjectablesProvider } from "@/wirestate-react/provision/create-injectables-provider";
 import { useInjection } from "@/wirestate-react/provision/use-injection";
@@ -16,7 +24,7 @@ describe("createInjectablesProvider", () => {
   let secondServiceActivated: number = 0;
   let secondServiceDeactivated: number = 0;
 
-  @injectable()
+  @Injectable()
   class FirstService {
     public value: string = "A";
 
@@ -31,7 +39,7 @@ describe("createInjectablesProvider", () => {
     }
   }
 
-  @injectable()
+  @Injectable()
   class SecondService {
     public value: string = "B";
 

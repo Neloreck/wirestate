@@ -1,4 +1,4 @@
-import { Container } from "inversify";
+import { Container } from "@wirestate/core";
 
 import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
 

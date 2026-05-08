@@ -29,19 +29,19 @@ Designed for complex applications, `wirestate` enforces a clear separation of co
 ## Installation
 
 ```bash
-npm install --save wirestate reflect-metadata
+npm install --save @wirestate/core reflect-metadata
 ```
 
-### Additionally, for mobx
+### For react-mobx
 
 ```bash
-npm install --save mobx mobx-react-lite
+npm install --save @wirestate/react @wirestate/react-mobx mobx mobx-react-lite
 ```
 
-### Additionally, for signals
+### For signals
 
 ```bash
-npm install --save @preact/signals-react
+npm install --save @wirestate/react @wirestate/react-signals @preact/signals-react
 npm install --save-dev @preact/signals-react-transform
 ```
 
@@ -52,8 +52,8 @@ npm install --save-dev @preact/signals-react-transform
 Services are standard classes decorated with `@Injectable`. Use `WireScope` to interact with the framework.
 
 ```typescript
-import { Injectable, Inject, WireScope, OnEvent, OnCommand, OnQuery } from 'wirestate';
-import { makeObservable, Observable, Action } from 'wirestate/mobx';
+import { Injectable, Inject, WireScope, OnEvent, OnCommand, OnQuery } from '@wirestate/core';
+import { makeObservable, Observable, Action } from '@wirestate/react-mobx';
 
 @Injectable()
 export class CounterService {
@@ -100,7 +100,7 @@ Bind services at any level of the component tree.
 Lifetimes are managed automatically.
 
 ```tsx
-import { IocProvider, createInjectablesProvider } from 'wirestate';
+import { IocProvider, createInjectablesProvider } from '@wirestate/react';
 import { CounterService } from './CounterService';
 
 const MainProvider = createInjectablesProvider([CounterService]);
@@ -122,8 +122,8 @@ Directly use services and rely on mobx reactivity.
 Or use specialized hooks for communication without direct references.
 
 ```tsx
-import { observer } from 'wirestate/mobx';
-import { useInjection, useCommandCaller, useEventEmitter } from 'wirestate';
+import { useInjection, useCommandCaller, useEventEmitter } from '@wirestate/react';
+import { observer } from '@wirestate/react-mobx';
 import { CounterService } from './CounterService';
 
 export const CounterView = observer(() => {
@@ -150,8 +150,8 @@ export const CounterView = observer(() => {
 Services use `signal` and `computed` for state management.
 
 ```typescript
-import { Injectable, Inject, WireScope, OnEvent, OnCommand, OnQuery } from 'wirestate';
-import { signal, computed, Signal, ReadonlySignal } from 'wirestate/signals';
+import { Injectable, Inject, WireScope, OnEvent, OnCommand, OnQuery } from '@wirestate/core';
+import { signal, computed, Signal, ReadonlySignal } from '@wirestate/react-signals';
 
 @Injectable()
 export class CounterService {
@@ -193,7 +193,7 @@ export class CounterService {
 The provider configuration remains the same regardless of the reactivity implementation.
 
 ```tsx
-import { IocProvider, createInjectablesProvider } from 'wirestate';
+import { IocProvider, createInjectablesProvider } from '@wirestate/react';
 import { CounterService } from './CounterService';
 
 const MainProvider = createInjectablesProvider([CounterService]);
@@ -214,7 +214,7 @@ export function Application() {
 Access signals directly in components. Reactivity is handled by the signals transform or manual subscription.
 
 ```tsx
-import { useInjection, useCommandCaller, useEventEmitter } from 'wirestate';
+import { useInjection, useCommandCaller, useEventEmitter } from '@wirestate/react';
 import { CounterService } from './CounterService';
 
 export function CounterView() {
