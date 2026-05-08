@@ -1,7 +1,7 @@
 {
-  "name": "@wirestate/core",
+  "name": "@wirestate/react",
   "version": "0.1.0",
-  "description": "Store management library core based on inversify",
+  "description": "React alias and adapters for wirestate",
   "sideEffects": false,
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/neloreck/wirestate#readme",
@@ -42,6 +42,8 @@
     "declarative",
     "management",
     "manager",
+    "mobx",
+    "react",
     "inversify",
     "ioc",
     "di",
@@ -54,6 +56,7 @@
     "inversify": "^8.1.0"
   },
   "peerDependencies": {
+    "react": ">=16.8.0",
     "reflect-metadata": ">=0.2.0",
     "tslib": ">=2.5.0"
   },

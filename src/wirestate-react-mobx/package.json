@@ -1,7 +1,7 @@
 {
-  "name": "@wirestate/core",
+  "name": "@wirestate/react-mobx",
   "version": "0.1.0",
-  "description": "Store management library core based on inversify",
+  "description": "Mobx alias and adapters for wirestate",
   "sideEffects": false,
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/neloreck/wirestate#readme",
@@ -42,6 +42,8 @@
     "declarative",
     "management",
     "manager",
+    "mobx",
+    "react",
     "inversify",
     "ioc",
     "di",
@@ -50,12 +52,10 @@
     "store",
     "typescript"
   ],
-  "dependencies": {
-    "inversify": "^8.1.0"
-  },
+  "dependencies": {},
   "peerDependencies": {
-    "reflect-metadata": ">=0.2.0",
-    "tslib": ">=2.5.0"
+    "mobx": ">=6.0.0",
+    "mobx-react-lite": ">=4.0.0"
   },
   "optionalDependencies": {}
 }

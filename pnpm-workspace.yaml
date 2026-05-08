@@ -2,6 +2,9 @@ packages:
   - 'cli/'
   - 'src/'
   - 'src/wirestate'
+  - 'src/wirestate-react'
+  - 'src/wirestate-react-mobx'
+  - 'src/wirestate-react-signals'
 allowBuilds:
   core-js: true
   unrs-resolver: true

@@ -7,4 +7,3 @@ export { mockBindEntry } from "@/wirestate/test-utils/mock-bind-entry";
 export { mockUnbindService } from "@/wirestate/test-utils/mock-unbind-service";
 export { mockContainer } from "@/wirestate/test-utils/mock-container";
 export { mockService } from "@/wirestate/test-utils/mock-service";
-export { withIocProvider } from "@/wirestate/test-utils/with-ioc-provider";

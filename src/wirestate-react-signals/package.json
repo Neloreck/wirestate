@@ -1,7 +1,7 @@
 {
-  "name": "@wirestate/core",
+  "name": "@wirestate/react-signals",
   "version": "0.1.0",
-  "description": "Store management library core based on inversify",
+  "description": "Preact signals alias and adapters for wirestate",
   "sideEffects": false,
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/neloreck/wirestate#readme",
@@ -20,13 +20,6 @@
         "production": "./cjs/production/index.js",
         "default": "./cjs/development/index.js"
       }
-    },
-    "./test-utils": {
-      "types": "./test-utils.d.ts",
-      "require": {
-        "production": "./cjs/production/test-utils.js",
-        "default": "./cjs/development/test-utils.js"
-      }
     }
   },
   "repository": {
@@ -42,6 +35,8 @@
     "declarative",
     "management",
     "manager",
+    "signals",
+    "react",
     "inversify",
     "ioc",
     "di",
@@ -50,12 +45,9 @@
     "store",
     "typescript"
   ],
-  "dependencies": {
-    "inversify": "^8.1.0"
-  },
+  "dependencies": {},
   "peerDependencies": {
-    "reflect-metadata": ">=0.2.0",
-    "tslib": ">=2.5.0"
+    "@preact/signals-react": ">=3.0.0"
   },
   "optionalDependencies": {}
 }
