@@ -3,9 +3,10 @@ import { Container, Newable } from "inversify";
 
 import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
 import { GenericService } from "@/fixtures/services/generic-service";
+
+import { mockContainer } from "@/wirestate/test-utils";
 import { useInjection } from "@/wirestate-react/provision/use-injection";
 import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
-import { mockContainer } from "@/wirestate/test-utils/mock-container";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 
 describe("useInjection", () => {

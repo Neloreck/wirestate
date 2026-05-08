@@ -5,7 +5,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
-import type { Optional, TAnyObject } from "@/wirestate/types/general";
+import { AnyObject, Optional } from "@/wirestate-react/types/general";
 
 /**
  * Resolves a value from the container if bound, returning null otherwise.
@@ -26,7 +26,7 @@ export function useOptionalInjection<T>(
     if (container.isBound(injectionId)) {
       dbg.info(prefix(__filename), "Resolving injection:", {
         token: injectionId,
-        name: (injectionId as TAnyObject)?.name ?? injectionId,
+        name: (injectionId as AnyObject)?.name ?? injectionId,
         revision,
         container,
         onFallback,
@@ -36,7 +36,7 @@ export function useOptionalInjection<T>(
     } else if (onFallback) {
       dbg.info(prefix(__filename), "Injection not found, using fallback handler:", {
         token: injectionId,
-        name: (injectionId as TAnyObject)?.name ?? injectionId,
+        name: (injectionId as AnyObject)?.name ?? injectionId,
         revision,
         container,
         onFallback,
@@ -46,7 +46,7 @@ export function useOptionalInjection<T>(
     } else {
       dbg.info(prefix(__filename), "Injection not found, returning null:", {
         token: injectionId,
-        name: (injectionId as TAnyObject)?.name ?? injectionId,
+        name: (injectionId as AnyObject)?.name ?? injectionId,
         revision,
         container,
         onFallback,

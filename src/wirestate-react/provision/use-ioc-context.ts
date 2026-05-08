@@ -1,9 +1,8 @@
 import { useContext } from "react";
 
-import { ERROR_CODE_INVALID_CONTEXT } from "@/wirestate/core/error/error-code";
-import { WirestateError } from "@/wirestate/core/error/wirestate-error";
+import { WirestateError } from "@/wirestate";
+import { ERROR_CODE_INVALID_CONTEXT } from "@/wirestate-react/error/error-code";
 import { type IIocContext, IocContext } from "@/wirestate-react/provision/ioc-context";
-import type { Optional } from "@/wirestate/types/general";
 
 /**
  * Returns the full IoC context.
@@ -12,7 +11,7 @@ import type { Optional } from "@/wirestate/types/general";
  * @internal
  */
 export function useIocContext(): IIocContext {
-  const value: Optional<IIocContext> = useContext(IocContext);
+  const value = useContext(IocContext);
 
   if (!value) {
     throw new WirestateError(

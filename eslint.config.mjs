@@ -125,6 +125,11 @@ export default [
             },
             {
               group: "external",
+              pattern: "@/fixtures/**",
+              position: "after",
+            },
+            {
+              group: "external",
               pattern: "@/**",
               position: "after",
             },

@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
+import { createIocContainer } from "@/wirestate";
 import { useContainerRevision } from "@/wirestate-react/provision/use-container-revision";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 

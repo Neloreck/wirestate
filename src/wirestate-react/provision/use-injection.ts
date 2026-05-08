@@ -5,7 +5,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
-import { TAnyObject } from "@/wirestate/types/general";
+import { AnyObject } from "@/wirestate-react/types/general";
 
 /**
  * Resolves a value from the container - constant or service.
@@ -21,7 +21,7 @@ export function useInjection<T>(injectionId: ServiceIdentifier<T>): T {
   return useMemo(() => {
     dbg.info(prefix(__filename), "New injection provision for token:", {
       token: injectionId,
-      name: (injectionId as TAnyObject)?.name ?? injectionId,
+      name: (injectionId as AnyObject)?.name ?? injectionId,
       revision,
       container,
     });

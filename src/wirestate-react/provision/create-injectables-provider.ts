@@ -4,16 +4,18 @@ import { type ReactElement, type ReactNode, useContext, useEffect, useMemo, useS
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { bindEntry } from "@/wirestate/core/bind/bind-entry";
-import { getEntryToken } from "@/wirestate/core/bind/get-entry-token";
-import { applySeeds } from "@/wirestate/core/container/apply-seeds";
-import { unapplySeeds } from "@/wirestate/core/container/unapply-seeds";
-import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "@/wirestate/core/error/error-code";
-import { WirestateError } from "@/wirestate/core/error/wirestate-error";
-import { type IIocContext, IocContext } from "@/wirestate-react/provision/ioc-context";
-import type { Optional } from "@/wirestate/types/general";
-import type { TSeedEntries } from "@/wirestate/types/initial-state";
-import type { IInjectableDescriptor } from "@/wirestate/types/privision";
+import {
+  applySeeds,
+  bindEntry,
+  InjectableDescriptor,
+  SeedEntries,
+  unapplySeeds,
+  WirestateError,
+  getEntryToken,
+} from "@/wirestate";
+import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "@/wirestate-react/error/error-code";
+import { IIocContext, IocContext } from "@/wirestate-react/provision/ioc-context";
+import { Optional } from "@/wirestate-react/types/general";
 
 /**
  * Props for the component returned by {@link createInjectablesProvider}.
@@ -23,7 +25,7 @@ export interface IInjectablesProviderProps {
    * Targeted seeds bound to specific injectables or tokens.
    * Subsequent prop changes are ignored. Use a React `key` to re-seed the tree.
    */
-  readonly seeds?: TSeedEntries;
+  readonly seeds?: SeedEntries;
   /**
    * Subtree that consumes the bound services.
    */
@@ -53,7 +55,7 @@ export interface ICreateInjectablesProviderOptions {
  * @returns injectables provider component
  */
 export function createInjectablesProvider(
-  entries: ReadonlyArray<Newable<object> | IInjectableDescriptor>,
+  entries: ReadonlyArray<Newable<object> | InjectableDescriptor>,
   options: ICreateInjectablesProviderOptions = {}
 ) {
   dbg.info(prefix(__filename), "Creating injectables provider:", { services: entries, options });

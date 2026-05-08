@@ -1,7 +1,7 @@
 import type { Container } from "inversify";
 import { type Context, createContext, type Dispatch, type SetStateAction } from "react";
 
-import type { Optional } from "@/wirestate/types/general";
+import { Optional } from "@/wirestate-react/types/general";
 
 /**
  * React context value.

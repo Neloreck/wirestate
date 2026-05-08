@@ -2,17 +2,18 @@ import { render, cleanup } from "@testing-library/react";
 import { Container, ServiceIdentifier } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
+
+import { mockContainer } from "@/wirestate/test-utils";
 import { useOptionalInjection } from "@/wirestate-react/provision/use-optional-injection";
-import { mockContainer } from "@/wirestate/test-utils/mock-container";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
-import { Optional, TAnyObject } from "@/wirestate/types/general";
+import { AnyObject, Optional } from "@/wirestate-react/types/general";
 
 describe("useOptionalInjection", () => {
   function TestComponent({ token = GenericService as ServiceIdentifier<unknown> }) {
     const service: Optional<unknown> = useOptionalInjection(token);
 
     return (
-      <div data-testid={"injectable-name"}>{service === null ? "null" : (service as TAnyObject).constructor.name}</div>
+      <div data-testid={"injectable-name"}>{service === null ? "null" : (service as AnyObject).constructor.name}</div>
     );
   }
 
