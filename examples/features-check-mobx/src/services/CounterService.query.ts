@@ -1,4 +1,4 @@
-import type { Optional } from "@/application/types";
+import type { Optional } from "@/types";
 
 export enum ECounterServiceQuery {
   GET_COUNTER_SUMMARY = "counter/summary",

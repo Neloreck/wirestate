@@ -2,12 +2,11 @@ import "./Application.css";
 
 import { useEffect } from "react";
 
-import { EventsLog } from "@/application/components/EventsLog";
-import { GeneralControls } from "@/application/components/GeneralControls";
-import { QueriesData } from "@/application/components/QueriesData";
-import { EGlobalEvent } from "@/core/events";
-import { GLOBAL_CONFIG } from "@/core/id";
-import { ThemeService } from "@/core/services/theme";
+import { EventsLog } from "@/components/EventsLog";
+import { GeneralControls } from "@/components/GeneralControls";
+import { QueriesData } from "@/components/QueriesData";
+import { EGlobalEvent } from "@/constants/events";
+import { GLOBAL_CONFIG } from "@/constants/id";
 import {
   useInjection,
   useEvent,
@@ -15,6 +14,7 @@ import {
   useEvents,
 } from "@/libs/wirestate";
 import { observer } from "@/libs/wirestate/mobx";
+import { ThemeService } from "@/services/ThemeService";
 
 export const Application = observer(() => {
   const themeService: ThemeService = useInjection(ThemeService);

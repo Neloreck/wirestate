@@ -1,5 +1,4 @@
-import type { Theme } from "@/application/types";
-import { EGlobalEvent } from "@/core/events";
+import { EGlobalEvent } from "@/constants/events";
 import {
   Inject,
   Injectable,
@@ -9,6 +8,7 @@ import {
   WireScope,
 } from "@/libs/wirestate";
 import { Action, Observable, makeObservable } from "@/libs/wirestate/mobx";
+import type { Theme } from "@/types";
 
 @Injectable()
 export class ThemeService {

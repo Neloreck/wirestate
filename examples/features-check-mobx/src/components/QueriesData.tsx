@@ -2,15 +2,7 @@ import "./QueriesData.css";
 
 import { useCallback, useState } from "react";
 
-import type { Optional, Theme } from "@/application/types";
-import { EGlobalQuery } from "@/core/queries";
-import {
-  ECounterServiceQuery,
-  type ICounterSnapshot,
-  type ICounterSummary,
-} from "@/core/services/counter";
-import { LoggerService } from "@/core/services/logging";
-import { ThemeService } from "@/core/services/theme";
+import { EGlobalQuery } from "@/constants/queries";
 import {
   type QueryCaller,
   type SyncQueryCaller,
@@ -21,6 +13,14 @@ import {
   useSyncQueryCaller,
 } from "@/libs/wirestate";
 import { observer } from "@/libs/wirestate/mobx";
+import {
+  ECounterServiceQuery,
+  type ICounterSnapshot,
+  type ICounterSummary,
+} from "@/services/CounterService.query";
+import { LoggerService } from "@/services/LoggerService";
+import { ThemeService } from "@/services/ThemeService";
+import type { Optional, Theme } from "@/types";
 
 export const QueriesData = observer(() => {
   const [snapshot, setSnapshot] = useState<Optional<ICounterSnapshot>>(null);

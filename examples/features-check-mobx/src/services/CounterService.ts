@@ -1,6 +1,4 @@
-import type { Optional } from "@/application/types";
-import { EGlobalEvent } from "@/core/events";
-import { LoggerService } from "@/core/services/logging";
+import { EGlobalEvent } from "@/constants/events";
 import {
   SEED,
   Inject,
@@ -17,12 +15,13 @@ import {
   Observable,
   makeObservable,
 } from "@/libs/wirestate/mobx";
-
 import {
   ECounterServiceQuery,
   type ICounterSnapshot,
   type ICounterSummary,
-} from "./CounterService.query";
+} from "@/services/CounterService.query";
+import { LoggerService } from "@/services/LoggerService";
+import type { Optional } from "@/types";
 
 export interface ICounterSeed {
   readonly count?: number;
