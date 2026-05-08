@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { WirestateError } from "@/wirestate";
+import { WirestateError } from "@/wirestate-core";
 import { ERROR_CODE_INVALID_CONTEXT } from "@/wirestate-react/error/error-code";
 import { type IIocContext, IocContext } from "@/wirestate-react/provision/ioc-context";
 

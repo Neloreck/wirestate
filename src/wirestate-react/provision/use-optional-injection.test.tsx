@@ -3,7 +3,7 @@ import { Container, ServiceIdentifier } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { mockContainer } from "@/wirestate/test-utils";
+import { mockContainer } from "@/wirestate-core/test-utils";
 import { useOptionalInjection } from "@/wirestate-react/provision/use-optional-injection";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 import { AnyObject, Optional } from "@/wirestate-react/types/general";

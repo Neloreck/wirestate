@@ -1,6 +1,6 @@
 import { Component, createElement, ReactNode } from "react";
 
-import { Optional } from "@/wirestate/types/general";
+import { Optional } from "@/wirestate-core/types/general";
 
 export class ErrorLogBoundary extends Component {
   public state = { error: null as Optional<Error> };

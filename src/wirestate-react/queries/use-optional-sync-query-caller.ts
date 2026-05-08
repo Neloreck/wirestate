@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { OptionalSyncQueryCaller, QUERY_BUS, QueryBus, QueryType } from "@/wirestate";
+import { OptionalSyncQueryCaller, QUERY_BUS, QueryBus, QueryType } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**

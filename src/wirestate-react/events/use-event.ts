@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 import { MutableRefObject, useEffect, useRef } from "react";
 
-import { EventBus, EventHandler, EventType, EVENT_BUS } from "@/wirestate";
+import { EventBus, EventHandler, EventType, EVENT_BUS } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**

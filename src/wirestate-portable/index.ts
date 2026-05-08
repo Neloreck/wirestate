@@ -1,2 +1,2 @@
-export * from "@/wirestate/index";
-export * from "@/wirestate/test-utils";
+export * from "@/wirestate-core";
+export * from "@/wirestate-core/test-utils";

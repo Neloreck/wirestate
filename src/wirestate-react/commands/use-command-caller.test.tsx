@@ -8,7 +8,7 @@ import {
   CommandDescriptor,
   CommandCaller,
   createIocContainer,
-} from "@/wirestate";
+} from "@/wirestate-core";
 import { useCommandCaller } from "@/wirestate-react/commands/use-command-caller";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 import { Optional } from "@/wirestate-react/types/general";

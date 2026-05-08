@@ -3,8 +3,8 @@ import { Container, injectable } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { OnActivated, OnDeactivation, SEED, SeedEntries, SEEDS, WirestateError } from "@/wirestate";
-import { mockContainer } from "@/wirestate/test-utils";
+import { OnActivated, OnDeactivation, SEED, SeedEntries, SEEDS, WirestateError } from "@/wirestate-core";
+import { mockContainer } from "@/wirestate-core/test-utils";
 import { ERROR_CODE_INVALID_CONTEXT } from "@/wirestate-react/error/error-code";
 import { createInjectablesProvider } from "@/wirestate-react/provision/create-injectables-provider";
 import { useInjection } from "@/wirestate-react/provision/use-injection";

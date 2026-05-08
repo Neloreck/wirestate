@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer, EVENT_BUS, EventBus, EventEmitter } from "@/wirestate";
+import { createIocContainer, EVENT_BUS, EventBus, EventEmitter } from "@/wirestate-core";
 import { useEventEmitter } from "@/wirestate-react/events/use-event-emitter";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 

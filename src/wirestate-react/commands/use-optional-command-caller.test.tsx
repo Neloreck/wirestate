@@ -1,7 +1,7 @@
 import { render, cleanup } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer, COMMAND_BUS, CommandBus, OptionalCommandCaller } from "@/wirestate";
+import { createIocContainer, COMMAND_BUS, CommandBus, OptionalCommandCaller } from "@/wirestate-core";
 import { useOptionalCommandCaller } from "@/wirestate-react/commands/use-optional-command-caller";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 

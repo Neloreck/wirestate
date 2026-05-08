@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer, QUERY_BUS, QueryBus, QueryCaller } from "@/wirestate";
+import { createIocContainer, QUERY_BUS, QueryBus, QueryCaller } from "@/wirestate-core";
 import { useQueryCaller } from "@/wirestate-react/queries/use-query-caller";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 

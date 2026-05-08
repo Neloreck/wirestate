@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 import { createElement, PropsWithChildren, useEffect, useMemo, useState } from "react";
 
-import { applySharedSeed, createIocContainer, WirestateError } from "@/wirestate";
+import { applySharedSeed, createIocContainer, WirestateError } from "@/wirestate-core";
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "@/wirestate-react/error/error-code";
 import { type IIocContext, IocContext } from "@/wirestate-react/provision/ioc-context";
 

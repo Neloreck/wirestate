@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { CommandBus, COMMAND_BUS, CommandDescriptor, CommandType } from "@/wirestate";
+import { CommandBus, COMMAND_BUS, CommandDescriptor, CommandType } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**

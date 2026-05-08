@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { EVENT_BUS, EventBus, EventEmitter, EventType } from "@/wirestate";
+import { EVENT_BUS, EventBus, EventEmitter, EventType } from "@/wirestate-core";
 import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
 
 /**

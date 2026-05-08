@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 import { useEffect, useRef } from "react";
 
-import { COMMAND_BUS, CommandBus, CommandHandler, CommandType } from "@/wirestate";
+import { COMMAND_BUS, CommandBus, CommandHandler, CommandType } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**

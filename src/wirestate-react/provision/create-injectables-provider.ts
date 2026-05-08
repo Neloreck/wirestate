@@ -12,7 +12,7 @@ import {
   unapplySeeds,
   WirestateError,
   getEntryToken,
-} from "@/wirestate";
+} from "@/wirestate-core";
 import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "@/wirestate-react/error/error-code";
 import { IIocContext, IocContext } from "@/wirestate-react/provision/ioc-context";
 import { Optional } from "@/wirestate-react/types/general";

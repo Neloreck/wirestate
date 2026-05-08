@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 import { useEffect, useRef } from "react";
 
-import { QUERY_BUS, QueryBus, QueryHandler, QueryType } from "@/wirestate";
+import { QUERY_BUS, QueryBus, QueryHandler, QueryType } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**

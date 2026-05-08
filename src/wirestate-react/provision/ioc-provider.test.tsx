@@ -3,7 +3,7 @@ import { Container } from "inversify";
 
 import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
 
-import { SEED, SEEDS } from "@/wirestate";
+import { SEED, SEEDS } from "@/wirestate-core";
 import { IocProvider } from "@/wirestate-react/provision/ioc-provider";
 import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
 import { AnyObject } from "@/wirestate-react/types/general";
