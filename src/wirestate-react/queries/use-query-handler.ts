@@ -1,7 +1,7 @@
 import { Container, QueryBus, QueryHandler, QueryType } from "@wirestate/core";
 import { useEffect, useRef } from "react";
 
-import { useContainer } from "@/wirestate-react/provision/use-container";
+import { useContainer } from "../provision/use-container";
 
 /**
  * Registers a query handler for the component's lifetime.

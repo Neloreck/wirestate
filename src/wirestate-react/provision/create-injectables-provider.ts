@@ -14,9 +14,10 @@ import { type ReactElement, type ReactNode, useContext, useEffect, useMemo, useS
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "@/wirestate-react/error/error-code";
-import { IocContext, IocReactContext } from "@/wirestate-react/provision/ioc-context";
-import { Optional } from "@/wirestate-react/types/general";
+import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
+import { Optional } from "../types/general";
+
+import { IocContext, IocReactContext } from "./ioc-context";
 
 /**
  * Props for the component returned by {@link createInjectablesProvider}.

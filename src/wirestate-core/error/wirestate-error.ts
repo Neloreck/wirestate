@@ -1,4 +1,4 @@
-import { ERROR_CODE_GENERIC } from "@/wirestate-core/error/error-code";
+import { ERROR_CODE_GENERIC } from "./error-code";
 
 /**
  * A custom error class that contains generic error information for Wirestate-related issues.

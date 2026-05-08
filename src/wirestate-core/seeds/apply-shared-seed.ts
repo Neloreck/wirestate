@@ -3,8 +3,8 @@ import type { Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { SEED_TOKEN } from "@/wirestate-core/registry";
-import type { AnyObject } from "@/wirestate-core/types/general";
+import { SEED_TOKEN } from "../registry";
+import type { AnyObject } from "../types/general";
 
 /**
  * Applies shared seed to the container.

@@ -1,6 +1,6 @@
 import { QueryType } from "@wirestate/core";
 
-import { MaybePromise, Optional } from "@/wirestate-react/types/general";
+import { MaybePromise, Optional } from "./general";
 
 /**
  * Public query responder signature.

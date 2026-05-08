@@ -4,8 +4,8 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
-import { EventEmitter } from "@/wirestate-react/types/events";
+import { useIocContext } from "../provision/use-ioc-context";
+import { EventEmitter } from "../types/events";
 
 /**
  * Returns a stable function to emit events.

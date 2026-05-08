@@ -1,8 +1,8 @@
 import { Container, EventBus, EventHandler } from "@wirestate/core";
 import { type MutableRefObject, useEffect, useRef } from "react";
 
-import { useContainer } from "@/wirestate-react/provision/use-container";
-import { Maybe } from "@/wirestate-react/types/general";
+import { useContainer } from "../provision/use-container";
+import { Maybe } from "../types/general";
 
 /**
  * Subscribes a component to all events without type filtering.

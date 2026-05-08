@@ -1,9 +1,9 @@
 import type { Container } from "inversify";
 
-import type { WireScope } from "@/wirestate-core/container/wire-scope";
-import type { CommandHandlerMetadata, CommandUnregister } from "@/wirestate-core/types/commands";
-import type { EventUnsubscriber, EventHandlerMetadata } from "@/wirestate-core/types/events";
-import type { QueryHandlerMetadata, QueryUnregister } from "@/wirestate-core/types/queries";
+import type { WireScope } from "./container/wire-scope";
+import type { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
+import type { EventUnsubscriber, EventHandlerMetadata } from "./types/events";
+import type { QueryHandlerMetadata, QueryUnregister } from "./types/queries";
 
 /**
  * Token for the container-scoped seeds map.

@@ -1,9 +1,9 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { EVENT_HANDLER_METADATA } from "@/wirestate-core/registry";
-import type { EventHandlerMetadata } from "@/wirestate-core/types/events";
-import { Maybe } from "@/wirestate-core/types/general";
+import { EVENT_HANDLER_METADATA } from "../registry";
+import type { EventHandlerMetadata } from "../types/events";
+import { Maybe } from "../types/general";
 
 /**
  * Retrieves `@OnEvent` metadata from the class hierarchy.

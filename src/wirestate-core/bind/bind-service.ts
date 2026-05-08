@@ -3,26 +3,26 @@ import { BindWhenOnFluentSyntax, Container, type Newable } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { CommandBus } from "@/wirestate-core/commands/command-bus";
-import { getCommandHandlerMetadata } from "@/wirestate-core/commands/get-command-handler-metadata";
-import { WireScope } from "@/wirestate-core/container/wire-scope";
-import { buildEventDispatcher } from "@/wirestate-core/events/build-event-dispatcher";
-import { EventBus } from "@/wirestate-core/events/event-bus";
-import { getQueryHandlerMetadata } from "@/wirestate-core/queries/get-query-handler-metadata";
-import { QueryBus } from "@/wirestate-core/queries/query-bus";
+import { CommandBus } from "../commands/command-bus";
+import { getCommandHandlerMetadata } from "../commands/get-command-handler-metadata";
+import { WireScope } from "../container/wire-scope";
+import { buildEventDispatcher } from "../events/build-event-dispatcher";
+import { EventBus } from "../events/event-bus";
+import { getQueryHandlerMetadata } from "../queries/get-query-handler-metadata";
+import { QueryBus } from "../queries/query-bus";
 import {
   COMMAND_UNREGISTERS_BY_SERVICE,
   CONTAINER_REFS_BY_SERVICE,
   QUERY_UNREGISTERS_BY_SERVICE,
   EVENT_UNSUBSCRIBERS_BY_SERVICE,
   WIRE_SCOPES_BY_SERVICE,
-} from "@/wirestate-core/registry";
-import { getActivatedHandlerMetadata } from "@/wirestate-core/service/get-activated-handler-metadata";
-import { getDeactivationHandlerMetadata } from "@/wirestate-core/service/get-deactivation-handler-metadata";
-import type { CommandHandler, CommandUnregister } from "@/wirestate-core/types/commands";
-import type { EventHandler, EventUnsubscriber } from "@/wirestate-core/types/events";
-import type { Maybe, MaybePromise, Optional } from "@/wirestate-core/types/general";
-import type { QueryHandler, QueryUnregister } from "@/wirestate-core/types/queries";
+} from "../registry";
+import { getActivatedHandlerMetadata } from "../service/get-activated-handler-metadata";
+import { getDeactivationHandlerMetadata } from "../service/get-deactivation-handler-metadata";
+import type { CommandHandler, CommandUnregister } from "../types/commands";
+import type { EventHandler, EventUnsubscriber } from "../types/events";
+import type { Maybe, MaybePromise, Optional } from "../types/general";
+import type { QueryHandler, QueryUnregister } from "../types/queries";
 
 export interface BindServiceOptions {
   isWithIgnoreLifecycle?: boolean;

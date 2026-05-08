@@ -1,16 +1,16 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER } from "@/wirestate-core/error/error-code";
-import { WirestateError } from "@/wirestate-core/error/wirestate-error";
+import { ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
 import {
   CommandStatus,
   type CommandDescriptor,
   type CommandHandler,
   type CommandType,
   type CommandUnregister,
-} from "@/wirestate-core/types/commands";
-import type { Maybe, Optional } from "@/wirestate-core/types/general";
+} from "../types/commands";
+import type { Maybe, Optional } from "../types/general";
 
 /**
  * Dispatches commands to handlers.

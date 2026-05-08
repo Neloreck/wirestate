@@ -1,9 +1,9 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { COMMAND_HANDLER_METADATA } from "@/wirestate-core/registry";
-import type { CommandHandlerMetadata, CommandType } from "@/wirestate-core/types/commands";
-import type { Maybe } from "@/wirestate-core/types/general";
+import { COMMAND_HANDLER_METADATA } from "../registry";
+import type { CommandHandlerMetadata, CommandType } from "../types/commands";
+import type { Maybe } from "../types/general";
 
 /**
  * Decorator for service methods that handle a command.

@@ -2,15 +2,16 @@ import { Container } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Injectable } from "@/wirestate-core/alias";
-import { bindService } from "@/wirestate-core/bind/bind-service";
-import { CommandBus } from "@/wirestate-core/commands/command-bus";
-import { EventBus } from "@/wirestate-core/events/event-bus";
-import { OnQuery } from "@/wirestate-core/queries/on-query";
-import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import { OnActivated } from "@/wirestate-core/service/on-activated";
-import { mockContainer } from "@/wirestate-core/test-utils";
-import { CommandStatus } from "@/wirestate-core/types/commands";
+import { Injectable } from "../alias";
+import { CommandBus } from "../commands/command-bus";
+import { EventBus } from "../events/event-bus";
+import { OnQuery } from "../queries/on-query";
+import { QueryBus } from "../queries/query-bus";
+import { OnActivated } from "../service/on-activated";
+import { mockContainer } from "../test-utils";
+import { CommandStatus } from "../types/commands";
+
+import { bindService } from "./bind-service";
 
 describe("bindService", () => {
   @Injectable()

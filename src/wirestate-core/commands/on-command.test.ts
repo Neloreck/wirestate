@@ -1,5 +1,5 @@
-import { getCommandHandlerMetadata } from "@/wirestate-core/commands/get-command-handler-metadata";
-import { OnCommand } from "@/wirestate-core/commands/on-command";
+import { getCommandHandlerMetadata } from "./get-command-handler-metadata";
+import { OnCommand } from "./on-command";
 
 describe("OnCommand and getCommandHandlerMetadata", () => {
   it("should collect metadata for a single class", () => {

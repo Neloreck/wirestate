@@ -5,9 +5,10 @@ import { mockContainer } from "@wirestate/core/test-utils";
 import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { useInjection } from "@/wirestate-react/provision/use-injection";
-import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
-import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
+import { withIocProvider } from "../test-utils/with-ioc-provider";
+
+import { useInjection } from "./use-injection";
+import { useIocContext } from "./use-ioc-context";
 
 describe("useInjection", () => {
   function TestComponent({ token = GenericService as Newable<object> }) {

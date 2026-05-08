@@ -1,8 +1,9 @@
 import { Container } from "inversify";
 
-import { emitEvent } from "@/wirestate-core/events/emit-event";
-import { EventBus } from "@/wirestate-core/events/event-bus";
-import { mockContainer } from "@/wirestate-core/test-utils";
+import { mockContainer } from "../test-utils/mock-container";
+
+import { emitEvent } from "./emit-event";
+import { EventBus } from "./event-bus";
 
 describe("emitEvent", () => {
   it("should call injected query bus methods with sync data", () => {

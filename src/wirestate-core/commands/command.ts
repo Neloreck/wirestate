@@ -3,8 +3,9 @@ import { type Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { CommandBus } from "@/wirestate-core/commands/command-bus";
-import type { CommandDescriptor, CommandType } from "@/wirestate-core/types/commands";
+import type { CommandDescriptor, CommandType } from "../types/commands";
+
+import { CommandBus } from "./command-bus";
 
 /**
  * Dispatches a command on the provided container.

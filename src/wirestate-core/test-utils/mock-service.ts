@@ -1,7 +1,7 @@
 import { Newable } from "inversify";
 
-import { mockBindService } from "@/wirestate-core/test-utils/mock-bind-service";
-import { mockContainer } from "@/wirestate-core/test-utils/mock-container";
+import { mockBindService } from "./mock-bind-service";
+import { mockContainer } from "./mock-container";
 
 /**
  * Options for {@link mockService}.

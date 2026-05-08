@@ -1,6 +1,6 @@
 import type { Newable, ServiceIdentifier } from "inversify";
 
-import type { InjectableDescriptor } from "@/wirestate-core/types/privision";
+import type { InjectableDescriptor } from "../types/privision";
 
 /**
  * Returns the container token for a service entry.

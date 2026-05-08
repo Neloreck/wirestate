@@ -1,9 +1,10 @@
 import { render } from "@testing-library/react";
 import { Container, createIocContainer, QueryBus } from "@wirestate/core";
 
-import { useQueryHandler } from "@/wirestate-react/queries/use-query-handler";
-import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
-import { AnyObject, MaybePromise } from "@/wirestate-react/types/general";
+import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { AnyObject, MaybePromise } from "../types/general";
+
+import { useQueryHandler } from "./use-query-handler";
 
 describe("useQueryHandler", () => {
   it("should register and unregister a query handler", () => {

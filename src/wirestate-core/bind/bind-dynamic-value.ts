@@ -3,7 +3,7 @@ import { bindingScopeValues, BindInWhenOnFluentSyntax, Container } from "inversi
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { InjectableDescriptor } from "@/wirestate-core/types/privision";
+import { InjectableDescriptor } from "../types/privision";
 
 /**
  * Binds a constant value to a token in the container.

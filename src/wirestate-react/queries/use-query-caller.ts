@@ -4,8 +4,8 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { useContainer } from "@/wirestate-react/provision/use-container";
-import { QueryCaller } from "@/wirestate-react/types/queries";
+import { useContainer } from "../provision/use-container";
+import { QueryCaller } from "../types/queries";
 
 /**
  * Returns a function to dispatch queries on the active container.

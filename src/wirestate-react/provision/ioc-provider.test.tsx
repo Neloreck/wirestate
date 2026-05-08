@@ -3,9 +3,10 @@ import { Container, SEED } from "@wirestate/core";
 
 import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
 
-import { IocProvider } from "@/wirestate-react/provision/ioc-provider";
-import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
-import { AnyObject } from "@/wirestate-react/types/general";
+import { AnyObject } from "../types/general";
+
+import { IocProvider } from "./ioc-provider";
+import { useIocContext } from "./use-ioc-context";
 
 describe("IocProvider", () => {
   function Consumer() {

@@ -4,8 +4,9 @@ import { useMemo } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
-import { AnyObject } from "@/wirestate-react/types/general";
+import { AnyObject } from "../types/general";
+
+import { useIocContext } from "./use-ioc-context";
 
 /**
  * Resolves a value from the container - constant or service.

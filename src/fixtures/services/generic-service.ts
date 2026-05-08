@@ -1,14 +1,12 @@
-import { Container } from "inversify";
-
-import { Inject, Injectable } from "@/wirestate-core/alias";
-import { OnCommand } from "@/wirestate-core/commands/on-command";
-import { WireScope } from "@/wirestate-core/container/wire-scope";
-import { OnEvent } from "@/wirestate-core/events/on-event";
-import { OnQuery } from "@/wirestate-core/queries/on-query";
-import { OnActivated } from "@/wirestate-core/service/on-activated";
-import { OnDeactivation } from "@/wirestate-core/service/on-deactivation";
-import { Event } from "@/wirestate-core/types/events";
-import { Maybe } from "@/wirestate-core/types/general";
+import { Inject, Injectable, Container } from "@wirestate/core/alias";
+import { OnCommand } from "@wirestate/core/commands/on-command";
+import { WireScope } from "@wirestate/core/container/wire-scope";
+import { OnEvent } from "@wirestate/core/events/on-event";
+import { OnQuery } from "@wirestate/core/queries/on-query";
+import { OnActivated } from "@wirestate/core/service/on-activated";
+import { OnDeactivation } from "@wirestate/core/service/on-deactivation";
+import { Event } from "@wirestate/core/types/events";
+import { Maybe } from "@wirestate/core/types/general";
 
 @Injectable()
 export class GenericService {

@@ -1,5 +1,5 @@
-import { ERROR_CODE_GENERIC } from "@/wirestate-core/error/error-code";
-import { WirestateError } from "@/wirestate-core/error/wirestate-error";
+import { ERROR_CODE_GENERIC } from "./error-code";
+import { WirestateError } from "./wirestate-error";
 
 describe("WirestateError", () => {
   it("should create an error with default code and message", () => {

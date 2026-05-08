@@ -1,9 +1,10 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { getEventHandlerMetadata } from "@/wirestate-core/events/get-event-handler-metadata";
-import type { EventDispatchEntry, EventHandler } from "@/wirestate-core/types/events";
-import type { Optional } from "@/wirestate-core/types/general";
+import type { EventDispatchEntry, EventHandler } from "../types/events";
+import type { Optional } from "../types/general";
+
+import { getEventHandlerMetadata } from "./get-event-handler-metadata";
 
 /**
  * Composes service event handlers into a single dispatcher.

@@ -1,11 +1,12 @@
 import { Container, Newable, ServiceIdentifier } from "inversify";
 
-import { getEntryToken } from "@/wirestate-core/bind/get-entry-token";
-import { createIocContainer } from "@/wirestate-core/container/create-ioc-container";
-import { ERROR_CODE_INVALID_ARGUMENTS } from "@/wirestate-core/error/error-code";
-import { WirestateError } from "@/wirestate-core/error/wirestate-error";
-import { mockBindEntry } from "@/wirestate-core/test-utils/mock-bind-entry";
-import type { InjectableDescriptor } from "@/wirestate-core/types/privision";
+import { getEntryToken } from "../bind/get-entry-token";
+import { createIocContainer } from "../container/create-ioc-container";
+import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
+import type { InjectableDescriptor } from "../types/privision";
+
+import { mockBindEntry } from "./mock-bind-entry";
 
 /**
  * Options for {@link mockContainer}.

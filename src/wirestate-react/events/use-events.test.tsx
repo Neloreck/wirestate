@@ -2,8 +2,9 @@ import { render, cleanup, act } from "@testing-library/react";
 import { Container, EventBus } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 
-import { useEvents } from "@/wirestate-react/events/use-events";
-import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
+import { withIocProvider } from "../test-utils/with-ioc-provider";
+
+import { useEvents } from "./use-events";
 
 describe("useEvents", () => {
   afterEach(() => {

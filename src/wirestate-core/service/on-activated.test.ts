@@ -1,5 +1,6 @@
-import { ACTIVATED_HANDLER_METADATA } from "@/wirestate-core/registry";
-import { OnActivated } from "@/wirestate-core/service/on-activated";
+import { ACTIVATED_HANDLER_METADATA } from "../registry";
+
+import { OnActivated } from "./on-activated";
 
 describe("OnActivated", () => {
   it("should register metadata for generic service classes", () => {

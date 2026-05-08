@@ -1,9 +1,9 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { COMMAND_HANDLER_METADATA } from "@/wirestate-core/registry";
-import type { CommandHandlerMetadata } from "@/wirestate-core/types/commands";
-import type { Maybe } from "@/wirestate-core/types/general";
+import { COMMAND_HANDLER_METADATA } from "../registry";
+import type { CommandHandlerMetadata } from "../types/commands";
+import type { Maybe } from "../types/general";
 
 /**
  * Retrieves `@OnCommand` metadata from the class hierarchy.

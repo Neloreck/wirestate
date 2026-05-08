@@ -1,8 +1,8 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { DEACTIVATION_HANDLER_METADATA } from "@/wirestate-core/registry";
-import type { Maybe } from "@/wirestate-core/types/general";
+import { DEACTIVATION_HANDLER_METADATA } from "../registry";
+import type { Maybe } from "../types/general";
 
 /**
  * Retrieves `@OnDeactivation` method names from the class hierarchy.

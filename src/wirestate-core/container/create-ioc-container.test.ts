@@ -1,12 +1,13 @@
 import { Container } from "inversify";
 
-import { bindService } from "@/wirestate-core/bind/bind-service";
-import { CommandBus } from "@/wirestate-core/commands/command-bus";
-import { createIocContainer } from "@/wirestate-core/container/create-ioc-container";
-import { WireScope } from "@/wirestate-core/container/wire-scope";
-import { EventBus } from "@/wirestate-core/events/event-bus";
-import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import { SEEDS_TOKEN, SEED_TOKEN } from "@/wirestate-core/registry";
+import { bindService } from "../bind/bind-service";
+import { CommandBus } from "../commands/command-bus";
+import { EventBus } from "../events/event-bus";
+import { QueryBus } from "../queries/query-bus";
+import { SEEDS_TOKEN, SEED_TOKEN } from "../registry";
+
+import { createIocContainer } from "./create-ioc-container";
+import { WireScope } from "./wire-scope";
 
 describe("createIocContainer", () => {
   it("should create a container with default essentials", () => {

@@ -13,10 +13,11 @@ import { mockContainer } from "@wirestate/core/test-utils";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { ERROR_CODE_INVALID_CONTEXT } from "@/wirestate-react/error/error-code";
-import { createInjectablesProvider } from "@/wirestate-react/provision/create-injectables-provider";
-import { useInjection } from "@/wirestate-react/provision/use-injection";
-import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
+import { ERROR_CODE_INVALID_CONTEXT } from "../error/error-code";
+import { withIocProvider } from "../test-utils/with-ioc-provider";
+
+import { createInjectablesProvider } from "./create-injectables-provider";
+import { useInjection } from "./use-injection";
 
 describe("createInjectablesProvider", () => {
   let firstServiceActivated: number = 0;

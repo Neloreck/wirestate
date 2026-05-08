@@ -3,20 +3,17 @@ import { injectable, Container, ServiceIdentifier } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { CommandBus } from "@/wirestate-core/commands/command-bus";
-import {
-  ERROR_CODE_ACCESS_AFTER_DISPOSAL,
-  ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
-} from "@/wirestate-core/error/error-code";
-import { WirestateError } from "@/wirestate-core/error/wirestate-error";
-import { EventBus } from "@/wirestate-core/events/event-bus";
-import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import { SEED_TOKEN, SEEDS_TOKEN } from "@/wirestate-core/registry";
-import type { CommandDescriptor, CommandType } from "@/wirestate-core/types/commands";
-import type { EventType } from "@/wirestate-core/types/events";
-import type { Optional, AnyObject, MaybePromise } from "@/wirestate-core/types/general";
-import type { SeedKey, SeedsMap } from "@/wirestate-core/types/initial-state";
-import type { QueryType } from "@/wirestate-core/types/queries";
+import { CommandBus } from "../commands/command-bus";
+import { ERROR_CODE_ACCESS_AFTER_DISPOSAL, ERROR_CODE_ACCESS_BEFORE_ACTIVATION } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
+import { EventBus } from "../events/event-bus";
+import { QueryBus } from "../queries/query-bus";
+import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
+import type { CommandDescriptor, CommandType } from "../types/commands";
+import type { EventType } from "../types/events";
+import type { Optional, AnyObject, MaybePromise } from "../types/general";
+import type { SeedKey, SeedsMap } from "../types/initial-state";
+import type { QueryType } from "../types/queries";
 
 /**
  * Injectable scope providing access to wirestate buses and seeds.

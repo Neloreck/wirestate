@@ -3,9 +3,10 @@ import { type Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import type { MaybePromise } from "@/wirestate-core/types/general";
-import type { QueryType } from "@/wirestate-core/types/queries";
+import type { MaybePromise } from "../types/general";
+import type { QueryType } from "../types/queries";
+
+import { QueryBus } from "./query-bus";
 
 /**
  * Dispatches a query on the provided container.

@@ -1,4 +1,4 @@
-import { Optional } from "@/wirestate-core/types/general";
+import { Optional } from "./general";
 
 /**
  * Event identifier.

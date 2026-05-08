@@ -1,6 +1,7 @@
-import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import { Optional } from "@/wirestate-core/types/general";
-import { QueryUnregister } from "@/wirestate-core/types/queries";
+import { Optional } from "../types/general";
+import { QueryUnregister } from "../types/queries";
+
+import { QueryBus } from "./query-bus";
 
 describe("QueryBus", () => {
   it("should register and dispatch a query handler", () => {

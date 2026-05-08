@@ -2,7 +2,7 @@ import { Container } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 import { createElement, ReactNode } from "react";
 
-import { IocProvider } from "@/wirestate-react/provision/ioc-provider";
+import { IocProvider } from "../provision/ioc-provider";
 
 /**
  * Wraps a component with IocProvider for testing.

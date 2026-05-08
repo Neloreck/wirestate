@@ -1,5 +1,6 @@
-import { EventBus } from "@/wirestate-core/events/event-bus";
-import { EventUnsubscriber } from "@/wirestate-core/types/events";
+import { EventUnsubscriber } from "../types/events";
+
+import { EventBus } from "./event-bus";
 
 describe("EventBus", () => {
   it("should emit event to subscribed handler", () => {

@@ -1,8 +1,9 @@
 import { Container } from "inversify";
 
-import { ScopeBindingType } from "@/wirestate-core/alias";
-import { bindDynamicValue } from "@/wirestate-core/bind/bind-dynamic-value";
-import { AnyObject } from "@/wirestate-core/types/general";
+import { ScopeBindingType } from "../alias";
+import { AnyObject } from "../types/general";
+
+import { bindDynamicValue } from "./bind-dynamic-value";
 
 describe("bindDynamicValue", () => {
   it("should bind a value using toDynamicValue", () => {

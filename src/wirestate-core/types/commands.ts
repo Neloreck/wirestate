@@ -1,4 +1,4 @@
-import type { MaybePromise } from "@/wirestate-core/types/general";
+import type { MaybePromise } from "./general";
 
 /**
  * Command identifier. Use symbols for private commands.

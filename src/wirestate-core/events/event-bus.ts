@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Event, EventHandler, EventType, EventUnsubscriber } from "@/wirestate-core/types/events";
+import { Event, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 
 /**
  * Dispatches events to subscribers.

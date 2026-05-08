@@ -1,9 +1,10 @@
 import { render } from "@testing-library/react";
 import { Container, createIocContainer, QueryBus } from "@wirestate/core";
 
-import { useQueryCaller } from "@/wirestate-react/queries/use-query-caller";
-import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
-import { QueryCaller } from "@/wirestate-react/types/queries";
+import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { QueryCaller } from "../types/queries";
+
+import { useQueryCaller } from "./use-query-caller";
 
 describe("useQueryCaller", () => {
   it("should return a caller that dispatches queries", async () => {

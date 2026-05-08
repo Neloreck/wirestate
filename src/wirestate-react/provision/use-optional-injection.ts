@@ -4,8 +4,9 @@ import { useMemo } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
-import { AnyObject, Optional } from "@/wirestate-react/types/general";
+import { AnyObject, Optional } from "../types/general";
+
+import { useIocContext } from "./use-ioc-context";
 
 /**
  * Resolves a value from the container if bound, returning null otherwise.

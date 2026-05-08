@@ -1,7 +1,7 @@
 import { type Container } from "@wirestate/core";
 import { type Context, createContext, type Dispatch, type SetStateAction } from "react";
 
-import { Optional } from "@/wirestate-react/types/general";
+import { Optional } from "../types/general";
 
 /**
  * React context value.

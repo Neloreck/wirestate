@@ -1,9 +1,10 @@
 import { render } from "@testing-library/react";
 import { Container, createIocContainer, EventBus } from "@wirestate/core";
 
-import { useEventEmitter } from "@/wirestate-react/events/use-event-emitter";
-import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
-import { EventEmitter } from "@/wirestate-react/types/events";
+import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { EventEmitter } from "../types/events";
+
+import { useEventEmitter } from "./use-event-emitter";
 
 describe("useEventEmitter", () => {
   it("should return an emitter that dispatches events", () => {

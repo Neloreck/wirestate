@@ -1,6 +1,6 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { getEntryToken } from "@/wirestate-core/bind/get-entry-token";
+import { getEntryToken } from "./get-entry-token";
 
 describe("getEntryToken", () => {
   it("should return the function itself if the entry is a function", () => {

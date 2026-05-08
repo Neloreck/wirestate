@@ -3,13 +3,14 @@ import { Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { CommandBus } from "@/wirestate-core/commands/command-bus";
-import { WireScope } from "@/wirestate-core/container/wire-scope";
-import { EventBus } from "@/wirestate-core/events/event-bus";
-import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import { SEED_TOKEN, SEEDS_TOKEN } from "@/wirestate-core/registry";
-import type { AnyObject } from "@/wirestate-core/types/general";
-import type { SeedsMap } from "@/wirestate-core/types/initial-state";
+import { CommandBus } from "../commands/command-bus";
+import { EventBus } from "../events/event-bus";
+import { QueryBus } from "../queries/query-bus";
+import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
+import type { AnyObject } from "../types/general";
+import type { SeedsMap } from "../types/initial-state";
+
+import { WireScope } from "./wire-scope";
 
 export interface CreateIocContainerOptions {
   /**

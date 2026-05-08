@@ -1,8 +1,9 @@
 import { Container } from "inversify";
 
-import { query } from "@/wirestate-core/queries/query";
-import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import { mockContainer } from "@/wirestate-core/test-utils";
+import { mockContainer } from "../test-utils/mock-container";
+
+import { query } from "./query";
+import { QueryBus } from "./query-bus";
 
 describe("query", () => {
   it("should call injected query bus methods with sync data", () => {

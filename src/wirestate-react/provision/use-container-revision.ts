@@ -1,4 +1,4 @@
-import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
+import { useIocContext } from "./use-ioc-context";
 
 /**
  * Returns the current container revision.

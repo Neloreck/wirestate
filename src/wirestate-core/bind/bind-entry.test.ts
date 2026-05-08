@@ -2,8 +2,9 @@ import { bindingScopeValues, bindingTypeValues, Container } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { bindEntry } from "@/wirestate-core/bind/bind-entry";
-import { mockContainer } from "@/wirestate-core/test-utils/mock-container";
+import { mockContainer } from "../test-utils/mock-container";
+
+import { bindEntry } from "./bind-entry";
 
 describe("bindEntry", () => {
   it("should bind a service class directly", () => {

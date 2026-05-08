@@ -3,8 +3,8 @@ import type { Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { SEEDS_TOKEN } from "@/wirestate-core/registry";
-import { SeedEntries, SeedsMap } from "@/wirestate-core/types/initial-state";
+import { SEEDS_TOKEN } from "../registry";
+import { SeedEntries, SeedsMap } from "../types/initial-state";
 
 /**
  * Applies seeds to the container into the existing instance instead of replacing it.

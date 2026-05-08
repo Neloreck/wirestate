@@ -1,7 +1,7 @@
 import { Container, type Newable } from "inversify";
 
-import { bindEntry } from "@/wirestate-core/bind/bind-entry";
-import type { InjectableDescriptor } from "@/wirestate-core/types/privision";
+import { bindEntry } from "../bind/bind-entry";
+import type { InjectableDescriptor } from "../types/privision";
 
 /**
  * Options for {@link mockBindEntry}.

@@ -1,9 +1,10 @@
 import { Container } from "inversify";
 
-import { SEED_TOKEN } from "@/wirestate-core/registry";
-import { applySharedSeed } from "@/wirestate-core/seeds/apply-shared-seed";
-import { mockContainer } from "@/wirestate-core/test-utils/mock-container";
-import { SeedsMap } from "@/wirestate-core/types/initial-state";
+import { SEED_TOKEN } from "../registry";
+import { mockContainer } from "../test-utils/mock-container";
+import { SeedsMap } from "../types/initial-state";
+
+import { applySharedSeed } from "./apply-shared-seed";
 
 describe("applySharedSeed", () => {
   it("should bind initial state to container when not yet bound", () => {

@@ -1,10 +1,11 @@
 import { Container } from "inversify";
 
-import { CommandBus } from "@/wirestate-core/commands/command-bus";
-import { commandOptional } from "@/wirestate-core/commands/command-optional";
-import { createIocContainer } from "@/wirestate-core/container/create-ioc-container";
-import { CommandStatus, CommandDescriptor } from "@/wirestate-core/types/commands";
-import { Optional } from "@/wirestate-core/types/general";
+import { createIocContainer } from "../container/create-ioc-container";
+import { CommandStatus, CommandDescriptor } from "../types/commands";
+import { Optional } from "../types/general";
+
+import { CommandBus } from "./command-bus";
+import { commandOptional } from "./command-optional";
 
 describe("commandOptional", () => {
   it("should dispatch a command on the container if handler exists", async () => {

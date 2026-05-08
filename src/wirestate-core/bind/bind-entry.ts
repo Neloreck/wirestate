@@ -3,10 +3,11 @@ import { bindingTypeValues, Container, Newable } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { bindConstant } from "@/wirestate-core/bind/bind-constant";
-import { bindDynamicValue } from "@/wirestate-core/bind/bind-dynamic-value";
-import { bindService, type BindServiceOptions } from "@/wirestate-core/bind/bind-service";
-import type { InjectableDescriptor } from "@/wirestate-core/types/privision";
+import type { InjectableDescriptor } from "../types/privision";
+
+import { bindConstant } from "./bind-constant";
+import { bindDynamicValue } from "./bind-dynamic-value";
+import { bindService, type BindServiceOptions } from "./bind-service";
 
 /**
  * Options for {@link bindEntry}.

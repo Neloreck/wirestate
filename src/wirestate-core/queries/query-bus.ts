@@ -1,10 +1,10 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "@/wirestate-core/error/error-code";
-import { WirestateError } from "@/wirestate-core/error/wirestate-error";
-import type { Maybe, MaybePromise, Optional } from "@/wirestate-core/types/general";
-import type { QueryHandler, QueryType, QueryUnregister } from "@/wirestate-core/types/queries";
+import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
+import type { Maybe, MaybePromise, Optional } from "../types/general";
+import type { QueryHandler, QueryType, QueryUnregister } from "../types/queries";
 
 /**
  * Dispatches queries to handlers.

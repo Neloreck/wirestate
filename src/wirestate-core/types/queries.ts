@@ -1,4 +1,4 @@
-import { MaybePromise } from "@/wirestate-core/types/general";
+import { MaybePromise } from "./general";
 
 /**
  * Query identifier. Use symbols for private queries.

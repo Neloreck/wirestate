@@ -1,5 +1,6 @@
-import { CommandBus } from "@/wirestate-core/commands/command-bus";
-import { CommandStatus, CommandDescriptor, CommandUnregister } from "@/wirestate-core/types/commands";
+import { CommandStatus, CommandDescriptor, CommandUnregister } from "../types/commands";
+
+import { CommandBus } from "./command-bus";
 
 describe("CommandBus", () => {
   it("should register and dispatch a command handler", async () => {

@@ -3,10 +3,10 @@ import { Container, type ServiceIdentifier } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ScopeBindingType } from "@/wirestate-core/alias";
-import { ERROR_CODE_BINDING_SCOPE } from "@/wirestate-core/error/error-code";
-import { WirestateError } from "@/wirestate-core/error/wirestate-error";
-import type { InjectableDescriptor } from "@/wirestate-core/types/privision";
+import { ScopeBindingType } from "../alias";
+import { ERROR_CODE_BINDING_SCOPE } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
+import type { InjectableDescriptor } from "../types/privision";
 
 /**
  * Binds a constant value to a token in the container.

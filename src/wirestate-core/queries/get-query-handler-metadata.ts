@@ -1,9 +1,9 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { QUERY_HANDLER_METADATA } from "@/wirestate-core/registry";
-import type { Maybe } from "@/wirestate-core/types/general";
-import type { QueryHandlerMetadata } from "@/wirestate-core/types/queries";
+import { QUERY_HANDLER_METADATA } from "../registry";
+import type { Maybe } from "../types/general";
+import type { QueryHandlerMetadata } from "../types/queries";
 
 /**
  * Retrieves `@OnQuery` metadata from the class hierarchy.

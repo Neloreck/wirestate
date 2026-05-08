@@ -1,6 +1,6 @@
 import { CommandDescriptor, CommandType } from "@wirestate/core";
 
-import { Optional } from "@/wirestate-react/types/general";
+import { Optional } from "./general";
 
 /**
  * Command calling function signature.

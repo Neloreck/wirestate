@@ -3,8 +3,9 @@ import { type Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { EventBus } from "@/wirestate-core/events/event-bus";
-import type { EventType } from "@/wirestate-core/types/events";
+import type { EventType } from "../types/events";
+
+import { EventBus } from "./event-bus";
 
 /**
  * Emits events for container from outside scope.

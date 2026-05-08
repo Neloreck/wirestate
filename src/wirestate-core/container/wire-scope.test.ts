@@ -2,19 +2,17 @@ import { Container } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { CommandBus } from "@/wirestate-core/commands/command-bus";
-import { createIocContainer } from "@/wirestate-core/container/create-ioc-container";
-import { WireScope } from "@/wirestate-core/container/wire-scope";
-import {
-  ERROR_CODE_ACCESS_AFTER_DISPOSAL,
-  ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
-} from "@/wirestate-core/error/error-code";
-import { WirestateError } from "@/wirestate-core/error/wirestate-error";
-import { EventBus } from "@/wirestate-core/events/event-bus";
-import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import { applySeeds } from "@/wirestate-core/seeds/apply-seeds";
-import { CommandStatus, CommandDescriptor } from "@/wirestate-core/types/commands";
-import { MaybePromise, Optional } from "@/wirestate-core/types/general";
+import { CommandBus } from "../commands/command-bus";
+import { ERROR_CODE_ACCESS_AFTER_DISPOSAL, ERROR_CODE_ACCESS_BEFORE_ACTIVATION } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
+import { EventBus } from "../events/event-bus";
+import { QueryBus } from "../queries/query-bus";
+import { applySeeds } from "../seeds/apply-seeds";
+import { CommandStatus, CommandDescriptor } from "../types/commands";
+import { MaybePromise, Optional } from "../types/general";
+
+import { createIocContainer } from "./create-ioc-container";
+import { WireScope } from "./wire-scope";
 
 describe("WireScope", () => {
   it("should throw error if accessed before activation", () => {

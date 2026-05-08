@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { useContainer } from "@/wirestate-react/provision/use-container";
+import { useContainer } from "../provision/use-container";
 
 /**
  * Returns a function to dispatch commands on the active container.

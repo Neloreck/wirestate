@@ -2,10 +2,11 @@ import { Container } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { SEEDS_TOKEN } from "@/wirestate-core/registry";
-import { applySeeds } from "@/wirestate-core/seeds/apply-seeds";
-import { mockContainer } from "@/wirestate-core/test-utils/mock-container";
-import { SeedsMap } from "@/wirestate-core/types/initial-state";
+import { SEEDS_TOKEN } from "../registry";
+import { mockContainer } from "../test-utils/mock-container";
+import { SeedsMap } from "../types/initial-state";
+
+import { applySeeds } from "./apply-seeds";
 
 describe("applySeeds", () => {
   it("should bind seeds to container when not yet bound", () => {

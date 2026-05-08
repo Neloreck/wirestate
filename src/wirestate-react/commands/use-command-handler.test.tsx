@@ -1,8 +1,9 @@
 import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus, createIocContainer, CommandDescriptor, CommandHandler } from "@wirestate/core";
 
-import { useCommandHandler } from "@/wirestate-react/commands/use-command-handler";
-import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
+import { withIocProvider } from "../test-utils/with-ioc-provider";
+
+import { useCommandHandler } from "./use-command-handler";
 
 describe("useCommandHandler", () => {
   afterEach(() => {

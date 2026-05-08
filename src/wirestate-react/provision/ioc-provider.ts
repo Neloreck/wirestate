@@ -1,8 +1,9 @@
 import { Container, applySharedSeed, createIocContainer, WirestateError } from "@wirestate/core";
 import { createElement, PropsWithChildren, useEffect, useMemo, useState } from "react";
 
-import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "@/wirestate-react/error/error-code";
-import { type IocContext, IocReactContext } from "@/wirestate-react/provision/ioc-context";
+import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "../error/error-code";
+
+import { type IocContext, IocReactContext } from "./ioc-context";
 
 /**
  * Props for {@link IocProvider}.

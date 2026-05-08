@@ -1,9 +1,9 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { EVENT_HANDLER_METADATA } from "@/wirestate-core/registry";
-import type { EventHandlerMetadata, EventType } from "@/wirestate-core/types/events";
-import type { Maybe, Optional } from "@/wirestate-core/types/general";
+import { EVENT_HANDLER_METADATA } from "../registry";
+import type { EventHandlerMetadata, EventType } from "../types/events";
+import type { Maybe, Optional } from "../types/general";
 
 /**
  * Decorator for service methods that respond to events.

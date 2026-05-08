@@ -1,5 +1,5 @@
-import { getQueryHandlerMetadata } from "@/wirestate-core/queries/get-query-handler-metadata";
-import { OnQuery } from "@/wirestate-core/queries/on-query";
+import { getQueryHandlerMetadata } from "./get-query-handler-metadata";
+import { OnQuery } from "./on-query";
 
 describe("OnQuery and getQueryHandlerMetadata", () => {
   it("should collect metadata for a single class", () => {

@@ -1,8 +1,8 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ACTIVATED_HANDLER_METADATA } from "@/wirestate-core/registry";
-import type { Maybe } from "@/wirestate-core/types/general";
+import { ACTIVATED_HANDLER_METADATA } from "../registry";
+import type { Maybe } from "../types/general";
 
 /**
  * Retrieves `@OnActivated` method names from the class hierarchy.

@@ -1,8 +1,9 @@
 import { Container } from "inversify";
 
-import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import { queryOptional } from "@/wirestate-core/queries/query-optional";
-import { mockContainer } from "@/wirestate-core/test-utils";
+import { mockContainer } from "../test-utils/mock-container";
+
+import { QueryBus } from "./query-bus";
+import { queryOptional } from "./query-optional";
 
 describe("queryOptional", () => {
   it("should return result when handler exists", () => {
