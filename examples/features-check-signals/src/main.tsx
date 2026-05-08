@@ -1,19 +1,21 @@
 import "reflect-metadata";
 import "@/styles/index.css";
 
+import {
+  ScopeBindingType,
+  type SeedEntries,
+  BindingType,
+} from "@wirestate/core";
+import {
+  createInjectablesProvider,
+  type InjectablesProvider,
+  IocProvider,
+} from "@wirestate/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { Application } from "@/Application";
 import { GLOBAL_CONFIG, GLOBAL_DYNAMIC_CONFIG } from "@/constants/id";
-import {
-  createInjectablesProvider,
-  IocProvider,
-  ScopeBindingType,
-  type SeedEntries,
-  type InjectablesProvider,
-  BindingType,
-} from "@/libs/wirestate";
 import { CounterService, type ICounterSeed } from "@/services/CounterService";
 import { LoggerService } from "@/services/LoggerService";
 import { ThemeService } from "@/services/ThemeService";

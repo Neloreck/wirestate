@@ -2,12 +2,14 @@ import "reflect-metadata";
 import "./styles/index.css";
 
 import {
-  createInjectablesProvider,
-  IocProvider,
+  BindingType,
   ScopeBindingType,
   type SeedEntries,
+} from "@wirestate/core";
+import {
+  createInjectablesProvider,
+  IocProvider,
   type InjectablesProvider,
-  BindingType,
 } from "@wirestate/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

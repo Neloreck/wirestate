@@ -1,3 +1,7 @@
+## 0.6.2
+
+- Corrected build system, react package structure
+
 ## 0.6.1
 
 - React related types moved to react lib

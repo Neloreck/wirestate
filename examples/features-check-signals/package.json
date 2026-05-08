@@ -11,6 +11,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@wirestate/core": "^0.6.1",
+    "@wirestate/react": "^0.6.2",
+    "@wirestate/react-signals": "^0.6.1",
     "@preact/signals-react": "^3.10.0",
     "inversify": "^8.1.0",
     "react": "^19.2.4",

@@ -1,8 +1,8 @@
 import "./QueriesData.css";
 
 import {
-  QueryCaller,
-  SyncQueryCaller,
+  type QueryCaller,
+  type SyncQueryCaller,
   useInjection,
   useOptionalInjection,
   useQueryCaller,

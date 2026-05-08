@@ -1,8 +1,5 @@
 import "./QueriesData.css";
 
-import { useCallback, useState } from "react";
-
-import { EGlobalQuery } from "@/constants/queries";
 import {
   type QueryCaller,
   type SyncQueryCaller,
@@ -11,7 +8,10 @@ import {
   useQueryCaller,
   useQueryHandler,
   useSyncQueryCaller,
-} from "@/libs/wirestate";
+} from "@wirestate/react";
+import { useCallback, useState } from "react";
+
+import { EGlobalQuery } from "@/constants/queries";
 import {
   ECounterServiceQuery,
   type ICounterSnapshot,

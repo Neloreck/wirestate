@@ -7,8 +7,10 @@ import { default as tsconfig } from "../../tsconfig.json";
 import { DIST_ROOT } from "../config/build.constants";
 import { PACKAGES } from "../config/packages";
 
+const isExternal = (pkg) => (id) => pkg.external.some((ext) => id === ext || id.startsWith(ext + "/"));
+
 const createPackageDtsConfig = (pkg) => ({
-  external: pkg.external,
+  external: isExternal(pkg),
   input: pkg.entries,
   output: {
     chunkFileNames: "lib.d.ts",

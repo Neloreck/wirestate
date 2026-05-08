@@ -1,11 +1,3 @@
-import { EGlobalCommand } from "@/constants/commands";
-import { EGlobalEvent } from "@/constants/events";
-import {
-  GLOBAL_CONFIG,
-  GLOBAL_DYNAMIC_CONFIG,
-  GLOBAL_NOT_EXISTING_CONFIG,
-} from "@/constants/id";
-import { EGlobalQuery } from "@/constants/queries";
 import {
   Inject,
   Injectable,
@@ -17,8 +9,17 @@ import {
   type Event,
   OnCommand,
   WireScope,
-} from "@/libs/wirestate";
-import { signal, Signal } from "@/libs/wirestate/signals";
+} from "@wirestate/core";
+import { signal, Signal } from "@wirestate/react-signals";
+
+import { EGlobalCommand } from "@/constants/commands";
+import { EGlobalEvent } from "@/constants/events";
+import {
+  GLOBAL_CONFIG,
+  GLOBAL_DYNAMIC_CONFIG,
+  GLOBAL_NOT_EXISTING_CONFIG,
+} from "@/constants/id";
+import { EGlobalQuery } from "@/constants/queries";
 import { ThemeService } from "@/services/ThemeService";
 
 export interface ILogEntry {

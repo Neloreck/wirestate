@@ -13,8 +13,10 @@ import { PACKAGES } from "../config/packages";
 
 import { BABEL_CONFIG } from "./babel.modern.config";
 
+const isExternal = (pkg) => (id) => pkg.external.some((ext) => id === ext || id.startsWith(ext + "/"));
+
 const createPackageEsmConfig = (pkg, env) => ({
-  external: pkg.external,
+  external: isExternal(pkg),
   input: pkg.entries,
   output: {
     compact: env === EEnvironment.PRODUCTION,

@@ -1,6 +1,4 @@
 import type { ReadonlySignal } from "@preact/signals-react";
-
-import { EGlobalEvent } from "@/constants/events";
 import {
   SEED,
   Inject,
@@ -10,8 +8,10 @@ import {
   OnActivated,
   OnDeactivation,
   WireScope,
-} from "@/libs/wirestate";
-import { signal, computed, Signal } from "@/libs/wirestate/signals";
+} from "@wirestate/core";
+import { signal, computed, Signal } from "@wirestate/react-signals";
+
+import { EGlobalEvent } from "@/constants/events";
 import { LoggerService } from "@/services/LoggerService";
 import type { Optional } from "@/types";
 

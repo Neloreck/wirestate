@@ -1,6 +1,7 @@
 import "./EventsLog.css";
 
-import { useInjection } from "@/libs/wirestate";
+import { useInjection } from "@wirestate/react";
+
 import { LoggerService } from "@/services/LoggerService";
 
 export function EventsLog() {

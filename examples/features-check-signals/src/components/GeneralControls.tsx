@@ -1,16 +1,16 @@
 import "./GeneralControls.css";
 
-import { useCallback } from "react";
-
-import { EGlobalCommand } from "@/constants/commands";
-import { EGlobalEvent } from "@/constants/events";
 import {
   type CommandCaller,
   type EventEmitter,
   useCommandCaller,
   useInjection,
   useEventEmitter,
-} from "@/libs/wirestate";
+} from "@wirestate/react";
+import { useCallback } from "react";
+
+import { EGlobalCommand } from "@/constants/commands";
+import { EGlobalEvent } from "@/constants/events";
 import { CounterService } from "@/services/CounterService";
 import { ThemeService } from "@/services/ThemeService";
 
