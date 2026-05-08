@@ -1,17 +1,15 @@
 import { render } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
-import { QueryBus } from "@/wirestate/core/queries/query-bus";
+import { createIocContainer, MaybePromise, QUERY_BUS, QueryBus } from "@/wirestate";
 import { useQueryHandler } from "@/wirestate-react/queries/use-query-handler";
-import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
-import { Callable, MaybePromise, TAnyObject } from "@/wirestate/types/general";
+import { AnyObject } from "@/wirestate-react/types/general";
 
 describe("useQueryHandler", () => {
   it("should register and unregister a query handler", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
     const handler = jest.fn((data: string) => data + "-result");
 
     function TestComponent() {
@@ -38,12 +36,12 @@ describe("useQueryHandler", () => {
 
   it("should update handler ref when handler changes", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
 
     const handler1 = jest.fn(() => "result1");
     const handler2 = jest.fn(() => "result2");
 
-    function TestComponent({ handler }: { handler: Callable<string> }) {
+    function TestComponent({ handler }: { handler: () => string }) {
       useQueryHandler("TEST_QUERY", handler);
 
       return null;
@@ -60,10 +58,10 @@ describe("useQueryHandler", () => {
 
   it("should re-register when query type changes", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
     const handler = jest.fn().mockReturnValue("value");
 
-    function TestComponent({ type }: TAnyObject) {
+    function TestComponent({ type }: AnyObject) {
       useQueryHandler(type, handler);
 
       return null;
@@ -82,11 +80,11 @@ describe("useQueryHandler", () => {
 
   it("should call latest handler registered during render", async () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
     const handler1 = jest.fn().mockReturnValue("value1");
     const handler2 = jest.fn().mockReturnValue("value2");
 
-    function TestComponent({ type, handler }: TAnyObject) {
+    function TestComponent({ type, handler }: AnyObject) {
       useQueryHandler(type, handler);
 
       return null;
@@ -111,7 +109,7 @@ describe("useQueryHandler", () => {
 
   it("should support async handlers", async () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
     const handler = jest.fn(async (data: string) => data + "-async");
 
     function TestComponent() {

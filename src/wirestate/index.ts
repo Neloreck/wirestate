@@ -4,32 +4,46 @@
 
 export * from "@/wirestate/alias";
 
-export { bindEntry } from "@/wirestate/core/bind/bind-entry";
-export { bindConstant } from "@/wirestate/core/bind/bind-constant";
-export { bindService } from "@/wirestate/core/bind/bind-service";
+export { bindEntry } from "@/wirestate/bind/bind-entry";
+export { bindConstant } from "@/wirestate/bind/bind-constant";
+export { bindService } from "@/wirestate/bind/bind-service";
+export { getEntryToken } from "@/wirestate/bind/get-entry-token";
 
-export { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
-export { command } from "@/wirestate/core/container/command";
-export { commandOptional } from "@/wirestate/core/container/command-optional";
-export { emitEvent } from "@/wirestate/core/container/emit-event";
-export { query } from "@/wirestate/core/container/query";
-export { queryOptional } from "@/wirestate/core/container/query-optional";
+export { createIocContainer } from "@/wirestate/container/create-ioc-container";
+export { command } from "@/wirestate/commands/command";
+export { commandOptional } from "@/wirestate/commands/command-optional";
+export { emitEvent } from "@/wirestate/events/emit-event";
+export { query } from "@/wirestate/queries/query";
+export { queryOptional } from "@/wirestate/queries/query-optional";
+export { OnCommand } from "@/wirestate/commands/on-command";
+export { CommandBus } from "@/wirestate/commands/command-bus";
 
-export { WirestateError } from "@/wirestate/core/error/wirestate-error";
+export { WirestateError } from "@/wirestate/error/wirestate-error";
 
-export { OnCommand } from "@/wirestate/core/commands/on-command";
+export { OnEvent } from "@/wirestate/events/on-event";
+export { EventBus } from "@/wirestate/events/event-bus";
 
-export { OnQuery } from "@/wirestate/core/queries/on-query";
+export {
+  SEED_TOKEN as SEED,
+  SEEDS_TOKEN as SEEDS,
+  COMMAND_BUS_TOKEN as COMMAND_BUS,
+  EVENT_BUS_TOKEN as EVENT_BUS,
+  QUERY_BUS_TOKEN as QUERY_BUS,
+} from "@/wirestate/registry";
 
-export { SEED_TOKEN as SEED } from "@/wirestate/core/registry";
+export { applySeeds } from "@/wirestate/seeds/apply-seeds";
+export { applySharedSeed } from "@/wirestate/seeds/apply-shared-seed";
+export { unapplySeeds } from "@/wirestate/seeds/unapply-seeds";
 
-export { WireScope } from "@/wirestate/core/scope/wire-scope";
+export { WireScope } from "@/wirestate/scope/wire-scope";
 
-export { OnActivated } from "@/wirestate/core/service/on-activated";
-export { OnDeactivation } from "@/wirestate/core/service/on-deactivation";
+export { OnActivated } from "@/wirestate/service/on-activated";
+export { OnDeactivation } from "@/wirestate/service/on-deactivation";
 
-export { OnEvent } from "@/wirestate/core/events/on-event";
+export { QueryBus } from "@/wirestate/queries/query-bus";
+export { OnQuery } from "@/wirestate/queries/on-query";
 
+export { MaybePromise } from "@/wirestate/types/general";
 export {
   TSeedEntries as SeedEntries,
   TSeedEntry as SeedEntry,
@@ -43,6 +57,7 @@ export {
   TCommandType as CommandType,
   TCommandUnregister as CommandUnregister,
   TCommandCaller as CommandCaller,
+  TOptionalCommandCaller as OptionalCommandCaller,
 } from "@/wirestate/types/commands";
 export {
   TOptionalQueryCaller as OptionalQueryCaller,

@@ -1,10 +1,8 @@
 import { Container } from "inversify";
 import { useEffect, useRef } from "react";
 
+import { QUERY_BUS, QueryBus, QueryHandler, QueryType } from "@/wirestate";
 import { useContainer } from "@/wirestate-react/provision/use-container";
-import { QueryBus } from "@/wirestate/core/queries/query-bus";
-import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
-import type { TQueryHandler, TQueryType } from "@/wirestate/types/queries";
 
 /**
  * Registers a query handler for the component's lifetime.
@@ -14,18 +12,18 @@ import type { TQueryHandler, TQueryType } from "@/wirestate/types/queries";
  * @param type - query type
  * @param handler - query handler function
  */
-export function useQueryHandler<R = unknown, D = unknown, T extends TQueryType = TQueryType>(
+export function useQueryHandler<R = unknown, D = unknown, T extends QueryType = QueryType>(
   type: T,
-  handler: TQueryHandler<D, R>
+  handler: QueryHandler<D, R>
 ): void {
   const container: Container = useContainer();
-  const handlerRef = useRef<TQueryHandler<D, R>>(handler);
+  const handlerRef = useRef<QueryHandler<D, R>>(handler);
 
   useEffect(() => {
     handlerRef.current = handler;
   });
 
   useEffect(() => {
-    return container.get<QueryBus>(QUERY_BUS_TOKEN).register<D, R>(type, (data) => handlerRef.current(data));
+    return container.get<QueryBus>(QUERY_BUS).register<D, R>(type, (data) => handlerRef.current(data));
   }, [container, type]);
 }

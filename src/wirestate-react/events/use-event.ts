@@ -1,10 +1,8 @@
 import { Container } from "inversify";
 import { MutableRefObject, useEffect, useRef } from "react";
 
-import { EventBus } from "@/wirestate/core/events/event-bus";
-import { useContainer } from "@/wirestate/core/provision/use-container";
-import { EVENT_BUS_TOKEN } from "@/wirestate/core/registry";
-import type { TEventHandler, TEventType } from "@/wirestate/types/events";
+import { EventBus, EventHandler, EventType, EVENT_BUS } from "@/wirestate";
+import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**
  * Subscribes a component to events.
@@ -12,9 +10,9 @@ import type { TEventHandler, TEventType } from "@/wirestate/types/events";
  * @param type - event type to listen to
  * @param handler - event handler to invoke when event is emitted
  */
-export function useEvent(type: TEventType, handler: TEventHandler): void {
-  const typeRef: MutableRefObject<TEventType> = useRef(type);
-  const handlerRef: MutableRefObject<TEventHandler> = useRef(handler);
+export function useEvent(type: EventType, handler: EventHandler): void {
+  const typeRef: MutableRefObject<EventType> = useRef(type);
+  const handlerRef: MutableRefObject<EventHandler> = useRef(handler);
   const container: Container = useContainer();
 
   useEffect(() => {
@@ -23,7 +21,7 @@ export function useEvent(type: TEventType, handler: TEventHandler): void {
   });
 
   useEffect(() => {
-    return container.get<EventBus>(EVENT_BUS_TOKEN).subscribe((event) => {
+    return container.get<EventBus>(EVENT_BUS).subscribe((event) => {
       if (event.type === typeRef.current) {
         handlerRef.current?.(event);
       }

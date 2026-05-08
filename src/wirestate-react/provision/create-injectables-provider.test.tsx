@@ -2,16 +2,13 @@ import { render, cleanup } from "@testing-library/react";
 import { Container, injectable } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
-import { ERROR_CODE_INVALID_CONTEXT } from "@/wirestate/core/error/error-code";
-import { WirestateError } from "@/wirestate/core/error/wirestate-error";
+
+import { OnActivated, OnDeactivation, SEED, SeedEntries, SEEDS, WirestateError } from "@/wirestate";
+import { mockContainer } from "@/wirestate/test-utils";
+import { ERROR_CODE_INVALID_CONTEXT } from "@/wirestate-react/error/error-code";
 import { createInjectablesProvider } from "@/wirestate-react/provision/create-injectables-provider";
 import { useInjection } from "@/wirestate-react/provision/use-injection";
-import { SEED_TOKEN, SEEDS_TOKEN } from "@/wirestate/core/registry";
-import { OnActivated } from "@/wirestate/core/service/on-activated";
-import { OnDeactivation } from "@/wirestate/core/service/on-deactivation";
-import { mockContainer } from "@/wirestate/test-utils/mock-container";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
-import { TSeedEntries } from "@/wirestate/types/initial-state";
 
 describe("createInjectablesProvider", () => {
   let firstServiceActivated: number = 0;
@@ -157,7 +154,7 @@ describe("createInjectablesProvider", () => {
     const container = mockContainer();
     const Provider = createInjectablesProvider([GenericService]);
 
-    const seeds: TSeedEntries = [
+    const seeds: SeedEntries = [
       [FirstService, { count: 5 }],
       [
         SecondService,
@@ -177,15 +174,15 @@ describe("createInjectablesProvider", () => {
       )
     );
 
-    expect(container.get(SEEDS_TOKEN)).toEqual(new Map(seeds));
-    expect(container.get(SEED_TOKEN)).toEqual({
+    expect(container.get(SEEDS)).toEqual(new Map(seeds));
+    expect(container.get(SEED)).toEqual({
       global: true,
     });
 
     unmount();
 
-    expect(container.get(SEEDS_TOKEN)).toEqual(new Map());
-    expect(container.get(SEED_TOKEN)).toEqual({
+    expect(container.get(SEEDS)).toEqual(new Map());
+    expect(container.get(SEED)).toEqual({
       global: true,
     });
   });

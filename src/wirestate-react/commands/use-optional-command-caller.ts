@@ -4,11 +4,8 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { CommandBus } from "@/wirestate/core/commands/command-bus";
-import { useContainer } from "@/wirestate/core/provision/use-container";
-import { COMMAND_BUS_TOKEN } from "@/wirestate/core/registry";
-import type { ICommandDescriptor, TCommandType } from "@/wirestate/types/commands";
-import type { Optional } from "@/wirestate/types/general";
+import { CommandBus, COMMAND_BUS, CommandDescriptor, CommandType } from "@/wirestate";
+import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**
  * Returns a function to dispatch optional commands on the active container.
@@ -20,16 +17,13 @@ export function useOptionalCommandCaller() {
   const container: Container = useContainer();
 
   return useCallback(
-    <R = unknown, D = unknown, T extends TCommandType = TCommandType>(
-      type: T,
-      data?: D
-    ): Optional<ICommandDescriptor<R>> => {
+    <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): CommandDescriptor<R> | null => {
       dbg.info(prefix(__filename), "Optional command:", {
         type,
         data,
       });
 
-      return container.get<CommandBus>(COMMAND_BUS_TOKEN).commandOptional<R, D>(type, data);
+      return container.get<CommandBus>(COMMAND_BUS).commandOptional<R, D>(type, data);
     },
     [container]
   );

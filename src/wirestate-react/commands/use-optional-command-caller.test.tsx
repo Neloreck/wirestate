@@ -1,13 +1,9 @@
 import { render, cleanup } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { CommandBus } from "@/wirestate/core/commands/command-bus";
+import { createIocContainer, COMMAND_BUS, CommandBus, OptionalCommandCaller } from "@/wirestate";
 import { useOptionalCommandCaller } from "@/wirestate-react/commands/use-optional-command-caller";
-import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
-import { COMMAND_BUS_TOKEN } from "@/wirestate/core/registry";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
-import { ICommandDescriptor, TOptionalCommandCaller } from "@/wirestate/types/commands";
-import { Optional } from "@/wirestate/types/general";
 
 describe("useOptionalCommandCaller", () => {
   afterEach(() => {
@@ -17,7 +13,7 @@ describe("useOptionalCommandCaller", () => {
   it("should return null if no handler exists", () => {
     const container: Container = createIocContainer();
 
-    let caller: Optional<TOptionalCommandCaller> = null;
+    let caller: OptionalCommandCaller = null as unknown as OptionalCommandCaller;
 
     function TestComponent() {
       caller = useOptionalCommandCaller();
@@ -28,15 +24,15 @@ describe("useOptionalCommandCaller", () => {
     render(withIocProvider(<TestComponent />, container));
 
     expect(caller as unknown).toBeInstanceOf(Function);
-    expect((caller as unknown as TOptionalCommandCaller)("MISSING_CMD")).toBeNull();
+    expect((caller as unknown as OptionalCommandCaller)("MISSING_CMD")).toBeNull();
   });
 
   it("should return descriptor if handler exists", async () => {
     const container: Container = createIocContainer();
 
-    container.get<CommandBus>(COMMAND_BUS_TOKEN).register("EXISTING_COMMAND", () => "ok");
+    container.get<CommandBus>(COMMAND_BUS).register("EXISTING_COMMAND", () => "ok");
 
-    let caller: Optional<TOptionalCommandCaller> = null;
+    let caller: OptionalCommandCaller = null as unknown as OptionalCommandCaller;
 
     function TestComponent() {
       caller = useOptionalCommandCaller();
@@ -46,7 +42,7 @@ describe("useOptionalCommandCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const descriptor: Optional<ICommandDescriptor> = (caller as unknown as TOptionalCommandCaller)("EXISTING_COMMAND");
+    const descriptor = (caller as unknown as OptionalCommandCaller)("EXISTING_COMMAND");
 
     expect(descriptor).not.toBeNull();
     expect(await descriptor!.task).toBe("ok");

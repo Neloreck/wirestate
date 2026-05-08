@@ -2,10 +2,11 @@ import { render } from "@testing-library/react";
 import { Container } from "inversify";
 
 import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
+
+import { SEED, SEEDS } from "@/wirestate";
 import { IocProvider } from "@/wirestate-react/provision/ioc-provider";
 import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
-import { SEED_TOKEN } from "@/wirestate/core/registry";
-import { TAnyObject } from "@/wirestate/types/general";
+import { AnyObject } from "@/wirestate-react/types/general";
 
 describe("IocProvider", () => {
   function Consumer() {
@@ -14,7 +15,7 @@ describe("IocProvider", () => {
     return (
       <div>
         <span data-testid={"revision"}>{revision ?? "?"}</span>
-        <span data-testid={"container-id"}>{(container as TAnyObject).id ?? "?"}</span>
+        <span data-testid={"container-id"}>{(container as AnyObject).id ?? "?"}</span>
       </div>
     );
   }
@@ -41,7 +42,7 @@ describe("IocProvider", () => {
   it("should use the provided external container", () => {
     const container: Container = new Container();
 
-    (container as TAnyObject).id = "external-id";
+    (container as AnyObject).id = "external-id";
 
     const { getByTestId } = render(
       <IocProvider container={container}>
@@ -54,9 +55,9 @@ describe("IocProvider", () => {
 
   it("should apply seed to external container", () => {
     const container: Container = new Container();
-    const seed: TAnyObject = { key: "value" };
+    const seed: AnyObject = { key: "value" };
 
-    expect(container.isBound(SEED_TOKEN)).toBe(false);
+    expect(container.isBound(SEED)).toBe(false);
 
     render(
       <IocProvider container={container} seed={seed}>
@@ -64,13 +65,13 @@ describe("IocProvider", () => {
       </IocProvider>
     );
 
-    expect(container.get(SEED_TOKEN)).toEqual(seed);
+    expect(container.get(SEEDS)).toEqual(seed);
   });
 
   it("should throw an error if external container stopped provision", async () => {
     const container: Container = new Container();
 
-    (container as TAnyObject).id = "external-id";
+    (container as AnyObject).id = "external-id";
 
     const { getByTestId, rerender } = render(
       <ErrorLogBoundary>

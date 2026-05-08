@@ -1,13 +1,9 @@
 import { render, cleanup } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { CommandBus } from "@/wirestate/core/commands/command-bus";
+import { CommandBus, createIocContainer, CommandDescriptor, COMMAND_BUS, CommandHandler } from "@/wirestate";
 import { useCommandHandler } from "@/wirestate-react/commands/use-command-handler";
-import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
-import { COMMAND_BUS_TOKEN } from "@/wirestate/core/registry";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
-import { ICommandDescriptor } from "@/wirestate/types/commands";
-import { TAnyObject } from "@/wirestate/types/general";
 
 describe("useCommandHandler", () => {
   afterEach(() => {
@@ -16,7 +12,7 @@ describe("useCommandHandler", () => {
 
   it("should register handler and unregister on unmount", async () => {
     const container: Container = createIocContainer();
-    const commandBus: CommandBus = container.get(COMMAND_BUS_TOKEN);
+    const commandBus: CommandBus = container.get(COMMAND_BUS);
     const handler = jest.fn(() => Promise.resolve("async-data"));
 
     function TestComponent() {
@@ -31,7 +27,7 @@ describe("useCommandHandler", () => {
 
     expect(commandBus.has("HOOK_COMMAND")).toBe(true);
 
-    const descriptor: ICommandDescriptor = commandBus.command("HOOK_COMMAND", "data");
+    const descriptor: CommandDescriptor = commandBus.command("HOOK_COMMAND", "data");
 
     await descriptor.task;
 
@@ -45,13 +41,13 @@ describe("useCommandHandler", () => {
 
   it("should update handler ref when handler changes", async () => {
     const container: Container = createIocContainer();
-    const commandBus: CommandBus = container.get(COMMAND_BUS_TOKEN);
+    const commandBus: CommandBus = container.get(COMMAND_BUS);
 
     const handler1 = jest.fn().mockReturnValue("first");
     const handler2 = jest.fn().mockReturnValue("second");
 
-    function TestComponent({ handler }: TAnyObject) {
-      useCommandHandler("UPDATE_COMMAND", handler);
+    function TestComponent({ handler }: Record<string, unknown>) {
+      useCommandHandler("UPDATE_COMMAND", handler as CommandHandler);
 
       return null;
     }

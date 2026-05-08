@@ -1,6 +1,6 @@
 import { Container, type Newable } from "inversify";
 
-import { bindService } from "@/wirestate/core/bind/bind-service";
+import { bindService } from "@/wirestate/bind/bind-service";
 
 /**
  * Options for {@link mockBindService}.

@@ -1,25 +1,22 @@
 import { render } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
-import { QueryBus } from "@/wirestate/core/queries/query-bus";
+import { createIocContainer, OptionalQueryCaller, QUERY_BUS, QueryBus } from "@/wirestate";
 import { useOptionalQueryCaller } from "@/wirestate-react/queries/use-optional-query-caller";
-import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
-import { MaybePromise, Optional } from "@/wirestate/types/general";
-import { TOptionalQueryCaller } from "@/wirestate/types/queries";
+import { MaybePromise, Optional } from "@/wirestate-react/types/general";
 
 describe("useOptionalQueryCaller", () => {
   it("should return a caller that dispatches queries", async () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
     const handler = jest.fn((data: string) => data + "-result");
 
     bus.register("TEST_QUERY", handler);
 
     jest.spyOn(bus, "queryOptional");
 
-    let caller: Optional<TOptionalQueryCaller> = null as Optional<TOptionalQueryCaller>;
+    let caller: Optional<OptionalQueryCaller> = null as Optional<OptionalQueryCaller>;
 
     function TestComponent() {
       caller = useOptionalQueryCaller();
@@ -29,7 +26,7 @@ describe("useOptionalQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: Optional<string> = await (caller as TOptionalQueryCaller)("TEST_QUERY", "some-data");
+    const result = await (caller as OptionalQueryCaller)("TEST_QUERY", "some-data");
 
     expect(result).toBe("some-data-result");
     expect(handler).toHaveBeenCalledWith("some-data");
@@ -38,8 +35,8 @@ describe("useOptionalQueryCaller", () => {
 
   it("should return null on unhandled queries", async () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
-    let caller: Optional<TOptionalQueryCaller> = null as Optional<TOptionalQueryCaller>;
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
+    let caller: Optional<OptionalQueryCaller> = null as Optional<OptionalQueryCaller>;
 
     jest.spyOn(bus, "queryOptional");
 
@@ -51,7 +48,7 @@ describe("useOptionalQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: Optional<MaybePromise<string>> = (caller as TOptionalQueryCaller)("NOT_EXISTING", "data");
+    const result: Optional<MaybePromise<string>> = (caller as OptionalQueryCaller)("NOT_EXISTING", "data");
 
     expect(result).toBeNull();
     expect(bus.queryOptional).toHaveBeenCalledWith("NOT_EXISTING", "data");
@@ -59,11 +56,11 @@ describe("useOptionalQueryCaller", () => {
 
   it("should resolve async handler results", async () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
 
     bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
 
-    let caller: Optional<TOptionalQueryCaller> = null as Optional<TOptionalQueryCaller>;
+    let caller: Optional<OptionalQueryCaller> = null as Optional<OptionalQueryCaller>;
 
     function TestComponent() {
       caller = useOptionalQueryCaller();
@@ -73,14 +70,14 @@ describe("useOptionalQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: Optional<string> = await (caller as TOptionalQueryCaller)("ASYNC_QUERY", "value");
+    const result: Optional<string> = await (caller as OptionalQueryCaller)("ASYNC_QUERY", "value");
 
     expect(result).toBe("value-async");
   });
 
   it("should return a stable caller between re-renders", () => {
     const container: Container = createIocContainer();
-    const callers: Array<TOptionalQueryCaller> = [];
+    const callers: Array<OptionalQueryCaller> = [];
 
     function TestComponent() {
       callers.push(useOptionalQueryCaller());
@@ -98,12 +95,12 @@ describe("useOptionalQueryCaller", () => {
 
   it("should support symbol query types", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
     const type: unique symbol = Symbol("optional-query");
 
     bus.register(type, () => "symbol-result");
 
-    let caller: Optional<TOptionalQueryCaller> = null as Optional<TOptionalQueryCaller>;
+    let caller: Optional<OptionalQueryCaller> = null as Optional<OptionalQueryCaller>;
 
     function TestComponent() {
       caller = useOptionalQueryCaller();
@@ -113,6 +110,6 @@ describe("useOptionalQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    expect((caller as TOptionalQueryCaller)(type)).toBe("symbol-result");
+    expect((caller as OptionalQueryCaller)(type)).toBe("symbol-result");
   });
 });

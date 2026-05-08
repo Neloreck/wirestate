@@ -4,9 +4,7 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { CommandBus } from "@/wirestate/core/commands/command-bus";
-import { COMMAND_BUS_TOKEN } from "@/wirestate/core/registry";
-import type { ICommandDescriptor, TCommandType } from "@/wirestate/types/commands";
+import { CommandBus, COMMAND_BUS, CommandDescriptor, CommandType } from "@/wirestate";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**
@@ -18,13 +16,13 @@ export function useCommandCaller() {
   const container: Container = useContainer();
 
   return useCallback(
-    <R = unknown, D = unknown, T extends TCommandType = TCommandType>(type: T, data?: D): ICommandDescriptor<R> => {
+    <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): CommandDescriptor<R> => {
       dbg.info(prefix(__filename), "Command:", {
         type,
         data,
       });
 
-      return container.get<CommandBus>(COMMAND_BUS_TOKEN).command<R, D>(type, data);
+      return container.get<CommandBus>(COMMAND_BUS).command<R, D>(type, data);
     },
     [container]
   );

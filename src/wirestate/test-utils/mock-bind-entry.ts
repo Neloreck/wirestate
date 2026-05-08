@@ -1,6 +1,6 @@
 import { Container, type Newable } from "inversify";
 
-import { bindEntry } from "@/wirestate/core/bind/bind-entry";
+import { bindEntry } from "@/wirestate/bind/bind-entry";
 import type { IInjectableDescriptor } from "@/wirestate/types/privision";
 
 /**

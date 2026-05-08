@@ -1,25 +1,22 @@
 import { render } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
-import { QueryBus } from "@/wirestate/core/queries/query-bus";
+import { createIocContainer, OptionalSyncQueryCaller, QUERY_BUS, QueryBus } from "@/wirestate";
 import { useOptionalSyncQueryCaller } from "@/wirestate-react/queries/use-optional-sync-query-caller";
-import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
-import { Optional } from "@/wirestate/types/general";
-import { TOptionalSyncQueryCaller } from "@/wirestate/types/queries";
+import { Optional } from "@/wirestate-react/types/general";
 
 describe("useOptionalSyncQueryCaller", () => {
   it("should return a caller that dispatches sync queries", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
     const handler = jest.fn((data: string) => data + "-result");
 
     bus.register("TEST_QUERY", handler);
 
     jest.spyOn(bus, "queryOptional");
 
-    let caller: Optional<TOptionalSyncQueryCaller> = null as Optional<TOptionalSyncQueryCaller>;
+    let caller: Optional<OptionalSyncQueryCaller> = null as Optional<OptionalSyncQueryCaller>;
 
     function TestComponent() {
       caller = useOptionalSyncQueryCaller();
@@ -29,7 +26,7 @@ describe("useOptionalSyncQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: Optional<string> = (caller as TOptionalSyncQueryCaller)("TEST_QUERY", "some-data");
+    const result: Optional<string> = (caller as OptionalSyncQueryCaller)("TEST_QUERY", "some-data");
 
     expect(result).toBe("some-data-result");
     expect(handler).toHaveBeenCalledWith("some-data");
@@ -38,8 +35,8 @@ describe("useOptionalSyncQueryCaller", () => {
 
   it("should return null on unhandled queries", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
-    let caller: Optional<TOptionalSyncQueryCaller> = null as Optional<TOptionalSyncQueryCaller>;
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
+    let caller: Optional<OptionalSyncQueryCaller> = null as Optional<OptionalSyncQueryCaller>;
 
     jest.spyOn(bus, "queryOptional");
 
@@ -51,7 +48,7 @@ describe("useOptionalSyncQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: Optional<string> = (caller as TOptionalSyncQueryCaller)("NOT_EXISTING", "data");
+    const result: Optional<string> = (caller as OptionalSyncQueryCaller)("NOT_EXISTING", "data");
 
     expect(result).toBeNull();
     expect(bus.queryOptional).toHaveBeenCalledWith("NOT_EXISTING", "data");
@@ -59,7 +56,7 @@ describe("useOptionalSyncQueryCaller", () => {
 
   it("should return a stable caller between re-renders", () => {
     const container: Container = createIocContainer();
-    const callers: Array<TOptionalSyncQueryCaller> = [];
+    const callers: Array<OptionalSyncQueryCaller> = [];
 
     function TestComponent() {
       callers.push(useOptionalSyncQueryCaller());
@@ -77,12 +74,12 @@ describe("useOptionalSyncQueryCaller", () => {
 
   it("should support symbol query types", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
     const type: unique symbol = Symbol("optional-sync-query");
 
     bus.register(type, () => "symbol-result");
 
-    let caller: Optional<TOptionalSyncQueryCaller> = null as Optional<TOptionalSyncQueryCaller>;
+    let caller: Optional<OptionalSyncQueryCaller> = null as Optional<OptionalSyncQueryCaller>;
 
     function TestComponent() {
       caller = useOptionalSyncQueryCaller();
@@ -92,6 +89,6 @@ describe("useOptionalSyncQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    expect((caller as TOptionalSyncQueryCaller)(type)).toBe("symbol-result");
+    expect((caller as OptionalSyncQueryCaller)(type)).toBe("symbol-result");
   });
 });

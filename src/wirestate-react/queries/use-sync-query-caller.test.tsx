@@ -1,25 +1,22 @@
 import { render } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer } from "@/wirestate/core/container/create-ioc-container";
-import { QueryBus } from "@/wirestate/core/queries/query-bus";
+import { createIocContainer, QUERY_BUS, QueryBus, SyncQueryCaller } from "@/wirestate";
 import { useSyncQueryCaller } from "@/wirestate-react/queries/use-sync-query-caller";
-import { QUERY_BUS_TOKEN } from "@/wirestate/core/registry";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
-import { Optional } from "@/wirestate/types/general";
-import { TSyncQueryCaller } from "@/wirestate/types/queries";
+import { Optional } from "@/wirestate-react/types/general";
 
 describe("useSyncQueryCaller", () => {
   it("should return a caller that dispatches sync queries", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
     const handler = jest.fn((data: string) => data + "-result");
 
     bus.register("TEST_QUERY", handler);
 
     jest.spyOn(bus, "query");
 
-    let caller: Optional<TSyncQueryCaller> = null as Optional<TSyncQueryCaller>;
+    let caller: Optional<SyncQueryCaller> = null as Optional<SyncQueryCaller>;
 
     function TestComponent() {
       caller = useSyncQueryCaller();
@@ -29,7 +26,7 @@ describe("useSyncQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    const result: string = (caller as TSyncQueryCaller)("TEST_QUERY", "some-data");
+    const result: string = (caller as SyncQueryCaller)("TEST_QUERY", "some-data");
 
     expect(result).toBe("some-data-result");
     expect(handler).toHaveBeenCalledWith("some-data");
@@ -38,11 +35,11 @@ describe("useSyncQueryCaller", () => {
 
   it("should throw on unhandled queries", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
 
     jest.spyOn(bus, "query");
 
-    let caller: Optional<TSyncQueryCaller> = null;
+    let caller: Optional<SyncQueryCaller> = null;
 
     function TestComponent() {
       caller = useSyncQueryCaller();
@@ -52,7 +49,7 @@ describe("useSyncQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    expect(() => (caller as TSyncQueryCaller)("NOT_EXISTING", "data")).toThrow(
+    expect(() => (caller as SyncQueryCaller)("NOT_EXISTING", "data")).toThrow(
       "No query handler registered in container for type: 'NOT_EXISTING'."
     );
     expect(bus.query).toHaveBeenCalledWith("NOT_EXISTING", "data");
@@ -60,7 +57,7 @@ describe("useSyncQueryCaller", () => {
 
   it("should return a stable caller between re-renders", () => {
     const container: Container = createIocContainer();
-    const callers: Array<TSyncQueryCaller> = [];
+    const callers: Array<SyncQueryCaller> = [];
 
     function TestComponent() {
       callers.push(useSyncQueryCaller());
@@ -78,12 +75,12 @@ describe("useSyncQueryCaller", () => {
 
   it("should support symbol query types", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
     const type: unique symbol = Symbol("sync-query");
 
     bus.register(type, () => "symbol-result");
 
-    let caller: Optional<TSyncQueryCaller> = null as Optional<TSyncQueryCaller>;
+    let caller: Optional<SyncQueryCaller> = null as Optional<SyncQueryCaller>;
 
     function TestComponent() {
       caller = useSyncQueryCaller();
@@ -93,6 +90,6 @@ describe("useSyncQueryCaller", () => {
 
     render(withIocProvider(<TestComponent />, container));
 
-    expect((caller as TSyncQueryCaller)(type)).toBe("symbol-result");
+    expect((caller as SyncQueryCaller)(type)).toBe("symbol-result");
   });
 });
