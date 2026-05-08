@@ -2,13 +2,12 @@ import { Container } from "inversify";
 
 import { query } from "@/wirestate-core/queries/query";
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import { QUERY_BUS_TOKEN } from "@/wirestate-core/registry";
 import { mockContainer } from "@/wirestate-core/test-utils";
 
 describe("query", () => {
   it("should call injected query bus methods with sync data", () => {
     const container: Container = mockContainer();
-    const bus: QueryBus = container.get(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get(QueryBus);
 
     jest.spyOn(bus, "query").mockImplementation(() => "test-sync-response");
 
@@ -21,7 +20,7 @@ describe("query", () => {
 
   it("should call injected query bus methods with async data", async () => {
     const container: Container = mockContainer();
-    const bus: QueryBus = container.get(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get(QueryBus);
 
     jest.spyOn(bus, "query").mockImplementation(async () => "test-async-response");
 
@@ -34,7 +33,7 @@ describe("query", () => {
 
   it("should throw on not defined query handlers", () => {
     const container: Container = mockContainer();
-    const bus: QueryBus = container.get(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get(QueryBus);
 
     jest.spyOn(bus, "query");
 

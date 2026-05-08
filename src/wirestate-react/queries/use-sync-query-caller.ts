@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { QueryBus, QUERY_BUS, SyncQueryCaller, QueryType } from "@/wirestate-core";
+import { QueryBus, SyncQueryCaller, QueryType } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**
@@ -24,7 +24,7 @@ export function useSyncQueryCaller(): SyncQueryCaller {
       });
 
       // Access the container-scoped QueryBus and execute the query.
-      return container.get<QueryBus>(QUERY_BUS).query(type, data);
+      return container.get(QueryBus).query(type, data);
     },
     [container]
   ) as SyncQueryCaller;

@@ -4,7 +4,6 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import { QUERY_BUS_TOKEN } from "@/wirestate-core/registry";
 import type { MaybePromise } from "@/wirestate-core/types/general";
 import type { TQueryType } from "@/wirestate-core/types/queries";
 
@@ -19,5 +18,5 @@ import type { TQueryType } from "@/wirestate-core/types/queries";
 export function query<R = unknown, D = unknown>(container: Container, type: TQueryType, data?: D): MaybePromise<R> {
   dbg.info(prefix(__filename), "Query data:", type, data, container);
 
-  return container.get<QueryBus>(QUERY_BUS_TOKEN).query<R, D>(type, data);
+  return container.get(QueryBus).query<R, D>(type, data);
 }

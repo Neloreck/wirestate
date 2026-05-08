@@ -3,8 +3,7 @@ import { type Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { CommandBus } from "@/wirestate-core/commands/command-bus";
-import { COMMAND_BUS_TOKEN } from "@/wirestate-core/registry";
+import { CommandBus } from "@/wirestate-core/commands/command-bus";
 import type { ICommandDescriptor, TCommandType } from "@/wirestate-core/types/commands";
 
 /**
@@ -22,5 +21,5 @@ export function command<R = unknown, D = unknown, T extends TCommandType = TComm
 ): ICommandDescriptor<R> {
   dbg.info(prefix(__filename), "Command:", type, data, container);
 
-  return container.get<CommandBus>(COMMAND_BUS_TOKEN).command<R, D>(type, data);
+  return container.get(CommandBus).command<R, D>(type, data);
 }

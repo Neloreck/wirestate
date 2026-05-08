@@ -14,7 +14,6 @@ import type { Maybe, Optional } from "@/wirestate-core/types/general";
 
 /**
  * Dispatches commands to handlers.
- * Scoped to a container under {@link COMMAND_BUS_TOKEN}.
  *
  * Unlike queries, command execution always wraps the handler in a promise
  * and returns a descriptor with task, status, and responder.

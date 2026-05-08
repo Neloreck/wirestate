@@ -2,13 +2,12 @@ import { Container } from "inversify";
 
 import { emitEvent } from "@/wirestate-core/events/emit-event";
 import { EventBus } from "@/wirestate-core/events/event-bus";
-import { EVENT_BUS_TOKEN } from "@/wirestate-core/registry";
 import { mockContainer } from "@/wirestate-core/test-utils";
 
 describe("emitEvent", () => {
   it("should call injected query bus methods with sync data", () => {
     const container: Container = mockContainer();
-    const bus: EventBus = container.get(EVENT_BUS_TOKEN);
+    const bus: EventBus = container.get(EventBus);
 
     jest.spyOn(bus, "emit").mockImplementation(jest.fn());
 
@@ -20,7 +19,7 @@ describe("emitEvent", () => {
 
   it("should call injected query bus methods with only type", () => {
     const container: Container = mockContainer();
-    const bus: EventBus = container.get(EVENT_BUS_TOKEN);
+    const bus: EventBus = container.get(EventBus);
 
     jest.spyOn(bus, "emit").mockImplementation(jest.fn());
 

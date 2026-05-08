@@ -6,21 +6,6 @@ import type { TEventUnsubscriber, IEventHandlerMetadata } from "@/wirestate-core
 import type { IQueryHandlerMetadata, TQueryUnregister } from "@/wirestate-core/types/queries";
 
 /**
- * Token for the container-scoped event bus.
- */
-export const EVENT_BUS_TOKEN: unique symbol = Symbol("@wirestate/event-bus");
-
-/**
- * Token for the container-scoped query bus.
- */
-export const QUERY_BUS_TOKEN: unique symbol = Symbol("@wirestate/query-bus");
-
-/**
- * Token for the container-scoped command bus.
- */
-export const COMMAND_BUS_TOKEN: unique symbol = Symbol("@wirestate/command-bus");
-
-/**
  * Token for the container-scoped seeds map.
  */
 export const SEEDS_TOKEN: unique symbol = Symbol("@wirestate/seeds");

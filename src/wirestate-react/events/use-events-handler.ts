@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 import { type MutableRefObject, useEffect, useRef } from "react";
 
-import { EVENT_BUS, EventBus, EventHandler } from "@/wirestate-core";
+import { EventBus, EventHandler } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 import { Maybe } from "@/wirestate-react/types/general";
 
@@ -19,7 +19,7 @@ export function useEventsHandler(handler: EventHandler): void {
   });
 
   useEffect(() => {
-    return container.get<EventBus>(EVENT_BUS).subscribe((event) => {
+    return container.get(EventBus).subscribe((event) => {
       handlerRef.current?.(event);
     });
   }, [container]);

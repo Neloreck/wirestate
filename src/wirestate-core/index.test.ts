@@ -18,7 +18,6 @@ describe("Library exported API from wirestate-core", () => {
     "Tagged",
     "forwardRef",
     // Core.
-    "COMMAND_BUS",
     "CommandBus",
     "CommandCaller",
     "CommandDescriptor",
@@ -26,7 +25,6 @@ describe("Library exported API from wirestate-core", () => {
     "CommandStatus",
     "CommandType",
     "CommandUnregister",
-    "EVENT_BUS",
     "Event",
     "EventBus",
     "EventEmitter",
@@ -42,7 +40,6 @@ describe("Library exported API from wirestate-core", () => {
     "OptionalCommandCaller",
     "OptionalQueryCaller",
     "OptionalSyncQueryCaller",
-    "QUERY_BUS",
     "QueryBus",
     "QueryCaller",
     "QueryHandler",

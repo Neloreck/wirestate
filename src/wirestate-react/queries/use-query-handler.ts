@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 import { useEffect, useRef } from "react";
 
-import { QUERY_BUS, QueryBus, QueryHandler, QueryType } from "@/wirestate-core";
+import { QueryBus, QueryHandler, QueryType } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**
@@ -24,6 +24,6 @@ export function useQueryHandler<R = unknown, D = unknown, T extends QueryType = 
   });
 
   useEffect(() => {
-    return container.get<QueryBus>(QUERY_BUS).register<D, R>(type, (data) => handlerRef.current(data));
+    return container.get(QueryBus).register<D, R>(type, (data) => handlerRef.current(data));
   }, [container, type]);
 }

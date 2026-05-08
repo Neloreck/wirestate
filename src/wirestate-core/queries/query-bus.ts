@@ -8,7 +8,6 @@ import type { TQueryHandler, TQueryType, TQueryUnregister } from "@/wirestate-co
 
 /**
  * Dispatches queries to handlers.
- * Scoped to a container under {@link QUERY_BUS_TOKEN}.
  */
 export class QueryBus {
   /**

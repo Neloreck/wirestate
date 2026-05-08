@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { EVENT_BUS, EventBus, EventEmitter, EventType } from "@/wirestate-core";
+import { EventBus, EventEmitter, EventType } from "@/wirestate-core";
 import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
 
 /**
@@ -23,7 +23,7 @@ export function useEventEmitter<P = unknown, T extends EventType = EventType>():
         from,
       });
 
-      container.get<EventBus>(EVENT_BUS).emit({ type, payload, from });
+      container.get(EventBus).emit({ type, payload, from });
     },
     [container]
   );

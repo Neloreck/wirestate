@@ -3,21 +3,15 @@ import { injectable, Container, ServiceIdentifier } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { CommandBus } from "@/wirestate-core/commands/command-bus";
+import { CommandBus } from "@/wirestate-core/commands/command-bus";
 import {
   ERROR_CODE_ACCESS_AFTER_DISPOSAL,
   ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
 } from "@/wirestate-core/error/error-code";
 import { WirestateError } from "@/wirestate-core/error/wirestate-error";
-import type { EventBus } from "@/wirestate-core/events/event-bus";
-import type { QueryBus } from "@/wirestate-core/queries/query-bus";
-import {
-  COMMAND_BUS_TOKEN,
-  SEED_TOKEN,
-  SEEDS_TOKEN,
-  QUERY_BUS_TOKEN,
-  EVENT_BUS_TOKEN,
-} from "@/wirestate-core/registry";
+import { EventBus } from "@/wirestate-core/events/event-bus";
+import { QueryBus } from "@/wirestate-core/queries/query-bus";
+import { SEED_TOKEN, SEEDS_TOKEN } from "@/wirestate-core/registry";
 import type { ICommandDescriptor, TCommandType } from "@/wirestate-core/types/commands";
 import type { TEventType } from "@/wirestate-core/types/events";
 import type { Optional, TAnyObject, MaybePromise } from "@/wirestate-core/types/general";
@@ -123,7 +117,7 @@ export class WireScope {
     });
 
     this.getContainer()
-      .get<EventBus>(EVENT_BUS_TOKEN)
+      .get(EventBus)
       .emit({
         type,
         payload,
@@ -144,7 +138,7 @@ export class WireScope {
   public queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): MaybePromise<R> {
     dbg.info(prefix(__filename), "Query data:", { type, data });
 
-    return this.getContainer().get<QueryBus>(QUERY_BUS_TOKEN).query<R, D>(type, data);
+    return this.getContainer().get(QueryBus).query<R, D>(type, data);
   }
 
   /**
@@ -161,7 +155,7 @@ export class WireScope {
   ): Optional<MaybePromise<R>> {
     dbg.info(prefix(__filename), "Query optional data:", { type, data });
 
-    return this.getContainer().get<QueryBus>(QUERY_BUS_TOKEN).queryOptional<R, D>(type, data);
+    return this.getContainer().get(QueryBus).queryOptional<R, D>(type, data);
   }
 
   /**
@@ -180,7 +174,7 @@ export class WireScope {
   ): ICommandDescriptor<R> {
     dbg.info(prefix(__filename), "Execute command:", { type, data });
 
-    return this.getContainer().get<CommandBus>(COMMAND_BUS_TOKEN).command<R, D>(type, data);
+    return this.getContainer().get(CommandBus).command<R, D>(type, data);
   }
 
   /**
@@ -197,7 +191,7 @@ export class WireScope {
   ): Optional<ICommandDescriptor<R>> {
     dbg.info(prefix(__filename), "Execute command:", { type, data });
 
-    return this.getContainer().get<CommandBus>(COMMAND_BUS_TOKEN).commandOptional<R, D>(type, data);
+    return this.getContainer().get(CommandBus).commandOptional<R, D>(type, data);
   }
 
   public getSeed<T>(): T;

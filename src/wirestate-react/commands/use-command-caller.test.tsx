@@ -1,14 +1,7 @@
 import { render, cleanup } from "@testing-library/react";
 import { Container } from "inversify";
 
-import {
-  COMMAND_BUS,
-  CommandBus,
-  CommandStatus,
-  CommandDescriptor,
-  CommandCaller,
-  createIocContainer,
-} from "@/wirestate-core";
+import { CommandBus, CommandStatus, CommandDescriptor, CommandCaller, createIocContainer } from "@/wirestate-core";
 import { useCommandCaller } from "@/wirestate-react/commands/use-command-caller";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 import { Optional } from "@/wirestate-react/types/general";
@@ -22,7 +15,7 @@ describe("useCommandCaller", () => {
     const container: Container = createIocContainer();
     const handler = jest.fn((data: string) => data + "-result");
 
-    container.get<CommandBus>(COMMAND_BUS).register("TEST_COMMAND", handler);
+    container.get(CommandBus).register("TEST_COMMAND", handler);
 
     let caller: Optional<CommandCaller> = null;
 

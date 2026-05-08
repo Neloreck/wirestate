@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { OptionalSyncQueryCaller, QUERY_BUS, QueryBus, QueryType } from "@/wirestate-core";
+import { OptionalSyncQueryCaller, QueryBus, QueryType } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**
@@ -23,7 +23,7 @@ export function useOptionalSyncQueryCaller(): OptionalSyncQueryCaller {
         data,
       });
 
-      return container.get<QueryBus>(QUERY_BUS).queryOptional(type, data);
+      return container.get(QueryBus).queryOptional(type, data);
     },
     [container]
   ) as OptionalSyncQueryCaller;

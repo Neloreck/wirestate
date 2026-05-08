@@ -3,8 +3,7 @@ import { type Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { EventBus } from "@/wirestate-core/events/event-bus";
-import { EVENT_BUS_TOKEN } from "@/wirestate-core/registry";
+import { EventBus } from "@/wirestate-core/events/event-bus";
 import type { TEventType } from "@/wirestate-core/types/events";
 
 /**
@@ -18,5 +17,5 @@ import type { TEventType } from "@/wirestate-core/types/events";
 export function emitEvent<P, T extends TEventType>(container: Container, type: T, payload?: P, from?: unknown): void {
   dbg.info(prefix(__filename), "Emit event:", { type: type, payload, container });
 
-  container.get<EventBus>(EVENT_BUS_TOKEN).emit({ type, payload, from });
+  container.get(EventBus).emit({ type, payload, from });
 }

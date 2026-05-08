@@ -1,7 +1,7 @@
 import { render, cleanup, act } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { EVENT_BUS, EventBus } from "@/wirestate-core";
+import { EventBus } from "@/wirestate-core";
 import { mockContainer } from "@/wirestate-core/test-utils";
 import { useEventsHandler } from "@/wirestate-react/events/use-events-handler";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
@@ -13,7 +13,7 @@ describe("useEventsHandler", () => {
 
   it("should subscribe to all events without filtering", () => {
     const container: Container = mockContainer();
-    const bus: EventBus = container.get(EVENT_BUS);
+    const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 
     function TestComponent(): null {
@@ -36,7 +36,7 @@ describe("useEventsHandler", () => {
 
   it("should unsubscribe on unmount", () => {
     const container: Container = mockContainer();
-    const bus: EventBus = container.get(EVENT_BUS);
+    const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 
     function TestComponent() {

@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { CommandBus, COMMAND_BUS, CommandDescriptor, CommandType } from "@/wirestate-core";
+import { CommandBus, CommandDescriptor, CommandType } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**
@@ -22,7 +22,7 @@ export function useCommandCaller() {
         data,
       });
 
-      return container.get<CommandBus>(COMMAND_BUS).command<R, D>(type, data);
+      return container.get(CommandBus).command<R, D>(type, data);
     },
     [container]
   );

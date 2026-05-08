@@ -8,7 +8,6 @@ import { CommandBus } from "@/wirestate-core/commands/command-bus";
 import { EventBus } from "@/wirestate-core/events/event-bus";
 import { OnQuery } from "@/wirestate-core/queries/on-query";
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import { COMMAND_BUS_TOKEN, EVENT_BUS_TOKEN, QUERY_BUS_TOKEN } from "@/wirestate-core/registry";
 import { OnActivated } from "@/wirestate-core/service/on-activated";
 import { mockContainer } from "@/wirestate-core/test-utils";
 import { ECommandStatus } from "@/wirestate-core/types/commands";
@@ -46,19 +45,19 @@ describe("bindService", () => {
     expect(instance.scope.isDisposed).toBe(false);
 
     // Test event from external source.
-    container.get<EventBus>(EVENT_BUS_TOKEN).emit({ type: "TEST_STRING_EVENT", payload: "string-event-data" });
+    container.get(EventBus).emit({ type: "TEST_STRING_EVENT", payload: "string-event-data" });
     expect(instance.isTestStringEventReceived).toBe(true);
     expect(instance.testStingEventPayload).toBe("string-event-data");
 
     // Test query from external source.
-    expect(container.get<QueryBus>(QUERY_BUS_TOKEN).query("TEST_STRING_QUERY")).toBe("string-query-response");
+    expect(container.get(QueryBus).query("TEST_STRING_QUERY")).toBe("string-query-response");
 
     // Test command from external source.
-    expect(container.get<CommandBus>(COMMAND_BUS_TOKEN).command("TEST_SYNC_COMMAND", 800)).toEqual({
+    expect(container.get(CommandBus).command("TEST_SYNC_COMMAND", 800)).toEqual({
       status: ECommandStatus.PENDING,
       task: expect.any(Promise),
     });
-    expect(await container.get<CommandBus>(COMMAND_BUS_TOKEN).command("TEST_SYNC_COMMAND", 800).task).toBe(1800);
+    expect(await container.get(CommandBus).command("TEST_SYNC_COMMAND", 800).task).toBe(1800);
 
     // Test deactivation.
     container.unbind(GenericService);
@@ -66,7 +65,7 @@ describe("bindService", () => {
     expect(instance.scope.isDisposed).toBe(true);
 
     // Verify query handler is removed
-    expect(() => container.get<QueryBus>(QUERY_BUS_TOKEN).query("TEST_QUERY")).toThrow();
+    expect(() => container.get(QueryBus).query("TEST_QUERY")).toThrow();
   });
 
   it("should skip lifecycle if isWithIgnoreLifecycle is true", () => {
@@ -111,7 +110,7 @@ describe("bindService", () => {
     const instance: CorruptedService = container.get(CorruptedService);
 
     expect(instance).toBeDefined();
-    expect(() => container.get<QueryBus>(QUERY_BUS_TOKEN).query("CORRUPTED_QUERY")).toThrow(
+    expect(() => container.get(QueryBus).query("CORRUPTED_QUERY")).toThrow(
       "No query handler registered in container for type: 'CORRUPTED_QUERY'."
     );
   });

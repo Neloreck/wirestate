@@ -12,7 +12,6 @@ import {
 import { WirestateError } from "@/wirestate-core/error/wirestate-error";
 import { EventBus } from "@/wirestate-core/events/event-bus";
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import { EVENT_BUS_TOKEN, QUERY_BUS_TOKEN, COMMAND_BUS_TOKEN } from "@/wirestate-core/registry";
 import { applySeeds } from "@/wirestate-core/seeds/apply-seeds";
 import { ECommandStatus, ICommandDescriptor } from "@/wirestate-core/types/commands";
 import { MaybePromise, Optional } from "@/wirestate-core/types/general";
@@ -63,7 +62,7 @@ describe("WireScope", () => {
 
   it("should emit events via event bus", () => {
     const container: Container = createIocContainer();
-    const bus: EventBus = container.get(EVENT_BUS_TOKEN);
+    const bus: EventBus = container.get(EventBus);
     const scope: WireScope = new WireScope(container);
 
     jest.spyOn(bus, "emit");
@@ -86,7 +85,7 @@ describe("WireScope", () => {
 
   it("should query data via query bus", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get(QueryBus);
     const scope: WireScope = new WireScope(container);
 
     bus.register("TEST_QUERY", () => "result-from-bus");
@@ -107,7 +106,7 @@ describe("WireScope", () => {
 
   it("should execute commands via command bus", async () => {
     const container: Container = createIocContainer();
-    const bus: CommandBus = container.get(COMMAND_BUS_TOKEN);
+    const bus: CommandBus = container.get(CommandBus);
     const scope: WireScope = new WireScope(container);
 
     bus.register("TEST_COMMAND", () => "result-from-command-bus");
@@ -132,7 +131,7 @@ describe("WireScope", () => {
 
   it("should execute optional commands via command bus", async () => {
     const container: Container = createIocContainer();
-    const bus: CommandBus = container.get(COMMAND_BUS_TOKEN);
+    const bus: CommandBus = container.get(CommandBus);
     const scope: WireScope = new WireScope(container);
 
     jest.spyOn(bus, "commandOptional");

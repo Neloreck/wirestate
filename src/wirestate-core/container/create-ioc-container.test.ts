@@ -6,22 +6,16 @@ import { createIocContainer } from "@/wirestate-core/container/create-ioc-contai
 import { WireScope } from "@/wirestate-core/container/wire-scope";
 import { EventBus } from "@/wirestate-core/events/event-bus";
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
-import {
-  EVENT_BUS_TOKEN,
-  QUERY_BUS_TOKEN,
-  COMMAND_BUS_TOKEN,
-  SEEDS_TOKEN,
-  SEED_TOKEN,
-} from "@/wirestate-core/registry";
+import { SEEDS_TOKEN, SEED_TOKEN } from "@/wirestate-core/registry";
 
 describe("createIocContainer", () => {
   it("should create a container with default essentials", () => {
     const container: Container = createIocContainer();
 
     expect(container).toBeInstanceOf(Container);
-    expect(container.get(EVENT_BUS_TOKEN)).toBeInstanceOf(EventBus);
-    expect(container.get(QUERY_BUS_TOKEN)).toBeInstanceOf(QueryBus);
-    expect(container.get(COMMAND_BUS_TOKEN)).toBeInstanceOf(CommandBus);
+    expect(container.get(EventBus)).toBeInstanceOf(EventBus);
+    expect(container.get(QueryBus)).toBeInstanceOf(QueryBus);
+    expect(container.get(CommandBus)).toBeInstanceOf(CommandBus);
     expect(container.get(SEEDS_TOKEN)).toBeInstanceOf(Map);
     expect(container.get(SEED_TOKEN)).toEqual({});
     expect(container.get(WireScope)).toBeInstanceOf(WireScope);
@@ -30,12 +24,12 @@ describe("createIocContainer", () => {
   it("should bind core buses as singletons by default", () => {
     const container: Container = createIocContainer();
 
-    expect(container.get(EVENT_BUS_TOKEN)).toBeInstanceOf(EventBus);
-    expect(container.get(EVENT_BUS_TOKEN)).toBe(container.get(EVENT_BUS_TOKEN));
-    expect(container.get(QUERY_BUS_TOKEN)).toBeInstanceOf(QueryBus);
-    expect(container.get(QUERY_BUS_TOKEN)).toBe(container.get(QUERY_BUS_TOKEN));
-    expect(container.get(COMMAND_BUS_TOKEN)).toBeInstanceOf(CommandBus);
-    expect(container.get(COMMAND_BUS_TOKEN)).toBe(container.get(COMMAND_BUS_TOKEN));
+    expect(container.get(EventBus)).toBeInstanceOf(EventBus);
+    expect(container.get(EventBus)).toBe(container.get(EventBus));
+    expect(container.get(QueryBus)).toBeInstanceOf(QueryBus);
+    expect(container.get(QueryBus)).toBe(container.get(QueryBus));
+    expect(container.get(CommandBus)).toBeInstanceOf(CommandBus);
+    expect(container.get(CommandBus)).toBe(container.get(CommandBus));
   });
 
   it("should bind WireScope in transient scope", () => {

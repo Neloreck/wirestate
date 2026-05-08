@@ -28,13 +28,7 @@ export { queryOptional } from "@/wirestate-core/queries/query-optional";
 export { QueryBus } from "@/wirestate-core/queries/query-bus";
 export { OnQuery } from "@/wirestate-core/queries/on-query";
 
-export {
-  SEED_TOKEN as SEED,
-  SEEDS_TOKEN as SEEDS,
-  COMMAND_BUS_TOKEN as COMMAND_BUS,
-  EVENT_BUS_TOKEN as EVENT_BUS,
-  QUERY_BUS_TOKEN as QUERY_BUS,
-} from "@/wirestate-core/registry";
+export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "@/wirestate-core/registry";
 
 export { applySeeds } from "@/wirestate-core/seeds/apply-seeds";
 export { applySharedSeed } from "@/wirestate-core/seeds/apply-shared-seed";

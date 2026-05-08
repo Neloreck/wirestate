@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer, QUERY_BUS, QueryBus, SyncQueryCaller } from "@/wirestate-core";
+import { createIocContainer, QueryBus, SyncQueryCaller } from "@/wirestate-core";
 import { useSyncQueryCaller } from "@/wirestate-react/queries/use-sync-query-caller";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 import { Optional } from "@/wirestate-react/types/general";
@@ -9,7 +9,7 @@ import { Optional } from "@/wirestate-react/types/general";
 describe("useSyncQueryCaller", () => {
   it("should return a caller that dispatches sync queries", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
+    const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((data: string) => data + "-result");
 
     bus.register("TEST_QUERY", handler);
@@ -35,7 +35,7 @@ describe("useSyncQueryCaller", () => {
 
   it("should throw on unhandled queries", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
+    const bus: QueryBus = container.get(QueryBus);
 
     jest.spyOn(bus, "query");
 
@@ -75,7 +75,7 @@ describe("useSyncQueryCaller", () => {
 
   it("should support symbol query types", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
+    const bus: QueryBus = container.get(QueryBus);
     const type: unique symbol = Symbol("sync-query");
 
     bus.register(type, () => "symbol-result");

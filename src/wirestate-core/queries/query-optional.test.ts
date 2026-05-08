@@ -2,13 +2,12 @@ import { Container } from "inversify";
 
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
 import { queryOptional } from "@/wirestate-core/queries/query-optional";
-import { QUERY_BUS_TOKEN } from "@/wirestate-core/registry";
 import { mockContainer } from "@/wirestate-core/test-utils";
 
 describe("queryOptional", () => {
   it("should return result when handler exists", () => {
     const container: Container = mockContainer();
-    const bus: QueryBus = container.get(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get(QueryBus);
 
     bus.register("TYPE", () => "value");
 
@@ -23,7 +22,7 @@ describe("queryOptional", () => {
 
   it("should pass data to handler", () => {
     const container: Container = mockContainer();
-    const bus: QueryBus = container.get(QUERY_BUS_TOKEN);
+    const bus: QueryBus = container.get(QueryBus);
 
     bus.register("CALC", (data: number) => data * 3);
 

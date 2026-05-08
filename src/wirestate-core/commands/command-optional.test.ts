@@ -3,7 +3,6 @@ import { Container } from "inversify";
 import { CommandBus } from "@/wirestate-core/commands/command-bus";
 import { commandOptional } from "@/wirestate-core/commands/command-optional";
 import { createIocContainer } from "@/wirestate-core/container/create-ioc-container";
-import { COMMAND_BUS_TOKEN } from "@/wirestate-core/registry";
 import { ECommandStatus, ICommandDescriptor } from "@/wirestate-core/types/commands";
 import { Optional } from "@/wirestate-core/types/general";
 
@@ -11,7 +10,7 @@ describe("commandOptional", () => {
   it("should dispatch a command on the container if handler exists", async () => {
     const container: Container = createIocContainer();
     const handler = jest.fn((data: string) => data + "-result");
-    const bus: CommandBus = container.get(COMMAND_BUS_TOKEN);
+    const bus: CommandBus = container.get(CommandBus);
 
     bus.register("TEST_COMMAND", handler);
 

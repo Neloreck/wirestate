@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer, OptionalQueryCaller, QUERY_BUS, QueryBus } from "@/wirestate-core";
+import { createIocContainer, OptionalQueryCaller, QueryBus } from "@/wirestate-core";
 import { useOptionalQueryCaller } from "@/wirestate-react/queries/use-optional-query-caller";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 import { MaybePromise, Optional } from "@/wirestate-react/types/general";
@@ -9,7 +9,7 @@ import { MaybePromise, Optional } from "@/wirestate-react/types/general";
 describe("useOptionalQueryCaller", () => {
   it("should return a caller that dispatches queries", async () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
+    const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((data: string) => data + "-result");
 
     bus.register("TEST_QUERY", handler);
@@ -35,7 +35,7 @@ describe("useOptionalQueryCaller", () => {
 
   it("should return null on unhandled queries", async () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
+    const bus: QueryBus = container.get(QueryBus);
     let caller: Optional<OptionalQueryCaller> = null as Optional<OptionalQueryCaller>;
 
     jest.spyOn(bus, "queryOptional");
@@ -56,7 +56,7 @@ describe("useOptionalQueryCaller", () => {
 
   it("should resolve async handler results", async () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
+    const bus: QueryBus = container.get(QueryBus);
 
     bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
 
@@ -95,7 +95,7 @@ describe("useOptionalQueryCaller", () => {
 
   it("should support symbol query types", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
+    const bus: QueryBus = container.get(QueryBus);
     const type: unique symbol = Symbol("optional-query");
 
     bus.register(type, () => "symbol-result");

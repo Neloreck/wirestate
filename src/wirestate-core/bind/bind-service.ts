@@ -7,16 +7,13 @@ import { CommandBus } from "@/wirestate-core/commands/command-bus";
 import { getCommandHandlerMetadata } from "@/wirestate-core/commands/get-command-handler-metadata";
 import { WireScope } from "@/wirestate-core/container/wire-scope";
 import { buildEventDispatcher } from "@/wirestate-core/events/build-event-dispatcher";
-import type { EventBus } from "@/wirestate-core/events/event-bus";
+import { EventBus } from "@/wirestate-core/events/event-bus";
 import { getQueryHandlerMetadata } from "@/wirestate-core/queries/get-query-handler-metadata";
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
 import {
-  COMMAND_BUS_TOKEN,
   COMMAND_UNREGISTERS_BY_SERVICE,
   CONTAINER_REFS_BY_SERVICE,
-  QUERY_BUS_TOKEN,
   QUERY_UNREGISTERS_BY_SERVICE,
-  EVENT_BUS_TOKEN,
   EVENT_UNSUBSCRIBERS_BY_SERVICE,
   WIRE_SCOPES_BY_SERVICE,
 } from "@/wirestate-core/registry";
@@ -84,7 +81,7 @@ export function bindService<T extends object>(
     // Register every `@OnQuery` handler on the container's QueryBus, and
     // remember the unregister functions so we can roll them back when the
     // service is deactivated.
-    const queryBus: QueryBus = container.get<QueryBus>(QUERY_BUS_TOKEN);
+    const queryBus: QueryBus = container.get(QueryBus);
 
     for (const meta of getQueryHandlerMetadata(instance)) {
       const method = (instance as unknown as Record<string | symbol, unknown>)[meta.methodName];
@@ -101,7 +98,7 @@ export function bindService<T extends object>(
     // Register every `@OnCommand` handler on the container's CommandBus, and
     // remember the unregister functions so we can roll them back when the
     // service is deactivated.
-    const commandBus: CommandBus = container.get<CommandBus>(COMMAND_BUS_TOKEN);
+    const commandBus: CommandBus = container.get(CommandBus);
 
     for (const meta of getCommandHandlerMetadata(instance)) {
       const method: unknown = (instance as unknown as Record<string | symbol, unknown>)[meta.methodName];
@@ -197,7 +194,7 @@ export function bindService<T extends object>(
  * @internal
  */
 function attachEventsSubscription<T extends object>(service: T, handler: TEventHandler): void {
-  const bus: Maybe<EventBus> = CONTAINER_REFS_BY_SERVICE.get(service)?.get<EventBus>(EVENT_BUS_TOKEN);
+  const bus: Maybe<EventBus> = CONTAINER_REFS_BY_SERVICE.get(service)?.get(EventBus);
 
   if (bus) {
     EVENT_UNSUBSCRIBERS_BY_SERVICE.set(service, bus.subscribe(handler));

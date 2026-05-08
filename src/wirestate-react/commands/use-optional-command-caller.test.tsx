@@ -1,7 +1,7 @@
 import { render, cleanup } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer, COMMAND_BUS, CommandBus, OptionalCommandCaller } from "@/wirestate-core";
+import { createIocContainer, CommandBus, OptionalCommandCaller } from "@/wirestate-core";
 import { useOptionalCommandCaller } from "@/wirestate-react/commands/use-optional-command-caller";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 
@@ -30,7 +30,7 @@ describe("useOptionalCommandCaller", () => {
   it("should return descriptor if handler exists", async () => {
     const container: Container = createIocContainer();
 
-    container.get<CommandBus>(COMMAND_BUS).register("EXISTING_COMMAND", () => "ok");
+    container.get(CommandBus).register("EXISTING_COMMAND", () => "ok");
 
     let caller: OptionalCommandCaller = null as unknown as OptionalCommandCaller;
 

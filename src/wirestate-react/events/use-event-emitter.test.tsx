@@ -1,14 +1,14 @@
 import { render } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer, EVENT_BUS, EventBus, EventEmitter } from "@/wirestate-core";
+import { createIocContainer, EventBus, EventEmitter } from "@/wirestate-core";
 import { useEventEmitter } from "@/wirestate-react/events/use-event-emitter";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 
 describe("useEventEmitter", () => {
   it("should return an emitter that dispatches events", () => {
     const container: Container = createIocContainer();
-    const bus: EventBus = container.get<EventBus>(EVENT_BUS);
+    const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 
     bus.subscribe(handler);

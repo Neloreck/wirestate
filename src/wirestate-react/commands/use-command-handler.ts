@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 import { useEffect, useRef } from "react";
 
-import { COMMAND_BUS, CommandBus, CommandHandler, CommandType } from "@/wirestate-core";
+import { CommandBus, CommandHandler, CommandType } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react/provision/use-container";
 
 /**
@@ -22,6 +22,6 @@ export function useCommandHandler<R = unknown, D = unknown>(type: CommandType, h
   });
 
   useEffect(() => {
-    return container.get<CommandBus>(COMMAND_BUS).register<D, R>(type, (data) => handlerRef.current(data));
+    return container.get(CommandBus).register<D, R>(type, (data) => handlerRef.current(data));
   }, [container, type]);
 }

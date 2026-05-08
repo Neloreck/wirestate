@@ -1,7 +1,7 @@
 import { render, cleanup } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { CommandBus, createIocContainer, CommandDescriptor, COMMAND_BUS, CommandHandler } from "@/wirestate-core";
+import { CommandBus, createIocContainer, CommandDescriptor, CommandHandler } from "@/wirestate-core";
 import { useCommandHandler } from "@/wirestate-react/commands/use-command-handler";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 
@@ -12,7 +12,7 @@ describe("useCommandHandler", () => {
 
   it("should register handler and unregister on unmount", async () => {
     const container: Container = createIocContainer();
-    const commandBus: CommandBus = container.get(COMMAND_BUS);
+    const commandBus: CommandBus = container.get(CommandBus);
     const handler = jest.fn(() => Promise.resolve("async-data"));
 
     function TestComponent() {
@@ -41,7 +41,7 @@ describe("useCommandHandler", () => {
 
   it("should update handler ref when handler changes", async () => {
     const container: Container = createIocContainer();
-    const commandBus: CommandBus = container.get(COMMAND_BUS);
+    const commandBus: CommandBus = container.get(CommandBus);
 
     const handler1 = jest.fn().mockReturnValue("first");
     const handler2 = jest.fn().mockReturnValue("second");

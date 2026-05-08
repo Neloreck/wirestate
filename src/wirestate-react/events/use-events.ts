@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 import { type MutableRefObject, useEffect, useRef } from "react";
 
-import { EVENT_BUS, EventBus, EventHandler, EventType } from "@/wirestate-core";
+import { EventBus, EventHandler, EventType } from "@/wirestate-core";
 import { useContainer } from "@/wirestate-react";
 
 /**
@@ -21,7 +21,7 @@ export function useEvents(types: ReadonlyArray<EventType>, handler: EventHandler
   });
 
   useEffect(() => {
-    return container.get<EventBus>(EVENT_BUS).subscribe((event) => {
+    return container.get(EventBus).subscribe((event) => {
       if (typesRef.current.includes(event.type)) {
         handlerRef.current?.(event);
       }

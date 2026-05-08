@@ -5,7 +5,6 @@ import { IEvent, TEventHandler, TEventType, TEventUnsubscriber } from "@/wiresta
 
 /**
  * Dispatches events to subscribers.
- * Scoped to a container under {@link EVENT_BUS_TOKEN}.
  */
 export class EventBus {
   private readonly handlers: Set<TEventHandler> = new Set();

@@ -1,14 +1,14 @@
 import { render } from "@testing-library/react";
 import { Container } from "inversify";
 
-import { createIocContainer, QUERY_BUS, QueryBus, QueryCaller } from "@/wirestate-core";
+import { createIocContainer, QueryBus, QueryCaller } from "@/wirestate-core";
 import { useQueryCaller } from "@/wirestate-react/queries/use-query-caller";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 
 describe("useQueryCaller", () => {
   it("should return a caller that dispatches queries", async () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
+    const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((data: string) => data + "-result");
 
     bus.register("TEST_QUERY", handler);
@@ -34,7 +34,7 @@ describe("useQueryCaller", () => {
 
   it("should throw on unhandled queries", async () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
+    const bus: QueryBus = container.get(QueryBus);
 
     jest.spyOn(bus, "query");
 
@@ -56,7 +56,7 @@ describe("useQueryCaller", () => {
 
   it("should forward async handler results", async () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
+    const bus: QueryBus = container.get(QueryBus);
 
     bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
 
@@ -95,7 +95,7 @@ describe("useQueryCaller", () => {
 
   it("should support symbol query types", () => {
     const container: Container = createIocContainer();
-    const bus: QueryBus = container.get<QueryBus>(QUERY_BUS);
+    const bus: QueryBus = container.get(QueryBus);
     const type: unique symbol = Symbol("test-query");
 
     bus.register(type, () => "symbol-result");
