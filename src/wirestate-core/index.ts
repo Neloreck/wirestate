@@ -43,7 +43,6 @@ export { OnDeactivation } from "@/wirestate-core/service/on-deactivation";
 export { QueryBus } from "@/wirestate-core/queries/query-bus";
 export { OnQuery } from "@/wirestate-core/queries/on-query";
 
-export { MaybePromise } from "@/wirestate-core/types/general";
 export {
   TSeedEntries as SeedEntries,
   TSeedEntry as SeedEntry,

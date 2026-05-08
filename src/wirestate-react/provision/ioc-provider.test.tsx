@@ -3,7 +3,7 @@ import { Container } from "inversify";
 
 import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
 
-import { SEED, SEEDS } from "@/wirestate-core";
+import { SEED } from "@/wirestate-core";
 import { IocProvider } from "@/wirestate-react/provision/ioc-provider";
 import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
 import { AnyObject } from "@/wirestate-react/types/general";
@@ -65,7 +65,7 @@ describe("IocProvider", () => {
       </IocProvider>
     );
 
-    expect(container.get(SEEDS)).toEqual(seed);
+    expect(container.get(SEED)).toEqual(seed);
   });
 
   it("should throw an error if external container stopped provision", async () => {
