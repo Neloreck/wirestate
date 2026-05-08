@@ -1,0 +1,57 @@
+{
+  "name": "@wirestate/lit",
+  "version": "0.1.0",
+  "description": "Lit elements integration for wirestate",
+  "sideEffects": false,
+  "author": "Syrotenko Igor",
+  "homepage": "https://github.com/neloreck/wirestate#readme",
+  "license": "MIT",
+  "main": "./cjs/development/index.js",
+  "module": "./esm/development/index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": {
+        "production": "./esm/production/index.js",
+        "default": "./esm/development/index.js"
+      },
+      "require": {
+        "production": "./cjs/production/index.js",
+        "default": "./cjs/development/index.js"
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neloreck/wirestate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/neloreck/wirestate/issues"
+  },
+  "keywords": [
+    "class-based",
+    "declarative",
+    "management",
+    "manager",
+    "lit",
+    "lit-element",
+    "web-components",
+    "inversify",
+    "ioc",
+    "di",
+    "dependency-injection",
+    "state",
+    "store",
+    "typescript"
+  ],
+  "dependencies": {},
+  "peerDependencies": {
+    "@wirestate/core": ">=0.6.0",
+    "lit": ">=3.0.0",
+    "@lit/context": ">=1.0.0",
+    "reflect-metadata": ">=0.2.0",
+    "tslib": ">=2.5.0"
+  },
+  "optionalDependencies": {}
+}

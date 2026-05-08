@@ -2,6 +2,7 @@ packages:
   - 'cli/'
   - 'src/'
   - 'src/wirestate-core'
+  - 'src/wirestate-lit'
   - 'src/wirestate-react'
   - 'src/wirestate-react-mobx'
   - 'src/wirestate-react-signals'
