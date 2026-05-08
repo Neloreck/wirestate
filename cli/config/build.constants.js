@@ -8,7 +8,7 @@ export const EEnvironment = {
 export const ENV = process.env.NODE_ENV || "development";
 export const IS_PRODUCTION = ENV === "production";
 
-export const BASE_EXTERNAL_DEPENDENCIES = [
+export const EXTERNAL_DEPENDENCIES = [
   "react",
   "inversify",
   "mobx",

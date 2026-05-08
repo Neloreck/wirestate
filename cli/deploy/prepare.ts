@@ -52,8 +52,11 @@ async function stagePackage(pkgName: string): Promise<void> {
 
   await Promise.all(copies);
 
+  const pkgReadme = path.resolve(pkgSrcDir, "README.md");
+  const rootReadme = path.resolve(PROJECT_ROOT, "README.md");
+
   copyFile(path.resolve(PROJECT_ROOT, "LICENSE"), path.resolve(pkgOutDir, "LICENSE"));
-  copyFile(path.resolve(PROJECT_ROOT, "README.md"), path.resolve(pkgOutDir, "README.md"));
+  copyFile(fs.existsSync(pkgReadme) ? pkgReadme : rootReadme, path.resolve(pkgOutDir, "README.md"));
   copyFile(path.resolve(PROJECT_ROOT, "CHANGELOG.md"), path.resolve(pkgOutDir, "CHANGELOG.md"));
   copyFile(path.resolve(pkgSrcDir, "package.json"), path.resolve(pkgOutDir, "package.json"));
 }

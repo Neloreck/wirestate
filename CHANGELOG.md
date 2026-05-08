@@ -1,3 +1,7 @@
+## 0.6.3
+
+- Update readme files for each module
+
 ## 0.6.2
 
 - Corrected build system, react package structure
