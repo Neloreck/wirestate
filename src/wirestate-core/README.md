@@ -199,6 +199,64 @@ export class PollingService {
 | `command(type)` | Get a caller for a command |
 | `query(type)` | Get a caller for a query |
 
+## Test utilities
+
+Available via `@wirestate/core/test-utils`:
+
+```ts
+import {
+  mockContainer,
+  mockService,
+  mockBindService,
+  mockBindEntry,
+  mockUnbindService,
+} from '@wirestate/core/test-utils';
+```
+
+### `mockContainer(options?)`
+
+Creates a configured IoC container for testing. Accepts an optional object:
+
+| Option | Type | Description |
+|---|---|---|
+| `entries` | `Array<Newable \| InjectableDescriptor>` | Services or descriptors to bind |
+| `activate` | `Array<ServiceIdentifier>` | Tokens to resolve immediately after binding |
+| `skipLifecycle` | `boolean` | Skip `@OnActivated` / `@OnDeactivation` hooks |
+
+```ts
+const container = mockContainer({
+  entries: [CounterService, LoggerService],
+  activate: [CounterService],
+});
+```
+
+### `mockService(ServiceClass, container?, options?)`
+
+Binds a service class to a container and returns its instance. Creates a new `mockContainer` if none is provided.
+
+```ts
+const counter = mockService(CounterService);
+counter.increment();
+expect(counter.count).toBe(1);
+```
+
+### `mockBindService(container, ServiceClass, options?)`
+
+Binds a service class to an existing container. Accepts `{ skipLifecycle?: boolean }`.
+
+### `mockBindEntry(container, entry, options?)`
+
+Binds a service class or `InjectableDescriptor` to an existing container. Accepts `{ skipLifecycle?: boolean }`.
+
+### `mockUnbindService(container, ServiceClass)`
+
+Removes a service binding from the container. Useful for overriding registrations between tests.
+
+```ts
+mockUnbindService(container, CounterService);
+mockBindEntry(container, { token: CounterService, useValue: fakeCounter });
+```
+
 ## License
 
 MIT

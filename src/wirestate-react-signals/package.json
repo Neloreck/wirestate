@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/react-signals",
-  "version": "0.6.1",
+  "version": "0.6.3",
   "description": "Preact signals alias and adapters for wirestate",
   "sideEffects": false,
   "author": "Syrotenko Igor",
