@@ -2,7 +2,7 @@ import { render, fireEvent, cleanup } from "@testing-library/react";
 import { Container, Newable } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 
-import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
+import { ErrorLogBoundary } from "@/fixtures/react-components/error-log-boundary";
 import { GenericService } from "@/fixtures/services/generic-service";
 
 import { withIocProvider } from "../test-utils/with-ioc-provider";

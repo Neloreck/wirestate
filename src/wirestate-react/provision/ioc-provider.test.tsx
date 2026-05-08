@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { Container, SEED } from "@wirestate/core";
 
-import { ErrorLogBoundary } from "@/fixtures/components/error-log-boundary";
+import { ErrorLogBoundary } from "@/fixtures/react-components/error-log-boundary";
 
 import { AnyObject } from "../types/general";
 

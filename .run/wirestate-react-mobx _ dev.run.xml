@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="features-check-mobx &gt; dev" type="js.build_tools.npm" folderName="examples" nameIsGenerated="true">
-    <package-json value="$PROJECT_DIR$/examples/features-check-mobx/package.json" />
+  <configuration default="false" name="wirestate-react-mobx &gt; dev" type="js.build_tools.npm" folderName="examples" nameIsGenerated="true">
+    <package-json value="$PROJECT_DIR$/examples/wirestate-react-mobx/package.json" />
     <command value="run" />
     <scripts>
       <script value="dev" />
