@@ -1,9 +1,9 @@
 import type { Container } from "inversify";
 
 import type { WireScope } from "@/wirestate-core/container/wire-scope";
-import type { ICommandHandlerMetadata, TCommandUnregister } from "@/wirestate-core/types/commands";
-import type { TEventUnsubscriber, IEventHandlerMetadata } from "@/wirestate-core/types/events";
-import type { IQueryHandlerMetadata, TQueryUnregister } from "@/wirestate-core/types/queries";
+import type { CommandHandlerMetadata, CommandUnregister } from "@/wirestate-core/types/commands";
+import type { EventUnsubscriber, EventHandlerMetadata } from "@/wirestate-core/types/events";
+import type { QueryHandlerMetadata, QueryUnregister } from "@/wirestate-core/types/queries";
 
 /**
  * Token for the container-scoped seeds map.
@@ -19,13 +19,13 @@ export const SEED_TOKEN: unique symbol = Symbol("@wirestate/seed");
  * Map of class constructors to their declared query handlers.
  * Inherited via a prototype chain at resolve time.
  */
-export const QUERY_HANDLER_METADATA: WeakMap<object, Array<IQueryHandlerMetadata>> = new WeakMap();
+export const QUERY_HANDLER_METADATA: WeakMap<object, Array<QueryHandlerMetadata>> = new WeakMap();
 
 /**
  * Map of class constructors to their declared command handlers.
  * Inherited via a prototype chain at resolve time.
  */
-export const COMMAND_HANDLER_METADATA: WeakMap<object, Array<ICommandHandlerMetadata>> = new WeakMap();
+export const COMMAND_HANDLER_METADATA: WeakMap<object, Array<CommandHandlerMetadata>> = new WeakMap();
 
 /**
  * Map of class constructors to their `@OnActivated`-decorated method names.
@@ -43,7 +43,7 @@ export const DEACTIVATION_HANDLER_METADATA: WeakMap<object, Array<string | symbo
  * Map of class constructors for their declared event handlers.
  * Inherited via a prototype chain at resolve time.
  */
-export const EVENT_HANDLER_METADATA: WeakMap<object, Array<IEventHandlerMetadata>> = new WeakMap();
+export const EVENT_HANDLER_METADATA: WeakMap<object, Array<EventHandlerMetadata>> = new WeakMap();
 
 /**
  * Private storage for service-to-container references.
@@ -58,14 +58,14 @@ export const WIRE_SCOPES_BY_SERVICE: WeakMap<object, Array<WireScope>> = new Wea
 /**
  * Private storage for service event unsubscribers.
  */
-export const EVENT_UNSUBSCRIBERS_BY_SERVICE: WeakMap<object, TEventUnsubscriber> = new WeakMap();
+export const EVENT_UNSUBSCRIBERS_BY_SERVICE: WeakMap<object, EventUnsubscriber> = new WeakMap();
 
 /**
  * Private storage for service query unregisters.
  */
-export const QUERY_UNREGISTERS_BY_SERVICE: WeakMap<object, Array<TQueryUnregister>> = new WeakMap();
+export const QUERY_UNREGISTERS_BY_SERVICE: WeakMap<object, Array<QueryUnregister>> = new WeakMap();
 
 /**
  * Private storage for service command unregisters.
  */
-export const COMMAND_UNREGISTERS_BY_SERVICE: WeakMap<object, Array<TCommandUnregister>> = new WeakMap();
+export const COMMAND_UNREGISTERS_BY_SERVICE: WeakMap<object, Array<CommandUnregister>> = new WeakMap();

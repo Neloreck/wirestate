@@ -1,4 +1,3 @@
-import { EGlobalEvent } from "@/constants/events";
 import {
   Inject,
   Injectable,
@@ -6,8 +5,10 @@ import {
   OnDeactivation,
   SEED,
   WireScope,
-} from "@/libs/wirestate";
-import { Action, Observable, makeObservable } from "@/libs/wirestate/mobx";
+} from "@wirestate/core";
+import { Action, Observable, makeObservable } from "@wirestate/react-mobx";
+
+import { EGlobalEvent } from "@/constants/events";
 import type { Theme } from "@/types";
 
 @Injectable()

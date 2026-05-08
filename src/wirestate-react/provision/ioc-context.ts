@@ -6,7 +6,7 @@ import { Optional } from "@/wirestate-react/types/general";
 /**
  * React context value.
  */
-export interface IIocContext {
+export interface IocContext {
   /**
    * Inversify container.
    */
@@ -25,6 +25,6 @@ export interface IIocContext {
  * React context carrying the IoC container.
  * Internal. Use hooks to access services.
  */
-export const IocContext: Context<Optional<IIocContext>> = createContext<Optional<IIocContext>>(null);
+export const IocReactContext: Context<Optional<IocContext>> = createContext<Optional<IocContext>>(null);
 
-IocContext.displayName = "IocContext";
+IocReactContext.displayName = "IocContext";

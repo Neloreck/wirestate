@@ -15,13 +15,13 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "@/wirestate-react/error/error-code";
-import { IIocContext, IocContext } from "@/wirestate-react/provision/ioc-context";
+import { IocContext, IocReactContext } from "@/wirestate-react/provision/ioc-context";
 import { Optional } from "@/wirestate-react/types/general";
 
 /**
  * Props for the component returned by {@link createInjectablesProvider}.
  */
-export interface IInjectablesProviderProps {
+export interface InjectablesProviderProps {
   /**
    * Targeted seeds bound to specific injectables or tokens.
    * Subsequent prop changes are ignored. Use a React `key` to re-seed the tree.
@@ -41,7 +41,7 @@ export type InjectablesProvider = ReturnType<typeof createInjectablesProvider>;
 /**
  * Configuration for {@link createInjectablesProvider}.
  */
-export interface ICreateInjectablesProviderOptions {
+export interface CreateInjectablesProviderOptions {
   /**
    * Services to resolve immediately on mount.
    */
@@ -57,7 +57,7 @@ export interface ICreateInjectablesProviderOptions {
  */
 export function createInjectablesProvider(
   entries: ReadonlyArray<Newable<object> | InjectableDescriptor>,
-  options: ICreateInjectablesProviderOptions = {}
+  options: CreateInjectablesProviderOptions = {}
 ) {
   dbg.info(prefix(__filename), "Creating injectables provider:", { services: entries, options });
 
@@ -76,8 +76,8 @@ export function createInjectablesProvider(
     }
   }
 
-  function InjectablesProviderComponent(props: IInjectablesProviderProps) {
-    const iocContext: Optional<IIocContext> = useContext(IocContext);
+  function InjectablesProviderComponent(props: InjectablesProviderProps) {
+    const iocContext: Optional<IocContext> = useContext(IocReactContext);
 
     if (!iocContext) {
       throw new WirestateError(
@@ -88,7 +88,7 @@ export function createInjectablesProvider(
 
     // Snapshot props on mount to ensure binding stability.
     // useState lazy initializer ensures it only runs once.
-    const [initialPropsSnapshot] = useState<IInjectablesProviderProps>(() => props);
+    const [initialPropsSnapshot] = useState<InjectablesProviderProps>(() => props);
 
     useMemo(() => {
       dbg.info(prefix(__filename), "Providing services on first render:", {

@@ -13,7 +13,7 @@ export { useOptionalInjection } from "@/wirestate-react/provision/use-optional-i
 export {
   createInjectablesProvider,
   InjectablesProvider,
-  IInjectablesProviderProps as InjectablesProviderProps,
+  InjectablesProviderProps as InjectablesProviderProps,
 } from "@/wirestate-react/provision/create-injectables-provider";
 export { IocProvider } from "@/wirestate-react/provision/ioc-provider";
 export { useContainer } from "@/wirestate-react/provision/use-container";
@@ -23,3 +23,13 @@ export { useEvent } from "@/wirestate-react/events/use-event";
 export { useEvents } from "@/wirestate-react/events/use-events";
 export { useEventsHandler } from "@/wirestate-react/events/use-events-handler";
 export { useEventEmitter } from "@/wirestate-react/events/use-event-emitter";
+
+export { OptionalCommandCaller, CommandCaller } from "@/wirestate-react/types/commands";
+export { EventEmitter } from "@/wirestate-react/types/events";
+export {
+  QueryResponder,
+  QueryCaller,
+  OptionalQueryCaller,
+  SyncQueryCaller,
+  OptionalSyncQueryCaller,
+} from "@/wirestate-react/types/queries";

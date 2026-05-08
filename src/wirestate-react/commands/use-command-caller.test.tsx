@@ -1,15 +1,9 @@
 import { render, cleanup } from "@testing-library/react";
-import {
-  Container,
-  CommandBus,
-  CommandStatus,
-  CommandDescriptor,
-  CommandCaller,
-  createIocContainer,
-} from "@wirestate/core";
+import { Container, CommandBus, CommandStatus, CommandDescriptor, createIocContainer } from "@wirestate/core";
 
 import { useCommandCaller } from "@/wirestate-react/commands/use-command-caller";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
+import { CommandCaller } from "@/wirestate-react/types/commands";
 import { Optional } from "@/wirestate-react/types/general";
 
 describe("useCommandCaller", () => {

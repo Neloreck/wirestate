@@ -1,6 +1,6 @@
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
 import { Optional } from "@/wirestate-core/types/general";
-import { TQueryUnregister } from "@/wirestate-core/types/queries";
+import { QueryUnregister } from "@/wirestate-core/types/queries";
 
 describe("QueryBus", () => {
   it("should register and dispatch a query handler", () => {
@@ -31,7 +31,7 @@ describe("QueryBus", () => {
   it("should unregister a handler", () => {
     const bus: QueryBus = new QueryBus();
 
-    const unregister: TQueryUnregister = bus.register("TYPE", () => "value");
+    const unregister: QueryUnregister = bus.register("TYPE", () => "value");
 
     expect(bus.has("TYPE")).toBe(true);
 
@@ -43,8 +43,8 @@ describe("QueryBus", () => {
   it("should fall back to previous handler after unregistering top of stack", () => {
     const bus: QueryBus = new QueryBus();
 
-    const unregisterFirst: TQueryUnregister = bus.register("TYPE", () => "first");
-    const unregisterSecond: TQueryUnregister = bus.register("TYPE", () => "second");
+    const unregisterFirst: QueryUnregister = bus.register("TYPE", () => "first");
+    const unregisterSecond: QueryUnregister = bus.register("TYPE", () => "second");
 
     expect(bus.query("TYPE")).toBe("second");
 
@@ -89,7 +89,7 @@ describe("QueryBus", () => {
 
   it("should not throw when calling unregister after clear", () => {
     const bus: QueryBus = new QueryBus();
-    const unregister: TQueryUnregister = bus.register("TYPE", () => "value");
+    const unregister: QueryUnregister = bus.register("TYPE", () => "value");
 
     bus.clear();
 
@@ -102,7 +102,7 @@ describe("QueryBus", () => {
 
     bus.register("TYPE", () => "first");
 
-    const unregister: TQueryUnregister = bus.register("TYPE", () => "second");
+    const unregister: QueryUnregister = bus.register("TYPE", () => "second");
 
     unregister();
 
@@ -156,7 +156,7 @@ describe("QueryBus", () => {
     it("should return null after unregistering last handler", () => {
       const bus: QueryBus = new QueryBus();
 
-      const unregister: TQueryUnregister = bus.register("TYPE", () => "value");
+      const unregister: QueryUnregister = bus.register("TYPE", () => "value");
 
       expect(bus.queryOptional("TYPE")).toBe("value");
 

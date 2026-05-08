@@ -1,9 +1,10 @@
 import { render } from "@testing-library/react";
-import { Container, createIocContainer, QueryBus, SyncQueryCaller } from "@wirestate/core";
+import { Container, createIocContainer, QueryBus } from "@wirestate/core";
 
 import { useSyncQueryCaller } from "@/wirestate-react/queries/use-sync-query-caller";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 import { Optional } from "@/wirestate-react/types/general";
+import { SyncQueryCaller } from "@/wirestate-react/types/queries";
 
 describe("useSyncQueryCaller", () => {
   it("should return a caller that dispatches sync queries", () => {

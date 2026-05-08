@@ -1,10 +1,11 @@
-import { Container, EventBus, EventEmitter, EventType } from "@wirestate/core";
+import { Container, EventBus, EventType } from "@wirestate/core";
 import { useCallback } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { useIocContext } from "@/wirestate-react/provision/use-ioc-context";
+import { EventEmitter } from "@/wirestate-react/types/events";
 
 /**
  * Returns a stable function to emit events.

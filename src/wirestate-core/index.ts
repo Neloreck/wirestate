@@ -37,35 +37,14 @@ export { unapplySeeds } from "@/wirestate-core/seeds/unapply-seeds";
 export { OnActivated } from "@/wirestate-core/service/on-activated";
 export { OnDeactivation } from "@/wirestate-core/service/on-deactivation";
 
+export { SeedEntries, SeedEntry, SeedKey } from "@/wirestate-core/types/initial-state";
+export { InjectableDescriptor } from "@/wirestate-core/types/privision";
 export {
-  TSeedEntries as SeedEntries,
-  TSeedEntry as SeedEntry,
-  TSeedKey as SeedKey,
-} from "@/wirestate-core/types/initial-state";
-export { IInjectableDescriptor as InjectableDescriptor } from "@/wirestate-core/types/privision";
-export {
-  ECommandStatus as CommandStatus,
-  ICommandDescriptor as CommandDescriptor,
-  TCommandHandler as CommandHandler,
-  TCommandType as CommandType,
-  TCommandUnregister as CommandUnregister,
-  TCommandCaller as CommandCaller,
-  TOptionalCommandCaller as OptionalCommandCaller,
+  CommandStatus,
+  CommandDescriptor,
+  CommandHandler,
+  CommandType,
+  CommandUnregister,
 } from "@/wirestate-core/types/commands";
-export {
-  TOptionalQueryCaller as OptionalQueryCaller,
-  TOptionalSyncQueryCaller as OptionalSyncQueryCaller,
-  TQueryCaller as QueryCaller,
-  TQueryHandler as QueryHandler,
-  TQueryResponder as QueryResponder,
-  TQueryType as QueryType,
-  TQueryUnregister as QueryUnregister,
-  TSyncQueryCaller as SyncQueryCaller,
-} from "@/wirestate-core/types/queries";
-export {
-  IEvent as Event,
-  TEventEmitter as EventEmitter,
-  TEventHandler as EventHandler,
-  TEventType as EventType,
-  TEventUnsubscriber as EventUnsubscriber,
-} from "@/wirestate-core/types/events";
+export { QueryHandler, QueryType, QueryUnregister } from "@/wirestate-core/types/queries";
+export { Event, EventHandler, EventType, EventUnsubscriber } from "@/wirestate-core/types/events";

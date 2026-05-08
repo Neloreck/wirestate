@@ -12,11 +12,11 @@ import { WirestateError } from "@/wirestate-core/error/wirestate-error";
 import { EventBus } from "@/wirestate-core/events/event-bus";
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "@/wirestate-core/registry";
-import type { ICommandDescriptor, TCommandType } from "@/wirestate-core/types/commands";
-import type { TEventType } from "@/wirestate-core/types/events";
-import type { Optional, TAnyObject, MaybePromise } from "@/wirestate-core/types/general";
-import type { TSeedKey, TSeedsMap } from "@/wirestate-core/types/initial-state";
-import type { TQueryType } from "@/wirestate-core/types/queries";
+import type { CommandDescriptor, CommandType } from "@/wirestate-core/types/commands";
+import type { EventType } from "@/wirestate-core/types/events";
+import type { Optional, AnyObject, MaybePromise } from "@/wirestate-core/types/general";
+import type { SeedKey, SeedsMap } from "@/wirestate-core/types/initial-state";
+import type { QueryType } from "@/wirestate-core/types/queries";
 
 /**
  * Injectable scope providing access to wirestate buses and seeds.
@@ -71,7 +71,7 @@ export class WireScope {
    */
   public resolve<T>(injectionId: ServiceIdentifier<T>): T {
     dbg.info(prefix(__filename), "Lazy resolve:", {
-      name: (injectionId as TAnyObject)?.name ?? injectionId,
+      name: (injectionId as AnyObject)?.name ?? injectionId,
       key: injectionId,
     });
 
@@ -90,7 +90,7 @@ export class WireScope {
    */
   public resolveOptional<T>(injectionId: ServiceIdentifier<T>): Optional<T> {
     dbg.info(prefix(__filename), "Lazy optional resolve:", {
-      name: (injectionId as TAnyObject)?.name ?? injectionId,
+      name: (injectionId as AnyObject)?.name ?? injectionId,
       key: injectionId,
     });
 
@@ -109,7 +109,7 @@ export class WireScope {
    *
    * @throws WirestateError if scope is not activated
    */
-  public emitEvent<P, T extends TEventType = TEventType>(type: T, payload?: P, from?: unknown): void {
+  public emitEvent<P, T extends EventType = EventType>(type: T, payload?: P, from?: unknown): void {
     dbg.info(prefix(__filename), "Emit event:", {
       type,
       payload,
@@ -135,7 +135,7 @@ export class WireScope {
    *
    * @throws WirestateError if scope is not activated
    */
-  public queryData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): MaybePromise<R> {
+  public queryData<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): MaybePromise<R> {
     dbg.info(prefix(__filename), "Query data:", { type, data });
 
     return this.getContainer().get(QueryBus).query<R, D>(type, data);
@@ -149,7 +149,7 @@ export class WireScope {
    * @param data - query data
    * @returns query result or null if handler is not registered
    */
-  public queryOptionalData<R = unknown, D = unknown, T extends TQueryType = TQueryType>(
+  public queryOptionalData<R = unknown, D = unknown, T extends QueryType = QueryType>(
     type: T,
     data?: D
   ): Optional<MaybePromise<R>> {
@@ -168,10 +168,10 @@ export class WireScope {
    *
    * @throws WirestateError if scope is not activated
    */
-  public executeCommand<R = unknown, D = unknown, T extends TCommandType = TCommandType>(
+  public executeCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(
     type: T,
     data?: D
-  ): ICommandDescriptor<R> {
+  ): CommandDescriptor<R> {
     dbg.info(prefix(__filename), "Execute command:", { type, data });
 
     return this.getContainer().get(CommandBus).command<R, D>(type, data);
@@ -185,17 +185,17 @@ export class WireScope {
    * @param data - command data
    * @returns command descriptor or null if handler is not registered
    */
-  public executeOptionalCommand<R = unknown, D = unknown, T extends TCommandType = TCommandType>(
+  public executeOptionalCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(
     type: T,
     data?: D
-  ): Optional<ICommandDescriptor<R>> {
+  ): Optional<CommandDescriptor<R>> {
     dbg.info(prefix(__filename), "Execute command:", { type, data });
 
     return this.getContainer().get(CommandBus).commandOptional<R, D>(type, data);
   }
 
   public getSeed<T>(): T;
-  public getSeed<T>(seed?: TSeedKey): Optional<T>;
+  public getSeed<T>(seed?: SeedKey): Optional<T>;
 
   /**
    * Reads seed for the provided injection.
@@ -207,13 +207,13 @@ export class WireScope {
    *
    * @throws WirestateError if context is not activated
    */
-  public getSeed<T extends TAnyObject>(seed?: TSeedKey): Optional<T> {
+  public getSeed<T extends AnyObject>(seed?: SeedKey): Optional<T> {
     dbg.info(prefix(__filename), "Get initial state for key:", {
-      key: (seed as TAnyObject)?.name ?? seed,
+      key: (seed as AnyObject)?.name ?? seed,
     });
 
     return seed
-      ? (this.getContainer().get<TSeedsMap>(SEEDS_TOKEN).get(seed) as T) || null
+      ? (this.getContainer().get<SeedsMap>(SEEDS_TOKEN).get(seed) as T) || null
       : this.getContainer().get<T>(SEED_TOKEN);
   }
 }

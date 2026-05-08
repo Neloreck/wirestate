@@ -3,7 +3,7 @@ import { Container } from "inversify";
 import { CommandBus } from "@/wirestate-core/commands/command-bus";
 import { commandOptional } from "@/wirestate-core/commands/command-optional";
 import { createIocContainer } from "@/wirestate-core/container/create-ioc-container";
-import { ECommandStatus, ICommandDescriptor } from "@/wirestate-core/types/commands";
+import { CommandStatus, CommandDescriptor } from "@/wirestate-core/types/commands";
 import { Optional } from "@/wirestate-core/types/general";
 
 describe("commandOptional", () => {
@@ -16,10 +16,10 @@ describe("commandOptional", () => {
 
     jest.spyOn(bus, "commandOptional");
 
-    const descriptor: Optional<ICommandDescriptor<string>> = commandOptional(container, "TEST_COMMAND", "data");
+    const descriptor: Optional<CommandDescriptor<string>> = commandOptional(container, "TEST_COMMAND", "data");
 
     expect(descriptor).not.toBeNull();
-    expect(descriptor?.status).toBe(ECommandStatus.PENDING);
+    expect(descriptor?.status).toBe(CommandStatus.PENDING);
 
     expect(await descriptor?.task).toBe("data-result");
     expect(handler).toHaveBeenCalledWith("data");
@@ -28,7 +28,7 @@ describe("commandOptional", () => {
 
   it("should return null if no handler exists", () => {
     const container: Container = createIocContainer();
-    const descriptor: Optional<ICommandDescriptor> = commandOptional(container, "NON_EXISTENT", "data");
+    const descriptor: Optional<CommandDescriptor> = commandOptional(container, "NON_EXISTENT", "data");
 
     expect(descriptor).toBeNull();
   });

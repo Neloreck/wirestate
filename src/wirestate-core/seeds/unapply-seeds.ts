@@ -4,7 +4,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { SEEDS_TOKEN } from "@/wirestate-core/registry";
-import { TSeedEntries, TSeedsMap } from "@/wirestate-core/types/initial-state";
+import { SeedEntries, SeedsMap } from "@/wirestate-core/types/initial-state";
 
 /**
  * Removes specific seeds from the container.
@@ -13,8 +13,8 @@ import { TSeedEntries, TSeedsMap } from "@/wirestate-core/types/initial-state";
  * @param container - target container
  * @param seeds - targeted seeds to remove
  */
-export function unapplySeeds(container: Container, seeds: TSeedEntries): void {
-  const existing: TSeedsMap = container.get(SEEDS_TOKEN);
+export function unapplySeeds(container: Container, seeds: SeedEntries): void {
+  const existing: SeedsMap = container.get(SEEDS_TOKEN);
 
   dbg.info(prefix(__filename), "Unapply seeds for container:", { existing, seeds, container });
 

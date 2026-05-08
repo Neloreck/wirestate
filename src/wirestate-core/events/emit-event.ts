@@ -4,7 +4,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { EventBus } from "@/wirestate-core/events/event-bus";
-import type { TEventType } from "@/wirestate-core/types/events";
+import type { EventType } from "@/wirestate-core/types/events";
 
 /**
  * Emits events for container from outside scope.
@@ -14,7 +14,7 @@ import type { TEventType } from "@/wirestate-core/types/events";
  * @param payload - event payload
  * @param from - optional indicator of the event source
  */
-export function emitEvent<P, T extends TEventType>(container: Container, type: T, payload?: P, from?: unknown): void {
+export function emitEvent<P, T extends EventType>(container: Container, type: T, payload?: P, from?: unknown): void {
   dbg.info(prefix(__filename), "Emit event:", { type: type, payload, container });
 
   container.get(EventBus).emit({ type, payload, from });

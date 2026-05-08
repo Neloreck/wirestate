@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { EVENT_HANDLER_METADATA } from "@/wirestate-core/registry";
-import type { IEventHandlerMetadata } from "@/wirestate-core/types/events";
+import type { EventHandlerMetadata } from "@/wirestate-core/types/events";
 import { Maybe } from "@/wirestate-core/types/general";
 
 /**
@@ -13,16 +13,16 @@ import { Maybe } from "@/wirestate-core/types/general";
  * @returns metadata list
  * @internal
  */
-export function getEventHandlerMetadata(instance: object): ReadonlyArray<IEventHandlerMetadata> {
+export function getEventHandlerMetadata(instance: object): ReadonlyArray<EventHandlerMetadata> {
   dbg.info(prefix(__filename), "Retrieving event handler metadata:", { name: instance.constructor.name, instance });
 
   let constructor: unknown = instance.constructor;
 
-  const chain: Array<Array<IEventHandlerMetadata>> = [];
+  const chain: Array<Array<EventHandlerMetadata>> = [];
 
   // Traverse prototype chain up to Object/Function
   while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
-    const own: Maybe<Array<IEventHandlerMetadata>> = EVENT_HANDLER_METADATA.get(constructor as object);
+    const own: Maybe<Array<EventHandlerMetadata>> = EVENT_HANDLER_METADATA.get(constructor as object);
 
     if (own && own.length > 0) {
       chain.push(own);

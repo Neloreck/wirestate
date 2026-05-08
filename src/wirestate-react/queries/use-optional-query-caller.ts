@@ -1,10 +1,11 @@
-import { Container, OptionalQueryCaller, QueryBus, QueryType } from "@wirestate/core";
+import { Container, QueryBus, QueryType } from "@wirestate/core";
 import { useCallback } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { useContainer } from "@/wirestate-react/provision/use-container";
+import { OptionalQueryCaller } from "@/wirestate-react/types/queries";
 
 /**
  * Returns a function to dispatch optional queries on the active container.

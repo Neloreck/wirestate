@@ -8,10 +8,10 @@ import { WireScope } from "@/wirestate-core/container/wire-scope";
 import { EventBus } from "@/wirestate-core/events/event-bus";
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "@/wirestate-core/registry";
-import type { TAnyObject } from "@/wirestate-core/types/general";
-import type { TSeedsMap } from "@/wirestate-core/types/initial-state";
+import type { AnyObject } from "@/wirestate-core/types/general";
+import type { SeedsMap } from "@/wirestate-core/types/initial-state";
 
-export interface ICreateIocContainerOptions {
+export interface CreateIocContainerOptions {
   /**
    * Parent container for inheritance.
    */
@@ -19,7 +19,7 @@ export interface ICreateIocContainerOptions {
   /**
    * Optional default seed value.
    */
-  readonly seed?: TAnyObject;
+  readonly seed?: AnyObject;
 }
 
 /**
@@ -28,7 +28,7 @@ export interface ICreateIocContainerOptions {
  * @param options - container configuration
  * @returns new IoC container
  */
-export function createIocContainer(options: ICreateIocContainerOptions = {}): Container {
+export function createIocContainer(options: CreateIocContainerOptions = {}): Container {
   dbg.info(prefix(__filename), "Creating IOC container:", { options });
 
   const container: Container = new Container({
@@ -39,7 +39,7 @@ export function createIocContainer(options: ICreateIocContainerOptions = {}): Co
   container.bind(EventBus).toConstantValue(new EventBus());
   container.bind(QueryBus).toConstantValue(new QueryBus());
   container.bind(CommandBus).toConstantValue(new CommandBus());
-  container.bind(SEEDS_TOKEN).toConstantValue(new Map() as TSeedsMap);
+  container.bind(SEEDS_TOKEN).toConstantValue(new Map() as SeedsMap);
   container.bind(SEED_TOKEN).toConstantValue(options.seed ?? {});
 
   container

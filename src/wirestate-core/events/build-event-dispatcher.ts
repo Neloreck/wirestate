@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { getEventHandlerMetadata } from "@/wirestate-core/events/get-event-handler-metadata";
-import type { IEventDispatchEntry, TEventHandler } from "@/wirestate-core/types/events";
+import type { EventDispatchEntry, EventHandler } from "@/wirestate-core/types/events";
 import type { Optional } from "@/wirestate-core/types/general";
 
 /**
@@ -12,10 +12,10 @@ import type { Optional } from "@/wirestate-core/types/general";
  * @returns event handler or null if no handlers are declared
  * @internal
  */
-export function buildEventDispatcher<T extends object>(instance: T): Optional<TEventHandler> {
+export function buildEventDispatcher<T extends object>(instance: T): Optional<EventHandler> {
   dbg.info(prefix(__filename), "Build event dispatcher for:", { name: instance.constructor.name, instance });
 
-  const entries: Array<IEventDispatchEntry> = [];
+  const entries: Array<EventDispatchEntry> = [];
 
   // Register methods decorated with @OnEvent.
   for (const meta of getEventHandlerMetadata(instance)) {
@@ -24,7 +24,7 @@ export function buildEventDispatcher<T extends object>(instance: T): Optional<TE
     if (typeof method === "function") {
       entries.push({
         types: meta.types,
-        handler: (method as TEventHandler).bind(instance),
+        handler: (method as EventHandler).bind(instance),
       });
     }
   }

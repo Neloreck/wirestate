@@ -97,17 +97,6 @@ export default [
           prev: ["const", "let", "var"],
         },
       ],
-      "@typescript-eslint/naming-convention": [
-        "error",
-        {
-          custom: {
-            match: true,
-            regex: "^I[A-Z]",
-          },
-          format: ["PascalCase"],
-          selector: "interface",
-        },
-      ],
       "import/order": [
         "error",
         {

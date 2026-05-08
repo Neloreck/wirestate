@@ -3,7 +3,7 @@ import { Container } from "inversify";
 import { SEED_TOKEN } from "@/wirestate-core/registry";
 import { applySharedSeed } from "@/wirestate-core/seeds/apply-shared-seed";
 import { mockContainer } from "@/wirestate-core/test-utils/mock-container";
-import { TSeedsMap } from "@/wirestate-core/types/initial-state";
+import { SeedsMap } from "@/wirestate-core/types/initial-state";
 
 describe("applySharedSeed", () => {
   it("should bind initial state to container when not yet bound", () => {
@@ -20,7 +20,7 @@ describe("applySharedSeed", () => {
     applySharedSeed(container, { x: 1 });
     applySharedSeed(container, { y: 2 });
 
-    const state: TSeedsMap = container.get(SEED_TOKEN);
+    const state: SeedsMap = container.get(SEED_TOKEN);
 
     expect(state).toEqual({ y: 2 });
   });

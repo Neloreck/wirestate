@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { EVENT_HANDLER_METADATA } from "@/wirestate-core/registry";
-import type { IEventHandlerMetadata, TEventType } from "@/wirestate-core/types/events";
+import type { EventHandlerMetadata, EventType } from "@/wirestate-core/types/events";
 import type { Maybe, Optional } from "@/wirestate-core/types/general";
 
 /**
@@ -11,14 +11,10 @@ import type { Maybe, Optional } from "@/wirestate-core/types/general";
  * @param types - event type(s) to handle. If omitted, handles all events
  * @returns decorator function
  */
-export function OnEvent(types?: TEventType | ReadonlyArray<TEventType>): MethodDecorator {
+export function OnEvent(types?: EventType | ReadonlyArray<EventType>): MethodDecorator {
   // Normalize types to an array or null for catch-all.
-  const normalized: Optional<ReadonlyArray<TEventType>> =
-    types === undefined
-      ? null
-      : Array.isArray(types)
-        ? [...(types as ReadonlyArray<TEventType>)]
-        : [types as TEventType];
+  const normalized: Optional<ReadonlyArray<EventType>> =
+    types === undefined ? null : Array.isArray(types) ? [...(types as ReadonlyArray<EventType>)] : [types as EventType];
 
   return (target, propertyKey) => {
     dbg.info(prefix(__filename), "Attaching OnEvent metadata:", {
@@ -31,7 +27,7 @@ export function OnEvent(types?: TEventType | ReadonlyArray<TEventType>): MethodD
 
     const constructor = target.constructor;
 
-    let list: Maybe<Array<IEventHandlerMetadata>> = EVENT_HANDLER_METADATA.get(constructor);
+    let list: Maybe<Array<EventHandlerMetadata>> = EVENT_HANDLER_METADATA.get(constructor);
 
     if (!list) {
       list = [];

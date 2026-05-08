@@ -3,7 +3,7 @@ import { Container } from "inversify";
 import { command } from "@/wirestate-core/commands/command";
 import { CommandBus } from "@/wirestate-core/commands/command-bus";
 import { createIocContainer } from "@/wirestate-core/container/create-ioc-container";
-import { ECommandStatus, ICommandDescriptor } from "@/wirestate-core/types/commands";
+import { CommandStatus, CommandDescriptor } from "@/wirestate-core/types/commands";
 
 describe("command", () => {
   it("should dispatch a command on the container", async () => {
@@ -15,9 +15,9 @@ describe("command", () => {
 
     jest.spyOn(bus, "command");
 
-    const descriptor: ICommandDescriptor<string> = command(container, "TEST_COMMAND", "data");
+    const descriptor: CommandDescriptor<string> = command(container, "TEST_COMMAND", "data");
 
-    expect(descriptor.status).toBe(ECommandStatus.PENDING);
+    expect(descriptor.status).toBe(CommandStatus.PENDING);
 
     expect(await descriptor.task).toBe("data-result");
     expect(handler).toHaveBeenCalledWith("data");

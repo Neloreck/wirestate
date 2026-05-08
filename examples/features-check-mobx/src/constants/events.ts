@@ -1,4 +1,4 @@
-import type { Event } from "@/libs/wirestate";
+import type { Event } from "@wirestate/core";
 
 export enum EGlobalEvent {
   COUNTER_INCREMENTED = "counter/incremented",

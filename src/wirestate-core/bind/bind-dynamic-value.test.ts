@@ -2,12 +2,12 @@ import { Container } from "inversify";
 
 import { ScopeBindingType } from "@/wirestate-core/alias";
 import { bindDynamicValue } from "@/wirestate-core/bind/bind-dynamic-value";
-import { TAnyObject } from "@/wirestate-core/types/general";
+import { AnyObject } from "@/wirestate-core/types/general";
 
 describe("bindDynamicValue", () => {
   it("should bind a value using toDynamicValue", () => {
     const container: Container = new Container();
-    const value: TAnyObject = { a: 1, b: 2 };
+    const value: AnyObject = { a: 1, b: 2 };
 
     bindDynamicValue(container, { id: "static-value-ref", value: value });
 
@@ -17,7 +17,7 @@ describe("bindDynamicValue", () => {
 
   it("should bind a factory function using toDynamicValue", () => {
     const container: Container = new Container();
-    const value: TAnyObject = { c: 3, d: 4 };
+    const value: AnyObject = { c: 3, d: 4 };
     const factory = jest.fn(() => value);
 
     bindDynamicValue(container, { id: "factory-value", factory });
@@ -30,7 +30,7 @@ describe("bindDynamicValue", () => {
 
   it("should respect Singleton scope", () => {
     const container: Container = new Container();
-    const value: TAnyObject = { c: 3, d: 4 };
+    const value: AnyObject = { c: 3, d: 4 };
     const factory = jest.fn(() => value);
 
     bindDynamicValue(container, { id: "factory-singleton", factory, scopeBindingType: ScopeBindingType.Singleton });

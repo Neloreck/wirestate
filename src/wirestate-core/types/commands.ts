@@ -1,50 +1,34 @@
-import type { MaybePromise, Optional } from "@/wirestate-core/types/general";
+import type { MaybePromise } from "@/wirestate-core/types/general";
 
 /**
  * Command identifier. Use symbols for private commands.
  */
-export type TCommandType = string | symbol;
+export type CommandType = string | symbol;
 
 /**
  * Command handler signature.
  */
-export type TCommandHandler<D = unknown, R = unknown> = (data: D) => MaybePromise<R>;
-
-/**
- * Command calling function signature.
- */
-export type TCommandCaller<R = unknown, D = unknown, T extends TCommandType = TCommandType> = (
-  type: T,
-  data?: D
-) => ICommandDescriptor<R>;
-
-/**
- * Command calling function signature.
- */
-export type TOptionalCommandCaller<R = unknown, D = unknown, T extends TCommandType = TCommandType> = (
-  type: T,
-  data?: D
-) => Optional<ICommandDescriptor<R>>;
+export type CommandHandler<D = unknown, R = unknown> = (data: D) => MaybePromise<R>;
 
 /**
  * Removes a command handler.
  */
-export type TCommandUnregister = () => void;
+export type CommandUnregister = () => void;
 
 /**
  * Metadata for `@OnCommand` decorated methods.
  *
  * @internal
  */
-export interface ICommandHandlerMetadata {
+export interface CommandHandlerMetadata {
   readonly methodName: string | symbol;
-  readonly type: TCommandType;
+  readonly type: CommandType;
 }
 
 /**
  * Command execution status.
  */
-export enum ECommandStatus {
+export enum CommandStatus {
   PENDING = "pending",
   SETTLED = "settled",
   ERROR = "error",
@@ -54,7 +38,7 @@ export enum ECommandStatus {
  * Descriptor returned by command execution.
  * Contains the task promise, current status, and responder with result/error.
  */
-export interface ICommandDescriptor<R = unknown> {
+export interface CommandDescriptor<R = unknown> {
   readonly task: Promise<R>;
-  readonly status: ECommandStatus;
+  readonly status: CommandStatus;
 }

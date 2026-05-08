@@ -5,7 +5,7 @@ import { GenericService } from "@/fixtures/services/generic-service";
 import { SEEDS_TOKEN } from "@/wirestate-core/registry";
 import { applySeeds } from "@/wirestate-core/seeds/apply-seeds";
 import { mockContainer } from "@/wirestate-core/test-utils/mock-container";
-import { TSeedsMap } from "@/wirestate-core/types/initial-state";
+import { SeedsMap } from "@/wirestate-core/types/initial-state";
 
 describe("applySeeds", () => {
   it("should bind seeds to container when not yet bound", () => {
@@ -13,7 +13,7 @@ describe("applySeeds", () => {
 
     applySeeds(container, [["ServiceA", { a: 1 }]]);
 
-    const seeds: TSeedsMap = container.get(SEEDS_TOKEN);
+    const seeds: SeedsMap = container.get(SEEDS_TOKEN);
 
     expect(seeds.has("ServiceA")).toBe(true);
     expect(seeds.has("ServiceB")).toBe(false);
@@ -28,7 +28,7 @@ describe("applySeeds", () => {
     applySeeds(container, [["ServiceB", { b: 2 }]]);
     applySeeds(container, [[GenericService, { c: 3 }]]);
 
-    const state: TSeedsMap = container.get(SEEDS_TOKEN);
+    const state: SeedsMap = container.get(SEEDS_TOKEN);
 
     expect(state.has("ServiceA")).toBe(true);
     expect(state.has("ServiceB")).toBe(true);

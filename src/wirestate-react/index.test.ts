@@ -2,9 +2,17 @@ describe("Library exported API from wirestate-react", () => {
   const libRoot = require("./index");
 
   const expectedLibExports: Array<string> = [
+    "CommandCaller",
+    "EventEmitter",
     "InjectablesProvider",
     "InjectablesProviderProps",
     "IocProvider",
+    "OptionalCommandCaller",
+    "OptionalQueryCaller",
+    "OptionalSyncQueryCaller",
+    "QueryCaller",
+    "QueryResponder",
+    "SyncQueryCaller",
     "createInjectablesProvider",
     "useCommandCaller",
     "useCommandHandler",

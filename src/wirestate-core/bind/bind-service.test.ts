@@ -10,7 +10,7 @@ import { OnQuery } from "@/wirestate-core/queries/on-query";
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
 import { OnActivated } from "@/wirestate-core/service/on-activated";
 import { mockContainer } from "@/wirestate-core/test-utils";
-import { ECommandStatus } from "@/wirestate-core/types/commands";
+import { CommandStatus } from "@/wirestate-core/types/commands";
 
 describe("bindService", () => {
   @Injectable()
@@ -54,7 +54,7 @@ describe("bindService", () => {
 
     // Test command from external source.
     expect(container.get(CommandBus).command("TEST_SYNC_COMMAND", 800)).toEqual({
-      status: ECommandStatus.PENDING,
+      status: CommandStatus.PENDING,
       task: expect.any(Promise),
     });
     expect(await container.get(CommandBus).command("TEST_SYNC_COMMAND", 800).task).toBe(1800);

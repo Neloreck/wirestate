@@ -3,12 +3,12 @@ import { Optional } from "@/wirestate-core/types/general";
 /**
  * Event identifier.
  */
-export type TEventType = string | symbol;
+export type EventType = string | symbol;
 
 /**
  * Event object.
  */
-export interface IEvent<P = unknown, T extends TEventType = TEventType, F = unknown> {
+export interface Event<P = unknown, T extends EventType = EventType, F = unknown> {
   readonly type: T;
   readonly payload?: P;
   readonly from?: F;
@@ -17,21 +17,21 @@ export interface IEvent<P = unknown, T extends TEventType = TEventType, F = unkn
 /**
  * Event handler signature.
  */
-export type TEventHandler<E extends IEvent = IEvent> = (event: E) => void;
+export type EventHandler<E extends Event = Event> = (event: E) => void;
 
 /**
  * Unsubscribes from events, part of events subscription lifecycle.
  */
-export type TEventUnsubscriber = () => void;
+export type EventUnsubscriber = () => void;
 
 /**
  * Internal dispatch entry.
  *
  * @internal
  */
-export interface IEventDispatchEntry {
-  readonly types: Optional<ReadonlyArray<IEvent["type"]>>;
-  readonly handler: TEventHandler;
+export interface EventDispatchEntry {
+  readonly types: Optional<ReadonlyArray<Event["type"]>>;
+  readonly handler: EventHandler;
 }
 
 /**
@@ -39,16 +39,7 @@ export interface IEventDispatchEntry {
  *
  * @internal
  */
-export interface IEventHandlerMetadata {
+export interface EventHandlerMetadata {
   readonly methodName: string | symbol;
-  readonly types: Optional<ReadonlyArray<TEventType>>;
+  readonly types: Optional<ReadonlyArray<EventType>>;
 }
-
-/**
- * Event emitter signature.
- */
-export type TEventEmitter<P = unknown, T extends TEventType = TEventType, F = unknown> = (
-  type: T,
-  payload?: P,
-  from?: F
-) => void;

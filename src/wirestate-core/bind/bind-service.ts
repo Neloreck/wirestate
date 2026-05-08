@@ -19,12 +19,12 @@ import {
 } from "@/wirestate-core/registry";
 import { getActivatedHandlerMetadata } from "@/wirestate-core/service/get-activated-handler-metadata";
 import { getDeactivationHandlerMetadata } from "@/wirestate-core/service/get-deactivation-handler-metadata";
-import type { TCommandHandler, TCommandUnregister } from "@/wirestate-core/types/commands";
-import type { TEventHandler, TEventUnsubscriber } from "@/wirestate-core/types/events";
+import type { CommandHandler, CommandUnregister } from "@/wirestate-core/types/commands";
+import type { EventHandler, EventUnsubscriber } from "@/wirestate-core/types/events";
 import type { Maybe, MaybePromise, Optional } from "@/wirestate-core/types/general";
-import type { TQueryHandler, TQueryUnregister } from "@/wirestate-core/types/queries";
+import type { QueryHandler, QueryUnregister } from "@/wirestate-core/types/queries";
 
-export interface IBindServiceOptions {
+export interface BindServiceOptions {
   isWithIgnoreLifecycle?: boolean;
 }
 
@@ -39,7 +39,7 @@ export interface IBindServiceOptions {
 export function bindService<T extends object>(
   container: Container,
   entry: Newable<T>,
-  options?: IBindServiceOptions
+  options?: BindServiceOptions
 ): void {
   dbg.info(prefix(__filename), "Binding service:", {
     name: entry.name,
@@ -72,7 +72,7 @@ export function bindService<T extends object>(
 
     // Compose all events listeners into a single bus subscription so we only
     // pay one Set lookup per emitted event.
-    const dispatcher: Optional<TEventHandler> = buildEventDispatcher(instance);
+    const dispatcher: Optional<EventHandler> = buildEventDispatcher(instance);
 
     if (dispatcher) {
       attachEventsSubscription(instance, dispatcher);
@@ -90,7 +90,7 @@ export function bindService<T extends object>(
         continue;
       }
 
-      const unregister: TQueryUnregister = queryBus.register(meta.type, (method as TQueryHandler).bind(instance));
+      const unregister: QueryUnregister = queryBus.register(meta.type, (method as QueryHandler).bind(instance));
 
       attachQueryUnregister(instance, unregister);
     }
@@ -107,7 +107,7 @@ export function bindService<T extends object>(
         continue;
       }
 
-      const unregister: TCommandUnregister = commandBus.register(meta.type, (method as TCommandHandler).bind(instance));
+      const unregister: CommandUnregister = commandBus.register(meta.type, (method as CommandHandler).bind(instance));
 
       attachCommandUnregister(instance, unregister);
     }
@@ -193,7 +193,7 @@ export function bindService<T extends object>(
  * @param handler - event handler
  * @internal
  */
-function attachEventsSubscription<T extends object>(service: T, handler: TEventHandler): void {
+function attachEventsSubscription<T extends object>(service: T, handler: EventHandler): void {
   const bus: Maybe<EventBus> = CONTAINER_REFS_BY_SERVICE.get(service)?.get(EventBus);
 
   if (bus) {
@@ -208,7 +208,7 @@ function attachEventsSubscription<T extends object>(service: T, handler: TEventH
  * @internal
  */
 function detachEventSubscription<T extends object>(service: T): void {
-  const unsubscribe: Maybe<TEventUnsubscriber> = EVENT_UNSUBSCRIBERS_BY_SERVICE.get(service);
+  const unsubscribe: Maybe<EventUnsubscriber> = EVENT_UNSUBSCRIBERS_BY_SERVICE.get(service);
 
   if (unsubscribe) {
     unsubscribe();
@@ -223,8 +223,8 @@ function detachEventSubscription<T extends object>(service: T): void {
  * @param unregister - query unregister function
  * @internal
  */
-function attachQueryUnregister<T extends object>(service: T, unregister: TQueryUnregister): void {
-  let list: Maybe<Array<TQueryUnregister>> = QUERY_UNREGISTERS_BY_SERVICE.get(service);
+function attachQueryUnregister<T extends object>(service: T, unregister: QueryUnregister): void {
+  let list: Maybe<Array<QueryUnregister>> = QUERY_UNREGISTERS_BY_SERVICE.get(service);
 
   if (!list) {
     list = [];
@@ -241,7 +241,7 @@ function attachQueryUnregister<T extends object>(service: T, unregister: TQueryU
  * @internal
  */
 function detachQueryUnregister<T extends object>(service: T): void {
-  const list: Maybe<Array<TQueryUnregister>> = QUERY_UNREGISTERS_BY_SERVICE.get(service);
+  const list: Maybe<Array<QueryUnregister>> = QUERY_UNREGISTERS_BY_SERVICE.get(service);
 
   if (!list) {
     return;
@@ -261,8 +261,8 @@ function detachQueryUnregister<T extends object>(service: T): void {
  * @param unregister - command unregister function
  * @internal
  */
-function attachCommandUnregister<T extends object>(service: T, unregister: TCommandUnregister): void {
-  let list: Maybe<Array<TCommandUnregister>> = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
+function attachCommandUnregister<T extends object>(service: T, unregister: CommandUnregister): void {
+  let list: Maybe<Array<CommandUnregister>> = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
 
   if (!list) {
     list = [];
@@ -279,7 +279,7 @@ function attachCommandUnregister<T extends object>(service: T, unregister: TComm
  * @internal
  */
 function detachCommandUnregister<T extends object>(service: T): void {
-  const list: Maybe<Array<TCommandUnregister>> = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
+  const list: Maybe<Array<CommandUnregister>> = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
 
   if (!list) {
     return;

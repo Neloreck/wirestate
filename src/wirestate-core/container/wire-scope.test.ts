@@ -13,7 +13,7 @@ import { WirestateError } from "@/wirestate-core/error/wirestate-error";
 import { EventBus } from "@/wirestate-core/events/event-bus";
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
 import { applySeeds } from "@/wirestate-core/seeds/apply-seeds";
-import { ECommandStatus, ICommandDescriptor } from "@/wirestate-core/types/commands";
+import { CommandStatus, CommandDescriptor } from "@/wirestate-core/types/commands";
 import { MaybePromise, Optional } from "@/wirestate-core/types/general";
 
 describe("WireScope", () => {
@@ -113,11 +113,11 @@ describe("WireScope", () => {
 
     jest.spyOn(bus, "command");
 
-    const result: ICommandDescriptor<string> = scope.executeCommand("TEST_COMMAND", "first-attempt");
+    const result: CommandDescriptor<string> = scope.executeCommand("TEST_COMMAND", "first-attempt");
 
-    expect(result.status).toBe(ECommandStatus.PENDING);
+    expect(result.status).toBe(CommandStatus.PENDING);
     expect(await result.task).toBe("result-from-command-bus");
-    expect(result.status).toBe(ECommandStatus.SETTLED);
+    expect(result.status).toBe(CommandStatus.SETTLED);
     expect(bus.command).toHaveBeenCalledWith("TEST_COMMAND", "first-attempt");
 
     expect(() => scope.executeCommand("NOT_EXISTING", "second-attempt")).toThrow(
@@ -136,17 +136,17 @@ describe("WireScope", () => {
 
     jest.spyOn(bus, "commandOptional");
 
-    const missing: Optional<ICommandDescriptor> = scope.executeOptionalCommand("TEST_COMMAND", "first-attempt");
+    const missing: Optional<CommandDescriptor> = scope.executeOptionalCommand("TEST_COMMAND", "first-attempt");
 
     expect(missing).toBeNull();
 
     bus.register("TEST_COMMAND", () => "result-from-command-bus");
 
-    const result: Optional<ICommandDescriptor<string>> = scope.executeOptionalCommand("TEST_COMMAND", "second-attempt");
+    const result: Optional<CommandDescriptor<string>> = scope.executeOptionalCommand("TEST_COMMAND", "second-attempt");
 
-    expect(result?.status).toBe(ECommandStatus.PENDING);
+    expect(result?.status).toBe(CommandStatus.PENDING);
     expect(await result?.task).toBe("result-from-command-bus");
-    expect(result?.status).toBe(ECommandStatus.SETTLED);
+    expect(result?.status).toBe(CommandStatus.SETTLED);
 
     expect(bus.commandOptional).toHaveBeenCalledTimes(2);
     expect(bus.commandOptional).toHaveBeenCalledWith("TEST_COMMAND", "first-attempt");

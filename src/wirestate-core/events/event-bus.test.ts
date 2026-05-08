@@ -1,5 +1,5 @@
 import { EventBus } from "@/wirestate-core/events/event-bus";
-import { TEventUnsubscriber } from "@/wirestate-core/types/events";
+import { EventUnsubscriber } from "@/wirestate-core/types/events";
 
 describe("EventBus", () => {
   it("should emit event to subscribed handler", () => {
@@ -29,7 +29,7 @@ describe("EventBus", () => {
     const bus = new EventBus();
     const handler = jest.fn();
 
-    const unsubscribe: TEventUnsubscriber = bus.subscribe(handler);
+    const unsubscribe: EventUnsubscriber = bus.subscribe(handler);
 
     unsubscribe();
     bus.emit({ type: "TEST" });

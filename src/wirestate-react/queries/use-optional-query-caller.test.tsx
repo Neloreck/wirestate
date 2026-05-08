@@ -1,9 +1,10 @@
 import { render } from "@testing-library/react";
-import { Container, createIocContainer, OptionalQueryCaller, QueryBus } from "@wirestate/core";
+import { Container, createIocContainer, QueryBus } from "@wirestate/core";
 
 import { useOptionalQueryCaller } from "@/wirestate-react/queries/use-optional-query-caller";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
 import { MaybePromise, Optional } from "@/wirestate-react/types/general";
+import { OptionalQueryCaller } from "@/wirestate-react/types/queries";
 
 describe("useOptionalQueryCaller", () => {
   it("should return a caller that dispatches queries", async () => {

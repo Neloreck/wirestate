@@ -1,13 +1,11 @@
-import { TAnyValue } from "@/wirestate/types";
+export interface Logger {
+  info(...args: Array<unknown>): void;
 
-export interface ILogger {
-  info(...args: Array<TAnyValue>): void;
+  error(...args: Array<unknown>): void;
 
-  error(...args: Array<TAnyValue>): void;
+  warn(...args: Array<unknown>): void;
 
-  warn(...args: Array<TAnyValue>): void;
-
-  debug(...args: Array<TAnyValue>): void;
+  debug(...args: Array<unknown>): void;
 }
 
-export const dbg: ILogger;
+export const dbg: Logger;

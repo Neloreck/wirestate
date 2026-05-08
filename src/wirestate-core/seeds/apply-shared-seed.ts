@@ -4,7 +4,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { SEED_TOKEN } from "@/wirestate-core/registry";
-import type { TAnyObject } from "@/wirestate-core/types/general";
+import type { AnyObject } from "@/wirestate-core/types/general";
 
 /**
  * Applies shared seed to the container.
@@ -12,8 +12,8 @@ import type { TAnyObject } from "@/wirestate-core/types/general";
  * @param container - target container
  * @param seed - shared seed object
  */
-export function applySharedSeed(container: Container, seed: TAnyObject): void {
+export function applySharedSeed(container: Container, seed: AnyObject): void {
   dbg.info(prefix(__filename), "Apply shared seed:", { shared: seed, container });
 
-  container.rebind<TAnyObject>(SEED_TOKEN).toConstantValue(seed);
+  container.rebind<AnyObject>(SEED_TOKEN).toConstantValue(seed);
 }

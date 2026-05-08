@@ -1,22 +1,22 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { IEvent, TEventHandler, TEventType, TEventUnsubscriber } from "@/wirestate-core/types/events";
+import { Event, EventHandler, EventType, EventUnsubscriber } from "@/wirestate-core/types/events";
 
 /**
  * Dispatches events to subscribers.
  */
 export class EventBus {
-  private readonly handlers: Set<TEventHandler> = new Set();
+  private readonly handlers: Set<EventHandler> = new Set();
 
   /**
    * Broadcasts an event to all subscribers.
    *
    * @param event - event to emit
    */
-  public emit<P = unknown, T extends TEventType = TEventType, F = unknown>(event: IEvent<P, T, F>): void {
+  public emit<P = unknown, T extends EventType = EventType, F = unknown>(event: Event<P, T, F>): void {
     // Snapshot prevents concurrent modification errors if handlers sub/unsub during emit.
-    const snapshot: Array<TEventHandler> = Array.from(this.handlers);
+    const snapshot: Array<EventHandler> = Array.from(this.handlers);
 
     for (const handler of snapshot) {
       try {
@@ -35,7 +35,7 @@ export class EventBus {
    * @param handler - event handler function
    * @returns unsubscribe function
    */
-  public subscribe(handler: TEventHandler): TEventUnsubscriber {
+  public subscribe(handler: EventHandler): EventUnsubscriber {
     dbg.info(prefix(__filename), "Adding event subscription:", {
       handler,
       bus: this,

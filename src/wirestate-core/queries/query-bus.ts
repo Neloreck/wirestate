@@ -4,7 +4,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "@/wirestate-core/error/error-code";
 import { WirestateError } from "@/wirestate-core/error/wirestate-error";
 import type { Maybe, MaybePromise, Optional } from "@/wirestate-core/types/general";
-import type { TQueryHandler, TQueryType, TQueryUnregister } from "@/wirestate-core/types/queries";
+import type { QueryHandler, QueryType, QueryUnregister } from "@/wirestate-core/types/queries";
 
 /**
  * Dispatches queries to handlers.
@@ -14,7 +14,7 @@ export class QueryBus {
    * Internal handler storage.
    * Uses a stack for each query type to support shadowing (e.g., component-level vs service-level).
    */
-  private readonly handlers: Map<TQueryType, Array<TQueryHandler>> = new Map();
+  private readonly handlers: Map<QueryType, Array<QueryHandler>> = new Map();
 
   /**
    * Registers a query handler.
@@ -24,21 +24,21 @@ export class QueryBus {
    * @param handler - handler function
    * @returns unregister function
    */
-  public register<D = unknown, R = unknown>(type: TQueryType, handler: TQueryHandler<D, R>): TQueryUnregister {
+  public register<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): QueryUnregister {
     dbg.info(prefix(__filename), "Registering query handler:", {
       type,
       handler,
       bus: this,
     });
 
-    let stack: Maybe<Array<TQueryHandler>> = this.handlers.get(type);
+    let stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
 
     if (!stack) {
       stack = [];
       this.handlers.set(type, stack);
     }
 
-    stack.push(handler as TQueryHandler);
+    stack.push(handler as QueryHandler);
 
     return () => {
       dbg.info(prefix(__filename), "Unregistering query handler:", {
@@ -47,13 +47,13 @@ export class QueryBus {
         bus: this,
       });
 
-      const current: Maybe<Array<TQueryHandler>> = this.handlers.get(type);
+      const current: Maybe<Array<QueryHandler>> = this.handlers.get(type);
 
       if (!current) {
         return;
       }
 
-      const index: number = current.indexOf(handler as TQueryHandler);
+      const index: number = current.indexOf(handler as QueryHandler);
 
       if (index >= 0) {
         current.splice(index, 1);
@@ -75,12 +75,12 @@ export class QueryBus {
    *
    * @throws if no handler is registered
    */
-  public query<R = unknown, D = unknown, T extends TQueryType = TQueryType>(type: T, data?: D): MaybePromise<R> {
-    const stack: Maybe<Array<TQueryHandler>> = this.handlers.get(type);
+  public query<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): MaybePromise<R> {
+    const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
 
     // Always use the top of the stack (most recent registration) if handlers are available.
     if (stack?.length) {
-      return (stack[stack.length - 1] as TQueryHandler<D, R>)(data as D);
+      return (stack[stack.length - 1] as QueryHandler<D, R>)(data as D);
     }
 
     throw new WirestateError(
@@ -96,14 +96,14 @@ export class QueryBus {
    * @param data - query payload
    * @returns query result or null if no handler is registered
    */
-  public queryOptional<R = unknown, D = unknown, T extends TQueryType = TQueryType>(
+  public queryOptional<R = unknown, D = unknown, T extends QueryType = QueryType>(
     type: T,
     data?: D
   ): Optional<MaybePromise<R>> {
-    const stack: Maybe<Array<TQueryHandler>> = this.handlers.get(type);
+    const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
 
     if (stack?.length) {
-      return (stack[stack.length - 1] as TQueryHandler<D, R>)(data as D);
+      return (stack[stack.length - 1] as QueryHandler<D, R>)(data as D);
     }
 
     return null;
@@ -115,8 +115,8 @@ export class QueryBus {
    * @param type - query type
    * @returns true if handler exists
    */
-  public has(type: TQueryType): boolean {
-    const stack: Maybe<Array<TQueryHandler>> = this.handlers.get(type);
+  public has(type: QueryType): boolean {
+    const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
 
     return Boolean(stack && stack.length);
   }

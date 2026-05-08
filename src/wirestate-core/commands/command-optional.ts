@@ -4,7 +4,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { CommandBus } from "@/wirestate-core/commands/command-bus";
-import type { ICommandDescriptor, TCommandType } from "@/wirestate-core/types/commands";
+import type { CommandDescriptor, CommandType } from "@/wirestate-core/types/commands";
 import type { Optional } from "@/wirestate-core/types/general";
 
 /**
@@ -15,11 +15,11 @@ import type { Optional } from "@/wirestate-core/types/general";
  * @param data - command data
  * @returns command descriptor or null
  */
-export function commandOptional<R = unknown, D = unknown, T extends TCommandType = TCommandType>(
+export function commandOptional<R = unknown, D = unknown, T extends CommandType = CommandType>(
   container: Container,
   type: T,
   data?: D
-): Optional<ICommandDescriptor<R>> {
+): Optional<CommandDescriptor<R>> {
   dbg.info(prefix(__filename), "Optional command:", type, data, container);
 
   return container.get(CommandBus).commandOptional<R, D>(type, data);

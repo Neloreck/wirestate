@@ -5,7 +5,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { QueryBus } from "@/wirestate-core/queries/query-bus";
 import type { MaybePromise, Optional } from "@/wirestate-core/types/general";
-import type { TQueryType } from "@/wirestate-core/types/queries";
+import type { QueryType } from "@/wirestate-core/types/queries";
 
 /**
  * Dispatches a query on the provided container, returning null if no handler is registered.
@@ -17,7 +17,7 @@ import type { TQueryType } from "@/wirestate-core/types/queries";
  */
 export function queryOptional<R = unknown, D = unknown>(
   container: Container,
-  type: TQueryType,
+  type: QueryType,
   data?: D
 ): Optional<MaybePromise<R>> {
   dbg.info(prefix(__filename), "Optional query data:", type, data, container);

@@ -3,7 +3,7 @@ import { bindingScopeValues, BindInWhenOnFluentSyntax, Container } from "inversi
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { IInjectableDescriptor } from "@/wirestate-core/types/privision";
+import { InjectableDescriptor } from "@/wirestate-core/types/privision";
 
 /**
  * Binds a constant value to a token in the container.
@@ -11,7 +11,7 @@ import { IInjectableDescriptor } from "@/wirestate-core/types/privision";
  * @param container - target Inversify container
  * @param entry - descriptor of entry to bind
  */
-export function bindDynamicValue(container: Container, entry: IInjectableDescriptor): void {
+export function bindDynamicValue(container: Container, entry: InjectableDescriptor): void {
   dbg.info(prefix(__filename), "Binding constant:", {
     entry,
     container,

@@ -6,7 +6,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { ScopeBindingType } from "@/wirestate-core/alias";
 import { ERROR_CODE_BINDING_SCOPE } from "@/wirestate-core/error/error-code";
 import { WirestateError } from "@/wirestate-core/error/wirestate-error";
-import type { IInjectableDescriptor } from "@/wirestate-core/types/privision";
+import type { InjectableDescriptor } from "@/wirestate-core/types/privision";
 
 /**
  * Binds a constant value to a token in the container.
@@ -14,7 +14,7 @@ import type { IInjectableDescriptor } from "@/wirestate-core/types/privision";
  * @param container - target Inversify container
  * @param entry - entry descriptor to bind
  */
-export function bindConstant<T>(container: Container, entry: IInjectableDescriptor): void {
+export function bindConstant<T>(container: Container, entry: InjectableDescriptor): void {
   dbg.info(prefix(__filename), "Binding constant:", {
     id: entry.id,
     value: entry.value,

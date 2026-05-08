@@ -5,13 +5,13 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { bindConstant } from "@/wirestate-core/bind/bind-constant";
 import { bindDynamicValue } from "@/wirestate-core/bind/bind-dynamic-value";
-import { bindService, type IBindServiceOptions } from "@/wirestate-core/bind/bind-service";
-import type { IInjectableDescriptor } from "@/wirestate-core/types/privision";
+import { bindService, type BindServiceOptions } from "@/wirestate-core/bind/bind-service";
+import type { InjectableDescriptor } from "@/wirestate-core/types/privision";
 
 /**
  * Options for {@link bindEntry}.
  */
-export interface IBindEntryOptions extends IBindServiceOptions {
+export interface BindEntryOptions extends BindServiceOptions {
   isWithIgnoreLifecycle?: boolean;
 }
 
@@ -32,8 +32,8 @@ export interface IBindEntryOptions extends IBindServiceOptions {
  */
 export function bindEntry<T extends object = object>(
   container: Container,
-  entry: Newable<T> | IInjectableDescriptor,
-  options: IBindEntryOptions = {}
+  entry: Newable<T> | InjectableDescriptor,
+  options: BindEntryOptions = {}
 ): void {
   if (typeof entry === "function") {
     return bindService(container, entry, options);

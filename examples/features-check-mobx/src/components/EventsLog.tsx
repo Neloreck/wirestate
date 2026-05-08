@@ -1,7 +1,8 @@
 import "./EventsLog.css";
 
-import { useInjection } from "@/libs/wirestate";
-import { observer } from "@/libs/wirestate/mobx";
+import { useInjection } from "@wirestate/react";
+import { observer } from "@wirestate/react-mobx";
+
 import { LoggerService } from "@/services/LoggerService";
 
 export const EventsLog = observer(() => {

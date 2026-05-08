@@ -1,5 +1,5 @@
 import { CommandBus } from "@/wirestate-core/commands/command-bus";
-import { ECommandStatus, ICommandDescriptor, TCommandUnregister } from "@/wirestate-core/types/commands";
+import { CommandStatus, CommandDescriptor, CommandUnregister } from "@/wirestate-core/types/commands";
 
 describe("CommandBus", () => {
   it("should register and dispatch a command handler", async () => {
@@ -8,15 +8,15 @@ describe("CommandBus", () => {
 
     bus.register("TEST", handler);
 
-    const descriptor: ICommandDescriptor<string> = bus.command("TEST", "data");
+    const descriptor: CommandDescriptor<string> = bus.command("TEST", "data");
 
-    expect(descriptor.status).toBe(ECommandStatus.PENDING);
+    expect(descriptor.status).toBe(CommandStatus.PENDING);
 
     const result: string = await descriptor.task;
 
     expect(result).toBe("result");
     expect(handler).toHaveBeenCalledWith("data");
-    expect(descriptor.status).toBe(ECommandStatus.SETTLED);
+    expect(descriptor.status).toBe(CommandStatus.SETTLED);
   });
 
   it("should throw when no handler is registered", () => {
@@ -31,7 +31,7 @@ describe("CommandBus", () => {
     bus.register("TYPE", () => "first");
     bus.register("TYPE", () => "second");
 
-    const descriptor: ICommandDescriptor<string> = bus.command("TYPE");
+    const descriptor: CommandDescriptor<string> = bus.command("TYPE");
 
     expect(await descriptor.task).toBe("second");
   });
@@ -39,7 +39,7 @@ describe("CommandBus", () => {
   it("should unregister a handler", () => {
     const bus: CommandBus = new CommandBus();
 
-    const unregister: TCommandUnregister = bus.register("TYPE", () => "value");
+    const unregister: CommandUnregister = bus.register("TYPE", () => "value");
 
     expect(bus.has("TYPE")).toBe(true);
 
@@ -51,8 +51,8 @@ describe("CommandBus", () => {
   it("should fall back to previous handler after unregistering top of stack", async () => {
     const bus: CommandBus = new CommandBus();
 
-    const unregisterFirst: TCommandUnregister = bus.register("TYPE", () => "first");
-    const unregisterSecond: TCommandUnregister = bus.register("TYPE", () => "second");
+    const unregisterFirst: CommandUnregister = bus.register("TYPE", () => "first");
+    const unregisterSecond: CommandUnregister = bus.register("TYPE", () => "second");
 
     expect(await bus.command("TYPE").task).toBe("second");
 
@@ -68,14 +68,14 @@ describe("CommandBus", () => {
 
     bus.register("ASYNC", async (data: number) => data * 2);
 
-    const descriptor: ICommandDescriptor<number> = bus.command<number>("ASYNC", 5);
+    const descriptor: CommandDescriptor<number> = bus.command<number>("ASYNC", 5);
 
-    expect(descriptor.status).toBe(ECommandStatus.PENDING);
+    expect(descriptor.status).toBe(CommandStatus.PENDING);
 
     const result: number = await descriptor.task;
 
     expect(result).toBe(10);
-    expect(descriptor.status).toBe(ECommandStatus.SETTLED);
+    expect(descriptor.status).toBe(CommandStatus.SETTLED);
   });
 
   it("should set error status on handler rejection", async () => {
@@ -86,13 +86,13 @@ describe("CommandBus", () => {
       throw error;
     });
 
-    const descriptor: ICommandDescriptor = bus.command("FAIL");
+    const descriptor: CommandDescriptor = bus.command("FAIL");
 
-    expect(descriptor.status).toBe(ECommandStatus.PENDING);
+    expect(descriptor.status).toBe(CommandStatus.PENDING);
 
     await expect(descriptor.task).rejects.toThrow("command failed");
 
-    expect(descriptor.status).toBe(ECommandStatus.ERROR);
+    expect(descriptor.status).toBe(CommandStatus.ERROR);
   });
 
   it("should set error status on async handler rejection", async () => {
@@ -103,11 +103,11 @@ describe("CommandBus", () => {
       throw error;
     });
 
-    const descriptor: ICommandDescriptor = bus.command("FAIL_ASYNC");
+    const descriptor: CommandDescriptor = bus.command("FAIL_ASYNC");
 
     await expect(descriptor.task).rejects.toThrow("async failed");
 
-    expect(descriptor.status).toBe(ECommandStatus.ERROR);
+    expect(descriptor.status).toBe(CommandStatus.ERROR);
   });
 
   it("should check if handler exists", () => {
@@ -134,7 +134,7 @@ describe("CommandBus", () => {
 
   it("should handle unregistering when stack is already empty", () => {
     const bus: CommandBus = new CommandBus();
-    const unregister: TCommandUnregister = bus.register("TYPE", () => null);
+    const unregister: CommandUnregister = bus.register("TYPE", () => null);
 
     unregister();
     expect(() => unregister()).not.toThrow();
@@ -146,7 +146,7 @@ describe("CommandBus", () => {
 
     bus.register(type, () => "symbol-result");
 
-    const descriptor: ICommandDescriptor<string> = bus.command(type);
+    const descriptor: CommandDescriptor<string> = bus.command(type);
 
     expect(await descriptor.task).toBe("symbol-result");
   });

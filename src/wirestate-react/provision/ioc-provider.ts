@@ -2,12 +2,12 @@ import { Container, applySharedSeed, createIocContainer, WirestateError } from "
 import { createElement, PropsWithChildren, useEffect, useMemo, useState } from "react";
 
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "@/wirestate-react/error/error-code";
-import { type IIocContext, IocContext } from "@/wirestate-react/provision/ioc-context";
+import { type IocContext, IocReactContext } from "@/wirestate-react/provision/ioc-context";
 
 /**
  * Props for {@link IocProvider}.
  */
-export interface IIocProviderProps extends PropsWithChildren<unknown> {
+export interface IocProviderProps extends PropsWithChildren<unknown> {
   /**
    * External container instance. If omitted, a new container is created.
    */
@@ -27,7 +27,7 @@ export interface IIocProviderProps extends PropsWithChildren<unknown> {
  * @param props.children - components to wrap
  * @returns provider element
  */
-export function IocProvider({ container: externalContainer, seed, children }: IIocProviderProps) {
+export function IocProvider({ container: externalContainer, seed, children }: IocProviderProps) {
   // Incremented on binding changes to invalidate descendant caches (e.g., useInjection).
   const [revision, setRevision] = useState<number>(1);
   // Lazy initialize owned container if no external container is provided.
@@ -43,7 +43,7 @@ export function IocProvider({ container: externalContainer, seed, children }: II
   }
 
   // Context value is stable unless the container or revision changes.
-  const value: IIocContext = useMemo<IIocContext>(() => ({ container, revision, setRevision }), [container, revision]);
+  const value: IocContext = useMemo<IocContext>(() => ({ container, revision, setRevision }), [container, revision]);
 
   useEffect(() => {
     if (seed) {
@@ -51,5 +51,5 @@ export function IocProvider({ container: externalContainer, seed, children }: II
     }
   }, [container]);
 
-  return createElement(IocContext.Provider, { value }, children);
+  return createElement(IocReactContext.Provider, { value }, children);
 }

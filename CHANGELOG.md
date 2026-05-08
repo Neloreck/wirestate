@@ -1,3 +1,8 @@
+## 0.6.1
+
+- React related types moved to react lib
+- Avoid prefixed I/T types
+
 ## 0.6.0
 
 - Split wirestate as separate @wirestate packages

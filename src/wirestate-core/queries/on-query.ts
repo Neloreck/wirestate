@@ -3,7 +3,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { QUERY_HANDLER_METADATA } from "@/wirestate-core/registry";
 import type { Maybe } from "@/wirestate-core/types/general";
-import type { IQueryHandlerMetadata, TQueryType } from "@/wirestate-core/types/queries";
+import type { QueryHandlerMetadata, QueryType } from "@/wirestate-core/types/queries";
 
 /**
  * Decorator for service methods that respond to a query.
@@ -11,7 +11,7 @@ import type { IQueryHandlerMetadata, TQueryType } from "@/wirestate-core/types/q
  * @param type - query type identifier
  * @returns decorator function
  */
-export function OnQuery(type: TQueryType): MethodDecorator {
+export function OnQuery(type: QueryType): MethodDecorator {
   return (target, propertyKey) => {
     dbg.info(prefix(__filename), "Attaching OnQuery metadata:", {
       name: target.constructor.name,
@@ -23,7 +23,7 @@ export function OnQuery(type: TQueryType): MethodDecorator {
 
     const constructor = target.constructor;
 
-    let list: Maybe<Array<IQueryHandlerMetadata>> = QUERY_HANDLER_METADATA.get(constructor);
+    let list: Maybe<Array<QueryHandlerMetadata>> = QUERY_HANDLER_METADATA.get(constructor);
 
     if (!list) {
       list = [];

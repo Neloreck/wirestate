@@ -2,12 +2,12 @@ import { Container } from "inversify";
 
 import { ScopeBindingType } from "@/wirestate-core/alias";
 import { bindConstant } from "@/wirestate-core/bind/bind-constant";
-import { IInjectableDescriptor } from "@/wirestate-core/types/privision";
+import { InjectableDescriptor } from "@/wirestate-core/types/privision";
 
 describe("bindConstant", () => {
   it("should bind a constant value to the container", () => {
     const container: Container = new Container();
-    const entry: IInjectableDescriptor = { id: "my-token", value: "my-value" };
+    const entry: InjectableDescriptor = { id: "my-token", value: "my-value" };
 
     bindConstant(container, entry);
 

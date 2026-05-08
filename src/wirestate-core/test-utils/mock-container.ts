@@ -5,16 +5,16 @@ import { createIocContainer } from "@/wirestate-core/container/create-ioc-contai
 import { ERROR_CODE_INVALID_ARGUMENTS } from "@/wirestate-core/error/error-code";
 import { WirestateError } from "@/wirestate-core/error/wirestate-error";
 import { mockBindEntry } from "@/wirestate-core/test-utils/mock-bind-entry";
-import type { IInjectableDescriptor } from "@/wirestate-core/types/privision";
+import type { InjectableDescriptor } from "@/wirestate-core/types/privision";
 
 /**
  * Options for {@link mockContainer}.
  */
-export interface IMockContainerOptions {
+export interface MockContainerOptions {
   /**
    * List of services or injectable descriptors to bind to the container.
    */
-  entries?: Array<Newable<object> | IInjectableDescriptor>;
+  entries?: Array<Newable<object> | InjectableDescriptor>;
   /**
    * List of injection identifiers to immediately activate after binding.
    * All identifiers must correspond to entries provided in the `services` list.
@@ -37,7 +37,7 @@ export interface IMockContainerOptions {
  *
  * @throws {WirestateError} if an identifier in `activate` is not found in `services`
  */
-export function mockContainer(options: IMockContainerOptions = {}): Container {
+export function mockContainer(options: MockContainerOptions = {}): Container {
   const { activate = [], entries = [], skipLifecycle } = options;
 
   if (activate.length) {

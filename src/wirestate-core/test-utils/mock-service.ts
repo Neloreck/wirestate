@@ -6,7 +6,7 @@ import { mockContainer } from "@/wirestate-core/test-utils/mock-container";
 /**
  * Options for {@link mockService}.
  */
-export interface IMockServiceOptions {
+export interface MockServiceOptions {
   /**
    * If true, skips the lifecycle hooks (e.g., OnActivated) during service binding and instantiation.
    */
@@ -24,7 +24,7 @@ export interface IMockServiceOptions {
 export function mockService<T extends object>(
   service: Newable<T>,
   container = mockContainer(),
-  options: IMockServiceOptions = {}
+  options: MockServiceOptions = {}
 ): T {
   mockBindService(container, service, {
     skipLifecycle: options.skipLifecycle,

@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { COMMAND_HANDLER_METADATA } from "@/wirestate-core/registry";
-import type { ICommandHandlerMetadata } from "@/wirestate-core/types/commands";
+import type { CommandHandlerMetadata } from "@/wirestate-core/types/commands";
 import type { Maybe } from "@/wirestate-core/types/general";
 
 /**
@@ -13,7 +13,7 @@ import type { Maybe } from "@/wirestate-core/types/general";
  * @returns metadata list
  * @internal
  */
-export function getCommandHandlerMetadata(instance: object): ReadonlyArray<ICommandHandlerMetadata> {
+export function getCommandHandlerMetadata(instance: object): ReadonlyArray<CommandHandlerMetadata> {
   dbg.info(prefix(__filename), "Resolving instance command metadata:", {
     name: instance.constructor.name,
     instance,
@@ -21,11 +21,11 @@ export function getCommandHandlerMetadata(instance: object): ReadonlyArray<IComm
 
   let constructor: unknown = instance.constructor;
 
-  const chain: Array<Array<ICommandHandlerMetadata>> = [];
+  const chain: Array<Array<CommandHandlerMetadata>> = [];
 
   // Traverse prototype chain up to Object/Function
   while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
-    const own: Maybe<Array<ICommandHandlerMetadata>> = COMMAND_HANDLER_METADATA.get(constructor as object);
+    const own: Maybe<Array<CommandHandlerMetadata>> = COMMAND_HANDLER_METADATA.get(constructor as object);
 
     if (own && own.length > 0) {
       chain.push(own);

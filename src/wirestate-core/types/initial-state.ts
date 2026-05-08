@@ -3,19 +3,19 @@ import { Newable } from "inversify";
 /**
  * Lookup key for service seeds.
  */
-export type TSeedKey = Newable | string | symbol;
+export type SeedKey = Newable | string | symbol;
 
 /**
  * Key-value map for targeted seeds.
  */
-export type TSeedsMap<T = unknown> = Map<TSeedKey, T>;
+export type SeedsMap<T = unknown> = Map<SeedKey, T>;
 
 /**
  * Service-to-seed mapping entry.
  */
-export type TSeedEntry<T = unknown> = readonly [TSeedKey, T];
+export type SeedEntry<T = unknown> = readonly [SeedKey, T];
 
 /**
  * Collection of seed entries.
  */
-export type TSeedEntries = ReadonlyArray<TSeedEntry>;
+export type SeedEntries = ReadonlyArray<SeedEntry>;

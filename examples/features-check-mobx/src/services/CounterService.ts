@@ -1,4 +1,3 @@
-import { EGlobalEvent } from "@/constants/events";
 import {
   SEED,
   Inject,
@@ -8,13 +7,15 @@ import {
   OnActivated,
   OnDeactivation,
   WireScope,
-} from "@/libs/wirestate";
+} from "@wirestate/core";
 import {
   Action,
   Computed,
   Observable,
   makeObservable,
-} from "@/libs/wirestate/mobx";
+} from "@wirestate/react-mobx";
+
+import { EGlobalEvent } from "@/constants/events";
 import {
   ECounterServiceQuery,
   type ICounterSnapshot,

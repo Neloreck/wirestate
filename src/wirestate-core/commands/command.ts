@@ -4,7 +4,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { CommandBus } from "@/wirestate-core/commands/command-bus";
-import type { ICommandDescriptor, TCommandType } from "@/wirestate-core/types/commands";
+import type { CommandDescriptor, CommandType } from "@/wirestate-core/types/commands";
 
 /**
  * Dispatches a command on the provided container.
@@ -14,11 +14,11 @@ import type { ICommandDescriptor, TCommandType } from "@/wirestate-core/types/co
  * @param data - command data
  * @returns command descriptor
  */
-export function command<R = unknown, D = unknown, T extends TCommandType = TCommandType>(
+export function command<R = unknown, D = unknown, T extends CommandType = CommandType>(
   container: Container,
   type: T,
   data?: D
-): ICommandDescriptor<R> {
+): CommandDescriptor<R> {
   dbg.info(prefix(__filename), "Command:", type, data, container);
 
   return container.get(CommandBus).command<R, D>(type, data);

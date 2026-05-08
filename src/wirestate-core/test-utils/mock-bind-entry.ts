@@ -1,12 +1,12 @@
 import { Container, type Newable } from "inversify";
 
 import { bindEntry } from "@/wirestate-core/bind/bind-entry";
-import type { IInjectableDescriptor } from "@/wirestate-core/types/privision";
+import type { InjectableDescriptor } from "@/wirestate-core/types/privision";
 
 /**
  * Options for {@link mockBindEntry}.
  */
-export interface IMockBindEntryOptions {
+export interface MockBindEntryOptions {
   /**
    * Whether to skip the activation lifecycle for the entry.
    * If true, `OnActivated` and `OnDeactivation` hooks will not be triggered.
@@ -27,8 +27,8 @@ export interface IMockBindEntryOptions {
  */
 export function mockBindEntry<T extends object>(
   container: Container,
-  entry: Newable<T> | IInjectableDescriptor,
-  options: IMockBindEntryOptions = {}
+  entry: Newable<T> | InjectableDescriptor,
+  options: MockBindEntryOptions = {}
 ): void {
   const { skipLifecycle } = options;
 

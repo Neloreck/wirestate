@@ -1,14 +1,14 @@
 import { ServiceIdentifier, bindingTypeValues, bindingScopeValues } from "inversify";
 
-export type TBindingType = (typeof bindingTypeValues)[keyof typeof bindingTypeValues];
+export type BindingType = (typeof bindingTypeValues)[keyof typeof bindingTypeValues];
 
-export type TScopeBindingType = (typeof bindingScopeValues)[keyof typeof bindingScopeValues];
+export type ScopeBindingType = (typeof bindingScopeValues)[keyof typeof bindingScopeValues];
 
-export interface IInjectableDescriptor<T = unknown, V = unknown> {
+export interface InjectableDescriptor<T = unknown, V = unknown> {
   id: ServiceIdentifier<T>;
   value?: V;
-  bindingType?: TBindingType;
-  scopeBindingType?: TScopeBindingType;
+  bindingType?: BindingType;
+  scopeBindingType?: ScopeBindingType;
   /**
    * Factory function for dynamic value bindings.
    * Used when type is set to DynamicValue.

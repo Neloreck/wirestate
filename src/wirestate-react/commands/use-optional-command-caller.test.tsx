@@ -1,8 +1,9 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, createIocContainer, CommandBus, OptionalCommandCaller } from "@wirestate/core";
+import { Container, createIocContainer, CommandBus } from "@wirestate/core";
 
 import { useOptionalCommandCaller } from "@/wirestate-react/commands/use-optional-command-caller";
 import { withIocProvider } from "@/wirestate-react/test-utils/with-ioc-provider";
+import { OptionalCommandCaller } from "@/wirestate-react/types/commands";
 
 describe("useOptionalCommandCaller", () => {
   afterEach(() => {
