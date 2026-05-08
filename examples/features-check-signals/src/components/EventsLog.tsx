@@ -1,7 +1,7 @@
 import "./EventsLog.css";
 
-import { LoggerService } from "@/core/services/logging";
 import { useInjection } from "@/libs/wirestate";
+import { LoggerService } from "@/services/LoggerService";
 
 export function EventsLog() {
   const loggerService: LoggerService = useInjection(LoggerService);

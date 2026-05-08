@@ -1,14 +1,11 @@
 import "reflect-metadata";
-import "@/application/styles/index.css";
+import "@/styles/index.css";
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { Application } from "@/application/Application";
-import { GLOBAL_CONFIG, GLOBAL_DYNAMIC_CONFIG } from "@/core/id";
-import { CounterService, type ICounterSeed } from "@/core/services/counter";
-import { LoggerService } from "@/core/services/logging";
-import { ThemeService } from "@/core/services/theme";
+import { Application } from "@/Application";
+import { GLOBAL_CONFIG, GLOBAL_DYNAMIC_CONFIG } from "@/constants/id";
 import {
   createInjectablesProvider,
   IocProvider,
@@ -17,6 +14,9 @@ import {
   type InjectablesProvider,
   BindingType,
 } from "@/libs/wirestate";
+import { CounterService, type ICounterSeed } from "@/services/CounterService";
+import { LoggerService } from "@/services/LoggerService";
+import { ThemeService } from "@/services/ThemeService";
 
 // [*] Pass IOC check - separation of container and services provision.
 const ServicesProvider: InjectablesProvider = createInjectablesProvider(

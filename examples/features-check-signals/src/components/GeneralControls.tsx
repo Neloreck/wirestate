@@ -2,10 +2,8 @@ import "./GeneralControls.css";
 
 import { useCallback } from "react";
 
-import { EGlobalCommand } from "@/core/commands";
-import { EGlobalEvent } from "@/core/events";
-import { CounterService } from "@/core/services/counter";
-import { ThemeService } from "@/core/services/theme";
+import { EGlobalCommand } from "@/constants/commands";
+import { EGlobalEvent } from "@/constants/events";
 import {
   type CommandCaller,
   type EventEmitter,
@@ -13,6 +11,8 @@ import {
   useInjection,
   useEventEmitter,
 } from "@/libs/wirestate";
+import { CounterService } from "@/services/CounterService";
+import { ThemeService } from "@/services/ThemeService";
 
 export function GeneralControls() {
   const counterService: CounterService = useInjection(CounterService);

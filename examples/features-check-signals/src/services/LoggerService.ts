@@ -1,12 +1,11 @@
-import { EGlobalCommand } from "@/core/commands";
-import { EGlobalEvent } from "@/core/events";
+import { EGlobalCommand } from "@/constants/commands";
+import { EGlobalEvent } from "@/constants/events";
 import {
   GLOBAL_CONFIG,
   GLOBAL_DYNAMIC_CONFIG,
   GLOBAL_NOT_EXISTING_CONFIG,
-} from "@/core/id";
-import { EGlobalQuery } from "@/core/queries";
-import { ThemeService } from "@/core/services/theme";
+} from "@/constants/id";
+import { EGlobalQuery } from "@/constants/queries";
 import {
   Inject,
   Injectable,
@@ -20,6 +19,7 @@ import {
   WireScope,
 } from "@/libs/wirestate";
 import { signal, Signal } from "@/libs/wirestate/signals";
+import { ThemeService } from "@/services/ThemeService";
 
 export interface ILogEntry {
   readonly id: number;
