@@ -5,7 +5,7 @@ import { createIocContainer, Container } from "@wirestate/core";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ContainerContext } from "../context/ioc-context";
+import { ContainerContext, IocContext } from "../context/ioc-context";
 import { Maybe } from "../types/general";
 
 export class ContainerProviderController implements ReactiveController {
@@ -13,6 +13,10 @@ export class ContainerProviderController implements ReactiveController {
   protected revision: number = 1;
 
   public container: Container;
+
+  public get value(): IocContext {
+    return this.provider.value;
+  }
 
   public constructor(
     private readonly host: ReactiveControllerHost & HTMLElement,

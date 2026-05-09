@@ -5,7 +5,6 @@ export {
   svg,
   SignalWatcher,
   computed,
-  Computed,
   Signal,
   watch,
   WatchDirective,
@@ -14,3 +13,5 @@ export {
 } from "@lit-labs/signals";
 
 export type State<T> = Signal.State<T>;
+
+export type Computed<T> = Signal.Computed<T>;

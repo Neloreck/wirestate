@@ -2,7 +2,7 @@
  * 'https://github.com/Neloreck/wirestate'
  */
 
-export { injection, InjectionDecorator } from "./consumption/injection";
+export { injection, InjectionDecorator, InjectionOptions } from "./consumption/injection";
 export { useInjection, UseInjectionOptions, UseInjectionValue } from "./consumption/use-injection";
 
 export { ContainerContext } from "./context/ioc-context";
