@@ -1,15 +1,21 @@
 import { ContextProvider } from "@lit/context";
 import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-element";
-import { createIocContainer, Container } from "@wirestate/core";
+import { createIocContainer, Container, applySharedSeed } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { ContainerContext, IocContext } from "../context/ioc-context";
-import { Maybe } from "../types/general";
+import { AnyObject } from "../types/general";
 
-export class ContainerProviderController implements ReactiveController {
-  protected provider: ContextProvider<typeof ContainerContext>;
+export interface IocProviderControllerOptions {
+  container?: Container;
+  seed?: AnyObject;
+}
+
+export class IocProviderController implements ReactiveController {
+  protected readonly provider: ContextProvider<typeof ContainerContext>;
+  protected readonly seed?: AnyObject;
   protected revision: number = 1;
 
   public container: Container;
@@ -20,11 +26,12 @@ export class ContainerProviderController implements ReactiveController {
 
   public constructor(
     private readonly host: ReactiveControllerHost & HTMLElement,
-    container?: Maybe<Container>
+    { container, seed }: IocProviderControllerOptions = {}
   ) {
     this.host.addController(this);
 
     this.container = container ?? createIocContainer();
+    this.seed = seed;
 
     dbg.info(prefix(__filename), "Constructing:", {
       host: this.host,
@@ -45,6 +52,15 @@ export class ContainerProviderController implements ReactiveController {
 
   public hostConnected(): void {
     dbg.info(prefix(__filename), "Host connected");
+
+    if (this.seed) {
+      dbg.info(prefix(__filename), "Apply shared seed:", {
+        container: this.container,
+        seed: this.seed,
+      });
+
+      applySharedSeed(this.container, this.seed);
+    }
   }
 
   public hostDisconnected(): void {

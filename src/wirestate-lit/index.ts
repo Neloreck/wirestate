@@ -7,6 +7,9 @@ export { useInjection, UseInjectionOptions, UseInjectionValue } from "./consumpt
 
 export { ContainerContext } from "./context/ioc-context";
 
-export { ContainerProviderController } from "./provision/container-provider-controller";
-export { ServicesProviderController } from "./provision/services-provider-controller";
-export { useContainerProvision } from "./provision/use-container-provision";
+export { IocProviderController, IocProviderControllerOptions } from "./provision/ioc-provider-controller";
+export {
+  ServicesProviderController,
+  ServicesProviderControllerOptions,
+} from "./provision/services-provider-controller";
+export { useIocProvision, UseIocProvisionOptions } from "./provision/use-ioc-provision";

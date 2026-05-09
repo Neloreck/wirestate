@@ -1,9 +1,9 @@
 import { Container, applySharedSeed, createIocContainer, WirestateError } from "@wirestate/core";
 import { createElement, PropsWithChildren, useEffect, useMemo, useState } from "react";
 
+import { type IocContext, IocReactContext } from "../context/ioc-context";
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "../error/error-code";
-
-import { type IocContext, IocReactContext } from "./ioc-context";
+import { AnyObject, Optional } from "../types/general";
 
 /**
  * Props for {@link IocProvider}.
@@ -16,7 +16,7 @@ export interface IocProviderProps extends PropsWithChildren<unknown> {
   /**
    * Shared seed for the container.
    */
-  readonly seed?: Record<string, unknown>;
+  readonly seed?: AnyObject;
 }
 
 /**
@@ -32,7 +32,7 @@ export function IocProvider({ container: externalContainer, seed, children }: Io
   // Incremented on binding changes to invalidate descendant caches (e.g., useInjection).
   const [revision, setRevision] = useState<number>(1);
   // Lazy initialize owned container if no external container is provided.
-  const [ownedContainer] = useState<Container | null>(() => (externalContainer ? null : createIocContainer()));
+  const [ownedContainer] = useState<Optional<Container>>(() => (externalContainer ? null : createIocContainer()));
 
   const container = externalContainer ?? ownedContainer;
 
