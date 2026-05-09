@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/lit-signals",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "Signals re-exports for wirestate lit elements",
   "sideEffects": false,
   "author": "Syrotenko Igor",

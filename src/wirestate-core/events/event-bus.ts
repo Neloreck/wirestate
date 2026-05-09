@@ -1,6 +1,3 @@
-import type { Maybe } from "@wirestate/core/types/general";
-import type { QueryHandler, QueryType } from "@wirestate/core/types/queries";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
