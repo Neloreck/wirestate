@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-export type AnyObject = Record<string, any>;
+export type AnyObject = Record<string | symbol, any>;
 
 export type Optional<T> = T | null;
 
