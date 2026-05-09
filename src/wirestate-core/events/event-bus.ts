@@ -1,3 +1,6 @@
+import type { Maybe } from "@wirestate/core/types/general";
+import type { QueryHandler, QueryType } from "@wirestate/core/types/queries";
+
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
@@ -43,14 +46,31 @@ export class EventBus {
 
     this.handlers.add(handler);
 
-    return () => {
-      dbg.info(prefix(__filename), "Removing event subscription:", {
-        handler,
-        bus: this,
-      });
+    return () => this.unsubscribe(handler);
+  }
 
-      this.handlers.delete(handler);
-    };
+  /**
+   * Removes a specific subscriber by handler reference.
+   * No-ops silently if the handler was not subscribed.
+   *
+   * @param handler - event handler to remove
+   */
+  public unsubscribe(handler: EventHandler): void {
+    dbg.info(prefix(__filename), "Removing event subscription:", {
+      handler,
+      bus: this,
+    });
+
+    this.handlers.delete(handler);
+  }
+
+  /**
+   * Checks if any handler is registered.
+   *
+   * @returns true if any handler exists
+   */
+  public has(): boolean {
+    return this.handlers.size > 0;
   }
 
   /**

@@ -9,11 +9,11 @@ import { WirestateError } from "../error/wirestate-error";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
-import type { CommandDescriptor, CommandType } from "../types/commands";
-import type { EventType } from "../types/events";
+import type { CommandDescriptor, CommandHandler, CommandUnregister, CommandType } from "../types/commands";
+import type { EventHandler, EventType, EventUnsubscriber } from "../types/events";
 import type { Optional, AnyObject, MaybePromise } from "../types/general";
 import type { SeedKey, SeedsMap } from "../types/initial-state";
-import type { QueryType } from "../types/queries";
+import type { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 
 /**
  * Injectable scope providing access to wirestate buses and seeds.
@@ -123,6 +123,35 @@ export class WireScope {
   }
 
   /**
+   * Subscribes a handler to all events on the event bus.
+   * Available only for activated containers.
+   *
+   * @param handler - event handler function
+   * @returns unsubscribe function
+   *
+   * @throws WirestateError if scope is not activated
+   */
+  public subscribeToEvent(handler: EventHandler): EventUnsubscriber {
+    dbg.info(prefix(__filename), "Subscribe event:", { handler });
+
+    return this.getContainer().get(EventBus).subscribe(handler);
+  }
+
+  /**
+   * Removes a specific event subscription by handler reference.
+   * Available only for activated containers.
+   *
+   * @param handler - event handler to remove
+   *
+   * @throws WirestateError if scope is not activated
+   */
+  public unsubscribeFromEvent(handler: EventHandler): void {
+    dbg.info(prefix(__filename), "Unsubscribe event:", { handler });
+
+    this.getContainer().get(EventBus).unsubscribe(handler);
+  }
+
+  /**
    * Dispatches a query and returns the result.
    * Available only for activated containers.
    *
@@ -153,6 +182,37 @@ export class WireScope {
     dbg.info(prefix(__filename), "Query optional data:", { type, data });
 
     return this.getContainer().get(QueryBus).queryOptional<R, D>(type, data);
+  }
+
+  /**
+   * Registers a query handler on the query bus.
+   * Available only for activated containers.
+   *
+   * @param type - query type
+   * @param handler - handler function
+   * @returns unregister function
+   *
+   * @throws WirestateError if scope is not activated
+   */
+  public registerQueryHandler<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): QueryUnregister {
+    dbg.info(prefix(__filename), "Register query handler:", { type });
+
+    return this.getContainer().get(QueryBus).register(type, handler);
+  }
+
+  /**
+   * Unregisters a specific query handler by type and reference.
+   * Available only for activated containers.
+   *
+   * @param type - query type
+   * @param handler - handler to remove
+   *
+   * @throws WirestateError if scope is not activated
+   */
+  public unregisterQueryHandler<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): void {
+    dbg.info(prefix(__filename), "Unregister query:", { type });
+
+    this.getContainer().get(QueryBus).unregister(type, handler);
   }
 
   /**
@@ -189,6 +249,40 @@ export class WireScope {
     dbg.info(prefix(__filename), "Execute command:", { type, data });
 
     return this.getContainer().get(CommandBus).commandOptional<R, D>(type, data);
+  }
+
+  /**
+   * Registers a command handler on the command bus.
+   * Available only for activated containers.
+   *
+   * @param type - command type
+   * @param handler - handler function
+   * @returns unregister function
+   *
+   * @throws WirestateError if scope is not activated
+   */
+  public registerCommandHandler<D = unknown, R = unknown>(
+    type: CommandType,
+    handler: CommandHandler<D, R>
+  ): CommandUnregister {
+    dbg.info(prefix(__filename), "Register command handler:", { type });
+
+    return this.getContainer().get(CommandBus).register(type, handler);
+  }
+
+  /**
+   * Unregisters a specific command handler by type and reference.
+   * Available only for activated containers.
+   *
+   * @param type - command type
+   * @param handler - handler to remove
+   *
+   * @throws WirestateError if scope is not activated
+   */
+  public unregisterCommandHandler<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): void {
+    dbg.info(prefix(__filename), "Unregister command:", { type });
+
+    this.getContainer().get(CommandBus).unregister(type, handler);
   }
 
   public getSeed<T>(): T;

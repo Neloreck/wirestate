@@ -63,6 +63,41 @@ describe("EventBus", () => {
     errorSpy.mockRestore();
   });
 
+  it("should unsubscribe handler by reference", () => {
+    const bus: EventBus = new EventBus();
+    const handler = jest.fn();
+
+    bus.subscribe(handler);
+    bus.unsubscribe(handler);
+
+    bus.emit({ type: "TEST" });
+    bus.emit({ type: "TEST" });
+
+    expect(handler).not.toHaveBeenCalled();
+  });
+
+  it("should not throw when unsubscribing a handler that was not subscribed", () => {
+    const bus: EventBus = new EventBus();
+    const handler = jest.fn();
+
+    expect(() => bus.unsubscribe(handler)).not.toThrow();
+  });
+
+  it("should only remove the specified handler when multiple are subscribed", () => {
+    const bus: EventBus = new EventBus();
+    const handlerA = jest.fn();
+    const handlerB = jest.fn();
+
+    bus.subscribe(handlerA);
+    bus.subscribe(handlerB);
+    bus.unsubscribe(handlerA);
+
+    bus.emit({ type: "TEST" });
+
+    expect(handlerA).not.toHaveBeenCalled();
+    expect(handlerB).toHaveBeenCalledTimes(1);
+  });
+
   it("should clear all handlers", () => {
     const bus: EventBus = new EventBus();
     const firstHandler = jest.fn();

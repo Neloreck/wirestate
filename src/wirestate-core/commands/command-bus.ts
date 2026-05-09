@@ -49,30 +49,39 @@ export class CommandBus {
 
     stack.push(handler as CommandHandler);
 
-    return () => {
-      dbg.info(prefix(__filename), "Unregistering command handler:", {
-        type,
-        handler,
-        bus: this,
-      });
+    return () => this.unregister(type, handler as CommandHandler);
+  }
 
-      const current: Maybe<Array<CommandHandler>> = this.handlers.get(type);
+  /**
+   * Unregisters a specific command handler by type and reference.
+   * No-ops silently if the handler was not registered for that type.
+   *
+   * @param type - command type
+   * @param handler - handler to remove
+   */
+  public unregister<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): void {
+    dbg.info(prefix(__filename), "Unregistering command handler:", {
+      type,
+      handler,
+      bus: this,
+    });
 
-      if (!current) {
-        return;
-      }
+    const current: Maybe<Array<CommandHandler>> = this.handlers.get(type);
 
-      const index: number = current.indexOf(handler as CommandHandler);
+    if (!current) {
+      return;
+    }
 
-      if (index >= 0) {
-        current.splice(index, 1);
-      }
+    const index: number = current.indexOf(handler as CommandHandler);
 
-      // Clean empty stacks.
-      if (current.length === 0) {
-        this.handlers.delete(type);
-      }
-    };
+    if (index >= 0) {
+      current.splice(index, 1);
+    }
+
+    // Clean empty stacks.
+    if (current.length === 0) {
+      this.handlers.delete(type);
+    }
   }
 
   /**

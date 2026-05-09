@@ -166,4 +166,63 @@ describe("QueryBus", () => {
       expect(bus.queryOptional("TYPE")).toBeNull();
     });
   });
+
+  describe("unregister", () => {
+    it("should unregister a specific handler by type and reference", () => {
+      const bus: QueryBus = new QueryBus();
+      const handler = jest.fn().mockReturnValue("value");
+
+      bus.register("TYPE", handler);
+      bus.unregister("TYPE", handler);
+
+      expect(bus.has("TYPE")).toBe(false);
+      expect(() => bus.query("TYPE")).toThrow("No query handler registered in container for type: 'TYPE'.");
+    });
+
+    it("should not throw when unregistering a handler not registered for the type", () => {
+      const bus: QueryBus = new QueryBus();
+      const handler = jest.fn();
+
+      expect(() => bus.unregister("MISSING", handler)).not.toThrow();
+    });
+
+    it("should not affect other handlers for the same type", () => {
+      const bus: QueryBus = new QueryBus();
+      const handlerA = jest.fn().mockReturnValue("a");
+      const handlerB = jest.fn().mockReturnValue("b");
+
+      bus.register("TYPE", handlerA);
+      bus.register("TYPE", handlerB);
+
+      expect(bus.query("TYPE")).toBe("b");
+
+      bus.unregister("TYPE", handlerB);
+
+      expect(bus.query("TYPE")).toBe("a");
+    });
+
+    it("should not affect handlers for other types", () => {
+      const bus: QueryBus = new QueryBus();
+      const handlerA = jest.fn().mockReturnValue("a");
+      const handlerB = jest.fn().mockReturnValue("b");
+
+      bus.register("TYPE_A", handlerA);
+      bus.register("TYPE_B", handlerB);
+      bus.unregister("TYPE_A", handlerA);
+
+      expect(bus.has("TYPE_A")).toBe(false);
+      expect(bus.query("TYPE_B")).toBe("b");
+    });
+
+    it("should not throw when unregistering a handler not present in the stack", () => {
+      const bus: QueryBus = new QueryBus();
+      const registered = jest.fn(() => "value");
+      const unregistered = jest.fn();
+
+      bus.register("TYPE", registered);
+
+      expect(() => bus.unregister("TYPE", unregistered)).not.toThrow();
+      expect(bus.query("TYPE")).toBe("value");
+    });
+  });
 });

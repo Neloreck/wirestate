@@ -194,10 +194,19 @@ export class PollingService {
 |---|---|
 | `getContainer()` | Access the raw IoC container |
 | `resolve(token)` | Resolve a service or value by token |
-| `getSeed(token)` | Get the per-service seed for a given token |
-| `emitEvent(type, payload?)` | Emit an event |
-| `command(type)` | Get a caller for a command |
-| `query(type)` | Get a caller for a query |
+| `resolveOptional(token)` | Resolve a service or value, returns `null` if not bound |
+| `getSeed(token?)` | Get the per-service or shared seed |
+| `emitEvent(type, payload?, from?)` | Emit an event |
+| `subscribeToEvent(handler)` | Subscribe a handler to all events; returns unsubscribe function |
+| `unsubscribeFromEvent(handler)` | Remove a specific event subscription by handler reference |
+| `queryData(type, data?)` | Dispatch a query and return the result |
+| `queryOptionalData(type, data?)` | Dispatch a query; returns `null` if no handler is registered |
+| `registerQueryHandler(type, handler)` | Register a query handler; returns unregister function |
+| `unregisterQueryHandler(type, handler)` | Remove a specific query handler by type and reference |
+| `executeCommand(type, data?)` | Dispatch a command and return a descriptor |
+| `executeOptionalCommand(type, data?)` | Dispatch a command; returns `null` if no handler is registered |
+| `registerCommandHandler(type, handler)` | Register a command handler; returns unregister function |
+| `unregisterCommandHandler(type, handler)` | Remove a specific command handler by type and reference |
 
 ## Test utilities
 

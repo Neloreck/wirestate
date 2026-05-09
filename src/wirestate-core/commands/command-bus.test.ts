@@ -181,4 +181,60 @@ describe("CommandBus", () => {
       expect(await descriptor!.task).toBe("async-value");
     });
   });
+
+  describe("unregister", () => {
+    it("should unregister a specific handler by type and reference", () => {
+      const bus: CommandBus = new CommandBus();
+      const handler = jest.fn(() => "value");
+
+      bus.register("TYPE", handler);
+      bus.unregister("TYPE", handler);
+
+      expect(bus.has("TYPE")).toBe(false);
+      expect(() => bus.command("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
+    });
+
+    it("should not throw when unregistering a handler not registered for the type", () => {
+      const bus: CommandBus = new CommandBus();
+      const handler = jest.fn();
+
+      expect(() => bus.unregister("MISSING", handler)).not.toThrow();
+    });
+
+    it("should not affect other handlers for the same type", async () => {
+      const bus: CommandBus = new CommandBus();
+      const handlerA = jest.fn(() => "a");
+      const handlerB = jest.fn(() => "b");
+
+      bus.register("TYPE", handlerA);
+      bus.register("TYPE", handlerB);
+      bus.unregister("TYPE", handlerB);
+
+      expect(await bus.command("TYPE").task).toBe("a");
+    });
+
+    it("should not affect handlers for other types", async () => {
+      const bus: CommandBus = new CommandBus();
+      const handlerA = jest.fn(() => "a");
+      const handlerB = jest.fn(() => "b");
+
+      bus.register("TYPE_A", handlerA);
+      bus.register("TYPE_B", handlerB);
+      bus.unregister("TYPE_A", handlerA);
+
+      expect(bus.has("TYPE_A")).toBe(false);
+      expect(await bus.command("TYPE_B").task).toBe("b");
+    });
+
+    it("should not throw when unregistering a handler not present in the stack", async () => {
+      const bus: CommandBus = new CommandBus();
+      const registered = jest.fn(() => "value");
+      const unregistered = jest.fn();
+
+      bus.register("TYPE", registered);
+
+      expect(() => bus.unregister("TYPE", unregistered)).not.toThrow();
+      expect(await bus.command("TYPE").task).toBe("value");
+    });
+  });
 });

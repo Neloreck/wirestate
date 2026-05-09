@@ -40,30 +40,39 @@ export class QueryBus {
 
     stack.push(handler as QueryHandler);
 
-    return () => {
-      dbg.info(prefix(__filename), "Unregistering query handler:", {
-        type,
-        handler,
-        bus: this,
-      });
+    return () => this.unregister(type, handler as QueryHandler);
+  }
 
-      const current: Maybe<Array<QueryHandler>> = this.handlers.get(type);
+  /**
+   * Unregisters a specific query handler by type and reference.
+   * No-ops silently if the handler was not registered for that type.
+   *
+   * @param type - query type
+   * @param handler - handler to remove
+   */
+  public unregister<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): void {
+    dbg.info(prefix(__filename), "Unregistering query handler:", {
+      type,
+      handler,
+      bus: this,
+    });
 
-      if (!current) {
-        return;
-      }
+    const current: Maybe<Array<QueryHandler>> = this.handlers.get(type);
 
-      const index: number = current.indexOf(handler as QueryHandler);
+    if (!current) {
+      return;
+    }
 
-      if (index >= 0) {
-        current.splice(index, 1);
-      }
+    const index: number = current.indexOf(handler as QueryHandler);
 
-      // Clean empty stacks.
-      if (current.length === 0) {
-        this.handlers.delete(type);
-      }
-    };
+    if (index >= 0) {
+      current.splice(index, 1);
+    }
+
+    // Clean empty stacks.
+    if (current.length === 0) {
+      this.handlers.delete(type);
+    }
   }
 
   /**

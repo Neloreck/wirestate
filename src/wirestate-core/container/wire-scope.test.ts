@@ -2,12 +2,17 @@ import { Container } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
+import { Inject, Injectable } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { ERROR_CODE_ACCESS_AFTER_DISPOSAL, ERROR_CODE_ACCESS_BEFORE_ACTIVATION } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
 import { applySeeds } from "../seeds/apply-seeds";
+import { OnActivated } from "../service/on-activated";
+import { OnDeactivation } from "../service/on-deactivation";
+import { mockContainer } from "../test-utils/mock-container";
+import { mockService } from "../test-utils/mock-service";
 import { CommandStatus, CommandDescriptor } from "../types/commands";
 import { MaybePromise, Optional } from "../types/general";
 
@@ -81,6 +86,40 @@ describe("WireScope", () => {
     });
   });
 
+  it("should subscribe to events via scope", () => {
+    const container: Container = createIocContainer();
+    const bus: EventBus = container.get(EventBus);
+    const scope: WireScope = new WireScope(container);
+    const handler = jest.fn();
+
+    jest.spyOn(bus, "subscribe");
+
+    const unsubscribe = scope.subscribeToEvent(handler);
+
+    expect(bus.subscribe).toHaveBeenCalledWith(handler);
+    expect(typeof unsubscribe).toBe("function");
+
+    bus.emit({ type: "TEST" });
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
+  it("should unsubscribe from events via scope", () => {
+    const container: Container = createIocContainer();
+    const bus: EventBus = container.get(EventBus);
+    const scope: WireScope = new WireScope(container);
+    const handler = jest.fn();
+
+    jest.spyOn(bus, "unsubscribe");
+
+    scope.subscribeToEvent(handler);
+    scope.unsubscribeFromEvent(handler);
+
+    expect(bus.unsubscribe).toHaveBeenCalledWith(handler);
+
+    bus.emit({ type: "TEST" });
+    expect(handler).not.toHaveBeenCalled();
+  });
+
   it("should query data via query bus", () => {
     const container: Container = createIocContainer();
     const bus: QueryBus = container.get(QueryBus);
@@ -151,6 +190,66 @@ describe("WireScope", () => {
     expect(bus.commandOptional).toHaveBeenCalledWith("TEST_COMMAND", "second-attempt");
   });
 
+  it("should register query handler via scope", () => {
+    const container: Container = createIocContainer();
+    const bus: QueryBus = container.get(QueryBus);
+    const scope: WireScope = new WireScope(container);
+    const handler = jest.fn().mockReturnValue("result");
+
+    jest.spyOn(bus, "register");
+
+    const unregister = scope.registerQueryHandler("TEST_QUERY", handler);
+
+    expect(bus.register).toHaveBeenCalledWith("TEST_QUERY", handler);
+    expect(typeof unregister).toBe("function");
+    expect(bus.query("TEST_QUERY")).toBe("result");
+  });
+
+  it("should register command handler via scope", async () => {
+    const container: Container = createIocContainer();
+    const bus: CommandBus = container.get(CommandBus);
+    const scope: WireScope = new WireScope(container);
+    const handler = jest.fn().mockReturnValue("result");
+
+    jest.spyOn(bus, "register");
+
+    const unregister = scope.registerCommandHandler("TEST_COMMAND", handler);
+
+    expect(bus.register).toHaveBeenCalledWith("TEST_COMMAND", handler);
+    expect(typeof unregister).toBe("function");
+    expect(await bus.command("TEST_COMMAND").task).toBe("result");
+  });
+
+  it("should unregister query handler via scope", () => {
+    const container: Container = createIocContainer();
+    const bus: QueryBus = container.get(QueryBus);
+    const scope: WireScope = new WireScope(container);
+    const handler = jest.fn().mockReturnValue("value");
+
+    jest.spyOn(bus, "unregister");
+
+    bus.register("TEST_QUERY", handler);
+    scope.unregisterQueryHandler("TEST_QUERY", handler);
+
+    expect(bus.unregister).toHaveBeenCalledWith("TEST_QUERY", handler);
+    expect(bus.has("TEST_QUERY")).toBe(false);
+  });
+
+  it("should unregister command handler via scope", () => {
+    const container: Container = createIocContainer();
+    const bus: CommandBus = container.get(CommandBus);
+    const scope: WireScope = new WireScope(container);
+    const handler = jest.fn().mockReturnValue("value");
+
+    jest.spyOn(bus, "unregister");
+
+    bus.register("TEST_COMMAND", handler);
+    scope.unregisterCommandHandler("TEST_COMMAND", handler);
+
+    expect(bus.unregister).toHaveBeenCalledWith("TEST_COMMAND", handler);
+    expect(bus.has("TEST_COMMAND")).toBe(false);
+  });
+
   it("should get global seed from container", () => {
     const container: Container = createIocContainer({ seed: { key: "val" } });
     const scope: WireScope = new WireScope(container);
@@ -166,5 +265,80 @@ describe("WireScope", () => {
 
     expect(scope.getSeed(GenericService)).toEqual({ a: 1, b: 2 });
     expect(scope.getSeed("NOT_EXISTING")).toBeNull();
+  });
+
+  it("should support full handler lifecycle: register on activation and unregister on deactivation without throwing", async () => {
+    @Injectable()
+    class ServiceWithManualSubs {
+      public constructor(
+        @Inject(WireScope)
+        private readonly scope: WireScope
+      ) {}
+
+      @OnActivated()
+      public onActivated(): void {
+        this.scope.subscribeToEvent(this.onEvent);
+        this.scope.registerCommandHandler("TEST_COMMAND", this.onCommand);
+        this.scope.registerQueryHandler("TEST_QUERY", this.onQuery);
+      }
+
+      @OnDeactivation()
+      public onDeactivation(): void {
+        this.scope.unsubscribeFromEvent(this.onEvent);
+        this.scope.unregisterCommandHandler("TEST_COMMAND", this.onCommand);
+        this.scope.unregisterQueryHandler("TEST_QUERY", this.onQuery);
+      }
+
+      public onEvent = jest.fn(() => void 0);
+
+      public onCommand = jest.fn(() => "command-value");
+
+      public onQuery = jest.fn(() => "query-value");
+    }
+
+    const container: Container = mockContainer();
+    const eventBus: EventBus = container.get(EventBus);
+    const queryBus: QueryBus = container.get(QueryBus);
+    const commandBus: CommandBus = container.get(CommandBus);
+
+    expect(eventBus.has()).toBe(false);
+    expect(commandBus.has("TEST_COMMAND")).toBe(false);
+    expect(queryBus.has("TEST_QUERY")).toBe(false);
+
+    const service: ServiceWithManualSubs = mockService(ServiceWithManualSubs, container);
+
+    expect(eventBus.has()).toBe(true);
+    expect(commandBus.has("TEST_COMMAND")).toBe(true);
+    expect(queryBus.has("TEST_QUERY")).toBe(true);
+
+    const scope: WireScope = container.get(WireScope);
+
+    scope.emitEvent("TEST_EVENT");
+    expect(service.onEvent).toHaveBeenCalledTimes(1);
+
+    expect(scope.queryData("TEST_QUERY")).toBe("query-value");
+    expect(service.onQuery).toHaveBeenCalledTimes(1);
+
+    expect(await scope.executeCommand("TEST_COMMAND").task).toBe("command-value");
+    expect(service.onCommand).toHaveBeenCalledTimes(1);
+
+    container.unbind(ServiceWithManualSubs);
+
+    expect(eventBus.has()).toBe(false);
+    expect(commandBus.has("TEST_COMMAND")).toBe(false);
+    expect(queryBus.has("TEST_QUERY")).toBe(false);
+
+    expect(() => scope.emitEvent("TEST_EVENT")).not.toThrow();
+    expect(service.onEvent).toHaveBeenCalledTimes(1);
+
+    expect(() => scope.queryData("TEST_QUERY")).toThrow(
+      "No query handler registered in container for type: 'TEST_QUERY'."
+    );
+    expect(service.onQuery).toHaveBeenCalledTimes(1);
+
+    expect(() => scope.executeCommand("TEST_COMMAND")).toThrow(
+      "No command handler registered in container for type: 'TEST_COMMAND'."
+    );
+    expect(service.onCommand).toHaveBeenCalledTimes(1);
   });
 });

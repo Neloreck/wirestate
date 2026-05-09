@@ -1,6 +1,11 @@
 ## 0.7.0
 
 - Add `useScope` in `@wirestate/react`
+- New lit elements modules - `@wirestate/lit` and `@wirestate/lit-signals`
+- `EventBus`: add `unsubscribe` method for explicit handler removal by reference
+- `QueryBus`: add `unregister` method for explicit handler removal by type and reference
+- `CommandBus`: add `unregister` method for explicit handler removal by type and reference
+- `WireScope`: add new event/command/query subscribe-unsubscribe methods
 
 ## 0.6.3
 
