@@ -48,7 +48,7 @@
   "dependencies": {},
   "peerDependencies": {
     "@wirestate/core": ">=0.6.0",
-    "lit": ">=3.0.0",
+    "@lit/reactive-element": ">=2.0.0",
     "@lit/context": ">=1.0.0",
     "reflect-metadata": ">=0.2.0",
     "tslib": ">=2.5.0"

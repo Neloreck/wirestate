@@ -1,4 +1,5 @@
 import { ContextConsumer } from "@lit/context";
+import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-element";
 import {
   applySeeds,
   bindEntry,
@@ -6,36 +7,35 @@ import {
   InjectableDescriptor,
   SeedEntries,
   unapplySeeds,
-  Container,
   Newable,
   ServiceIdentifier,
 } from "@wirestate/core";
 import { Callable } from "@wirestate/core/types/general";
-import { LitElement, ReactiveController, ReactiveControllerHost } from "lit";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { ContainerContext, IocContext } from "../context/ioc-context";
 import { Maybe } from "../types/general";
 
-import { ContainerContext } from "./ioc-provider-context";
+export interface ServicesProviderControllerOptions {
+  entries: ReadonlyArray<Newable<object> | InjectableDescriptor>;
+  into?: IocContext | (() => IocContext);
+  activate?: ReadonlyArray<ServiceIdentifier>;
+  seeds?: SeedEntries;
+}
 
-export class ServicesProviderController implements ReactiveController {
-  public readonly consumer: ContextConsumer<typeof ContainerContext, LitElement>;
+export class ServicesProviderController<E extends ReactiveControllerHost & HTMLElement> implements ReactiveController {
+  public readonly consumer: ContextConsumer<typeof ContainerContext, E>;
   public readonly entries: ReadonlyArray<Newable<object> | InjectableDescriptor>;
 
   public readonly activate: Maybe<ReadonlyArray<ServiceIdentifier>>;
   public readonly seeds: Maybe<SeedEntries>;
-  public readonly container: Maybe<Container | Callable<Container>>;
+  public readonly into: Maybe<IocContext | Callable<IocContext>>;
 
   public constructor(
-    private readonly host: ReactiveControllerHost & LitElement,
-    options: {
-      entries: ReadonlyArray<Newable<object> | InjectableDescriptor>;
-      container?: Container | (() => Container);
-      activate?: ReadonlyArray<ServiceIdentifier>;
-      seeds?: SeedEntries;
-    }
+    private readonly host: E,
+    options: ServicesProviderControllerOptions
   ) {
     dbg.info(prefix(__filename), "Construct:", {
       host,
@@ -47,7 +47,7 @@ export class ServicesProviderController implements ReactiveController {
     this.entries = options.entries;
     this.activate = options.activate;
     this.seeds = options.seeds;
-    this.container = options.container;
+    this.into = options.into;
 
     this.consumer = new ContextConsumer(host, {
       context: ContainerContext,
@@ -57,19 +57,19 @@ export class ServicesProviderController implements ReactiveController {
   }
 
   public hostConnected(): void {
-    const container: Maybe<Container> = this.container
-      ? typeof this.container === "function"
-        ? this.container()
-        : this.container
+    const context: Maybe<IocContext> = this.into
+      ? typeof this.into === "function"
+        ? this.into()
+        : this.into
       : this.consumer.value;
 
     dbg.info(prefix(__filename), "Host connected:", {
       consumerValue: this.consumer.value,
-      containerResolver: this.container,
-      container,
+      containerResolver: this.into,
+      container: context,
     });
 
-    if (!container) {
+    if (!context) {
       if (this.consumer["provided"] === false) {
         throw new Error("not provided");
       }
@@ -81,46 +81,46 @@ export class ServicesProviderController implements ReactiveController {
 
     // Seed must be applied BEFORE binding so @Inject(INITIAL_STATE_TOKEN) works during activation.
     if (this.seeds) {
-      applySeeds(container, this.seeds);
+      applySeeds(context.container, this.seeds);
     }
 
     for (const entry of this.entries) {
-      bindEntry(container, entry);
+      bindEntry(context.container, entry);
     }
 
     if (this.activate) {
       for (const eager of this.activate) {
-        container.get(eager);
+        context.container.get(eager);
       }
     }
   }
 
   public hostDisconnected(): void {
-    const container: Maybe<Container> = this.container
-      ? typeof this.container === "function"
-        ? this.container()
-        : this.container
+    const context: Maybe<IocContext> = this.into
+      ? typeof this.into === "function"
+        ? this.into()
+        : this.into
       : this.consumer.value;
 
     dbg.info(prefix(__filename), "Host disconnected:", {
       consumerValue: this.consumer.value,
-      containerResolver: this.container,
-      container,
+      containerResolver: this.into,
+      container: context,
     });
 
-    if (!container) {
+    if (!context) {
       throw new Error("todo");
     }
 
     for (const entry of this.entries) {
       const token: ServiceIdentifier = getEntryToken(entry);
 
-      container.unbind(token);
+      context.container.unbind(token);
     }
 
     // Remove only this provider's targeted initial state entries.
     if (this.seeds) {
-      unapplySeeds(container, this.seeds);
+      unapplySeeds(context.container, this.seeds);
     }
   }
 }
