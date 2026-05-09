@@ -1,6 +1,6 @@
 ## 0.7.0
 
-- Todo
+- Add `useScope` in `@wirestate/react`
 
 ## 0.6.3
 

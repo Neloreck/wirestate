@@ -3,6 +3,7 @@ import { useContext } from "react";
 
 import { type IocContext, IocReactContext } from "../context/ioc-context";
 import { ERROR_CODE_INVALID_CONTEXT } from "../error/error-code";
+import { Optional } from "../types/general";
 
 /**
  * Returns the full IoC context.
@@ -11,7 +12,7 @@ import { ERROR_CODE_INVALID_CONTEXT } from "../error/error-code";
  * @internal
  */
 export function useIocContext(): IocContext {
-  const value = useContext(IocReactContext);
+  const value: Optional<IocContext> = useContext(IocReactContext);
 
   if (!value) {
     throw new WirestateError(

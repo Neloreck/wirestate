@@ -18,6 +18,7 @@ export {
 export { IocProvider } from "./provision/ioc-provider";
 export { useContainer } from "./provision/use-container";
 export { useContainerRevision } from "./provision/use-container-revision";
+export { useScope } from "./provision/use-scope";
 
 export { useEvent } from "./events/use-event";
 export { useEvents } from "./events/use-events";

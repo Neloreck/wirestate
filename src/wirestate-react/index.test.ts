@@ -29,6 +29,7 @@ describe("Library exported API from wirestate-react", () => {
     "useOptionalSyncQueryCaller",
     "useQueryCaller",
     "useQueryHandler",
+    "useScope",
     "useSyncQueryCaller",
   ];
 

@@ -186,6 +186,10 @@ Returns the nearest `Container` instance. Useful for advanced manual resolution.
 
 Returns a counter that increments each time the container is reset. Use to trigger effects when the container changes.
 
+### `useScope()`
+
+Returns the current `WireScope` linked to the nearest container.
+
 ## Test utilities
 
 ```ts
