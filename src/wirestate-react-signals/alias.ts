@@ -1,3 +1,7 @@
+/**
+ * @group preact-react-signals
+ * @see {@link https://www.npmjs.com/package/@preact/signals-react}
+ */
 export {
   Model,
   ModelConstructor,

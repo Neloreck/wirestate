@@ -18,6 +18,9 @@ import { prefix } from "@/macroses/prefix.macro";
 import { ContainerContext, IocContext } from "../context/ioc-context";
 import { Maybe } from "../types/general";
 
+/**
+ * @group provision
+ */
 export interface ServicesProviderControllerOptions {
   entries: ReadonlyArray<Newable<object> | InjectableDescriptor>;
   into?: IocContext | (() => IocContext);
@@ -25,6 +28,9 @@ export interface ServicesProviderControllerOptions {
   seeds?: SeedEntries;
 }
 
+/**
+ * @group provision
+ */
 export class ServicesProviderController<E extends ReactiveControllerHost & HTMLElement> implements ReactiveController {
   public readonly consumer: ContextConsumer<typeof ContainerContext, E>;
   public readonly entries: ReadonlyArray<Newable<object> | InjectableDescriptor>;

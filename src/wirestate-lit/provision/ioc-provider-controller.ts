@@ -8,11 +8,17 @@ import { prefix } from "@/macroses/prefix.macro";
 import { ContainerContext, IocContext } from "../context/ioc-context";
 import { AnyObject } from "../types/general";
 
+/**
+ * @group provision
+ */
 export interface IocProviderControllerOptions {
   container?: Container;
   seed?: AnyObject;
 }
 
+/**
+ * @group provision
+ */
 export class IocProviderController implements ReactiveController {
   protected readonly provider: ContextProvider<typeof ContainerContext>;
   protected readonly seed?: AnyObject;

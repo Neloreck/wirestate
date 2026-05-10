@@ -5,6 +5,9 @@ import { Event, EventBus, EventHandler, EventType, EventUnsubscriber } from "@wi
 import { ContainerContext } from "../context/ioc-context";
 import { Optional } from "../types/general";
 
+/**
+ * @group events
+ */
 export class OnEventController<E extends Event = Event> implements ReactiveController {
   private eventBus: Optional<EventBus> = null;
   private unsubscriber: Optional<EventUnsubscriber> = null;

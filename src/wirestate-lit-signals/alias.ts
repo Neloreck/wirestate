@@ -1,8 +1,11 @@
 import { Signal } from "signal-polyfill";
 
+/**
+ * @group signals
+ * @see {@link https://lit.dev/docs/data/signals/}
+ */
 export {
   signal,
-  svg,
   SignalWatcher,
   computed,
   Signal,
@@ -12,6 +15,14 @@ export {
   WatchDirectiveFunction,
 } from "@lit-labs/signals";
 
+/**
+ * @group signals
+ * @see {@link https://lit.dev/docs/data/signals/}
+ */
 export type State<T> = Signal.State<T>;
 
+/**
+ * @group signals
+ * @see {@link https://lit.dev/docs/data/signals/}
+ */
 export type Computed<T> = Signal.Computed<T>;

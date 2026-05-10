@@ -5,6 +5,9 @@ import { ServiceIdentifier } from "@wirestate/core";
 import { ContainerContext } from "../context/ioc-context";
 import { FieldMustMatchProvidedType, Interface } from "../types/general";
 
+/**
+ * @group consumption
+ */
 export type InjectionDecorator<ValueType> = {
   // Standard:
   <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V extends ValueType>(
@@ -18,11 +21,20 @@ export type InjectionDecorator<ValueType> = {
   ): FieldMustMatchProvidedType<Proto, K, ValueType>;
 };
 
+/**
+ * @group consumption
+ */
 export interface InjectionOptions<T> {
   injectionId: ServiceIdentifier<T>;
   subscribe?: boolean;
 }
 
+/**
+ * @param root0
+ * @param root0.injectionId
+ * @param root0.subscribe
+ * @group consumption
+ */
 export function injection<T>({ injectionId, subscribe }: InjectionOptions<T>): InjectionDecorator<T> {
   return ((
     protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, T>,

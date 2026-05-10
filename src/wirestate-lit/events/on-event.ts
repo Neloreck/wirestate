@@ -5,6 +5,9 @@ import { AnyObject, Interface, Optional } from "../types/general";
 
 import { OnEventController } from "./on-event-controller";
 
+/**
+ * @group events
+ */
 export interface OnEventDecorator<E extends Event = Event> {
   // Standard (TC39):
   <This extends Interface<Omit<ReactiveElement, "renderRoot">>>(
@@ -15,6 +18,11 @@ export interface OnEventDecorator<E extends Event = Event> {
   (target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor): void;
 }
 
+/**
+ * @group events
+ *
+ * @param types
+ */
 export function onEvent<E extends Event = Event>(types?: EventType | ReadonlyArray<EventType>): OnEventDecorator<E> {
   const normalized: Optional<ReadonlyArray<EventType>> =
     types === undefined ? null : Array.isArray(types) ? [...(types as ReadonlyArray<EventType>)] : [types as EventType];

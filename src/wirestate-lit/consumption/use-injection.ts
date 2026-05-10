@@ -8,17 +8,32 @@ import { prefix } from "@/macroses/prefix.macro";
 import { ContainerContext } from "../context/ioc-context";
 import { Optional } from "../types/general";
 
+/**
+ * @group consumption
+ */
 export interface UseInjectionOptions<T> {
   once?: boolean;
   value?: Optional<T>;
   injectionId: ServiceIdentifier<T>;
 }
 
+/**
+ * @group consumption
+ */
 export interface UseInjectionValue<T> {
   injectionId: ServiceIdentifier<T>;
   value: T;
 }
 
+/**
+ * @group consumption
+ *
+ * @param host
+ * @param root0
+ * @param root0.once
+ * @param root0.injectionId
+ * @param root0.value
+ */
 export function useInjection<T extends object, E extends ReactiveControllerHost & HTMLElement>(
   host: E,
   { once, injectionId, value }: UseInjectionOptions<T>
