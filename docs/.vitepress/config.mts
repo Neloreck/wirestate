@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
+  base: '/wirestate/',
   title: "Wirestate",
   description: "State management framework based on InversifyJS",
   themeConfig: {

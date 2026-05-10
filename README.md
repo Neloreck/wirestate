@@ -30,6 +30,16 @@ npm install @wirestate/react-mobx mobx mobx-react-lite
 npm install @wirestate/react-signals @preact/signals-react
 ```
 
+### For Lit
+
+```bash
+# Core + Lit integration
+npm install @wirestate/core @wirestate/lit reflect-metadata
+
+# With Signals reactivity
+npm install @wirestate/lit-signals @lit-labs/signals
+```
+
 Import `reflect-metadata` once at the application entry point before any other wirestate imports.
 
 ## License
