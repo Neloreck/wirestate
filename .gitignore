@@ -76,3 +76,9 @@ iife/
 /docs/api/
 /docs/.vitepress/dist/
 /docs/.vitepress/cache/
+
+# Agents / ai
+.agents
+.claude
+.junie
+skills-lock.json

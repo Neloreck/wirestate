@@ -35,6 +35,7 @@ export default defineConfig({
               { text: "@wirestate/core", link: "/api/wirestate-core/" },
               { text: "@wirestate/core/test-utils", link: "/api/wirestate-core/test-utils/" },
               { text: "@wirestate/lit", link: "/api/wirestate-lit/" },
+              { text: "@wirestate/lit/test-utils", link: "/api/wirestate-lit/test-utils/" },
               { text: "@wirestate/lit-signals", link: "/api/wirestate-lit-signals/" },
               { text: "@wirestate/react", link: "/api/wirestate-react/" },
               { text: "@wirestate/react/test-utils", link: "/api/wirestate-react/test-utils/" },

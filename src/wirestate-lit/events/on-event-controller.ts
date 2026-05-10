@@ -13,7 +13,7 @@ import { Optional } from "../types/general";
  * @group events
  */
 export class OnEventController<E extends Event = Event> implements ReactiveController {
-  private eventBus: Optional<EventBus> = null;
+  private bus: Optional<EventBus> = null;
   private unsubscriber: Optional<EventUnsubscriber> = null;
 
   private readonly types: Optional<ReadonlyArray<EventType>>;
@@ -22,7 +22,7 @@ export class OnEventController<E extends Event = Event> implements ReactiveContr
   /**
    * @param host - the host element
    * @param types - event types to listen for, if null, all events will be handled
-   * @param handler - event handler function
+   * @param handler - the event handler function
    */
   public constructor(host: ReactiveElement, types: Optional<ReadonlyArray<EventType>>, handler: EventHandler<E>) {
     host.addController(this);
@@ -34,7 +34,7 @@ export class OnEventController<E extends Event = Event> implements ReactiveContr
       context: ContainerContext,
       subscribe: true,
       callback: (context) => {
-        this.eventBus = context.container.get(EventBus);
+        this.bus = context.container.get(EventBus);
 
         if (host.isConnected) {
           this.resubscribe();
@@ -43,14 +43,22 @@ export class OnEventController<E extends Event = Event> implements ReactiveContr
     });
   }
 
+  public hostConnected(): void {
+    this.resubscribe();
+  }
+
+  public hostDisconnected(): void {
+    this.cleanup();
+  }
+
   private resubscribe(): void {
     this.cleanup();
 
-    if (this.eventBus) {
+    if (this.bus) {
       if (this.types === null) {
-        this.unsubscriber = this.eventBus.subscribe(this.handler as EventHandler);
+        this.unsubscriber = this.bus.subscribe(this.handler as EventHandler);
       } else {
-        this.unsubscriber = this.eventBus.subscribe((event) => {
+        this.unsubscriber = this.bus.subscribe((event) => {
           if ((this.types as ReadonlyArray<EventType>).includes(event.type)) {
             this.handler(event as E);
           }
@@ -62,13 +70,5 @@ export class OnEventController<E extends Event = Event> implements ReactiveContr
   private cleanup(): void {
     this.unsubscriber?.();
     this.unsubscriber = null;
-  }
-
-  public hostConnected(): void {
-    this.resubscribe();
-  }
-
-  public hostDisconnected(): void {
-    this.cleanup();
   }
 }

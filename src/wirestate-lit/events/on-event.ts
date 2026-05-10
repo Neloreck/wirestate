@@ -25,9 +25,9 @@ export interface OnEventDecorator<E extends Event = Event> {
  *
  * @group events
  *
- * @param types - event types to listen for, if omitted, all events will be handled
- * @returns onEvent raw decorator value
-
+ * @param types - Event types to listen for. If omitted, all events will be handled.
+ * @returns The decorator function.
+ *
  * @example
  * ```typescript
  * class MyElement extends LitElement {

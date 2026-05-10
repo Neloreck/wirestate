@@ -146,6 +146,9 @@ importers:
       jest-environment-jsdom:
         specifier: ^30.3.0
         version: 30.3.0
+      lit:
+        specifier: ^3.3.2
+        version: 3.3.2
       mobx:
         specifier: ^6.15.0
         version: 6.15.0

@@ -125,7 +125,7 @@ export {
  * @group mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
- * @returns {@link action} decorator
+ * @returns action decorator
  */
 export function Action(): IActionFactory {
   return action;
@@ -135,7 +135,7 @@ export function Action(): IActionFactory {
  * @group mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
- * @returns {@link computed} decorator
+ * @returns computed decorator
  */
 export function Computed(): IComputedFactory {
   return computed;
@@ -145,7 +145,7 @@ export function Computed(): IComputedFactory {
  * @group mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
- * @returns {@link observable} decorator
+ * @returns observable decorator
  */
 export function Observable(): IObservableFactory {
   return observable;
@@ -155,7 +155,7 @@ export function Observable(): IObservableFactory {
  * @group mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
- * @returns {@link observable.shallow} decorator
+ * @returns observable.shallow decorator
  */
 export function ShallowObservable() {
   return observable.shallow;
@@ -165,7 +165,7 @@ export function ShallowObservable() {
  * @group mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
- * @returns {@link observable.ref} decorator
+ * @returns observable.ref decorator
  */
 export function RefObservable() {
   return observable.ref;
@@ -175,7 +175,7 @@ export function RefObservable() {
  * @group mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
- * @returns {@link observable.deep} decorator
+ * @returns observable.deep decorator
  */
 export function DeepObservable() {
   return observable.deep;
