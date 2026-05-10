@@ -11,6 +11,8 @@ import type { InjectableDescriptor } from "../types/privision";
 /**
  * Binds a constant value to a token in the container.
  *
+ * @group bind
+ *
  * @param container - target Inversify container
  * @param entry - entry descriptor to bind
  */

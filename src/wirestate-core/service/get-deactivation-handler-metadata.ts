@@ -8,9 +8,11 @@ import type { Maybe } from "../types/general";
  * Retrieves `@OnDeactivation` method names from the class hierarchy.
  * Returns method names ordered from base to derived class.
  *
+ * @group service
+ * @internal
+ *
  * @param instance - service instance
  * @returns list of method names
- * @internal
  */
 export function getDeactivationHandlerMetadata(instance: object): ReadonlyArray<string | symbol> {
   dbg.info(prefix(__filename), "Resolving OnDeactivation metadata:", { name: instance.constructor.name, instance });

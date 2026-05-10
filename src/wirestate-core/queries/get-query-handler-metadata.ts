@@ -9,9 +9,11 @@ import type { QueryHandlerMetadata } from "../types/queries";
  * Retrieves `@OnQuery` metadata from the class hierarchy.
  * Returns handlers ordered from base to derived class.
  *
+ * @group queries
+ * @internal
+ *
  * @param instance - service instance
  * @returns metadata list
- * @internal
  */
 export function getQueryHandlerMetadata(instance: object): ReadonlyArray<QueryHandlerMetadata> {
   dbg.info(prefix(__filename), "Resolving instance query metadata:", { name: instance.constructor.name, instance });

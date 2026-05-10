@@ -10,6 +10,8 @@ import { SeedEntries, SeedsMap } from "../types/initial-state";
  * Applies seeds to the container into the existing instance instead of replacing it.
  * This allows multiple providers to co-exist without wiping each other's seeds.
  *
+ * @group seeds
+ *
  * @param container - target container
  * @param seeds - targeted seed entries apply
  */

@@ -1,43 +1,41 @@
-import { defineConfig } from 'vitepress'
+import { defineConfig } from "vitepress";
 
 export default defineConfig({
-  base: '/wirestate/',
+  base: "/wirestate/",
   title: "Wirestate",
   description: "State management framework based on InversifyJS",
   themeConfig: {
     nav: [
-      { text: 'Home', link: '/' },
-      { text: 'Guide', link: '/intro' },
-      { text: 'API', link: '/api/' }
+      { text: "Home", link: "/" },
+      { text: "Guide", link: "/intro" },
+      { text: "API", link: "/api/" },
     ],
     sidebar: [
       {
-        text: 'Guide',
-        items: [
-          { text: 'Introduction', link: '/intro' }
-        ]
+        text: "Guide",
+        items: [{ text: "Introduction", link: "/intro" }],
       },
       {
-        text: 'API Reference',
+        text: "API Reference",
         items: [
-          { text: 'Overview', link: '/api/' },
-          { text: 'Modules', link: '/api/modules' },
+          { text: "Overview", link: "/api/" },
+          { text: "Modules", link: "/api/modules" },
           {
-            text: 'Packages',
+            text: "Packages",
             items: [
-              { text: 'Core', link: '/api/wirestate-core/' },
-              { text: 'Lit', link: '/api/wirestate-lit/' },
-              { text: 'Lit Signals', link: '/api/wirestate-lit-signals/' },
-              { text: 'React', link: '/api/wirestate-react/' },
-              { text: 'React MobX', link: '/api/wirestate-react-mobx/' },
-              { text: 'React Signals', link: '/api/wirestate-react-signals/' }
-            ]
-          }
-        ]
-      }
+              { text: "@wirestate/core", link: "/api/wirestate-core/" },
+              { text: "@wirestate/core/test-utils", link: "/api/wirestate-core/test-utils/" },
+              { text: "@wirestate/lit", link: "/api/wirestate-lit/" },
+              { text: "@wirestate/lit-signals", link: "/api/wirestate-lit-signals/" },
+              { text: "@wirestate/react", link: "/api/wirestate-react/" },
+              { text: "@wirestate/react/test-utils", link: "/api/wirestate-react/test-utils/" },
+              { text: "@wirestate/react-mobx", link: "/api/wirestate-react-mobx/" },
+              { text: "@wirestate/react-signals", link: "/api/wirestate-react-signals/" },
+            ],
+          },
+        ],
+      },
     ],
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/Neloreck/wirestate' }
-    ]
-  }
-})
+    socialLinks: [{ icon: "github", link: "https://github.com/Neloreck/wirestate" }],
+  },
+});

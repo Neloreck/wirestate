@@ -8,6 +8,8 @@ import { InjectableDescriptor } from "../types/privision";
 /**
  * Binds a constant value to a token in the container.
  *
+ * @group bind
+ *
  * @param container - target Inversify container
  * @param entry - descriptor of entry to bind
  */

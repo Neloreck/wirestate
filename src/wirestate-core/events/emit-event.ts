@@ -10,6 +10,8 @@ import { EventBus } from "./event-bus";
 /**
  * Emits events for container from outside scope.
  *
+ * @group events
+ *
  * @param container - inversify container
  * @param type - event type ot emit
  * @param payload - event payload

@@ -11,6 +11,8 @@ import { CommandBus } from "./command-bus";
 /**
  * Dispatches a command on the provided container, returning null if no handler is registered.
  *
+ * @group commands
+ *
  * @param container - inversify container
  * @param type - command type
  * @param data - command data

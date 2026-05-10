@@ -1,5 +1,9 @@
 import { LazyServiceIdentifier, type ServiceIdentifier } from "inversify";
 
+/**
+ * @group inversify
+ * @see {@link https://inversify.io/}
+ */
 export {
   Container,
   ContainerModule,
@@ -18,6 +22,15 @@ export {
   LazyServiceIdentifier,
 } from "inversify";
 
+/**
+ * Util to resolve circular dependencies by wrapping the service identifier in a lazy identifier.
+ *
+ * @group inversify
+ * @see {@link https://inversify.io/}
+ *
+ * @param forward - a function that returns the service identifier
+ * @returns a lazy service identifier
+ */
 export function forwardRef<TInstance = unknown>(
   forward: () => ServiceIdentifier<TInstance>
 ): LazyServiceIdentifier<TInstance> {

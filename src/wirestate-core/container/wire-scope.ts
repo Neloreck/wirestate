@@ -19,6 +19,8 @@ import type { QueryHandler, QueryUnregister, QueryType } from "../types/queries"
  * Injectable scope providing access to wirestate buses and seeds.
  * Each injecting service receives its own instance (transient scope).
  * The scope is activated and deactivated automatically alongside its owner service.
+ *
+ * @group container
  */
 @injectable()
 export class WireScope {

@@ -11,6 +11,8 @@ import { bindService, type BindServiceOptions } from "./bind-service";
 
 /**
  * Options for {@link bindEntry}.
+ *
+ * @group bind
  */
 export interface BindEntryOptions extends BindServiceOptions {
   isWithIgnoreLifecycle?: boolean;
@@ -25,6 +27,8 @@ export interface BindEntryOptions extends BindServiceOptions {
  * - Constant values - bound via `bindConstant`
  * - Dynamic values - bound via `toDynamicValue` with optional scope
  * - Instance bindings - bound as generic singleton service
+ *
+ * @group bind
  *
  * @param container - target IOC container to bind into
  * @param entry - entry descriptor to bind

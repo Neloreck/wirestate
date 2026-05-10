@@ -9,9 +9,11 @@ import { getEventHandlerMetadata } from "./get-event-handler-metadata";
 /**
  * Composes service event handlers into a single dispatcher.
  *
+ * @group events
+ * @internal
+ *
  * @param instance - service instance
  * @returns event handler or null if no handlers are declared
- * @internal
  */
 export function buildEventDispatcher<T extends object>(instance: T): Optional<EventHandler> {
   dbg.info(prefix(__filename), "Build event dispatcher for:", { name: instance.constructor.name, instance });

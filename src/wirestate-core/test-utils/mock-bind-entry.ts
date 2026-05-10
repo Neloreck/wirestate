@@ -5,6 +5,8 @@ import type { InjectableDescriptor } from "../types/privision";
 
 /**
  * Options for {@link mockBindEntry}.
+ *
+ * @group bind
  */
 export interface MockBindEntryOptions {
   /**
@@ -19,6 +21,8 @@ export interface MockBindEntryOptions {
  * Binds a service entry to the IoC container for testing purposes.
  * This utility uses {@link bindEntry} internally.
  * It supports both service classes and injectable descriptors (constants, dynamic values, etc.).
+ *
+ * @group bind
  *
  * @param container - the IoC container to bind the entry to
  * @param entry - the service class or injectable descriptor to bind

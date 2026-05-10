@@ -12,7 +12,13 @@ import tsPlugin from "typescript-eslint";
 
 export default [
   {
-    ignores: ["target/**/*", "node_modules/**/*", "examples/**/*"],
+    ignores: [
+      "docs/.vitepress/dist/**/*",
+      "docs/.vitepress/cache/**/*",
+      "examples/**/*",
+      "node_modules/**/*",
+      "target/**/*",
+    ],
   },
   jsdocPlugin.configs["flat/recommended"],
   jsPlugin.configs.recommended,

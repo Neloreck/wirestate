@@ -8,9 +8,11 @@ import type { Maybe } from "../types/general";
  * Retrieves `@OnActivated` method names from the class hierarchy.
  * Returns method names ordered from base to derived class.
  *
+ * @group service
+ * @internal
+ *
  * @param instance - service instance
  * @returns list of method names
- * @internal
  */
 export function getActivatedHandlerMetadata(instance: object): ReadonlyArray<string | symbol> {
   dbg.info(prefix(__filename), "Resolving OnActivated metadata:", { name: instance.constructor.name, instance });

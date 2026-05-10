@@ -5,6 +5,8 @@ import { ERROR_CODE_GENERIC } from "./error-code";
  *
  * This class extends the native `Error` class and is used to represent errors specific
  * to the Wirestate library, providing more structured error handling.
+ *
+ * @group error
  */
 export class WirestateError extends Error {
   /**

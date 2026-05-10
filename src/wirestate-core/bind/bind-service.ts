@@ -32,6 +32,8 @@ export interface BindServiceOptions {
  * Registers a service class in the container with activation/deactivation logic.
  * Ensures container references, event subscriptions, command and query handlers are managed correctly.
  *
+ * @group bind
+ *
  * @param container - target Inversify container
  * @param entry - service constructor
  * @param options - options object to control binding flow

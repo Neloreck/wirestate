@@ -7,6 +7,8 @@ import type { Maybe } from "../types/general";
 /**
  * Decorator for service methods that run before deactivation.
  *
+ * @group service
+ *
  * @returns decorator function
  */
 export function OnDeactivation(): MethodDecorator {

@@ -8,6 +8,8 @@ import type { Maybe } from "../types/general";
 /**
  * Decorator for service methods that handle a command.
  *
+ * @group commands
+ *
  * @param type - command type identifier
  * @returns decorator function
  */

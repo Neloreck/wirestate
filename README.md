@@ -1,8 +1,11 @@
 # wirestate
 
+[![docs](https://img.shields.io/badge/docs-github_pages-blue)](https://neloreck.github.io/wirestate)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/master/LICENSE)
+
 State management framework based on InversifyJS dependency injection.
 Organizes application logic into injectable services that communicate through events, commands, and queries.
-Reactivity is handled externally — use MobX, Preact Signals, or your own solution.
+Reactivity is handled externally — use MobX, Signals, or your own solution.
 
 ## Packages
 
@@ -41,6 +44,11 @@ npm install @wirestate/lit-signals @lit-labs/signals
 ```
 
 Import `reflect-metadata` once at the application entry point before any other wirestate imports.
+
+## Docs
+
+- [General](https://neloreck.github.io/wirestate/)
+- [API](https://neloreck.github.io/wirestate/api/modules.html)
 
 ## License
 

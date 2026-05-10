@@ -5,6 +5,8 @@ import { Event, EventHandler, EventType, EventUnsubscriber } from "../types/even
 
 /**
  * Dispatches events to subscribers.
+ *
+ * @group events
  */
 export class EventBus {
   private readonly handlers: Set<EventHandler> = new Set();

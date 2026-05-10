@@ -4,6 +4,8 @@ import { Container, type Newable } from "inversify";
  * Unbinds a service from the IoC container.
  * This is useful in tests to reset or override specific service registrations.
  *
+ * @group bind
+ *
  * @param container - the IoC container to unbind the service from
  * @param ServiceClass - the service class to unbind
  */

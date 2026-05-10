@@ -10,6 +10,8 @@ import { SeedEntries, SeedsMap } from "../types/initial-state";
  * Removes specific seeds from the container.
  * Used during provider unmounting to clean up only the entries owned by that provider.
  *
+ * @group seeds
+ *
  * @param container - target container
  * @param seeds - targeted seeds to remove
  */

@@ -9,9 +9,11 @@ import { Maybe } from "../types/general";
  * Retrieves `@OnEvent` metadata from the class hierarchy.
  * Returns handlers ordered from base to derived class.
  *
+ * @group events
+ * @internal
+ *
  * @param instance - service instance
  * @returns metadata list
- * @internal
  */
 export function getEventHandlerMetadata(instance: object): ReadonlyArray<EventHandlerMetadata> {
   dbg.info(prefix(__filename), "Retrieving event handler metadata:", { name: instance.constructor.name, instance });

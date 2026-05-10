@@ -10,6 +10,8 @@ import { mockBindEntry } from "./mock-bind-entry";
 
 /**
  * Options for {@link mockContainer}.
+ *
+ * @group test-utils
  */
 export interface MockContainerOptions {
   /**
@@ -32,6 +34,8 @@ export interface MockContainerOptions {
  * Creates and configures a mock IoC container for testing.
  * This utility initializes a new container and binds the provided services or descriptors using {@link mockBindEntry}.
  * It also supports optional immediate activation of services.
+ *
+ * @group container
  *
  * @param options - configuration options for the mock container
  * @returns a configured InversifyJS {@link Container}

@@ -8,6 +8,8 @@ import type { QueryHandlerMetadata, QueryType } from "../types/queries";
 /**
  * Decorator for service methods that respond to a query.
  *
+ * @group queries
+ *
  * @param type - query type identifier
  * @returns decorator function
  */

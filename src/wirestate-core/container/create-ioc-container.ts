@@ -12,6 +12,11 @@ import type { SeedsMap } from "../types/initial-state";
 
 import { WireScope } from "./wire-scope";
 
+/**
+ * Options for {@link createIocContainer}.
+ *
+ * @group container
+ */
 export interface CreateIocContainerOptions {
   /**
    * Parent container for inheritance.
@@ -25,6 +30,8 @@ export interface CreateIocContainerOptions {
 
 /**
  * Creates an IoC container with framework essentials.
+ *
+ * @group container
  *
  * @param options - container configuration
  * @returns new IoC container

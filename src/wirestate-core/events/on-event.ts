@@ -8,6 +8,8 @@ import type { Maybe, Optional } from "../types/general";
 /**
  * Decorator for service methods that respond to events.
  *
+ * @group events
+ *
  * @param types - event type(s) to handle. If omitted, handles all events
  * @returns decorator function
  */

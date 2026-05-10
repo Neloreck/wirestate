@@ -11,6 +11,8 @@ import { QueryBus } from "./query-bus";
 /**
  * Dispatches a query on the provided container, returning null if no handler is registered.
  *
+ * @group queries
+ *
  * @param container - inversify container
  * @param type - query type
  * @param data - query data

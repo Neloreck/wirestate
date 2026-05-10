@@ -8,6 +8,8 @@ import type { QueryHandler, QueryType, QueryUnregister } from "../types/queries"
 
 /**
  * Dispatches queries to handlers.
+ *
+ * @group queries
  */
 export class QueryBus {
   /**

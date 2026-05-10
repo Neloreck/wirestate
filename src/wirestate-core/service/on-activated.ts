@@ -7,6 +7,8 @@ import type { Maybe } from "../types/general";
 /**
  * Decorator for service methods that run after activation.
  *
+ * @group service
+ *
  * @returns decorator function
  */
 export function OnActivated(): MethodDecorator {

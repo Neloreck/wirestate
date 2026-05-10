@@ -7,6 +7,8 @@ import type { InjectableDescriptor } from "../types/privision";
  * For plain service classes the class itself is the token;
  * for descriptors the `id` field is used.
  *
+ * @group bind
+ *
  * @param entry - entry descriptor to get service identifier for
  * @returns injectable identifier token
  */

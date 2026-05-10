@@ -9,6 +9,8 @@ import type { AnyObject } from "../types/general";
 /**
  * Applies shared seed to the container.
  *
+ * @group seeds
+ *
  * @param container - target container
  * @param seed - shared seed object
  */

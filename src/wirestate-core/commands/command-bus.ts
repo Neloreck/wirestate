@@ -17,6 +17,8 @@ import type { Maybe, Optional } from "../types/general";
  *
  * Unlike queries, command execution always wraps the handler in a promise
  * and returns a descriptor with task, status, and responder.
+ *
+ * @group commands
  */
 export class CommandBus {
   /**

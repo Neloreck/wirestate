@@ -11,6 +11,8 @@ import { QueryBus } from "./query-bus";
 /**
  * Dispatches a query on the provided container.
  *
+ * @group queries
+ *
  * @param container - inversify container
  * @param type - query type
  * @param data - query data

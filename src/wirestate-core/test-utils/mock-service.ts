@@ -5,6 +5,8 @@ import { mockContainer } from "./mock-container";
 
 /**
  * Options for {@link mockService}.
+ *
+ * @group service
  */
 export interface MockServiceOptions {
   /**
@@ -15,6 +17,8 @@ export interface MockServiceOptions {
 
 /**
  * Mocks a service by binding it to an IoC container and returning its instance.
+ *
+ * @group service
  *
  * @param service - the service class to mock
  * @param container - the IoC container to use, defaults to a new {@link mockContainer}
