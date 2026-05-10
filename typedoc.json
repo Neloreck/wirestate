@@ -7,5 +7,15 @@
   "plugin": ["typedoc-plugin-markdown"],
   "entryFileName": "index.md",
   "hideGenerator": true,
-  "cleanOutputDir": true
+  "cleanOutputDir": true,
+  "parametersFormat": "table",
+  "enumMembersFormat": "table",
+  "typeDeclarationFormat": "table",
+  "propertyMembersFormat": "table",
+  "indexFormat": "table",
+  "expandParameters": true,
+  "useCodeBlocks": true,
+  "expandObjects": true,
+  "hideBreadcrumbs": true,
+  "hidePageHeader": true
 }
