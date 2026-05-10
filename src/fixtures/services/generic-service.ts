@@ -16,6 +16,8 @@ export class GenericService {
 
   public testStingEventPayload: Maybe<string> = null;
 
+  public value: string = "test-value";
+
   public constructor(
     @Inject(WireScope)
     public readonly scope: WireScope
@@ -29,6 +31,10 @@ export class GenericService {
   @OnDeactivation()
   public deactivate(): void {
     this.isActivated = false;
+  }
+
+  public getValue(): string {
+    return this.value;
   }
 
   public testResolveService(): GenericService {

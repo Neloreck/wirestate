@@ -47,14 +47,25 @@ export interface InjectionOptions<T> {
  *
  * @group consumption
  *
- * @param options - injection options including the service identifier
- * @param options.injectionId - the service identifier to inject from the IoC container
- * @param options.once - whether to subscribe to changes in the context, if false, the property will be updated if the container in the context changes
+ * @param optionsOrInjectionId - injection options including the service identifier or the service identifier itself
+ * @returns injection decorator instance
  *
  * @example
  * ```typescript
  * class MyElement extends LitElement {
- *   @injection({ injectionId: MyService })
+ *   @injection(MyService)
+ *   private myService!: MyService;
+ *
+ *   public render() {
+ *     return html`<div>${this.myService.getName()}</div>`;
+ *   }
+ * }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * class MyElement extends LitElement {
+ *   @injection({ injectionId: MyService, once: true })
  *   private myService!: MyService;
  *
  *   public render() {
@@ -63,11 +74,18 @@ export interface InjectionOptions<T> {
  * }
  * ```
  */
-export function injection<T>({ injectionId, once }: InjectionOptions<T>): InjectionDecorator<T> {
+export function injection<T>(optionsOrInjectionId: InjectionOptions<T> | ServiceIdentifier<T>): InjectionDecorator<T> {
+  const options: InjectionOptions<T> =
+    typeof optionsOrInjectionId === "object" && optionsOrInjectionId !== null && "injectionId" in optionsOrInjectionId
+      ? optionsOrInjectionId
+      : { injectionId: optionsOrInjectionId as ServiceIdentifier<T> };
+
   return ((
     protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, T>,
     nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, T>
-  ) => {
+  ): void => {
+    const { injectionId, once } = options;
+
     // Standard decorators branch.
     if (typeof nameOrContext === "object") {
       nameOrContext.addInitializer(function () {

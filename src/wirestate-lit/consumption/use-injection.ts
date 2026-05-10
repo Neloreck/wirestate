@@ -51,16 +51,24 @@ export interface UseInjectionValue<T> {
  * @group consumption
  *
  * @param host - the host element
- * @param options - injection options including the service identifier
- * @param options.once - if true, the service will be fetched only once when the controller is created
- * @param options.value - initial value for the injection before it's fetched from the container
- * @param options.injectionId - the service identifier to inject
+ * @param optionsOrInjectionId - injection options including the service identifier or the service identifier itself
  * @returns injection descriptor object
  *
  * @example
  * ```typescript
  * class MyElement extends LitElement {
- *   private myService = useInjection(this, { injectionId: MyService });
+ *   private myService = useInjection(this, MyService);
+ *
+ *   render() {
+ *     return html`<div>${this.myService.value.getName()}</div>`;
+ *   }
+ * }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * class MyElement extends LitElement {
+ *   private myService = useInjection(this, { injectionId: MyService, once: true });
  *
  *   render() {
  *     return html`<div>${this.myService.value.getName()}</div>`;
@@ -70,8 +78,15 @@ export interface UseInjectionValue<T> {
  */
 export function useInjection<T extends object, E extends ReactiveControllerHost & HTMLElement>(
   host: E,
-  { once, injectionId, value }: UseInjectionOptions<T>
+  optionsOrInjectionId: UseInjectionOptions<T> | ServiceIdentifier<T>
 ): UseInjectionValue<T> {
+  const options: UseInjectionOptions<T> =
+    typeof optionsOrInjectionId === "object" && optionsOrInjectionId !== null && "injectionId" in optionsOrInjectionId
+      ? optionsOrInjectionId
+      : { injectionId: optionsOrInjectionId as ServiceIdentifier<T> };
+
+  const { once, injectionId, value } = options;
+
   dbg.info(prefix(__filename), "Creating:", {
     host,
     once,

@@ -62,9 +62,9 @@ class MyComponent extends LitElement {
 
 ## Injection
 
-### `@injection(options)` / `useInjection(host, options)`
+### `@injection(optionsOrId)` / `useInjection(host, optionsOrId)`
 
-Injects a service from the nearest IoC container.
+Injects a service from the nearest IoC container. Supports both options object and direct service identifier.
 
 ```typescript
 import { LitElement, html } from 'lit';
@@ -74,8 +74,13 @@ import { MyService } from './services';
 
 @customElement('my-component')
 class MyComponent extends LitElement {
-  @injection({ injectionId: MyService })
+  // Using identifier:
+  @injection(MyService)
   private myService!: MyService;
+
+  // Using options object:
+  @injection({ injectionId: MyService, once: true })
+  private onceService!: MyService;
 
   render() {
     return html`<div>${this.myService.getData()}</div>`;
@@ -91,7 +96,11 @@ import { useInjection } from '@wirestate/lit';
 import { MyService } from './services';
 
 class MyComponent extends LitElement {
-  private myService = useInjection(this, { injectionId: MyService });
+  // Using identifier:
+  private myService = useInjection(this, MyService);
+
+  // Using options object:
+  private onceService = useInjection(this, { injectionId: MyService, once: true });
 
   render() {
     return html`<div>${this.myService.value.getData()}</div>`;

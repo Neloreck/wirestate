@@ -1,6 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { CommandBus, CommandDescriptor, CommandStatus, createIocContainer } from "@wirestate/core";
-import { Container } from "inversify";
+import { CommandBus, CommandDescriptor, CommandStatus, createIocContainer, Container } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
