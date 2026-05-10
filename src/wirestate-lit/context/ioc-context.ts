@@ -33,4 +33,4 @@ export interface IocContext {
  *
  * @group context
  */
-export const ContainerContext = createContext<IocContext>(IOC_CONTAINER_KEY);
+export const IocContextObject = createContext<IocContext>(IOC_CONTAINER_KEY);

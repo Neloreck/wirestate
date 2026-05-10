@@ -17,7 +17,7 @@ export { onQuery, OnQueryDecorator } from "./queries/on-query";
 export { OnQueryController } from "./queries/on-query-controller";
 export { useOnQuery, UseOnQueryOptions } from "./queries/use-on-query";
 
-export { ContainerContext } from "./context/ioc-context";
+export { IocContextObject, IocContext } from "./context/ioc-context";
 
 export { iocProvide, IocProviderDecorator } from "./provision/ioc-provide";
 export { IocProviderController, IocProviderControllerOptions } from "./provision/ioc-provider-controller";

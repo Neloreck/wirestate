@@ -2,12 +2,13 @@ describe("Library exported API from wirestate/lit", () => {
   const libRoot = require("./index");
 
   const expectedLibExports: Array<string> = [
-    "ContainerContext",
     "InjectablesProviderController",
     "InjectablesProviderControllerOptions",
     "InjectablesProviderDecorator",
     "InjectionDecorator",
     "InjectionOptions",
+    "IocContext",
+    "IocContextObject",
     "IocProviderController",
     "IocProviderControllerOptions",
     "IocProviderDecorator",

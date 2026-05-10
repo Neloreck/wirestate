@@ -5,7 +5,7 @@ import { CommandBus, CommandHandler, CommandType, CommandUnregister } from "@wir
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ContainerContext } from "../context/ioc-context";
+import { IocContextObject } from "../context/ioc-context";
 import { Optional } from "../types/general";
 
 /**
@@ -37,7 +37,7 @@ export class OnCommandController<D = unknown, R = unknown> implements ReactiveCo
     dbg.info(prefix(__filename), "Constructing:", { host, type });
 
     new ContextConsumer(host, {
-      context: ContainerContext,
+      context: IocContextObject,
       subscribe: true,
       callback: (context) => {
         this.bus = context.container.get(CommandBus);

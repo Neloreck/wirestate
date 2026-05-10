@@ -5,7 +5,7 @@ import { createIocContainer, Container, applySharedSeed } from "@wirestate/core"
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ContainerContext, IocContext } from "../context/ioc-context";
+import { IocContextObject, IocContext } from "../context/ioc-context";
 import { AnyObject } from "../types/general";
 
 /**
@@ -34,7 +34,7 @@ export interface IocProviderControllerOptions {
 export class IocProviderController<
   E extends ReactiveControllerHost & HTMLElement = ReactiveControllerHost & HTMLElement,
 > implements ReactiveController {
-  protected readonly provider: ContextProvider<typeof ContainerContext>;
+  protected readonly provider: ContextProvider<typeof IocContextObject>;
   protected readonly seed?: AnyObject;
   protected revision: number = 1;
 
@@ -73,7 +73,7 @@ export class IocProviderController<
     });
 
     this.provider = new ContextProvider(host, {
-      context: ContainerContext,
+      context: IocContextObject,
       initialValue: {
         container: this.container,
         revision: this.revision,

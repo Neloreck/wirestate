@@ -5,7 +5,7 @@ import { ServiceIdentifier } from "@wirestate/core";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ContainerContext } from "../context/ioc-context";
+import { IocContextObject } from "../context/ioc-context";
 import { Optional } from "../types/general";
 
 /**
@@ -96,7 +96,7 @@ export function useInjection<T extends object, E extends ReactiveControllerHost 
   const current: UseInjectionValue<T> = { value: value as unknown as T, injectionId };
 
   new ContextConsumer(host, {
-    context: ContainerContext,
+    context: IocContextObject,
     subscribe: !once,
     callback: (it) => {
       current.value = it.container.get(injectionId);

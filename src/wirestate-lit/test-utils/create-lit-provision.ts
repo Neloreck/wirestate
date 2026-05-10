@@ -2,7 +2,7 @@ import { ContextProvider } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
 import { Container, createIocContainer } from "@wirestate/core";
 
-import { ContainerContext } from "../context/ioc-context";
+import { IocContextObject } from "../context/ioc-context";
 
 let isProviderDefined: boolean = false;
 
@@ -28,7 +28,7 @@ export interface LitProvisionFixture {
   /**
    * Lit context provider.
    */
-  readonly contextProvider: ContextProvider<typeof ContainerContext, WsTestProviderElement>;
+  readonly contextProvider: ContextProvider<typeof IocContextObject, WsTestProviderElement>;
   /**
    * The IoC container provided to child elements.
    */
@@ -54,10 +54,10 @@ export function createLitProvision(container?: Container): LitProvisionFixture {
   const iocContainer: Container = container ?? createIocContainer();
   const provider: WsTestProviderElement = new WsTestProviderElement();
 
-  const contextProvider: ContextProvider<typeof ContainerContext, WsTestProviderElement> = new ContextProvider(
+  const contextProvider: ContextProvider<typeof IocContextObject, WsTestProviderElement> = new ContextProvider(
     provider,
     {
-      context: ContainerContext,
+      context: IocContextObject,
       initialValue: {
         container: iocContainer,
         revision: 1,

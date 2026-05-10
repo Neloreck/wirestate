@@ -20,7 +20,7 @@ export interface UseOnQueryOptions<D = unknown, R = unknown> {
 }
 
 /**
- * Registers a query handler on the {@link QueryBus} for the host element's lifetime.
+ * Registers a query handler on the `QueryBus` for the host element's lifetime.
  *
  * @group queries
  *

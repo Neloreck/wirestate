@@ -3,7 +3,7 @@ import { ReactiveElement } from "@lit/reactive-element";
 import { Container, createIocContainer, SEED } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
-import { ContainerContext, IocContext } from "../context/ioc-context";
+import { IocContextObject, IocContext } from "../context/ioc-context";
 import { Maybe } from "../types/general";
 
 import { IocProviderController } from "./ioc-provider-controller";
@@ -72,7 +72,7 @@ describe("IocProviderController", () => {
     let receivedContext: Maybe<IocContext>;
 
     new ContextConsumer(child, {
-      context: ContainerContext,
+      context: IocContextObject,
       subscribe: true,
       callback: (context) => {
         receivedContext = context;

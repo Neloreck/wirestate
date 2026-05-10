@@ -16,7 +16,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { Callable } from "../../wirestate-react/types/general";
-import { ContainerContext, IocContext } from "../context/ioc-context";
+import { IocContextObject, IocContext } from "../context/ioc-context";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { Maybe } from "../types/general";
 
@@ -71,7 +71,7 @@ export interface InjectablesProviderControllerOptions {
 export class InjectablesProviderController<
   E extends ReactiveControllerHost & HTMLElement = ReactiveControllerHost & HTMLElement,
 > implements ReactiveController {
-  protected readonly consumer?: ContextConsumer<typeof ContainerContext, E>;
+  protected readonly consumer?: ContextConsumer<typeof IocContextObject, E>;
 
   private readonly entries: ReadonlyArray<Newable<object> | InjectableDescriptor>;
   private readonly activate: Maybe<ReadonlyArray<ServiceIdentifier>>;
@@ -107,7 +107,7 @@ export class InjectablesProviderController<
     if (!this.into) {
       // subscribe: false — binding happens once per connect, not on every revision update.
       this.consumer = new ContextConsumer(host, {
-        context: ContainerContext,
+        context: IocContextObject,
         subscribe: false,
         callback: (context) => {
           if (!host.isConnected) {

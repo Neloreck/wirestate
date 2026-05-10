@@ -73,7 +73,7 @@ export {
 } from "inversify";
 
 /**
- * @group inversify
+ * @group inversify-binding
  * @see {@link https://inversify.io/}
  */
 export { bindingTypeValues as BindingType, bindingScopeValues as ScopeBindingType } from "inversify";

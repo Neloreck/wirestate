@@ -2,7 +2,7 @@ import { ContextConsumer } from "@lit/context";
 import { ReactiveController, ReactiveElement } from "@lit/reactive-element";
 import { Event, EventBus, EventHandler, EventType, EventUnsubscriber } from "@wirestate/core";
 
-import { ContainerContext } from "../context/ioc-context";
+import { IocContextObject } from "../context/ioc-context";
 import { Optional } from "../types/general";
 
 /**
@@ -31,7 +31,7 @@ export class OnEventController<E extends Event = Event> implements ReactiveContr
     this.handler = handler;
 
     new ContextConsumer(host, {
-      context: ContainerContext,
+      context: IocContextObject,
       subscribe: true,
       callback: (context) => {
         this.bus = context.container.get(EventBus);
