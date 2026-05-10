@@ -71,3 +71,8 @@ iife/
 
 
 /.idea/
+
+# Documentation
+/docs/api/
+/docs/.vitepress/dist/
+/docs/.vitepress/cache/

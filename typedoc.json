@@ -1,0 +1,11 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "Wirestate API",
+  "entryPoints": ["src/*/index.ts"],
+  "exclude": ["src/wirestate-portable/index.ts"],
+  "out": "docs/api",
+  "plugin": ["typedoc-plugin-markdown"],
+  "entryFileName": "index.md",
+  "hideGenerator": true,
+  "cleanOutputDir": true
+}
