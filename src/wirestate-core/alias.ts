@@ -50,6 +50,8 @@ export {
   ServiceIdentifier,
   Unbind,
   UnbindSync,
+  bindingScopeValues,
+  bindingTypeValues,
 } from "inversify";
 
 /**

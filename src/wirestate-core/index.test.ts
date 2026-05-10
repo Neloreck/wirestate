@@ -62,6 +62,7 @@ describe("Library exported API from wirestate-core", () => {
     "UnbindSync",
     "Unmanaged",
     "bindingScopeValues",
+    "bindingTypeValues",
     "forwardRef",
     // Core.
     "CommandBus",
