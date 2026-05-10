@@ -1,12 +1,19 @@
+import "@/styles/index.css";
+
 import "reflect-metadata";
+
 import "@/components/general-controls";
 import "@/components/events-log";
 import "@/components/queries-data";
-import "@/styles/index.css";
 
 import { BindingType, ScopeBindingType } from "@wirestate/core";
-import { ContainerProviderController, ServicesProviderController } from "@wirestate/lit";
-import { LitElement, html, css, CSSResult, TemplateResult } from "lit";
+import {
+  IocProviderController,
+  InjectablesProviderController,
+  useInjectablesProvider,
+  useIocProvision,
+} from "@wirestate/lit";
+import { LitElement, html, CSSResult, TemplateResult, css } from "lit";
 import { customElement } from "lit/decorators.js";
 
 import { GLOBAL_CONFIG, GLOBAL_DYNAMIC_CONFIG } from "@/constants/id";
@@ -22,19 +29,14 @@ export class Application extends LitElement {
         display: flex;
         flex-direction: column;
         width: 1126px;
-        max-width: 100%;
         margin: 0 auto;
-        text-align: center;
-        border-inline: 1px solid var(--border);
-        min-height: 100svh;
-        box-sizing: border-box;
+        gap: var(--space-4);
       }
     `,
   ];
 
-  public iocProviderController = new ContainerProviderController(this);
-
-  public containersProviderController = new ServicesProviderController(this, {
+  public readonly ioc: IocProviderController = useIocProvision(this);
+  public readonly injectables: InjectablesProviderController = useInjectablesProvider(this, {
     entries: [
       LoggerService,
       CounterService,
@@ -57,7 +59,7 @@ export class Application extends LitElement {
       [CounterService, { count: 10 }],
       [LoggerService, { enabled: true }],
     ],
-    into: () => this.iocProviderController.provider.value,
+    into: () => this.ioc.value,
   });
 
   public render(): TemplateResult {

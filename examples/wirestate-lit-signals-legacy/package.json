@@ -1,5 +1,5 @@
 {
-  "name": "wirestate-lit-signals",
+  "name": "wirestate-lit-signals-legacy",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -8,11 +8,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@lit/context": "^1.1.6",
     "@lit-labs/signals": "^0.2.0",
+    "@lit/context": "^1.1.6",
     "@wirestate/core": "^0.6.3",
-    "@wirestate/lit": "^0.6.0",
-    "@wirestate/lit-signals": "^0.6.0",
+    "@wirestate/lit": "^0.6.1",
+    "@wirestate/lit-signals": "^0.6.1",
     "inversify": "^8.1.0",
     "lit": "^3.3.2",
     "reflect-metadata": "^0.2.2"
@@ -21,10 +21,13 @@
     "@eslint/js": "9.39.4",
     "@types/node": "^25.6.1",
     "@typescript-eslint/parser": "^8.59.2",
+    "@web-types/lit": "^2.0.0-3",
+    "autoprefixer": "^10.5.0",
     "eslint": " ^9.3.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "globals": "^17.6.0",
+    "postcss": "^8.5.14",
     "prettier": "^3.8.3",
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.11"

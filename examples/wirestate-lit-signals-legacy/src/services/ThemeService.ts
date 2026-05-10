@@ -2,10 +2,11 @@ import { Inject, Injectable, OnActivated, OnDeactivation, SEED, WireScope } from
 import { signal, State } from "@wirestate/lit-signals";
 
 import { EGlobalEvent } from "@/constants/events";
+import { Theme } from "@/types";
 
 @Injectable()
 export class ThemeService {
-  public theme: State<string> = signal("light");
+  public theme: State<Theme> = signal("light");
 
   public constructor(
     @Inject(WireScope)
