@@ -16,9 +16,7 @@ describe("IocProviderController", () => {
   class TestChildElement extends ReactiveElement {}
 
   afterEach(() => {
-    for (const child of document.body.children) {
-      child.remove();
-    }
+    Array.from(document.body.childNodes).forEach((it) => it.remove());
   });
 
   it("should create a new container when none is provided", () => {

@@ -26,9 +26,7 @@ describe("iocProvide", () => {
   class ChildElement extends ReactiveElement {}
 
   afterEach(() => {
-    for (const child of document.body.children) {
-      child.remove();
-    }
+    Array.from(document.body.childNodes).forEach((it) => it.remove());
   });
 
   it("should expose an IocProviderController instance immediately after construction", () => {
