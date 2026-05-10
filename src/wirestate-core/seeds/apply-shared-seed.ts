@@ -11,8 +11,8 @@ import type { AnyObject } from "../types/general";
  *
  * @group seeds
  *
- * @param container - target container
- * @param seed - shared seed object
+ * @param container - Target container.
+ * @param seed - Shared seed object.
  */
 export function applySharedSeed(container: Container, seed: AnyObject): void {
   dbg.info(prefix(__filename), "Apply shared seed:", { shared: seed, container });

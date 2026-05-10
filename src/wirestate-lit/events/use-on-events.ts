@@ -26,11 +26,11 @@ export interface UseOnEventsOptions<E extends Event = Event> {
  *
  * @group events
  *
- * @param host - the host element
- * @param options - event handling options
- * @param options.handler - event handler function
- * @param options.types - event types to listen for, if null or undefined, all events will be handled
- * @returns events subscription controller
+ * @param host - The host element.
+ * @param options - Event handling options.
+ * @param options.handler - Event handler function.
+ * @param options.types - Event types to listen for, if null or undefined, all events will be handled.
+ * @returns Events subscription controller.
  *
  * @example
  * ```typescript

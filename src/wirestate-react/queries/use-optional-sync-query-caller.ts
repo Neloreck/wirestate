@@ -13,7 +13,7 @@ import { OptionalSyncQueryCaller } from "../types/queries";
  *
  * @group queries
  *
- * @returns optional sync query dispatcher
+ * @returns Optional sync query dispatcher.
  */
 export function useOptionalSyncQueryCaller(): OptionalSyncQueryCaller {
   const container: Container = useContainer();

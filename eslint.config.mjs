@@ -63,6 +63,12 @@ export default [
           endLines: 0,
         },
       ],
+      "jsdoc/require-description-complete-sentence": [
+        "error",
+        {
+          tags: ["param", "returns"],
+        },
+      ],
       "jsdoc/require-returns-check": "off",
       "jsdoc/require-jsdoc": "off",
       "jsdoc/require-param-type": "off",

@@ -6,8 +6,8 @@ import { Container, type Newable } from "inversify";
  *
  * @group bind
  *
- * @param container - the IoC container to unbind the service from
- * @param ServiceClass - the service class to unbind
+ * @param container - The IoC container to unbind the service from.
+ * @param ServiceClass - The service class to unbind.
  */
 export function mockUnbindService<T extends object>(container: Container, ServiceClass: Newable<T>): void {
   container.unbind(ServiceClass);

@@ -12,8 +12,8 @@ import type { Maybe } from "../types/general";
  * @group commands
  * @internal
  *
- * @param instance - service instance
- * @returns metadata list
+ * @param instance - Service instance.
+ * @returns Metadata list.
  */
 export function getCommandHandlerMetadata(instance: object): ReadonlyArray<CommandHandlerMetadata> {
   dbg.info(prefix(__filename), "Resolving instance command metadata:", {

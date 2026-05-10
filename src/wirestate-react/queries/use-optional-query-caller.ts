@@ -13,7 +13,7 @@ import { OptionalQueryCaller } from "../types/queries";
  *
  * @group queries
  *
- * @returns optional query dispatcher
+ * @returns Optional query dispatcher.
  */
 export function useOptionalQueryCaller(): OptionalQueryCaller {
   const container: Container = useContainer();

@@ -31,9 +31,9 @@ export class CommandBus {
    * Registers a command handler.
    * Returns an unregister function.
    *
-   * @param type - command type
-   * @param handler - handler function
-   * @returns unregister function
+   * @param type - Command type.
+   * @param handler - Handler function.
+   * @returns Unregister function.
    */
   public register<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): CommandUnregister {
     dbg.info(prefix(__filename), "Registering command handler:", {
@@ -58,8 +58,8 @@ export class CommandBus {
    * Unregisters a specific command handler by type and reference.
    * No-ops silently if the handler was not registered for that type.
    *
-   * @param type - command type
-   * @param handler - handler to remove
+   * @param type - Command type.
+   * @param handler - Handler to remove.
    */
   public unregister<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): void {
     dbg.info(prefix(__filename), "Unregistering command handler:", {
@@ -90,11 +90,11 @@ export class CommandBus {
    * Dispatches a command to the last registered handler.
    * Wraps the handler execution in a promise and returns a descriptor.
    *
-   * @param type - command type
-   * @param data - command payload
-   * @returns command descriptor with task, status, and responder
+   * @param type - Command type.
+   * @param data - Command payload.
+   * @returns Command descriptor with task, status, and responder.
    *
-   * @throws if no handler is registered
+   * @throws If no handler is registered.
    */
   public command<R = unknown, D = unknown>(type: CommandType, data?: D): CommandDescriptor<R> {
     const stack: Maybe<Array<CommandHandler>> = this.handlers.get(type);
@@ -132,9 +132,9 @@ export class CommandBus {
   /**
    * Dispatches a command to the last registered handler, returning null if no handler exists.
    *
-   * @param type - command type
-   * @param data - command payload
-   * @returns command descriptor or null if no handler is registered
+   * @param type - Command type.
+   * @param data - Command payload.
+   * @returns Command descriptor or null if no handler is registered.
    */
   public commandOptional<R = unknown, D = unknown>(type: CommandType, data?: D): Optional<CommandDescriptor<R>> {
     const stack: Maybe<Array<CommandHandler>> = this.handlers.get(type);
@@ -145,8 +145,8 @@ export class CommandBus {
   /**
    * Checks if a handler is registered for the given type.
    *
-   * @param type - command type
-   * @returns true if handler exists
+   * @param type - Command type.
+   * @returns True if handler exists.
    */
   public has(type: CommandType): boolean {
     return Boolean(this.handlers.get(type)?.length);

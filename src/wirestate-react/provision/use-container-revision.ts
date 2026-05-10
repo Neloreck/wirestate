@@ -5,7 +5,7 @@ import { useIocContext } from "./use-ioc-context";
  *
  * @group provision
  *
- * @returns revision number
+ * @returns Revision number.
  */
 export function useContainerRevision(): number {
   return useIocContext().revision;

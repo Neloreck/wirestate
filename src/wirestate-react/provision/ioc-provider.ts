@@ -26,11 +26,11 @@ export interface IocProviderProps extends PropsWithChildren<unknown> {
  *
  * @group provision
  *
- * @param props - component props
- * @param props.container - external container instance
- * @param props.seed - shared seed across the container
- * @param props.children - components to wrap
- * @returns provider element
+ * @param props - Component props.
+ * @param props.container - External container instance.
+ * @param props.seed - Shared seed across the container.
+ * @param props.children - Components to wrap.
+ * @returns Provider element.
  */
 export function IocProvider({ container: externalContainer, seed, children }: IocProviderProps) {
   // Incremented on binding changes to invalidate descendant caches (e.g., useInjection).

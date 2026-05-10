@@ -10,8 +10,8 @@ import { useContainer } from "../provision/use-container";
  *
  * @group commands
  *
- * @param type - command type
- * @param handler - command handler function
+ * @param type - Command type.
+ * @param handler - Command handler function.
  */
 export function useCommandHandler<R = unknown, D = unknown>(type: CommandType, handler: CommandHandler<D, R>): void {
   const container: Container = useContainer();

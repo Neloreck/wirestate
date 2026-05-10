@@ -32,8 +32,8 @@ export interface InjectablesProviderDecorator<T extends ReactiveElement = Reacti
  *
  * @group provision
  *
- * @param options - provisioning options
- * @returns injectables provider decorator instance
+ * @param options - Provisioning options.
+ * @returns Injectables provider decorator instance.
  *
  * @example
  * ```typescript

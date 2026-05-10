@@ -13,7 +13,7 @@ import { SyncQueryCaller } from "../types/queries";
  *
  * @group queries
  *
- * @returns sync query dispatcher
+ * @returns Sync query dispatcher.
  */
 export function useSyncQueryCaller(): SyncQueryCaller {
   const container: Container = useContainer();

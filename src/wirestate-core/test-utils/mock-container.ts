@@ -37,10 +37,10 @@ export interface MockContainerOptions {
  *
  * @group container
  *
- * @param options - configuration options for the mock container
- * @returns a configured InversifyJS {@link Container}
+ * @param options - Configuration options for the mock container.
+ * @returns A configured InversifyJS {@link Container}.
  *
- * @throws {WirestateError} if an identifier in `activate` is not found in `services`
+ * @throws {WirestateError} If an identifier in `activate` is not found in `services`.
  */
 export function mockContainer(options: MockContainerOptions = {}): Container {
   const { activate = [], entries = [], skipLifecycle } = options;

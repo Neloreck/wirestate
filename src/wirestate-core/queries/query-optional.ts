@@ -13,10 +13,10 @@ import { QueryBus } from "./query-bus";
  *
  * @group queries
  *
- * @param container - inversify container
- * @param type - query type
- * @param data - query data
- * @returns query result or null
+ * @param container - Inversify container.
+ * @param type - Query type.
+ * @param data - Query data.
+ * @returns Query result or null.
  */
 export function queryOptional<R = unknown, D = unknown>(
   container: Container,

@@ -24,11 +24,11 @@ export interface UseOnCommandOptions<D = unknown, R = unknown> {
  *
  * @group commands
  *
- * @param host - the host element
- * @param options - command handling options
- * @param options.type - the command type to listen for
- * @param options.handler - the command handler function
- * @returns the command controller instance
+ * @param host - The host element.
+ * @param options - Command handling options.
+ * @param options.type - The command type to listen for.
+ * @param options.handler - The command handler function.
+ * @returns The command controller instance.
  *
  * @example
  * ```typescript

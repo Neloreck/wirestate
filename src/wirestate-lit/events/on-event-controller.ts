@@ -20,9 +20,9 @@ export class OnEventController<E extends Event = Event> implements ReactiveContr
   private readonly handler: EventHandler<E>;
 
   /**
-   * @param host - the host element
-   * @param types - event types to listen for, if null, all events will be handled
-   * @param handler - the event handler function
+   * @param host - The host element.
+   * @param types - Event types to listen for, if null, all events will be handled.
+   * @param handler - The event handler function.
    */
   public constructor(host: ReactiveElement, types: Optional<ReadonlyArray<EventType>>, handler: EventHandler<E>) {
     host.addController(this);

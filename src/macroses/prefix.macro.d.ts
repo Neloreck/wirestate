@@ -1,7 +1,7 @@
 /**
  * Returns a prefix for a filename/path.
  *
- * @param filename - filename/path to retrieve base prefix for
- * @returns filename prefix to use for logging
+ * @param filename - Filename/path to retrieve base prefix for.
+ * @returns Filename prefix to use for logging.
  */
 export function prefix(filename: string): string;

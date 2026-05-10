@@ -13,10 +13,10 @@ import { CommandBus } from "./command-bus";
  *
  * @group commands
  *
- * @param container - inversify container
- * @param type - command type
- * @param data - command data
- * @returns command descriptor or null
+ * @param container - Inversify container.
+ * @param type - Command type.
+ * @param data - Command data.
+ * @returns Command descriptor or null.
  */
 export function commandOptional<R = unknown, D = unknown, T extends CommandType = CommandType>(
   container: Container,

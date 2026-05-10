@@ -13,10 +13,10 @@ import { QueryBus } from "./query-bus";
  *
  * @group queries
  *
- * @param container - inversify container
- * @param type - query type
- * @param data - query data
- * @returns query result
+ * @param container - Inversify container.
+ * @param type - Query type.
+ * @param data - Query data.
+ * @returns Query result.
  */
 export function query<R = unknown, D = unknown>(container: Container, type: QueryType, data?: D): MaybePromise<R> {
   dbg.info(prefix(__filename), "Query data:", type, data, container);

@@ -29,8 +29,8 @@ export interface OnCommandDecorator<D = unknown, R = unknown> {
  *
  * @group commands
  *
- * @param type - the command type to handle
- * @returns the decorator function.
+ * @param type - The command type to handle.
+ * @returns The decorator function.
  *
  * @example
  * ```typescript

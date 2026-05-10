@@ -35,9 +35,9 @@ export class WireScope {
    * Access the IoC container.
    * Available only for activated instances of scope.
    *
-   * @returns active container
+   * @returns Active container.
    *
-   * @throws WirestateError if scope is not activated or already disposed
+   * @throws WirestateError if scope is not activated or already disposed.
    */
   public getContainer(): Container {
     if (this.container) {
@@ -63,10 +63,10 @@ export class WireScope {
    * Use for lazy resolution or circular dependency breaking.
    * Available only for activated containers.
    *
-   * @param injectionId - injection identifier
-   * @returns resolved injection, service instance, or generic value
+   * @param injectionId - Injection identifier.
+   * @returns Resolved injection, service instance, or generic value.
    *
-   * @throws WirestateError if scope is not activated
+   * @throws WirestateError if scope is not activated.
    */
   public resolve<T>(injectionId: ServiceIdentifier<T>): T {
     dbg.info(prefix(__filename), "Lazy resolve:", {
@@ -82,10 +82,10 @@ export class WireScope {
    * Use for lazy resolution or circular dependency breaking.
    * Available only for activated containers.
    *
-   * @param injectionId - injection identifier
-   * @returns resolved injection, service instance, generic value, or null if it is not bound
+   * @param injectionId - Injection identifier.
+   * @returns Resolved injection, service instance, generic value, or null if it is not bound.
    *
-   * @throws WirestateError if scope is not activated
+   * @throws WirestateError if scope is not activated.
    */
   public resolveOptional<T>(injectionId: ServiceIdentifier<T>): Optional<T> {
     dbg.info(prefix(__filename), "Lazy optional resolve:", {
@@ -102,11 +102,11 @@ export class WireScope {
    * Broadcasts an event.
    * Available only for activated containers.
    *
-   * @param type - type of event to emit
-   * @param payload - optional payload to send with the event
-   * @param from - optional sender of the event
+   * @param type - Type of event to emit.
+   * @param payload - Optional payload to send with the event.
+   * @param from - Optional sender of the event.
    *
-   * @throws WirestateError if scope is not activated
+   * @throws WirestateError if scope is not activated.
    */
   public emitEvent<P, T extends EventType = EventType>(type: T, payload?: P, from?: unknown): void {
     dbg.info(prefix(__filename), "Emit event:", {
@@ -128,10 +128,10 @@ export class WireScope {
    * Subscribes a handler to all events on the event bus.
    * Available only for activated containers.
    *
-   * @param handler - event handler function
-   * @returns unsubscribe function
+   * @param handler - Event handler function.
+   * @returns Unsubscribe function.
    *
-   * @throws WirestateError if scope is not activated
+   * @throws WirestateError if scope is not activated.
    */
   public subscribeToEvent(handler: EventHandler): EventUnsubscriber {
     dbg.info(prefix(__filename), "Subscribe event:", { handler });
@@ -143,9 +143,9 @@ export class WireScope {
    * Removes a specific event subscription by handler reference.
    * Available only for activated containers.
    *
-   * @param handler - event handler to remove
+   * @param handler - Event handler to remove.
    *
-   * @throws WirestateError if scope is not activated
+   * @throws WirestateError if scope is not activated.
    */
   public unsubscribeFromEvent(handler: EventHandler): void {
     dbg.info(prefix(__filename), "Unsubscribe event:", { handler });
@@ -157,11 +157,11 @@ export class WireScope {
    * Dispatches a query and returns the result.
    * Available only for activated containers.
    *
-   * @param type - query type
-   * @param data - query data
-   * @returns query result
+   * @param type - Query type.
+   * @param data - Query data.
+   * @returns Query result.
    *
-   * @throws WirestateError if scope is not activated
+   * @throws WirestateError if scope is not activated.
    */
   public queryData<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): MaybePromise<R> {
     dbg.info(prefix(__filename), "Query data:", { type, data });
@@ -173,9 +173,9 @@ export class WireScope {
    * Dispatches a query and returns the result.
    * Available only for activated containers.
    *
-   * @param type - query type
-   * @param data - query data
-   * @returns query result or null if handler is not registered
+   * @param type - Query type.
+   * @param data - Query data.
+   * @returns Query result or null if handler is not registered.
    */
   public queryOptionalData<R = unknown, D = unknown, T extends QueryType = QueryType>(
     type: T,
@@ -190,11 +190,11 @@ export class WireScope {
    * Registers a query handler on the query bus.
    * Available only for activated containers.
    *
-   * @param type - query type
-   * @param handler - handler function
-   * @returns unregister function
+   * @param type - Query type.
+   * @param handler - Handler function.
+   * @returns Unregister function.
    *
-   * @throws WirestateError if scope is not activated
+   * @throws WirestateError if scope is not activated.
    */
   public registerQueryHandler<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): QueryUnregister {
     dbg.info(prefix(__filename), "Register query handler:", { type });
@@ -206,10 +206,10 @@ export class WireScope {
    * Unregisters a specific query handler by type and reference.
    * Available only for activated containers.
    *
-   * @param type - query type
-   * @param handler - handler to remove
+   * @param type - Query type.
+   * @param handler - Handler to remove.
    *
-   * @throws WirestateError if scope is not activated
+   * @throws WirestateError if scope is not activated.
    */
   public unregisterQueryHandler<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): void {
     dbg.info(prefix(__filename), "Unregister query:", { type });
@@ -221,11 +221,11 @@ export class WireScope {
    * Dispatches a command and returns the descriptor.
    * Available only for activated containers.
    *
-   * @param type - command type
-   * @param data - command data
-   * @returns command descriptor
+   * @param type - Command type.
+   * @param data - Command data.
+   * @returns Command descriptor.
    *
-   * @throws WirestateError if scope is not activated
+   * @throws WirestateError if scope is not activated.
    */
   public executeCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(
     type: T,
@@ -240,9 +240,9 @@ export class WireScope {
    * Dispatches a command and returns the descriptor.
    * Available only for activated containers.
    *
-   * @param type - command type
-   * @param data - command data
-   * @returns command descriptor or null if handler is not registered
+   * @param type - Command type.
+   * @param data - Command data.
+   * @returns Command descriptor or null if handler is not registered.
    */
   public executeOptionalCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(
     type: T,
@@ -257,11 +257,11 @@ export class WireScope {
    * Registers a command handler on the command bus.
    * Available only for activated containers.
    *
-   * @param type - command type
-   * @param handler - handler function
-   * @returns unregister function
+   * @param type - Command type.
+   * @param handler - Handler function.
+   * @returns Unregister function.
    *
-   * @throws WirestateError if scope is not activated
+   * @throws WirestateError if scope is not activated.
    */
   public registerCommandHandler<D = unknown, R = unknown>(
     type: CommandType,
@@ -276,10 +276,10 @@ export class WireScope {
    * Unregisters a specific command handler by type and reference.
    * Available only for activated containers.
    *
-   * @param type - command type
-   * @param handler - handler to remove
+   * @param type - Command type.
+   * @param handler - Handler to remove.
    *
-   * @throws WirestateError if scope is not activated
+   * @throws WirestateError if scope is not activated.
    */
   public unregisterCommandHandler<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): void {
     dbg.info(prefix(__filename), "Unregister command:", { type });
@@ -295,10 +295,10 @@ export class WireScope {
    * Returns shared seed if parameters are not provided.
    * Available only for activated containers.
    *
-   * @param seed - lookup key
-   * @returns seed data or null if missing
+   * @param seed - Lookup key.
+   * @returns Seed data or null if missing.
    *
-   * @throws WirestateError if context is not activated
+   * @throws WirestateError if context is not activated.
    */
   public getSeed<T extends AnyObject>(seed?: SeedKey): Optional<T> {
     dbg.info(prefix(__filename), "Get initial state for key:", {

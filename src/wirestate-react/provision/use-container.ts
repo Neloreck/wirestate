@@ -7,7 +7,7 @@ import { useIocContext } from "./use-ioc-context";
  *
  * @group provision
  *
- * @returns active Inversify container
+ * @returns Active Inversify container.
  */
 export function useContainer(): Container {
   return useIocContext().container;

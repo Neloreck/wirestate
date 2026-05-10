@@ -84,8 +84,8 @@ export { bindingTypeValues as BindingType, bindingScopeValues as ScopeBindingTyp
  * @group inversify
  * @see {@link https://inversify.io/}
  *
- * @param forward - a function that returns the service identifier
- * @returns a lazy service identifier
+ * @param forward - A function that returns the service identifier.
+ * @returns A lazy service identifier.
  */
 export function forwardRef<TInstance = unknown>(
   forward: () => ServiceIdentifier<TInstance>

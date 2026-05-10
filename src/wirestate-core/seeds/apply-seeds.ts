@@ -12,8 +12,8 @@ import { SeedEntries, SeedsMap } from "../types/initial-state";
  *
  * @group seeds
  *
- * @param container - target container
- * @param seeds - targeted seed entries apply
+ * @param container - Target container.
+ * @param seeds - Targeted seed entries apply.
  */
 export function applySeeds(container: Container, seeds: SeedEntries): void {
   const existing: SeedsMap = container.get(SEEDS_TOKEN);

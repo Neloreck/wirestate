@@ -24,9 +24,9 @@ export class OnQueryController<D = unknown, R = unknown> implements ReactiveCont
   private readonly handler: QueryHandler<D, R>;
 
   /**
-   * @param host - the host element
-   * @param type - the query type to handle
-   * @param handler - the query handler function
+   * @param host - The host element.
+   * @param type - The query type to handle.
+   * @param handler - The query handler function.
    */
   public constructor(host: ReactiveElement, type: QueryType, handler: QueryHandler<D, R>) {
     host.addController(this);

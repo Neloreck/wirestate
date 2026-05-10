@@ -8,8 +8,8 @@ import { useContainer } from "../provision/use-container";
  *
  * @group events
  *
- * @param types - event types to filter by
- * @param handler - events handler
+ * @param types - Event types to filter by.
+ * @param handler - Events handler.
  */
 export function useEvents(types: ReadonlyArray<EventType>, handler: EventHandler): void {
   const typesRef: MutableRefObject<ReadonlyArray<EventType>> = useRef(types);

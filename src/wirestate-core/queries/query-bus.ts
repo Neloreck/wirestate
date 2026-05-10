@@ -22,9 +22,9 @@ export class QueryBus {
    * Registers a query handler.
    * Returns an unregister function.
    *
-   * @param type - query type
-   * @param handler - handler function
-   * @returns unregister function
+   * @param type - Query type.
+   * @param handler - Handler function.
+   * @returns Unregister function.
    */
   public register<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): QueryUnregister {
     dbg.info(prefix(__filename), "Registering query handler:", {
@@ -49,8 +49,8 @@ export class QueryBus {
    * Unregisters a specific query handler by type and reference.
    * No-ops silently if the handler was not registered for that type.
    *
-   * @param type - query type
-   * @param handler - handler to remove
+   * @param type - Query type.
+   * @param handler - Handler to remove.
    */
   public unregister<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): void {
     dbg.info(prefix(__filename), "Unregistering query handler:", {
@@ -80,11 +80,11 @@ export class QueryBus {
   /**
    * Dispatches a query to the last registered handler.
    *
-   * @param type - query type
-   * @param data - query payload
-   * @returns query result
+   * @param type - Query type.
+   * @param data - Query payload.
+   * @returns Query result.
    *
-   * @throws if no handler is registered
+   * @throws If no handler is registered.
    */
   public query<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): MaybePromise<R> {
     const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
@@ -103,9 +103,9 @@ export class QueryBus {
   /**
    * Dispatches a query to the last registered handler, returning null if no handler exists.
    *
-   * @param type - query type
-   * @param data - query payload
-   * @returns query result or null if no handler is registered
+   * @param type - Query type.
+   * @param data - Query payload.
+   * @returns Query result or null if no handler is registered.
    */
   public queryOptional<R = unknown, D = unknown, T extends QueryType = QueryType>(
     type: T,
@@ -123,8 +123,8 @@ export class QueryBus {
   /**
    * Checks if a handler is registered for the given type.
    *
-   * @param type - query type
-   * @returns true if handler exists
+   * @param type - Query type.
+   * @returns True if handler exists.
    */
   public has(type: QueryType): boolean {
     const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);

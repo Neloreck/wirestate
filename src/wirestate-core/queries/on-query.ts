@@ -10,8 +10,8 @@ import type { QueryHandlerMetadata, QueryType } from "../types/queries";
  *
  * @group queries
  *
- * @param type - query type identifier
- * @returns decorator function
+ * @param type - Query type identifier.
+ * @returns Decorator function.
  */
 export function OnQuery(type: QueryType): MethodDecorator {
   return (target, propertyKey) => {

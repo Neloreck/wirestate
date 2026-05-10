@@ -34,9 +34,9 @@ export interface BindServiceOptions {
  *
  * @group bind
  *
- * @param container - target Inversify container
- * @param entry - service constructor
- * @param options - options object to control binding flow
+ * @param container - Target Inversify container.
+ * @param entry - Service constructor.
+ * @param options - Options object to control binding flow.
  */
 export function bindService<T extends object>(
   container: Container,
@@ -191,8 +191,8 @@ export function bindService<T extends object>(
 /**
  * Attaches a event subscription to a service.
  *
- * @param service - service instance
- * @param handler - event handler
+ * @param service - Service instance.
+ * @param handler - Event handler.
  * @internal
  */
 function attachEventsSubscription<T extends object>(service: T, handler: EventHandler): void {
@@ -206,7 +206,7 @@ function attachEventsSubscription<T extends object>(service: T, handler: EventHa
 /**
  * Detaches the event subscription from a service.
  *
- * @param service - service instance
+ * @param service - Service instance.
  * @internal
  */
 function detachEventSubscription<T extends object>(service: T): void {
@@ -221,8 +221,8 @@ function detachEventSubscription<T extends object>(service: T): void {
 /**
  * Registers a query unregister function for a service.
  *
- * @param service - service instance
- * @param unregister - query unregister function
+ * @param service - Service instance.
+ * @param unregister - Query unregister function.
  * @internal
  */
 function attachQueryUnregister<T extends object>(service: T, unregister: QueryUnregister): void {
@@ -239,7 +239,7 @@ function attachQueryUnregister<T extends object>(service: T, unregister: QueryUn
 /**
  * Executes and removes all query unregister functions for a service.
  *
- * @param service - service instance
+ * @param service - Service instance.
  * @internal
  */
 function detachQueryUnregister<T extends object>(service: T): void {
@@ -259,8 +259,8 @@ function detachQueryUnregister<T extends object>(service: T): void {
 /**
  * Registers a command unregister function for a service.
  *
- * @param service - service instance
- * @param unregister - command unregister function
+ * @param service - Service instance.
+ * @param unregister - Command unregister function.
  * @internal
  */
 function attachCommandUnregister<T extends object>(service: T, unregister: CommandUnregister): void {
@@ -277,7 +277,7 @@ function attachCommandUnregister<T extends object>(service: T, unregister: Comma
 /**
  * Executes and removes all command unregister functions for a service.
  *
- * @param service - service instance
+ * @param service - Service instance.
  * @internal
  */
 function detachCommandUnregister<T extends object>(service: T): void {
@@ -299,10 +299,10 @@ function detachCommandUnregister<T extends object>(service: T): void {
  * Property iteration happens only when the constructor metadata declares a WireScope
  * parameter, avoiding false positives from manually created or subclassed scopes.
  *
- * todo: Simplify this part.
+ * Todo: Simplify this part..
  *
- * @param service - service instance
- * @param Service - service constructor
+ * @param service - Service instance.
+ * @param Service - Service constructor.
  * @internal
  */
 function attachWireScopes<T extends object>(service: T, Service: Newable<T>): void {
@@ -331,9 +331,9 @@ function attachWireScopes<T extends object>(service: T, Service: Newable<T>): vo
  * Marks all injected WireScope instances for this service as disposed and removes
  * the stored references.
  *
- * todo: Simplify this part.
+ * Todo: Simplify this part..
  *
- * @param service - service instance
+ * @param service - Service instance.
  * @internal
  */
 function detachWireScopes<T extends object>(service: T): void {

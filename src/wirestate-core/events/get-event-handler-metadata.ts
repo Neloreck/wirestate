@@ -12,8 +12,8 @@ import { Maybe } from "../types/general";
  * @group events
  * @internal
  *
- * @param instance - service instance
- * @returns metadata list
+ * @param instance - Service instance.
+ * @returns Metadata list.
  */
 export function getEventHandlerMetadata(instance: object): ReadonlyArray<EventHandlerMetadata> {
   dbg.info(prefix(__filename), "Retrieving event handler metadata:", { name: instance.constructor.name, instance });

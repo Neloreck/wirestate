@@ -29,8 +29,8 @@ export interface OnQueryDecorator<D = unknown, R = unknown> {
  *
  * @group queries
  *
- * @param type - the query type to handle
- * @returns the decorator function
+ * @param type - The query type to handle.
+ * @returns The decorator function.
  *
  * @example
  * ```typescript

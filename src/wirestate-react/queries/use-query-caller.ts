@@ -12,7 +12,7 @@ import { QueryCaller } from "../types/queries";
  *
  * @group queries
  *
- * @returns query dispatcher
+ * @returns Query dispatcher.
  */
 export function useQueryCaller(): QueryCaller {
   const container: Container = useContainer();

@@ -15,8 +15,8 @@ const NODE_MODULES = "node_modules/";
 /**
  * Extracts the npm package name from a file path, or null if the path is not inside node_modules.
  *
- * @param filePath - full path to the file
- * @returns optional package name
+ * @param filePath - Full path to the file.
+ * @returns Optional package name.
  */
 function extractPackageName(filePath) {
   // Use the last node_modules/ to skip pnpm virtual store prefix
@@ -31,7 +31,7 @@ function extractPackageName(filePath) {
 }
 
 /**
- * @param application - tsdoc application instance to hook into
+ * @param application - TSDoc application instance to hook into.
  */
 export function load(application) {
   application.converter.on(Converter.EVENT_RESOLVE_BEGIN, (context) => {

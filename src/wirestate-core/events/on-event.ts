@@ -10,8 +10,8 @@ import type { Maybe, Optional } from "../types/general";
  *
  * @group events
  *
- * @param types - event type(s) to handle. If omitted, handles all events
- * @returns decorator function
+ * @param types - Event type(s) to handle. If omitted, handles all events.
+ * @returns Decorator function.
  */
 export function OnEvent(types?: EventType | ReadonlyArray<EventType>): MethodDecorator {
   // Normalize types to an array or null for catch-all.

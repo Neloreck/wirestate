@@ -59,9 +59,9 @@ export interface CreateInjectablesProviderOptions {
  *
  * @group provision
  *
- * @param entries - service classes or injectable descriptors to bind
- * @param options - provider configuration
- * @returns injectables provider component
+ * @param entries - Service classes or injectable descriptors to bind.
+ * @param options - Provider configuration.
+ * @returns Injectables provider component.
  */
 export function createInjectablesProvider(
   entries: ReadonlyArray<Newable<object> | InjectableDescriptor>,

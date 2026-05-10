@@ -10,8 +10,8 @@ import { useContainer } from "../provision/use-container";
  *
  * @group queries
  *
- * @param type - query type
- * @param handler - query handler function
+ * @param type - Query type.
+ * @param handler - Query handler function.
  */
 export function useQueryHandler<R = unknown, D = unknown, T extends QueryType = QueryType>(
   type: T,

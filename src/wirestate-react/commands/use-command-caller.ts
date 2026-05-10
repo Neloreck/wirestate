@@ -11,7 +11,7 @@ import { useContainer } from "../provision/use-container";
  *
  * @group commands
  *
- * @returns command dispatcher
+ * @returns Command dispatcher.
  */
 export function useCommandCaller() {
   const container: Container = useContainer();

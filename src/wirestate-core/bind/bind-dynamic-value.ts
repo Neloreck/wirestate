@@ -10,8 +10,8 @@ import { InjectableDescriptor } from "../types/privision";
  *
  * @group bind
  *
- * @param container - target Inversify container
- * @param entry - descriptor of entry to bind
+ * @param container - Target Inversify container.
+ * @param entry - Descriptor of entry to bind.
  */
 export function bindDynamicValue(container: Container, entry: InjectableDescriptor): void {
   dbg.info(prefix(__filename), "Binding constant:", {

@@ -8,8 +8,8 @@ import { useContainer } from "../provision/use-container";
  *
  * @group events
  *
- * @param type - event type to listen to
- * @param handler - event handler to invoke when event is emitted
+ * @param type - Event type to listen to.
+ * @param handler - Event handler to invoke when event is emitted.
  */
 export function useEvent(type: EventType, handler: EventHandler): void {
   const typeRef: MutableRefObject<EventType> = useRef(type);

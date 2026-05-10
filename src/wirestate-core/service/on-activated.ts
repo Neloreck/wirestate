@@ -9,7 +9,7 @@ import type { Maybe } from "../types/general";
  *
  * @group service
  *
- * @returns decorator function
+ * @returns Decorator function.
  */
 export function OnActivated(): MethodDecorator {
   return (target, propertyKey) => {

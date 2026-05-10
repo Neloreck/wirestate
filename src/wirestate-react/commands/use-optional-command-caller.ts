@@ -12,7 +12,7 @@ import { useContainer } from "../provision/use-container";
  *
  * @group commands
  *
- * @returns optional command dispatcher
+ * @returns Optional command dispatcher.
  */
 export function useOptionalCommandCaller() {
   const container: Container = useContainer();

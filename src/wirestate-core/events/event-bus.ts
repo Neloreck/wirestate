@@ -14,7 +14,7 @@ export class EventBus {
   /**
    * Broadcasts an event to all subscribers.
    *
-   * @param event - event to emit
+   * @param event - Event to emit.
    */
   public emit<P = unknown, T extends EventType = EventType, F = unknown>(event: Event<P, T, F>): void {
     // Snapshot prevents concurrent modification errors if handlers sub/unsub during emit.
@@ -34,8 +34,8 @@ export class EventBus {
    * Subscribes a handler to all events.
    * Returns an unsubscribe function.
    *
-   * @param handler - event handler function
-   * @returns unsubscribe function
+   * @param handler - Event handler function.
+   * @returns Unsubscribe function.
    */
   public subscribe(handler: EventHandler): EventUnsubscriber {
     dbg.info(prefix(__filename), "Adding event subscription:", {
@@ -52,7 +52,7 @@ export class EventBus {
    * Removes a specific subscriber by handler reference.
    * No-ops silently if the handler was not subscribed.
    *
-   * @param handler - event handler to remove
+   * @param handler - Event handler to remove.
    */
   public unsubscribe(handler: EventHandler): void {
     dbg.info(prefix(__filename), "Removing event subscription:", {
@@ -66,7 +66,7 @@ export class EventBus {
   /**
    * Checks if any handler is registered.
    *
-   * @returns true if any handler exists
+   * @returns True if any handler exists.
    */
   public has(): boolean {
     return this.handlers.size > 0;

@@ -10,7 +10,7 @@ import { Optional } from "../types/general";
  *
  * @group provision
  *
- * @returns active IoC context
+ * @returns Active IoC context.
  * @internal
  */
 export function useIocContext(): IocContext {

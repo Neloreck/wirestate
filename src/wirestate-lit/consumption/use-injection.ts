@@ -50,9 +50,9 @@ export interface UseInjectionValue<T> {
  *
  * @group consumption
  *
- * @param host - the host element
- * @param optionsOrInjectionId - injection options including the service identifier or the service identifier itself
- * @returns injection descriptor object
+ * @param host - The host element.
+ * @param optionsOrInjectionId - Injection options including the service identifier or the service identifier itself.
+ * @returns Injection descriptor object.
  *
  * @example
  * ```typescript

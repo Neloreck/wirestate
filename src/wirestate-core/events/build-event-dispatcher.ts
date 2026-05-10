@@ -12,8 +12,8 @@ import { getEventHandlerMetadata } from "./get-event-handler-metadata";
  * @group events
  * @internal
  *
- * @param instance - service instance
- * @returns event handler or null if no handlers are declared
+ * @param instance - Service instance.
+ * @returns Event handler or null if no handlers are declared.
  */
 export function buildEventDispatcher<T extends object>(instance: T): Optional<EventHandler> {
   dbg.info(prefix(__filename), "Build event dispatcher for:", { name: instance.constructor.name, instance });

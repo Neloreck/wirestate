@@ -44,17 +44,17 @@ export class IocProviderController<
   public container: Container;
 
   /**
-   * @returns current {@link IocContext} value served to child consumers
+   * @returns Current {@link IocContext} value served to child consumers.
    */
   public get value(): IocContext {
     return this.provider.value;
   }
 
   /**
-   * @param host - the host element
-   * @param options - provisioning options
-   * @param options.container - optional existing container to use. If not provided, a new one will be created
-   * @param options.seed - optional seed data to apply to the container
+   * @param host - The host element.
+   * @param options - Provisioning options.
+   * @param options.container - Optional existing container to use. If not provided, a new one will be created.
+   * @param options.seed - Optional seed data to apply to the container.
    */
   public constructor(
     private readonly host: E,

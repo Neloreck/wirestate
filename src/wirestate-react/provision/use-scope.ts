@@ -12,7 +12,7 @@ import { useIocContext } from "./use-ioc-context";
  *
  * @group provision
  *
- * @returns active wire scope
+ * @returns Active wire scope.
  */
 export function useScope(): WireScope {
   const { container } = useIocContext();

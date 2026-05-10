@@ -12,8 +12,8 @@ import type { QueryHandlerMetadata } from "../types/queries";
  * @group queries
  * @internal
  *
- * @param instance - service instance
- * @returns metadata list
+ * @param instance - Service instance.
+ * @returns Metadata list.
  */
 export function getQueryHandlerMetadata(instance: object): ReadonlyArray<QueryHandlerMetadata> {
   dbg.info(prefix(__filename), "Resolving instance query metadata:", { name: instance.constructor.name, instance });

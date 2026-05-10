@@ -47,8 +47,8 @@ export interface InjectionOptions<T> {
  *
  * @group consumption
  *
- * @param optionsOrInjectionId - injection options including the service identifier or the service identifier itself
- * @returns injection decorator instance
+ * @param optionsOrInjectionId - Injection options including the service identifier or the service identifier itself.
+ * @returns Injection decorator instance.
  *
  * @example
  * ```typescript

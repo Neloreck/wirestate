@@ -26,14 +26,14 @@ export interface BindEntryOptions extends BindServiceOptions {
  * - Service classes (function entries) - bound as singleton
  * - Constant values - bound via `bindConstant`
  * - Dynamic values - bound via `toDynamicValue` with optional scope
- * - Instance bindings - bound as generic singleton service
+ * - Instance bindings - bound as generic singleton service.
  *
  * @group bind
  *
- * @param container - target IOC container to bind into
- * @param entry - entry descriptor to bind
- * @param options - optional binding configuration
- * @returns void
+ * @param container - Target IOC container to bind into.
+ * @param entry - Entry descriptor to bind.
+ * @param options - Optional binding configuration.
+ * @returns Void.
  */
 export function bindEntry<T extends object = object>(
   container: Container,

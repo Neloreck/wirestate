@@ -12,7 +12,7 @@ import { EventEmitter } from "../types/events";
  *
  * @group events
  *
- * @returns event emitter
+ * @returns Event emitter.
  */
 export function useEventEmitter<P = unknown, T extends EventType = EventType>(): EventEmitter<P, T> {
   const container: Container = useIocContext().container;

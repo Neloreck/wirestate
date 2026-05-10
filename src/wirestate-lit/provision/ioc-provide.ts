@@ -27,10 +27,10 @@ export interface IocProviderDecorator<E extends ReactiveElement = ReactiveElemen
  *
  * @group provision
  *
- * @param options - provisioning options including container and seed data
- * @param options.container - optional existing container to use, if not provided, a new one will be created
- * @param options.seed - optional seed data to apply to the container
- * @returns IOC provision controller instance
+ * @param options - Provisioning options including container and seed data.
+ * @param options.container - Optional existing container to use, if not provided, a new one will be created.
+ * @param options.seed - Optional seed data to apply to the container.
+ * @returns IOC provision controller instance.
  *
  * @example
  * ```typescript

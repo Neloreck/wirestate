@@ -9,13 +9,13 @@ import { InjectablesProviderController, InjectablesProviderControllerOptions } f
  *
  * @group provision
  *
- * @param host - the host element
- * @param options - provisioning options
- * @param options.entries - list of service entries to bind to the container
- * @param options.into - target IoC context; if omitted, uses the nearest provider context
- * @param options.activate - list of service identifiers to activate immediately after binding
- * @param options.seeds - seed data applied before binding
- * @returns the controller instance
+ * @param host - The host element.
+ * @param options - Provisioning options.
+ * @param options.entries - List of service entries to bind to the container.
+ * @param options.into - Target IoC context; if omitted, uses the nearest provider context.
+ * @param options.activate - List of service identifiers to activate immediately after binding.
+ * @param options.seeds - Seed data applied before binding.
+ * @returns The controller instance.
  *
  * @example
  * ```typescript

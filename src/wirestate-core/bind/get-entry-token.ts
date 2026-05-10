@@ -9,8 +9,8 @@ import type { InjectableDescriptor } from "../types/privision";
  *
  * @group bind
  *
- * @param entry - entry descriptor to get service identifier for
- * @returns injectable identifier token
+ * @param entry - Entry descriptor to get service identifier for.
+ * @returns Injectable identifier token.
  */
 export function getEntryToken<T extends object = object>(entry: Newable<T> | InjectableDescriptor): ServiceIdentifier {
   return typeof entry === "function" ? entry : entry.id;

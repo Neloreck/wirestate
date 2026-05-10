@@ -33,8 +33,8 @@ export interface CreateIocContainerOptions {
  *
  * @group container
  *
- * @param options - container configuration
- * @returns new IoC container
+ * @param options - Container configuration.
+ * @returns New IoC container.
  */
 export function createIocContainer(options: CreateIocContainerOptions = {}): Container {
   dbg.info(prefix(__filename), "Creating IOC container:", { options });

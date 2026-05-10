@@ -10,8 +10,8 @@ import type { Maybe } from "../types/general";
  *
  * @group commands
  *
- * @param type - command type identifier
- * @returns decorator function
+ * @param type - Command type identifier.
+ * @returns Decorator function.
  */
 export function OnCommand(type: CommandType): MethodDecorator {
   return (target, propertyKey) => {

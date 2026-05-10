@@ -24,11 +24,11 @@ export interface UseOnQueryOptions<D = unknown, R = unknown> {
  *
  * @group queries
  *
- * @param host - the host element
- * @param options - query handling options
- * @param options.type - the query type to handle
- * @param options.handler - the query handler function
- * @returns the query controller instance
+ * @param host - The host element.
+ * @param options - Query handling options.
+ * @param options.type - The query type to handle.
+ * @param options.handler - The query handler function.
+ * @returns The query controller instance.
  *
  * @example
  * ```typescript

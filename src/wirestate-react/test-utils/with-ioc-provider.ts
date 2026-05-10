@@ -9,10 +9,10 @@ import { IocProvider } from "../provision/ioc-provider";
  *
  * @group provision
  *
- * @param children - components to wrap
- * @param container - optional custom container
- * @param seed - optional shared seed object
- * @returns wrapped components
+ * @param children - Components to wrap.
+ * @param container - Optional custom container.
+ * @param seed - Optional shared seed object.
+ * @returns Wrapped components.
  */
 export function withIocProvider(
   children: ReactNode,

@@ -22,10 +22,10 @@ export interface MockBindServiceOptions {
  *
  * @group bind
  *
- * @param container - the IoC container to bind the service to
- * @param ServiceClass - the service class to bind
- * @param options - optional binding configuration
- * @returns void
+ * @param container - The IoC container to bind the service to.
+ * @param ServiceClass - The service class to bind.
+ * @param options - Optional binding configuration.
+ * @returns Void.
  */
 export function mockBindService<T extends object>(
   container: Container,

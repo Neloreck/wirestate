@@ -12,10 +12,10 @@ import { EventBus } from "./event-bus";
  *
  * @group events
  *
- * @param container - inversify container
- * @param type - event type ot emit
- * @param payload - event payload
- * @param from - optional indicator of the event source
+ * @param container - Inversify container.
+ * @param type - Event type ot emit.
+ * @param payload - Event payload.
+ * @param from - Optional indicator of the event source.
  */
 export function emitEvent<P, T extends EventType>(container: Container, type: T, payload?: P, from?: unknown): void {
   dbg.info(prefix(__filename), "Emit event:", { type: type, payload, container });

@@ -12,8 +12,8 @@ import { SeedEntries, SeedsMap } from "../types/initial-state";
  *
  * @group seeds
  *
- * @param container - target container
- * @param seeds - targeted seeds to remove
+ * @param container - Target container.
+ * @param seeds - Targeted seeds to remove.
  */
 export function unapplySeeds(container: Container, seeds: SeedEntries): void {
   const existing: SeedsMap = container.get(SEEDS_TOKEN);

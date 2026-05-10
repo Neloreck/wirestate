@@ -24,10 +24,10 @@ export interface MockBindEntryOptions {
  *
  * @group bind
  *
- * @param container - the IoC container to bind the entry to
- * @param entry - the service class or injectable descriptor to bind
- * @param options - optional binding configuration
- * @returns void
+ * @param container - The IoC container to bind the entry to.
+ * @param entry - The service class or injectable descriptor to bind.
+ * @param options - Optional binding configuration.
+ * @returns Void.
  */
 export function mockBindEntry<T extends object>(
   container: Container,

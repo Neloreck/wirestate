@@ -14,9 +14,9 @@ import { useIocContext } from "./use-ioc-context";
  *
  * @group provision
  *
- * @param injectionId - injection identifier
- * @param onFallback - optional callback to handle cases when dependency was not resolved
- * @returns resolved value, result of optional fallback handler or null
+ * @param injectionId - Injection identifier.
+ * @param onFallback - Optional callback to handle cases when dependency was not resolved.
+ * @returns Resolved value, result of optional fallback handler or null.
  */
 export function useOptionalInjection<T>(
   injectionId: ServiceIdentifier<T>,

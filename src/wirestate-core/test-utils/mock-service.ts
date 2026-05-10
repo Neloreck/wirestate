@@ -20,10 +20,10 @@ export interface MockServiceOptions {
  *
  * @group service
  *
- * @param service - the service class to mock
- * @param container - the IoC container to use, defaults to a new {@link mockContainer}
- * @param options - additional options for mocking
- * @returns the instantiated service instance
+ * @param service - The service class to mock.
+ * @param container - The IoC container to use, defaults to a new {@link mockContainer}.
+ * @param options - Additional options for mocking.
+ * @returns The instantiated service instance.
  */
 export function mockService<T extends object>(
   service: Newable<T>,

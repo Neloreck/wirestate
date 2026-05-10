@@ -11,8 +11,8 @@ import type { Maybe } from "../types/general";
  * @group service
  * @internal
  *
- * @param instance - service instance
- * @returns list of method names
+ * @param instance - Service instance.
+ * @returns List of method names.
  */
 export function getActivatedHandlerMetadata(instance: object): ReadonlyArray<string | symbol> {
   dbg.info(prefix(__filename), "Resolving OnActivated metadata:", { name: instance.constructor.name, instance });

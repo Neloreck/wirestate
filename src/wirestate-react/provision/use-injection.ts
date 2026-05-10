@@ -14,8 +14,8 @@ import { useIocContext } from "./use-ioc-context";
  *
  * @group provision
  *
- * @param injectionId - injection identifier
- * @returns resolved value
+ * @param injectionId - Injection identifier.
+ * @returns Resolved value.
  */
 export function useInjection<T>(injectionId: ServiceIdentifier<T>): T {
   const { container, revision } = useIocContext();

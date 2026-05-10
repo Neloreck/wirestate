@@ -45,8 +45,8 @@ export interface LitProvisionFixture {
  *
  * @group test-utils
  *
- * @param container - optional pre-configured container; a fresh one is created when omitted
- * @returns fixture provision object for unit testing
+ * @param container - Optional pre-configured container; a fresh one is created when omitted.
+ * @returns Fixture provision object for unit testing.
  */
 export function createLitProvision(container?: Container): LitProvisionFixture {
   ensureProviderDefined();

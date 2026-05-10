@@ -9,7 +9,7 @@ import { Maybe } from "../types/general";
  *
  * @group events
  *
- * @param handler - event handler invoked for every emitted event
+ * @param handler - Event handler invoked for every emitted event.
  */
 export function useEventsHandler(handler: EventHandler): void {
   const handlerRef: MutableRefObject<Maybe<EventHandler>> = useRef(handler);
