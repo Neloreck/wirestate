@@ -1,6 +1,6 @@
 import { ReactiveElement } from "@lit/reactive-element";
 
-import { AnyObject, FieldMustMatchProvidedType, Interface } from "../types/general";
+import { FieldMustMatchProvidedType, Interface, Maybe } from "../types/general";
 
 import { IocProviderController, IocProviderControllerOptions } from "./ioc-provider-controller";
 
@@ -47,23 +47,27 @@ export function iocProvide<E extends ReactiveElement>({
   return ((
     protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, IocProviderController<E>>,
     nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, IocProviderController<E>>
-  ): void => {
+  ) => {
     if (typeof nameOrContext === "object") {
       // Standard decorators:
       nameOrContext.addInitializer(function () {
         protoOrTarget.set.call(this, new IocProviderController(this as unknown as E, { container, seed }));
       });
     } else {
-      // Experimental legacy decorators:
-      (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement): void => {
-        const controller = new IocProviderController(element as E, { container, seed });
+      let controller: Maybe<IocProviderController<E>>;
 
-        element.addController({
-          hostConnected(): void {
-            (element as AnyObject)[nameOrContext] = controller;
-          },
-        });
+      (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement): void => {
+        controller = new IocProviderController(element as E, { container, seed });
       });
+
+      return {
+        get(this: ReactiveElement): IocProviderController<E> {
+          return controller as IocProviderController<E>;
+        },
+        set(): void {},
+        configurable: true,
+        enumerable: true,
+      };
     }
   }) as IocProviderDecorator<E>;
 }

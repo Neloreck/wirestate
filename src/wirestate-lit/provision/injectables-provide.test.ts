@@ -31,7 +31,7 @@ describe("injectablesProvide", () => {
     const element: DecoratedElement = new DecoratedElement();
 
     expect(container.isBound(GenericService)).toBe(false);
-    expect(element.servicesProvider).toBeUndefined();
+    expect(element.servicesProvider).toBeInstanceOf(InjectablesProviderController);
 
     provider.appendChild(element);
     expect(container.isBound(GenericService)).toBe(true);

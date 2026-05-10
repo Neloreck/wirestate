@@ -1,6 +1,6 @@
 import { ReactiveElement } from "@lit/reactive-element";
 
-import { AnyObject, FieldMustMatchProvidedType, Interface } from "../types/general";
+import { FieldMustMatchProvidedType, Interface, Maybe } from "../types/general";
 
 import { InjectablesProviderController, InjectablesProviderControllerOptions } from "./injectables-provider-controller";
 
@@ -51,26 +51,27 @@ export function injectablesProvide<E extends ReactiveElement = ReactiveElement>(
     nameOrContext:
       | PropertyKey
       | ClassAccessorDecoratorContext<ReactiveElement, InjectablesProviderController<ReactiveElement>>
-  ): void => {
+  ) => {
     if (typeof nameOrContext === "object") {
       // Standard decorators:
       nameOrContext.addInitializer(function () {
         protoOrTarget.set.call(this, new InjectablesProviderController(this as ReactiveElement, options));
       });
     } else {
-      // Experimental legacy decorators:
-      (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement): void => {
-        const controller: InjectablesProviderController = new InjectablesProviderController(
-          element as ReactiveElement,
-          options
-        );
+      let controller: Maybe<InjectablesProviderController<E>>;
 
-        element.addController({
-          hostConnected(): void {
-            (element as AnyObject)[nameOrContext] = controller;
-          },
-        });
+      (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement): void => {
+        controller = new InjectablesProviderController(element as E, options);
       });
+
+      return {
+        get(this: ReactiveElement): InjectablesProviderController<E> {
+          return controller as InjectablesProviderController<E>;
+        },
+        set(): void {},
+        configurable: true,
+        enumerable: true,
+      };
     }
   }) as InjectablesProviderDecorator<E>;
 }

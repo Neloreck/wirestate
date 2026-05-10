@@ -31,10 +31,11 @@ describe("iocProvide", () => {
     }
   });
 
-  it("should expose an IocProviderController instance after host connects", () => {
+  it("should expose an IocProviderController instance immediately after construction", () => {
     const element: DecoratedElement = new DecoratedElement();
 
-    expect(element.ioc).toBeUndefined();
+    expect(element.ioc).toBeInstanceOf(IocProviderController);
+    expect(element.ioc.container).toBeInstanceOf(Container);
 
     document.body.appendChild(element);
     expect(element.ioc).toBeInstanceOf(IocProviderController);

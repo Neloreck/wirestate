@@ -133,16 +133,16 @@ describe("InjectablesProviderController", () => {
   });
 
   it("should throw a meaningful error when 'into' resolves to null", () => {
-    const { provider } = fixture;
-
     const element: TestConsumerElement = new TestConsumerElement();
 
-    new InjectablesProviderController(element, {
+    const controller = new InjectablesProviderController(element, {
       entries: [GenericService],
       into: () => null as unknown as IocContext,
     });
 
-    expect(() => provider.appendChild(element)).toThrow(
+    // Calling hostConnected() directly avoids jsdom swallowing the error via its
+    // custom-element reactions mechanism before it can reach expect().toThrow().
+    expect(() => controller.hostConnected()).toThrow(
       "InjectablesProviderController: the 'into' option resolved to null or undefined. Ensure the value or resolver function returns a valid IocContext."
     );
   });

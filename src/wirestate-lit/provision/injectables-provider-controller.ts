@@ -126,6 +126,12 @@ export class InjectablesProviderController<
     dbg.info(prefix(__filename), "Host connected:", { into: this.into });
 
     if (!this.into) {
+      // ContextConsumer with subscribe:false only invokes the user callback once (provided flag stays true
+      // after disconnect). On reconnect we fall back to the cached consumer.value so bind() still fires.
+      if (this.consumer?.value) {
+        this.bind(this.consumer.value);
+      }
+
       return;
     }
 
