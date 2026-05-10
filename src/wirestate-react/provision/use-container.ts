@@ -5,6 +5,8 @@ import { useIocContext } from "./use-ioc-context";
 /**
  * Returns the active IoC container.
  *
+ * @group provision
+ *
  * @returns active Inversify container
  */
 export function useContainer(): Container {

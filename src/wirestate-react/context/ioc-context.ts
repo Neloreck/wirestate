@@ -5,6 +5,8 @@ import { Optional } from "../types/general";
 
 /**
  * React context value.
+ *
+ * @group context
  */
 export interface IocContext {
   /**
@@ -24,6 +26,8 @@ export interface IocContext {
 /**
  * React context carrying the IoC container.
  * Internal. Use hooks to access services.
+ *
+ * @group context
  */
 export const IocReactContext: Context<Optional<IocContext>> = createContext<Optional<IocContext>>(null);
 

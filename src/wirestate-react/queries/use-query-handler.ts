@@ -8,6 +8,8 @@ import { useContainer } from "../provision/use-container";
  * The handler is stored in a ref to avoid manual memoization.
  * Only one handler is active per type; newer registrations shadow older ones.
  *
+ * @group queries
+ *
  * @param type - query type
  * @param handler - query handler function
  */

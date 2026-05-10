@@ -11,6 +11,8 @@ import { SyncQueryCaller } from "../types/queries";
  * Returns a stable function to dispatch synchronous queries.
  * Returns the value directly from the handler.
  *
+ * @group queries
+ *
  * @returns sync query dispatcher
  */
 export function useSyncQueryCaller(): SyncQueryCaller {

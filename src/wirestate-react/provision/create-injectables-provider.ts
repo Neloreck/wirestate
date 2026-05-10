@@ -20,6 +20,8 @@ import { Optional } from "../types/general";
 
 /**
  * Props for the component returned by {@link createInjectablesProvider}.
+ *
+ * @group provision
  */
 export interface InjectablesProviderProps {
   /**
@@ -35,11 +37,15 @@ export interface InjectablesProviderProps {
 
 /**
  * Component returned by {@link createInjectablesProvider}.
+ *
+ * @group provision
  */
 export type InjectablesProvider = ReturnType<typeof createInjectablesProvider>;
 
 /**
  * Configuration for {@link createInjectablesProvider}.
+ *
+ * @group provision
  */
 export interface CreateInjectablesProviderOptions {
   /**
@@ -50,6 +56,8 @@ export interface CreateInjectablesProviderOptions {
 
 /**
  * Creates a component that manages injectable lifetimes for its subtree.
+ *
+ * @group provision
  *
  * @param entries - service classes or injectable descriptors to bind
  * @param options - provider configuration

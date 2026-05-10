@@ -12,6 +12,8 @@ import { useIocContext } from "./use-ioc-context";
  * Resolves a value from the container if bound, returning null otherwise.
  * Unlike {@link useInjection}, this hook does not throw when the token is not bound.
  *
+ * @group provision
+ *
  * @param injectionId - injection identifier
  * @param onFallback - optional callback to handle cases when dependency was not resolved
  * @returns resolved value, result of optional fallback handler or null

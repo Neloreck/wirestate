@@ -4,6 +4,8 @@ import { Optional } from "./general";
 
 /**
  * Command calling function signature.
+ *
+ * @group commands
  */
 export type CommandCaller<R = unknown, D = unknown, T extends CommandType = CommandType> = (
   type: T,
@@ -12,6 +14,8 @@ export type CommandCaller<R = unknown, D = unknown, T extends CommandType = Comm
 
 /**
  * Command calling function signature.
+ *
+ * @group commands
  */
 export type OptionalCommandCaller<R = unknown, D = unknown, T extends CommandType = CommandType> = (
   type: T,

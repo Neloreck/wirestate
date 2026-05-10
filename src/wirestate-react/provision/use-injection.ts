@@ -12,6 +12,8 @@ import { useIocContext } from "./use-ioc-context";
  * Resolves a value from the container - constant or service.
  * Automatically re-resolves if the container is reset or services are rebound.
  *
+ * @group provision
+ *
  * @param injectionId - injection identifier
  * @returns resolved value
  */

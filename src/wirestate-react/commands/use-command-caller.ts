@@ -9,6 +9,8 @@ import { useContainer } from "../provision/use-container";
 /**
  * Returns a function to dispatch commands on the active container.
  *
+ * @group commands
+ *
  * @returns command dispatcher
  */
 export function useCommandCaller() {

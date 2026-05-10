@@ -8,6 +8,8 @@ import { useContainer } from "../provision/use-container";
  * The handler is stored in a ref to avoid manual memoization.
  * Only one handler is active per type; newer registrations shadow older ones.
  *
+ * @group commands
+ *
  * @param type - command type
  * @param handler - command handler function
  */

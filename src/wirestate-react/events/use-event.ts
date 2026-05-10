@@ -6,6 +6,8 @@ import { useContainer } from "../provision/use-container";
 /**
  * Subscribes a component to events.
  *
+ * @group events
+ *
  * @param type - event type to listen to
  * @param handler - event handler to invoke when event is emitted
  */

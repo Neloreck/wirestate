@@ -10,6 +10,8 @@ import { QueryCaller } from "../types/queries";
 /**
  * Returns a function to dispatch queries on the active container.
  *
+ * @group queries
+ *
  * @returns query dispatcher
  */
 export function useQueryCaller(): QueryCaller {

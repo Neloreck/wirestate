@@ -4,7 +4,14 @@ export default defineConfig({
   base: "/wirestate/",
   title: "Wirestate",
   description: "State management framework based on InversifyJS",
+  async transformPageData(pageData) {
+    if (pageData.relativePath.startsWith("api/wirestate-")) {
+      pageData.frontmatter.prev = false;
+      pageData.frontmatter.next = false;
+    }
+  },
   themeConfig: {
+    outline: [2, 3],
     nav: [
       { text: "Home", link: "/" },
       { text: "Guide", link: "/intro" },

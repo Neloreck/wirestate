@@ -11,6 +11,8 @@ import { OptionalSyncQueryCaller } from "../types/queries";
  * Returns a stable function to dispatch synchronous optional queries.
  * Returns null instead of throwing when no handler is registered.
  *
+ * @group queries
+ *
  * @returns optional sync query dispatcher
  */
 export function useOptionalSyncQueryCaller(): OptionalSyncQueryCaller {

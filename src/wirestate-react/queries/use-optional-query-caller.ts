@@ -11,6 +11,8 @@ import { OptionalQueryCaller } from "../types/queries";
  * Returns a function to dispatch optional queries on the active container.
  * Returns null instead of throwing when no handler is registered.
  *
+ * @group queries
+ *
  * @returns optional query dispatcher
  */
 export function useOptionalQueryCaller(): OptionalQueryCaller {

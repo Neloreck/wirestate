@@ -7,6 +7,8 @@ import { IocProvider } from "../provision/ioc-provider";
 /**
  * Wraps a component with IocProvider for testing.
  *
+ * @group provision
+ *
  * @param children - components to wrap
  * @param container - optional custom container
  * @param seed - optional shared seed object

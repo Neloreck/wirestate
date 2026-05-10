@@ -8,6 +8,8 @@ import { Optional } from "../types/general";
 /**
  * Returns the full IoC context.
  *
+ * @group provision
+ *
  * @returns active IoC context
  * @internal
  */

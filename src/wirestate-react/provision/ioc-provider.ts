@@ -7,6 +7,8 @@ import { AnyObject, Optional } from "../types/general";
 
 /**
  * Props for {@link IocProvider}.
+ *
+ * @group provision
  */
 export interface IocProviderProps extends PropsWithChildren<unknown> {
   /**
@@ -21,6 +23,8 @@ export interface IocProviderProps extends PropsWithChildren<unknown> {
 
 /**
  * Provides an IoC container to the component tree.
+ *
+ * @group provision
  *
  * @param props - component props
  * @param props.container - external container instance

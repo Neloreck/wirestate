@@ -7,6 +7,8 @@ import { Maybe } from "../types/general";
 /**
  * Subscribes a component to all events without type filtering.
  *
+ * @group events
+ *
  * @param handler - event handler invoked for every emitted event
  */
 export function useEventsHandler(handler: EventHandler): void {

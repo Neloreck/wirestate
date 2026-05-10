@@ -10,6 +10,8 @@ import { useContainer } from "../provision/use-container";
  * Returns a function to dispatch optional commands on the active container.
  * Returns null instead of throwing when no handler is registered.
  *
+ * @group commands
+ *
  * @returns optional command dispatcher
  */
 export function useOptionalCommandCaller() {

@@ -10,6 +10,8 @@ import { EventEmitter } from "../types/events";
 /**
  * Returns a stable function to emit events.
  *
+ * @group events
+ *
  * @returns event emitter
  */
 export function useEventEmitter<P = unknown, T extends EventType = EventType>(): EventEmitter<P, T> {
