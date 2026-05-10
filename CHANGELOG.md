@@ -6,6 +6,7 @@
 - `QueryBus`: add `unregister` method for explicit handler removal by type and reference
 - `CommandBus`: add `unregister` method for explicit handler removal by type and reference
 - `WireScope`: add new event/command/query subscribe-unsubscribe methods
+- Export more alias / methods from `@wirestate/core`
 - Export more alias / methods from `@wirestate/react-mobx`
 
 ## 0.6.3
