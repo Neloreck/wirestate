@@ -4,6 +4,7 @@ export default defineConfig({
   base: "/wirestate/",
   title: "Wirestate",
   description: "State management framework based on InversifyJS",
+  head: [["link", { rel: "icon", type: "image/svg+xml", href: "/wirestate/logo.svg" }]],
   async transformPageData(pageData) {
     if (pageData.relativePath.startsWith("api/wirestate-")) {
       pageData.frontmatter.prev = false;

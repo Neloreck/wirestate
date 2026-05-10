@@ -6,6 +6,8 @@ import { AnyObject, Interface, Optional } from "../types/general";
 import { OnEventController } from "./on-event-controller";
 
 /**
+ * Type definition for the on-event decorator.
+ *
  * @group events
  */
 export interface OnEventDecorator<E extends Event = Event> {
@@ -19,9 +21,42 @@ export interface OnEventDecorator<E extends Event = Event> {
 }
 
 /**
+ * Decorator to handle events from the event bus.
+ *
  * @group events
  *
- * @param types
+ * @param types - event types to listen for, if omitted, all events will be handled
+ * @returns onEvent raw decorator value
+
+ * @example
+ * ```typescript
+ * class MyElement extends LitElement {
+ *   @onEvent()
+ *   private onMyEvent(event: Event) {
+ *     console.log('Event received:', event);
+ *   }
+ * }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * class MyElement extends LitElement {
+ *   @onEvent('MY_EVENT_TYPE')
+ *   private onMyEvent(event: MyEvent) {
+ *     console.log('Event received:', event);
+ *   }
+ * }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * class MyElement extends LitElement {
+ *   @onEvent(['MY_EVENT_TYPE_1', 'MY_EVENT_TYPE_2'])
+ *   private onMyEvent(event: Event) {
+ *     console.log('Event received:', event);
+ *   }
+ * }
+ * ```
  */
 export function onEvent<E extends Event = Event>(types?: EventType | ReadonlyArray<EventType>): OnEventDecorator<E> {
   const normalized: Optional<ReadonlyArray<EventType>> =
@@ -30,14 +65,14 @@ export function onEvent<E extends Event = Event>(types?: EventType | ReadonlyArr
   return ((protoOrTarget: object, nameOrContext: PropertyKey | ClassMethodDecoratorContext) => {
     if (typeof nameOrContext === "object") {
       // Standard decorators:
-      nameOrContext.addInitializer(function () {
+      nameOrContext.addInitializer(function (): void {
         new OnEventController(this as ReactiveElement, normalized, (event) =>
           (this as AnyObject)[nameOrContext.name](event)
         );
       });
     } else {
       // Experimental legacy decorators:
-      (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement) => {
+      (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement): void => {
         new OnEventController(element, normalized, (event) => (element as AnyObject)[nameOrContext](event));
       });
     }

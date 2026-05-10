@@ -9,30 +9,64 @@ import { ContainerContext } from "../context/ioc-context";
 import { Optional } from "../types/general";
 
 /**
+ * Options for the {@link useInjection} hook.
+ *
  * @group consumption
  */
 export interface UseInjectionOptions<T> {
+  /**
+   * If true, the service will be fetched only once when the controller is created.
+   * If false (default), it will update if the container in the context changes.
+   */
   once?: boolean;
+  /**
+   * Initial value for the injection before it's fetched from the container.
+   */
   value?: Optional<T>;
+  /**
+   * The service identifier to inject.
+   */
   injectionId: ServiceIdentifier<T>;
 }
 
 /**
+ * The return value of the {@link useInjection} hook, containing the injected service.
+ *
  * @group consumption
  */
 export interface UseInjectionValue<T> {
+  /**
+   * The service identifier used for injection.
+   */
   injectionId: ServiceIdentifier<T>;
+  /**
+   * The injected service instance.
+   */
   value: T;
 }
 
 /**
+ * Hook (controller) to inject a service from the IoC container in a Lit component.
+ *
  * @group consumption
  *
- * @param host
- * @param root0
- * @param root0.once
- * @param root0.injectionId
- * @param root0.value
+ * @param host - the host element
+ * @param options - injection options including the service identifier
+ * @param options.once - if true, the service will be fetched only once when the controller is created
+ * @param options.value - initial value for the injection before it's fetched from the container
+ * @param options.injectionId - the service identifier to inject
+ * @returns injection descriptor object
+ *
+ * @example
+ * ```typescript
+ * class MyElement extends LitElement {
+ *   private myService = useInjection(this, { injectionId: MyService });
+ *
+ *   render() {
+ *     return html`<div>${this.myService.value.getName()}</div>`;
+ *   }
+ * }
+ * ```
  */
 export function useInjection<T extends object, E extends ReactiveControllerHost & HTMLElement>(
   host: E,

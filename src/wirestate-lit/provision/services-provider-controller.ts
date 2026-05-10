@@ -9,6 +9,7 @@ import {
   unapplySeeds,
   Newable,
   ServiceIdentifier,
+  WirestateError,
 } from "@wirestate/core";
 import { Callable } from "@wirestate/core/types/general";
 
@@ -19,16 +20,35 @@ import { ContainerContext, IocContext } from "../context/ioc-context";
 import { Maybe } from "../types/general";
 
 /**
+ * Options for the {@link ServicesProviderController}.
+ *
  * @group provision
  */
 export interface ServicesProviderControllerOptions {
+  /**
+   * List of service entries to bind to the container.
+   */
   entries: ReadonlyArray<Newable<object> | InjectableDescriptor>;
+  /**
+   * Target IoC context to bind services into.
+   * If not provided, it will use the context from the nearest provider.
+   */
   into?: IocContext | (() => IocContext);
+  /**
+   * List of service identifiers to activate (get from container) immediately.
+   */
   activate?: ReadonlyArray<ServiceIdentifier>;
+  /**
+   * Seed data to apply to the container.
+   */
   seeds?: SeedEntries;
 }
 
 /**
+ * Controller that binds services to an IoC container when the host connects.
+ *
+ * It automatically unbinds the services when the host disconnects.
+ *
  * @group provision
  */
 export class ServicesProviderController<E extends ReactiveControllerHost & HTMLElement> implements ReactiveController {
@@ -39,6 +59,14 @@ export class ServicesProviderController<E extends ReactiveControllerHost & HTMLE
   public readonly seeds: Maybe<SeedEntries>;
   public readonly into: Maybe<IocContext | Callable<IocContext>>;
 
+  /**
+   * @param host - the host element
+   * @param options - provisioning options
+   * @param options.entries - list of service entries to bind to the container
+   * @param options.into - target IoC context to bind services into, if not provided, it will use the context from the nearest provider
+   * @param options.activate - list of service identifiers to activate (get from container) immediately
+   * @param options.seeds - seed data to apply to the container
+   */
   public constructor(
     private readonly host: E,
     options: ServicesProviderControllerOptions
@@ -77,10 +105,10 @@ export class ServicesProviderController<E extends ReactiveControllerHost & HTMLE
 
     if (!context) {
       if (this.consumer["provided"] === false) {
-        throw new Error("not provided");
+        throw new WirestateError(-1, "not provided");
       }
 
-      throw new Error("todo");
+      throw new WirestateError(-1, "todo");
     }
 
     dbg.info(prefix(__filename), "Binding seeds and entries");
@@ -115,7 +143,7 @@ export class ServicesProviderController<E extends ReactiveControllerHost & HTMLE
     });
 
     if (!context) {
-      throw new Error("todo");
+      throw new WirestateError(-1, "todo");
     }
 
     for (const entry of this.entries) {

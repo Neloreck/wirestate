@@ -11,6 +11,7 @@ export { useOnEvents, UseOnEventsOptions } from "./events/use-on-events";
 
 export { ContainerContext } from "./context/ioc-context";
 
+export { iocProvide, IocProviderDecorator } from "./provision/ioc-provide";
 export { IocProviderController, IocProviderControllerOptions } from "./provision/ioc-provider-controller";
 export {
   ServicesProviderController,

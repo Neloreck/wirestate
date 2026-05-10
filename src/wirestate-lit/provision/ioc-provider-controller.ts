@@ -9,14 +9,26 @@ import { ContainerContext, IocContext } from "../context/ioc-context";
 import { AnyObject } from "../types/general";
 
 /**
+ * Options for the {@link IocProviderController}.
+ *
  * @group provision
  */
 export interface IocProviderControllerOptions {
+  /**
+   * Optional existing container to use. If not provided, a new one will be created.
+   */
   container?: Container;
+  /**
+   * Optional seed data to apply to the container.
+   */
   seed?: AnyObject;
 }
 
 /**
+ * Controller that provides an IoC container context to the host element and its children.
+ *
+ * It manages the lifecycle of the container and handles revision updates to notify consumers.
+ *
  * @group provision
  */
 export class IocProviderController implements ReactiveController {
@@ -24,12 +36,24 @@ export class IocProviderController implements ReactiveController {
   protected readonly seed?: AnyObject;
   protected revision: number = 1;
 
+  /**
+   * The managed Inversify IoC container.
+   */
   public container: Container;
 
+  /**
+   * @returns current {@link IocContext} value served to child consumers
+   */
   public get value(): IocContext {
     return this.provider.value;
   }
 
+  /**
+   * @param host - the host element
+   * @param options - provisioning options
+   * @param options.container - optional existing container to use. If not provided, a new one will be created
+   * @param options.seed - optional seed data to apply to the container
+   */
   public constructor(
     private readonly host: ReactiveControllerHost & HTMLElement,
     { container, seed }: IocProviderControllerOptions = {}

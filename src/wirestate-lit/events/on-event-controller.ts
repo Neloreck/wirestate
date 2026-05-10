@@ -6,6 +6,10 @@ import { ContainerContext } from "../context/ioc-context";
 import { Optional } from "../types/general";
 
 /**
+ * Controller that subscribes to events from the event bus.
+ *
+ * It automatically handles subscription and unsubscription based on the host element's lifecycle.
+ *
  * @group events
  */
 export class OnEventController<E extends Event = Event> implements ReactiveController {
@@ -15,6 +19,11 @@ export class OnEventController<E extends Event = Event> implements ReactiveContr
   private readonly types: Optional<ReadonlyArray<EventType>>;
   private readonly handler: EventHandler<E>;
 
+  /**
+   * @param host - the host element
+   * @param types - event types to listen for, if null, all events will be handled
+   * @param handler - event handler function
+   */
   public constructor(host: ReactiveElement, types: Optional<ReadonlyArray<EventType>>, handler: EventHandler<E>) {
     host.addController(this);
 
