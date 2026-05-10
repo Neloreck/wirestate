@@ -18,7 +18,7 @@ export interface UseOnEventsOptions<E extends Event = Event> {
   /**
    * Event types to listen for. If null or undefined, all events will be handled.
    */
-  types: Optional<EventType | ReadonlyArray<EventType>>;
+  types?: Optional<EventType | ReadonlyArray<EventType>>;
 }
 
 /**
