@@ -21,8 +21,10 @@ export { ContainerContext } from "./context/ioc-context";
 
 export { iocProvide, IocProviderDecorator } from "./provision/ioc-provide";
 export { IocProviderController, IocProviderControllerOptions } from "./provision/ioc-provider-controller";
+export { injectablesProvide, InjectablesProviderDecorator } from "./provision/injectables-provide";
 export {
-  ServicesProviderController,
-  ServicesProviderControllerOptions,
-} from "./provision/services-provider-controller";
+  InjectablesProviderController,
+  InjectablesProviderControllerOptions,
+} from "./provision/injectables-provider-controller";
+export { useInjectablesProvider } from "./provision/use-injectables-provider";
 export { useIocProvision, UseIocProvisionOptions } from "./provision/use-ioc-provision";

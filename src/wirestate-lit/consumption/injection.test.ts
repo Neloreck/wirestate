@@ -9,7 +9,7 @@ import { createLitProvision, LitProvisionFixture } from "../test-utils/create-li
 
 import { injection } from "./injection";
 
-describe("@injection decorator", () => {
+describe("injection", () => {
   let fixture: LitProvisionFixture;
 
   beforeEach(() => {

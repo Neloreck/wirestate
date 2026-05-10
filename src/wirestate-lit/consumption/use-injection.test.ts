@@ -9,7 +9,7 @@ import { createLitProvision, LitProvisionFixture } from "../test-utils/create-li
 
 import { useInjection } from "./use-injection";
 
-describe("useInjection hook", () => {
+describe("useInjection", () => {
   let fixture: LitProvisionFixture;
 
   beforeEach(() => {

@@ -1,6 +1,6 @@
 import { ReactiveElement } from "@lit/reactive-element";
 
-import { FieldMustMatchProvidedType, Interface } from "../types/general";
+import { AnyObject, FieldMustMatchProvidedType, Interface } from "../types/general";
 
 import { IocProviderController, IocProviderControllerOptions } from "./ioc-provider-controller";
 
@@ -9,9 +9,9 @@ import { IocProviderController, IocProviderControllerOptions } from "./ioc-provi
  *
  * @group provision
  */
-export interface IocProviderDecorator {
+export interface IocProviderDecorator<E extends ReactiveElement = ReactiveElement> {
   // Standard:
-  <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V extends IocProviderController>(
+  <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V extends IocProviderController<E>>(
     value: ClassAccessorDecoratorTarget<C, V>,
     context: ClassAccessorDecoratorContext<C, V>
   ): void;
@@ -19,7 +19,7 @@ export interface IocProviderDecorator {
   <K extends PropertyKey, Proto extends Interface<Omit<ReactiveElement, "renderRoot">>>(
     protoOrDescriptor: Proto,
     name?: K
-  ): FieldMustMatchProvidedType<Proto, K, IocProviderController>;
+  ): FieldMustMatchProvidedType<Proto, K, IocProviderController<E>>;
 }
 
 /**
@@ -40,25 +40,30 @@ export interface IocProviderDecorator {
  * }
  * ```
  */
-export function iocProvide({ container, seed }: IocProviderControllerOptions = {}): IocProviderDecorator {
+export function iocProvide<E extends ReactiveElement>({
+  container,
+  seed,
+}: IocProviderControllerOptions = {}): IocProviderDecorator<E> {
   return ((
-    protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, IocProviderController>,
-    nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, IocProviderController>
-  ) => {
+    protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, IocProviderController<E>>,
+    nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, IocProviderController<E>>
+  ): void => {
     if (typeof nameOrContext === "object") {
       // Standard decorators:
       nameOrContext.addInitializer(function () {
-        protoOrTarget.set.call(
-          this,
-          new IocProviderController(this as unknown as ReactiveElement, { container, seed })
-        );
+        protoOrTarget.set.call(this, new IocProviderController(this as unknown as E, { container, seed }));
       });
     } else {
       // Experimental legacy decorators:
       (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement): void => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (element as any)[nameOrContext] = new IocProviderController(element, { container, seed });
+        const controller = new IocProviderController(element as E, { container, seed });
+
+        element.addController({
+          hostConnected(): void {
+            (element as AnyObject)[nameOrContext] = controller;
+          },
+        });
       });
     }
-  }) as IocProviderDecorator;
+  }) as IocProviderDecorator<E>;
 }

@@ -31,7 +31,9 @@ export interface IocProviderControllerOptions {
  *
  * @group provision
  */
-export class IocProviderController implements ReactiveController {
+export class IocProviderController<
+  E extends ReactiveControllerHost & HTMLElement = ReactiveControllerHost & HTMLElement,
+> implements ReactiveController {
   protected readonly provider: ContextProvider<typeof ContainerContext>;
   protected readonly seed?: AnyObject;
   protected revision: number = 1;
@@ -55,7 +57,7 @@ export class IocProviderController implements ReactiveController {
    * @param options.seed - optional seed data to apply to the container
    */
   public constructor(
-    private readonly host: ReactiveControllerHost & HTMLElement,
+    private readonly host: E,
     { container, seed }: IocProviderControllerOptions = {}
   ) {
     this.host.addController(this);

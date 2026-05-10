@@ -7,7 +7,7 @@ import { createLitProvision, LitProvisionFixture } from "../test-utils/create-li
 import { OnQueryController } from "./on-query-controller";
 import { useOnQuery } from "./use-on-query";
 
-describe("useOnQuery hook", () => {
+describe("useOnQuery", () => {
   @customElement("ws-query-consumer")
   class TestConsumerElement extends ReactiveElement {}
 

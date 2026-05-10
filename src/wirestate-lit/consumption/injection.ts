@@ -3,7 +3,7 @@ import { ReactiveElement } from "@lit/reactive-element";
 import { ServiceIdentifier } from "@wirestate/core";
 
 import { ContainerContext } from "../context/ioc-context";
-import { FieldMustMatchProvidedType, Interface } from "../types/general";
+import { AnyObject, FieldMustMatchProvidedType, Interface } from "../types/general";
 
 /**
  * Type definition for the injection decorator.
@@ -103,8 +103,7 @@ export function injection<T>(optionsOrInjectionId: InjectionOptions<T> | Service
         new ContextConsumer(element, {
           context: ContainerContext,
           callback: (it) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (element as any)[nameOrContext] = it.container.get(injectionId);
+            (element as AnyObject)[nameOrContext] = it.container.get(injectionId);
           },
           subscribe: !once,
         });

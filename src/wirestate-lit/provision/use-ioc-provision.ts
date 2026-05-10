@@ -42,6 +42,6 @@ export interface UseIocProvisionOptions {
 export function useIocProvision<E extends ReactiveControllerHost & HTMLElement>(
   host: E,
   options: UseIocProvisionOptions = {}
-): IocProviderController {
+): IocProviderController<E> {
   return new IocProviderController(host, options);
 }

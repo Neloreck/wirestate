@@ -19,7 +19,7 @@ npm install @wirestate/core @wirestate/lit lit reflect-metadata
   - **Commands**: Register command handlers using `@onCommand` or `useOnCommand`.
   - **Queries**: Register query handlers using `@onQuery` or `useOnQuery`.
 - **Container Provisioning**: Provide and manage IoC containers within the Lit component tree using `@iocProvide` or `useIocProvision`.
-- **Service Binding**: Dynamically bind services to the container using `ServicesProviderController`.
+- **Service Binding**: Dynamically bind services to the container using `@injectablesProvide`, `useInjectablesProvider`, or `InjectablesProviderController`.
 - **Test Utilities**: Simplified setup for unit testing components with IoC dependencies.
 
 ## Provisioning
@@ -44,18 +44,69 @@ class MyApp extends LitElement {
 }
 ```
 
-### `ServicesProviderController`
+### `@injectablesProvide(options)` / `useInjectablesProvider(host, options)`
 
-Allows binding a set of services to the container scoped to the component's lifetime. Services are activated on connect and deactivated on disconnect.
+Binds a set of injectables to the nearest IoC container for the host element's lifetime. Entries are bound when the host connects and unbound when it disconnects.
+
+Using the decorator (accessor):
 
 ```typescript
 import { LitElement } from 'lit';
-import { ServicesProviderController } from '@wirestate/lit';
-import { MyService, AnotherService } from './services';
+import { customElement } from 'lit/decorators.js';
+import { injectablesProvide, InjectablesProviderController } from '@wirestate/lit';
 
-class MyComponent extends LitElement {
-  private services = new ServicesProviderController(this, {
-    entries: [MyService, AnotherService],
+import { AuthService, UserService } from './services';
+
+@customElement('my-app')
+class MyApp extends LitElement {
+  @injectablesProvide({ entries: [AuthService, UserService], activate: [AuthService] })
+  public services!: InjectablesProviderController<MyApp>;
+}
+```
+
+Using the hook:
+
+```typescript
+import { LitElement } from 'lit';
+import { useInjectablesProvider } from '@wirestate/lit';
+
+import { AuthService, UserService } from './services';
+
+class MyApp extends LitElement {
+  private services = useInjectablesProvider(this, {
+    entries: [AuthService, UserService],
+    activate: [AuthService],
+  });
+}
+```
+
+Using the controller directly:
+
+```typescript
+import { LitElement } from 'lit';
+import { InjectablesProviderController } from '@wirestate/lit';
+
+import { AuthService, UserService } from './services';
+
+class MyApp extends LitElement {
+  private services = new InjectablesProviderController(this, {
+    entries: [AuthService, UserService],
+    activate: [AuthService],
+  });
+}
+```
+
+To bind into a specific container instead of the nearest provider context, pass the `into` option:
+
+```typescript
+import { LitElement } from 'lit';
+import { useInjectablesProvider } from '@wirestate/lit';
+
+import { AuthService, UserService } from './services';
+
+class MyApp extends LitElement {
+  private services = useInjectablesProvider(this, {
+    entries: [AuthService, UserService],
   });
 }
 ```
@@ -70,6 +121,7 @@ Injects a service from the nearest IoC container. Supports both options object a
 import { LitElement, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { injection } from '@wirestate/lit';
+
 import { MyService } from './services';
 
 @customElement('my-component')
@@ -93,6 +145,7 @@ Using the controller:
 ```typescript
 import { LitElement, html } from 'lit';
 import { useInjection } from '@wirestate/lit';
+
 import { MyService } from './services';
 
 class MyComponent extends LitElement {
@@ -117,6 +170,7 @@ Subscribe to events from the event bus using `@onEvent` decorator or `useOnEvent
 ```typescript
 import { LitElement } from 'lit';
 import { onEvent } from '@wirestate/lit';
+
 import { UserLoggedInEvent } from './events';
 
 class MyListener extends LitElement {

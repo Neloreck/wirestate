@@ -7,7 +7,7 @@ import { createLitProvision, LitProvisionFixture } from "../test-utils/create-li
 import { OnEventController } from "./on-event-controller";
 import { useOnEvents } from "./use-on-events";
 
-describe("useOnEvents hook", () => {
+describe("useOnEvents", () => {
   @customElement("ws-event-consumer")
   class TestConsumerElement extends ReactiveElement {}
 
