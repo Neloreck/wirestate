@@ -38,7 +38,7 @@ export { unapplySeeds } from "./seeds/unapply-seeds";
 export { OnActivated } from "./service/on-activated";
 export { OnDeactivation } from "./service/on-deactivation";
 
-export { SeedEntries, SeedEntry, SeedKey } from "./types/initial-state";
+export { SeedsMap, SeedEntries, SeedEntry, SeedKey } from "./types/initial-state";
 export { InjectableDescriptor } from "./types/privision";
 export { CommandStatus, CommandDescriptor, CommandHandler, CommandType, CommandUnregister } from "./types/commands";
 export { QueryHandler, QueryType, QueryUnregister } from "./types/queries";

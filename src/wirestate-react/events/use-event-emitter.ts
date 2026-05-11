@@ -8,11 +8,25 @@ import { useIocContext } from "../provision/use-ioc-context";
 import { EventEmitter } from "../types/events";
 
 /**
- * Returns a stable function to emit events.
+ * Returns a stable function to emit events via the {@link EventBus}.
+ *
+ * @remarks
+ * The returned emitter is memoized using `useCallback` and stays stable
+ * for the lifetime of the container.
  *
  * @group events
  *
- * @returns Event emitter.
+ * @template P - Default payload type for emitted events.
+ * @template T - Default event identifier type.
+ *
+ * @returns An event emitter function.
+ *
+ * @example
+ * ```tsx
+ * const emit: EventEmitter = useEventEmitter();
+ *
+ * const onClick = () => emit("BUTTON_CLICKED", { id: "submit" });
+ * ```
  */
 export function useEventEmitter<P = unknown, T extends EventType = EventType>(): EventEmitter<P, T> {
   const container: Container = useIocContext().container;

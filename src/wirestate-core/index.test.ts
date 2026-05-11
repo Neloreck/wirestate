@@ -94,6 +94,7 @@ describe("Library exported API from wirestate-core", () => {
     "SeedEntries",
     "SeedEntry",
     "SeedKey",
+    "SeedsMap",
     "WireScope",
     "WirestateError",
     "applySeeds",

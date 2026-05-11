@@ -5,11 +5,24 @@ import { useContainer } from "../provision/use-container";
 import { Maybe } from "../types/general";
 
 /**
- * Subscribes a component to all events without type filtering.
+ * Subscribes a component to all events on the {@link EventBus} without type filtering.
+ *
+ * @remarks
+ * Useful for logging, debugging, or cross-cutting concerns that need to see
+ * every event passing through the bus.
+ * The handler is synced via `useRef` to avoid stale closures.
+ * The subscription is automatically cleaned up on unmount.
  *
  * @group events
  *
  * @param handler - Event handler invoked for every emitted event.
+ *
+ * @example
+ * ```tsx
+ * useEventsHandler((event) => {
+ *   console.log('Event receieved:', event.type, event.payload);
+ * });
+ * ```
  */
 export function useEventsHandler(handler: EventHandler): void {
   const handlerRef: MutableRefObject<Maybe<EventHandler>> = useRef(handler);

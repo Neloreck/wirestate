@@ -55,7 +55,7 @@ export interface MockContainerOptions {
  * @param options - Configuration options for the mock container.
  * @returns A configured Inversify {@link Container}.
  *
- * @throws {@link WirestateError} If an identifier in `activate` is not found in `entries`.
+ * @throws {WirestateError} If an identifier in `activate` is not found in `entries`.
  *
  * @example
  * ```typescript

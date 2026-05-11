@@ -29,7 +29,7 @@ export interface MockServiceOptions {
  * @template T - The type of the service being mocked.
  *
  * @param service - The service class constructor to mock.
- * @param container - The Inversify {@link Container} to use (defaults to a new mock container).
+ * @param container - The Inversify container to use (defaults to a new mock container).
  * @param options - Additional options for mocking.
  * @returns The resolved service instance.
  *

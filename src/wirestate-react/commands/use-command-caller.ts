@@ -5,15 +5,27 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { useContainer } from "../provision/use-container";
+import { CommandCaller } from "../types/commands";
 
 /**
- * Returns a function to dispatch commands on the active container.
+ * Returns a stable function to dispatch commands on the active container.
+ *
+ * @remarks
+ * The returned dispatcher is memoized using `useCallback` and stays stable
+ * for the lifetime of the container. It uses {@link CommandBus.command} internally.
  *
  * @group commands
  *
- * @returns Command dispatcher.
+ * @returns A command dispatcher function that takes a type and optional data.
+ *
+ * @example
+ * ```tsx
+ * const call: CommandCaller = useCommandCaller();
+ *
+ * const onClick = () => call("SAVE_USER_COMMAND", { id: 1 });
+ * ```
  */
-export function useCommandCaller() {
+export function useCommandCaller(): CommandCaller {
   const container: Container = useContainer();
 
   return useCallback(

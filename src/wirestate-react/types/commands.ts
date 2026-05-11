@@ -7,7 +7,7 @@ import { Optional } from "./general";
  *
  * @group commands
  */
-export type CommandCaller<R = unknown, D = unknown, T extends CommandType = CommandType> = (
+export type CommandCaller = <R = unknown, D = unknown, T extends CommandType = CommandType>(
   type: T,
   data?: D
 ) => CommandDescriptor<R>;
@@ -17,7 +17,7 @@ export type CommandCaller<R = unknown, D = unknown, T extends CommandType = Comm
  *
  * @group commands
  */
-export type OptionalCommandCaller<R = unknown, D = unknown, T extends CommandType = CommandType> = (
+export type OptionalCommandCaller = <R = unknown, D = unknown, T extends CommandType = CommandType>(
   type: T,
   data?: D
 ) => Optional<CommandDescriptor<R>>;
