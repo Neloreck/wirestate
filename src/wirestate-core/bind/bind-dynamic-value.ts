@@ -17,7 +17,7 @@ import { InjectableDescriptor } from "../types/privision";
  *
  * @template T - Type of the value being bound.
  *
- * @param container - Target Inversify container.
+ * @param container - Target Inversify {@link Container}.
  * @param entry - Descriptor containing `id`, `factory` or `value`, and optional `scopeBindingType`.
  * @returns Inversify fluent syntax for additional constraints.
  *

@@ -25,7 +25,7 @@ export interface BindEntryOptions extends BindServiceOptions {
 }
 
 /**
- * Binds an entry to the Inversify container using the appropriate strategy.
+ * Binds an entry to the Inversify {@link Container} using the appropriate strategy.
  *
  * @remarks
  * This is a high-level dispatching function that selects the binding method based on the `entry` type:
@@ -38,7 +38,7 @@ export interface BindEntryOptions extends BindServiceOptions {
  *
  * @template T - Type of the object being bound.
  *
- * @param container - Target Inversify container.
+ * @param container - Target Inversify {@link Container}.
  * @param entry - Class constructor or {@link InjectableDescriptor} describing the service.
  * @param options - Optional binding configuration (primarily used for class-based services).
  *

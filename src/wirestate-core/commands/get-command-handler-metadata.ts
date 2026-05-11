@@ -7,13 +7,16 @@ import type { Maybe } from "../types/general";
 
 /**
  * Retrieves `@OnCommand` metadata from the class hierarchy.
- * Returns handlers ordered from base to derived class.
+ *
+ * @remarks
+ * Traverses the prototype chain to collect all command handlers.
+ * Returns metadata ordered from base class to derived class to ensure parent-first execution.
  *
  * @group commands
  * @internal
  *
- * @param instance - Service instance.
- * @returns Metadata list.
+ * @param instance - The service instance to inspect.
+ * @returns A read-only array of metadata for all discovered command handlers.
  */
 export function getCommandHandlerMetadata(instance: object): ReadonlyArray<CommandHandlerMetadata> {
   dbg.info(prefix(__filename), "Resolving instance command metadata:", {

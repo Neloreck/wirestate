@@ -19,7 +19,7 @@ import type { InjectableDescriptor } from "../types/privision";
  *
  * @template T - Type of the service being bound.
  *
- * @param container - Target Inversify container.
+ * @param container - Target Inversify {@link Container}.
  * @param entry - Descriptor containing `id` (token) and `value` (constant).
  * @returns Inversify fluent syntax for additional constraints.
  *

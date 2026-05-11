@@ -40,7 +40,7 @@ export interface BindServiceOptions {
 }
 
 /**
- * Registers a service class in the container with full lifecycle and messaging integration.
+ * Registers a service class in the {@link Container} with full lifecycle and messaging integration.
  *
  * @remarks
  * Binds the class in singleton scope and configures Inversify activation/deactivation hooks to:
@@ -54,7 +54,7 @@ export interface BindServiceOptions {
  *
  * @template T - Type of the service instance.
  *
- * @param container - Target Inversify container.
+ * @param container - Target Inversify {@link Container}.
  * @param entry - Service class constructor.
  * @param options - Configuration options for the binding.
  *

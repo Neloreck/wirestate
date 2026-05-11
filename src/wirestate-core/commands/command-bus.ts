@@ -13,10 +13,12 @@ import {
 import type { Maybe, Optional } from "../types/general";
 
 /**
- * Dispatches commands to handlers.
+ * Orchestrates command dispatching and handler registration.
  *
- * Unlike queries, command execution always wraps the handler in a promise
- * and returns a descriptor with task, status, and responder.
+ * @remarks
+ * The `CommandBus` provides a way to decouple command dispatchers from their handlers.
+ * It supports handler shadowing: when multiple handlers are registered for the same type,
+ * the last registered one takes priority.
  *
  * @group commands
  */
@@ -28,73 +30,33 @@ export class CommandBus {
   private readonly handlers: Map<CommandType, Array<CommandHandler>> = new Map();
 
   /**
-   * Registers a command handler.
-   * Returns an unregister function.
-   *
-   * @param type - Command type.
-   * @param handler - Handler function.
-   * @returns Unregister function.
+   * Removes all registered command handlers from the bus.
    */
-  public register<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): CommandUnregister {
-    dbg.info(prefix(__filename), "Registering command handler:", {
-      type,
-      handler,
-      bus: this,
-    });
-
-    let stack: Maybe<Array<CommandHandler>> = this.handlers.get(type);
-
-    if (!stack) {
-      stack = [];
-      this.handlers.set(type, stack);
-    }
-
-    stack.push(handler as CommandHandler);
-
-    return () => this.unregister(type, handler as CommandHandler);
-  }
-
-  /**
-   * Unregisters a specific command handler by type and reference.
-   * No-ops silently if the handler was not registered for that type.
-   *
-   * @param type - Command type.
-   * @param handler - Handler to remove.
-   */
-  public unregister<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): void {
-    dbg.info(prefix(__filename), "Unregistering command handler:", {
-      type,
-      handler,
-      bus: this,
-    });
-
-    const current: Maybe<Array<CommandHandler>> = this.handlers.get(type);
-
-    if (!current) {
-      return;
-    }
-
-    const index: number = current.indexOf(handler as CommandHandler);
-
-    if (index >= 0) {
-      current.splice(index, 1);
-    }
-
-    // Clean empty stacks.
-    if (current.length === 0) {
-      this.handlers.delete(type);
-    }
+  public clear(): void {
+    this.handlers.clear();
   }
 
   /**
    * Dispatches a command to the last registered handler.
-   * Wraps the handler execution in a promise and returns a descriptor.
    *
-   * @param type - Command type.
-   * @param data - Command payload.
-   * @returns Command descriptor with task, status, and responder.
+   * @remarks
+   * Execution is always asynchronous. The handler's return value is wrapped in a Promise.
+   * Returns a {@link CommandDescriptor} that tracks the execution status and task.
    *
-   * @throws If no handler is registered.
+   * @template R - Type of the command result.
+   * @template D - Type of the command payload data.
+   *
+   * @param type - Command identifier.
+   * @param data - Optional payload for the handler.
+   * @returns A descriptor for the executing command.
+   *
+   * @throws {@link WirestateError} If no handler is registered.
+   *
+   * @example
+   * ```typescript
+   * const descriptor: CommandDescriptor<User> = commandBus.command<User, string>("GET_USER", "id-123");
+   * const user: User = await descriptor.task;
+   * ```
    */
   public command<R = unknown, D = unknown>(type: CommandType, data?: D): CommandDescriptor<R> {
     const stack: Maybe<Array<CommandHandler>> = this.handlers.get(type);
@@ -130,11 +92,14 @@ export class CommandBus {
   }
 
   /**
-   * Dispatches a command to the last registered handler, returning null if no handler exists.
+   * Dispatches a command if a handler exists, otherwise returns null.
    *
-   * @param type - Command type.
-   * @param data - Command payload.
-   * @returns Command descriptor or null if no handler is registered.
+   * @template R - Type of the command result.
+   * @template D - Type of the command payload data.
+   *
+   * @param type - Command identifier.
+   * @param data - Optional payload for the handler.
+   * @returns A command descriptor, or `null` if no handler is found.
    */
   public commandOptional<R = unknown, D = unknown>(type: CommandType, data?: D): Optional<CommandDescriptor<R>> {
     const stack: Maybe<Array<CommandHandler>> = this.handlers.get(type);
@@ -143,19 +108,89 @@ export class CommandBus {
   }
 
   /**
-   * Checks if a handler is registered for the given type.
+   * Checks if at least one handler is registered for the given command type.
    *
-   * @param type - Command type.
-   * @returns True if handler exists.
+   * @param type - Command identifier.
+   * @returns `true` if a handler is available, `false` otherwise.
    */
   public has(type: CommandType): boolean {
     return Boolean(this.handlers.get(type)?.length);
   }
 
   /**
-   * Removes all registered handlers.
+   * Registers a handler for a specific command type.
+   *
+   * @remarks
+   * If multiple handlers are registered for the same type, they are stored in a stack.
+   * The most recently registered handler will be used for dispatching.
+   *
+   * @template D - Type of the command payload data.
+   * @template R - Type of the command execution result.
+   *
+   * @param type - Command identifier.
+   * @param handler - Function to execute when the command is dispatched.
+   * @returns A function to unregister the handler.
+   *
+   * @example
+   * ```typescript
+   * const unregister: CommandUnregister = commandBus.register("LOG_MESSAGE", (message: string) => {
+   *   console.log(message);
+   * });
+   * ```
    */
-  public clear(): void {
-    this.handlers.clear();
+  public register<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): CommandUnregister {
+    dbg.info(prefix(__filename), "Registering command handler:", {
+      type,
+      handler,
+      bus: this,
+    });
+
+    let stack: Maybe<Array<CommandHandler>> = this.handlers.get(type);
+
+    if (!stack) {
+      stack = [];
+      this.handlers.set(type, stack);
+    }
+
+    stack.push(handler as CommandHandler);
+
+    return () => this.unregister(type, handler as CommandHandler);
+  }
+
+  /**
+   * Removes a previously registered command handler.
+   *
+   * @remarks
+   * If the handler was not registered for the given type, this operation does nothing.
+   *
+   * @template D - Type of the command payload data.
+   * @template R - Type of the command execution result.
+   *
+   * @param type - Command identifier.
+   * @param handler - The handler function instance to remove.
+   */
+  public unregister<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): void {
+    dbg.info(prefix(__filename), "Unregistering command handler:", {
+      type,
+      handler,
+      bus: this,
+    });
+
+    const current: Maybe<Array<CommandHandler>> = this.handlers.get(type);
+
+    if (!current) {
+      return;
+    }
+
+    const index: number = current.indexOf(handler as CommandHandler);
+
+    if (index >= 0) {
+      current.splice(index, 1);
+    }
+
+    // Clean empty stacks.
+    if (current.length === 0) {
+      this.handlers.delete(type);
+    }
   }
 }

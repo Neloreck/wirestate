@@ -8,14 +8,33 @@ import type { CommandDescriptor, CommandType } from "../types/commands";
 import { CommandBus } from "./command-bus";
 
 /**
- * Dispatches a command on the provided container.
+ * Dispatches a command through the {@link CommandBus} resolved from the container.
+ *
+ * @remarks
+ * This is a convenience wrapper around the `CommandBus.command` method.
+ * Commands allow for decoupled communication between services.
  *
  * @group commands
  *
- * @param container - Inversify container.
- * @param type - Command type.
- * @param data - Command data.
- * @returns Command descriptor.
+ * @template R - Type of the expected result from the command execution.
+ * @template D - Type of the data (payload) passed to the command.
+ * @template T - Type of the command identifier.
+ *
+ * @param container - Inversify {@link Container} to resolve the {@link CommandBus} from.
+ * @param type - Unique identifier of the command to dispatch.
+ * @param data - Optional payload for the command handler.
+ * @returns A descriptor to track the command execution and result.
+ *
+ * @example
+ * ```typescript
+ * const descriptor = command<User, UserFindParameters>(
+ *   container,
+ *   "FIND_USER",
+ *   { id: "123" }
+ * );
+ *
+ * const user: User = await descriptor.task;
+ * ```
  */
 export function command<R = unknown, D = unknown, T extends CommandType = CommandType>(
   container: Container,
