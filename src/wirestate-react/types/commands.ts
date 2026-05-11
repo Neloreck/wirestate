@@ -3,7 +3,7 @@ import { CommandDescriptor, CommandType } from "@wirestate/core";
 import { Optional } from "./general";
 
 /**
- * Signature for a function that dispatches commands.
+ * Represents signature for a function that dispatches commands.
  *
  * @remarks
  * Typically returned by {@link useCommandCaller}. Dispatched commands are
@@ -26,7 +26,7 @@ export type CommandCaller = <R = unknown, D = unknown, T extends CommandType = C
 ) => CommandDescriptor<R>;
 
 /**
- * Signature for a function that dispatches optional commands.
+ * Represents signature for a function that dispatches optional commands.
  *
  * @remarks
  * Typically returned by {@link useOptionalCommandCaller}. Returns `null` if no

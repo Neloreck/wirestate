@@ -4,7 +4,7 @@ import { mockBindService } from "./mock-bind-service";
 import { mockContainer } from "./mock-container";
 
 /**
- * Options for {@link mockService}.
+ * Represents options for {@link mockService}.
  *
  * @group test-utils
  */

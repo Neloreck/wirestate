@@ -25,7 +25,7 @@ import type { Maybe, MaybePromise, Optional } from "../types/general";
 import type { QueryHandler, QueryUnregister } from "../types/queries";
 
 /**
- * Options for {@link bindService}.
+ * Represents options for {@link bindService}.
  *
  * @group bind
  */
@@ -40,7 +40,7 @@ export interface BindServiceOptions {
 }
 
 /**
- * Registers a service class in the {@link Container} with full lifecycle and messaging integration.
+ * Binds a service class in the {@link Container} with full lifecycle and messaging integration.
  *
  * @remarks
  * Binds the class in singleton scope and configures Inversify activation/deactivation hooks to:

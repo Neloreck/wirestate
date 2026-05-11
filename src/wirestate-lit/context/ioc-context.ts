@@ -9,7 +9,7 @@ import { Container } from "@wirestate/core";
 export const IOC_CONTAINER_KEY: unique symbol = Symbol("ContainerContext");
 
 /**
- * Interface for the IoC context value.
+ * Represents interface for the IoC context value.
  *
  * @group context
  */

@@ -19,7 +19,7 @@ import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "../erro
 import { Optional } from "../types/general";
 
 /**
- * Props for the component returned by {@link createInjectablesProvider}.
+ * Represents props for the component returned by {@link createInjectablesProvider}.
  *
  * @group provision
  */

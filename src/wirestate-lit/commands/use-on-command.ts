@@ -4,7 +4,7 @@ import { CommandHandler, CommandType } from "@wirestate/core";
 import { OnCommandController } from "./on-command-controller";
 
 /**
- * Options for the {@link useOnCommand} hook.
+ * Represents options for the {@link useOnCommand} hook.
  *
  * @group commands
  */

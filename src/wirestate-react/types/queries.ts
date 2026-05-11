@@ -3,7 +3,7 @@ import { QueryType } from "@wirestate/core";
 import { MaybePromise, Optional } from "./general";
 
 /**
- * Signature for a function that responds to a query.
+ * Represents signature for a function that responds to a query.
  *
  * @group queries
  *
@@ -17,7 +17,7 @@ import { MaybePromise, Optional } from "./general";
 export type QueryResponder<R = unknown, D = unknown> = (data?: D) => MaybePromise<R>;
 
 /**
- * Signature for a function that dispatches queries and returns their result.
+ * Represents signature for a function that dispatches queries and returns their result.
  *
  * @remarks
  * Typically returned by {@link useQueryCaller}.
@@ -39,7 +39,7 @@ export type QueryCaller = <R = unknown, D = unknown, T extends QueryType = Query
 ) => MaybePromise<R>;
 
 /**
- * Signature for a function that dispatches synchronous queries.
+ * Represents signature for a function that dispatches synchronous queries.
  *
  * @remarks
  * Typically returned by {@link useSyncQueryCaller}.
@@ -58,7 +58,7 @@ export type QueryCaller = <R = unknown, D = unknown, T extends QueryType = Query
 export type SyncQueryCaller = <R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D) => R;
 
 /**
- * Signature for a function that dispatches optional queries.
+ * Represents signature for a function that dispatches optional queries.
  *
  * @remarks
  * Typically returned by {@link useOptionalQueryCaller}. Returns `null` when
@@ -81,7 +81,7 @@ export type OptionalQueryCaller = <R = unknown, D = unknown, T extends QueryType
 ) => Optional<MaybePromise<R>>;
 
 /**
- * Signature for a function that dispatches optional synchronous queries.
+ * Represents signature for a function that dispatches optional synchronous queries.
  *
  * @remarks
  * Typically returned by {@link useOptionalSyncQueryCaller}. Returns `null`

@@ -21,7 +21,7 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { Maybe } from "../types/general";
 
 /**
- * Options for the {@link InjectablesProviderController}.
+ * Represents options for the {@link InjectablesProviderController}.
  *
  * @group provision
  */

@@ -1,7 +1,7 @@
 import { MaybePromise } from "./general";
 
 /**
- * Unique identifier for a query.
+ * Represents unique identifier for a query.
  *
  * @remarks
  * Queries use a request-response pattern. Using symbols is recommended for
@@ -17,7 +17,7 @@ import { MaybePromise } from "./general";
 export type QueryType = string | symbol;
 
 /**
- * Signature for a function that handles queries of a specific type.
+ * Represents signature for a function that handles queries of a specific type.
  *
  * @remarks
  * Query handlers can be synchronous or asynchronous. They receive a payload
@@ -36,7 +36,7 @@ export type QueryType = string | symbol;
 export type QueryHandler<D = unknown, R = unknown> = (data: D) => MaybePromise<R>;
 
 /**
- * Function returned by registration methods to remove a query handler.
+ * Represents function returned by registration methods to remove a query handler.
  *
  * @group queries
  *
@@ -50,7 +50,7 @@ export type QueryHandler<D = unknown, R = unknown> = (data: D) => MaybePromise<R
 export type QueryUnregister = () => void;
 
 /**
- * Metadata descriptor for methods decorated with {@link OnQuery}.
+ * Represents metadata descriptor for methods decorated with {@link OnQuery}.
  *
  * @remarks
  * This interface is used internally to track which methods should be registered

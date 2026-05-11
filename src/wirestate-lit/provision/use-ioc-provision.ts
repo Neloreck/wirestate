@@ -6,7 +6,7 @@ import { AnyObject } from "../types/general";
 import { IocProviderController } from "./ioc-provider-controller";
 
 /**
- * Options for the {@link useIocProvision} hook.
+ * Represents options for the {@link useIocProvision} hook.
  *
  * @group provision
  */

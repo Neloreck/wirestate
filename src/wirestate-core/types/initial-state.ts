@@ -1,7 +1,7 @@
 import { Newable } from "inversify";
 
 /**
- * Lookup key for service seeds.
+ * Represents a lookup key for service seeds.
  *
  * @remarks
  * Supports class constructors (for targeted seeds), strings, or symbols.
@@ -11,7 +11,7 @@ import { Newable } from "inversify";
 export type SeedKey = Newable | string | symbol;
 
 /**
- * Key-value map for targeted seeds.
+ * Represents a key-value map for targeted seeds.
  *
  * @remarks
  * Used to store initial state values that are injected into services
@@ -24,7 +24,7 @@ export type SeedKey = Newable | string | symbol;
 export type SeedsMap<T = unknown> = Map<SeedKey, T>;
 
 /**
- * A single service-to-seed mapping entry.
+ * Represents a single service-to-seed mapping entry.
  *
  * @remarks
  * Represented as a readonly tuple of `[SeedKey, T]`.
@@ -36,7 +36,7 @@ export type SeedsMap<T = unknown> = Map<SeedKey, T>;
 export type SeedEntry<T = unknown> = readonly [SeedKey, T];
 
 /**
- * A collection of seed entries.
+ * Represents a collection of seed entries.
  *
  * @remarks
  * Used during container initialization to populate the {@link SeedsMap}.

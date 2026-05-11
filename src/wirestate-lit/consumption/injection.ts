@@ -6,7 +6,7 @@ import { IocContextObject } from "../context/ioc-context";
 import { AnyObject, FieldMustMatchProvidedType, Interface } from "../types/general";
 
 /**
- * Type definition for the injection decorator.
+ * Represents definition of the injection decorator.
  *
  * @group consumption
  */
@@ -24,7 +24,7 @@ export interface InjectionDecorator<T> {
 }
 
 /**
- * Options for the {@link injection} decorator.
+ * Represents options for the {@link injection} decorator.
  *
  * @group consumption
  */

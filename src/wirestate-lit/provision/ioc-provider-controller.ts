@@ -9,7 +9,7 @@ import { IocContextObject, IocContext } from "../context/ioc-context";
 import { AnyObject } from "../types/general";
 
 /**
- * Options for the {@link IocProviderController}.
+ * Represents options for the {@link IocProviderController}.
  *
  * @group provision
  */

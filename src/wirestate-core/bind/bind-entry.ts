@@ -10,7 +10,7 @@ import { bindDynamicValue } from "./bind-dynamic-value";
 import { bindService, type BindServiceOptions } from "./bind-service";
 
 /**
- * Options for {@link bindEntry}.
+ * Represents options for {@link bindEntry}.
  *
  * @group bind
  */

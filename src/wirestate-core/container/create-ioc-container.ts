@@ -13,7 +13,7 @@ import type { SeedsMap } from "../types/initial-state";
 import { WireScope } from "./wire-scope";
 
 /**
- * Configuration options for {@link createIocContainer}.
+ * Represents configuration options for {@link createIocContainer}.
  *
  * @group container
  */

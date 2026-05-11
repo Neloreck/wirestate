@@ -4,7 +4,7 @@ import { bindEntry } from "../bind/bind-entry";
 import type { InjectableDescriptor } from "../types/privision";
 
 /**
- * Options for {@link mockBindEntry}.
+ * Represents options for {@link mockBindEntry}.
  *
  * @group test-utils
  */

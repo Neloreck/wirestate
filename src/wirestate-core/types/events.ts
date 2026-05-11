@@ -1,14 +1,14 @@
 import { Optional } from "./general";
 
 /**
- * Event identifier.
+ * Represents an Event identifier.
  *
  * @group events
  */
 export type EventType = string | symbol;
 
 /**
- * Event object.
+ * Represents an event object.
  *
  * @group events
  */
@@ -19,21 +19,21 @@ export interface Event<P = unknown, T extends EventType = EventType, F = unknown
 }
 
 /**
- * Event handler signature.
+ * Represents event handler signature.
  *
  * @group events
  */
 export type EventHandler<E extends Event = Event> = (event: E) => void;
 
 /**
- * Unsubscribes from events, part of events subscription lifecycle.
+ * Represents event bus unsubscribing function, part of events subscription lifecycle.
  *
  * @group events
  */
 export type EventUnsubscriber = () => void;
 
 /**
- * Internal dispatch entry.
+ * Represents internal dispatch entry.
  *
  * @group events
  * @internal
@@ -44,7 +44,7 @@ export interface EventDispatchEntry {
 }
 
 /**
- * Metadata for OnEvent decorated methods.
+ * Represents metadata for OnEvent decorated methods.
  *
  * @group events
  * @internal

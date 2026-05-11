@@ -3,7 +3,7 @@ import { Container, type Newable } from "inversify";
 import { bindService } from "../bind/bind-service";
 
 /**
- * Options for {@link mockBindService}.
+ * Represents options for {@link mockBindService}.
  *
  * @group test-utils
  */

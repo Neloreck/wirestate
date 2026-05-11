@@ -6,7 +6,7 @@ import { AnyObject, Interface, Optional } from "../types/general";
 import { OnEventController } from "./on-event-controller";
 
 /**
- * Type definition for the on-event decorator.
+ * Represents type definition for the on-event decorator.
  *
  * @group events
  */

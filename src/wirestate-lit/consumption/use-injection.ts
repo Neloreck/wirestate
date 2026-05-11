@@ -9,7 +9,7 @@ import { IocContextObject } from "../context/ioc-context";
 import { Optional } from "../types/general";
 
 /**
- * Options for the {@link useInjection} hook.
+ * Represents options for the {@link useInjection} hook.
  *
  * @group consumption
  */
@@ -30,7 +30,7 @@ export interface UseInjectionOptions<T> {
 }
 
 /**
- * The return value of the {@link useInjection} hook, containing the injected service.
+ * Represents the return value of the {@link useInjection} hook, containing the injected service.
  *
  * @group consumption
  */

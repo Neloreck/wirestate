@@ -15,7 +15,7 @@ export type BindingType = (typeof bindingTypeValues)[keyof typeof bindingTypeVal
 export type ScopeBindingType = (typeof bindingScopeValues)[keyof typeof bindingScopeValues];
 
 /**
- * Descriptor used by wirestate bind/provision APIs to describe how one injectable is resolved.
+ * Represents descriptor used by wirestate bind/provision APIs to describe how one injectable is resolved.
  *
  * @remarks
  * This interface bridges standard Inversify binding options with Wirestate's simplified registration API.

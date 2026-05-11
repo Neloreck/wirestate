@@ -9,7 +9,7 @@ import type { InjectableDescriptor } from "../types/privision";
 import { mockBindEntry } from "./mock-bind-entry";
 
 /**
- * Options for {@link mockContainer}.
+ * Represents options for {@link mockContainer}.
  *
  * @group test-utils
  */
@@ -43,7 +43,7 @@ export interface MockContainerOptions {
 }
 
 /**
- * Creates and configures an Inversify {@link Container} for testing.
+ * Mocks and configures an Inversify {@link Container} for testing.
  *
  * @remarks
  * This utility initializes a new container via {@link createIocContainer} and

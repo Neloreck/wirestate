@@ -1,7 +1,7 @@
 import { EventType } from "@wirestate/core";
 
 /**
- * Signature for a function that emits events via the EventBus.
+ * Represents signature for a function that emits events via the EventBus.
  *
  * @remarks
  * Typically returned by {@link useEventEmitter}. Supports optional payload
