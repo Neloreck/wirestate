@@ -1,4 +1,4 @@
-import { Container, type ServiceIdentifier } from "inversify";
+import { BindWhenOnFluentSyntax, Container, type ServiceIdentifier } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -9,14 +9,33 @@ import { WirestateError } from "../error/wirestate-error";
 import type { InjectableDescriptor } from "../types/privision";
 
 /**
- * Binds a constant value to a token in the container.
+ * Binds a constant value to a service identifier in the container.
+ *
+ * @remarks
+ * Use this to register configuration values, primitive constants, or pre-instantiated objects.
+ * Constant values are bound with a singleton scope by default.
  *
  * @group bind
  *
+ * @template T - Type of the service being bound.
+ *
  * @param container - Target Inversify container.
- * @param entry - Entry descriptor to bind.
+ * @param entry - Descriptor containing `id` (token) and `value` (constant).
+ * @returns Inversify fluent syntax for additional constraints.
+ *
+ * @throws {@link WirestateError} If `entry.scopeBindingType` is not `Singleton`.
+ *
+ * @example
+ * ```typescript
+ * const API_URL: unique symbol = Symbol("API_URL");
+ *
+ * bindConstant(container, {
+ *   id: API_URL,
+ *   value: "https://api.example.com"
+ * });
+ * ```
  */
-export function bindConstant<T>(container: Container, entry: InjectableDescriptor): void {
+export function bindConstant<T>(container: Container, entry: InjectableDescriptor): BindWhenOnFluentSyntax<T> {
   dbg.info(prefix(__filename), "Binding constant:", {
     id: entry.id,
     value: entry.value,
@@ -28,5 +47,5 @@ export function bindConstant<T>(container: Container, entry: InjectableDescripto
     throw new WirestateError(ERROR_CODE_BINDING_SCOPE, "Provided unexpected binding scope for constant value.");
   }
 
-  container.bind<T>(entry.id as ServiceIdentifier<T>).toConstantValue(entry.value as T);
+  return container.bind<T>(entry.id as ServiceIdentifier<T>).toConstantValue(entry.value as T);
 }

@@ -4,9 +4,10 @@
 
 export * from "./alias";
 
-export { bindEntry } from "./bind/bind-entry";
 export { bindConstant } from "./bind/bind-constant";
-export { bindService } from "./bind/bind-service";
+export { bindDynamicValue } from "./bind/bind-dynamic-value";
+export { bindEntry, BindEntryOptions } from "./bind/bind-entry";
+export { bindService, BindServiceOptions } from "./bind/bind-service";
 export { getEntryToken } from "./bind/get-entry-token";
 
 export { command } from "./commands/command";

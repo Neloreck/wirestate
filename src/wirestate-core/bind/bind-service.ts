@@ -24,19 +24,72 @@ import type { EventHandler, EventUnsubscriber } from "../types/events";
 import type { Maybe, MaybePromise, Optional } from "../types/general";
 import type { QueryHandler, QueryUnregister } from "../types/queries";
 
+/**
+ * Options for {@link bindService}.
+ *
+ * @group bind
+ */
 export interface BindServiceOptions {
+  /**
+   * If true, suppresses execution of `@OnActivated` and `@OnDeactivation` methods.
+   * Messaging registrations (commands, queries, events) are still processed.
+   *
+   * @default false
+   */
   isWithIgnoreLifecycle?: boolean;
 }
 
 /**
- * Registers a service class in the container with activation/deactivation logic.
- * Ensures container references, event subscriptions, command and query handlers are managed correctly.
+ * Registers a service class in the container with full lifecycle and messaging integration.
+ *
+ * @remarks
+ * Binds the class in singleton scope and configures Inversify activation/deactivation hooks to:
+ * - Manage the `IS_DISPOSED` lifecycle state flag.
+ * - Trigger `@OnActivated` and `@OnDeactivation` decorated methods.
+ * - Register/unregister `@OnCommand`, `@OnEvent` and `@OnQuery` handlers.
+ * - Set up event dispatching and bus subscriptions.
+ * - Track and dispose injected {@link WireScope} instances.
  *
  * @group bind
  *
+ * @template T - Type of the service instance.
+ *
  * @param container - Target Inversify container.
- * @param entry - Service constructor.
- * @param options - Options object to control binding flow.
+ * @param entry - Service class constructor.
+ * @param options - Configuration options for the binding.
+ *
+ * @example
+ * ```typescript
+ * @Injectable()
+ * class UserService {
+ *   @OnActivated()
+ *   public onActivated(): void {
+ *     console.log("UserService activated");
+ *   }
+ *
+ *   @OnDeactivation()
+ *   public onDeactivation(): void {
+ *     console.log("UserService deactivating");
+ *   }
+ *
+ *   @OnEvent("USER_LOGGED_IN")
+ *   private onUserLoggedIn(event: UserLoggedInEvent) {
+ *     console.log('User logged in:', event.payload);
+ *   }
+ *
+ *   @OnCommand("LOG_DATE_NOW")
+ *   private onLogDateNow(): void {
+ *     console.log("Date now:", new Date());
+ *   }
+ *
+ *   @OnQuery("DATE_NOW")
+ *   private onQueryDateNow(): void {
+ *     return new Date();
+ *   }
+ * }
+ *
+ * bindService(container, UserService);
+ * ```
  */
 export function bindService<T extends object>(
   container: Container,

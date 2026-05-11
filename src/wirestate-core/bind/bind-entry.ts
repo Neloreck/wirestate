@@ -15,25 +15,59 @@ import { bindService, type BindServiceOptions } from "./bind-service";
  * @group bind
  */
 export interface BindEntryOptions extends BindServiceOptions {
+  /**
+   * If true, the service's lifecycle methods (like `@OnActivated`) will be ignored
+   * during the binding process.
+   *
+   * @default `false`
+   */
   isWithIgnoreLifecycle?: boolean;
 }
 
 /**
- * Binds a single service entry to the container, dispatching to the
- * correct binding strategy based on the descriptor's `type` field.
+ * Binds an entry to the Inversify container using the appropriate strategy.
  *
- * Supports:
- * - Service classes (function entries) - bound as singleton
- * - Constant values - bound via `bindConstant`
- * - Dynamic values - bound via `toDynamicValue` with optional scope
- * - Instance bindings - bound as generic singleton service.
+ * @remarks
+ * This is a high-level dispatching function that selects the binding method based on the `entry` type:
+ * - **Class Constructor**: Binds as a singleton service via {@link bindService}.
+ * - **ConstantValue**: Binds a fixed value via {@link bindConstant}.
+ * - **DynamicValue**: Binds a factory-generated value via {@link bindDynamicValue}.
+ * - **Instance**: Binds a value as a class instance via {@link bindService}.
  *
  * @group bind
  *
- * @param container - Target IOC container to bind into.
- * @param entry - Entry descriptor to bind.
- * @param options - Optional binding configuration.
- * @returns Void.
+ * @template T - Type of the object being bound.
+ *
+ * @param container - Target Inversify container.
+ * @param entry - Class constructor or {@link InjectableDescriptor} describing the service.
+ * @param options - Optional binding configuration (primarily used for class-based services).
+ *
+ * @throws {@link WirestateError} If `entry.scopeBindingType` is not `Singleton` for constant values.
+ *
+ * @example
+ * ```typescript
+ * // Binding a class constructor (defaults to singleton)
+ * class MyService {}
+ *
+ * bindEntry(container, MyService);
+ *
+ * // Binding a constant value
+ * const API_URL: unique symbol = Symbol("API_URL");
+ *
+ * bindEntry(container, {
+ *   id: API_URL,
+ *   value: "https://api.example.com"
+ * });
+ *
+ * // Binding a dynamic value (factory)
+ * const CURRENT_TIME: unique symbol = Symbol("CURRENT_TIME");
+ *
+ * bindEntry(container, {
+ *   id: CURRENT_TIME,
+ *   bindingType: "DynamicValue",
+ *   factory: () => new Date()
+ * });
+ * ```
  */
 export function bindEntry<T extends object = object>(
   container: Container,
@@ -41,11 +75,15 @@ export function bindEntry<T extends object = object>(
   options: BindEntryOptions = {}
 ): void {
   if (typeof entry === "function") {
-    return bindService(container, entry, options);
+    bindService(container, entry, options);
+
+    return;
   }
 
   if (!entry.bindingType || entry.bindingType === bindingTypeValues.ConstantValue) {
-    return bindConstant(container, entry);
+    bindConstant(container, entry);
+
+    return;
   }
 
   if (entry.bindingType === bindingTypeValues.DynamicValue) {
@@ -54,7 +92,9 @@ export function bindEntry<T extends object = object>(
       container,
     });
 
-    return bindDynamicValue(container, entry);
+    bindDynamicValue(container, entry);
+
+    return;
   }
 
   dbg.info(prefix(__filename), "Binding entry with fallback:", {
@@ -63,5 +103,5 @@ export function bindEntry<T extends object = object>(
   });
 
   // Default: treat as class descriptor (Instance binding).
-  return bindService(container, entry.value as unknown as Newable<T>, options);
+  bindService(container, entry.value as unknown as Newable<T>, options);
 }

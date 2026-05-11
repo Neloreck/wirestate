@@ -65,6 +65,8 @@ describe("Library exported API from wirestate-core", () => {
     "bindingTypeValues",
     "forwardRef",
     // Core.
+    "BindEntryOptions",
+    "BindServiceOptions",
     "CommandBus",
     "CommandDescriptor",
     "CommandHandler",
@@ -96,6 +98,7 @@ describe("Library exported API from wirestate-core", () => {
     "applySeeds",
     "applySharedSeed",
     "bindConstant",
+    "bindDynamicValue",
     "bindEntry",
     "bindService",
     "command",
