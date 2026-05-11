@@ -3,14 +3,14 @@ import { ServiceIdentifier, bindingTypeValues, bindingScopeValues } from "invers
 /**
  * Inversify binding strategy types.
  *
- * @group bind
+ * @group Bind
  */
 export type BindingType = (typeof bindingTypeValues)[keyof typeof bindingTypeValues];
 
 /**
  * Inversify scope strategy types.
  *
- * @group bind
+ * @group Bind
  */
 export type ScopeBindingType = (typeof bindingScopeValues)[keyof typeof bindingScopeValues];
 
@@ -21,7 +21,7 @@ export type ScopeBindingType = (typeof bindingScopeValues)[keyof typeof bindingS
  * This interface bridges standard Inversify binding options with Wirestate's simplified registration API.
  * It is used by {@link bindConstant}, {@link bindDynamicValue}, and {@link bindEntry}.
  *
- * @group bind
+ * @group Bind
  *
  * @template T - Service type resolved from container by {@link id} or returned by {@link factory}.
  * @template V - Value type used by constant/value-style bindings via {@link value}.

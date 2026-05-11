@@ -12,7 +12,7 @@ import type { Maybe } from "../types/general";
  * Methods decorated with `@OnCommand` are automatically registered as command handlers
  * when the service is bound via {@link bindService}.
  *
- * @group commands
+ * @group Commands
  *
  * @param type - Unique identifier of the command to handle.
  * @returns A method decorator function.

@@ -15,7 +15,7 @@ import { CommandBus } from "./command-bus";
  * This is a convenience wrapper around the `CommandBus.commandOptional` method.
  * Unlike {@link command}, it does not throw if no handler is registered.
  *
- * @group commands
+ * @group Commands
  *
  * @template R - Type of the expected result from the command execution.
  * @template D - Type of the data (payload) passed to the command.

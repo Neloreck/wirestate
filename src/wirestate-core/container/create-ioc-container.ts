@@ -15,7 +15,7 @@ import { WireScope } from "./wire-scope";
 /**
  * Represents configuration options for {@link createIocContainer}.
  *
- * @group container
+ * @group Container
  */
 export interface CreateIocContainerOptions {
   /**
@@ -40,7 +40,7 @@ export interface CreateIocContainerOptions {
  * - Service bridge: {@link WireScope} (bound in transient scope).
  * - Default scope set to `Singleton`.
  *
- * @group container
+ * @group Container
  *
  * @param options - {@link Container} configuration.
  * @returns A new Inversify {@link Container} instance.

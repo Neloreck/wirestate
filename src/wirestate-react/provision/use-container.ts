@@ -10,7 +10,7 @@ import { useIocContext } from "./use-ioc-context";
  * resolution or checking bindings. For typical service usage, prefer
  * {@link useInjection}.
  *
- * @group provision
+ * @group Provision
  *
  * @returns The active Inversify container.
  *

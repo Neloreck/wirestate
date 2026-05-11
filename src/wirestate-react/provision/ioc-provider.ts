@@ -8,7 +8,7 @@ import { AnyObject, Optional } from "../types/general";
 /**
  * Props for {@link IocProvider}.
  *
- * @group provision
+ * @group Provision
  */
 export interface IocProviderProps extends PropsWithChildren<unknown> {
   /**
@@ -30,7 +30,7 @@ export interface IocProviderProps extends PropsWithChildren<unknown> {
  * This component should be placed near the root of your application. It initializes
  * the IocReactContext, which is consumed by hooks like `useService` and `useContainer`.
  *
- * @group provision
+ * @group Provision
  *
  * @param props - Component properties.
  * @param props.container - External Inversify container instance.

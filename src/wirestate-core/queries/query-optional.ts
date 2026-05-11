@@ -15,7 +15,7 @@ import { QueryBus } from "./query-bus";
  * This is a convenience wrapper around the `QueryBus.queryOptional` method.
  * Use this when the query resolution is optional and you want to avoid catching errors.
  *
- * @group queries
+ * @group Queries
  *
  * @template R - Type of the expected query result.
  * @template D - Type of the input data (payload).

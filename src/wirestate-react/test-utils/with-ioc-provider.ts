@@ -11,7 +11,7 @@ import { IocProvider } from "../provision/ioc-provider";
  * This utility simplifies setting up the IoC context in unit tests. It automatically
  * creates a {@link mockContainer} if none is provided.
  *
- * @group test-utils
+ * @group Test-utils
  *
  * @param children - The React tree to be wrapped.
  * @param container - An optional Inversify container. Defaults to a new {@link mockContainer}.

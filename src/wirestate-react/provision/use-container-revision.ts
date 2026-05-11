@@ -8,7 +8,7 @@ import { useIocContext } from "./use-ioc-context";
  * a descendant provider change. Hooks like {@link useInjection} use this to
  * invalidate their cache and re-resolve services.
  *
- * @group provision
+ * @group Provision
  *
  * @returns The current revision number.
  */

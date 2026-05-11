@@ -13,7 +13,7 @@ import { Maybe } from "../types/general";
  * It ensures that handlers are returned in parent-to-child order (base class handlers first),
  * which is critical for maintaining predictable event execution patterns in inherited services.
  *
- * @group events
+ * @group Events
  * @internal
  *
  * @param instance - The service instance to scan for event handlers.

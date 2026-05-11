@@ -20,7 +20,7 @@ import type { Maybe, Optional } from "../types/general";
  * It supports handler shadowing: when multiple handlers are registered for the same type,
  * the last registered one takes priority.
  *
- * @group commands
+ * @group Commands
  */
 export class CommandBus {
   /**

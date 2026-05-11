@@ -5,7 +5,7 @@ import { MaybePromise, Optional } from "./general";
 /**
  * Represents signature for a function that responds to a query.
  *
- * @group queries
+ * @group Queries
  *
  * @template R - The result type of the query.
  * @template D - The type of the data payload.
@@ -22,7 +22,7 @@ export type QueryResponder<R = unknown, D = unknown> = (data?: D) => MaybePromis
  * @remarks
  * Typically returned by {@link useQueryCaller}.
  *
- * @group queries
+ * @group Queries
  *
  * @template R - The result type of the query.
  * @template D - The type of the data payload.
@@ -44,7 +44,7 @@ export type QueryCaller = <R = unknown, D = unknown, T extends QueryType = Query
  * @remarks
  * Typically returned by {@link useSyncQueryCaller}.
  *
- * @group queries
+ * @group Queries
  *
  * @template R - The result type of the query.
  * @template D - The type of the data payload.
@@ -64,7 +64,7 @@ export type SyncQueryCaller = <R = unknown, D = unknown, T extends QueryType = Q
  * Typically returned by {@link useOptionalQueryCaller}. Returns `null` when
  * no handler is registered.
  *
- * @group queries
+ * @group Queries
  *
  * @template R - The result type of the query.
  * @template D - The type of the data payload.
@@ -87,7 +87,7 @@ export type OptionalQueryCaller = <R = unknown, D = unknown, T extends QueryType
  * Typically returned by {@link useOptionalSyncQueryCaller}. Returns `null`
  * when no handler is registered.
  *
- * @group queries
+ * @group Queries
  *
  * @template R - The result type of the query.
  * @template D - The type of the data payload.

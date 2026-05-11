@@ -8,7 +8,7 @@ import { IocProviderController } from "./ioc-provider-controller";
 /**
  * Represents options for the {@link useIocProvision} hook.
  *
- * @group provision
+ * @group Provision
  */
 export interface UseIocProvisionOptions {
   /**
@@ -24,7 +24,7 @@ export interface UseIocProvisionOptions {
 /**
  * Hook (controller) to provide an IoC container to the host element and its children.
  *
- * @group provision
+ * @group Provision
  *
  * @param host - The host element.
  * @param options - Provisioning options.

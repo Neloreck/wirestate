@@ -11,7 +11,7 @@ import { mockBindEntry } from "./mock-bind-entry";
 /**
  * Represents options for {@link mockContainer}.
  *
- * @group test-utils
+ * @group Test-utils
  */
 export interface MockContainerOptions {
   /**
@@ -50,7 +50,7 @@ export interface MockContainerOptions {
  * binds the provided `entries` using {@link mockBindEntry}. It can also
  * automatically resolve (activate) a subset of services.
  *
- * @group test-utils
+ * @group Test-utils
  *
  * @param options - Configuration options for the mock container.
  * @returns A configured Inversify {@link Container}.

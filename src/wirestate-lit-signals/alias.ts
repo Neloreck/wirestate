@@ -1,7 +1,7 @@
 import { Signal } from "signal-polyfill";
 
 /**
- * @group signals
+ * @group Signals
  * @see {@link https://lit.dev/docs/data/signals/}
  */
 export {
@@ -16,13 +16,13 @@ export {
 } from "@lit-labs/signals";
 
 /**
- * @group signals
+ * @group Signals
  * @see {@link https://lit.dev/docs/data/signals/}
  */
 export type State<T> = Signal.State<T>;
 
 /**
- * @group signals
+ * @group Signals
  * @see {@link https://lit.dev/docs/data/signals/}
  */
 export type Computed<T> = Signal.Computed<T>;

@@ -15,7 +15,7 @@ import type { QueryHandler, QueryType, QueryUnregister } from "../types/queries"
  * the last registered one (e.g., at the component level) takes priority over earlier ones
  * (e.g., at the global service level).
  *
- * @group queries
+ * @group Queries
  */
 export class QueryBus {
   /**

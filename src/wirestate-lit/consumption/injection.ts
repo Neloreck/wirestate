@@ -8,7 +8,7 @@ import { AnyObject, FieldMustMatchProvidedType, Interface } from "../types/gener
 /**
  * Represents definition of the injection decorator.
  *
- * @group consumption
+ * @group Consumption
  */
 export interface InjectionDecorator<T> {
   // Standard:
@@ -26,7 +26,7 @@ export interface InjectionDecorator<T> {
 /**
  * Represents options for the {@link injection} decorator.
  *
- * @group consumption
+ * @group Consumption
  */
 export interface InjectionOptions<T> {
   /**
@@ -45,7 +45,7 @@ export interface InjectionOptions<T> {
 /**
  * Decorator to inject a service from the IoC container into a Lit element property.
  *
- * @group consumption
+ * @group Consumption
  *
  * @param optionsOrInjectionId - Injection options including the service identifier or the service identifier itself.
  * @returns Injection decorator instance.

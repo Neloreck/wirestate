@@ -15,7 +15,7 @@ import type { Maybe, Optional } from "../types/general";
  * You can specify one or more event types to handle. If `types` is omitted,
  * the method acts as a catch-all handler for all events broadcasted to the {@link EventBus}.
  *
- * @group events
+ * @group Events
  *
  * @param types - Event identifier(s) to handle. If omitted, handles all events.
  * @returns Method decorator.

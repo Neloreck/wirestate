@@ -8,7 +8,7 @@ import { ERROR_CODE_GENERIC } from "./error-code";
  * and a descriptive message. It is used throughout the library to signal lifecycle
  * violations, messaging failures, and configuration issues.
  *
- * @group error
+ * @group Error
  *
  * @example
  * ```typescript

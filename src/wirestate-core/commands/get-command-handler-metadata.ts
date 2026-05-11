@@ -12,7 +12,7 @@ import type { Maybe } from "../types/general";
  * Traverses the prototype chain to collect all command handlers.
  * Returns metadata ordered from base class to derived class to ensure parent-first execution.
  *
- * @group commands
+ * @group Commands
  * @internal
  *
  * @param instance - The service instance to inspect.

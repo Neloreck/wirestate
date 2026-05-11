@@ -14,7 +14,7 @@ import { OptionalSyncQueryCaller } from "../types/queries";
  * Similar to {@link useOptionalQueryCaller}, but returns the value directly
  * (synchronously) from the handler. Returns `null` if no handler is registered.
  *
- * @group queries
+ * @group Queries
  *
  * @returns An optional synchronous query dispatcher function.
  *

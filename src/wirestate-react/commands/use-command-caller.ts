@@ -14,7 +14,7 @@ import { CommandCaller } from "../types/commands";
  * The returned dispatcher is memoized using `useCallback` and stays stable
  * for the lifetime of the container. It uses {@link CommandBus.command} internally.
  *
- * @group commands
+ * @group Commands
  *
  * @returns A command dispatcher function that takes a type and optional data.
  *

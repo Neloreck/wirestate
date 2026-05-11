@@ -14,7 +14,7 @@ import { SeedEntries, SeedsMap } from "../types/initial-state";
  * the seeds owned by that specific provider are removed, leaving other
  * providers' seeds intact.
  *
- * @group seeds
+ * @group Seeds
  *
  * @param container - The Inversify {@link Container} to clean up.
  * @param seeds - The targeted {@link SeedEntries} to remove.

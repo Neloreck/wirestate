@@ -14,7 +14,7 @@ import { SeedEntries, SeedsMap } from "../types/initial-state";
  * This ensures that multiple providers can co-exist and contribute their own seeds
  * without overwriting each other's data.
  *
- * @group seeds
+ * @group Seeds
  *
  * @param container - The Inversify {@link Container} where seeds should be applied.
  * @param seeds - An array of {@link SeedEntries} to add to the container.

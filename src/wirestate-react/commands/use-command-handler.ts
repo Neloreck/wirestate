@@ -12,7 +12,7 @@ import { useContainer } from "../provision/use-container";
  * Only one handler is active per type; newer registrations shadow older ones.
  * The handler is automatically unregistered when the component unmounts.
  *
- * @group commands
+ * @group Commands
  *
  * @template R - Result type of the command.
  * @template D - Data/payload type of the command.

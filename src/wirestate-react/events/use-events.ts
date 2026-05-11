@@ -11,7 +11,7 @@ import { useContainer } from "../provision/use-container";
  * types using a single handler.
  * The handler and type list are synced via `useRef` to avoid stale closures.
  *
- * @group events
+ * @group Events
  *
  * @param types - Array of event types (strings or symbols) to filter by.
  * @param handler - Function invoked when any of the specified events are emitted.

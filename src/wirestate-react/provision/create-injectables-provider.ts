@@ -21,7 +21,7 @@ import { Optional } from "../types/general";
 /**
  * Represents props for the component returned by {@link createInjectablesProvider}.
  *
- * @group provision
+ * @group Provision
  */
 export interface InjectablesProviderProps {
   /**
@@ -42,14 +42,14 @@ export interface InjectablesProviderProps {
 /**
  * Component returned by {@link createInjectablesProvider}.
  *
- * @group provision
+ * @group Provision
  */
 export type InjectablesProvider = ReturnType<typeof createInjectablesProvider>;
 
 /**
  * Configuration for {@link createInjectablesProvider}.
  *
- * @group provision
+ * @group Provision
  */
 export interface CreateInjectablesProviderOptions {
   /**
@@ -71,7 +71,7 @@ export interface CreateInjectablesProviderOptions {
  *
  * It must be rendered within an {@link IocProvider}.
  *
- * @group provision
+ * @group Provision
  *
  * @param entries - Array of service classes or {@link InjectableDescriptor} objects to bind.
  * @param options - Configuration options for the provider.

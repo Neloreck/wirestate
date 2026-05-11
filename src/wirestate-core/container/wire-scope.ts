@@ -24,7 +24,7 @@ import type { QueryHandler, QueryUnregister, QueryType } from "../types/queries"
  *
  * Methods are available only while the scope is "active" (after service activation and before deactivation).
  *
- * @group container
+ * @group Container
  */
 @injectable()
 export class WireScope {

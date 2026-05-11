@@ -6,7 +6,7 @@ import { OnCommandController } from "./on-command-controller";
 /**
  * Represents options for the {@link useOnCommand} hook.
  *
- * @group commands
+ * @group Commands
  */
 export interface UseOnCommandOptions<D = unknown, R = unknown> {
   /**
@@ -22,7 +22,7 @@ export interface UseOnCommandOptions<D = unknown, R = unknown> {
 /**
  * Registers a command handler on the CommandBus for the host element's lifetime.
  *
- * @group commands
+ * @group Commands
  *
  * @param host - The host element.
  * @param options - Command handling options.

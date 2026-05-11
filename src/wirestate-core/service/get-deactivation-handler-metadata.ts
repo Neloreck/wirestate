@@ -11,7 +11,7 @@ import type { Maybe } from "../types/general";
  * This utility ensures that handlers are returned in parent-to-child order (base class handlers first),
  * maintaining a predictable cleanup sequence for inherited services.
  *
- * @group service
+ * @group Service
  * @internal
  *
  * @param instance - The service instance to scan for deactivation handlers.

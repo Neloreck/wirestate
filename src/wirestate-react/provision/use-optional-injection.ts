@@ -15,7 +15,7 @@ import { useIocContext } from "./use-ioc-context";
  * Unlike {@link useInjection}, this hook does not throw if the dependency
  * is missing from the container.
  *
- * @group provision
+ * @group Provision
  *
  * @template T - The type of the value being resolved.
  *

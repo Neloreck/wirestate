@@ -15,7 +15,7 @@ import { useIocContext } from "./use-ioc-context";
  * This hook automatically re-resolves the dependency if the container's
  * revision changes (e.g., due to re-binding in a provider).
  *
- * @group provision
+ * @group Provision
  *
  * @template T - The type of the value being resolved.
  *

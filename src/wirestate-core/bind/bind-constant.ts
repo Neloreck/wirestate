@@ -15,7 +15,7 @@ import type { InjectableDescriptor } from "../types/privision";
  * Use this to register configuration values, primitive constants, or pre-instantiated objects.
  * Constant values are bound with a singleton scope by default.
  *
- * @group bind
+ * @group Bind
  *
  * @template T - Type of the service being bound.
  *

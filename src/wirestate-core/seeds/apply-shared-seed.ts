@@ -14,7 +14,7 @@ import type { AnyObject } from "../types/general";
  * This function uses `rebind` to ensure the new shared seed replaces the previous one.
  * The shared seed is typically used for global configuration or common state.
  *
- * @group seeds
+ * @group Seeds
  *
  * @param container - The Inversify {@link Container} to update.
  * @param seed - The new shared seed object.

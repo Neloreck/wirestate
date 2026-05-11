@@ -10,7 +10,7 @@ import { OnCommandController } from "./on-command-controller";
  *
  * Supports both standard (TC39) and legacy experimental decorators.
  *
- * @group commands
+ * @group Commands
  */
 export interface OnCommandDecorator<D = unknown, R = unknown> {
   // Standard (TC39):
@@ -27,7 +27,7 @@ export interface OnCommandDecorator<D = unknown, R = unknown> {
  *
  * The handler is registered when the host element connects to the DOM and unregistered when it disconnects.
  *
- * @group commands
+ * @group Commands
  *
  * @param type - The command type to handle.
  * @returns The decorator function.

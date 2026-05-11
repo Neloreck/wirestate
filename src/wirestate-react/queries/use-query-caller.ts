@@ -14,7 +14,7 @@ import { QueryCaller } from "../types/queries";
  * The returned dispatcher is memoized using `useCallback` and stays stable
  * for the lifetime of the container. It uses {@link QueryBus.query} internally.
  *
- * @group queries
+ * @group Queries
  *
  * @returns A query dispatcher function.
  *

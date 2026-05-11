@@ -13,7 +13,7 @@ import { InjectableDescriptor } from "../types/privision";
  * The binding uses `entry.factory` if provided; otherwise, it falls back to `entry.value`.
  * Supports custom scoping via `entry.scopeBindingType`.
  *
- * @group bind
+ * @group Bind
  *
  * @template T - Type of the value being bound.
  *

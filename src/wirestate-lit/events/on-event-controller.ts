@@ -10,7 +10,7 @@ import { Optional } from "../types/general";
  *
  * It automatically handles subscription and unsubscription based on the host element's lifecycle.
  *
- * @group events
+ * @group Events
  */
 export class OnEventController<E extends Event = Event> implements ReactiveController {
   private bus: Optional<EventBus> = null;

@@ -7,7 +7,7 @@ import { MaybePromise } from "./general";
  * Queries use a request-response pattern. Using symbols is recommended for
  * private or internal queries to avoid naming collisions.
  *
- * @group queries
+ * @group Queries
  *
  * @example
  * ```typescript
@@ -23,7 +23,7 @@ export type QueryType = string | symbol;
  * Query handlers can be synchronous or asynchronous. They receive a payload
  * and must return a result (or a Promise resolving to it).
  *
- * @group queries
+ * @group Queries
  *
  * @template D - Type of the input data (payload).
  * @template R - Type of the returned result.
@@ -38,7 +38,7 @@ export type QueryHandler<D = unknown, R = unknown> = (data: D) => MaybePromise<R
 /**
  * Represents function returned by registration methods to remove a query handler.
  *
- * @group queries
+ * @group Queries
  *
  * @example
  * ```typescript
@@ -56,7 +56,7 @@ export type QueryUnregister = () => void;
  * This interface is used internally to track which methods should be registered
  * on the {@link QueryBus} during service activation.
  *
- * @group queries
+ * @group Queries
  * @internal
  */
 export interface QueryHandlerMetadata {

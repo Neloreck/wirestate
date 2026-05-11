@@ -13,7 +13,7 @@ import { Maybe } from "../types/general";
  * The handler is synced via `useRef` to avoid stale closures.
  * The subscription is automatically cleaned up on unmount.
  *
- * @group events
+ * @group Events
  *
  * @param handler - Event handler invoked for every emitted event.
  *

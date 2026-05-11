@@ -6,7 +6,7 @@ import { OnQueryController } from "./on-query-controller";
 /**
  * Represents options for the {@link useOnQuery} hook.
  *
- * @group queries
+ * @group Queries
  */
 export interface UseOnQueryOptions<D = unknown, R = unknown> {
   /**
@@ -22,7 +22,7 @@ export interface UseOnQueryOptions<D = unknown, R = unknown> {
 /**
  * Registers a query handler on the `QueryBus` for the host element's lifetime.
  *
- * @group queries
+ * @group Queries
  *
  * @param host - The host element.
  * @param options - Query handling options.

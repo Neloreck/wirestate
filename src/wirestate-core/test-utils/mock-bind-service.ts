@@ -5,7 +5,7 @@ import { bindService } from "../bind/bind-service";
 /**
  * Represents options for {@link mockBindService}.
  *
- * @group test-utils
+ * @group Test-utils
  */
 export interface MockBindServiceOptions {
   /**
@@ -26,7 +26,7 @@ export interface MockBindServiceOptions {
  * This utility is a testing wrapper for {@link bindService}.
  * It ensures the service is correctly registered with singleton scope and lifecycle metadata.
  *
- * @group test-utils
+ * @group Test-utils
  *
  * @template T - The type of the service being bound.
  *

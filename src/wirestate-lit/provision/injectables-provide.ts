@@ -5,11 +5,11 @@ import { FieldMustMatchProvidedType, Interface, Maybe } from "../types/general";
 import { InjectablesProviderController, InjectablesProviderControllerOptions } from "./injectables-provider-controller";
 
 /**
- * Type for the {@link injectablesProvide} decorator.
+ * Represents type for the {@link injectablesProvide} decorator.
  *
  * Supports both standard (TC39) and legacy experimental decorators.
  *
- * @group provision
+ * @group Provision
  */
 export interface InjectablesProviderDecorator<T extends ReactiveElement = ReactiveElement> {
   // Standard (TC39):
@@ -30,7 +30,7 @@ export interface InjectablesProviderDecorator<T extends ReactiveElement = Reacti
  * Entries are bound when the host connects and unbound when it disconnects.
  * The decorated accessor or property holds the resulting {@link InjectablesProviderController} instance.
  *
- * @group provision
+ * @group Provision
  *
  * @param options - Provisioning options.
  * @returns Injectables provider decorator instance.

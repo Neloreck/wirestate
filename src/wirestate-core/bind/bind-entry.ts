@@ -12,7 +12,7 @@ import { bindService, type BindServiceOptions } from "./bind-service";
 /**
  * Represents options for {@link bindEntry}.
  *
- * @group bind
+ * @group Bind
  */
 export interface BindEntryOptions extends BindServiceOptions {
   /**
@@ -34,7 +34,7 @@ export interface BindEntryOptions extends BindServiceOptions {
  * - **DynamicValue**: Binds a factory-generated value via {@link bindDynamicValue}.
  * - **Instance**: Binds a value as a class instance via {@link bindService}.
  *
- * @group bind
+ * @group Bind
  *
  * @template T - Type of the object being bound.
  *

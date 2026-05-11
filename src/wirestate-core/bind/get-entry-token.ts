@@ -10,7 +10,7 @@ import type { InjectableDescriptor } from "../types/privision";
  * - If `entry` is a class constructor, it is returned as the identifier.
  * - If `entry` is an {@link InjectableDescriptor}, its `id` field is returned.
  *
- * @group bind
+ * @group Bind
  *
  * @template T - Type of the injectable object.
  *

@@ -14,7 +14,7 @@ import { Optional } from "../types/general";
  * The handler is registered when the host connects and unregistered when it disconnects.
  * When the IoC context is updated (container revision change), the handler is re-registered automatically.
  *
- * @group commands
+ * @group Commands
  */
 export class OnCommandController<D = unknown, R = unknown> implements ReactiveController {
   private bus: Optional<CommandBus> = null;

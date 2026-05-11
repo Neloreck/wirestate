@@ -12,7 +12,7 @@ import { Optional } from "../types/general";
  * This is an internal utility hook used by other hooks in the library.
  * It throws an error if called outside of an {@link IocProvider}.
  *
- * @group provision
+ * @group Provision
  * @internal
  *
  * @returns The active {@link IocContext}.

@@ -6,7 +6,7 @@ import type { InjectableDescriptor } from "../types/privision";
 /**
  * Represents options for {@link mockBindEntry}.
  *
- * @group test-utils
+ * @group Test-utils
  */
 export interface MockBindEntryOptions {
   /**
@@ -28,7 +28,7 @@ export interface MockBindEntryOptions {
  * This utility is a testing wrapper for {@link bindEntry}.
  * It supports both service classes and {@link InjectableDescriptor} objects.
  *
- * @group test-utils
+ * @group Test-utils
  *
  * @template T - The type of the service being bound.
  *

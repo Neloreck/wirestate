@@ -1,7 +1,7 @@
 import { LazyServiceIdentifier, type ServiceIdentifier } from "inversify";
 
 /**
- * @group inversify
+ * @group External-inversify
  * @see {@link https://inversify.io/}
  */
 export {
@@ -55,7 +55,7 @@ export {
 } from "inversify";
 
 /**
- * @group inversify
+ * @group External-inversify
  * @see {@link https://inversify.io/}
  */
 export {
@@ -73,7 +73,7 @@ export {
 } from "inversify";
 
 /**
- * @group inversify-binding
+ * @group External-inversify-binding
  * @see {@link https://inversify.io/}
  */
 export { bindingTypeValues as BindingType, bindingScopeValues as ScopeBindingType } from "inversify";
@@ -81,7 +81,7 @@ export { bindingTypeValues as BindingType, bindingScopeValues as ScopeBindingTyp
 /**
  * Util to resolve circular dependencies by wrapping the service identifier in a lazy identifier.
  *
- * @group inversify
+ * @group External-inversify
  * @see {@link https://inversify.io/}
  *
  * @param forward - A function that returns the service identifier.

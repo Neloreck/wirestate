@@ -5,9 +5,9 @@ import { FieldMustMatchProvidedType, Interface, Maybe } from "../types/general";
 import { IocProviderController, IocProviderControllerOptions } from "./ioc-provider-controller";
 
 /**
- * Type definition for the ioc-provide decorator.
+ * Represents type definition for the ioc-provide decorator.
  *
- * @group provision
+ * @group Provision
  */
 export interface IocProviderDecorator<E extends ReactiveElement = ReactiveElement> {
   // Standard:
@@ -25,7 +25,7 @@ export interface IocProviderDecorator<E extends ReactiveElement = ReactiveElemen
 /**
  * Decorator to provide an IoC container to child components.
  *
- * @group provision
+ * @group Provision
  *
  * @param options - Provisioning options including container and seed data.
  * @param options.container - Optional existing container to use, if not provided, a new one will be created.

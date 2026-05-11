@@ -7,7 +7,7 @@ import { EventType } from "@wirestate/core";
  * Typically returned by {@link useEventEmitter}. Supports optional payload
  * and source identifier.
  *
- * @group events
+ * @group Events
  *
  * @template P - The type of the event payload.
  * @template T - The event identifier type.

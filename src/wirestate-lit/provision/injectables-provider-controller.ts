@@ -23,7 +23,7 @@ import { Maybe } from "../types/general";
 /**
  * Represents options for the {@link InjectablesProviderController}.
  *
- * @group provision
+ * @group Provision
  */
 export interface InjectablesProviderControllerOptions {
   /**
@@ -55,7 +55,7 @@ export interface InjectablesProviderControllerOptions {
  * ancestor via Lit context. Seeds are applied before entries so that `@Inject(SEEDS_TOKEN)`
  * works during service activation.
  *
- * @group provision
+ * @group Provision
  *
  * @example
  * ```typescript

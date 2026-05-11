@@ -11,7 +11,7 @@ import { Event, EventHandler, EventType, EventUnsubscriber } from "../types/even
  * Unlike commands or queries, which are dispatched to a single handler,
  * events are broadcast to all registered subscribers.
  *
- * @group events
+ * @group Events
  */
 export class EventBus {
   private readonly handlers: Set<EventHandler> = new Set();

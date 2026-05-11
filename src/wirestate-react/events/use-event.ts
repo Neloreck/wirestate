@@ -11,7 +11,7 @@ import { useContainer } from "../provision/use-container";
  * cleaned up on unmount. The handler is synced via `useRef` to avoid stale
  * closures without requiring manual memoization of the handler function.
  *
- * @group events
+ * @group Events
  *
  * @param type - Event type to listen for.
  * @param handler - Function invoked when the specified event is emitted.

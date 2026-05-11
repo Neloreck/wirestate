@@ -8,7 +8,7 @@ import { Container, type Newable } from "inversify";
  * It is useful in tests to reset or override specific service registrations
  * between test cases.
  *
- * @group test-utils
+ * @group Test-utils
  *
  * @template T - The type of the service to unbind.
  *

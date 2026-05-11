@@ -11,7 +11,7 @@ import { useContainer } from "../provision/use-container";
  * closures. Only one handler is active per type; newer registrations shadow older ones.
  * The handler is automatically unregistered when the component unmounts.
  *
- * @group queries
+ * @group Queries
  *
  * @template R - Result type of the query.
  * @template D - Data/payload type of the query.

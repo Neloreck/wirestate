@@ -11,7 +11,7 @@ import { Optional } from "../types/general";
 /**
  * Represents options for the {@link useInjection} hook.
  *
- * @group consumption
+ * @group Consumption
  */
 export interface UseInjectionOptions<T> {
   /**
@@ -32,7 +32,7 @@ export interface UseInjectionOptions<T> {
 /**
  * Represents the return value of the {@link useInjection} hook, containing the injected service.
  *
- * @group consumption
+ * @group Consumption
  */
 export interface UseInjectionValue<T> {
   /**
@@ -48,7 +48,7 @@ export interface UseInjectionValue<T> {
 /**
  * Hook (controller) to inject a service from the IoC container in a Lit component.
  *
- * @group consumption
+ * @group Consumption
  *
  * @param host - The host element.
  * @param optionsOrInjectionId - Injection options including the service identifier or the service identifier itself.

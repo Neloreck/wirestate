@@ -15,7 +15,7 @@ import { SyncQueryCaller } from "../types/queries";
  * instead of a Promise (unless the handler itself returns a Promise).
  * Memoized using `useCallback`.
  *
- * @group queries
+ * @group Queries
  *
  * @returns A synchronous query dispatcher function.
  *

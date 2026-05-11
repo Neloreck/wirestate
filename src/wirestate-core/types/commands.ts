@@ -6,7 +6,7 @@ import type { MaybePromise } from "./general";
  * @remarks
  * Use strings for public commands and symbols for private/scoped commands to avoid name collisions.
  *
- * @group commands
+ * @group Commands
  *
  * @example
  * ```typescript
@@ -25,7 +25,7 @@ export type CommandType = string | symbol;
 /**
  * Represents function signature for handling command execution.
  *
- * @group commands
+ * @group Commands
  *
  * @template D - Type of the input payload (data) for the command.
  * @template R - Type of the result returned by the handler (can be wrapped in a Promise).
@@ -43,7 +43,7 @@ export type CommandHandler<D = unknown, R = unknown> = (payload: D) => MaybeProm
  * Represents function returned when a command handler is registered.
  * Calling this function removes the handler from the command bus.
  *
- * @group commands
+ * @group Commands
  *
  * @example
  * ```typescript
@@ -57,7 +57,7 @@ export type CommandUnregister = () => void;
 /**
  * Metadata for `@OnCommand` decorated methods.
  *
- * @group commands
+ * @group Commands
  * @internal
  */
 export interface CommandHandlerMetadata {
@@ -68,7 +68,7 @@ export interface CommandHandlerMetadata {
 /**
  * Represents the current state of a command execution.
  *
- * @group commands
+ * @group Commands
  */
 export enum CommandStatus {
   /** The command task has started but not yet completed. */
@@ -86,7 +86,7 @@ export enum CommandStatus {
  * Returned by the command bus when a command is dispatched. It allows tracking
  * the progress and outcome of the command execution.
  *
- * @group commands
+ * @group Commands
  *
  * @template R - Type of the result produced by the command.
  */

@@ -8,7 +8,7 @@ import { OnEventController } from "./on-event-controller";
 /**
  * Represents options for the {@link useOnEvents} hook.
  *
- * @group events
+ * @group Events
  */
 export interface UseOnEventsOptions<E extends Event = Event> {
   /**
@@ -24,7 +24,7 @@ export interface UseOnEventsOptions<E extends Event = Event> {
 /**
  * Hook (controller) to handle events from the event bus.
  *
- * @group events
+ * @group Events
  *
  * @param host - The host element.
  * @param options - Event handling options.

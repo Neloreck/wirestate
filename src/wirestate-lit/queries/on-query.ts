@@ -10,7 +10,7 @@ import { OnQueryController } from "./on-query-controller";
  *
  * Supports both standard (TC39) and legacy experimental decorators.
  *
- * @group queries
+ * @group Queries
  */
 export interface OnQueryDecorator<D = unknown, R = unknown> {
   // Standard (TC39):
@@ -27,7 +27,7 @@ export interface OnQueryDecorator<D = unknown, R = unknown> {
  *
  * The handler is registered when the host element connects to the DOM and unregistered when it disconnects.
  *
- * @group queries
+ * @group Queries
  *
  * @param type - The query type to handle.
  * @returns The decorator function.

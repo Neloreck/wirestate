@@ -13,7 +13,7 @@ import { EventBus } from "./event-bus";
  * @remarks
  * Use this utility to emit events from outside a service's {@link WireScope} (e.g., from a bootstrap script or external controller).
  *
- * @group events
+ * @group Events
  *
  * @template P - Type of the event payload.
  * @template T - Type of the event identifier.

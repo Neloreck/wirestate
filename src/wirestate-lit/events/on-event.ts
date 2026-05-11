@@ -8,7 +8,7 @@ import { OnEventController } from "./on-event-controller";
 /**
  * Represents type definition for the on-event decorator.
  *
- * @group events
+ * @group Events
  */
 export interface OnEventDecorator<E extends Event = Event> {
   // Standard (TC39):
@@ -23,7 +23,7 @@ export interface OnEventDecorator<E extends Event = Event> {
 /**
  * Decorator to handle events from the event bus.
  *
- * @group events
+ * @group Events
  *
  * @param types - Event types to listen for. If omitted, all events will be handled.
  * @returns The decorator function.

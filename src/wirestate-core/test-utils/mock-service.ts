@@ -6,7 +6,7 @@ import { mockContainer } from "./mock-container";
 /**
  * Represents options for {@link mockService}.
  *
- * @group test-utils
+ * @group Test-utils
  */
 export interface MockServiceOptions {
   /**
@@ -24,7 +24,7 @@ export interface MockServiceOptions {
  * This is a high-level utility that combines {@link mockContainer} and {@link mockBindService}.
  * If no container is provided, a fresh one is created.
  *
- * @group test-utils
+ * @group Test-utils
  *
  * @template T - The type of the service being mocked.
  *

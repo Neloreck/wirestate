@@ -10,7 +10,7 @@ import { Optional } from "../types/general";
  * Contains the Inversify container and a revision counter used to trigger
  * re-renders in components when the container bindings change.
  *
- * @group context
+ * @group Context
  */
 export interface IocContext {
   /**
@@ -34,7 +34,7 @@ export interface IocContext {
  * This context is internal to Wirestate. Consumers should use provided hooks
  * like {@link useContainer}, {@link useInjection} or {@link useScope} to access the container and resolved services.
  *
- * @group context
+ * @group Context
  */
 export const IocReactContext: Context<Optional<IocContext>> = createContext<Optional<IocContext>>(null);
 

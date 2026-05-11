@@ -1,5 +1,5 @@
 /**
- * @group preact-react-signals
+ * @group Signals
  * @see {@link https://www.npmjs.com/package/@preact/signals-react}
  */
 export {

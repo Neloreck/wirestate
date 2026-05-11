@@ -1,7 +1,7 @@
 import { action, computed, IActionFactory, IComputedFactory, IObservableFactory, observable } from "mobx";
 
 /**
- * @group mobx
+ * @group Mobx
  * @see {@link https://mobx.js.org/README.html}
  */
 export {
@@ -104,7 +104,7 @@ export {
 } from "mobx";
 
 /**
- * @group mobx-react
+ * @group Mobx-react
  * @see {@link https://mobx.js.org/react-integration.html}
  */
 export {
@@ -122,7 +122,7 @@ export {
 } from "mobx-react-lite";
 
 /**
- * @group mobx-alias
+ * @group Mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
  * @returns Action decorator.
@@ -132,7 +132,7 @@ export function Action(): IActionFactory {
 }
 
 /**
- * @group mobx-alias
+ * @group Mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
  * @returns Computed decorator.
@@ -142,7 +142,7 @@ export function Computed(): IComputedFactory {
 }
 
 /**
- * @group mobx-alias
+ * @group Mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
  * @returns Observable decorator.
@@ -152,7 +152,7 @@ export function Observable(): IObservableFactory {
 }
 
 /**
- * @group mobx-alias
+ * @group Mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
  * @returns Observable.shallow decorator.
@@ -162,7 +162,7 @@ export function ShallowObservable() {
 }
 
 /**
- * @group mobx-alias
+ * @group Mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
  * @returns Observable.ref decorator.
@@ -172,7 +172,7 @@ export function RefObservable() {
 }
 
 /**
- * @group mobx-alias
+ * @group Mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
  * @returns Observable.deep decorator.

@@ -7,7 +7,7 @@ import { InjectablesProviderController, InjectablesProviderControllerOptions } f
  *
  * Entries are bound when the host connects and unbound when it disconnects.
  *
- * @group provision
+ * @group Provision
  *
  * @param host - The host element.
  * @param options - Provisioning options.

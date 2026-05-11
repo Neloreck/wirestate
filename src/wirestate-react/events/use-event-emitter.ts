@@ -14,7 +14,7 @@ import { EventEmitter } from "../types/events";
  * The returned emitter is memoized using `useCallback` and stays stable
  * for the lifetime of the container.
  *
- * @group events
+ * @group Events
  *
  * @template P - Default payload type for emitted events.
  * @template T - Default event identifier type.

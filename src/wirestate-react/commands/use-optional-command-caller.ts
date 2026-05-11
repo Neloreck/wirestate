@@ -15,7 +15,7 @@ import { OptionalCommandCaller } from "../types/commands";
  * {WirestateError} if no handler is registered for the command type.
  * Uses {@link CommandBus.commandOptional} internally.
  *
- * @group commands
+ * @group Commands
  *
  * @returns An optional command dispatcher function.
  *

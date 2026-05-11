@@ -6,7 +6,7 @@ import { Newable } from "inversify";
  * @remarks
  * Supports class constructors (for targeted seeds), strings, or symbols.
  *
- * @group seeds
+ * @group Seeds
  */
 export type SeedKey = Newable | string | symbol;
 
@@ -17,7 +17,7 @@ export type SeedKey = Newable | string | symbol;
  * Used to store initial state values that are injected into services
  * based on their class constructor or a custom token.
  *
- * @group seeds
+ * @group Seeds
  *
  * @template T - The type of values stored in the map.
  */
@@ -29,7 +29,7 @@ export type SeedsMap<T = unknown> = Map<SeedKey, T>;
  * @remarks
  * Represented as a readonly tuple of `[SeedKey, T]`.
  *
- * @group seeds
+ * @group Seeds
  *
  * @template T - The type of the seed value.
  */
@@ -41,6 +41,6 @@ export type SeedEntry<T = unknown> = readonly [SeedKey, T];
  * @remarks
  * Used during container initialization to populate the {@link SeedsMap}.
  *
- * @group seeds
+ * @group Seeds
  */
 export type SeedEntries = ReadonlyArray<SeedEntry>;

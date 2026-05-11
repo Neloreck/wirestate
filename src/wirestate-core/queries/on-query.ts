@@ -16,7 +16,7 @@ import type { QueryHandlerMetadata, QueryType } from "../types/queries";
  * are registered for the same query type, the most recent one (usually the most
  * specific in terms of class hierarchy or registration order) will shadow the others.
  *
- * @group queries
+ * @group Queries
  *
  * @param type - Unique query identifier to handle.
  * @returns Method decorator.

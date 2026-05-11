@@ -13,7 +13,7 @@ import { useIocContext } from "./use-ioc-context";
  * The scope is recreated if the container changes. It provides a convenient
  * way to access container features like events, commands, and queries.
  *
- * @group provision
+ * @group Provision
  *
  * @returns A {@link WireScope} instance.
  *

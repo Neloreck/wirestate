@@ -11,7 +11,7 @@ import { AnyObject } from "../types/general";
 /**
  * Represents options for the {@link IocProviderController}.
  *
- * @group provision
+ * @group Provision
  */
 export interface IocProviderControllerOptions {
   /**
@@ -29,7 +29,7 @@ export interface IocProviderControllerOptions {
  *
  * It manages the lifecycle of the container and handles revision updates to notify consumers.
  *
- * @group provision
+ * @group Provision
  */
 export class IocProviderController<
   E extends ReactiveControllerHost & HTMLElement = ReactiveControllerHost & HTMLElement,

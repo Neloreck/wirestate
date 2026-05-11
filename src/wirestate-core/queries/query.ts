@@ -15,7 +15,7 @@ import { QueryBus } from "./query-bus";
  * This is a convenience wrapper around the `QueryBus.query` method.
  * Queries allow for decoupled request-response communication between services.
  *
- * @group queries
+ * @group Queries
  *
  * @template R - Type of the expected query result.
  * @template D - Type of the input data (payload).

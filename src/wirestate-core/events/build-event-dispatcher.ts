@@ -14,7 +14,7 @@ import { getEventHandlerMetadata } from "./get-event-handler-metadata";
  * If handlers are found, it returns a fan-out function that dispatches events
  * to all matching methods based on their registered event types.
  *
- * @group events
+ * @group Events
  * @internal
  *
  * @template T - Type of the service instance.

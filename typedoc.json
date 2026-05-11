@@ -5,6 +5,7 @@
   "exclude": ["src/wirestate-portable/index.ts"],
   "out": "docs/api",
   "plugin": ["typedoc-plugin-markdown", "./docs/plugins/typedoc-npm-sources.mjs"],
+  "groupOrder": ["*", "External-inversify", "External-inversify-binding"],
   "entryFileName": "index.md",
   "hideGenerator": true,
   "cleanOutputDir": true,

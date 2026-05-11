@@ -15,7 +15,7 @@ import { OptionalQueryCaller } from "../types/queries";
  * for the lifetime of the container. It returns `null` instead of throwing
  * if no handler is registered.
  *
- * @group queries
+ * @group Queries
  *
  * @returns An optional query dispatcher function.
  *

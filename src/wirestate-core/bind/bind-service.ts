@@ -27,7 +27,7 @@ import type { QueryHandler, QueryUnregister } from "../types/queries";
 /**
  * Represents options for {@link bindService}.
  *
- * @group bind
+ * @group Bind
  */
 export interface BindServiceOptions {
   /**
@@ -50,7 +50,7 @@ export interface BindServiceOptions {
  * - Set up event dispatching and bus subscriptions.
  * - Track and dispose injected {@link WireScope} instances.
  *
- * @group bind
+ * @group Bind
  *
  * @template T - Type of the service instance.
  *

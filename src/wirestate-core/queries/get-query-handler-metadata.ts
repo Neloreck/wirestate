@@ -14,7 +14,7 @@ import type { QueryHandlerMetadata } from "../types/queries";
  * Since queries support shadowing, child class handlers registered later will effectively
  * override parent handlers for the same query type.
  *
- * @group queries
+ * @group Queries
  * @internal
  *
  * @param instance - The service instance to scan for query handlers.

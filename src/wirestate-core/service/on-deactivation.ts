@@ -15,7 +15,7 @@ import type { Maybe } from "../types/general";
  * Multiple `@OnDeactivation` methods can exist in the same class hierarchy; they are executed
  * in parent-to-child order.
  *
- * @group service
+ * @group Service
  *
  * @returns A method decorator function.
  *
