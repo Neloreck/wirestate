@@ -9,13 +9,27 @@ import { AnyObject } from "../types/general";
 import { useIocContext } from "./use-ioc-context";
 
 /**
- * Resolves a value from the container - constant or service.
- * Automatically re-resolves if the container is reset or services are rebound.
+ * Resolves a service or constant from the active container.
+ *
+ * @remarks
+ * This hook automatically re-resolves the dependency if the container's
+ * revision changes (e.g., due to re-binding in a provider).
  *
  * @group provision
  *
- * @param injectionId - Injection identifier.
- * @returns Resolved value.
+ * @template T - The type of the value being resolved.
+ *
+ * @param injectionId - The service identifier (string, symbol, or constructor).
+ *
+ * @returns The resolved instance or value.
+ *
+ * @throws {WirestateError} If the container is not found in context.
+ * @throws {Error} If Inversify fails to resolve the identifier.
+ *
+ * @example
+ * ```tsx
+ * const api: ApiService = useInjection(ApiService);
+ * ```
  */
 export function useInjection<T>(injectionId: ServiceIdentifier<T>): T {
   const { container, revision } = useIocContext();

@@ -26,7 +26,11 @@ import { Optional } from "../types/general";
 export interface InjectablesProviderProps {
   /**
    * Targeted seeds bound to specific injectables or tokens.
-   * Subsequent prop changes are ignored. Use a React `key` to re-seed the tree.
+   *
+   * @remarks
+   * These seeds are applied before services are bound.
+   * Subsequent prop changes are ignored. Use a React `key` on the provider
+   * to force a re-mount and re-seed the subtree.
    */
   readonly seeds?: SeedEntries;
   /**
@@ -49,19 +53,46 @@ export type InjectablesProvider = ReturnType<typeof createInjectablesProvider>;
  */
 export interface CreateInjectablesProviderOptions {
   /**
-   * Services to resolve immediately on mount.
+   * Services to resolve immediately when the provider mounts.
+   *
+   * @remarks
+   * Listed services must also be present in the `entries` array.
    */
   readonly activate?: ReadonlyArray<ServiceIdentifier>;
 }
 
 /**
- * Creates a component that manages injectable lifetimes for its subtree.
+ * Creates a React component that manages the lifecycle of specified injectables for its subtree.
+ *
+ * @remarks
+ * The returned component (an "Injectables Provider") binds services to the container
+ * when it mounts and unbinds them when it unmounts. This allows for feature-scoped
+ * or screen-scoped service lifecycles.
+ *
+ * It must be rendered within an {@link IocProvider}.
  *
  * @group provision
  *
- * @param entries - Service classes or injectable descriptors to bind.
- * @param options - Provider configuration.
- * @returns Injectables provider component.
+ * @param entries - Array of service classes or {@link InjectableDescriptor} objects to bind.
+ * @param options - Configuration options for the provider.
+ *
+ * @returns A React component that provisions the specified services.
+ *
+ * @example
+ * ```tsx
+ * const InjectablesProvider = createInjectablesProvider(
+ *   SomeService, { token: CONFIG_TOKEN, value: { enabled: true } }],
+ *   { activate: [SomeService] }
+ * );
+ *
+ * function Root() {
+ *   return (
+ *     <InjectablesProvider seeds={[[SomeService, { id: 123 }]]}>
+ *       <RootPage />
+ *     </InjectablesProvider>
+ *   );
+ * }
+ * ```
  */
 export function createInjectablesProvider(
   entries: ReadonlyArray<Newable<object> | InjectableDescriptor>,

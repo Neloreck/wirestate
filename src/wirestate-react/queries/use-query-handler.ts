@@ -5,13 +5,27 @@ import { useContainer } from "../provision/use-container";
 
 /**
  * Registers a query handler for the component's lifetime.
- * The handler is stored in a ref to avoid manual memoization.
- * Only one handler is active per type; newer registrations shadow older ones.
+ *
+ * @remarks
+ * The handler is stored in a `useRef` and synced on every render to avoid stale
+ * closures. Only one handler is active per type; newer registrations shadow older ones.
+ * The handler is automatically unregistered when the component unmounts.
  *
  * @group queries
  *
- * @param type - Query type.
- * @param handler - Query handler function.
+ * @template R - Result type of the query.
+ * @template D - Data/payload type of the query.
+ * @template T - Query identifier type.
+ *
+ * @param type - Query identifier (string or symbol).
+ * @param handler - Function that responds to the query.
+ *
+ * @example
+ * ```tsx
+ * useQueryHandler("GET_DATA", (data) => {
+ *   return { id: data.id, value: "Resolved" };
+ * });
+ * ```
  */
 export function useQueryHandler<R = unknown, D = unknown, T extends QueryType = QueryType>(
   type: T,

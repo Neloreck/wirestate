@@ -9,11 +9,20 @@ import { OptionalSyncQueryCaller } from "../types/queries";
 
 /**
  * Returns a stable function to dispatch synchronous optional queries.
- * Returns null instead of throwing when no handler is registered.
+ *
+ * @remarks
+ * Similar to {@link useOptionalQueryCaller}, but returns the value directly
+ * (synchronously) from the handler. Returns `null` if no handler is registered.
  *
  * @group queries
  *
- * @returns Optional sync query dispatcher.
+ * @returns An optional synchronous query dispatcher function.
+ *
+ * @example
+ * ```tsx
+ * const querySyncOptional: OptionalSyncQueryCaller = useOptionalSyncQueryCaller();
+ * const value: ThemePreference | null = querySyncOptional(GET_THEME_PREFERENCE);
+ * ```
  */
 export function useOptionalSyncQueryCaller(): OptionalSyncQueryCaller {
   const container: Container = useContainer();

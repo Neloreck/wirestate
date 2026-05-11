@@ -57,8 +57,8 @@ export type CommandUnregister = () => void;
 /**
  * Metadata for `@OnCommand` decorated methods.
  *
- * @internal
  * @group commands
+ * @internal
  */
 export interface CommandHandlerMetadata {
   readonly methodName: string | symbol;

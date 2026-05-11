@@ -244,9 +244,10 @@ export function bindService<T extends object>(
 /**
  * Attaches a event subscription to a service.
  *
+ * @internal
+ *
  * @param service - Service instance.
  * @param handler - Event handler.
- * @internal
  */
 function attachEventsSubscription<T extends object>(service: T, handler: EventHandler): void {
   const bus: Maybe<EventBus> = CONTAINER_REFS_BY_SERVICE.get(service)?.get(EventBus);
@@ -259,8 +260,9 @@ function attachEventsSubscription<T extends object>(service: T, handler: EventHa
 /**
  * Detaches the event subscription from a service.
  *
- * @param service - Service instance.
  * @internal
+ *
+ * @param service - Service instance.
  */
 function detachEventSubscription<T extends object>(service: T): void {
   const unsubscribe: Maybe<EventUnsubscriber> = EVENT_UNSUBSCRIBERS_BY_SERVICE.get(service);
@@ -274,9 +276,10 @@ function detachEventSubscription<T extends object>(service: T): void {
 /**
  * Registers a query unregister function for a service.
  *
+ * @internal
+ *
  * @param service - Service instance.
  * @param unregister - Query unregister function.
- * @internal
  */
 function attachQueryUnregister<T extends object>(service: T, unregister: QueryUnregister): void {
   let list: Maybe<Array<QueryUnregister>> = QUERY_UNREGISTERS_BY_SERVICE.get(service);
@@ -292,8 +295,9 @@ function attachQueryUnregister<T extends object>(service: T, unregister: QueryUn
 /**
  * Executes and removes all query unregister functions for a service.
  *
- * @param service - Service instance.
  * @internal
+ *
+ * @param service - Service instance.
  */
 function detachQueryUnregister<T extends object>(service: T): void {
   const list: Maybe<Array<QueryUnregister>> = QUERY_UNREGISTERS_BY_SERVICE.get(service);
@@ -312,9 +316,10 @@ function detachQueryUnregister<T extends object>(service: T): void {
 /**
  * Registers a command unregister function for a service.
  *
+ * @internal
+ *
  * @param service - Service instance.
  * @param unregister - Command unregister function.
- * @internal
  */
 function attachCommandUnregister<T extends object>(service: T, unregister: CommandUnregister): void {
   let list: Maybe<Array<CommandUnregister>> = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
@@ -330,8 +335,9 @@ function attachCommandUnregister<T extends object>(service: T, unregister: Comma
 /**
  * Executes and removes all command unregister functions for a service.
  *
- * @param service - Service instance.
  * @internal
+ *
+ * @param service - Service instance.
  */
 function detachCommandUnregister<T extends object>(service: T): void {
   const list: Maybe<Array<CommandUnregister>> = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
@@ -354,9 +360,10 @@ function detachCommandUnregister<T extends object>(service: T): void {
  *
  * Todo: Simplify this part..
  *
+ * @internal
+ *
  * @param service - Service instance.
  * @param Service - Service constructor.
- * @internal
  */
 function attachWireScopes<T extends object>(service: T, Service: Newable<T>): void {
   const paramTypes = Reflect.getMetadata("design:paramtypes", Service) as Array<unknown> | undefined;
@@ -386,8 +393,9 @@ function attachWireScopes<T extends object>(service: T, Service: Newable<T>): vo
  *
  * Todo: Simplify this part..
  *
- * @param service - Service instance.
  * @internal
+ *
+ * @param service - Service instance.
  */
 function detachWireScopes<T extends object>(service: T): void {
   const scopes: Maybe<Array<WireScope>> = WIRE_SCOPES_BY_SERVICE.get(service);

@@ -12,25 +12,44 @@ import { AnyObject, Optional } from "../types/general";
  */
 export interface IocProviderProps extends PropsWithChildren<unknown> {
   /**
-   * External container instance. If omitted, a new container is created.
+   * External Inversify container instance.
+   * If omitted, a new container is automatically created via {@link createIocContainer}.
    */
   readonly container?: Container;
   /**
-   * Shared seed for the container.
+   * Shared seed data to be applied to the container.
+   * This data is available to all services in the container.
    */
   readonly seed?: AnyObject;
 }
 
 /**
- * Provides an IoC container to the component tree.
+ * Provides an Inversify IoC container to the React component tree.
+ *
+ * @remarks
+ * This component should be placed near the root of your application. It initializes
+ * the IocReactContext, which is consumed by hooks like `useService` and `useContainer`.
  *
  * @group provision
  *
- * @param props - Component props.
- * @param props.container - External container instance.
- * @param props.seed - Shared seed across the container.
- * @param props.children - Components to wrap.
- * @returns Provider element.
+ * @param props - Component properties.
+ * @param props.container - External Inversify container instance.
+ * @param props.seed - Shared seed data to be applied to the container.
+ * @param props.children - React children element.
+ * @returns A React Context Provider element.
+ *
+ * @example
+ * ```tsx
+ * const seed = { API_URL: "https://api.example.com" };
+ *
+ * function Application() {
+ *   return (
+ *     <IocProvider seed={seed}>
+ *       <HomePage />
+ *     </IocProvider>
+ *   );
+ * }
+ * ```
  */
 export function IocProvider({ container: externalContainer, seed, children }: IocProviderProps) {
   // Incremented on binding changes to invalidate descendant caches (e.g., useInjection).

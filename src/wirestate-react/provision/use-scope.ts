@@ -7,12 +7,22 @@ import { prefix } from "@/macroses/prefix.macro";
 import { useIocContext } from "./use-ioc-context";
 
 /**
- * Returns the current `WireScope` instance bound to the active container.
- * Recreates scope when the container is reset or changed.
+ * Returns a {@link WireScope} instance bound to the active container.
+ *
+ * @remarks
+ * The scope is recreated if the container changes. It provides a convenient
+ * way to access container features like events, commands, and queries.
  *
  * @group provision
  *
- * @returns Active wire scope.
+ * @returns A {@link WireScope} instance.
+ *
+ * @example
+ * ```tsx
+ * const scope: WireScope = useScope();
+ *
+ * scope.emitEvent("UI_READY");
+ * ```
  */
 export function useScope(): WireScope {
   const { container } = useIocContext();

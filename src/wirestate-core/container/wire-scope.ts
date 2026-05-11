@@ -80,7 +80,7 @@ export class WireScope {
    * @returns The resolved instance or value.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
-   * @throws Error If the service cannot be resolved from the container.
+   * @throws {Error} If the service cannot be resolved from the container.
    *
    * @example
    * ```typescript

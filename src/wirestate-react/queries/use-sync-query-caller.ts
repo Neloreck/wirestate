@@ -9,11 +9,21 @@ import { SyncQueryCaller } from "../types/queries";
 
 /**
  * Returns a stable function to dispatch synchronous queries.
- * Returns the value directly from the handler.
+ *
+ * @remarks
+ * The returned dispatcher returns the value directly from the handler
+ * instead of a Promise (unless the handler itself returns a Promise).
+ * Memoized using `useCallback`.
  *
  * @group queries
  *
- * @returns Sync query dispatcher.
+ * @returns A synchronous query dispatcher function.
+ *
+ * @example
+ * ```tsx
+ * const querySync: SyncQueryCaller = useSyncQueryCaller();
+ * const config: ApplicationConfig = querySync("GET_APP_CONFIG");
+ * ```
  */
 export function useSyncQueryCaller(): SyncQueryCaller {
   const container: Container = useContainer();

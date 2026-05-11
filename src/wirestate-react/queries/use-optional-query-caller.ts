@@ -8,12 +8,22 @@ import { useContainer } from "../provision/use-container";
 import { OptionalQueryCaller } from "../types/queries";
 
 /**
- * Returns a function to dispatch optional queries on the active container.
- * Returns null instead of throwing when no handler is registered.
+ * Returns a stable function to dispatch optional queries on the active container.
+ *
+ * @remarks
+ * The returned dispatcher is memoized using `useCallback` and stays stable
+ * for the lifetime of the container. It returns `null` instead of throwing
+ * if no handler is registered.
  *
  * @group queries
  *
- * @returns Optional query dispatcher.
+ * @returns An optional query dispatcher function.
+ *
+ * @example
+ * ```tsx
+ * const queryOptional: OptionalQueryCaller = useOptionalQueryCaller();
+ * const settings: UserSettings | null = await queryOptional(GET_USER_SETTINGS, { id: 1 });
+ * ```
  */
 export function useOptionalQueryCaller(): OptionalQueryCaller {
   const container: Container = useContainer();

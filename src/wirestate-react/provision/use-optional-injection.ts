@@ -9,14 +9,25 @@ import { AnyObject, Optional } from "../types/general";
 import { useIocContext } from "./use-ioc-context";
 
 /**
- * Resolves a value from the container if bound, returning null otherwise.
- * Unlike {@link useInjection}, this hook does not throw when the token is not bound.
+ * Safely resolves a value from the container, returning a fallback or null if not bound.
+ *
+ * @remarks
+ * Unlike {@link useInjection}, this hook does not throw if the dependency
+ * is missing from the container.
  *
  * @group provision
  *
- * @param injectionId - Injection identifier.
- * @param onFallback - Optional callback to handle cases when dependency was not resolved.
- * @returns Resolved value, result of optional fallback handler or null.
+ * @template T - The type of the value being resolved.
+ *
+ * @param injectionId - The service identifier (string, symbol, or constructor).
+ * @param onFallback - Optional function called to provide a value if the token is not bound.
+ *
+ * @returns The resolved value, the result of the fallback function, or `null`.
+ *
+ * @example
+ * ```tsx
+ * const logger = useOptionalInjection(FileLogger, (container) => container.get(ConsoleLoggerService);
+ * ```
  */
 export function useOptionalInjection<T>(
   injectionId: ServiceIdentifier<T>,
