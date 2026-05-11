@@ -15,7 +15,7 @@ export { commandOptional } from "./commands/command-optional";
 export { OnCommand } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";
 
-export { createIocContainer } from "./container/create-ioc-container";
+export { createIocContainer, CreateIocContainerOptions } from "./container/create-ioc-container";
 export { WireScope } from "./container/wire-scope";
 
 export { WirestateError } from "./error/wirestate-error";

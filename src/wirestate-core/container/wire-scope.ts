@@ -16,9 +16,13 @@ import type { SeedKey, SeedsMap } from "../types/initial-state";
 import type { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 
 /**
- * Injectable scope providing access to wirestate buses and seeds.
- * Each injecting service receives its own instance (transient scope).
- * The scope is activated and deactivated automatically alongside its owner service.
+ * A transient bridge providing services with access to Wirestate buses, lazy resolution, and seeds.
+ *
+ * @remarks
+ * Every service bound via {@link bindService} receives its own unique `WireScope` instance.
+ * It acts as a facade to the IoC container while enforcing lifecycle safety.
+ *
+ * Methods are available only while the scope is "active" (after service activation and before deactivation).
  *
  * @group container
  */
@@ -32,12 +36,18 @@ export class WireScope {
   public constructor(private readonly container: Optional<Container>) {}
 
   /**
-   * Access the IoC container.
-   * Available only for activated instances of scope.
+   * Provides direct access to the underlying Inversify {@link Container}.
    *
-   * @returns Active container.
+   * @returns The active {@link Container}.
    *
-   * @throws WirestateError if scope is not activated or already disposed.
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * const container: Container = scope.getContainer();
+   *
+   * container.bind("TOKEN").toConstantValue(42);
+   * ```
    */
   public getContainer(): Container {
     if (this.container) {
@@ -59,14 +69,23 @@ export class WireScope {
   }
 
   /**
-   * Resolves a sibling service or injected value.
-   * Use for lazy resolution or circular dependency breaking.
-   * Available only for activated containers.
+   * Lazily resolves a service or value from the container.
    *
-   * @param injectionId - Injection identifier.
-   * @returns Resolved injection, service instance, or generic value.
+   * @remarks
+   * Use this to break circular dependencies or for services that are not needed immediately.
    *
-   * @throws WirestateError if scope is not activated.
+   * @template T - Type of the service or value to resolve.
+   *
+   * @param injectionId - Service token (class constructor, symbol, or string).
+   * @returns The resolved instance or value.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   * @throws Error If the service cannot be resolved from the container.
+   *
+   * @example
+   * ```typescript
+   * const service: MyService = scope.resolve(MyService);
+   * ```
    */
   public resolve<T>(injectionId: ServiceIdentifier<T>): T {
     dbg.info(prefix(__filename), "Lazy resolve:", {
@@ -78,14 +97,21 @@ export class WireScope {
   }
 
   /**
-   * Resolves a sibling service or injected value.
-   * Use for lazy resolution or circular dependency breaking.
-   * Available only for activated containers.
+   * Lazily resolves a service if it is bound, otherwise returns null.
    *
-   * @param injectionId - Injection identifier.
-   * @returns Resolved injection, service instance, generic value, or null if it is not bound.
+   * @template T - Type of the service or value to resolve.
    *
-   * @throws WirestateError if scope is not activated.
+   * @param injectionId - Service token (class constructor, symbol, or string).
+   * @returns The resolved instance, value, or `null` if not bound.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * const logger: Logger | null = scope.resolveOptional(Logger);
+   *
+   * logger?.info("Resolved optionally");
+   * ```
    */
   public resolveOptional<T>(injectionId: ServiceIdentifier<T>): Optional<T> {
     dbg.info(prefix(__filename), "Lazy optional resolve:", {
@@ -99,14 +125,21 @@ export class WireScope {
   }
 
   /**
-   * Broadcasts an event.
-   * Available only for activated containers.
+   * Dispatches an event to the {@link EventBus}.
    *
-   * @param type - Type of event to emit.
-   * @param payload - Optional payload to send with the event.
-   * @param from - Optional sender of the event.
+   * @template P - Type of the event payload.
+   * @template T - Type of the event identifier.
    *
-   * @throws WirestateError if scope is not activated.
+   * @param type - Event identifier.
+   * @param payload - Optional data associated with the event.
+   * @param from - Optional source identifier (defaults to current scope).
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * scope.emitEvent("VALUE_CHANGED", { value: "abcd" });
+   * ```
    */
   public emitEvent<P, T extends EventType = EventType>(type: T, payload?: P, from?: unknown): void {
     dbg.info(prefix(__filename), "Emit event:", {
@@ -125,13 +158,19 @@ export class WireScope {
   }
 
   /**
-   * Subscribes a handler to all events on the event bus.
-   * Available only for activated containers.
+   * Subscribes to all events on the {@link EventBus}.
    *
-   * @param handler - Event handler function.
-   * @returns Unsubscribe function.
+   * @param handler - Function called for every emitted event.
+   * @returns A function to unsubscribe.
    *
-   * @throws WirestateError if scope is not activated.
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * const unsubscribe: EventUnsubscriber = scope.subscribeToEvent((event) => {
+   *   console.log("Event received:", event);
+   * });
+   * ```
    */
   public subscribeToEvent(handler: EventHandler): EventUnsubscriber {
     dbg.info(prefix(__filename), "Subscribe event:", { handler });
@@ -140,12 +179,16 @@ export class WireScope {
   }
 
   /**
-   * Removes a specific event subscription by handler reference.
-   * Available only for activated containers.
+   * Unsubscribes a specific handler from the {@link EventBus}.
    *
-   * @param handler - Event handler to remove.
+   * @param handler - The handler instance to remove.
    *
-   * @throws WirestateError if scope is not activated.
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * scope.unsubscribeFromEvent(this.onEvent);
+   * ```
    */
   public unsubscribeFromEvent(handler: EventHandler): void {
     dbg.info(prefix(__filename), "Unsubscribe event:", { handler });
@@ -154,14 +197,23 @@ export class WireScope {
   }
 
   /**
-   * Dispatches a query and returns the result.
-   * Available only for activated containers.
+   * Dispatches a query and waits for the result.
    *
-   * @param type - Query type.
-   * @param data - Query data.
-   * @returns Query result.
+   * @template R - Type of the query result.
+   * @template D - Type of the query data (payload).
+   * @template T - Type of the query identifier.
    *
-   * @throws WirestateError if scope is not activated.
+   * @param type - Query identifier.
+   * @param data - Input data for the query handler.
+   * @returns The query result (can be a Promise).
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   * @throws {@link WirestateError} If no query handler is registered.
+   *
+   * @example
+   * ```typescript
+   * const user: User = await scope.queryData("GET_USER", { id: 1 });
+   * ```
    */
   public queryData<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): MaybePromise<R> {
     dbg.info(prefix(__filename), "Query data:", { type, data });
@@ -170,12 +222,22 @@ export class WireScope {
   }
 
   /**
-   * Dispatches a query and returns the result.
-   * Available only for activated containers.
+   * Dispatches a query and returns the result, or null if no handler is registered.
    *
-   * @param type - Query type.
-   * @param data - Query data.
-   * @returns Query result or null if handler is not registered.
+   * @template R - Type of the query result.
+   * @template D - Type of the query data (payload).
+   * @template T - Type of the query identifier.
+   *
+   * @param type - Query identifier.
+   * @param data - Input data for the query handler.
+   * @returns The query result or `null`.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * const config: Config | null = await scope.queryOptionalData("GET_CONFIG");
+   * ```
    */
   public queryOptionalData<R = unknown, D = unknown, T extends QueryType = QueryType>(
     type: T,
@@ -187,14 +249,21 @@ export class WireScope {
   }
 
   /**
-   * Registers a query handler on the query bus.
-   * Available only for activated containers.
+   * Registers a handler for a specific query type.
    *
-   * @param type - Query type.
-   * @param handler - Handler function.
-   * @returns Unregister function.
+   * @template D - Type of the query data (payload).
+   * @template R - Type of the query result.
    *
-   * @throws WirestateError if scope is not activated.
+   * @param type - Query identifier.
+   * @param handler - The handler function.
+   * @returns A function to unregister the handler.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * scope.registerQueryHandler("GET_DATE_NOW", () => new Date());
+   * ```
    */
   public registerQueryHandler<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): QueryUnregister {
     dbg.info(prefix(__filename), "Register query handler:", { type });
@@ -203,13 +272,20 @@ export class WireScope {
   }
 
   /**
-   * Unregisters a specific query handler by type and reference.
-   * Available only for activated containers.
+   * Removes a specific query handler registration.
    *
-   * @param type - Query type.
-   * @param handler - Handler to remove.
+   * @template D - Type of the query data (payload).
+   * @template R - Type of the query result.
    *
-   * @throws WirestateError if scope is not activated.
+   * @param type - Query identifier.
+   * @param handler - The handler instance to remove.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * scope.unregisterQueryHandler("GET_DATE_NOW", this.onGetDateNow);
+   * ```
    */
   public unregisterQueryHandler<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): void {
     dbg.info(prefix(__filename), "Unregister query:", { type });
@@ -218,14 +294,25 @@ export class WireScope {
   }
 
   /**
-   * Dispatches a command and returns the descriptor.
-   * Available only for activated containers.
+   * Dispatches a command and returns a descriptor to track its progress.
    *
-   * @param type - Command type.
-   * @param data - Command data.
-   * @returns Command descriptor.
+   * @template R - Type of the command result.
+   * @template D - Type of the command payload.
+   * @template T - Type of the command identifier.
    *
-   * @throws WirestateError if scope is not activated.
+   * @param type - Command identifier.
+   * @param data - Payload for the command.
+   * @returns A {@link CommandDescriptor}.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   * @throws {@link WirestateError} If no command handler is registered.
+   *
+   * @example
+   * ```typescript
+   * const descriptor: CommandDescriptor = scope.executeCommand("LOGOUT");
+   *
+   * await descriptor.task;
+   * ```
    */
   public executeCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(
     type: T,
@@ -237,12 +324,26 @@ export class WireScope {
   }
 
   /**
-   * Dispatches a command and returns the descriptor.
-   * Available only for activated containers.
+   * Dispatches a command if a handler is registered, otherwise returns null.
    *
-   * @param type - Command type.
-   * @param data - Command data.
-   * @returns Command descriptor or null if handler is not registered.
+   * @template R - Type of the command result.
+   * @template D - Type of the command payload.
+   * @template T - Type of the command identifier.
+   *
+   * @param type - Command identifier.
+   * @param data - Payload for the command.
+   * @returns A {@link CommandDescriptor} or `null`.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * const descriptor: CommandDescriptor | null = scope.executeOptionalCommand("CLEANUP_CACHE");
+   *
+   * if (descriptor) {
+   *   await descriptor.task;
+   * }
+   * ```
    */
   public executeOptionalCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(
     type: T,
@@ -254,14 +355,23 @@ export class WireScope {
   }
 
   /**
-   * Registers a command handler on the command bus.
-   * Available only for activated containers.
+   * Registers a handler for a specific command type.
    *
-   * @param type - Command type.
-   * @param handler - Handler function.
-   * @returns Unregister function.
+   * @template D - Type of the command payload.
+   * @template R - Type of the command result.
    *
-   * @throws WirestateError if scope is not activated.
+   * @param type - Command identifier.
+   * @param handler - The handler function.
+   * @returns A function to unregister the handler.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * scope.registerCommandHandler("LOG_ERROR", (error) => {
+   *   console.error(error);
+   * });
+   * ```
    */
   public registerCommandHandler<D = unknown, R = unknown>(
     type: CommandType,
@@ -273,13 +383,20 @@ export class WireScope {
   }
 
   /**
-   * Unregisters a specific command handler by type and reference.
-   * Available only for activated containers.
+   * Removes a specific command handler registration.
    *
-   * @param type - Command type.
-   * @param handler - Handler to remove.
+   * @template D - Type of the command payload.
+   * @template R - Type of the command result.
    *
-   * @throws WirestateError if scope is not activated.
+   * @param type - Command identifier.
+   * @param handler - The handler instance to remove.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * scope.unregisterCommandHandler("LOG_ERROR", this.handleLogError);
+   * ```
    */
   public unregisterCommandHandler<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): void {
     dbg.info(prefix(__filename), "Unregister command:", { type });
@@ -291,14 +408,27 @@ export class WireScope {
   public getSeed<T>(seed?: SeedKey): Optional<T>;
 
   /**
-   * Reads seed for the provided injection.
-   * Returns shared seed if parameters are not provided.
-   * Available only for activated containers.
+   * Retrieves seed data (initial state) from the container.
    *
-   * @param seed - Lookup key.
-   * @returns Seed data or null if missing.
+   * @remarks
+   * If `seed` key is provided, looks up a specific value in the seed map.
+   * If omitted, returns the global/shared seed object.
    *
-   * @throws WirestateError if context is not activated.
+   * @template T - Expected type of the seed data.
+   *
+   * @param seed - Optional lookup key (identifier or token).
+   * @returns The seed data or `null` if not found.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * // Get specific seed
+   * const apiUrl = scope.getSeed<string>("API_URL");
+   *
+   * // Get global seed object
+   * const seeds = scope.getSeed<GlobalSeed>();
+   * ```
    */
   public getSeed<T extends AnyObject>(seed?: SeedKey): Optional<T> {
     dbg.info(prefix(__filename), "Get initial state for key:", {

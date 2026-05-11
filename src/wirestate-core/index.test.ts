@@ -73,6 +73,7 @@ describe("Library exported API from wirestate-core", () => {
     "CommandStatus",
     "CommandType",
     "CommandUnregister",
+    "CreateIocContainerOptions",
     "Event",
     "EventBus",
     "EventHandler",

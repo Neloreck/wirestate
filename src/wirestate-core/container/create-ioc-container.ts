@@ -13,28 +13,46 @@ import type { SeedsMap } from "../types/initial-state";
 import { WireScope } from "./wire-scope";
 
 /**
- * Options for {@link createIocContainer}.
+ * Configuration options for {@link createIocContainer}.
  *
  * @group container
  */
 export interface CreateIocContainerOptions {
   /**
-   * Parent container for inheritance.
+   * Optional parent container.
+   * Enables hierarchical resolution and sharing of bindings.
    */
   readonly parent?: Container;
   /**
-   * Optional default seed value.
+   * Initial data for the root seed.
+   * Accessible via {@link WireScope.getSeed}() in services.
    */
   readonly seed?: AnyObject;
 }
 
 /**
- * Creates an IoC container with framework essentials.
+ * Creates an Inversify IoC container pre-configured with Wirestate essentials.
+ *
+ * @remarks
+ * The container is initialized with:
+ * - State management tokens: `SEEDS_TOKEN` and `SEED_TOKEN`.
+ * - Messaging buses: {@link EventBus}, {@link QueryBus}, {@link CommandBus}.
+ * - Service bridge: {@link WireScope} (bound in transient scope).
+ * - Default scope set to `Singleton`.
  *
  * @group container
  *
- * @param options - Container configuration.
- * @returns New IoC container.
+ * @param options - {@link Container} configuration.
+ * @returns A new Inversify {@link Container} instance.
+ *
+ * @example
+ * ```typescript
+ * const container: Container = createIocContainer({
+ *   seed: { apiUrl: "https://api.example.com" }
+ * });
+ *
+ * bindService(container, MyService);
+ * ```
  */
 export function createIocContainer(options: CreateIocContainerOptions = {}): Container {
   dbg.info(prefix(__filename), "Creating IOC container:", { options });
