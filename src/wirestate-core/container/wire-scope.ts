@@ -404,33 +404,48 @@ export class WireScope {
     this.getContainer().get(CommandBus).unregister(type, handler);
   }
 
-  public getSeed<T>(): T;
-  public getSeed<T>(seed?: SeedKey): Optional<T>;
-
   /**
-   * Retrieves seed data (initial state) from the container.
+   * Retrieves the global seed object (initial state) from the container.
    *
    * @remarks
-   * If `seed` key is provided, looks up a specific value in the seed map.
-   * If omitted, returns the global/shared seed object.
+   * Use this to access the entire seed object when no specific key is provided.
    *
-   * @template T - Expected type of the seed data.
-   *
-   * @param seed - Optional lookup key (identifier or token).
-   * @returns The seed data or `null` if not found.
+   * @template T - Expected type of the global seed object.
+   * @returns The global seed object.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
    *
    * @example
    * ```typescript
-   * // Get specific seed
-   * const apiUrl = scope.getSeed<string>("API_URL");
+   * interface GlobalSeed {
+   *   apiUrl: string;
+   * }
    *
-   * // Get global seed object
-   * const seeds = scope.getSeed<GlobalSeed>();
+   * const seeds: GlobalSeed = scope.getSeed();
    * ```
    */
-  public getSeed<T extends AnyObject>(seed?: SeedKey): Optional<T> {
+  public getSeed<T extends AnyObject>(): T;
+
+  /**
+   * Retrieves a specific seed value by key from the container's seed map.
+   *
+   * @remarks
+   * Use this to retrieve individual values registered in the seed map.
+   *
+   * @template T - Expected type of the seed value.
+   * @param seed - Lookup key (identifier or token) for the seed.
+   * @returns The seed value or `null` if not found.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * const apiUrl: string = scope.getSeed("API_URL");
+   * ```
+   */
+  public getSeed<T>(seed: SeedKey): Optional<T>;
+
+  public getSeed<T>(seed?: SeedKey): Optional<T> {
     dbg.info(prefix(__filename), "Get initial state for key:", {
       key: (seed as AnyObject)?.name ?? seed,
     });
