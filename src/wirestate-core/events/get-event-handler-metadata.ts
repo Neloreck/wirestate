@@ -6,14 +6,27 @@ import type { EventHandlerMetadata } from "../types/events";
 import { Maybe } from "../types/general";
 
 /**
- * Retrieves `@OnEvent` metadata from the class hierarchy.
- * Returns handlers ordered from base to derived class.
+ * Retrieves event handler metadata for a service instance by traversing its prototype chain.
+ *
+ * @remarks
+ * This utility collects metadata registered via the {@link OnEvent} decorator.
+ * It ensures that handlers are returned in parent-to-child order (base class handlers first),
+ * which is critical for maintaining predictable event execution patterns in inherited services.
  *
  * @group events
  * @internal
  *
- * @param instance - Service instance.
- * @returns Metadata list.
+ * @param instance - The service instance to scan for event handlers.
+ * @returns A read-only array of event handler metadata, ordered from base to derived class.
+ *
+ * @example
+ * ```typescript
+ * const metadata = getEventHandlerMetadata(myService);
+ *
+ * metadata.forEach(meta => {
+ *   console.log(`Method ${String(meta.propertyKey)} handles event ${String(meta.type)}`);
+ * });
+ * ```
  */
 export function getEventHandlerMetadata(instance: object): ReadonlyArray<EventHandlerMetadata> {
   dbg.info(prefix(__filename), "Retrieving event handler metadata:", { name: instance.constructor.name, instance });

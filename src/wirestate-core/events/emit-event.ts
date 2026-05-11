@@ -8,14 +8,25 @@ import type { EventType } from "../types/events";
 import { EventBus } from "./event-bus";
 
 /**
- * Emits events for container from outside scope.
+ * Broadcasts an event to all subscribers via the {@link EventBus} resolved from the container.
+ *
+ * @remarks
+ * Use this utility to emit events from outside a service's {@link WireScope} (e.g., from a bootstrap script or external controller).
  *
  * @group events
  *
- * @param container - Inversify container.
- * @param type - Event type ot emit.
- * @param payload - Event payload.
- * @param from - Optional indicator of the event source.
+ * @template P - Type of the event payload.
+ * @template T - Type of the event identifier.
+ *
+ * @param container - Inversify {@link Container} to resolve the {@link EventBus} from.
+ * @param type - Unique event identifier.
+ * @param payload - Optional data associated with the event.
+ * @param from - Optional source identifier.
+ *
+ * @example
+ * ```typescript
+ * emitEvent(container, "SYSTEM_READY", { version: "1.0.0" });
+ * ```
  */
 export function emitEvent<P, T extends EventType>(container: Container, type: T, payload?: P, from?: unknown): void {
   dbg.info(prefix(__filename), "Emit event:", { type: type, payload, container });

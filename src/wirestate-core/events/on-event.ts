@@ -8,10 +8,37 @@ import type { Maybe, Optional } from "../types/general";
 /**
  * Decorator for service methods that respond to events.
  *
+ * @remarks
+ * Methods decorated with `@OnEvent` are automatically registered as subscribers
+ * when the service is bound via {@link bindService}.
+ *
+ * You can specify one or more event types to handle. If `types` is omitted,
+ * the method acts as a catch-all handler for all events broadcasted to the {@link EventBus}.
+ *
  * @group events
  *
- * @param types - Event type(s) to handle. If omitted, handles all events.
- * @returns Decorator function.
+ * @param types - Event identifier(s) to handle. If omitted, handles all events.
+ * @returns Method decorator.
+ *
+ * @example
+ * ```typescript
+ * class MyService {
+ *   @OnEvent("USER_LOGGED_IN")
+ *   private onLogin(event: Event<User>): void {
+ *     console.log("User logged in:", event);
+ *   }
+ *
+ *   @OnEvent(["LOGOUT", "SESSION_EXPIRED"])
+ *   private onSessionEnd(event: Event): void {
+ *     console.log("Specific event received:", event);
+ *   }
+ *
+ *   @OnEvent()
+ *   private onAnyEvent(event: Event): void {
+ *     // Catch-all handler
+ *   }
+ * }
+ * ```
  */
 export function OnEvent(types?: EventType | ReadonlyArray<EventType>): MethodDecorator {
   // Normalize types to an array or null for catch-all.

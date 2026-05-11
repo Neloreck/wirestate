@@ -9,11 +9,27 @@ import { getEventHandlerMetadata } from "./get-event-handler-metadata";
 /**
  * Composes service event handlers into a single dispatcher.
  *
+ * @remarks
+ * Scans the provided instance for methods decorated with {@link OnEvent}.
+ * If handlers are found, it returns a fan-out function that dispatches events
+ * to all matching methods based on their registered event types.
+ *
  * @group events
  * @internal
  *
- * @param instance - Service instance.
- * @returns Event handler or null if no handlers are declared.
+ * @template T - Type of the service instance.
+ *
+ * @param instance - Service instance to scan for handlers.
+ * @returns A unified event handler, or `null` if no handlers are declared.
+ *
+ * @example
+ * ```typescript
+ * const dispatcher = buildEventDispatcher(myServiceInstance);
+ *
+ * if (dispatcher) {
+ *   dispatcher({ type: "SOME_EVENT", payload: { data: 123 } });
+ * }
+ * ```
  */
 export function buildEventDispatcher<T extends object>(instance: T): Optional<EventHandler> {
   dbg.info(prefix(__filename), "Build event dispatcher for:", { name: instance.constructor.name, instance });
