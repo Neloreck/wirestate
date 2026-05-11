@@ -1,11 +1,15 @@
 import { ServiceIdentifier, bindingTypeValues, bindingScopeValues } from "inversify";
 
 /**
+ * Inversify binding strategy types.
+ *
  * @group bind
  */
 export type BindingType = (typeof bindingTypeValues)[keyof typeof bindingTypeValues];
 
 /**
+ * Inversify scope strategy types.
+ *
  * @group bind
  */
 export type ScopeBindingType = (typeof bindingScopeValues)[keyof typeof bindingScopeValues];
@@ -13,39 +17,61 @@ export type ScopeBindingType = (typeof bindingScopeValues)[keyof typeof bindingS
 /**
  * Descriptor used by wirestate bind/provision APIs to describe how one injectable is resolved.
  *
+ * @remarks
+ * This interface bridges standard Inversify binding options with Wirestate's simplified registration API.
+ * It is used by {@link bindConstant}, {@link bindDynamicValue}, and {@link bindEntry}.
+ *
  * @group bind
  *
- * @template T Service type resolved from container by {@link id} or returned by {@link factory}.
- * @template V Value type used by constant/value-style bindings via {@link value}.
+ * @template T - Service type resolved from container by {@link id} or returned by {@link factory}.
+ * @template V - Value type used by constant/value-style bindings via {@link value}.
+ *
+ * @example
+ * ```typescript
+ * const descriptor: InjectableDescriptor<UserRepo> = {
+ *   id: UserRepo,
+ *   scopeBindingType: "Singleton"
+ * };
+ * ```
  */
 export interface InjectableDescriptor<T = unknown, V = unknown> {
   /**
    * Inversify binding strategy.
+   *
+   * @remarks
    * Example values: `ConstantValue`, `DynamicValue`, `Factory`, `Provider`.
    */
   bindingType?: BindingType;
 
   /**
    * Factory function used by dynamic value bindings.
-   * Called by container to create service instance of type T.
+   *
+   * @remarks
+   * Called by the {@link Container} to create a service instance of type T.
    */
   factory?: () => T;
 
   /**
-   * Unique service token used by Inversify to locate injectable binding.
+   * Unique service token used by Inversify to locate the injectable binding.
+   *
+   * @remarks
    * Accepts class constructor, symbol, or string service identifier.
    */
   id: ServiceIdentifier<T>;
 
   /**
    * Inversify scope strategy for created instances.
+   *
+   * @remarks
    * Example values: `Singleton`, `Transient`, `Request`.
    */
   scopeBindingType?: ScopeBindingType;
 
   /**
    * Prebuilt value for value-based bindings.
-   * Used when binding mode expects direct value instance.
+   *
+   * @remarks
+   * Used when binding mode expects a direct value instance (e.g., constant values).
    */
   value?: V;
 }

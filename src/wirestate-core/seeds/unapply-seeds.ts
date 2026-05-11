@@ -7,13 +7,22 @@ import { SEEDS_TOKEN } from "../registry";
 import { SeedEntries, SeedsMap } from "../types/initial-state";
 
 /**
- * Removes specific seeds from the container.
- * Used during provider unmounting to clean up only the entries owned by that provider.
+ * Removes specific targeted seeds from the container's internal seed map.
+ *
+ * @remarks
+ * This is typically called during provider unmounting to ensure that only
+ * the seeds owned by that specific provider are removed, leaving other
+ * providers' seeds intact.
  *
  * @group seeds
  *
- * @param container - Target container.
- * @param seeds - Targeted seeds to remove.
+ * @param container - The Inversify {@link Container} to clean up.
+ * @param seeds - The targeted {@link SeedEntries} to remove.
+ *
+ * @example
+ * ```typescript
+ * unapplySeeds(container, [[UserService, { initialUser: "admin" }]]);
+ * ```
  */
 export function unapplySeeds(container: Container, seeds: SeedEntries): void {
   const existing: SeedsMap = container.get(SEEDS_TOKEN);

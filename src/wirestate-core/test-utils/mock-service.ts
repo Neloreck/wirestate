@@ -6,24 +6,37 @@ import { mockContainer } from "./mock-container";
 /**
  * Options for {@link mockService}.
  *
- * @group service
+ * @group test-utils
  */
 export interface MockServiceOptions {
   /**
-   * If true, skips the lifecycle hooks (e.g., OnActivated) during service binding and instantiation.
+   * If true, skips lifecycle hooks (e.g., `@OnActivated`) during binding and instantiation.
+   *
+   * @default false
    */
   skipLifecycle?: boolean;
 }
 
 /**
- * Mocks a service by binding it to an IoC container and returning its instance.
+ * Mocks a service by binding it to an IoC container and returning its resolved instance.
  *
- * @group service
+ * @remarks
+ * This is a high-level utility that combines {@link mockContainer} and {@link mockBindService}.
+ * If no container is provided, a fresh one is created.
  *
- * @param service - The service class to mock.
- * @param container - The IoC container to use, defaults to a new {@link mockContainer}.
+ * @group test-utils
+ *
+ * @template T - The type of the service being mocked.
+ *
+ * @param service - The service class constructor to mock.
+ * @param container - The Inversify {@link Container} to use (defaults to a new mock container).
  * @param options - Additional options for mocking.
- * @returns The instantiated service instance.
+ * @returns The resolved service instance.
+ *
+ * @example
+ * ```typescript
+ * const service: MyService = mockService(MyService);
+ * ```
  */
 export function mockService<T extends object>(
   service: Newable<T>,

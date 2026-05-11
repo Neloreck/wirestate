@@ -7,7 +7,13 @@ import type { Maybe, MaybePromise, Optional } from "../types/general";
 import type { QueryHandler, QueryType, QueryUnregister } from "../types/queries";
 
 /**
- * Dispatches queries to handlers.
+ * Orchestrates query dispatching and handler registration.
+ *
+ * @remarks
+ * The `QueryBus` provides a request-response mechanism for decoupled communication.
+ * It supports handler shadowing: when multiple handlers are registered for the same type,
+ * the last registered one (e.g., at the component level) takes priority over earlier ones
+ * (e.g., at the global service level).
  *
  * @group queries
  */
@@ -19,12 +25,23 @@ export class QueryBus {
   private readonly handlers: Map<QueryType, Array<QueryHandler>> = new Map();
 
   /**
-   * Registers a query handler.
-   * Returns an unregister function.
+   * Registers a handler for a specific query type.
    *
-   * @param type - Query type.
-   * @param handler - Handler function.
-   * @returns Unregister function.
+   * @remarks
+   * If multiple handlers are registered for the same type, they are stored in a stack.
+   * The most recently registered handler will be used for resolution.
+   *
+   * @template D - Type of the query input data.
+   * @template R - Type of the query result.
+   *
+   * @param type - Unique query identifier.
+   * @param handler - Function to execute when the query is dispatched.
+   * @returns A function to unregister the handler.
+   *
+   * @example
+   * ```typescript
+   * const unregister: QueryUnregister = queryBus.register("GET_NOW", () => Date.now());
+   * ```
    */
   public register<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): QueryUnregister {
     dbg.info(prefix(__filename), "Registering query handler:", {
@@ -46,11 +63,16 @@ export class QueryBus {
   }
 
   /**
-   * Unregisters a specific query handler by type and reference.
-   * No-ops silently if the handler was not registered for that type.
+   * Removes a previously registered query handler.
    *
-   * @param type - Query type.
-   * @param handler - Handler to remove.
+   * @remarks
+   * If the handler was not registered for the given type, this operation does nothing.
+   *
+   * @template D - Type of the query input data.
+   * @template R - Type of the query result.
+   *
+   * @param type - Unique query identifier.
+   * @param handler - The handler function instance to remove.
    */
   public unregister<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): void {
     dbg.info(prefix(__filename), "Unregistering query handler:", {
@@ -78,13 +100,26 @@ export class QueryBus {
   }
 
   /**
-   * Dispatches a query to the last registered handler.
+   * Dispatches a query to the last registered handler and returns the result.
    *
-   * @param type - Query type.
-   * @param data - Query payload.
-   * @returns Query result.
+   * @remarks
+   * Query handlers can be synchronous or asynchronous. The result is returned as-is
+   * (or as a Promise if the handler is async).
    *
-   * @throws If no handler is registered.
+   * @template R - Type of the expected query result.
+   * @template D - Type of the data (payload) passed to the query.
+   * @template T - Type of the query identifier.
+   *
+   * @param type - Unique query identifier.
+   * @param data - Optional input data for the handler.
+   * @returns The result of the query execution.
+   *
+   * @throws {@link WirestateError} If no handler is registered for the given type.
+   *
+   * @example
+   * ```typescript
+   * const user: User = await queryBus.query<User, string>("FIND_USER", "user-id-123");
+   * ```
    */
   public query<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): MaybePromise<R> {
     const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
@@ -101,11 +136,15 @@ export class QueryBus {
   }
 
   /**
-   * Dispatches a query to the last registered handler, returning null if no handler exists.
+   * Dispatches a query if a handler exists, otherwise returns null.
    *
-   * @param type - Query type.
-   * @param data - Query payload.
-   * @returns Query result or null if no handler is registered.
+   * @template R - Type of the expected query result.
+   * @template D - Type of the data (payload) passed to the query.
+   * @template T - Type of the query identifier.
+   *
+   * @param type - Unique query identifier.
+   * @param data - Optional input data for the handler.
+   * @returns The query result, or `null` if no handler is found.
    */
   public queryOptional<R = unknown, D = unknown, T extends QueryType = QueryType>(
     type: T,
@@ -121,10 +160,10 @@ export class QueryBus {
   }
 
   /**
-   * Checks if a handler is registered for the given type.
+   * Checks if at least one handler is registered for the given query type.
    *
-   * @param type - Query type.
-   * @returns True if handler exists.
+   * @param type - Unique query identifier.
+   * @returns `true` if a handler is available, `false` otherwise.
    */
   public has(type: QueryType): boolean {
     const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
@@ -133,7 +172,7 @@ export class QueryBus {
   }
 
   /**
-   * Removes all registered handlers.
+   * Removes all registered query handlers from the bus.
    *
    * @internal
    */

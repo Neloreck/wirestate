@@ -5,14 +5,24 @@ import { ACTIVATED_HANDLER_METADATA } from "../registry";
 import type { Maybe } from "../types/general";
 
 /**
- * Retrieves `@OnActivated` method names from the class hierarchy.
- * Returns method names ordered from base to derived class.
+ * Retrieves the names of methods decorated with {@link OnActivated} by traversing the prototype chain.
+ *
+ * @remarks
+ * This utility ensures that handlers are returned in parent-to-child order (base class handlers first),
+ * maintaining a predictable initialization sequence for inherited services.
  *
  * @group service
  * @internal
  *
- * @param instance - Service instance.
- * @returns List of method names.
+ * @param instance - The service instance to scan for activation handlers.
+ * @returns A read-only array of method names (strings or symbols).
+ *
+ * @example
+ * ```typescript
+ * const methods = getActivatedHandlerMetadata(myService);
+ *
+ * methods.forEach(methodName => (myService as any)[methodName]());
+ * ```
  */
 export function getActivatedHandlerMetadata(instance: object): ReadonlyArray<string | symbol> {
   dbg.info(prefix(__filename), "Resolving OnActivated metadata:", { name: instance.constructor.name, instance });

@@ -9,14 +9,26 @@ import type { QueryType } from "../types/queries";
 import { QueryBus } from "./query-bus";
 
 /**
- * Dispatches a query on the provided container, returning null if no handler is registered.
+ * Dispatches a query through the {@link QueryBus}, returning null if no handler is registered.
+ *
+ * @remarks
+ * This is a convenience wrapper around the `QueryBus.queryOptional` method.
+ * Use this when the query resolution is optional and you want to avoid catching errors.
  *
  * @group queries
  *
- * @param container - Inversify container.
- * @param type - Query type.
- * @param data - Query data.
- * @returns Query result or null.
+ * @template R - Type of the expected query result.
+ * @template D - Type of the input data (payload).
+ *
+ * @param container - Inversify {@link Container} to resolve the {@link QueryBus} from.
+ * @param type - Unique query identifier.
+ * @param data - Optional input data for the query handler.
+ * @returns The query result or `null` if no handler exists.
+ *
+ * @example
+ * ```typescript
+ * const config: Config | null = await queryOptional<Config>(container, "GET_OPTIONAL_CONFIG");
+ * ```
  */
 export function queryOptional<R = unknown, D = unknown>(
   container: Container,

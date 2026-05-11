@@ -16,31 +16,54 @@ import { mockBindEntry } from "./mock-bind-entry";
 export interface MockContainerOptions {
   /**
    * List of services or injectable descriptors to bind to the container.
+   *
+   * @remarks
+   * Accepts class constructors or {@link InjectableDescriptor} objects.
    */
   entries?: Array<Newable<object> | InjectableDescriptor>;
+
   /**
    * List of injection identifiers to immediately activate after binding.
-   * All identifiers must correspond to entries provided in the `services` list.
+   *
+   * @remarks
+   * Activating a service triggers its resolution and `@OnActivated` hooks.
+   * All identifiers must correspond to entries provided in the `entries` list.
    */
   activate?: Array<ServiceIdentifier>;
+
   /**
    * Whether to skip the activation lifecycle for all bound services.
-   * If true, `OnActivated` and `OnDeactivation` hooks will not be triggered.
+   *
+   * @remarks
+   * If true, `@OnActivated` and `@OnDeactivation` hooks will not be triggered.
+   *
+   * @default false
    */
   skipLifecycle?: boolean;
 }
 
 /**
- * Creates and configures a mock IoC container for testing.
- * This utility initializes a new container and binds the provided services or descriptors using {@link mockBindEntry}.
- * It also supports optional immediate activation of services.
+ * Creates and configures an Inversify {@link Container} for testing.
  *
- * @group container
+ * @remarks
+ * This utility initializes a new container via {@link createIocContainer} and
+ * binds the provided `entries` using {@link mockBindEntry}. It can also
+ * automatically resolve (activate) a subset of services.
+ *
+ * @group test-utils
  *
  * @param options - Configuration options for the mock container.
- * @returns A configured InversifyJS {@link Container}.
+ * @returns A configured Inversify {@link Container}.
  *
- * @throws {WirestateError} If an identifier in `activate` is not found in `services`.
+ * @throws {@link WirestateError} If an identifier in `activate` is not found in `entries`.
+ *
+ * @example
+ * ```typescript
+ * const container: Container = mockContainer({
+ *   entries: [UserService, AuthService],
+ *   activate: [AuthService]
+ * });
+ * ```
  */
 export function mockContainer(options: MockContainerOptions = {}): Container {
   const { activate = [], entries = [], skipLifecycle } = options;

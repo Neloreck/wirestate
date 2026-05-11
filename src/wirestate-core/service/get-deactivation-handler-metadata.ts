@@ -5,14 +5,24 @@ import { DEACTIVATION_HANDLER_METADATA } from "../registry";
 import type { Maybe } from "../types/general";
 
 /**
- * Retrieves `@OnDeactivation` method names from the class hierarchy.
- * Returns method names ordered from base to derived class.
+ * Retrieves the names of methods decorated with {@link OnDeactivation} by traversing the prototype chain.
+ *
+ * @remarks
+ * This utility ensures that handlers are returned in parent-to-child order (base class handlers first),
+ * maintaining a predictable cleanup sequence for inherited services.
  *
  * @group service
  * @internal
  *
- * @param instance - Service instance.
- * @returns List of method names.
+ * @param instance - The service instance to scan for deactivation handlers.
+ * @returns A read-only array of method names (strings or symbols).
+ *
+ * @example
+ * ```typescript
+ * const methods = getDeactivationHandlerMetadata(myService);
+ *
+ * methods.forEach(methodName => (myService as any)[methodName]());
+ * ```
  */
 export function getDeactivationHandlerMetadata(instance: object): ReadonlyArray<string | symbol> {
   dbg.info(prefix(__filename), "Resolving OnDeactivation metadata:", { name: instance.constructor.name, instance });

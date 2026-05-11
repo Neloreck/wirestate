@@ -6,22 +6,41 @@ import type { EventUnsubscriber, EventHandlerMetadata } from "./types/events";
 import type { QueryHandlerMetadata, QueryUnregister } from "./types/queries";
 
 /**
- * Token for the container-scoped seeds map.
+ * Unique symbol used as a token for the container-scoped seeds map.
+ *
+ * @remarks
+ * This token is used to bind and resolve the {@link SeedsMap} in the Inversify {@link Container}.
  *
  * @group seeds
+ *
+ * @example
+ * ```typescript
+ * const seedsMap: SeedsMap = container.get(SEEDS_TOKEN);
+ * ```
  */
-export const SEEDS_TOKEN: unique symbol = Symbol("@wirestate/seeds");
+export const SEEDS_TOKEN: unique symbol = Symbol("@wirestate/core/seeds");
 
 /**
- * Token for the container-scoped shared seed object.
+ * Unique symbol used as a token for the container-scoped shared seed object.
+ *
+ * @remarks
+ * This token is used to bind and resolve the global shared seed object in the Inversify {@link Container}.
  *
  * @group seeds
+ *
+ * @example
+ * ```typescript
+ * const sharedSeed: AnyObject = container.get(SEED_TOKEN);
+ * ```
  */
-export const SEED_TOKEN: unique symbol = Symbol("@wirestate/seed");
+export const SEED_TOKEN: unique symbol = Symbol("@wirestate/core/seed");
 
 /**
- * Map of class constructors to their declared query handlers.
- * Inherited via a prototype chain at resolve time.
+ * Registry of class constructors to their declared query handlers.
+ *
+ * @remarks
+ * This map is populated by the {@link OnQuery} decorator. Handlers are
+ * inherited via the prototype chain at service resolution time.
  *
  * @group queries
  * @internal
@@ -29,8 +48,11 @@ export const SEED_TOKEN: unique symbol = Symbol("@wirestate/seed");
 export const QUERY_HANDLER_METADATA: WeakMap<object, Array<QueryHandlerMetadata>> = new WeakMap();
 
 /**
- * Map of class constructors to their declared command handlers.
- * Inherited via a prototype chain at resolve time.
+ * Registry of class constructors to their declared command handlers.
+ *
+ * @remarks
+ * This map is populated by the {@link OnCommand} decorator. Handlers are
+ * inherited via the prototype chain at service resolution time.
  *
  * @group commands
  * @internal
@@ -38,8 +60,11 @@ export const QUERY_HANDLER_METADATA: WeakMap<object, Array<QueryHandlerMetadata>
 export const COMMAND_HANDLER_METADATA: WeakMap<object, Array<CommandHandlerMetadata>> = new WeakMap();
 
 /**
- * Map of class constructors to their `@OnActivated`-decorated method names.
- * Inherited via a prototype chain at resolve time.
+ * Registry of class constructors to their `@OnActivated`-decorated method names.
+ *
+ * @remarks
+ * This map is populated by the {@link OnActivated} decorator. Activation hooks are
+ * executed in parent-to-child order during service initialization.
  *
  * @group service
  * @internal
@@ -47,8 +72,11 @@ export const COMMAND_HANDLER_METADATA: WeakMap<object, Array<CommandHandlerMetad
 export const ACTIVATED_HANDLER_METADATA: WeakMap<object, Array<string | symbol>> = new WeakMap();
 
 /**
- * Map of class constructors to their `@OnDeactivation`-decorated method names.
- * Inherited via a prototype chain at resolve time.
+ * Registry of class constructors to their `@OnDeactivation`-decorated method names.
+ *
+ * @remarks
+ * This map is populated by the {@link OnDeactivation} decorator. Deactivation hooks are
+ * executed in parent-to-child order during service disposal.
  *
  * @group service
  * @internal
@@ -56,8 +84,11 @@ export const ACTIVATED_HANDLER_METADATA: WeakMap<object, Array<string | symbol>>
 export const DEACTIVATION_HANDLER_METADATA: WeakMap<object, Array<string | symbol>> = new WeakMap();
 
 /**
- * Map of class constructors for their declared event handlers.
- * Inherited via a prototype chain at resolve time.
+ * Registry of class constructors to their declared event handlers.
+ *
+ * @remarks
+ * This map is populated by the {@link OnEvent} decorator. Event handlers are
+ * inherited via the prototype chain at service resolution time.
  *
  * @group events
  * @internal
@@ -65,7 +96,11 @@ export const DEACTIVATION_HANDLER_METADATA: WeakMap<object, Array<string | symbo
 export const EVENT_HANDLER_METADATA: WeakMap<object, Array<EventHandlerMetadata>> = new WeakMap();
 
 /**
- * Private storage for service-to-container references.
+ * Internal storage for mapping service instances to their originating Inversify containers.
+ *
+ * @remarks
+ * Used during the service lifecycle to ensure that resolution and messaging
+ * occur within the correct container context.
  *
  * @group bind
  * @internal
@@ -73,7 +108,11 @@ export const EVENT_HANDLER_METADATA: WeakMap<object, Array<EventHandlerMetadata>
 export const CONTAINER_REFS_BY_SERVICE: WeakMap<object, Container> = new WeakMap();
 
 /**
- * Private storage for injected WireScope instances per service.
+ * Internal storage for managing injected {@link WireScope} instances per service.
+ *
+ * @remarks
+ * Tracks the scopes associated with a service instance for lifecycle management
+ * and cleanup.
  *
  * @group container
  * @internal
@@ -81,7 +120,11 @@ export const CONTAINER_REFS_BY_SERVICE: WeakMap<object, Container> = new WeakMap
 export const WIRE_SCOPES_BY_SERVICE: WeakMap<object, Array<WireScope>> = new WeakMap();
 
 /**
- * Private storage for service event unsubscribers.
+ * Internal storage for service event unsubscribers.
+ *
+ * @remarks
+ * Stores the unsubscription functions returned when a service automatically
+ * subscribes to events via the {@link OnEvent} decorator.
  *
  * @group events
  * @internal
@@ -89,7 +132,11 @@ export const WIRE_SCOPES_BY_SERVICE: WeakMap<object, Array<WireScope>> = new Wea
 export const EVENT_UNSUBSCRIBERS_BY_SERVICE: WeakMap<object, EventUnsubscriber> = new WeakMap();
 
 /**
- * Private storage for service query unregisters.
+ * Internal storage for service query unregisters.
+ *
+ * @remarks
+ * Stores the unregistration functions returned when a service automatically
+ * registers query handlers via the {@link OnQuery} decorator.
  *
  * @group queries
  * @internal
@@ -97,7 +144,11 @@ export const EVENT_UNSUBSCRIBERS_BY_SERVICE: WeakMap<object, EventUnsubscriber> 
 export const QUERY_UNREGISTERS_BY_SERVICE: WeakMap<object, Array<QueryUnregister>> = new WeakMap();
 
 /**
- * Private storage for service command unregisters.
+ * Internal storage for service command unregisters.
+ *
+ * @remarks
+ * Stores the unregistration functions returned when a service automatically
+ * registers command handlers via the {@link OnCommand} decorator.
  *
  * @group commands
  * @internal

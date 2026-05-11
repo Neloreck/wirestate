@@ -6,28 +6,40 @@ import type { InjectableDescriptor } from "../types/privision";
 /**
  * Options for {@link mockBindEntry}.
  *
- * @group bind
+ * @group test-utils
  */
 export interface MockBindEntryOptions {
   /**
    * Whether to skip the activation lifecycle for the entry.
-   * If true, `OnActivated` and `OnDeactivation` hooks will not be triggered.
-   * Note: This only applies when the entry is a service class or an instance binding.
+   *
+   * @remarks
+   * If true, `@OnActivated` and `@OnDeactivation` hooks will not be triggered.
+   * This only applies when the entry is a service class or an instance binding.
+   *
+   * @default false
    */
   skipLifecycle?: boolean;
 }
 
 /**
  * Binds a service entry to the IoC container for testing purposes.
- * This utility uses {@link bindEntry} internally.
- * It supports both service classes and injectable descriptors (constants, dynamic values, etc.).
  *
- * @group bind
+ * @remarks
+ * This utility is a testing wrapper for {@link bindEntry}.
+ * It supports both service classes and {@link InjectableDescriptor} objects.
  *
- * @param container - The IoC container to bind the entry to.
- * @param entry - The service class or injectable descriptor to bind.
- * @param options - Optional binding configuration.
- * @returns Void.
+ * @group test-utils
+ *
+ * @template T - The type of the service being bound.
+ *
+ * @param container - The Inversify {@link Container} to bind the entry to.
+ * @param entry - The service class constructor or {@link InjectableDescriptor} to bind.
+ * @param options - Configuration options for the mock binding.
+ *
+ * @example
+ * ```typescript
+ * mockBindEntry(container, UserService, { skipLifecycle: true });
+ * ```
  */
 export function mockBindEntry<T extends object>(
   container: Container,
@@ -36,7 +48,7 @@ export function mockBindEntry<T extends object>(
 ): void {
   const { skipLifecycle } = options;
 
-  return bindEntry(container, entry, {
+  bindEntry(container, entry, {
     isWithIgnoreLifecycle: skipLifecycle,
   });
 }

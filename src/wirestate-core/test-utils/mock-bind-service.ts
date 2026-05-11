@@ -5,27 +5,39 @@ import { bindService } from "../bind/bind-service";
 /**
  * Options for {@link mockBindService}.
  *
- * @group bind
+ * @group test-utils
  */
 export interface MockBindServiceOptions {
   /**
    * Whether to skip the activation lifecycle for the service.
-   * If true, `OnActivated` and `OnDeactivation` hooks will not be triggered.
+   *
+   * @remarks
+   * If true, `@OnActivated` and `@OnDeactivation` hooks will not be triggered.
+   *
+   * @default false
    */
   skipLifecycle?: boolean;
 }
 
 /**
  * Binds a service class to the IoC container for testing purposes.
- * This utility uses {@link bindService} internally to ensure the service is correctly registered
- * with the appropriate scope and metadata.
  *
- * @group bind
+ * @remarks
+ * This utility is a testing wrapper for {@link bindService}.
+ * It ensures the service is correctly registered with singleton scope and lifecycle metadata.
  *
- * @param container - The IoC container to bind the service to.
- * @param ServiceClass - The service class to bind.
- * @param options - Optional binding configuration.
- * @returns Void.
+ * @group test-utils
+ *
+ * @template T - The type of the service being bound.
+ *
+ * @param container - The Inversify {@link Container} to bind the service to.
+ * @param ServiceClass - The service class constructor to bind.
+ * @param options - Configuration options for the mock binding.
+ *
+ * @example
+ * ```typescript
+ * mockBindService(container, AnalyticsService);
+ * ```
  */
 export function mockBindService<T extends object>(
   container: Container,
@@ -34,7 +46,7 @@ export function mockBindService<T extends object>(
 ): void {
   const { skipLifecycle } = options;
 
-  return bindService(container, ServiceClass, {
+  bindService(container, ServiceClass, {
     isWithIgnoreLifecycle: skipLifecycle,
   });
 }

@@ -7,13 +7,25 @@ import { SEEDS_TOKEN } from "../registry";
 import { SeedEntries, SeedsMap } from "../types/initial-state";
 
 /**
- * Applies seeds to the container into the existing instance instead of replacing it.
- * This allows multiple providers to co-exist without wiping each other's seeds.
+ * Applies targeted seeds to the container's internal seed map.
+ *
+ * @remarks
+ * This function updates the existing {@link SeedsMap} instance instead of replacing it.
+ * This ensures that multiple providers can co-exist and contribute their own seeds
+ * without overwriting each other's data.
  *
  * @group seeds
  *
- * @param container - Target container.
- * @param seeds - Targeted seed entries apply.
+ * @param container - The Inversify {@link Container} where seeds should be applied.
+ * @param seeds - An array of {@link SeedEntries} to add to the container.
+ *
+ * @example
+ * ```typescript
+ * applySeeds(container, [
+ *   [UserService, { initialUser: "admin" }],
+ *   ["API_KEY", "12345"]
+ * ]);
+ * ```
  */
 export function applySeeds(container: Container, seeds: SeedEntries): void {
   const existing: SeedsMap = container.get(SEEDS_TOKEN);
