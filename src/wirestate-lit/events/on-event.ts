@@ -8,6 +8,9 @@ import { OnEventController } from "./on-event-controller";
 /**
  * Represents type definition for the on-event decorator.
  *
+ * @remarks
+ * Supports both TC39 and legacy experimental decorators.
+ *
  * @group Events
  */
 export interface OnEventDecorator<E extends Event = Event> {
@@ -21,19 +24,22 @@ export interface OnEventDecorator<E extends Event = Event> {
 }
 
 /**
- * Decorator to handle events from the event bus.
+ * Decorator for Lit element methods that handle events from the event bus.
+ *
+ * @remarks
+ * The handler is registered when the host connects and unregistered when it disconnects.
  *
  * @group Events
  *
  * @param types - Event types to listen for. If omitted, all events will be handled.
- * @returns The decorator function.
+ * @returns A method decorator function.
  *
  * @example
  * ```typescript
  * class MyElement extends LitElement {
  *   @onEvent()
  *   private onMyEvent(event: Event) {
- *     console.log('Event received:', event);
+ *     console.log("Event received:", event);
  *   }
  * }
  * ```
@@ -41,9 +47,9 @@ export interface OnEventDecorator<E extends Event = Event> {
  * @example
  * ```typescript
  * class MyElement extends LitElement {
- *   @onEvent('MY_EVENT_TYPE')
+ *   @onEvent("MY_EVENT_TYPE")
  *   private onMyEvent(event: MyEvent) {
- *     console.log('Event received:', event);
+ *     console.log("Event received:", event);
  *   }
  * }
  * ```
@@ -51,9 +57,9 @@ export interface OnEventDecorator<E extends Event = Event> {
  * @example
  * ```typescript
  * class MyElement extends LitElement {
- *   @onEvent(['MY_EVENT_TYPE_1', 'MY_EVENT_TYPE_2'])
+ *   @onEvent(["MY_EVENT_TYPE_1", "MY_EVENT_TYPE_2"])
  *   private onMyEvent(event: Event) {
- *     console.log('Event received:', event);
+ *     console.log("Event received:", event);
  *   }
  * }
  * ```

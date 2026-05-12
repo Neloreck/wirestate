@@ -8,6 +8,8 @@
 - `WireScope`: add new event/command/query subscribe-unsubscribe methods
 - Export more alias / methods from `@wirestate/core`
 - Export more alias / methods from `@wirestate/react-mobx`
+- Export missing methods typing for `@wirestate/core`
+- Extensive JSDoc coverage for wirestate packages
 
 ## 0.6.3
 
@@ -70,6 +72,6 @@
 - useService -> useInjection
 - AbstractService::getService -> AbstractService::resolve
 
-## 0.1.1
+## 0.1.0
 
 - Initial release

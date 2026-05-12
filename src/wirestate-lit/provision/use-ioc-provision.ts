@@ -22,20 +22,18 @@ export interface UseIocProvisionOptions {
 }
 
 /**
- * Hook (controller) to provide an IoC container to the host element and its children.
+ * Hook that provides an IoC container to the host element and its children.
  *
  * @group Provision
  *
  * @param host - The host element.
  * @param options - Provisioning options.
- * @param options.container - Optional existing container to use.
- * @param options.seed - Optional seed data to apply to the container.
- * @returns Ioc provision controller instance.
+ * @returns An instance of {@link IocProviderController}.
  *
  * @example
  * ```typescript
  * class MyRootElement extends LitElement {
- *   private ioc = useIocProvision(this, { seed: { initialData: '...' } });
+ *   private ioc = useIocProvision(this, { seed: { initialData: "..." } });
  * }
  * ```
  */

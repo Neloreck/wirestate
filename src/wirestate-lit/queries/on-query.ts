@@ -8,7 +8,8 @@ import { OnQueryController } from "./on-query-controller";
 /**
  * Represents interface for the {@link onQuery} decorator.
  *
- * Supports both standard (TC39) and legacy experimental decorators.
+ * @remarks
+ * Supports both TC39 and legacy experimental decorators.
  *
  * @group Queries
  */
@@ -23,20 +24,21 @@ export interface OnQueryDecorator<D = unknown, R = unknown> {
 }
 
 /**
- * Decorator that registers a Lit element method as a query handler for the given type.
+ * Decorator for Lit element methods that handle a specific query.
  *
- * The handler is registered when the host element connects to the DOM and unregistered when it disconnects.
+ * @remarks
+ * The handler is registered when the host connects and unregistered when it disconnects.
  *
  * @group Queries
  *
- * @param type - The query type to handle.
- * @returns The decorator function.
+ * @param type - Unique identifier of the query to handle.
+ * @returns A method decorator function.
  *
  * @example
  * ```typescript
  * class MyElement extends LitElement {
  *   @onQuery("GET_USER_NAME")
- *   public onGetUserName(data: QueryData) {
+ *   private onGetUserName(data: QueryData) {
  *     return "Alice";
  *   }
  * }

@@ -5,7 +5,10 @@ import { FieldMustMatchProvidedType, Interface, Maybe } from "../types/general";
 import { IocProviderController, IocProviderControllerOptions } from "./ioc-provider-controller";
 
 /**
- * Represents type definition for the ioc-provide decorator.
+ * Represents interface for the {@link iocProvide} decorator.
+ *
+ * @remarks
+ * Supports both TC39 and legacy experimental decorators.
  *
  * @group Provision
  */
@@ -23,19 +26,22 @@ export interface IocProviderDecorator<E extends ReactiveElement = ReactiveElemen
 }
 
 /**
- * Decorator to provide an IoC container to child components.
+ * Decorator that provides an IoC container to child components.
+ *
+ * @remarks
+ * The container is provided via Lit context. It is created (or used from options) when the host connects.
  *
  * @group Provision
  *
- * @param options - Provisioning options including container and seed data.
+ * @param options - Provisioning options.
  * @param options.container - Optional existing container to use, if not provided, a new one will be created.
  * @param options.seed - Optional seed data to apply to the container.
- * @returns IOC provision controller instance.
+ * @returns An instance of {@link IocProviderDecorator}.
  *
  * @example
  * ```typescript
  * class MyRootElement extends LitElement {
- *   @iocProvide({ seed: { someData: 'value' } })
+ *   @iocProvide({ seed: { someData: "value" } })
  *   private ioc!: IocProviderController;
  * }
  * ```

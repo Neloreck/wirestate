@@ -29,8 +29,8 @@ export { queryOptional } from "./queries/query-optional";
 export { QueryBus } from "./queries/query-bus";
 export { OnQuery } from "./queries/on-query";
 
-export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "./registry";
-
+export { SEEDS_TOKEN as SEEDS } from "@wirestate/core/seeds/tokens";
+export { SEED_TOKEN as SEED } from "@wirestate/core/seeds/tokens";
 export { applySeeds } from "./seeds/apply-seeds";
 export { applySharedSeed } from "./seeds/apply-shared-seed";
 export { unapplySeeds } from "./seeds/unapply-seeds";

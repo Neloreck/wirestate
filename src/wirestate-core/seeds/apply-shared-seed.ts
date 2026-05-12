@@ -3,8 +3,9 @@ import type { Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { SEED_TOKEN } from "../registry";
 import type { AnyObject } from "../types/general";
+
+import { SEED_TOKEN } from "./tokens";
 
 /**
  * Rebinds the global shared seed object in the container.

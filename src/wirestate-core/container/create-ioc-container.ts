@@ -6,7 +6,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
-import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
+import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 import type { AnyObject } from "../types/general";
 import type { SeedsMap } from "../types/initial-state";
 

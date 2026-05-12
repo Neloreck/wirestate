@@ -9,10 +9,11 @@ import { IocContextObject } from "../context/ioc-context";
 import { Optional } from "../types/general";
 
 /**
- * Reactive controller that registers a command handler on the {@link CommandBus} for the host element's lifetime.
+ * Controller that registers a command handler for the host element's lifetime.
  *
+ * @remarks
  * The handler is registered when the host connects and unregistered when it disconnects.
- * When the IoC context is updated (container revision change), the handler is re-registered automatically.
+ * It automatically re-registers if the IoC container is updated.
  *
  * @group Commands
  */
@@ -25,16 +26,16 @@ export class OnCommandController<D = unknown, R = unknown> implements ReactiveCo
 
   /**
    * @param host - The host element.
-   * @param type - The command type to handle.
+   * @param type - Unique identifier of the command to handle.
    * @param handler - The command handler function.
    */
   public constructor(host: ReactiveElement, type: CommandType, handler: CommandHandler<D, R>) {
+    dbg.info(prefix(__filename), "Constructing:", { host, type });
+
     host.addController(this);
 
     this.type = type;
     this.handler = handler;
-
-    dbg.info(prefix(__filename), "Constructing:", { host, type });
 
     new ContextConsumer(host, {
       context: IocContextObject,
@@ -69,6 +70,8 @@ export class OnCommandController<D = unknown, R = unknown> implements ReactiveCo
   }
 
   private cleanup(): void {
+    dbg.info(prefix(__filename), "Cleanup:", { type: this.type });
+
     this.unregister?.();
     this.unregister = null;
   }

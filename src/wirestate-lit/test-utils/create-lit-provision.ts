@@ -16,7 +16,7 @@ function ensureProviderDefined(): void {
 }
 
 /**
- * Fixture returned by {@link createLitProvision}.
+ * Represents the result of the {@link createLitProvision} utility.
  *
  * @group Test-utils
  */
@@ -40,13 +40,15 @@ export interface LitProvisionFixture {
 }
 
 /**
- * Creates a Lit provider element with an IoC container context and appends it to `document.body`.
- * Child elements appended to the returned `provider` can consume the context via `ContextConsumer`.
+ * Creates a test provider element with an IoC container and appends it to the DOM.
+ *
+ * @remarks
+ * Child elements appended to the returned provider can consume the context via `ContextConsumer`.
  *
  * @group Test-utils
  *
- * @param container - Optional pre-configured container; a fresh one is created when omitted.
- * @returns Fixture provision object for unit testing.
+ * @param container - Optional pre-configured container.
+ * @returns An instance of {@link LitProvisionFixture}.
  */
 export function createLitProvision(container?: Container): LitProvisionFixture {
   ensureProviderDefined();

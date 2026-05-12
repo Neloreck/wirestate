@@ -12,7 +12,7 @@ import { OnEventController } from "./on-event-controller";
  */
 export interface UseOnEventsOptions<E extends Event = Event> {
   /**
-   * Event handler function.
+   * The event handler function.
    */
   handler: EventHandler<E>;
   /**
@@ -22,7 +22,7 @@ export interface UseOnEventsOptions<E extends Event = Event> {
 }
 
 /**
- * Hook (controller) to handle events from the event bus.
+ * Hook that subscribes to events for the host element's lifetime.
  *
  * @group Events
  *
@@ -30,7 +30,7 @@ export interface UseOnEventsOptions<E extends Event = Event> {
  * @param options - Event handling options.
  * @param options.handler - Event handler function.
  * @param options.types - Event types to listen for, if null or undefined, all events will be handled.
- * @returns Events subscription controller.
+ * @returns An instance of {@link OnEventController}.
  *
  * @example
  * ```typescript
@@ -45,7 +45,7 @@ export interface UseOnEventsOptions<E extends Event = Event> {
  * ```typescript
  * class MyElement extends LitElement {
  *   private eventHandler = useOnEvents(this, {
- *     types: [MyEvent],
+ *     types: ["MY_EVENT"],
  *     handler: (event) => console.log(event),
  *   });
  * }

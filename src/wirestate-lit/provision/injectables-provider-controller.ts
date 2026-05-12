@@ -48,12 +48,12 @@ export interface InjectablesProviderControllerOptions {
 }
 
 /**
- * Controller that binds a set of injectables to an IoC container when the host connects
- * and unbinds them when the host disconnects.
+ * Controller that binds injectables to an IoC container for the host element's lifetime.
  *
- * When no `into` context is provided, the controller uses the nearest {@link IocProviderController}
- * ancestor via Lit context. Seeds are applied before entries so that `@Inject(SEEDS_TOKEN)`
- * works during service activation.
+ * @remarks
+ * Entries are bound when the host connects and unbound when it disconnects.
+ * If no `into` context is provided, it uses the nearest {@link IocProviderController}.
+ * Seeds are applied before entries are bound.
  *
  * @group Provision
  *
@@ -95,7 +95,7 @@ export class InjectablesProviderController<
     private readonly host: E,
     options: InjectablesProviderControllerOptions
   ) {
-    dbg.info(prefix(__filename), "Construct:", { host, options });
+    dbg.info(prefix(__filename), "Constructing:", { host, options });
 
     this.host.addController(this);
 

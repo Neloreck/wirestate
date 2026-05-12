@@ -20,7 +20,7 @@ export interface UseOnCommandOptions<D = unknown, R = unknown> {
 }
 
 /**
- * Registers a command handler on the CommandBus for the host element's lifetime.
+ * Hook that registers a command handler for the host element's lifetime.
  *
  * @group Commands
  *

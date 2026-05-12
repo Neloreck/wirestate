@@ -1,10 +1,10 @@
 import { Container } from "inversify";
 
-import { SEED_TOKEN } from "../registry";
 import { mockContainer } from "../test-utils/mock-container";
 import { SeedsMap } from "../types/initial-state";
 
 import { applySharedSeed } from "./apply-shared-seed";
+import { SEED_TOKEN } from "./tokens";
 
 describe("applySharedSeed", () => {
   it("should bind initial state to container when not yet bound", () => {

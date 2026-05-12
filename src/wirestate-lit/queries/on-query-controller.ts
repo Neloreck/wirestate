@@ -11,8 +11,9 @@ import { Optional } from "../types/general";
 /**
  * Reactive controller that registers a query handler on the {@link QueryBus} for the host element's lifetime.
  *
+ * @remarks
  * The handler is registered when the host connects and unregistered when it disconnects.
- * When the IoC context is updated (container revision change), the handler is re-registered automatically.
+ * It automatically re-registers if the IoC container is updated.
  *
  * @group Queries
  */
@@ -25,7 +26,7 @@ export class OnQueryController<D = unknown, R = unknown> implements ReactiveCont
 
   /**
    * @param host - The host element.
-   * @param type - The query type to handle.
+   * @param type - Unique identifier of the query to handle.
    * @param handler - The query handler function.
    */
   public constructor(host: ReactiveElement, type: QueryType, handler: QueryHandler<D, R>) {

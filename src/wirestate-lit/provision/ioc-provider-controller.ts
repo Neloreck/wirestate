@@ -27,7 +27,10 @@ export interface IocProviderControllerOptions {
 /**
  * Controller that provides an IoC container context to the host element and its children.
  *
+ * @remarks
  * It manages the lifecycle of the container and handles revision updates to notify consumers.
+ * The container is created (or used from options) when the controller is instantiated.
+ * Seed data is applied when the host connects.
  *
  * @group Provision
  */

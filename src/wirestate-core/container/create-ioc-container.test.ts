@@ -4,7 +4,7 @@ import { bindService } from "../bind/bind-service";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
-import { SEEDS_TOKEN, SEED_TOKEN } from "../registry";
+import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 
 import { createIocContainer } from "./create-ioc-container";
 import { WireScope } from "./wire-scope";

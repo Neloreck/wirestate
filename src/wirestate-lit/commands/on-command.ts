@@ -8,7 +8,8 @@ import { OnCommandController } from "./on-command-controller";
 /**
  * Represents interface for the {@link onCommand} decorator.
  *
- * Supports both standard (TC39) and legacy experimental decorators.
+ * @remarks
+ * Supports both TC39 and legacy experimental decorators.
  *
  * @group Commands
  */
@@ -23,20 +24,21 @@ export interface OnCommandDecorator<D = unknown, R = unknown> {
 }
 
 /**
- * Decorator that registers a Lit element method as a command handler for the given type.
+ * Decorator for Lit element methods that handle a specific command.
  *
- * The handler is registered when the host element connects to the DOM and unregistered when it disconnects.
+ * @remarks
+ * The handler is registered when the host connects and unregistered when it disconnects.
  *
  * @group Commands
  *
- * @param type - The command type to handle.
- * @returns The decorator function.
+ * @param type - Unique identifier of the command to handle.
+ * @returns A method decorator function.
  *
  * @example
  * ```typescript
  * class MyElement extends LitElement {
  *   @onCommand("SAVE")
- *   private handleSave(data: SomeData): void {
+ *   private onSave(data: SomeData): void {
  *     // handle command
  *   }
  * }

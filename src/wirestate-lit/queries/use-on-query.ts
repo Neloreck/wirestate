@@ -20,7 +20,7 @@ export interface UseOnQueryOptions<D = unknown, R = unknown> {
 }
 
 /**
- * Registers a query handler on the `QueryBus` for the host element's lifetime.
+ * Hook that registers a query handler for the host element's lifetime.
  *
  * @group Queries
  *
@@ -28,7 +28,7 @@ export interface UseOnQueryOptions<D = unknown, R = unknown> {
  * @param options - Query handling options.
  * @param options.type - The query type to handle.
  * @param options.handler - The query handler function.
- * @returns The query controller instance.
+ * @returns An instance of {@link OnQueryController}.
  *
  * @example
  * ```typescript

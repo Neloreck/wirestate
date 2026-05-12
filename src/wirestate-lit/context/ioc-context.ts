@@ -2,20 +2,20 @@ import { createContext } from "@lit/context";
 import { Container } from "@wirestate/core";
 
 /**
- * Context key for the IoC container.
+ * Unique symbol used as a key for the IoC context.
  *
  * @group Context
  */
 export const IOC_CONTAINER_KEY: unique symbol = Symbol("ContainerContext");
 
 /**
- * Represents interface for the IoC context value.
+ * Interface for the IoC context value.
  *
  * @group Context
  */
 export interface IocContext {
   /**
-   * The Inversify IoC container.
+   * The IoC container instance.
    */
   readonly container: Container;
   /**
@@ -29,7 +29,7 @@ export interface IocContext {
 }
 
 /**
- * Lit context for providing and consuming the IoC container.
+ * Lit context object for providing and consuming the IoC container.
  *
  * @group Context
  */

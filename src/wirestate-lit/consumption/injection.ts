@@ -8,6 +8,9 @@ import { AnyObject, FieldMustMatchProvidedType, Interface } from "../types/gener
 /**
  * Represents definition of the injection decorator.
  *
+ * @remarks
+ * Supports both TC39 and legacy experimental decorators.
+ *
  * @group Consumption
  */
 export interface InjectionDecorator<T> {
@@ -30,14 +33,15 @@ export interface InjectionDecorator<T> {
  */
 export interface InjectionOptions<T> {
   /**
-   * The service identifier to inject from the IoC container.
+   * The service identifier to inject.
    */
   injectionId: ServiceIdentifier<T>;
   /**
-   * Whether to subscribe to changes in the context.
+   * Whether to subscribe to container changes.
    *
+   * @remarks
    * If true, the property will be updated if the container in the context changes.
-   * False by default.
+   * Defaults to false.
    */
   once?: boolean;
 }
@@ -47,8 +51,8 @@ export interface InjectionOptions<T> {
  *
  * @group Consumption
  *
- * @param optionsOrInjectionId - Injection options including the service identifier or the service identifier itself.
- * @returns Injection decorator instance.
+ * @param optionsOrInjectionId - Injection options or service identifier.
+ * @returns An instance of {@link InjectionDecorator}.
  *
  * @example
  * ```typescript

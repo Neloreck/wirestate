@@ -7,7 +7,8 @@ import { InjectablesProviderController, InjectablesProviderControllerOptions } f
 /**
  * Represents type for the {@link injectablesProvide} decorator.
  *
- * Supports both standard (TC39) and legacy experimental decorators.
+ * @remarks
+ * Supports both TC39 and legacy experimental decorators.
  *
  * @group Provision
  */
@@ -27,19 +28,19 @@ export interface InjectablesProviderDecorator<T extends ReactiveElement = Reacti
 /**
  * Decorator that binds a set of injectables to the nearest IoC container for the host element's lifetime.
  *
+ * @remarks
  * Entries are bound when the host connects and unbound when it disconnects.
- * The decorated accessor or property holds the resulting {@link InjectablesProviderController} instance.
  *
  * @group Provision
  *
  * @param options - Provisioning options.
- * @returns Injectables provider decorator instance.
+ * @returns An instance of {@link InjectablesProviderDecorator}.
  *
  * @example
  * ```typescript
  * class MyComponent extends LitElement {
  *   @injectablesProvide({ entries: [AuthService, UserService], activate: [AuthService] })
- *   public services!: InjectablesProviderController<MyComponent>;
+ *   public controller!: InjectablesProviderController<MyComponent>;
  * }
  * ```
  */

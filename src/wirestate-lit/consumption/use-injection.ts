@@ -15,12 +15,15 @@ import { Optional } from "../types/general";
  */
 export interface UseInjectionOptions<T> {
   /**
+   * Whether to subscribe to container changes.
+   *
+   * @remarks
    * If true, the service will be fetched only once when the controller is created.
-   * If false (default), it will update if the container in the context changes.
+   * Defaults to false.
    */
   once?: boolean;
   /**
-   * Initial value for the injection before it's fetched from the container.
+   * Initial value before the service is fetched.
    */
   value?: Optional<T>;
   /**
@@ -30,7 +33,7 @@ export interface UseInjectionOptions<T> {
 }
 
 /**
- * Represents the return value of the {@link useInjection} hook, containing the injected service.
+ * Represents result of the {@link useInjection} hook.
  *
  * @group Consumption
  */
@@ -46,13 +49,13 @@ export interface UseInjectionValue<T> {
 }
 
 /**
- * Hook (controller) to inject a service from the IoC container in a Lit component.
+ * Hook (controller) to inject a service from the IoC container.
  *
  * @group Consumption
  *
  * @param host - The host element.
- * @param optionsOrInjectionId - Injection options including the service identifier or the service identifier itself.
- * @returns Injection descriptor object.
+ * @param optionsOrInjectionId - Injection options or service identifier.
+ * @returns An instance of {@link UseInjectionValue}.
  *
  * @example
  * ```typescript

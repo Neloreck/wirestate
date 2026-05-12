@@ -3,8 +3,9 @@ import type { Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { SEEDS_TOKEN } from "../registry";
 import { SeedEntries, SeedsMap } from "../types/initial-state";
+
+import { SEEDS_TOKEN } from "./tokens";
 
 /**
  * Removes specific targeted seeds from the container's internal seed map.
