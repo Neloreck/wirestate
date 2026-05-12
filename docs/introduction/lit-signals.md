@@ -25,7 +25,7 @@ export class CounterService {
 
 ### 2. Provide the Container and Services
 
-Every Wirestate tree needs an IoC container (`useIocProvision`) and controller that binds services (`useInjectablesProvider`).
+Every Wirestate tree needs an IoC container (`useIocProvision`) and a controller that binds services (`useInjectablesProvider`).
 These hooks are applied to a Lit element that acts as the root.
 
 ```ts
@@ -73,7 +73,11 @@ export class MyCounter extends LitElement {
   private counterService!: CounterService;
 
   public render() {
-    return html` <button @click=${() => this.counter.increment()}>Count: ${watch(this.counterService.count)}</button> `;
+    return html`
+      <button @click=${() => this.counterService.increment()}>
+        Count: ${watch(this.counterService.count)}
+      </button>
+    `;
   }
 }
 ```
@@ -101,7 +105,7 @@ export class CounterService {
     const seed = this.scope.getSeed<CounterSeed>(CounterService);
 
     if (typeof seed?.count === "number") {
-      this.count.value = seed.count;
+      this.count.set(seed.count);
     }
   }
 }
@@ -135,7 +139,7 @@ export class ApplicationRoot extends LitElement {
 
 ## Events and Queries in Lit
 
-Lit components use similar `@onEvent` / `@onQuery` decorators as `@wirestate/core` services.
+Lit components use similar `@onEvent` / `@onQuery` / `@onCommand` decorators from `@wirestate/lit`.
 
 ```ts
 import { Event } from "@wirestate/core";
@@ -146,17 +150,17 @@ export class MyLogger extends LitElement {
   // ...
 
   @onEvent("COUNTER_INCREMENTED")
-  private onCounterIncremented(event: Event<number>): void {
-    console.log("New count:", event.payload);
+  private onCounterIncremented(event: Event<{ count: number }>): void {
+    console.log("New count:", event.payload?.count);
   }
 
   @onQuery("GET_LABEL")
-  private onQueryLabel(): string {
+  private onGetLabel(): string {
     return "some-counter-label";
   }
 
   @onCommand("DUMP_LOGS")
-  private onQueryLabel(): void {
+  private onDumpLogs(): void {
     console.log("Dumping logs on command");
   }
 

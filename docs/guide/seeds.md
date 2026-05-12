@@ -5,8 +5,8 @@ They solve server-side rendering hydration, per-instance parameterization, and d
 
 ## Global Seed
 
-A single object available to all services in the container.\
-Inject it via the `SEED` token or access from `WireScope` instance.
+A single object available to all services in the container.
+Inject it via the `SEED` token or access from a `WireScope` instance.
 
 ```ts
 import { Container, createIocContainer } from "@wirestate/core";
@@ -40,9 +40,9 @@ export class ApiClient {
     return this.seed.apiUrl;
   }
 
-  // Inline execution resolution:
+  // Runtime resolution via scope:
   public get baseUrlFromScope(): string {
-    return this.scope.seed<GlobalSeed>()!.apiUrl;
+    return this.scope.getSeed<GlobalSeed>()!.apiUrl;
   }
 }
 ```
@@ -54,7 +54,7 @@ import { SEED } from "@wirestate/core";
 import { useInjection } from "@wirestate/react";
 
 function SomeComponent() {
-  const seed: GlobalSeed = useInjection(SEED_TOKEN)
+  const seed: GlobalSeed = useInjection(SEED);
 
   // ...
 }
@@ -63,11 +63,14 @@ function SomeComponent() {
 ### Lit
 
 ```ts
+import { SEED } from "@wirestate/core";
+import { injection } from "@wirestate/lit";
+
 @customElement("some-component")
 class SomeComponent extends ReactiveElement {
-  @injection(SEED_TOKEN)
+  @injection(SEED)
   public seed!: GlobalSeed;
-  
+
   // ...
 }
 ```
@@ -78,9 +81,7 @@ Per-service seeds scope initialization data to a specific service or by unique i
 Read them via `scope.getSeed(ServiceClass)` or `scope.getSeed("SEED_KEY")`.
 Returns `null` if no seed was provided for that service.
 
-
 ### Service
-
 
 ```ts
 import { Injectable, Inject, OnActivated, WireScope } from "@wirestate/core";

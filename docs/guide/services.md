@@ -141,9 +141,9 @@ export class PollingService {
 }
 ```
 
-### IS_DISPOSED
+### Disposing
 
-`IS_DISPOSED` is a readonly boolean set to `true` after deactivation. Check it in async callbacks that outlive the service.
+`isDisposed` is a readonly boolean set to `true` after deactivation. Check it in async callbacks that outlive the service.
 
 ```ts
 @Injectable()
@@ -159,7 +159,7 @@ export class DataService {
 
     // On deactivation scopes are marked as disposed.
     // So if deactivation already happened, async code here is working in already destroyed data service.
-    if (!this.scope.IS_DISPOSED) {
+    if (!this.scope.isDisposed) {
       this.data.value = data;
     }
   }

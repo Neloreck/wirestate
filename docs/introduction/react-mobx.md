@@ -255,7 +255,7 @@ import { useSyncQueryCaller, SyncQueryCaller } from "@wirestate/react";
 import { useCallback, useState } from "react";
 
 function ThemeToggle() {
-  const [theme, setTheme] = useState("unknown");
+  const [theme, setTheme] = useState<string>("unknown");
   const query: SyncQueryCaller = useSyncQueryCaller();
 
   const onQueryTheme = useCallback(() => {

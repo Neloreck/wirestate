@@ -9,7 +9,7 @@ The core of Wirestate is the **Service** — an `@Injectable` class holding stat
 Services hold a reactive state.
 
 ```ts
-import { Injectable, Inject, WireScope } from "@wirestate/core";
+import { Injectable } from "@wirestate/core";
 import { signal, Signal } from "@wirestate/react-signals";
 
 @Injectable()
@@ -189,11 +189,11 @@ export class ThemeService {
 ```
 
 ```tsx
-import { useSyncQueryCaller } from "@wirestate/react";
-import { useCallback } from "react";
+import { useSyncQueryCaller, SyncQueryCaller } from "@wirestate/react";
+import { useCallback, useState } from "react";
 
 function ThemeToggle() {
-  const [theme, setTheme] = useState("unknown");
+  const [theme, setTheme] = useState<string>("unknown");
 
   const query: SyncQueryCaller = useSyncQueryCaller();
 

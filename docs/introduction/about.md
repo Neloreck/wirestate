@@ -38,11 +38,11 @@ const InjectablesProvider = createInjectablesProvider([CounterService]);
 
 export function Application() {
   return (
-    <InjectablesProvider>
-      <Services>
+    <IocProvider>
+      <InjectablesProvider>
         <Counter />
-      </Services>
-    </InjectablesProvider>
+      </InjectablesProvider>
+    </IocProvider>
   );
 }
 ```
