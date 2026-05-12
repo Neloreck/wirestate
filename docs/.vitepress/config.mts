@@ -16,13 +16,30 @@ export default defineConfig({
     outline: [2, 3],
     nav: [
       { text: "Home", link: "/" },
-      { text: "Guide", link: "/intro" },
+      { text: "Introduction", link: "/introduction/about" },
+      { text: "Guide", link: "/guide/services" },
       { text: "API", link: "/api/" },
     ],
     sidebar: [
       {
+        text: "Introduction",
+        items: [
+          { text: "About", link: "/introduction/about" },
+          { text: "Installation", link: "/introduction/installation" },
+          { text: "React/Signals", link: "/introduction/react-signals" },
+          { text: "React/MobX", link: "/introduction/react-mobx" },
+          { text: "Lit/Signals", link: "/introduction/lit-signals" },
+        ],
+      },
+      {
         text: "Guide",
-        items: [{ text: "Introduction", link: "/intro" }],
+        items: [
+          { text: "Services", link: "/guide/services" },
+          { text: "Messaging", link: "/guide/messaging" },
+          { text: "Containers", link: "/guide/containers" },
+          { text: "Seeds", link: "/guide/seeds" },
+          { text: "Testing", link: "/guide/testing" },
+        ],
       },
       {
         text: "API Reference",
