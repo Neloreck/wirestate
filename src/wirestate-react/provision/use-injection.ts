@@ -36,7 +36,7 @@ export function useInjection<T>(injectionId: ServiceIdentifier<T>): T {
 
   // Revision bump causes a container reset; force re-resolution to drop stale instances.
   return useMemo(() => {
-    dbg.info(prefix(__filename), "New injection provision for token:", {
+    dbg.info(prefix(__filename), "Resolving injection:", {
       token: injectionId,
       name: (injectionId as AnyObject)?.name ?? injectionId,
       revision,

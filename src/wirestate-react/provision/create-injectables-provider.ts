@@ -1,21 +1,35 @@
 import {
-  applySeeds,
-  bindEntry,
   InjectableDescriptor,
   SeedEntries,
-  unapplySeeds,
   WirestateError,
   getEntryToken,
   Newable,
   type ServiceIdentifier,
+  applySeeds,
+  bindEntry,
+  unapplySeeds,
 } from "@wirestate/core";
-import { type ReactElement, type ReactNode, useContext, useEffect, useMemo, useState } from "react";
+import { Container } from "inversify";
+import {
+  MutableRefObject,
+  ReactElement,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { IocContext, IocReactContext } from "../context/ioc-context";
-import { ERROR_CODE_INVALID_CONTEXT, ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
+import {
+  ERROR_CODE_FAILED_REBIND_ATTEMPT,
+  ERROR_CODE_INVALID_CONTEXT,
+  ERROR_CODE_VALIDATION_ERROR,
+} from "../error/error-code";
 import { Optional } from "../types/general";
 
 /**
@@ -125,99 +139,139 @@ export function createInjectablesProvider(
       );
     }
 
+    const { container, revision } = iocContext;
+
     // Snapshot props on mount to ensure binding stability.
     // useState lazy initializer ensures it only runs once.
     const [initialPropsSnapshot] = useState<InjectablesProviderProps>(() => props);
 
+    // When the parent container instance is replaced (e.g. HMR), migrate bindings to the new container.
+    // Handle double effects in strict mode and prevent doubled store lifecycles.
+    const previousContainerRef: MutableRefObject<Optional<Container>> = useRef(null);
+
+    // Bind services synchronously so children can resolve them on their first render.
+    // `entries` is stable (defined at module level), so this only runs once.
+    // No need to do shallow checks here.
     useMemo(() => {
+      if (previousContainerRef.current === container) {
+        dbg.info(prefix(__filename), "Skip use-memo cached call:", {
+          container: container,
+          revision: revision,
+          services: entries,
+          initialPropsSnapshot,
+          activate,
+        });
+
+        return;
+      }
+
       dbg.info(prefix(__filename), "Providing services on first render:", {
-        container: iocContext.container,
-        revision: iocContext.revision,
+        container: container,
+        revision: revision,
         services: entries,
         initialPropsSnapshot,
         activate,
       });
 
-      // Seed must be applied BEFORE binding so @Inject(INITIAL_STATE_TOKEN) works during activation.
+      // Seed must be applied before binding so @Inject(INITIAL_STATE_TOKEN) works during activation.
       if (initialPropsSnapshot.seeds) {
-        applySeeds(iocContext.container, initialPropsSnapshot.seeds);
+        applySeeds(container, initialPropsSnapshot.seeds);
       }
 
       for (const entry of entries) {
-        if (!iocContext.container.isBound(getEntryToken(entry))) {
-          bindEntry(iocContext.container, entry);
+        if (container.isBound(getEntryToken(entry))) {
+          throw new WirestateError(
+            ERROR_CODE_FAILED_REBIND_ATTEMPT,
+            "Trying to rebind service that is already bound in the parent container. Your InjectablesProvider should not redefine services in the provider."
+          );
         }
+
+        bindEntry(container, entry);
       }
 
       if (activate) {
         for (const eager of activate) {
-          iocContext.container.get(eager);
+          container.get(eager);
         }
       }
-    }, entries);
+
+      previousContainerRef.current = container;
+    }, []);
 
     useEffect(() => {
       dbg.info(prefix(__filename), "Providing services on mount:", {
-        container: iocContext.container,
-        revision: iocContext.revision,
+        container: container,
+        revision: revision,
         entries,
         initialPropsSnapshot,
         activate,
       });
 
-      // Re-apply state and re-bind if container was reset (e.g. StrictMode remount or HMR).
       let didRebind: boolean = false;
 
+      // Re-apply state and re-bind if container was reset (e.g. StrictMode remount or HMR).
       if (initialPropsSnapshot.seeds) {
-        applySeeds(iocContext.container, initialPropsSnapshot.seeds);
+        applySeeds(container, initialPropsSnapshot.seeds);
       }
 
       for (const entry of entries) {
-        if (!iocContext.container.isBound(getEntryToken(entry))) {
+        if (!container.isBound(getEntryToken(entry))) {
           didRebind = true;
-          bindEntry(iocContext.container, entry);
+          bindEntry(container, entry);
+        } else {
+          dbg.info(prefix(__filename), "Skip binding of provider entry:", {
+            entry,
+            container: container,
+            revision: revision,
+          });
         }
       }
 
       if (activate) {
         for (const eager of activate) {
-          iocContext.container.get(eager);
+          container.get(eager);
         }
       }
 
       // Increment revision to invalidate stale injection caches.
       if (didRebind) {
-        iocContext.setRevision((r) => r + 1);
+        dbg.info(prefix(__filename), "Bump revision:", {
+          container: container,
+          from: revision,
+          to: revision + 1,
+        });
+
+        iocContext.setRevision((revision) => revision + 1);
       }
 
       return () => {
         dbg.info(prefix(__filename), "Unprovision services on unmount:", {
-          container: iocContext.container,
-          revision: iocContext.revision,
+          container: container,
+          revision: revision,
           entries,
         });
 
         for (const entry of entries) {
-          const token: ServiceIdentifier = getEntryToken(entry);
-
-          if (iocContext.container.isBound(token)) {
-            iocContext.container.unbind(token);
-          }
+          container.unbind(getEntryToken(entry));
         }
 
         // Remove only this provider's targeted initial state entries.
         if (initialPropsSnapshot.seeds) {
-          unapplySeeds(iocContext.container, initialPropsSnapshot.seeds);
+          unapplySeeds(container, initialPropsSnapshot.seeds);
         }
       };
-    }, entries);
+    }, [container]);
 
     return props.children as ReactElement;
   }
 
   InjectablesProviderComponent.displayName = "InjectablesProvider";
 
-  dbg.info(prefix(__filename), "Created injectables provider:", { InjectablesProviderComponent, entries, options });
+  dbg.info(prefix(__filename), "Created injectables provider:", {
+    InjectablesProviderComponent,
+    entries,
+    options,
+  });
 
   return InjectablesProviderComponent;
 }

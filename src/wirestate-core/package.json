@@ -54,7 +54,6 @@
     "inversify": "^8.1.0"
   },
   "peerDependencies": {
-    "reflect-metadata": ">=0.2.0",
     "tslib": ">=2.5.0"
   },
   "optionalDependencies": {}

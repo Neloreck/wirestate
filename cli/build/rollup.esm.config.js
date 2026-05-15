@@ -31,7 +31,6 @@ const createPackageEsmConfig = (pkg, env) => ({
     }),
     replace({
       preventAssignment: true,
-      IS_DEV: env !== EEnvironment.PRODUCTION,
     }),
     typescript({
       sourceMap: true,

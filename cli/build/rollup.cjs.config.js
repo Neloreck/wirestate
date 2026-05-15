@@ -31,7 +31,6 @@ const createPackageCjsConfig = (pkg, env) => ({
     }),
     replace({
       preventAssignment: true,
-      IS_DEV: (env !== EEnvironment.PRODUCTION).toString(),
     }),
     typescript({
       tsconfig: TS_BUILD_CONFIG,

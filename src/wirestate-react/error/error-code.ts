@@ -1,4 +1,5 @@
 export const ERROR_CODE_VALIDATION_ERROR: number = 1050;
 export const ERROR_CODE_INVALID_CONTEXT: number = 1052;
 
+export const ERROR_CODE_FAILED_REBIND_ATTEMPT: number = 1100;
 export const ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER: number = 1101;

@@ -10,37 +10,28 @@ import { visualizer } from "rollup-plugin-visualizer";
 
 import { default as tsconfig } from "../../tsconfig.json";
 import {
-  EEnvironment,
   EXTERNAL_DEPENDENCIES,
-  MOBX_ENTRY,
+  PORTABLE_CORE_ENTRY,
+  PORTABLE_CORE_LIT_SIGNALS_ENTRY,
+  PORTABLE_CORE_REACT_MOBX_ENTRY,
+  PORTABLE_CORE_REACT_SIGNALS_ENTRY,
   PORTABLE_DEBUG_ROOT,
-  PORTABLE_ENTRY,
   PORTABLE_ROOT,
-  SIGNALS_ENTRY,
+  SRC_PATH,
   STATS_ROOT,
   TS_PORTABLE_CONFIG,
-  WS_ROOT,
 } from "../config/build.constants";
 
 import { BABEL_CONFIG } from "./babel.modern.config";
 
 const isLoggingEnabled = process.env.LIB_DEBUG_LOGGING === "true" || process.env.LIB_DEBUG_LOGGING === "1";
 
-const createPortableConfig = (env, isDebug) => ({
+const createPortableConfig = (entry, isDebug) => ({
   external: EXTERNAL_DEPENDENCIES,
-  input: [PORTABLE_ENTRY, MOBX_ENTRY, SIGNALS_ENTRY],
+  input: entry,
   output: {
-    compact: env === EEnvironment.PRODUCTION,
+    compact: false,
     dir: isDebug ? PORTABLE_DEBUG_ROOT : PORTABLE_ROOT,
-    entryFileNames: (chunkInfo) => {
-      if (chunkInfo.facadeModuleId === MOBX_ENTRY) {
-        return "mobx.js";
-      } else if (chunkInfo.facadeModuleId === SIGNALS_ENTRY) {
-        return "signals.js";
-      }
-
-      return "wirestate.js";
-    },
     preserveModules: false,
     sourcemap: true,
     format: "es",
@@ -55,11 +46,7 @@ const createPortableConfig = (env, isDebug) => ({
       extensions: [".ts", ".tsx", ".js", ".jsx"],
     }),
     commonjs(),
-    replace({
-      preventAssignment: true,
-      IS_DEV: env !== EEnvironment.PRODUCTION,
-      __filename: (id) => `"${path.relative(WS_ROOT, id)}"`,
-    }),
+    replace({ preventAssignment: true }),
     typescript({
       sourceMap: true,
       tsconfig: TS_PORTABLE_CONFIG,
@@ -70,7 +57,7 @@ const createPortableConfig = (env, isDebug) => ({
     visualizer({
       filename: path.resolve(STATS_ROOT, "ptb-stats.html"),
       gzipSize: true,
-      projectRoot: WS_ROOT,
+      projectRoot: SRC_PATH,
     }),
     clear({
       targets: [isDebug ? PORTABLE_DEBUG_ROOT : PORTABLE_ROOT],
@@ -78,20 +65,11 @@ const createPortableConfig = (env, isDebug) => ({
   ],
 });
 
-const createPortableDtsConfig = (env, isDebug) => ({
+const createPortableDtsConfig = (entry, isDebug) => ({
   external: EXTERNAL_DEPENDENCIES,
-  input: [PORTABLE_ENTRY, MOBX_ENTRY, SIGNALS_ENTRY],
+  input: entry,
   output: {
     dir: isDebug ? PORTABLE_DEBUG_ROOT : PORTABLE_ROOT,
-    entryFileNames: (chunkInfo) => {
-      if (chunkInfo.facadeModuleId === MOBX_ENTRY) {
-        return "mobx.d.ts";
-      } else if (chunkInfo.facadeModuleId === SIGNALS_ENTRY) {
-        return "signals.d.ts";
-      }
-
-      return "wirestate.d.ts";
-    },
     format: "es",
   },
   plugins: [
@@ -106,6 +84,10 @@ const createPortableDtsConfig = (env, isDebug) => ({
 });
 
 export default [
-  createPortableDtsConfig(EEnvironment.PRODUCTION, isLoggingEnabled),
-  createPortableConfig(EEnvironment.PRODUCTION, isLoggingEnabled),
-];
+  PORTABLE_CORE_ENTRY,
+  PORTABLE_CORE_LIT_SIGNALS_ENTRY,
+  PORTABLE_CORE_REACT_SIGNALS_ENTRY,
+  PORTABLE_CORE_REACT_MOBX_ENTRY,
+]
+  .map((entry) => [createPortableDtsConfig(entry, isLoggingEnabled), createPortableConfig(entry, isLoggingEnabled)])
+  .flat();

@@ -13,7 +13,5 @@ module.exports = {
     "node_modules/.pnpm/(?!inversify|@inversifyjs|@preact|@lit-labs|signal-polyfill|lit|lit-html|@lit)",
   ],
   testEnvironment: "jsdom",
-  globals: {
-    IS_DEV: true,
-  },
+  globals: {},
 };

@@ -34,9 +34,7 @@ export const TS_PORTABLE_CONFIG = path.resolve(__dirname, "./tsconfig.portable.j
 
 export const SRC_PATH = path.resolve(PROJECT_ROOT, "./src");
 
-export const PORTABLE_ENTRY = path.resolve(SRC_PATH, "./wirestate-portable/index.ts");
-
-// Portable build:
-export const WS_ROOT = path.resolve(SRC_PATH, "./wirestate-core");
-export const MOBX_ENTRY = path.resolve(SRC_PATH, "wirestate-react-mobx/index.ts");
-export const SIGNALS_ENTRY = path.resolve(SRC_PATH, "wirestate-react-signals/index.ts");
+export const PORTABLE_CORE_ENTRY = path.resolve(SRC_PATH, "./portable/wirestate.ts");
+export const PORTABLE_CORE_LIT_SIGNALS_ENTRY = path.resolve(SRC_PATH, "./portable/wirestate-lit-signals.ts");
+export const PORTABLE_CORE_REACT_MOBX_ENTRY = path.resolve(SRC_PATH, "./portable/wirestate-react-mobx.ts");
+export const PORTABLE_CORE_REACT_SIGNALS_ENTRY = path.resolve(SRC_PATH, "./portable/wirestate-react-signals.ts");
