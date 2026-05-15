@@ -1,7 +1,7 @@
 import { Container, type Newable } from "inversify";
 
 import { bindEntry } from "../bind/bind-entry";
-import type { InjectableDescriptor } from "../types/privision";
+import { InjectableDescriptor } from "../types/privision";
 
 /**
  * Represents options for {@link mockBindEntry}.

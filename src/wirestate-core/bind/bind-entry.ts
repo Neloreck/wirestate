@@ -3,7 +3,7 @@ import { bindingTypeValues, Container, Newable } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { InjectableDescriptor } from "../types/privision";
+import { InjectableDescriptor } from "../types/privision";
 
 import { bindConstant } from "./bind-constant";
 import { bindDynamicValue } from "./bind-dynamic-value";
@@ -21,7 +21,7 @@ export interface BindEntryOptions extends BindServiceOptions {
    *
    * @default `false`
    */
-  isWithIgnoreLifecycle?: boolean;
+  readonly isWithIgnoreLifecycle?: boolean;
 }
 
 /**

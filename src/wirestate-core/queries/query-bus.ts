@@ -3,8 +3,8 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import type { Maybe, MaybePromise, Optional } from "../types/general";
-import type { QueryHandler, QueryType, QueryUnregister } from "../types/queries";
+import { Maybe, MaybePromise, Optional } from "../types/general";
+import { QueryHandler, QueryType, QueryUnregister } from "../types/queries";
 
 /**
  * Orchestrates query dispatching and handler registration.

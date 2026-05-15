@@ -41,7 +41,7 @@ export interface InjectableDescriptor<T = unknown, V = unknown> {
    * @remarks
    * Example values: `ConstantValue`, `DynamicValue`, `Factory`, `Provider`.
    */
-  bindingType?: BindingType;
+  readonly bindingType?: BindingType;
 
   /**
    * Factory function used by dynamic value bindings.
@@ -49,7 +49,7 @@ export interface InjectableDescriptor<T = unknown, V = unknown> {
    * @remarks
    * Called by the {@link Container} to create a service instance of type T.
    */
-  factory?: () => T;
+  readonly factory?: () => T;
 
   /**
    * Unique service token used by Inversify to locate the injectable binding.
@@ -57,7 +57,7 @@ export interface InjectableDescriptor<T = unknown, V = unknown> {
    * @remarks
    * Accepts class constructor, symbol, or string service identifier.
    */
-  id: ServiceIdentifier<T>;
+  readonly id: ServiceIdentifier<T>;
 
   /**
    * Inversify scope strategy for created instances.
@@ -65,7 +65,7 @@ export interface InjectableDescriptor<T = unknown, V = unknown> {
    * @remarks
    * Example values: `Singleton`, `Transient`, `Request`.
    */
-  scopeBindingType?: ScopeBindingType;
+  readonly scopeBindingType?: ScopeBindingType;
 
   /**
    * Prebuilt value for value-based bindings.
@@ -73,5 +73,5 @@ export interface InjectableDescriptor<T = unknown, V = unknown> {
    * @remarks
    * Used when binding mode expects a direct value instance (e.g., constant values).
    */
-  value?: V;
+  readonly value?: V;
 }

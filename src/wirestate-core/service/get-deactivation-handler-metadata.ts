@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { DEACTIVATION_HANDLER_METADATA } from "../registry";
-import type { Maybe } from "../types/general";
+import { Maybe } from "../types/general";
 
 /**
  * Retrieves the names of methods decorated with {@link OnDeactivation} by traversing the prototype chain.

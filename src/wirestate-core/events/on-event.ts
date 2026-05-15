@@ -2,8 +2,8 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { EVENT_HANDLER_METADATA } from "../registry";
-import type { EventHandlerMetadata, EventType } from "../types/events";
-import type { Maybe, Optional } from "../types/general";
+import { EventHandlerMetadata, EventType } from "../types/events";
+import { Maybe, Optional } from "../types/general";
 
 /**
  * Decorator for service methods that respond to events.

@@ -1,10 +1,10 @@
-import type { Container } from "inversify";
+import { Container } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { CommandDescriptor, CommandType } from "../types/commands";
-import type { Optional } from "../types/general";
+import { CommandDescriptor, CommandType } from "../types/commands";
+import { Optional } from "../types/general";
 
 import { CommandBus } from "./command-bus";
 

@@ -3,7 +3,7 @@ import { type Container } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { EventType } from "../types/events";
+import { EventType } from "../types/events";
 
 import { EventBus } from "./event-bus";
 

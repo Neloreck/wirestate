@@ -9,11 +9,11 @@ import { WirestateError } from "../error/wirestate-error";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
-import type { CommandDescriptor, CommandHandler, CommandUnregister, CommandType } from "../types/commands";
-import type { EventHandler, EventType, EventUnsubscriber } from "../types/events";
-import type { Optional, AnyObject, MaybePromise } from "../types/general";
-import type { SeedKey, SeedsMap } from "../types/initial-state";
-import type { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
+import { CommandDescriptor, CommandHandler, CommandUnregister, CommandType } from "../types/commands";
+import { EventHandler, EventType, EventUnsubscriber } from "../types/events";
+import { Optional, AnyObject, MaybePromise } from "../types/general";
+import { SeedKey, SeedsMap } from "../types/initial-state";
+import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 
 /**
  * A transient bridge providing services with access to Wirestate buses, lazy resolution, and seeds.

@@ -1,9 +1,9 @@
-import type { Container } from "inversify";
+import { Container } from "inversify";
 
-import type { WireScope } from "./container/wire-scope";
-import type { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
-import type { EventHandlerMetadata, EventUnsubscriber } from "./types/events";
-import type { QueryHandlerMetadata, QueryUnregister } from "./types/queries";
+import { WireScope } from "./container/wire-scope";
+import { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
+import { EventHandlerMetadata, EventUnsubscriber } from "./types/events";
+import { QueryHandlerMetadata, QueryUnregister } from "./types/queries";
 
 /**
  * Registry of class constructors to their declared query handlers.

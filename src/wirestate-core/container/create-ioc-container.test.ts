@@ -1,5 +1,6 @@
 import { Container } from "inversify";
 
+import { Injectable } from "../alias";
 import { bindService } from "../bind/bind-service";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
@@ -69,5 +70,69 @@ describe("createIocContainer", () => {
     bindService(container, TestService);
 
     expect(container.get(TestService)).toBe(container.get(TestService));
+  });
+
+  it("should use provided seed", () => {
+    const container: Container = createIocContainer({ seed: { key: "value" } });
+
+    expect(container.get(SEED_TOKEN)).toEqual({ key: "value" });
+  });
+
+  it("should use provided seeds", () => {
+    const TEST_TOKEN: unique symbol = Symbol.for("TEST_TOKEN");
+    const container: Container = createIocContainer({
+      seeds: [[TEST_TOKEN, { data: 123 }]],
+    });
+
+    const seedsMap: Map<unknown, unknown> = container.get(SEEDS_TOKEN);
+
+    expect(seedsMap.get(TEST_TOKEN)).toEqual({ data: 123 });
+  });
+
+  it("should bind provided entries", () => {
+    class TestService {}
+    const container: Container = createIocContainer({
+      entries: [TestService],
+    });
+
+    expect(container.get(TestService)).toBeInstanceOf(TestService);
+  });
+
+  it("should activate provided services", () => {
+    let activated: boolean = false;
+
+    @Injectable()
+    class TestService {
+      public constructor() {
+        activated = true;
+      }
+    }
+
+    createIocContainer({
+      entries: [TestService],
+      activate: [TestService],
+    });
+
+    expect(activated).toBe(true);
+  });
+
+  it("should throw error if activate is provided without entries", () => {
+    expect(() =>
+      createIocContainer({
+        activate: ["SomeService"],
+      })
+    ).toThrow("Supplied activation list while entries for binding are not provided.");
+  });
+
+  it("should throw error if activated service is not in entries", () => {
+    @Injectable()
+    class TestService {}
+
+    expect(() =>
+      createIocContainer({
+        entries: [TestService],
+        activate: ["OtherService"],
+      })
+    ).toThrow("is listed in 'activate' but was not provided in 'entries'.");
   });
 });

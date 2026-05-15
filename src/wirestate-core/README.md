@@ -45,11 +45,15 @@ export class CounterService {
 ```ts
 import { createIocContainer, bindService } from '@wirestate/core';
 
-const container = createIocContainer();
+const container = createIocContainer({
+  seed: { baseUrl: "https://example.com" },
+  entries: [CounterService]
+});
 
-bindService(container, CounterService);
+bindService(container, AnotherService);
 
-const service = container.get(CounterService);
+const counterService = container.get(CounterService);
+const anotherService = container.get(AnotherService);
 ```
 
 `bindService` binds a class in singleton scope by default.

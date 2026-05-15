@@ -10,7 +10,7 @@ import {
   type CommandType,
   type CommandUnregister,
 } from "../types/commands";
-import type { Maybe, Optional } from "../types/general";
+import { Maybe, Optional } from "../types/general";
 
 /**
  * Orchestrates command dispatching and handler registration.

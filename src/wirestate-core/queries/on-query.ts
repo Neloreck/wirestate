@@ -2,8 +2,8 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { QUERY_HANDLER_METADATA } from "../registry";
-import type { Maybe } from "../types/general";
-import type { QueryHandlerMetadata, QueryType } from "../types/queries";
+import { Maybe } from "../types/general";
+import { QueryHandlerMetadata, QueryType } from "../types/queries";
 
 /**
  * Decorator for service methods that respond to a query.

@@ -10,6 +10,7 @@
 - Export more alias / methods from `@wirestate/react-mobx`
 - Export missing methods typing for `@wirestate/core`
 - Extensive JSDoc coverage for wirestate packages
+- `createIocContainer`: Added ability to instantly provide and activate entries, targeted seeds
 
 ## 0.6.3
 

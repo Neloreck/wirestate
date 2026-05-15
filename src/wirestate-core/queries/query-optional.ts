@@ -1,10 +1,10 @@
-import type { Container } from "inversify";
+import { Container } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { MaybePromise, Optional } from "../types/general";
-import type { QueryType } from "../types/queries";
+import { MaybePromise, Optional } from "../types/general";
+import { QueryType } from "../types/queries";
 
 import { QueryBus } from "./query-bus";
 

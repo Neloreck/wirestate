@@ -1,8 +1,8 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { EventDispatchEntry, EventHandler } from "../types/events";
-import type { Optional } from "../types/general";
+import { EventDispatchEntry, EventHandler } from "../types/events";
+import { Optional } from "../types/general";
 
 import { getEventHandlerMetadata } from "./get-event-handler-metadata";
 

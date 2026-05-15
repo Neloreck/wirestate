@@ -81,6 +81,17 @@ Per-service seeds scope initialization data to a specific service or by unique i
 Read them via `scope.getSeed(ServiceClass)` or `scope.getSeed("SEED_KEY")`.
 Returns `null` if no seed was provided for that service.
 
+```ts
+import { Container, createIocContainer } from "@wirestate/core";
+
+const container: Container = createIocContainer({
+  seeds: [
+    [CounterService, { count: 1000 }],
+    ["SOME_KEY", "VALUE"],
+  ],
+});
+```
+
 ### Service
 
 ```ts

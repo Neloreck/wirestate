@@ -6,7 +6,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { ScopeBindingType } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import type { InjectableDescriptor } from "../types/privision";
+import { InjectableDescriptor } from "../types/privision";
 
 /**
  * Binds a constant value to a service identifier in the container.

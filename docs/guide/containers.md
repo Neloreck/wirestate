@@ -13,6 +13,17 @@ bindService(container, UserService);
 bindService(container, AuthService);
 ```
 
+You can provide bindings and services to activate directly in the options:
+
+```ts
+const container: Container = createIocContainer({
+  entries: [UserService, { id: "CONFIG", value: { a: 1, b: 2 } }],
+  activate: [UserService],
+  seed: { apiUrl: "https://api.example.com" },
+  seeds: [[UserService, { cache: false }]],
+});
+```
+
 ## Child Containers
 
 Pass `parent` to create a child container. Child containers inherit parent bindings but maintain independent

@@ -1,4 +1,4 @@
-import type { MaybePromise } from "./general";
+import { MaybePromise } from "./general";
 
 /**
  * Represents identifier used to dispatch and handle commands.

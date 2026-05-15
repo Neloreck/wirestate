@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { DEACTIVATION_HANDLER_METADATA } from "../registry";
-import type { Maybe } from "../types/general";
+import { Maybe } from "../types/general";
 
 /**
  * Decorator for service methods that should be executed before the service instance is deactivated.

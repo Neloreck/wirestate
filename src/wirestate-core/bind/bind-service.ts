@@ -19,10 +19,10 @@ import {
 } from "../registry";
 import { getActivatedHandlerMetadata } from "../service/get-activated-handler-metadata";
 import { getDeactivationHandlerMetadata } from "../service/get-deactivation-handler-metadata";
-import type { CommandHandler, CommandUnregister } from "../types/commands";
-import type { EventHandler, EventUnsubscriber } from "../types/events";
-import type { Maybe, MaybePromise, Optional } from "../types/general";
-import type { QueryHandler, QueryUnregister } from "../types/queries";
+import { CommandHandler, CommandUnregister } from "../types/commands";
+import { EventHandler, EventUnsubscriber } from "../types/events";
+import { Maybe, MaybePromise, Optional } from "../types/general";
+import { QueryHandler, QueryUnregister } from "../types/queries";
 
 /**
  * Represents options for {@link bindService}.
@@ -36,7 +36,7 @@ export interface BindServiceOptions {
    *
    * @default false
    */
-  isWithIgnoreLifecycle?: boolean;
+  readonly isWithIgnoreLifecycle?: boolean;
 }
 
 /**
