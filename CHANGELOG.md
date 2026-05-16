@@ -13,6 +13,7 @@
 - `createIocContainer`: Added ability to instantly provide and activate entries, targeted seeds
 - `IocProvider`: No nested logics, no seed provision anymore, just plain rough provider
 - `IocActivator`: Added separate activation component
+- `useRootContainer`: Added separate hook for store management in React tree
 
 ## 0.6.3
 

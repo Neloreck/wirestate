@@ -45,7 +45,38 @@ Use child containers to isolate a subtree of services (e.g., a modal, a wizard s
 
 ```tsx
 import { createIocContainer } from "@wirestate/core";
-import { IocProvider } from "@wirestate/react";
+import { IocProvider, useRootContainer } from "@wirestate/react";
+import { CounterService, LoggerService } from "./services";
+
+export function Application() {
+  const container: Container = useRootContainer(
+    () =>
+      createIocContainer({
+        entries: [CounterService, LoggerService],
+      }),
+    []
+  );
+
+  return (
+    <IocProvider container={container}>
+      <IocActivator activate={[LoggerService]}>
+        <SomeComponent />
+      </IocActivator>
+    </IocProvider>
+  );
+}
+```
+
+`useRootContainer` is useful when the root container should be created inside a component and recreated only when dependencies change.
+It also respects HMR refreshing and causes store recreation on replacement of dependency services used in provided factory function.
+
+---
+
+For globally declared store outside of React rendering tree following approach can be used:
+
+```tsx
+import { createIocContainer } from "@wirestate/core";
+import { IocProvider, useRootContainer } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 const container: Container = createIocContainer({

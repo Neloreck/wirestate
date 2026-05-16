@@ -41,15 +41,17 @@ export function Application() {
 With locally declared container:
 
 ```tsx
-import { createIocContainer } from "@wirestate/core";
-import { IocProvider, IocActivator } from "@wirestate/react";
+import { createIocContainer, Container } from "@wirestate/core";
+import { IocProvider, IocActivator, useRootContainer } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 export function Application() {
-  const [container] = useState(() =>
-    createIocContainer({
-      entries: [CounterService, LoggerService],
-    })
+  const container: Container = useRootContainer(
+    () =>
+      createIocContainer({
+        entries: [CounterService, LoggerService],
+      }),
+    []
   );
 
   return (
@@ -57,6 +59,32 @@ export function Application() {
       <IocActivator activate={[LoggerService]}>
         <SomeComponent />
       </IocActivator>
+    </IocProvider>
+  );
+}
+```
+
+### `useRootContainer(factory, deps)`
+
+Creates and memoizes a root container for the component instance.
+The factory runs again only when `deps` change or on dev mode HMR refreshment.
+
+```tsx
+import { Container, createIocContainer } from "@wirestate/core";
+import { useRootContainer } from "@wirestate/react";
+
+function Root() {
+  const container: Container = useRootContainer(
+    () =>
+      createIocContainer({
+        entries: [CounterService, LoggerService],
+      }),
+    []
+  );
+
+  return (
+    <IocProvider container={container}>
+      <SomeComponent />
     </IocProvider>
   );
 }

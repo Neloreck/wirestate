@@ -19,6 +19,7 @@ export { useContainer } from "./provision/use-container";
 export { useContainerRevision } from "./provision/use-container-revision";
 export { useInjection } from "./provision/use-injection";
 export { useOptionalInjection } from "./provision/use-optional-injection";
+export { useRootContainer } from "./provision/use-root-container";
 export { useScope } from "./provision/use-scope";
 
 export { useEvent } from "./events/use-event";
