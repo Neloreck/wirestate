@@ -17,10 +17,10 @@ You can provide bindings and services to activate directly in the options:
 
 ```ts
 const container: Container = createIocContainer({
-  entries: [UserService, { id: "CONFIG", value: { a: 1, b: 2 } }],
-  activate: [UserService],
   seed: { apiUrl: "https://api.example.com" },
   seeds: [[UserService, { cache: false }]],
+  entries: [UserService, { id: "CONFIG", value: { a: 1, b: 2 } }],
+  activate: [UserService],
 });
 ```
 
@@ -41,34 +41,25 @@ Use child containers to isolate a subtree of services (e.g., a modal, a wizard s
 
 ### IocProvider
 
-`IocProvider` creates the root container for the React tree. It must be the outermost Wirestate provider.
+`IocProvider` provides the root container for the React tree. It must be the outermost Wirestate provider.
 
 ```tsx
+import { createIocContainer } from "@wirestate/core";
 import { IocProvider } from "@wirestate/react";
+import { CounterService, LoggerService } from "./services";
+
+const container: Container = createIocContainer({
+  entries: [CounterService, LoggerService],
+  activate: [LoggerService],
+});
 
 export function Application() {
   return (
-    <IocProvider>
-      <Router />
+    <IocProvider container={container}>
+      <SomeComponent />
     </IocProvider>
   );
 }
-```
-
-Pass a parent container to the root container:
-
-```tsx
-<IocProvider container={parentContainer}>
-  <Router />
-</IocProvider>
-```
-
-Pass a seed to the root container:
-
-```tsx
-<IocProvider seed={{ apiUrl: process.env.API_URL }}>
-  <Router />
-</IocProvider>
 ```
 
 ### createInjectablesProvider
@@ -87,7 +78,7 @@ export const InjectablesProvider = createInjectablesProvider([CartService, Check
 ```tsx
 export function Application() {
   return (
-    <IocProvider>
+    <IocProvider container={container}>
       <InjectablesProvider>
         <CheckoutFlow />
       </InjectablesProvider>

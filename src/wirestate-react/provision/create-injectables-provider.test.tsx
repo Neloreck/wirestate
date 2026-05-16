@@ -4,7 +4,6 @@ import {
   Injectable,
   OnActivated,
   OnDeactivation,
-  SEED,
   SeedEntries,
   SEEDS,
   WirestateError,
@@ -160,7 +159,7 @@ describe("createInjectablesProvider", () => {
   });
 
   it("should accept seeds props", () => {
-    const container = mockContainer();
+    const container: Container = mockContainer();
     const Provider = createInjectablesProvider([GenericService]);
 
     const seeds: SeedEntries = [
@@ -178,22 +177,15 @@ describe("createInjectablesProvider", () => {
         <Provider seeds={seeds}>
           <div />
         </Provider>,
-        container,
-        { global: true }
+        container
       )
     );
 
     expect(container.get(SEEDS)).toEqual(new Map(seeds));
-    expect(container.get(SEED)).toEqual({
-      global: true,
-    });
 
     unmount();
 
     expect(container.get(SEEDS)).toEqual(new Map());
-    expect(container.get(SEED)).toEqual({
-      global: true,
-    });
   });
 
   it("should throw if rendered outside IocProvider", () => {

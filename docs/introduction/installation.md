@@ -15,6 +15,8 @@ Wirestate consists of a core package and UI-specific bindings.
 To use wirestate you will need `@wirestate/core` and specific binding packages depending on rendering and 
 state management libraries you use.
 
+Select <ins>one of</ins> the variants matching your setup below:
+
 ### 2.A `React` with `signals`
 
 ```bash

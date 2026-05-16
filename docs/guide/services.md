@@ -12,11 +12,11 @@ import { Injectable } from "@wirestate/core";
 
 @Injectable()
 export class UserService {
-  // ..
-
   public currentUser: User | null = null;
 
-  // ..
+  public logCurrentUser(): void {
+    console.log("Current user:", this.currentUser);
+  }
 }
 ```
 
@@ -108,8 +108,6 @@ export class FeedService {
       await this.loadFeed(seed.feedId);
     }
   }
-
-  // ...
 }
 ```
 
@@ -136,8 +134,6 @@ export class PollingService {
       this.timerId = 0;
     }
   }
-
-  // ...
 }
 ```
 
@@ -163,8 +159,6 @@ export class DataService {
       this.data.value = data;
     }
   }
-
-  // ...
 }
 ```
 

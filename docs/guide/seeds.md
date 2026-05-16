@@ -9,7 +9,7 @@ A single object available to all services in the container.
 Inject it via the `SEED` token or access from a `WireScope` instance.
 
 ```ts
-import { Container, createIocContainer } from "@wirestate/core";
+import { applySharedSeed, Container, createIocContainer, SEED } from "@wirestate/core";
 
 interface GlobalSeed {
   apiUrl: string;
@@ -19,6 +19,10 @@ interface GlobalSeed {
 const container: Container = createIocContainer({
   seed: { apiUrl: "https://api.example.com", locale: "en-US" } as GlobalSeed,
 });
+
+applySharedSeed(container, { apiUrl: "https://api2.example.com", locale: "en-GB" });
+
+const seed: GlobalSeed = container.get(SEED);
 ```
 
 ### Service
@@ -48,6 +52,28 @@ export class ApiClient {
 ```
 
 ### React
+
+```tsx
+import { applySharedSeed, createIocContainer, Container } from "@wirestate/core";
+import { IocProvider } from "@wirestate/react";
+import { CounterService } from "./CounterService";
+
+const container: Container = createIocContainer({
+  entries: [CounterService],
+});
+
+export function Application() {
+  useEffect(() => {
+    applySharedSeed(container, { apiUrl: "https://api.next.example.com", locale: "en-US" });
+  }, []);
+
+  return (
+    <IocProvider container={container}>
+      <RootPage />
+    </IocProvider>
+  );
+}
+```
 
 ```tsx
 import { SEED } from "@wirestate/core";
@@ -125,16 +151,26 @@ export class CounterService {
 ### React
 
 ```tsx
-import { createInjectablesProvider, IocProvider } from "@wirestate/react";
+import { applySeeds, createIocContainer, Container } from "@wirestate/core";
+import { IocProvider } from "@wirestate/react";
 import { CounterService } from "./CounterService";
 
-const InjectablesProvider = createInjectablesProvider([CounterService]);
+const container: Container = createIocContainer({
+  seeds: [[CounterService, { count: 5 }]],
+  entries: [CounterService],
+});
 
-<IocProvider seed={{ apiUrl: "https://api.example.com" }}>
-  <InjectablesProvider seeds={[[CounterService, { count: 42 }]]}>
-    <RootPage />
-  </InjectablesProvider>
-</IocProvider>;
+export function Application() {
+  useEffect(() => {
+    applySeeds(container, [[CounterService, { count: 50 }]]);
+  }, []);
+
+  return (
+    <IocProvider container={container}>
+      <RootPage />
+    </IocProvider>
+  );
+}
 ```
 
 ### Lit

@@ -18,11 +18,18 @@ npm install @wirestate/core @wirestate/react reflect-metadata
 Root provider. Creates the top-level IoC container. Place once near the root of your application.
 
 ```tsx
+import { createIocContainer } from '@wirestate/core';
 import { IocProvider } from '@wirestate/react';
+import { CounterService, LoggerService } from './services';
 
-export function App() {
+const container: Container = createIocContainer({
+  entries: [CounterService, LoggerService],
+  activate: [LoggerService]
+});
+
+export function Application() {
   return (
-    <IocProvider>
+    <IocProvider container={container}>
       <SomeComponent />
     </IocProvider>
   );

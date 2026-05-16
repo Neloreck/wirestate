@@ -1,1 +1,1 @@
-export { createLitProvision } from "./test-utils/create-lit-provision";
+export { createLitProvision, LitProvisionFixture } from "./test-utils/create-lit-provision";

@@ -15,8 +15,8 @@ It separates your business logic from the UI layer, making it easier to scale, t
 ### 1. Define a Service
 
 ```ts
-import { Injectable } from '@wirestate/core';
-import { signal, Signal } from '@wirestate/react-signals';
+import { Injectable } from "@wirestate/core";
+import { signal, Signal } from "@wirestate/react-signals";
 
 @Injectable()
 export class CounterService {
@@ -31,17 +31,18 @@ export class CounterService {
 ### 2. Provide the Service
 
 ```tsx
-import { IocProvider, createInjectablesProvider } from '@wirestate/react';
-import { CounterService } from './CounterService';
+import { createIocContainer, Container } from "@wirestate/core";
+import { IocProvider, createInjectablesProvider } from "@wirestate/react";
+import { CounterService } from "./CounterService";
 
-const InjectablesProvider = createInjectablesProvider([CounterService]);
+const container: Container = createIocContainer({
+  entries: [CounterService],
+});
 
 export function Application() {
   return (
-    <IocProvider>
-      <InjectablesProvider>
-        <Counter />
-      </InjectablesProvider>
+    <IocProvider container={container}>
+      <Counter />
     </IocProvider>
   );
 }
@@ -50,16 +51,12 @@ export function Application() {
 ### 3. Use the Service
 
 ```tsx
-import { useInjection } from '@wirestate/react';
-import { CounterService } from './CounterService';
+import { useInjection } from "@wirestate/react";
+import { CounterService } from "./CounterService";
 
 export function Counter() {
   const counterService: CounterService = useInjection(CounterService);
 
-  return (
-    <button onClick={() => counterService.increment()}>
-      Count: {counterService.count.value}
-    </button>
-  );
+  return <button onClick={() => counterService.increment()}>Count: {counterService.count.value}</button>;
 }
 ```

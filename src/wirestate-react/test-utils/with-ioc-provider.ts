@@ -15,7 +15,6 @@ import { IocProvider } from "../provision/ioc-provider";
  *
  * @param children - The React tree to be wrapped.
  * @param container - An optional Inversify container. Defaults to a new {@link mockContainer}.
- * @param seed - Optional shared seed data to be applied to the container.
  * @returns A React element wrapped in an {@link IocProvider}.
  *
  * @example
@@ -25,10 +24,6 @@ import { IocProvider } from "../provision/ioc-provider";
  * render(withIocProvider(<MyComponent />, container));
  * ```
  */
-export function withIocProvider(
-  children: ReactNode,
-  container: Container = mockContainer(),
-  seed?: Record<string, unknown>
-) {
-  return createElement(IocProvider, { container, seed }, children);
+export function withIocProvider(children: ReactNode, container: Container = mockContainer()) {
+  return createElement(IocProvider, { container }, children);
 }

@@ -8,6 +8,16 @@ Wirestate provides three message-passing patterns. All three buses live on the c
 | Command | Caller -> handler   | 1 -> 1      | `CommandDescriptor`        |
 | Query   | Caller -> handler   | 1 -> 1      | result \ `Promise<result>` |
 
+
+## Choosing a Pattern
+
+| Use     | When                                                                                      |
+| ------- | ----------------------------------------------------------------------------------------- |
+| Event   | Notification that something happened. Callers don't care who's listening or if anyone is. |
+| Command | Trigger a side-effectful operation. Caller wants to know when it finishes.                |
+| Query   | Read data owned by another service without creating a direct dependency.                  |
+
+
 ## Events
 
 Events are fire-and-forget broadcasts. Any number of services or UI components can subscribe.
@@ -272,11 +282,3 @@ function DateWidget() {
   // ...
 }
 ```
-
-## Choosing a Pattern
-
-| Use     | When                                                                                      |
-| ------- | ----------------------------------------------------------------------------------------- |
-| Event   | Notification that something happened. Callers don't care who's listening or if anyone is. |
-| Command | Trigger a side-effectful operation. Caller wants to know when it finishes.                |
-| Query   | Read data owned by another service without creating a direct dependency.                  |

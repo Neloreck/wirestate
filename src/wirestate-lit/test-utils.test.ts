@@ -1,7 +1,7 @@
 describe("Library exported API from wirestate/lit/test-utils", () => {
   const libRoot = require("./test-utils");
 
-  const expectedLibExports: Array<string> = ["createLitProvision"];
+  const expectedLibExports: Array<string> = ["createLitProvision", "LitProvisionFixture"];
 
   const assertListIntersection = (first: Array<string>, second: Array<string>) => {
     first.forEach((it: string) => {

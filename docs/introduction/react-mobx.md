@@ -69,18 +69,17 @@ Wrap state mutations in `@Action()` to batch MobX updates and keep reactions con
 `createInjectablesProvider` creates a React component that binds services into a child IoC container. `IocProvider` provides the root container.
 
 ```tsx
-import { IocProvider, createInjectablesProvider } from "@wirestate/react";
-import { CounterService } from "./CounterService";
-import { LoggerService } from "./LoggerService";
+import { Container, createIocContainer } from "@wirestate/core";
+import { IocProvider } from "@wirestate/react";
 
-const InjectablesProvider = createInjectablesProvider([CounterService, LoggerService]);
+const container: Container = createIocContainer({
+  entries: [CounterService, LoggerService],
+});
 
 export function Application() {
   return (
     <IocProvider>
-      <InjectablesProvider>
-        <Counter />
-      </InjectablesProvider>
+      <Counter />
     </IocProvider>
   );
 }
@@ -93,7 +92,6 @@ Wrap components in `observer` so they re-render when observed properties change.
 ```tsx
 import { useInjection } from "@wirestate/react";
 import { observer } from "@wirestate/react-mobx";
-import { CounterService } from "./CounterService";
 
 export const Counter = observer(function () {
   const counterService: CounterService = useInjection(CounterService);
@@ -270,6 +268,19 @@ function ThemeToggle() {
 
 Pass initialization data to services when the provider mounts. Read seeds in `@OnActivated` and apply them inside an `@Action()` to keep MobX updates batched.
 
+```tsx
+const container: Container = createIocContainer({
+  seeds: [[CounterService, { initialCount: 10 }]],
+  entries: [CounterService],
+});
+```
+
+```tsx
+<IocProvider container={container}>
+  <Application />
+</IocProvider>;
+```
+
 ```ts
 import { Injectable, Inject, OnActivated, WireScope } from "@wirestate/core";
 import { Observable, Action, makeObservable } from "@wirestate/react-mobx";
@@ -306,24 +317,12 @@ export class CounterService {
 }
 ```
 
-```tsx
-const SEEDS = [[CounterService, { initialCount: 10 }]];
-
-const InjectablesProvider = createInjectablesProvider([CounterService]);
-
-<InjectablesProvider seeds={SEEDS}>
-  <Application />
-</InjectablesProvider>;
-```
-
 ### Testing
 
 Services are plain classes — test them without a UI framework.
 
 ```ts
 import { mockContainer } from "@wirestate/core/test-utils";
-import { CounterService } from "./CounterService";
-import { LoggerService } from "./LoggerService";
 
 test("increments counter", () => {
   const container = mockContainer({ entries: [LoggerService, CounterService] });
