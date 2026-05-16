@@ -17,14 +17,16 @@ npm install @wirestate/core @wirestate/react reflect-metadata
 
 Root provider. Creates the top-level IoC container. Place once near the root of your application.
 
+With globally declared container:
+
 ```tsx
-import { createIocContainer } from '@wirestate/core';
-import { IocProvider } from '@wirestate/react';
-import { CounterService, LoggerService } from './services';
+import { createIocContainer, Container } from "@wirestate/core";
+import { IocProvider } from "@wirestate/react";
+import { CounterService, LoggerService } from "./services";
 
 const container: Container = createIocContainer({
   entries: [CounterService, LoggerService],
-  activate: [LoggerService]
+  activate: [LoggerService],
 });
 
 export function Application() {
@@ -36,14 +38,38 @@ export function Application() {
 }
 ```
 
+With locally declared container:
+
+```tsx
+import { createIocContainer } from "@wirestate/core";
+import { IocProvider, IocActivator } from "@wirestate/react";
+import { CounterService, LoggerService } from "./services";
+
+export function Application() {
+  const [container] = useState(() =>
+    createIocContainer({
+      entries: [CounterService, LoggerService],
+    })
+  );
+
+  return (
+    <IocProvider container={container}>
+      <IocActivator activate={[LoggerService]}>
+        <SomeComponent />
+      </IocActivator>
+    </IocProvider>
+  );
+}
+```
+
 ### `createInjectablesProvider`
 
 Creates a component that binds a set of services into a child container scoped to the component's lifetime.
 Services are activated on mount and deactivated on unmount. Expects to be under `IocProvider` tree.
 
 ```tsx
-import { createInjectablesProvider } from '@wirestate/react';
-import { CounterService, LoggerService } from './services';
+import { createInjectablesProvider } from "@wirestate/react";
+import { CounterService, LoggerService } from "./services";
 
 const InjectionProvider = createInjectablesProvider([CounterService, LoggerService]);
 
@@ -58,12 +84,31 @@ export function CounterPage() {
 
 **Props:**
 
-| Prop | Type | Description |
-|---|---|---|
-| `seed` | `object` | Shared seed injected into all services via `@Inject(SEED)` |
+| Prop    | Type          | Description                                                 |
+| ------- | ------------- | ----------------------------------------------------------- |
 | `seeds` | `SeedEntries` | Per-service seeds, e.g. `[[CounterService, { count: 10 }]]` |
 
-Both `seed` and `seeds` are applied on first render only.
+`seeds` are applied on first render only.
+
+### `IocActivator`
+
+Resolves a list of already bound services from the current container before rendering children.
+Useful when services should be eagerly activated for a subtree.
+
+```tsx
+import { IocActivator } from "@wirestate/react";
+import { CounterService, LoggerService } from "./services";
+
+export function CounterPage() {
+  return (
+    <IocActivator activate={[CounterService, LoggerService]}>
+      <CounterView />
+    </IocActivator>
+  );
+}
+```
+
+`IocActivator` runs activation once per container instance. If the container changes, activation runs again.
 
 ## Injection hooks
 
@@ -72,8 +117,8 @@ Both `seed` and `seeds` are applied on first render only.
 Resolves a value from the nearest container. Re-resolves when the container resets.
 
 ```tsx
-import { useInjection } from '@wirestate/react';
-import { CounterService } from './services';
+import { useInjection } from "@wirestate/react";
+import { CounterService } from "./services";
 
 function CounterView() {
   const counter = useInjection(CounterService);
@@ -94,8 +139,8 @@ Returns a function that emits an event into the current container's event bus.
 ```tsx
 const emit = useEventEmitter();
 
-emit('RESET');
-emit('ADD', { amount: 5 });
+emit("RESET");
+emit("ADD", { amount: 5 });
 ```
 
 ### `useEvent(type, handler)`
@@ -103,7 +148,7 @@ emit('ADD', { amount: 5 });
 Subscribes a handler to a single event type for the lifetime of the component.
 
 ```tsx
-useEvent('RESET', (event) => {
+useEvent("RESET", (event) => {
   console.log(event.type, event.payload);
 });
 ```
@@ -113,7 +158,7 @@ useEvent('RESET', (event) => {
 Subscribes to multiple event types with a single handler.
 
 ```tsx
-useEvents(['RESET', 'CLEAR'], (event) => {
+useEvents(["RESET", "CLEAR"], (event) => {
   console.log(event.type, event.payload);
 });
 ```
@@ -138,7 +183,7 @@ Returns a function that dispatches a command and waits for its result.
 const call = useCommandCaller();
 
 async function handleClick() {
-  await call('LOGIN', { username: 'alice' }).task;
+  await call("LOGIN", { username: "alice" }).task;
 }
 ```
 
@@ -151,7 +196,7 @@ Same as `useCommandCaller` but returns `null` if no handler is registered.
 Registers a command handler from a component for the lifetime of the component.
 
 ```tsx
-useCommandHandler('SCROLL_TOP', () => {
+useCommandHandler("SCROLL_TOP", () => {
   window.scrollTo(0, 0);
 });
 ```
@@ -164,7 +209,7 @@ Returns an async function that calls a query handler and resolves its return val
 
 ```tsx
 const query = useQueryCaller();
-const items = await query('GET_ITEMS');
+const items = await query("GET_ITEMS");
 ```
 
 ### `useSyncQueryCaller()`
@@ -180,7 +225,7 @@ Return `null` when no handler is registered instead of throwing.
 Registers a query handler from a component.
 
 ```tsx
-useQueryHandler('GET_SCROLL_POS', () => window.scrollY);
+useQueryHandler("GET_SCROLL_POS", () => window.scrollY);
 ```
 
 ## Container hooks
@@ -200,7 +245,7 @@ Returns the current `WireScope` linked to the nearest container.
 ## Test utilities
 
 ```ts
-import { withIocProvider } from '@wirestate/react/test-utils';
+import { withIocProvider } from "@wirestate/react/test-utils";
 ```
 
 `withIocProvider(children, container?, seed?)` — wraps a React tree with an `IocProvider` for use in tests.

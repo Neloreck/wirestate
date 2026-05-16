@@ -14,21 +14,14 @@ npm install @wirestate/lit-signals @lit-labs/signals
 ## Usage
 
 ```ts
-import {
-  signal,
-  computed,
-  watch,
-  Signal,
-  State,
-  Computed,
-} from '@wirestate/lit-signals';
+import { signal, computed, watch, Signal, State, Computed } from "@wirestate/lit-signals";
 ```
 
 Example service:
 
 ```ts
-import { Injectable, Inject, WireScope } from '@wirestate/core';
-import { signal, computed, State, Computed } from '@wirestate/lit-signals';
+import { Injectable, Inject, WireScope } from "@wirestate/core";
+import { signal, computed, State, Computed } from "@wirestate/lit-signals";
 
 @Injectable()
 export class CounterService {
@@ -46,14 +39,14 @@ export class CounterService {
 Example Lit element:
 
 ```ts
-import { LitElement, html } from 'lit';
-import { customElement } from 'lit/decorators.js';
-import { injection } from '@wirestate/lit';
-import { watch, computed } from '@wirestate/lit-signals';
+import { LitElement, html } from "lit";
+import { customElement } from "lit/decorators.js";
+import { injection } from "@wirestate/lit";
+import { watch, computed } from "@wirestate/lit-signals";
 
-import { CounterService } from './services';
+import { CounterService } from "./services";
 
-@customElement('my-component')
+@customElement("my-component")
 class MyComponent extends LitElement {
   @injection({ injectionId: CounterService })
   private readonly counterService!: CounterService;

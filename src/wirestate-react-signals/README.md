@@ -20,20 +20,14 @@ npm install --save-dev @preact/signals-react-transform
 ## Usage
 
 ```ts
-import {
-  signal,
-  computed,
-  effect,
-  Signal,
-  ReadonlySignal,
-} from '@wirestate/react-signals';
+import { signal, computed, effect, Signal, ReadonlySignal } from "@wirestate/react-signals";
 ```
 
 Example service:
 
 ```ts
-import { Injectable, Inject, WireScope } from '@wirestate/core';
-import { signal, computed, Signal, ReadonlySignal } from '@wirestate/react-signals';
+import { Injectable, Inject, WireScope } from "@wirestate/core";
+import { signal, computed, Signal, ReadonlySignal } from "@wirestate/react-signals";
 
 @Injectable()
 export class CounterService {

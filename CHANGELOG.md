@@ -12,6 +12,7 @@
 - Extensive JSDoc coverage for wirestate packages
 - `createIocContainer`: Added ability to instantly provide and activate entries, targeted seeds
 - `IocProvider`: No nested logics, no seed provision anymore, just plain rough provider
+- `IocActivator`: Added separate activation component
 
 ## 0.6.3
 

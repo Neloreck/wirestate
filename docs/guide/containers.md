@@ -89,6 +89,26 @@ export function Application() {
 
 Services bound at a higher provider are available to all child providers through Inversify's container hierarchy.
 
+### IocActivator
+
+`IocActivator` resolves listed services from the current container before rendering children.
+Use it when services are already bound and should be activated eagerly for a subtree.
+
+```tsx
+import { IocActivator } from "@wirestate/react";
+import { CartService, CheckoutService } from "./services";
+
+export function CheckoutPage() {
+  return (
+    <IocActivator activate={[CartService, CheckoutService]}>
+      <CheckoutFlow />
+    </IocActivator>
+  );
+}
+```
+
+Activation runs once per container instance and runs again when the container instance changes.
+
 ### Passing Seeds to a Provider
 
 ```tsx
@@ -102,7 +122,8 @@ const SEEDS = [[CartService, { items: hydratedItems }]];
 ### Accessing the Container Directly
 
 ```tsx
-import { Container, WireScope, useContainer, useScope } from "@wirestate/react";
+import { Container, WireScope } from "@wirestate/core";
+import { useContainer, useScope } from "@wirestate/react";
 
 function DevTools() {
   const container: Container = useContainer();

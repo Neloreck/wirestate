@@ -14,20 +14,13 @@ npm install @wirestate/react-mobx mobx mobx-react-lite
 ## Usage
 
 ```ts
-import {
-  makeObservable,
-  observer,
-  Observable,
-  ShallowObservable,
-  Action,
-  Computed,
-} from '@wirestate/react-mobx';
+import { makeObservable, observer, Observable, ShallowObservable, Action, Computed } from "@wirestate/react-mobx";
 ```
 
 ## Decorator wrappers
 
 | Export                | Wraps                |
-|-----------------------|----------------------|
+| --------------------- | -------------------- |
 | `Observable()`        | `observable`         |
 | `ShallowObservable()` | `observable.shallow` |
 | `RefObservable()`     | `observable.ref`     |
@@ -38,8 +31,8 @@ import {
 Example:
 
 ```ts
-import { Injectable, Inject, WireScope } from '@wirestate/core';
-import { makeObservable, Observable, Action } from '@wirestate/react-mobx';
+import { Injectable, Inject, WireScope } from "@wirestate/core";
+import { makeObservable, Observable, Action } from "@wirestate/react-mobx";
 
 @Injectable()
 export class CounterService {

@@ -12,7 +12,7 @@
     "build:esm": "rollup -c cli/build/rollup.esm.config.js --bundleConfigAsCjs",
     "build:pkg": "ts-node cli/deploy/prepare.ts",
     "build:ptb": "rollup -c cli/build/rollup.esm.portable.config.js --bundleConfigAsCjs",
-    "build:ptb:debug": "LIB_DEBUG_LOGGING=true rollup -c cli/build/rollup.esm.portable.config.js --bundleConfigAsCjs",
+    "build:ptb:debug": "npx cross-env LIB_DEBUG_LOGGING=true rollup -c cli/build/rollup.esm.portable.config.js --bundleConfigAsCjs",
     "clean": "rimraf ./target",
     "deploy": "pnpm pre-deploy && ts-node cli/deploy/publish.ts",
     "deploy:experimental": "pnpm pre-deploy && ts-node cli/deploy/publish.ts --tag experimental",

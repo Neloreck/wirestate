@@ -8,16 +8,17 @@ export { useQueryHandler } from "./queries/use-query-handler";
 export { useSyncQueryCaller } from "./queries/use-sync-query-caller";
 export { useOptionalSyncQueryCaller } from "./queries/use-optional-sync-query-caller";
 
-export { useInjection } from "./provision/use-injection";
-export { useOptionalInjection } from "./provision/use-optional-injection";
 export {
   createInjectablesProvider,
   InjectablesProvider,
   InjectablesProviderProps as InjectablesProviderProps,
 } from "./provision/create-injectables-provider";
+export { IocActivator, IocActivatorProps } from "./provision/ioc-activator";
 export { IocProvider } from "./provision/ioc-provider";
 export { useContainer } from "./provision/use-container";
 export { useContainerRevision } from "./provision/use-container-revision";
+export { useInjection } from "./provision/use-injection";
+export { useOptionalInjection } from "./provision/use-optional-injection";
 export { useScope } from "./provision/use-scope";
 
 export { useEvent } from "./events/use-event";

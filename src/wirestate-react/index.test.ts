@@ -6,6 +6,8 @@ describe("Library exported API from wirestate-react", () => {
     "EventEmitter",
     "InjectablesProvider",
     "InjectablesProviderProps",
+    "IocActivator",
+    "IocActivatorProps",
     "IocProvider",
     "OptionalCommandCaller",
     "OptionalQueryCaller",

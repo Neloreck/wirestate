@@ -78,7 +78,7 @@ const container: Container = createIocContainer({
 
 export function Application() {
   return (
-    <IocProvider>
+    <IocProvider container={container}>
       <Counter />
     </IocProvider>
   );

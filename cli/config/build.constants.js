@@ -25,8 +25,8 @@ export const TARGET_ROOT = path.resolve(PROJECT_ROOT, "./target");
 export const PKG_ROOT = path.resolve(TARGET_ROOT, "./pkg");
 
 export const DIST_ROOT = path.resolve(TARGET_ROOT, "./dist");
-export const PORTABLE_ROOT = path.resolve(DIST_ROOT, "./portable");
-export const PORTABLE_DEBUG_ROOT = path.resolve(DIST_ROOT, "./portable-debug");
+export const PORTABLE_ROOT = path.resolve(DIST_ROOT, "./wirestate-portable");
+export const PORTABLE_DEBUG_ROOT = path.resolve(DIST_ROOT, "./wirestate-portable-debug");
 export const STATS_ROOT = path.resolve(DIST_ROOT, "./stats");
 
 export const TS_BUILD_CONFIG = path.resolve(__dirname, "./tsconfig.build.json");
