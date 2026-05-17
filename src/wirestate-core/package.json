@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/core",
-  "version": "0.7.0",
+  "version": "0.7.0-experimental.1",
   "description": "Store management library core based on inversify",
   "sideEffects": false,
   "author": "Syrotenko Igor",
