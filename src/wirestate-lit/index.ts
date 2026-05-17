@@ -17,14 +17,17 @@ export { onQuery, OnQueryDecorator } from "./queries/on-query";
 export { OnQueryController } from "./queries/on-query-controller";
 export { useOnQuery, UseOnQueryOptions } from "./queries/use-on-query";
 
-export { IocContextObject, IocContext } from "./context/ioc-context";
+export { ContainerContext } from "./context/container-context";
 
-export { iocProvide, IocProviderDecorator } from "./provision/ioc-provide";
-export { IocProviderController, IocProviderControllerOptions } from "./provision/ioc-provider-controller";
-export { injectablesProvide, InjectablesProviderDecorator } from "./provision/injectables-provide";
+export { containerProvide, ContainerProviderDecorator } from "./provision/container-provide";
 export {
-  InjectablesProviderController,
-  InjectablesProviderControllerOptions,
-} from "./provision/injectables-provider-controller";
-export { useInjectablesProvider } from "./provision/use-injectables-provider";
-export { useIocProvision, UseIocProvisionOptions } from "./provision/use-ioc-provision";
+  ContainerProviderController,
+  ContainerProviderControllerOptions,
+} from "./provision/container-provider-controller";
+export { subContainerProvide, SubContainerProviderDecorator } from "./provision/sub-container-provide";
+export {
+  SubContainerProviderController,
+  SubContainerProviderControllerOptions,
+} from "./provision/sub-container-provider-controller";
+export { useSubContainerProvider } from "./provision/use-sub-container-provider";
+export { useContainerProvision, UseContainerProvisionOptions } from "./provision/use-container-provision";

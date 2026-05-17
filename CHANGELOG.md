@@ -1,4 +1,4 @@
-## 0.7.0
+## Unreleased
 
 - Add `useScope` in `@wirestate/react`
 - New lit elements modules - `@wirestate/lit` and `@wirestate/lit-signals`
@@ -17,6 +17,10 @@
 - `ContainerProvider`: Simpler provider for containers.
 - `SubContainerProvider`: Added component solving problems of removed `createInjectablesProvider`
 - `ContainerActivator`: Added separate activation component
+- Replace IoC-context provision APIs with `ContainerContext`, `containerProvide`, `ContainerProviderController`, and `useContainerProvision`
+- Replace injectables-provider APIs with `subContainerProvide`, `SubContainerProviderController`, and `useSubContainerProvider`
+- Provide plain `Container` values through Lit context instead of wrapper objects
+- Recreate managed child containers when the parent container context changes
 
 ## 0.6.3
 

@@ -5,7 +5,7 @@ import { QueryBus, QueryHandler, QueryType, QueryUnregister } from "@wirestate/c
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { IocContextObject } from "../context/ioc-context";
+import { ContainerContext } from "../context/container-context";
 import { Optional } from "../types/general";
 
 /**
@@ -38,10 +38,10 @@ export class OnQueryController<D = unknown, R = unknown> implements ReactiveCont
     dbg.info(prefix(__filename), "Constructing:", { host, type });
 
     new ContextConsumer(host, {
-      context: IocContextObject,
+      context: ContainerContext,
       subscribe: true,
-      callback: (context) => {
-        this.bus = context.container.get(QueryBus);
+      callback: (container) => {
+        this.bus = container.get(QueryBus);
 
         if (host.isConnected) {
           this.reregister();

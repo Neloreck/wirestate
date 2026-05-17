@@ -78,26 +78,22 @@ describe("OnCommandController", () => {
     expect(await descriptor.task).toBe(42);
   });
 
-  it("should re-register when IoC context is updated (revision, container)", () => {
-    const container: Container = mockContainer();
-    const bus: CommandBus = container.get(CommandBus);
+  it("should re-register when container context is updated", () => {
+    const firstContainer: Container = mockContainer();
+    const secondContainer: Container = mockContainer();
+    const bus: CommandBus = firstContainer.get(CommandBus);
     const element: TestConsumerElement = new TestConsumerElement();
     const handler = jest.fn();
 
-    const { provider, contextProvider } = createLitProvision(container);
+    const { provider, contextProvider } = createLitProvision(firstContainer);
 
     new OnCommandController(element, "REVISION_COMMAND", handler);
 
     provider.appendChild(element);
     expect(bus.has("REVISION_COMMAND")).toBe(true);
 
-    contextProvider.setValue({ ...contextProvider.value, revision: 1000 });
-    expect(bus.has("REVISION_COMMAND")).toBe(true);
-
-    const newContainer: Container = mockContainer();
-
-    contextProvider.setValue({ ...contextProvider.value, container: newContainer });
-    expect(container.get(CommandBus).has("REVISION_COMMAND")).toBe(false);
-    expect(newContainer.get(CommandBus).has("REVISION_COMMAND")).toBe(true);
+    contextProvider.setValue(secondContainer);
+    expect(firstContainer.get(CommandBus).has("REVISION_COMMAND")).toBe(false);
+    expect(secondContainer.get(CommandBus).has("REVISION_COMMAND")).toBe(true);
   });
 });

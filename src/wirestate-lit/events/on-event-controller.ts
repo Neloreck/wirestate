@@ -5,7 +5,7 @@ import { Event, EventBus, EventHandler, EventType, EventUnsubscriber } from "@wi
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { IocContextObject } from "../context/ioc-context";
+import { ContainerContext } from "../context/container-context";
 import { Optional } from "../types/general";
 
 /**
@@ -38,10 +38,10 @@ export class OnEventController<E extends Event = Event> implements ReactiveContr
     this.handler = handler;
 
     new ContextConsumer(host, {
-      context: IocContextObject,
+      context: ContainerContext,
       subscribe: true,
-      callback: (context) => {
-        this.bus = context.container.get(EventBus);
+      callback: (container) => {
+        this.bus = container.get(EventBus);
 
         if (host.isConnected) {
           this.resubscribe();

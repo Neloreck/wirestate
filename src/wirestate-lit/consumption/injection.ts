@@ -2,7 +2,7 @@ import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
 import { ServiceIdentifier } from "@wirestate/core";
 
-import { IocContextObject } from "../context/ioc-context";
+import { ContainerContext } from "../context/container-context";
 import { AnyObject, FieldMustMatchProvidedType, Interface } from "../types/general";
 
 /**
@@ -94,9 +94,9 @@ export function injection<T>(optionsOrInjectionId: InjectionOptions<T> | Service
     if (typeof nameOrContext === "object") {
       nameOrContext.addInitializer(function () {
         new ContextConsumer(this, {
-          context: IocContextObject,
-          callback: (it) => {
-            protoOrTarget.set.call(this, it.container.get(injectionId));
+          context: ContainerContext,
+          callback: (container) => {
+            protoOrTarget.set.call(this, container.get(injectionId));
           },
           subscribe: !once,
         });
@@ -105,9 +105,9 @@ export function injection<T>(optionsOrInjectionId: InjectionOptions<T> | Service
       // Experimental decorators branch.
       (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement): void => {
         new ContextConsumer(element, {
-          context: IocContextObject,
-          callback: (it) => {
-            (element as AnyObject)[nameOrContext] = it.container.get(injectionId);
+          context: ContainerContext,
+          callback: (container) => {
+            (element as AnyObject)[nameOrContext] = container.get(injectionId);
           },
           subscribe: !once,
         });

@@ -1,0 +1,16 @@
+import { createContext } from "@lit/context";
+import { Container } from "inversify";
+
+/**
+ * Unique symbol used as a key for the IoC context.
+ *
+ * @group Context
+ */
+export const CONTAINER_KEY: unique symbol = Symbol("ContainerContext");
+
+/**
+ * Lit context object for providing and consuming the container.
+ *
+ * @group Context
+ */
+export const ContainerContext = createContext<Container>(CONTAINER_KEY);
