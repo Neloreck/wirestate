@@ -1,14 +1,3 @@
-import { signal, Signal } from "@wirestate/react-signals";
-
-import { EGlobalCommand } from "@/constants/commands";
-import { EGlobalEvent } from "@/constants/events";
-import {
-  GLOBAL_CONFIG,
-  GLOBAL_DYNAMIC_CONFIG,
-  GLOBAL_NOT_EXISTING_CONFIG,
-} from "@/constants/id";
-import { EGlobalQuery } from "@/constants/queries";
-import { ThemeService } from "@/services/ThemeService";
 import {
   Inject,
   Injectable,
@@ -20,7 +9,18 @@ import {
   type Event,
   OnCommand,
   WireScope,
-} from "@/wirestate-react-signals";
+} from "@wirestate/core";
+import { signal, Signal } from "@wirestate/react-signals";
+
+import { EGlobalCommand } from "@/constants/commands";
+import { EGlobalEvent } from "@/constants/events";
+import {
+  GLOBAL_CONFIG,
+  GLOBAL_DYNAMIC_CONFIG,
+  GLOBAL_NOT_EXISTING_CONFIG,
+} from "@/constants/id";
+import { EGlobalQuery } from "@/constants/queries";
+import { ThemeService } from "@/services/ThemeService";
 
 export interface ILogEntry {
   readonly id: number;
@@ -71,6 +71,8 @@ export class LoggerService {
 
     // [*] Pass safe lifecycle checks - can emit from deactivation.
     this.scope.emitEvent(`deactivating/${this.constructor.name}`);
+
+    this.clear();
   }
 
   public clear(): void {
