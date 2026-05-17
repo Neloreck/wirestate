@@ -7,12 +7,7 @@ import "@/components/events-log";
 import "@/components/queries-data";
 
 import { BindingType, ScopeBindingType } from "@wirestate/core";
-import {
-  IocProviderController,
-  InjectablesProviderController,
-  useInjectablesProvider,
-  useIocProvision,
-} from "@wirestate/lit";
+import { ContainerProvider, containerProvide } from "@wirestate/lit";
 import { LitElement, html, CSSResult, TemplateResult, css } from "lit";
 import { customElement } from "lit/decorators.js";
 
@@ -35,32 +30,33 @@ export class Application extends LitElement {
     `,
   ];
 
-  public readonly ioc: IocProviderController = useIocProvision(this);
-  public readonly injectables: InjectablesProviderController = useInjectablesProvider(this, {
-    entries: [
-      LoggerService,
-      CounterService,
-      ThemeService,
-      // [*] Pass DI check - allow injecting static values / configs.
-      {
-        id: GLOBAL_CONFIG,
-        value: { first: 1, second: 2, third: null, random: Math.random() },
-      },
-      // [*] Pass DI check - allow injecting dynamic values / configs.
-      {
-        id: GLOBAL_DYNAMIC_CONFIG,
-        value: { random: Math.random(), another: true },
-        bindingType: BindingType.DynamicValue,
-        scopeBindingType: ScopeBindingType.Singleton,
-      },
-    ],
-    activate: [LoggerService],
-    seeds: [
-      [CounterService, { count: 10 }],
-      [LoggerService, { enabled: true }],
-    ],
-    into: () => this.ioc.value,
-  });
+  @containerProvide({
+    options: {
+      seeds: [
+        [CounterService, { count: 10 }],
+        [LoggerService, { enabled: true }],
+      ],
+      entries: [
+        LoggerService,
+        CounterService,
+        ThemeService,
+        // [*] Pass DI check - allow injecting static values / configs.
+        {
+          id: GLOBAL_CONFIG,
+          value: { first: 1, second: 2, third: null, random: Math.random() },
+        },
+        // [*] Pass DI check - allow injecting dynamic values / configs.
+        {
+          id: GLOBAL_DYNAMIC_CONFIG,
+          value: { random: Math.random(), another: true },
+          bindingType: BindingType.DynamicValue,
+          scopeBindingType: ScopeBindingType.Singleton,
+        },
+      ],
+      activate: [LoggerService],
+    },
+  })
+  public readonly containerProvider!: ContainerProvider;
 
   public render(): TemplateResult {
     return html`
