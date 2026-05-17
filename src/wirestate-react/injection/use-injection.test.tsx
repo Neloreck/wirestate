@@ -42,7 +42,7 @@ describe("useInjection", () => {
     expect(getByTestId("injectable-name").textContent).toBe("GenericService");
   });
 
-  it("should throw error when used outside of IocProvider", () => {
+  it("should throw error when used outside of ContainerProvider", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     const { getByText } = render(

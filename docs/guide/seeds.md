@@ -55,7 +55,7 @@ export class ApiClient {
 
 ```tsx
 import { applySharedSeed, createContainer, Container } from "@wirestate/core";
-import { IocProvider } from "@wirestate/react";
+import { ContainerProvider } from "@wirestate/react";
 import { CounterService } from "./CounterService";
 
 const container: Container = createContainer({
@@ -68,9 +68,9 @@ export function Application() {
   }, []);
 
   return (
-    <IocProvider container={container}>
+    <ContainerProvider container={container}>
       <RootPage />
-    </IocProvider>
+    </ContainerProvider>
   );
 }
 ```
@@ -152,7 +152,7 @@ export class CounterService {
 
 ```tsx
 import { applySeeds, createContainer, Container } from "@wirestate/core";
-import { IocProvider } from "@wirestate/react";
+import { ContainerProvider } from "@wirestate/react";
 import { CounterService } from "./CounterService";
 
 const container: Container = createContainer({
@@ -166,9 +166,9 @@ export function Application() {
   }, []);
 
   return (
-    <IocProvider container={container}>
+    <ContainerProvider container={container}>
       <RootPage />
-    </IocProvider>
+    </ContainerProvider>
   );
 }
 ```

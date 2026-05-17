@@ -55,11 +55,11 @@ export class CounterService {
 
 ### Providing Services
 
-Create application container and provided it via `IocProvider`.
+Create an application container and provide it via `ContainerProvider`.
 
 ```tsx
 import { Container, createContainer } from "@wirestate/core";
-import { IocProvider } from "@wirestate/react";
+import { ContainerProvider } from "@wirestate/react";
 
 const container: Container = createContainer({
   entries: [CounterService, LoggerService],
@@ -67,9 +67,9 @@ const container: Container = createContainer({
 
 export function Application() {
   return (
-    <IocProvider>
+    <ContainerProvider container={container}>
       <Counter />
-    </IocProvider>
+    </ContainerProvider>
   );
 }
 ```
@@ -215,9 +215,9 @@ const container: Container = createContainer({
 ```
 
 ```tsx
-<IocProvider container={container}>
+<ContainerProvider container={container}>
   <Application />
-</IocProvider>;
+</ContainerProvider>;
 ```
 
 ```ts

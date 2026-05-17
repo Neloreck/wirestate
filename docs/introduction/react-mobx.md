@@ -66,11 +66,11 @@ Wrap state mutations in `@Action()` to batch MobX updates and keep reactions con
 
 ### Providing Services
 
-`createInjectablesProvider` creates a React component that binds services into a child IoC container. `IocProvider` provides the root container.
+`ContainerProvider` provides the root container for the React tree.
 
 ```tsx
 import { Container, createContainer } from "@wirestate/core";
-import { IocProvider } from "@wirestate/react";
+import { ContainerProvider } from "@wirestate/react";
 
 const container: Container = createContainer({
   entries: [CounterService, LoggerService],
@@ -78,9 +78,9 @@ const container: Container = createContainer({
 
 export function Application() {
   return (
-    <IocProvider container={container}>
+    <ContainerProvider container={container}>
       <Counter />
-    </IocProvider>
+    </ContainerProvider>
   );
 }
 ```
@@ -276,9 +276,9 @@ const container: Container = createContainer({
 ```
 
 ```tsx
-<IocProvider container={container}>
+<ContainerProvider container={container}>
   <Application />
-</IocProvider>;
+</ContainerProvider>;
 ```
 
 ```ts

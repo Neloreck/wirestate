@@ -32,7 +32,7 @@ export class CounterService {
 
 ```tsx
 import { createContainer, Container } from "@wirestate/core";
-import { IocProvider, createInjectablesProvider } from "@wirestate/react";
+import { ContainerProvider } from "@wirestate/react";
 import { CounterService } from "./CounterService";
 
 const container: Container = createContainer({
@@ -41,9 +41,9 @@ const container: Container = createContainer({
 
 export function Application() {
   return (
-    <IocProvider container={container}>
+    <ContainerProvider container={container}>
       <Counter />
-    </IocProvider>
+    </ContainerProvider>
   );
 }
 ```

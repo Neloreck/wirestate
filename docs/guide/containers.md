@@ -39,13 +39,13 @@ Use child containers to isolate a subtree of services (e.g., a modal, a wizard s
 
 ## React
 
-### IocProvider
+### ContainerProvider
 
-`IocProvider` provides the root container for the React tree. It must be the outermost Wirestate provider.
+`ContainerProvider` provides the root container for the React tree. It must be the outermost Wirestate provider.
 
 ```tsx
-import { createContainer } from "@wirestate/core";
-import { IocProvider, useRootContainer } from "@wirestate/react";
+import { Container, createContainer } from "@wirestate/core";
+import { ContainerActivator, ContainerProvider, useRootContainer } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 export function Application() {
@@ -58,25 +58,22 @@ export function Application() {
   );
 
   return (
-    <IocProvider container={container}>
-      <IocActivator activate={[LoggerService]}>
+    <ContainerProvider container={container}>
+      <ContainerActivator activate={[LoggerService]}>
         <SomeComponent />
-      </IocActivator>
-    </IocProvider>
+      </ContainerActivator>
+    </ContainerProvider>
   );
 }
 ```
 
 `useRootContainer` is useful when the root container should be created inside a component and recreated only when dependencies change.
-It also respects HMR refreshing and causes store recreation on replacement of dependency services used in provided factory function.
 
----
-
-For globally declared store outside of React rendering tree following approach can be used:
+For globally declared container outside of the React rendering tree, use a prebuilt container:
 
 ```tsx
-import { createContainer } from "@wirestate/core";
-import { IocProvider, useRootContainer } from "@wirestate/react";
+import { Container, createContainer } from "@wirestate/core";
+import { ContainerProvider } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 const container: Container = createContainer({
@@ -86,54 +83,61 @@ const container: Container = createContainer({
 
 export function Application() {
   return (
-    <IocProvider container={container}>
+    <ContainerProvider container={container}>
       <SomeComponent />
-    </IocProvider>
+    </ContainerProvider>
   );
 }
 ```
 
-### createInjectablesProvider
+### SubContainerProvider
 
-Creates a component that binds a fixed list of services to the React tree provided container.
-Services are activated on mount and deactivated on unmount.
+`SubContainerProvider` creates a child container under the current `ContainerProvider` and binds services for that subtree.
+Use it when a branch of the tree needs scoped services or per-service seeds.
 
-```ts
-import { createInjectablesProvider } from "@wirestate/react";
+```tsx
+import { ReactNode } from "react";
+import { SubContainerProvider } from "@wirestate/react";
 import { CartService } from "./CartService";
 import { CheckoutService } from "./CheckoutService";
 
-export const InjectablesProvider = createInjectablesProvider([CartService, CheckoutService]);
+export function CheckoutServicesProvider(props: { children?: ReactNode }) {
+  return (
+    <SubContainerProvider entries={[CartService, CheckoutService]}>
+      {props.children}
+    </SubContainerProvider>
+  );
+}
 ```
 
 ```tsx
 export function Application() {
   return (
-    <IocProvider container={container}>
-      <InjectablesProvider>
+    <ContainerProvider container={container}>
+      <CheckoutServicesProvider>
         <CheckoutFlow />
-      </InjectablesProvider>
-    </IocProvider>
+      </CheckoutServicesProvider>
+    </ContainerProvider>
   );
 }
 ```
 
-Services bound at a higher provider are available to all child providers through Inversify's container hierarchy.
+Services bound at a higher provider are available to child providers through Inversify's container hierarchy.
 
-### IocActivator
+### ContainerActivator
 
-`IocActivator` resolves listed services from the current container before rendering children.
+`ContainerActivator` resolves listed services from the current container before rendering children.
 Use it when services are already bound and should be activated eagerly for a subtree.
 
 ```tsx
-import { IocActivator } from "@wirestate/react";
+import { ContainerActivator } from "@wirestate/react";
 import { CartService, CheckoutService } from "./services";
 
 export function CheckoutPage() {
   return (
-    <IocActivator activate={[CartService, CheckoutService]}>
+    <ContainerActivator activate={[CartService, CheckoutService]}>
       <CheckoutFlow />
-    </IocActivator>
+    </ContainerActivator>
   );
 }
 ```
@@ -145,9 +149,9 @@ Activation runs once per container instance and runs again when the container in
 ```tsx
 const SEEDS = [[CartService, { items: hydratedItems }]];
 
-<InjectablesProvider seeds={SEEDS}>
+<SubContainerProvider entries={[CartService, CheckoutService]} seeds={SEEDS}>
   <CheckoutFlow />
-</InjectablesProvider>;
+</SubContainerProvider>;
 ```
 
 ### Accessing the Container Directly

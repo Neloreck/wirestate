@@ -109,23 +109,19 @@ mockBindService(container, CounterService, { skipLifecycle: true });
 
 ## React Testing
 
-Wrap a component tree with an `IocProvider` backed by a test container:
+Wrap a component tree with `withContainerProvider` to apply a test container without manually rendering `ContainerProvider`:
 
 ```tsx
-import { IocProvider } from "@wirestate/react";
 import { render } from "@testing-library/react";
 import { mockContainer } from "@wirestate/core/test-utils";
+import { withContainerProvider } from "@wirestate/react/test-utils";
 import { CounterService } from "./CounterService";
 import { Counter } from "./Counter";
 
 test("renders count", () => {
   const container = mockContainer({ entries: [CounterService], activate: [CounterService] });
 
-  const { getByText } = render(
-    <IocProvider container={container}>
-      <Counter />
-    </IocProvider>
-  );
+  const { getByText } = render(withContainerProvider(<Counter />, container));
 
   expect(getByText("Count: 0")).toBeInTheDocument();
 });

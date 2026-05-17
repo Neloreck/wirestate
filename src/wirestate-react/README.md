@@ -15,7 +15,8 @@ npm install @wirestate/core @wirestate/react reflect-metadata
 
 ### `ContainerProvider`
 
-Root provider. Creates the top-level IoC container. Place once near the root of your application.
+Root provider. Exposes the top-level container to the React tree. Pass either an existing container instance or
+`createContainer(...)` options.
 
 With globally declared container:
 
@@ -42,7 +43,7 @@ With locally declared container:
 
 ```tsx
 import { createContainer, Container } from "@wirestate/core";
-import { ContaierProvider, ContainerActivator, useRootContainer } from "@wirestate/react";
+import { ContainerActivator, ContainerProvider, useRootContainer } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 export function Application() {
@@ -55,11 +56,11 @@ export function Application() {
   );
 
   return (
-    <ContaierProvider container={container}>
+    <ContainerProvider container={container}>
       <ContainerActivator activate={[LoggerService]}>
         <SomeComponent />
       </ContainerActivator>
-    </ContaierProvider>
+    </ContainerProvider>
   );
 }
 ```
@@ -71,7 +72,7 @@ The factory runs again only when `deps` change or on dev mode HMR refreshment.
 
 ```tsx
 import { Container, createContainer } from "@wirestate/core";
-import { useRootContainer, ContainerProvider } from "@wirestate/react";
+import { ContainerProvider, useRootContainer } from "@wirestate/react";
 
 function Root() {
   const container: Container = useRootContainer(
@@ -90,33 +91,39 @@ function Root() {
 }
 ```
 
-### `createInjectablesProvider`
+### `SubContainerProvider`
 
-Creates a component that binds a set of services into a child container scoped to the component's lifetime.
-Services are activated on mount and deactivated on unmount. Expects to be under `ContainerProvider` tree.
+Creates a child container scoped to a subtree.
+Use it under `ContainerProvider` when a branch needs its own service bindings or per-service seeds.
 
 ```tsx
-import { createInjectablesProvider } from "@wirestate/react";
+import { ReactNode } from "react";
+import { SubContainerProvider } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
-const InjectionProvider = createInjectablesProvider([CounterService, LoggerService]);
+function CounterServicesProvider(props: { children?: ReactNode }) {
+  return (
+    <SubContainerProvider entries={[CounterService, LoggerService]}>
+      {props.children}
+    </SubContainerProvider>
+  );
+}
 
 export function CounterPage() {
   return (
-    <InjectionProvider>
+    <CounterServicesProvider>
       <CounterView />
-    </InjectionProvider>
+    </CounterServicesProvider>
   );
 }
 ```
 
 **Props:**
 
-| Prop    | Type          | Description                                                 |
-| ------- | ------------- | ----------------------------------------------------------- |
-| `seeds` | `SeedEntries` | Per-service seeds, e.g. `[[CounterService, { count: 10 }]]` |
-
-`seeds` are applied on first render only.
+| Prop      | Type                | Description                                                                    |
+| --------- | ------------------- | ------------------------------------------------------------------------------ |
+| `entries` | `InjectableEntries` | Services or binding descriptors to add to the child container.                 |
+| `seeds`   | `SeedEntries`       | Per-service seeds, e.g. `[[CounterService, { count: 10 }]]`. Applied on mount. |
 
 ### `ContainerActivator`
 
@@ -262,10 +269,6 @@ useQueryHandler("GET_SCROLL_POS", () => window.scrollY);
 
 Returns the nearest `Container` instance. Useful for advanced manual resolution.
 
-### `useContainerRevision()`
-
-Returns a counter that increments each time the container is reset. Use to trigger effects when the container changes.
-
 ### `useScope()`
 
 Returns the current `WireScope` linked to the nearest container.
@@ -276,7 +279,7 @@ Returns the current `WireScope` linked to the nearest container.
 import { withContainerProvider } from "@wirestate/react/test-utils";
 ```
 
-`withContainerProvider(children, container?, seed?)` — wraps a React tree with an `ContainerProvider` for use in tests.
+`withContainerProvider(children, container?)` wraps a React tree with a `ContainerProvider` for use in tests.
 
 ## License
 

@@ -21,7 +21,7 @@ import { ContainerProvider } from "../provision/container-provider";
  * ```tsx
  * const container: Container = mockContainer();
  *
- * render(withIocProvider(<MyComponent />, container));
+ * render(withContainerProvider(<MyComponent />, container));
  * ```
  */
 export function withContainerProvider(children: ReactNode, container: Container = mockContainer()) {
