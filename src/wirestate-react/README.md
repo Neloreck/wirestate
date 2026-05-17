@@ -13,27 +13,27 @@ npm install @wirestate/core @wirestate/react reflect-metadata
 
 ## Providers
 
-### `IocProvider`
+### `ContainerProvider`
 
 Root provider. Creates the top-level IoC container. Place once near the root of your application.
 
 With globally declared container:
 
 ```tsx
-import { createIocContainer, Container } from "@wirestate/core";
-import { IocProvider } from "@wirestate/react";
+import { createContainer, Container } from "@wirestate/core";
+import { ContainerProvider } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
-const container: Container = createIocContainer({
+const container: Container = createContainer({
   entries: [CounterService, LoggerService],
   activate: [LoggerService],
 });
 
 export function Application() {
   return (
-    <IocProvider container={container}>
+    <ContainerProvider container={container}>
       <SomeComponent />
-    </IocProvider>
+    </ContainerProvider>
   );
 }
 ```
@@ -41,25 +41,25 @@ export function Application() {
 With locally declared container:
 
 ```tsx
-import { createIocContainer, Container } from "@wirestate/core";
-import { IocProvider, IocActivator, useRootContainer } from "@wirestate/react";
+import { createContainer, Container } from "@wirestate/core";
+import { ContaierProvider, ContainerActivator, useRootContainer } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 export function Application() {
   const container: Container = useRootContainer(
     () =>
-      createIocContainer({
+      createContainer({
         entries: [CounterService, LoggerService],
       }),
     []
   );
 
   return (
-    <IocProvider container={container}>
-      <IocActivator activate={[LoggerService]}>
+    <ContaierProvider container={container}>
+      <ContainerActivator activate={[LoggerService]}>
         <SomeComponent />
-      </IocActivator>
-    </IocProvider>
+      </ContainerActivator>
+    </ContaierProvider>
   );
 }
 ```
@@ -70,22 +70,22 @@ Creates and memoizes a root container for the component instance.
 The factory runs again only when `deps` change or on dev mode HMR refreshment.
 
 ```tsx
-import { Container, createIocContainer } from "@wirestate/core";
-import { useRootContainer } from "@wirestate/react";
+import { Container, createContainer } from "@wirestate/core";
+import { useRootContainer, ContainerProvider } from "@wirestate/react";
 
 function Root() {
   const container: Container = useRootContainer(
     () =>
-      createIocContainer({
+      createContainer({
         entries: [CounterService, LoggerService],
       }),
     []
   );
 
   return (
-    <IocProvider container={container}>
+    <ContainerProvider container={container}>
       <SomeComponent />
-    </IocProvider>
+    </ContainerProvider>
   );
 }
 ```
@@ -93,7 +93,7 @@ function Root() {
 ### `createInjectablesProvider`
 
 Creates a component that binds a set of services into a child container scoped to the component's lifetime.
-Services are activated on mount and deactivated on unmount. Expects to be under `IocProvider` tree.
+Services are activated on mount and deactivated on unmount. Expects to be under `ContainerProvider` tree.
 
 ```tsx
 import { createInjectablesProvider } from "@wirestate/react";
@@ -118,25 +118,25 @@ export function CounterPage() {
 
 `seeds` are applied on first render only.
 
-### `IocActivator`
+### `ContainerActivator`
 
 Resolves a list of already bound services from the current container before rendering children.
 Useful when services should be eagerly activated for a subtree.
 
 ```tsx
-import { IocActivator } from "@wirestate/react";
+import { ContainerActivator } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 export function CounterPage() {
   return (
-    <IocActivator activate={[CounterService, LoggerService]}>
+    <ContainerActivator activate={[CounterService, LoggerService]}>
       <CounterView />
-    </IocActivator>
+    </ContainerActivator>
   );
 }
 ```
 
-`IocActivator` runs activation once per container instance. If the container changes, activation runs again.
+`ContainerActivator` runs activation once per container instance. If the container changes, activation runs again.
 
 ## Injection hooks
 
@@ -273,10 +273,10 @@ Returns the current `WireScope` linked to the nearest container.
 ## Test utilities
 
 ```ts
-import { withIocProvider } from "@wirestate/react/test-utils";
+import { withContainerProvider } from "@wirestate/react/test-utils";
 ```
 
-`withIocProvider(children, container?, seed?)` — wraps a React tree with an `IocProvider` for use in tests.
+`withContainerProvider(children, container?, seed?)` — wraps a React tree with an `ContainerProvider` for use in tests.
 
 ## License
 
