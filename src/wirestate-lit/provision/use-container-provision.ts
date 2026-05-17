@@ -1,13 +1,13 @@
 import { ReactiveControllerHost } from "@lit/reactive-element";
 
-import { ContainerProviderController, ContainerProviderControllerOptions } from "./container-provider-controller";
+import { ContainerProvider, ContainerProviderOptions } from "./container-provider";
 
 /**
  * Represents options for the {@link useContainerProvision} hook.
  *
  * @group Provision
  */
-export type UseContainerProvisionOptions = ContainerProviderControllerOptions;
+export type UseContainerProvisionOptions = ContainerProviderOptions;
 
 /**
  * Hook that provides a container to the host element and its children.
@@ -24,12 +24,12 @@ export type UseContainerProvisionOptions = ContainerProviderControllerOptions;
  * @param options - Provisioning options.
  * @param options.container - External container instance to provide.
  * @param options.options - Managed container creation options.
- * @returns An instance of {@link ContainerProviderController}.
+ * @returns An instance of {@link ContainerProvider}.
  *
  * @example
  * ```typescript
  * class MyRootElement extends LitElement {
- *   private container: ContainerProviderController = useContainerProvision(this, {
+ *   private containerProvider: ContainerProvider = useContainerProvision(this, {
  *     options: {
  *       entries: [LoggerService],
  *       activate: [LoggerService],
@@ -41,13 +41,13 @@ export type UseContainerProvisionOptions = ContainerProviderControllerOptions;
  * @example
  * ```typescript
  * class MyRootElement extends LitElement {
- *   private container: ContainerProviderController = useContainerProvision(this, { container: container });
+ *   private containerProvider: ContainerProvider = useContainerProvision(this, { container: container });
  * }
  * ```
  */
 export function useContainerProvision<E extends ReactiveControllerHost & HTMLElement>(
   host: E,
   options: UseContainerProvisionOptions
-): ContainerProviderController<E> {
-  return new ContainerProviderController(host, options);
+): ContainerProvider<E> {
+  return new ContainerProvider(host, options);
 }

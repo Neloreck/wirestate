@@ -2,7 +2,7 @@ import { ReactiveElement } from "@lit/reactive-element";
 
 import { FieldMustMatchProvidedType, Interface, Maybe } from "../types/general";
 
-import { ContainerProviderController, ContainerProviderControllerOptions } from "./container-provider-controller";
+import { ContainerProvider, ContainerProviderOptions } from "./container-provider";
 
 /**
  * Represents interface for the {@link containerProvide} decorator.
@@ -14,7 +14,7 @@ import { ContainerProviderController, ContainerProviderControllerOptions } from 
  */
 export interface ContainerProviderDecorator<E extends ReactiveElement = ReactiveElement> {
   // Standard:
-  <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V extends ContainerProviderController<E>>(
+  <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V extends ContainerProvider<E>>(
     value: ClassAccessorDecoratorTarget<C, V>,
     context: ClassAccessorDecoratorContext<C, V>
   ): void;
@@ -22,7 +22,7 @@ export interface ContainerProviderDecorator<E extends ReactiveElement = Reactive
   <K extends PropertyKey, Proto extends Interface<Omit<ReactiveElement, "renderRoot">>>(
     protoOrDescriptor: Proto,
     name?: K
-  ): FieldMustMatchProvidedType<Proto, K, ContainerProviderController<E>>;
+  ): FieldMustMatchProvidedType<Proto, K, ContainerProvider<E>>;
 }
 
 /**
@@ -53,7 +53,7 @@ export interface ContainerProviderDecorator<E extends ReactiveElement = Reactive
  *       entries: [LoggerService],
  *     },
  *   })
- *   private container!: ContainerProviderController;
+ *   private containerProvider!: ContainerProvider;
  * }
  * ```
  *
@@ -61,32 +61,32 @@ export interface ContainerProviderDecorator<E extends ReactiveElement = Reactive
  * ```typescript
  * class MyRootElement extends LitElement {
  *   @containerProvide({ container: container })
- *   private container!: ContainerProviderController;
+ *   private containerProvider!: ContainerProvider;
  * }
  * ```
  */
 export function containerProvide<E extends ReactiveElement>(
-  options: ContainerProviderControllerOptions
+  options: ContainerProviderOptions
 ): ContainerProviderDecorator<E> {
   return ((
-    protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, ContainerProviderController<E>>,
-    nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, ContainerProviderController<E>>
+    protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, ContainerProvider<E>>,
+    nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, ContainerProvider<E>>
   ) => {
     if (typeof nameOrContext === "object") {
       // Standard decorators:
       nameOrContext.addInitializer(function () {
-        protoOrTarget.set.call(this, new ContainerProviderController(this as unknown as E, options));
+        protoOrTarget.set.call(this, new ContainerProvider(this as unknown as E, options));
       });
     } else {
-      let controller: Maybe<ContainerProviderController<E>>;
+      let controller: Maybe<ContainerProvider<E>>;
 
       (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement): void => {
-        controller = new ContainerProviderController(element as E, options);
+        controller = new ContainerProvider(element as E, options);
       });
 
       return {
-        get(this: ReactiveElement): ContainerProviderController<E> {
-          return controller as ContainerProviderController<E>;
+        get(this: ReactiveElement): ContainerProvider<E> {
+          return controller as ContainerProvider<E>;
         },
         set(): void {},
         configurable: true,

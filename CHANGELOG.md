@@ -10,15 +10,16 @@
 - Export more alias / methods from `@wirestate/react-mobx`
 - Export missing methods typing for `@wirestate/core`
 - Extensive JSDoc coverage for wirestate packages
-- `createIocContainer`: Added ability to instantly provide and activate entries, targeted seeds
+- `createIocContainer`: Removed in favor of `createContainer`
+- `createContainer`: Added ability to instantly provide and activate entries, targeted seeds
 - `createInjectablesProvider`: Removed.
 - `IocProvider`: Removed
 - `useRootContainer`: Added separate hook for store management in React tree
 - `ContainerProvider`: Simpler provider for containers.
 - `SubContainerProvider`: Added component solving problems of removed `createInjectablesProvider`
 - `ContainerActivator`: Added separate activation component
-- Replace IoC-context provision APIs with `ContainerContext`, `containerProvide`, `ContainerProviderController`, and `useContainerProvision`
-- Replace injectables-provider APIs with `subContainerProvide`, `SubContainerProviderController`, and `useSubContainerProvider`
+- Replace IoC-context provision APIs with `ContainerContext`, `containerProvide`, `ContainerProvider`, and `useContainerProvision`
+- Replace injectables-provider APIs with `subContainerProvide`, `SubContainerProvider`, and `useSubContainerProvider`
 - Provide plain `Container` values through Lit context instead of wrapper objects
 - Recreate managed child containers when the parent container context changes
 

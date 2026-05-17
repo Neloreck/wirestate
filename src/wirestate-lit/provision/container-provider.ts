@@ -10,7 +10,7 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { Maybe } from "../types/general";
 
 /**
- * Represents options for the {@link ContainerProviderController}.
+ * Represents options for the {@link ContainerProvider}.
  *
  * @remarks
  * Provide either an external `container` or managed creation `options`, but
@@ -18,13 +18,13 @@ import { Maybe } from "../types/general";
  *
  * @group Provision
  */
-export interface ContainerProviderControllerOptions {
+export interface ContainerProviderOptions {
   /**
    * External container instance to provide as-is.
    *
    * @remarks
    * External containers are never activated, recreated, or disposed by this
-   * controller.
+   * provider.
    */
   readonly container?: Container;
 
@@ -32,7 +32,7 @@ export interface ContainerProviderControllerOptions {
    * Managed container creation options.
    *
    * @remarks
-   * The managed container is created during controller construction without
+   * The managed container is created during provider construction without
    * eager activation, activated when the host connects, disposed when it
    * disconnects, and recreated on the next reconnect.
    */
@@ -40,23 +40,21 @@ export interface ContainerProviderControllerOptions {
 }
 
 /**
- * Controller that provides an IoC container context to the host element and its children.
+ * Provider that exposes an IoC container context to the host element and its children.
  *
  * @remarks
- * The controller supports two modes:
+ * The provider supports two modes:
  *
  * - External mode: `container` is an existing {@link Container}. The
- *   controller passes it through context and does not alter its lifecycle.
- * - Managed mode: `options` is {@link CreateContainerOptions}. The controller
+ *   provider passes it through context and does not alter its lifecycle.
+ * - Managed mode: `options` is {@link CreateContainerOptions}. The provider
  *   creates a container during construction without eager activation,
  *   activates configured entries when the host connects, disposes the
  *   container when the host disconnects, and recreates it on reconnect.
  *
  * @group Provision
  */
-export class ContainerProviderController<
-  E extends ReactiveControllerHost & HTMLElement = ReactiveControllerHost & HTMLElement,
->
+export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = ReactiveControllerHost & HTMLElement>
   extends ContextProvider<typeof ContainerContext, E>
   implements ReactiveController
 {
@@ -70,16 +68,16 @@ export class ContainerProviderController<
    * @param options.container - External container instance to provide.
    * @param options.options - Managed container creation options.
    */
-  public constructor(host: E, options: ContainerProviderControllerOptions) {
+  public constructor(host: E, options: ContainerProviderOptions) {
     if (!options.container && !options.options) {
       throw new WirestateError(
         ERROR_CODE_INVALID_ARGUMENTS,
-        "ContainerProviderController requires a valid container instance or creation options."
+        "ContainerProvider requires a valid container instance or creation options."
       );
     } else if (options.container && options.options) {
       throw new WirestateError(
         ERROR_CODE_INVALID_ARGUMENTS,
-        "ContainerProviderController requires only container or valid options object to be provided."
+        "ContainerProvider requires only container or valid options object to be provided."
       );
     }
 

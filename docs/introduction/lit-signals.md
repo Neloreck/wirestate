@@ -26,22 +26,20 @@ export class CounterService {
 ### 2. Provide the Container and Services
 
 Every Wirestate tree needs a root container (`useContainerProvision`) and, when you want subtree-local services,
-a child-container controller (`useSubContainerProvider`). These hooks are applied to a Lit element that acts as the root.
+a child-container provider (`useSubContainerProvider`). These hooks are applied to a Lit element that acts as the root.
 
 ```ts
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import {
-  ContainerProviderController,
-  SubContainerProviderController,
+  ContainerProvider,
   useContainerProvision,
-  useSubContainerProvider,
 } from "@wirestate/lit";
 import { CounterService } from "./CounterService";
 
 @customElement("application-root")
 export class ApplicationRoot extends LitElement {
-  public readonly container: ContainerProviderController = useContainerProvision(this, {
+  public readonly containerProvider: ContainerProvider = useContainerProvision(this, {
     options: {
       entries: [CounterService],
     },
@@ -114,16 +112,14 @@ export class CounterService {
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import {
-  ContainerProviderController,
-  SubContainerProviderController,
+  ContainerProvider,
   useContainerProvision,
-  useSubContainerProvider,
 } from "@wirestate/lit";
 import { CounterService } from "./CounterService";
 
 @customElement("application-root")
 export class ApplicationRoot extends LitElement {
-  public readonly container: ContainerProviderController = useContainerProvision(this, {
+  public readonly container: ContainerProvider = useContainerProvision(this, {
     options: {
       entries: [CounterService],
       seeds: [[CounterService, { count: 100 }]],

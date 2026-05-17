@@ -2,12 +2,12 @@
 
 ## Root Container
 
-`createIocContainer` creates an Inversify container pre-bound with Wirestate's buses and tokens. All services in the same container share the same `EventBus`, `CommandBus`, and `QueryBus`.
+`createContainer` creates an Inversify container pre-bound with Wirestate's buses and tokens. All services in the same container share the same `EventBus`, `CommandBus`, and `QueryBus`.
 
 ```ts
-import { Container, createIocContainer, bindService } from "@wirestate/core";
+import { Container, createContainer, bindService } from "@wirestate/core";
 
-const container: Container = createIocContainer({ seed: { apiUrl: "https://api.example.com" } });
+const container: Container = createContainer({ seed: { apiUrl: "https://api.example.com" } });
 
 bindService(container, UserService);
 bindService(container, AuthService);
@@ -16,7 +16,7 @@ bindService(container, AuthService);
 You can provide bindings and services to activate directly in the options:
 
 ```ts
-const container: Container = createIocContainer({
+const container: Container = createContainer({
   seed: { apiUrl: "https://api.example.com" },
   seeds: [[UserService, { cache: false }]],
   entries: [UserService, { id: "CONFIG", value: { a: 1, b: 2 } }],
@@ -30,7 +30,7 @@ Pass `parent` to create a child container. Child containers inherit parent bindi
 buses — events emitted in a child do not bubble to the parent.
 
 ```ts
-const child: Container = createIocContainer({ parent: container });
+const child: Container = createContainer({ parent: container });
 
 bindService(child, CartService); // CartService scoped to child
 ```
@@ -44,14 +44,14 @@ Use child containers to isolate a subtree of services (e.g., a modal, a wizard s
 `IocProvider` provides the root container for the React tree. It must be the outermost Wirestate provider.
 
 ```tsx
-import { createIocContainer } from "@wirestate/core";
+import { createContainer } from "@wirestate/core";
 import { IocProvider, useRootContainer } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 export function Application() {
   const container: Container = useRootContainer(
     () =>
-      createIocContainer({
+      createContainer({
         entries: [CounterService, LoggerService],
       }),
     []
@@ -75,11 +75,11 @@ It also respects HMR refreshing and causes store recreation on replacement of de
 For globally declared store outside of React rendering tree following approach can be used:
 
 ```tsx
-import { createIocContainer } from "@wirestate/core";
+import { createContainer } from "@wirestate/core";
 import { IocProvider, useRootContainer } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
-const container: Container = createIocContainer({
+const container: Container = createContainer({
   entries: [CounterService, LoggerService],
   activate: [LoggerService],
 });
@@ -176,7 +176,7 @@ Provide a root container to a Lit subtree.
 ```ts
 import { LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
-import { containerProvide, ContainerProviderController } from "@wirestate/lit";
+import { containerProvide, ContainerProvider } from "@wirestate/lit";
 
 import { CartService } from "./CartService";
 
@@ -189,7 +189,7 @@ class ApplicationRoot extends LitElement {
       seed: { someData: "value" },
     },
   })
-  private container!: ContainerProviderController;
+  private containerProvider!: ContainerProvider;
 }
 ```
 
@@ -204,7 +204,7 @@ Create a managed child container derived from the nearest parent container conte
 ```ts
 import { LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
-import { subContainerProvide, SubContainerProviderController } from "@wirestate/lit";
+import { subContainerProvide, SubContainerProvider } from "@wirestate/lit";
 
 import { CartService } from "./CartService";
 
@@ -216,7 +216,7 @@ class ProvidingElement extends LitElement {
       activate: [CartService],
     },
   })
-  public container!: SubContainerProviderController;
+  public containerProvider!: SubContainerProvider;
 }
 ```
 

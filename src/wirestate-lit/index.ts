@@ -19,15 +19,9 @@ export { useOnQuery, UseOnQueryOptions } from "./queries/use-on-query";
 
 export { ContainerContext } from "./context/container-context";
 
+export { ContainerProvider, ContainerProviderOptions } from "./provision/container-provider";
+export { SubContainerProvider, SubContainerProviderOptions } from "./provision/sub-container-provider";
 export { containerProvide, ContainerProviderDecorator } from "./provision/container-provide";
-export {
-  ContainerProviderController,
-  ContainerProviderControllerOptions,
-} from "./provision/container-provider-controller";
 export { subContainerProvide, SubContainerProviderDecorator } from "./provision/sub-container-provide";
-export {
-  SubContainerProviderController,
-  SubContainerProviderControllerOptions,
-} from "./provision/sub-container-provider-controller";
-export { useSubContainerProvider } from "./provision/use-sub-container-provider";
 export { useContainerProvision, UseContainerProvisionOptions } from "./provision/use-container-provision";
+export { useSubContainerProvider } from "./provision/use-sub-container-provider";

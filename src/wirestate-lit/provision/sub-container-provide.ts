@@ -2,10 +2,7 @@ import { ReactiveElement } from "@lit/reactive-element";
 
 import { FieldMustMatchProvidedType, Interface, Maybe } from "../types/general";
 
-import {
-  SubContainerProviderController,
-  SubContainerProviderControllerOptions,
-} from "./sub-container-provider-controller";
+import { SubContainerProvider, SubContainerProviderOptions } from "./sub-container-provider";
 
 /**
  * Represents type for the {@link subContainerProvide} decorator.
@@ -17,7 +14,7 @@ import {
  */
 export interface SubContainerProviderDecorator<T extends ReactiveElement = ReactiveElement> {
   // Standard (TC39):
-  <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V extends SubContainerProviderController<T>>(
+  <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V extends SubContainerProvider<T>>(
     value: ClassAccessorDecoratorTarget<C, V>,
     context: ClassAccessorDecoratorContext<C, V>
   ): void;
@@ -25,7 +22,7 @@ export interface SubContainerProviderDecorator<T extends ReactiveElement = React
   <K extends PropertyKey, Proto extends Interface<Omit<ReactiveElement, "renderRoot">>>(
     protoOrDescriptor: Proto,
     name?: K
-  ): FieldMustMatchProvidedType<Proto, K, SubContainerProviderController<T>>;
+  ): FieldMustMatchProvidedType<Proto, K, SubContainerProvider<T>>;
 }
 
 /**
@@ -52,34 +49,32 @@ export interface SubContainerProviderDecorator<T extends ReactiveElement = React
  *       activate: [AuthService],
  *     },
  *   })
- *   public controller!: SubContainerProviderController<MyComponent>;
+ *   public containerProvider!: SubContainerProvider<MyComponent>;
  * }
  * ```
  */
 export function subContainerProvide<E extends ReactiveElement = ReactiveElement>(
-  options: SubContainerProviderControllerOptions
+  options: SubContainerProviderOptions
 ): SubContainerProviderDecorator<E> {
   return ((
-    protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, SubContainerProviderController<ReactiveElement>>,
-    nameOrContext:
-      | PropertyKey
-      | ClassAccessorDecoratorContext<ReactiveElement, SubContainerProviderController<ReactiveElement>>
+    protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, SubContainerProvider<ReactiveElement>>,
+    nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, SubContainerProvider<ReactiveElement>>
   ) => {
     if (typeof nameOrContext === "object") {
       // Standard decorators:
       nameOrContext.addInitializer(function () {
-        protoOrTarget.set.call(this, new SubContainerProviderController(this as ReactiveElement, options));
+        protoOrTarget.set.call(this, new SubContainerProvider(this as ReactiveElement, options));
       });
     } else {
-      let controller: Maybe<SubContainerProviderController<E>>;
+      let provider: Maybe<SubContainerProvider<E>>;
 
       (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement): void => {
-        controller = new SubContainerProviderController(element as E, options);
+        provider = new SubContainerProvider(element as E, options);
       });
 
       return {
-        get(this: ReactiveElement): SubContainerProviderController<E> {
-          return controller as SubContainerProviderController<E>;
+        get(this: ReactiveElement): SubContainerProvider<E> {
+          return provider as SubContainerProvider<E>;
         },
         set(): void {},
         configurable: true,

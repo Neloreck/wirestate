@@ -7,9 +7,9 @@ import { customElement } from "lit/decorators.js";
 import { ContainerContext } from "../context/container-context";
 import { Maybe } from "../types/general";
 
-import { ContainerProviderController } from "./container-provider-controller";
+import { ContainerProvider } from "./container-provider";
 
-describe("ContainerProviderController", () => {
+describe("ContainerProvider", () => {
   @customElement("ws-container-provider-host")
   class TestProviderElement extends ReactiveElement {}
 
@@ -23,7 +23,7 @@ describe("ContainerProviderController", () => {
   it("should use the provided container", () => {
     const element: TestProviderElement = new TestProviderElement();
     const container: Container = mockContainer();
-    const controller: ContainerProviderController = new ContainerProviderController(element, {
+    const controller: ContainerProvider = new ContainerProvider(element, {
       container: container,
     });
 
@@ -38,7 +38,7 @@ describe("ContainerProviderController", () => {
     const element: TestProviderElement = new TestProviderElement();
     const container: Container = mockContainer();
     const child: TestChildElement = new TestChildElement();
-    const controller: ContainerProviderController = new ContainerProviderController(element, {
+    const controller: ContainerProvider = new ContainerProvider(element, {
       container,
     });
 
@@ -68,7 +68,7 @@ describe("ContainerProviderController", () => {
     const initialContainer: Container = mockContainer();
     const nextContainer: Container = mockContainer();
     const child: TestChildElement = new TestChildElement();
-    const controller: ContainerProviderController = new ContainerProviderController(element, {
+    const controller: ContainerProvider = new ContainerProvider(element, {
       container: initialContainer,
     });
 
@@ -99,7 +99,7 @@ describe("ContainerProviderController", () => {
     const container: Container = mockContainer();
     const unbindAllSpy = jest.spyOn(container, "unbindAll");
 
-    new ContainerProviderController(element, {
+    new ContainerProvider(element, {
       container,
     });
 
@@ -113,7 +113,7 @@ describe("ContainerProviderController", () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
-    const controller: ContainerProviderController = new ContainerProviderController(element, {
+    const controller: ContainerProvider = new ContainerProvider(element, {
       options: {
         entries: [{ id: CONFIG_TOKEN, value: "managed" }],
       },
@@ -158,7 +158,7 @@ describe("ContainerProviderController", () => {
     }
 
     const element: TestProviderElement = new TestProviderElement();
-    const controller: ContainerProviderController = new ContainerProviderController(element, {
+    const controller: ContainerProvider = new ContainerProvider(element, {
       options: {
         activate: [LifecycleService],
         entries: [LifecycleService],

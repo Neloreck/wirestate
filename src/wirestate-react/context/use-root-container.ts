@@ -21,7 +21,7 @@ import { prefix } from "@/macroses/prefix.macro";
  * ```tsx
  * const container: Container = useRootContainer(
  *   () =>
- *     createIocContainer({
+ *     createContainer({
  *       entries: [CounterService, LoggerService],
  *     }),
  *   []

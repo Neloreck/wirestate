@@ -41,9 +41,9 @@ export class CounterService {
 ## Container
 
 ```ts
-import { createIocContainer, bindService } from "@wirestate/core";
+import { createContainer, bindService } from "@wirestate/core";
 
-const container = createIocContainer({
+const container = createContainer({
   seed: { baseUrl: "https://example.com" },
   entries: [CounterService],
 });

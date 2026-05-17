@@ -19,7 +19,7 @@ npm install @wirestate/core @wirestate/lit lit reflect-metadata
   - **Commands**: Register command handlers using `@onCommand` or `useOnCommand`.
   - **Queries**: Register query handlers using `@onQuery` or `useOnQuery`.
 - **Container Provisioning**: Provide and manage containers within the Lit component tree using `@containerProvide` or `useContainerProvision`.
-- **Sub-containers**: Create managed child containers derived from the parent context using `@subContainerProvide`, `useSubContainerProvider`, or `SubContainerProviderController`.
+- **Sub-containers**: Create managed child containers derived from the parent context using `@subContainerProvide`, `useSubContainerProvider`, or `SubContainerProvider`.
 - **Test Utilities**: Simplified setup for unit testing components with IoC dependencies.
 
 ## Provisioning
@@ -33,7 +33,7 @@ Pass `container` to expose an existing container, or pass `options` to create an
 ```typescript
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
-import { containerProvide, ContainerProviderController } from "@wirestate/lit";
+import { containerProvide, ContainerProvider } from "@wirestate/lit";
 
 @customElement("my-app")
 class MyApp extends LitElement {
@@ -42,7 +42,7 @@ class MyApp extends LitElement {
       seed: { someData: "value" },
     },
   })
-  private container!: ContainerProviderController;
+  private containerProvider!: ContainerProvider;
 
   render() {
     return html`<my-component></my-component>`;
@@ -59,7 +59,7 @@ Using the decorator (accessor):
 ```typescript
 import { LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
-import { subContainerProvide, SubContainerProviderController } from "@wirestate/lit";
+import { subContainerProvide, SubContainerProvider } from "@wirestate/lit";
 
 import { AuthService, UserService } from "./services";
 
@@ -71,7 +71,7 @@ class MyApp extends LitElement {
       activate: [AuthService],
     },
   })
-  public container!: SubContainerProviderController;
+  public containerProvider!: SubContainerProvider;
 }
 ```
 
@@ -93,16 +93,16 @@ class MyApp extends LitElement {
 }
 ```
 
-Using the controller directly:
+Using the provider directly:
 
 ```typescript
 import { LitElement } from "lit";
-import { SubContainerProviderController } from "@wirestate/lit";
+import { SubContainerProvider } from "@wirestate/lit";
 
 import { AuthService, UserService } from "./services";
 
 class MyApp extends LitElement {
-  private container = new SubContainerProviderController(this, {
+  private containerProvider: SubContainerProvider = new SubContainerProvider(this, {
     options: {
       entries: [AuthService, UserService],
       activate: [AuthService],
@@ -120,7 +120,7 @@ import { useSubContainerProvider } from "@wirestate/lit";
 import { AuthService, UserService } from "./services";
 
 class MyApp extends LitElement {
-  private services = useSubContainerProvider(this, {
+  private provider: SubContainerProvider = useSubContainerProvider(this, {
     options: {
       entries: [AuthService, UserService],
       seeds: [[AuthService, { role: "admin" }]],

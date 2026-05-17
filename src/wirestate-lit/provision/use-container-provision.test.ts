@@ -7,7 +7,7 @@ import { customElement } from "lit/decorators.js";
 import { ContainerContext } from "../context/container-context";
 import { Maybe } from "../types/general";
 
-import { ContainerProviderController } from "./container-provider-controller";
+import { ContainerProvider } from "./container-provider";
 import { useContainerProvision } from "./use-container-provision";
 
 describe("useContainerProvision hook", () => {
@@ -21,22 +21,22 @@ describe("useContainerProvision hook", () => {
     Array.from(document.body.childNodes).forEach((it) => it.remove());
   });
 
-  it("should return an instance of IocProviderController", () => {
+  it("should return an instance of ContainerProvider", () => {
     const container: Container = mockContainer();
     const element: TestProviderElement = new TestProviderElement();
-    const controller: ContainerProviderController = useContainerProvision(element, { container });
+    const provider: ContainerProvider = useContainerProvision(element, { container });
 
-    expect(controller).toBeInstanceOf(ContainerProviderController);
+    expect(provider).toBeInstanceOf(ContainerProvider);
   });
 
   it("should create a managed container from creation options", () => {
     const element: TestProviderElement = new TestProviderElement();
-    const controller: ContainerProviderController = useContainerProvision(element, { options: {} });
+    const provider: ContainerProvider = useContainerProvision(element, { options: {} });
 
     document.body.appendChild(element);
 
-    expect(controller.value).toBeDefined();
-    expect(controller.value).toBeInstanceOf(Container);
+    expect(provider.value).toBeDefined();
+    expect(provider.value).toBeInstanceOf(Container);
 
     element.remove();
   });
@@ -44,11 +44,11 @@ describe("useContainerProvision hook", () => {
   it("should use the provided container", () => {
     const container: Container = createContainer();
     const element: TestProviderElement = new TestProviderElement();
-    const controller: ContainerProviderController = useContainerProvision(element, { container });
+    const provider: ContainerProvider = useContainerProvision(element, { container });
 
     document.body.appendChild(element);
 
-    expect(controller.value).toBe(container);
+    expect(provider.value).toBe(container);
 
     element.remove();
   });
@@ -57,7 +57,7 @@ describe("useContainerProvision hook", () => {
     const container: Container = createContainer();
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
-    const controller: ContainerProviderController = useContainerProvision(element, { container });
+    const provider: ContainerProvider = useContainerProvision(element, { container });
 
     document.body.appendChild(element);
 
@@ -74,7 +74,7 @@ describe("useContainerProvision hook", () => {
     element.appendChild(child);
 
     expect(receivedContainer).toBeDefined();
-    expect(receivedContainer).toBe(controller.value);
+    expect(receivedContainer).toBe(provider.value);
 
     element.remove();
   });

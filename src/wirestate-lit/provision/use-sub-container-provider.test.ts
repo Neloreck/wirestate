@@ -4,7 +4,7 @@ import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
 
-import { SubContainerProviderController } from "./sub-container-provider-controller";
+import { SubContainerProvider } from "./sub-container-provider";
 import { useSubContainerProvider } from "./use-sub-container-provider";
 
 describe("useSubContainerProvider", () => {
@@ -31,20 +31,20 @@ describe("useSubContainerProvider", () => {
     fixture = createLitProvision(parent);
 
     const element: TestConsumerElement = new TestConsumerElement();
-    const controller = useSubContainerProvider(element, {
+    const provider: SubContainerProvider = useSubContainerProvider(element, {
       options: {
         entries: [{ id: CONFIG_TOKEN, value: "child-value" }],
       },
     });
 
-    expect(controller).toBeInstanceOf(SubContainerProviderController);
-    expect(controller.value).toBeUndefined();
+    expect(provider).toBeInstanceOf(SubContainerProvider);
+    expect(provider.value).toBeUndefined();
 
     fixture.provider.appendChild(element);
 
-    expect(controller.value).toBeInstanceOf(Container);
-    expect(controller.value).not.toBe(parent);
-    expect(controller.value.get(CONFIG_TOKEN)).toBe("child-value");
-    expect(controller.value.get(PARENT_TOKEN)).toBe("parent-value");
+    expect(provider.value).toBeInstanceOf(Container);
+    expect(provider.value).not.toBe(parent);
+    expect(provider.value.get(CONFIG_TOKEN)).toBe("child-value");
+    expect(provider.value.get(PARENT_TOKEN)).toBe("parent-value");
   });
 });

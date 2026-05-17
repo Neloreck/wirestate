@@ -1,9 +1,6 @@
 import { ReactiveControllerHost } from "@lit/reactive-element";
 
-import {
-  SubContainerProviderController,
-  SubContainerProviderControllerOptions,
-} from "./sub-container-provider-controller";
+import { SubContainerProvider, SubContainerProviderOptions } from "./sub-container-provider";
 
 /**
  * Hook that provides a managed child container for the host element's lifetime.
@@ -18,12 +15,12 @@ import {
  * @param host - The host element.
  * @param options - Provisioning options.
  * @param options.options - Child-container creation options.
- * @returns An instance of {@link SubContainerProviderController}.
+ * @returns An instance of {@link SubContainerProvider}.
  *
  * @example
  * ```typescript
  * class MyComponent extends LitElement {
- *   private container: SubContainerProviderController = useSubContainerProvider(this, {
+ *   private containerProvider: SubContainerProvider = useSubContainerProvider(this, {
  *     options: {
  *       entries: [AuthService, UserService],
  *     },
@@ -33,7 +30,7 @@ import {
  */
 export function useSubContainerProvider<E extends ReactiveControllerHost & HTMLElement>(
   host: E,
-  options: SubContainerProviderControllerOptions
-): SubContainerProviderController<E> {
-  return new SubContainerProviderController<E>(host, options);
+  options: SubContainerProviderOptions
+): SubContainerProvider<E> {
+  return new SubContainerProvider<E>(host, options);
 }

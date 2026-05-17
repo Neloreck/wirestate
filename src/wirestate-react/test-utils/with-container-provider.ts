@@ -19,7 +19,7 @@ import { ContainerProvider } from "../provision/container-provider";
  *
  * @example
  * ```tsx
- * const container: Container = createIocContainer();
+ * const container: Container = mockContainer();
  *
  * render(withIocProvider(<MyComponent />, container));
  * ```

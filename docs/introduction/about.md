@@ -31,11 +31,11 @@ export class CounterService {
 ### 2. Provide the Service
 
 ```tsx
-import { createIocContainer, Container } from "@wirestate/core";
+import { createContainer, Container } from "@wirestate/core";
 import { IocProvider, createInjectablesProvider } from "@wirestate/react";
 import { CounterService } from "./CounterService";
 
-const container: Container = createIocContainer({
+const container: Container = createContainer({
   entries: [CounterService],
 });
 

@@ -16,11 +16,11 @@ import { ContainerContext } from "../context/container-context";
 import { Maybe } from "../types/general";
 
 /**
- * Represents options for the {@link SubContainerProviderController}.
+ * Represents options for the {@link SubContainerProvider}.
  *
  * @group Provision
  */
-export interface SubContainerProviderControllerOptions {
+export interface SubContainerProviderOptions {
   /**
    * Managed child-container creation options.
    *
@@ -49,10 +49,10 @@ export interface SubContainerProviderControllerOptions {
 }
 
 /**
- * Controller that provides a managed child container for the host element's lifetime.
+ * Provider that exposes a managed child container for the host element's lifetime.
  *
  * @remarks
- * The controller always owns a child container derived from the nearest parent
+ * The provider always owns a child container derived from the nearest parent
  * {@link ContainerContext}. When connected, it creates a child container using
  * the latest parent context, provides it to descendants, destroys it when the
  * host disconnects, and replaces it whenever the parent container changes.
@@ -62,7 +62,7 @@ export interface SubContainerProviderControllerOptions {
  * @example
  * ```typescript
  * class MyComponent extends LitElement {
- *   private container = new SubContainerProviderController(this, {
+ *   private container = new SubContainerProvider(this, {
  *     options: {
  *       entries: [AuthService, UserService],
  *       activate: [AuthService],
@@ -72,14 +72,12 @@ export interface SubContainerProviderControllerOptions {
  * }
  * ```
  */
-export class SubContainerProviderController<
-  E extends ReactiveControllerHost & HTMLElement = ReactiveControllerHost & HTMLElement,
->
+export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement = ReactiveControllerHost & HTMLElement>
   extends ContextProvider<typeof ContainerContext, E>
   implements ReactiveController
 {
   protected readonly consumer: ContextConsumer<typeof ContainerContext, E>;
-  protected readonly options: SubContainerProviderControllerOptions["options"];
+  protected readonly options: SubContainerProviderOptions["options"];
 
   protected parent: Maybe<Container> = null;
   protected destroyed: boolean = true;
@@ -88,7 +86,7 @@ export class SubContainerProviderController<
    * @param host - The host element.
    * @param options - Provisioning options, including child entries, eager activations, and seeds.
    */
-  public constructor(host: E, options: SubContainerProviderControllerOptions) {
+  public constructor(host: E, options: SubContainerProviderOptions) {
     super(host, {
       context: ContainerContext,
     });

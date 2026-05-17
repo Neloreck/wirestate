@@ -8,7 +8,7 @@ import { ContainerContext } from "../context/container-context";
 import { Maybe } from "../types/general";
 
 import { containerProvide } from "./container-provide";
-import { ContainerProviderController } from "./container-provider-controller";
+import { ContainerProvider } from "./container-provider";
 
 describe("containerProvide", () => {
   @customElement("ws-container-provide-decorated")
@@ -16,7 +16,7 @@ describe("containerProvide", () => {
     @containerProvide({
       container: mockContainer(),
     })
-    public container!: ContainerProviderController;
+    public containerProvider!: ContainerProvider;
   }
 
   @customElement("ws-container-provide-child")
@@ -26,19 +26,19 @@ describe("containerProvide", () => {
     Array.from(document.body.childNodes).forEach((it) => it.remove());
   });
 
-  it("should expose an ContainerProviderController instance immediately after construction", () => {
+  it("should expose an ContainerProvider instance immediately after construction", () => {
     const element: DecoratedElement = new DecoratedElement();
 
-    expect(element.container).toBeInstanceOf(ContainerProviderController);
-    expect(element.container.value).toBeInstanceOf(Container);
+    expect(element.containerProvider).toBeInstanceOf(ContainerProvider);
+    expect(element.containerProvider.value).toBeInstanceOf(Container);
 
     document.body.appendChild(element);
-    expect(element.container).toBeInstanceOf(ContainerProviderController);
-    expect(element.container.value).toBeInstanceOf(Container);
+    expect(element.containerProvider).toBeInstanceOf(ContainerProvider);
+    expect(element.containerProvider.value).toBeInstanceOf(Container);
 
     element.remove();
-    expect(element.container).toBeInstanceOf(ContainerProviderController);
-    expect(element.container.value).toBeInstanceOf(Container);
+    expect(element.containerProvider).toBeInstanceOf(ContainerProvider);
+    expect(element.containerProvider.value).toBeInstanceOf(Container);
   });
 
   it("should provide container to child elements", () => {
@@ -60,7 +60,7 @@ describe("containerProvide", () => {
     element.appendChild(child);
 
     expect(receivedContainer).toBeDefined();
-    expect(receivedContainer!).toBe(element.container.value);
+    expect(receivedContainer).toBe(element.containerProvider.value);
 
     element.remove();
   });

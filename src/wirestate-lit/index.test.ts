@@ -3,9 +3,9 @@ describe("Library exported API from wirestate/lit", () => {
 
   const expectedLibExports: Array<string> = [
     "ContainerContext",
-    "ContainerProviderController",
-    "ContainerProviderControllerOptions",
+    "ContainerProvider",
     "ContainerProviderDecorator",
+    "ContainerProviderOptions",
     "InjectionDecorator",
     "InjectionOptions",
     "OnCommandController",
@@ -14,9 +14,9 @@ describe("Library exported API from wirestate/lit", () => {
     "OnEventDecorator",
     "OnQueryController",
     "OnQueryDecorator",
-    "SubContainerProviderController",
-    "SubContainerProviderControllerOptions",
+    "SubContainerProvider",
     "SubContainerProviderDecorator",
+    "SubContainerProviderOptions",
     "UseContainerProvisionOptions",
     "UseInjectionOptions",
     "UseInjectionValue",

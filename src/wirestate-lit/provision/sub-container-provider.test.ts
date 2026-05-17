@@ -7,9 +7,9 @@ import { ContainerContext } from "../context/container-context";
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
 import { Maybe } from "../types/general";
 
-import { SubContainerProviderController } from "./sub-container-provider-controller";
+import { SubContainerProvider } from "./sub-container-provider";
 
-describe("SubContainerProviderController", () => {
+describe("SubContainerProvider", () => {
   const CONFIG_TOKEN: string = "CONFIG_TOKEN";
   const PARENT_TOKEN: string = "PARENT_TOKEN";
 
@@ -34,7 +34,7 @@ describe("SubContainerProviderController", () => {
 
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
-    const controller: SubContainerProviderController = new SubContainerProviderController(element, {
+    const provider: SubContainerProvider = new SubContainerProvider(element, {
       options: {
         entries: [{ id: CONFIG_TOKEN, value: "child-value" }],
       },
@@ -54,12 +54,12 @@ describe("SubContainerProviderController", () => {
 
     element.appendChild(child);
 
-    expect(controller.value).toBeInstanceOf(Container);
-    expect(controller.value).not.toBe(parent);
-    expect(controller.value.get(CONFIG_TOKEN)).toBe("child-value");
-    expect(controller.value.get(PARENT_TOKEN)).toBe("parent-value");
+    expect(provider.value).toBeInstanceOf(Container);
+    expect(provider.value).not.toBe(parent);
+    expect(provider.value.get(CONFIG_TOKEN)).toBe("child-value");
+    expect(provider.value.get(PARENT_TOKEN)).toBe("parent-value");
     expect(parent.isBound(CONFIG_TOKEN)).toBe(false);
-    expect(receivedContext).toBe(controller.value);
+    expect(receivedContext).toBe(provider.value);
   });
 
   it("should activate configured entries when the child container is created", () => {
@@ -76,7 +76,7 @@ describe("SubContainerProviderController", () => {
     }
 
     const element: TestProviderElement = new TestProviderElement();
-    const controller: SubContainerProviderController = new SubContainerProviderController(element, {
+    const provider: SubContainerProvider = new SubContainerProvider(element, {
       options: {
         activate: [LifecycleService],
         entries: [LifecycleService],
@@ -87,7 +87,7 @@ describe("SubContainerProviderController", () => {
 
     fixture.provider.appendChild(element);
 
-    expect(controller.value.get(LifecycleService)).toBeInstanceOf(LifecycleService);
+    expect(provider.value.get(LifecycleService)).toBeInstanceOf(LifecycleService);
     expect(lifecycleEvents).toEqual(["activate"]);
   });
 
@@ -110,7 +110,7 @@ describe("SubContainerProviderController", () => {
     }
 
     const element: TestProviderElement = new TestProviderElement();
-    const controller: SubContainerProviderController = new SubContainerProviderController(element, {
+    const provider: SubContainerProvider = new SubContainerProvider(element, {
       options: {
         activate: [LifecycleService],
         entries: [LifecycleService, { id: CONFIG_TOKEN, value: "stable" }],
@@ -119,7 +119,7 @@ describe("SubContainerProviderController", () => {
 
     fixture.provider.appendChild(element);
 
-    const firstContainer: Container = controller.value;
+    const firstContainer: Container = provider.value;
 
     expect(firstContainer.get(CONFIG_TOKEN)).toBe("stable");
     expect(lifecycleEvents).toEqual(["activate"]);
@@ -130,7 +130,7 @@ describe("SubContainerProviderController", () => {
 
     fixture.provider.appendChild(element);
 
-    const secondContainer: Container = controller.value;
+    const secondContainer: Container = provider.value;
 
     expect(secondContainer).not.toBe(firstContainer);
     expect(secondContainer.get(CONFIG_TOKEN)).toBe("stable");
@@ -163,7 +163,7 @@ describe("SubContainerProviderController", () => {
     }
 
     const element: TestProviderElement = new TestProviderElement();
-    const controller: SubContainerProviderController = new SubContainerProviderController(element, {
+    const provider: SubContainerProvider = new SubContainerProvider(element, {
       options: {
         activate: [LifecycleService],
         entries: [LifecycleService, { id: CONFIG_TOKEN, value: "child-value" }],
@@ -172,14 +172,14 @@ describe("SubContainerProviderController", () => {
 
     fixture.provider.appendChild(element);
 
-    const firstContainer: Container = controller.value;
+    const firstContainer: Container = provider.value;
 
     expect(firstContainer.get(PARENT_TOKEN)).toBe("first-parent");
     expect(lifecycleEvents).toEqual(["activate"]);
 
     fixture.contextProvider.value = secondParent;
 
-    const secondContainer: Container = controller.value;
+    const secondContainer: Container = provider.value;
 
     expect(secondContainer).not.toBe(firstContainer);
     expect(secondContainer.get(CONFIG_TOKEN)).toBe("child-value");
@@ -192,7 +192,7 @@ describe("SubContainerProviderController", () => {
 
     const element: TestProviderElement = new TestProviderElement();
 
-    new SubContainerProviderController(element, {
+    new SubContainerProvider(element, {
       options: {
         entries: [{ id: CONFIG_TOKEN, value: "child-value" }],
       },

@@ -70,7 +70,7 @@ export interface CreateContainerOptions {
  *
  * @example
  * ```typescript
- * const container: Container = createIocContainer({
+ * const container: Container = createContainer({
  *   seeds: [
  *     [CounterService, { count: 1000 }],
  *     ["SOME_KEY", "VALUE"],
