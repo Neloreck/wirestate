@@ -1,5 +1,6 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, CommandBus, createContainer, CommandDescriptor, CommandHandler } from "@wirestate/core";
+import { Container, CommandBus, CommandDescriptor, CommandHandler } from "@wirestate/core";
+import { mockContainer } from "@wirestate/core/test-utils";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
 
@@ -11,7 +12,7 @@ describe("useCommandHandler", () => {
   });
 
   it("should register handler and unregister on unmount", async () => {
-    const container: Container = createContainer();
+    const container: Container = mockContainer();
     const commandBus: CommandBus = container.get(CommandBus);
     const handler = jest.fn(() => Promise.resolve("async-data"));
 
@@ -40,7 +41,7 @@ describe("useCommandHandler", () => {
   });
 
   it("should update handler ref when handler changes", async () => {
-    const container: Container = createContainer();
+    const container: Container = mockContainer();
     const commandBus: CommandBus = container.get(CommandBus);
 
     const handler1 = jest.fn().mockReturnValue("first");

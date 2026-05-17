@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react";
-import { Container, createContainer, QueryBus } from "@wirestate/core";
+import { Container, QueryBus } from "@wirestate/core";
+import { mockContainer } from "@wirestate/core/test-utils";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
 import { QueryCaller } from "../types/queries";
@@ -8,7 +9,7 @@ import { useQueryCaller } from "./use-query-caller";
 
 describe("useQueryCaller", () => {
   it("should return a caller that dispatches queries", async () => {
-    const container: Container = createContainer();
+    const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((data: string) => data + "-result");
 
@@ -34,7 +35,7 @@ describe("useQueryCaller", () => {
   });
 
   it("should throw on unhandled queries", async () => {
-    const container: Container = createContainer();
+    const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
 
     jest.spyOn(bus, "query");
@@ -56,7 +57,7 @@ describe("useQueryCaller", () => {
   });
 
   it("should forward async handler results", async () => {
-    const container: Container = createContainer();
+    const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
 
     bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
@@ -77,7 +78,7 @@ describe("useQueryCaller", () => {
   });
 
   it("should return a stable caller between re-renders", () => {
-    const container: Container = createContainer();
+    const container: Container = mockContainer();
     const callers: Array<QueryCaller> = [];
 
     function TestComponent() {
@@ -95,7 +96,7 @@ describe("useQueryCaller", () => {
   });
 
   it("should support symbol query types", () => {
-    const container: Container = createContainer();
+    const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
     const type: unique symbol = Symbol("test-query");
 

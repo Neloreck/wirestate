@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react";
-import { Container, createContainer, QueryBus } from "@wirestate/core";
+import { Container, QueryBus } from "@wirestate/core";
+import { mockContainer } from "@wirestate/core/test-utils";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
 import { Optional } from "../types/general";
@@ -9,7 +10,7 @@ import { useSyncQueryCaller } from "./use-sync-query-caller";
 
 describe("useSyncQueryCaller", () => {
   it("should return a caller that dispatches sync queries", () => {
-    const container: Container = createContainer();
+    const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((data: string) => data + "-result");
 
@@ -35,7 +36,7 @@ describe("useSyncQueryCaller", () => {
   });
 
   it("should throw on unhandled queries", () => {
-    const container: Container = createContainer();
+    const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
 
     jest.spyOn(bus, "query");
@@ -57,7 +58,7 @@ describe("useSyncQueryCaller", () => {
   });
 
   it("should return a stable caller between re-renders", () => {
-    const container: Container = createContainer();
+    const container: Container = mockContainer();
     const callers: Array<SyncQueryCaller> = [];
 
     function TestComponent() {
@@ -75,7 +76,7 @@ describe("useSyncQueryCaller", () => {
   });
 
   it("should support symbol query types", () => {
-    const container: Container = createContainer();
+    const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
     const type: unique symbol = Symbol("sync-query");
 

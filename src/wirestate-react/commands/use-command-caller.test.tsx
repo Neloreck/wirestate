@@ -1,5 +1,6 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, CommandBus, CommandStatus, CommandDescriptor, createContainer } from "@wirestate/core";
+import { Container, CommandBus, CommandStatus, CommandDescriptor } from "@wirestate/core";
+import { mockContainer } from "@wirestate/core/test-utils";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
 import { CommandCaller } from "../types/commands";
@@ -13,7 +14,7 @@ describe("useCommandCaller", () => {
   });
 
   it("should return a caller that dispatches commands", async () => {
-    const container: Container = createContainer();
+    const container: Container = mockContainer();
     const handler = jest.fn((data: string) => data + "-result");
 
     container.get(CommandBus).register("TEST_COMMAND", handler);
@@ -39,7 +40,7 @@ describe("useCommandCaller", () => {
   });
 
   it("should throw on unhandled commands", async () => {
-    const container: Container = createContainer();
+    const container: Container = mockContainer();
     let caller: CommandCaller = null as unknown as CommandCaller;
 
     function TestComponent() {
