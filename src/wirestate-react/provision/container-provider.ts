@@ -1,11 +1,13 @@
 import { Container, createContainer, CreateContainerOptions } from "@wirestate/core";
-import { createElement, ReactNode, useEffect, useRef, useState } from "react";
+import { createElement, ReactNode } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { ContainerReactContext } from "../context/container-context";
 import { shallowEqualArrays } from "../utils/shallow-equal-arrays";
+
+import { ContainerProvisionState, useContainerProvisionState } from "./use-container-provision-state";
 
 /**
  * Describes how {@link ContainerProvider} receives its root container.
@@ -22,16 +24,10 @@ type ContainerProviderSource = Container | CreateContainerOptions;
  *
  * @internal
  */
-interface ContainerProviderState {
-  readonly mode: "external" | "managed";
-  readonly container: Container;
-  readonly options: CreateContainerOptions;
-  readonly value: { value: Container };
-  unmounted: boolean;
-}
+type ContainerProviderState = ContainerProvisionState<ContainerProviderSource>;
 
 /**
- * Props accepted by {@link ContainerProvider}.
+ * Represents props accepted by {@link ContainerProvider}.
  *
  * @group Provision
  */
@@ -70,45 +66,13 @@ export interface ContainerProviderProps {
  * @returns A React context provider for the active container.
  */
 export function ContainerProvider(props: ContainerProviderProps) {
-  const stateRef = useRef<ContainerProviderState | null>(null);
-  const disposedRef = useRef<WeakSet<Container>>(new WeakSet<Container>());
-  const [, forceUpdate] = useState<number>(0);
+  const state: ContainerProviderState = useContainerProvisionState(props.container, {
+    create: createContainerState,
+    label: "ContainerProvider",
+    reuse: canReuseContainerState,
+  });
 
-  const dispose = (container: Container): void => {
-    disposeOnce(container, disposedRef.current);
-  };
-
-  const state: ContainerProviderState = reconcileContainerState(stateRef.current, props.container, dispose);
-
-  stateRef.current = state;
-
-  useEffect(() => {
-    dbg.info(prefix(__filename), "Provider mounted:", {
-      container: state.container,
-      mode: state.mode,
-    });
-
-    if (reviveManagedContainer(stateRef, disposedRef.current)) {
-      forceUpdate((version: number) => version + 1);
-    }
-
-    state.unmounted = false;
-
-    return () => {
-      dbg.info(prefix(__filename), "Provider unmounting:", {
-        container: state.container,
-        mode: state.mode,
-      });
-
-      if (state.mode === "managed") {
-        dispose(state.container);
-      }
-
-      state.unmounted = true;
-    };
-  }, [state]);
-
-  return createElement(ContainerReactContext.Provider, state.value, props.children ?? null);
+  return createElement(ContainerReactContext.Provider, { value: state.container }, props.children ?? null);
 }
 
 /**
@@ -116,39 +80,23 @@ export function ContainerProvider(props: ContainerProviderProps) {
  *
  * @param current - Previously exposed state, if any.
  * @param source - Current container source prop.
- * @param dispose - Idempotent disposal callback for owned containers.
- * @returns Existing or replacement provider state.
+ * @param disposed - Containers already disposed by this provider.
+ * @returns `true` when current state can be reused.
  */
-function reconcileContainerState(
-  current: ContainerProviderState | null,
+function canReuseContainerState(
+  current: ContainerProviderState,
   source: ContainerProviderSource,
-  dispose: (container: Container) => void
-): ContainerProviderState {
+  disposed: WeakSet<Container>
+): boolean {
   if (source instanceof Container) {
-    if (current?.mode === "managed") {
-      dispose(current.container);
-    }
-
-    if (current?.mode === "external" && current.container === source) {
-      return current;
-    }
-
-    return createContainerState(source);
+    return !current.owned && current.container === source;
   }
 
-  if (
-    current?.mode === "managed" &&
-    !current.unmounted &&
-    shallowEqualArrays(source.entries ?? [], current.options.entries ?? [])
-  ) {
-    return current;
-  }
-
-  if (current?.mode === "managed") {
-    dispose(current.container);
-  }
-
-  return createContainerState(source);
+  return (
+    current.owned &&
+    !disposed.has(current.container) &&
+    shallowEqualArrays(source.entries ?? [], current.source instanceof Container ? [] : (current.source.entries ?? []))
+  );
 }
 
 /**
@@ -164,72 +112,21 @@ function createContainerState(source: ContainerProviderSource): ContainerProvide
     });
 
     return {
-      mode: "external",
+      source,
       container: source,
-      options: {},
-      value: { value: source },
-      unmounted: false,
+      owned: false,
     };
   } else {
     dbg.info(prefix(__filename), "Constructing for managed container:", {
-      options: source,
+      source,
     });
 
     const container: Container = createContainer(source);
 
     return {
-      mode: "managed",
+      source,
       container,
-      options: source,
-      value: { value: container },
-      unmounted: false,
+      owned: true,
     };
   }
-}
-
-/**
- * Recreates a managed container that was disposed by development remount cleanup.
- *
- * @param stateRef - Mutable provider state ref.
- * @param stateRef.current - Current provider state.
- * @param disposed - Containers already disposed by this provider.
- * @returns `true` when a fresh container was created.
- */
-function reviveManagedContainer(
-  stateRef: { current: ContainerProviderState | null },
-  disposed: WeakSet<Container>
-): boolean {
-  const state: ContainerProviderState | null = stateRef.current;
-
-  if (!state || state.mode !== "managed" || !disposed.has(state.container)) {
-    return false;
-  }
-
-  dbg.info(prefix(__filename), "Provider recreating cleaned container:", {
-    container: state.container,
-    mode: state.mode,
-  });
-
-  stateRef.current = createContainerState(state.options);
-
-  return true;
-}
-
-/**
- * Disposes a container once.
- *
- * @param container - Container to dispose.
- * @param disposed - Set of containers already disposed by this provider.
- */
-function disposeOnce(container: Container, disposed: WeakSet<Container>): void {
-  if (disposed.has(container)) {
-    return;
-  }
-
-  dbg.info(prefix(__filename), "Provider disposing container:", {
-    container,
-  });
-
-  container.unbindAll();
-  disposed.add(container);
 }

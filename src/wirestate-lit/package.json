@@ -47,7 +47,7 @@
   ],
   "dependencies": {},
   "peerDependencies": {
-    "@wirestate/core": ">=0.6.0",
+    "@wirestate/core": ">=0.7.0-experimental.1",
     "@lit/reactive-element": ">=2.0.0",
     "@lit/context": ">=1.0.0",
     "reflect-metadata": ">=0.2.0",

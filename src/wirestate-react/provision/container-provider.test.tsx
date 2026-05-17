@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react";
-import { Container } from "@wirestate/core";
+import { Container, Injectable, OnActivated, OnDeactivation } from "@wirestate/core";
+import { StrictMode } from "react";
 
 import { useContainer } from "../context/use-container";
 import { useInjection } from "../injection/use-injection";
@@ -101,5 +102,65 @@ describe("ContainerProvider", () => {
     expect(containers).toHaveLength(2);
     expect(containers[1]).toBe(containers[0]);
     expect(getByTestId("value").textContent).toBe("stable");
+  });
+
+  it("should dispose previous managed container before activating replacement", () => {
+    const lifecycleEvents: Array<string> = [];
+    const CONFIG_TOKEN: string = "CONFIG_TOKEN";
+
+    @Injectable()
+    class LifecycleService {
+      @OnActivated()
+      public onActivated(): void {
+        lifecycleEvents.push("activate");
+      }
+
+      @OnDeactivation()
+      public onDeactivation(): void {
+        lifecycleEvents.push("deactivate");
+      }
+    }
+
+    const { rerender } = render(
+      <ContainerProvider
+        container={{
+          activate: [LifecycleService],
+          entries: [LifecycleService],
+        }}
+      />
+    );
+
+    expect(lifecycleEvents).toEqual(["activate"]);
+
+    rerender(
+      <ContainerProvider
+        container={{
+          activate: [LifecycleService],
+          entries: [LifecycleService, { id: CONFIG_TOKEN, value: "next" }],
+        }}
+      />
+    );
+
+    expect(lifecycleEvents).toEqual(["activate", "deactivate", "activate"]);
+  });
+
+  it("should recreate managed container with strict mode", () => {
+    const CONFIG_TOKEN: string = "CONFIG_TOKEN";
+
+    function TrackingConsumer() {
+      const value: string = useInjection(CONFIG_TOKEN);
+
+      return <span data-testid={"value"}>{value}</span>;
+    }
+
+    const { getByTestId } = render(
+      <StrictMode>
+        <ContainerProvider container={{ entries: [{ id: CONFIG_TOKEN, value: "strict" }] }}>
+          <TrackingConsumer />
+        </ContainerProvider>
+      </StrictMode>
+    );
+
+    expect(getByTestId("value").textContent).toBe("strict");
   });
 });

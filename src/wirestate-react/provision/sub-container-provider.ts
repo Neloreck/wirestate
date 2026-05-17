@@ -1,25 +1,32 @@
-import { applySeeds, bindEntry, Container, SeedEntries } from "@wirestate/core";
+import { Container, createContainer, SeedEntries } from "@wirestate/core";
 import { InjectableEntries } from "@wirestate/core/types/privision";
-import { createElement, type ReactNode, useEffect, useRef, useState } from "react";
+import { createElement, type ReactNode } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { ContainerReactContext } from "../context/container-context";
 import { useContainer } from "../context/use-container";
-import { Maybe, Optional } from "../types/general";
 import { shallowEqualArrays } from "../utils/shallow-equal-arrays";
+
+import { ContainerProvisionState, useContainerProvisionState } from "./use-container-provision-state";
 
 /**
  * Runtime snapshot currently exposed by {@link SubContainerProvider}.
  *
  * @internal
  */
-interface SubContainerState {
+type SubContainerState = ContainerProvisionState<SubContainerSource>;
+
+/**
+ * Child-container inputs controlled by {@link SubContainerProvider}.
+ *
+ * @internal
+ */
+interface SubContainerSource {
   readonly parent: Container;
+  readonly seeds?: SeedEntries;
   readonly entries: InjectableEntries;
-  readonly container: Container;
-  readonly value: { value: Container };
 }
 
 /**
@@ -68,148 +75,64 @@ export interface SubContainerProviderProps {
 export function SubContainerProvider(props: SubContainerProviderProps) {
   const parent: Container = useContainer();
 
-  const stateRef = useRef<Optional<SubContainerState>>(null);
-  const disposedRef = useRef<WeakSet<Container>>(new WeakSet<Container>());
-  const [, forceUpdate] = useState<number>(0);
+  const source: SubContainerSource = {
+    entries: props.entries,
+    parent,
+    seeds: props.seeds,
+  };
 
-  /**
-   * Disposes a {@link Container} once.
-   *
-   * @internal
-   *
-   * @param container - Target container to dispose.
-   */
-  function disposeOnce(container: Container): void {
-    if (disposedRef.current.has(container)) {
-      return;
-    }
+  const state: SubContainerState = useContainerProvisionState(source, {
+    create: createSubContainerState,
+    label: "SubContainerProvider",
+    reuse: canReuseSubContainerState,
+  });
 
-    dbg.info(prefix(__filename), "Provider unbinding container:", {
-      container,
-      seeds: props.seeds,
-      entries: props.entries,
-    });
-
-    container.unbindAll();
-    disposedRef.current.add(container);
-  }
-
-  stateRef.current = reconcileSubContainerState(stateRef.current, parent, props, disposeOnce);
-
-  const state: SubContainerState = stateRef.current as SubContainerState;
-
-  useEffect(() => {
-    dbg.info(prefix(__filename), "Provider mounted:", {
-      container: state.container,
-      seeds: props.seeds,
-      entries: props.entries,
-    });
-
-    if (reviveSubContainer(stateRef, disposedRef.current, props.seeds)) {
-      forceUpdate((it: number) => it + 1);
-    }
-
-    return () => disposeOnce(state.container);
-  }, [state]);
-
-  return createElement(ContainerReactContext.Provider, state.value, props.children ?? null);
+  return createElement(ContainerReactContext.Provider, { value: state.container }, props.children ?? null);
 }
 
 /**
  * Selects the child-container state that should be exposed for this render.
  *
  * @param current - Previously exposed state, if any.
- * @param parent - Current parent container from context.
- * @param props - Current provider props.
- * @param dispose - Idempotent disposal callback for child containers.
+ * @param source - Current provider source.
+ * @param disposed - Child containers already disposed by this provider.
  * @returns Existing or replacement child-container state.
  */
-function reconcileSubContainerState(
-  current: Optional<SubContainerState>,
-  parent: Container,
-  props: SubContainerProviderProps,
-  dispose: (container: Container) => void
-): SubContainerState {
-  if (current && current.parent === parent && shallowEqualArrays(props.entries, current.entries)) {
-    return current;
-  }
-
-  if (current) {
-    dispose(current.container);
-  }
-
-  return createSubContainer(parent, props.entries, props.seeds);
+function canReuseSubContainerState(
+  current: SubContainerState,
+  source: SubContainerSource,
+  disposed: WeakSet<Container>
+): boolean {
+  return (
+    !disposed.has(current.container) &&
+    current.source.parent === source.parent &&
+    shallowEqualArrays(source.entries, current.source.entries)
+  );
 }
 
 /**
  * Creates a child container, applies seeds, and binds entries.
  *
- * @param parent - Parent container used for hierarchical resolution.
- * @param entries - Entries to bind in the child container.
- * @param seeds - Optional targeted seeds applied before binding.
+ * @param source - Parent container plus child bindings.
  * @returns Child-container state ready for context.
  */
-function createSubContainer(
-  parent: Container,
-  entries: InjectableEntries,
-  seeds: Maybe<SeedEntries>
-): SubContainerState {
-  const container: Container = new Container({
-    defaultScope: "Singleton",
-    parent,
+function createSubContainerState(source: SubContainerSource): SubContainerState {
+  const container: Container = createContainer({
+    entries: source.entries,
+    parent: source.parent,
+    seeds: source.seeds,
   });
 
-  dbg.info(prefix(__filename), "Constructing new provider:", {
-    parent,
+  dbg.info(prefix(__filename), "Constructing new container state:", {
+    parent: source.parent,
     container,
-    seeds,
-    entries,
+    seeds: source.seeds,
+    entries: source.entries,
   });
-
-  if (seeds) {
-    applySeeds(container, seeds);
-  }
-
-  for (const entry of entries) {
-    bindEntry(container, entry);
-  }
 
   return {
-    parent,
-    entries,
+    source,
     container,
-    value: { value: container },
+    owned: true,
   };
-}
-
-/**
- * Recreates a child container that was disposed by development remount cleanup.
- *
- * @param stateRef - Mutable child-container state ref.
- * @param stateRef.current - Current child-container state.
- * @param disposed - Containers already disposed by this provider.
- * @param seeds - Current seed entries.
- * @returns `true` when a fresh child container was created.
- */
-function reviveSubContainer(
-  stateRef: { current: Optional<SubContainerState> },
-  disposed: WeakSet<Container>,
-  seeds: Maybe<SeedEntries>
-): boolean {
-  const state: Optional<SubContainerState> = stateRef.current;
-
-  if (!state || !disposed.has(state.container)) {
-    return false;
-  }
-
-  dbg.info(prefix(__filename), "Provider recreating cleaned container:", {
-    parent: state.parent,
-    container: state.container,
-    seeds,
-    entries: state.entries,
-  });
-
-  stateRef.current = createSubContainer(state.parent, state.entries, seeds);
-
-  return true;
 }
