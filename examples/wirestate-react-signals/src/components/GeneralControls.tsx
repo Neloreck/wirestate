@@ -1,18 +1,18 @@
 import "./GeneralControls.css";
 
-import {
-  type CommandCaller,
-  type EventEmitter,
-  useCommandCaller,
-  useInjection,
-  useEventEmitter,
-} from "@wirestate/react";
 import { useCallback } from "react";
 
 import { EGlobalCommand } from "@/constants/commands";
 import { EGlobalEvent } from "@/constants/events";
 import { CounterService } from "@/services/CounterService";
 import { ThemeService } from "@/services/ThemeService";
+import {
+  type CommandCaller,
+  type EventEmitter,
+  useCommandCaller,
+  useInjection,
+  useEventEmitter,
+} from "@/wirestate-react-signals";
 
 export function GeneralControls() {
   const counterService: CounterService = useInjection(CounterService);

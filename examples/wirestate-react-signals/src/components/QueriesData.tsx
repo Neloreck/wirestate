@@ -1,14 +1,5 @@
 import "./QueriesData.css";
 
-import {
-  type QueryCaller,
-  type SyncQueryCaller,
-  useInjection,
-  useOptionalInjection,
-  useQueryCaller,
-  useQueryHandler,
-  useSyncQueryCaller,
-} from "@wirestate/react";
 import { useCallback, useState } from "react";
 
 import { EGlobalQuery } from "@/constants/queries";
@@ -20,6 +11,15 @@ import {
 import { LoggerService } from "@/services/LoggerService";
 import { ThemeService } from "@/services/ThemeService";
 import type { Optional, Theme } from "@/types";
+import {
+  type QueryCaller,
+  type SyncQueryCaller,
+  useInjection,
+  useOptionalInjection,
+  useQueryCaller,
+  useQueryHandler,
+  useSyncQueryCaller,
+} from "@/wirestate-react-signals";
 
 export function QueriesData() {
   const [snapshot, setSnapshot] = useState<Optional<ICounterSnapshot>>(null);

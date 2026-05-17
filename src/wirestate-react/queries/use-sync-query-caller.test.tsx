@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
-import { Container, createIocContainer, QueryBus } from "@wirestate/core";
+import { Container, createContainer, QueryBus } from "@wirestate/core";
 
-import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { withContainerProvider } from "../test-utils/with-container-provider";
 import { Optional } from "../types/general";
 import { SyncQueryCaller } from "../types/queries";
 
@@ -9,7 +9,7 @@ import { useSyncQueryCaller } from "./use-sync-query-caller";
 
 describe("useSyncQueryCaller", () => {
   it("should return a caller that dispatches sync queries", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((data: string) => data + "-result");
 
@@ -25,7 +25,7 @@ describe("useSyncQueryCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     const result: string = (caller as SyncQueryCaller)("TEST_QUERY", "some-data");
 
@@ -35,7 +35,7 @@ describe("useSyncQueryCaller", () => {
   });
 
   it("should throw on unhandled queries", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
 
     jest.spyOn(bus, "query");
@@ -48,7 +48,7 @@ describe("useSyncQueryCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     expect(() => (caller as SyncQueryCaller)("NOT_EXISTING", "data")).toThrow(
       "No query handler registered in container for type: 'NOT_EXISTING'."
@@ -57,7 +57,7 @@ describe("useSyncQueryCaller", () => {
   });
 
   it("should return a stable caller between re-renders", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const callers: Array<SyncQueryCaller> = [];
 
     function TestComponent() {
@@ -66,16 +66,16 @@ describe("useSyncQueryCaller", () => {
       return null;
     }
 
-    const { rerender } = render(withIocProvider(<TestComponent />, container));
+    const { rerender } = render(withContainerProvider(<TestComponent />, container));
 
-    rerender(withIocProvider(<TestComponent />, container));
+    rerender(withContainerProvider(<TestComponent />, container));
 
     expect(callers).toHaveLength(2);
     expect(callers[0]).toBe(callers[1]);
   });
 
   it("should support symbol query types", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const type: unique symbol = Symbol("sync-query");
 
@@ -89,7 +89,7 @@ describe("useSyncQueryCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     expect((caller as SyncQueryCaller)(type)).toBe("symbol-result");
   });

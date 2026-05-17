@@ -1,7 +1,7 @@
 import { Container, CommandBus, CommandHandler, CommandType } from "@wirestate/core";
 import { useEffect, useRef } from "react";
 
-import { useContainer } from "../provision/use-container";
+import { useContainer } from "../context/use-container";
 
 /**
  * Registers a command handler for the component's lifetime.

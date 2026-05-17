@@ -1,17 +1,17 @@
-import { Container } from "inversify";
+import { Container } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 /**
- * Creates and memoizes a root IoC container for a component.
+ * Creates and memoizes a root container for a component.
  *
  * @remarks
  * The `factory` function re-runs only when one of `deps` changes.
  * Between such changes, the same container instance is returned.
  *
- * @group Provision
+ * @group Context
  *
  * @param factory - Lazily creates the root container.
  * @param deps - Dependency list controlling when container is recreated.

@@ -2,7 +2,7 @@ import { render, cleanup, act } from "@testing-library/react";
 import { Container, EventBus } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 
-import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { withContainerProvider } from "../test-utils/with-container-provider";
 
 import { useEvent } from "./use-event";
 
@@ -22,7 +22,7 @@ describe("useEvent", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     act(() => bus.emit({ type: "X" }));
     act(() => bus.emit({ type: "Y", payload: 1 }));
@@ -45,7 +45,7 @@ describe("useEvent", () => {
 
     act(() => bus.emit({ type: "X" }));
 
-    const { unmount } = render(withIocProvider(<TestComponent />, container));
+    const { unmount } = render(withContainerProvider(<TestComponent />, container));
 
     act(() => bus.emit({ type: "X" }));
     act(() => bus.emit({ type: "X" }));

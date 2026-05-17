@@ -1,3 +1,4 @@
+import { Newable } from "@wirestate/core/index";
 import { ServiceIdentifier, bindingTypeValues, bindingScopeValues } from "inversify";
 
 /**
@@ -75,3 +76,14 @@ export interface InjectableDescriptor<T = unknown, V = unknown> {
    */
   readonly value?: V;
 }
+
+/**
+ * Readonly list of entries accepted by Wirestate registration APIs.
+ *
+ * @remarks
+ * Each item can be either a service class constructor (`Newable<object>`) or
+ * a fully configured {@link InjectableDescriptor}.
+ *
+ * @group Bind
+ */
+export type InjectableEntries = ReadonlyArray<Newable<object> | InjectableDescriptor>;

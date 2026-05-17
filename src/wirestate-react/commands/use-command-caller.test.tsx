@@ -1,7 +1,7 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, CommandBus, CommandStatus, CommandDescriptor, createIocContainer } from "@wirestate/core";
+import { Container, CommandBus, CommandStatus, CommandDescriptor, createContainer } from "@wirestate/core";
 
-import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { withContainerProvider } from "../test-utils/with-container-provider";
 import { CommandCaller } from "../types/commands";
 import { Optional } from "../types/general";
 
@@ -13,7 +13,7 @@ describe("useCommandCaller", () => {
   });
 
   it("should return a caller that dispatches commands", async () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const handler = jest.fn((data: string) => data + "-result");
 
     container.get(CommandBus).register("TEST_COMMAND", handler);
@@ -26,7 +26,7 @@ describe("useCommandCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     const descriptor: CommandDescriptor = (caller as unknown as CommandCaller)("TEST_COMMAND", "some-data");
 
@@ -39,7 +39,7 @@ describe("useCommandCaller", () => {
   });
 
   it("should throw on unhandled commands", async () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     let caller: CommandCaller = null as unknown as CommandCaller;
 
     function TestComponent() {
@@ -48,7 +48,7 @@ describe("useCommandCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     expect(() => (caller as unknown as CommandCaller)("NOT_EXISTING", 1000)).toThrow(
       "No command handler registered in container for type: 'NOT_EXISTING'."

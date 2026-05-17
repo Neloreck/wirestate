@@ -1,16 +1,15 @@
-import { Container, ServiceIdentifier } from "inversify";
+import { Container, ServiceIdentifier } from "@wirestate/core";
 import { MutableRefObject, ReactElement, ReactNode, useRef } from "react";
 
+import { useContainer } from "../context/use-container";
 import { Optional } from "../types/general";
 
-import { useContainer } from "./use-container";
-
 /**
- * Props for {@link IocActivator}.
+ * Represents props for {@link ContainerActivator}.
  *
  * @group Provision
  */
-export interface IocActivatorProps {
+export interface ContainerActivatorProps {
   /**
    * Services to resolve immediately on render.
    *
@@ -39,7 +38,7 @@ export interface IocActivatorProps {
  * @param props.children - React children element.
  * @returns React children after activation side effect is applied.
  */
-export function IocActivator(props: IocActivatorProps) {
+export function ContainerActivator(props: ContainerActivatorProps) {
   const container: Container = useContainer();
   const activatedContainerRef: MutableRefObject<Optional<Container>> = useRef(null);
 

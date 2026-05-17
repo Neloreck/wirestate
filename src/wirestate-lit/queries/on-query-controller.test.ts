@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { QueryBus, createIocContainer, Container } from "@wirestate/core";
+import { QueryBus, createContainer, Container } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
@@ -65,7 +65,7 @@ describe("OnQueryController", () => {
   });
 
   it("should keep handler registered after context revision update", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const element: TestConsumerElement = new TestConsumerElement();
     const handler = jest.fn(() => "test-result");
@@ -80,7 +80,7 @@ describe("OnQueryController", () => {
     contextProvider.setValue({ ...contextProvider.value, revision: 1000 });
     expect(bus.has("REVISION_QUERY")).toBe(true);
 
-    const newContainer: Container = createIocContainer();
+    const newContainer: Container = createContainer();
 
     contextProvider.setValue({ ...contextProvider.value, container: newContainer });
     expect(container.get(QueryBus).has("REVISION_QUERY")).toBe(false);

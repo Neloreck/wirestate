@@ -1,14 +1,14 @@
 import { render } from "@testing-library/react";
-import { Container, createIocContainer, EventBus } from "@wirestate/core";
+import { Container, createContainer, EventBus } from "@wirestate/core";
 
-import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { withContainerProvider } from "../test-utils/with-container-provider";
 import { EventEmitter } from "../types/events";
 
 import { useEventEmitter } from "./use-event-emitter";
 
 describe("useEventEmitter", () => {
   it("should return an emitter that dispatches events", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 
@@ -24,7 +24,7 @@ describe("useEventEmitter", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     (emitter as EventEmitter)("TEST_EVENT", { foo: "bar" }, "source");
 

@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { useIocContext } from "../provision/use-ioc-context";
+import { useContainer } from "../context/use-container";
 import { EventEmitter } from "../types/events";
 
 /**
@@ -29,7 +29,7 @@ import { EventEmitter } from "../types/events";
  * ```
  */
 export function useEventEmitter<P = unknown, T extends EventType = EventType>(): EventEmitter<P, T> {
-  const container: Container = useIocContext().container;
+  const container: Container = useContainer();
 
   return useCallback(
     <P, T extends EventType>(type: T, payload?: P, from?: unknown) => {

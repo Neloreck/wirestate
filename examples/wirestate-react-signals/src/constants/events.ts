@@ -1,4 +1,4 @@
-import { type Event } from "@wirestate/core";
+import { type Event } from "@/wirestate-react-signals";
 
 export enum EGlobalEvent {
   COUNTER_INCREMENTED = "counter/incremented",

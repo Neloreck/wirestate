@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { CommandBus, CommandDescriptor, CommandStatus, createIocContainer, Container } from "@wirestate/core";
+import { CommandBus, CommandDescriptor, CommandStatus, createContainer, Container } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
@@ -78,7 +78,7 @@ describe("OnCommandController", () => {
   });
 
   it("should re-register when IoC context is updated (revision, container)", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
     const element: TestConsumerElement = new TestConsumerElement();
     const handler = jest.fn();
@@ -93,7 +93,7 @@ describe("OnCommandController", () => {
     contextProvider.setValue({ ...contextProvider.value, revision: 1000 });
     expect(bus.has("REVISION_COMMAND")).toBe(true);
 
-    const newContainer: Container = createIocContainer();
+    const newContainer: Container = createContainer();
 
     contextProvider.setValue({ ...contextProvider.value, container: newContainer });
     expect(container.get(CommandBus).has("REVISION_COMMAND")).toBe(false);

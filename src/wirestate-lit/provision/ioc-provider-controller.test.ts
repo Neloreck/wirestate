@@ -1,6 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, createIocContainer, SEED } from "@wirestate/core";
+import { Container, createContainer, SEED } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { IocContextObject, IocContext } from "../context/ioc-context";
@@ -34,7 +34,7 @@ describe("IocProviderController", () => {
   });
 
   it("should use the provided container", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const element: TestProviderElement = new TestProviderElement();
     const controller: IocProviderController = new IocProviderController(element, { container });
 

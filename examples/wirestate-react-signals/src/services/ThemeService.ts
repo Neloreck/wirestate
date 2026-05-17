@@ -1,3 +1,7 @@
+import { signal, Signal } from "@wirestate/react-signals";
+
+import { EGlobalEvent } from "@/constants/events";
+import type { Theme } from "@/types";
 import {
   Inject,
   Injectable,
@@ -5,11 +9,7 @@ import {
   OnDeactivation,
   SEED,
   WireScope,
-} from "@wirestate/core";
-import { signal, Signal } from "@wirestate/react-signals";
-
-import { EGlobalEvent } from "@/constants/events";
-import type { Theme } from "@/types";
+} from "@/wirestate-react-signals";
 
 @Injectable()
 export class ThemeService {

@@ -4,7 +4,7 @@ import { mockContainer } from "@wirestate/core/test-utils";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { withContainerProvider } from "../test-utils/with-container-provider";
 import { AnyObject, Optional } from "../types/general";
 
 import { useOptionalInjection } from "./use-optional-injection";
@@ -25,7 +25,9 @@ describe("useOptionalInjection", () => {
   it("should return null when token is not bound", () => {
     const container: Container = mockContainer();
 
-    const { getByTestId } = render(withIocProvider(<TestComponent token={Symbol("optional-token")} />, container));
+    const { getByTestId } = render(
+      withContainerProvider(<TestComponent token={Symbol("optional-token")} />, container)
+    );
 
     expect(getByTestId("injectable-name").textContent).toBe("null");
   });
@@ -35,7 +37,7 @@ describe("useOptionalInjection", () => {
       entries: [GenericService],
     });
 
-    const { getByTestId } = render(withIocProvider(<TestComponent token={GenericService} />, container));
+    const { getByTestId } = render(withContainerProvider(<TestComponent token={GenericService} />, container));
 
     expect(getByTestId("injectable-name").textContent).toBe(GenericService.name);
   });
@@ -50,7 +52,7 @@ describe("useOptionalInjection", () => {
       return <div data-testid={"result"}>{data}</div>;
     }
 
-    const { getByTestId } = render(withIocProvider(<FallbackComponent />, container));
+    const { getByTestId } = render(withContainerProvider(<FallbackComponent />, container));
 
     expect(getByTestId("result").textContent).toBe("fallback-value");
   });
@@ -68,7 +70,7 @@ describe("useOptionalInjection", () => {
       return <div data-testid={"result"}>{data}</div>;
     }
 
-    const { getByTestId } = render(withIocProvider(<FallbackComponent />, container));
+    const { getByTestId } = render(withContainerProvider(<FallbackComponent />, container));
 
     expect(getByTestId("result").textContent).toBe("bound-value");
   });

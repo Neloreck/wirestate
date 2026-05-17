@@ -1,6 +1,6 @@
 import { ContextProvider } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, createIocContainer } from "@wirestate/core";
+import { Container, createContainer } from "@wirestate/core";
 
 import { IocContextObject } from "../context/ioc-context";
 
@@ -53,7 +53,7 @@ export interface LitProvisionFixture {
 export function createLitProvision(container?: Container): LitProvisionFixture {
   ensureProviderDefined();
 
-  const iocContainer: Container = container ?? createIocContainer();
+  const iocContainer: Container = container ?? createContainer();
   const provider: WsTestProviderElement = new WsTestProviderElement();
 
   const contextProvider: ContextProvider<typeof IocContextObject, WsTestProviderElement> = new ContextProvider(

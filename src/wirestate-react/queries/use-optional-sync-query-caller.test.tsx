@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
-import { Container, createIocContainer, QueryBus } from "@wirestate/core";
+import { Container, createContainer, QueryBus } from "@wirestate/core";
 
-import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { withContainerProvider } from "../test-utils/with-container-provider";
 import { Optional } from "../types/general";
 import { OptionalSyncQueryCaller } from "../types/queries";
 
@@ -9,7 +9,7 @@ import { useOptionalSyncQueryCaller } from "./use-optional-sync-query-caller";
 
 describe("useOptionalSyncQueryCaller", () => {
   it("should return a caller that dispatches sync queries", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((data: string) => data + "-result");
 
@@ -25,7 +25,7 @@ describe("useOptionalSyncQueryCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     const result: Optional<string> = (caller as OptionalSyncQueryCaller)("TEST_QUERY", "some-data");
 
@@ -35,7 +35,7 @@ describe("useOptionalSyncQueryCaller", () => {
   });
 
   it("should return null on unhandled queries", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     let caller: Optional<OptionalSyncQueryCaller> = null as Optional<OptionalSyncQueryCaller>;
 
@@ -47,7 +47,7 @@ describe("useOptionalSyncQueryCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     const result: Optional<string> = (caller as OptionalSyncQueryCaller)("NOT_EXISTING", "data");
 
@@ -56,7 +56,7 @@ describe("useOptionalSyncQueryCaller", () => {
   });
 
   it("should return a stable caller between re-renders", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const callers: Array<OptionalSyncQueryCaller> = [];
 
     function TestComponent() {
@@ -65,16 +65,16 @@ describe("useOptionalSyncQueryCaller", () => {
       return null;
     }
 
-    const { rerender } = render(withIocProvider(<TestComponent />, container));
+    const { rerender } = render(withContainerProvider(<TestComponent />, container));
 
-    rerender(withIocProvider(<TestComponent />, container));
+    rerender(withContainerProvider(<TestComponent />, container));
 
     expect(callers).toHaveLength(2);
     expect(callers[0]).toBe(callers[1]);
   });
 
   it("should support symbol query types", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const type: unique symbol = Symbol("optional-sync-query");
 
@@ -88,7 +88,7 @@ describe("useOptionalSyncQueryCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     expect((caller as OptionalSyncQueryCaller)(type)).toBe("symbol-result");
   });

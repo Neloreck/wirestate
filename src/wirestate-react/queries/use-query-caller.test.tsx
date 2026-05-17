@@ -1,14 +1,14 @@
 import { render } from "@testing-library/react";
-import { Container, createIocContainer, QueryBus } from "@wirestate/core";
+import { Container, createContainer, QueryBus } from "@wirestate/core";
 
-import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { withContainerProvider } from "../test-utils/with-container-provider";
 import { QueryCaller } from "../types/queries";
 
 import { useQueryCaller } from "./use-query-caller";
 
 describe("useQueryCaller", () => {
   it("should return a caller that dispatches queries", async () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((data: string) => data + "-result");
 
@@ -24,7 +24,7 @@ describe("useQueryCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     const result: string = await (caller as QueryCaller)("TEST_QUERY", "some-data");
 
@@ -34,7 +34,7 @@ describe("useQueryCaller", () => {
   });
 
   it("should throw on unhandled queries", async () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
 
     jest.spyOn(bus, "query");
@@ -47,7 +47,7 @@ describe("useQueryCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     expect(() => (caller as QueryCaller)("NOT_EXISTING", "data")).toThrow(
       "No query handler registered in container for type: 'NOT_EXISTING'."
@@ -56,7 +56,7 @@ describe("useQueryCaller", () => {
   });
 
   it("should forward async handler results", async () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
 
     bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
@@ -69,7 +69,7 @@ describe("useQueryCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     const result: string = await (caller as QueryCaller)("ASYNC_QUERY", "value");
 
@@ -77,7 +77,7 @@ describe("useQueryCaller", () => {
   });
 
   it("should return a stable caller between re-renders", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const callers: Array<QueryCaller> = [];
 
     function TestComponent() {
@@ -86,16 +86,16 @@ describe("useQueryCaller", () => {
       return null;
     }
 
-    const { rerender } = render(withIocProvider(<TestComponent />, container));
+    const { rerender } = render(withContainerProvider(<TestComponent />, container));
 
-    rerender(withIocProvider(<TestComponent />, container));
+    rerender(withContainerProvider(<TestComponent />, container));
 
     expect(callers).toHaveLength(2);
     expect(callers[0]).toBe(callers[1]);
   });
 
   it("should support symbol query types", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const type: unique symbol = Symbol("test-query");
 
@@ -109,7 +109,7 @@ describe("useQueryCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     expect((caller as QueryCaller)(type)).toBe("symbol-result");
   });

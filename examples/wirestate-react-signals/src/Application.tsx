@@ -1,11 +1,5 @@
 import "./Application.css";
 
-import {
-  useInjection,
-  useEvent,
-  useEventsHandler,
-  useEvents,
-} from "@wirestate/react";
 import { useEffect } from "react";
 
 import { EventsLog } from "@/components/EventsLog";
@@ -14,6 +8,12 @@ import { QueriesData } from "@/components/QueriesData";
 import { EGlobalEvent } from "@/constants/events";
 import { GLOBAL_CONFIG } from "@/constants/id";
 import { ThemeService } from "@/services/ThemeService";
+import {
+  useInjection,
+  useEvent,
+  useEventsHandler,
+  useEvents,
+} from "@/wirestate-react-signals";
 
 export function Application() {
   const themeService: ThemeService = useInjection(ThemeService);

@@ -1,15 +1,3 @@
-import {
-  Inject,
-  Injectable,
-  OnActivated,
-  OnDeactivation,
-  OnQuery,
-  Optional,
-  OnEvent,
-  type Event,
-  OnCommand,
-  WireScope,
-} from "@wirestate/core";
 import { signal, Signal } from "@wirestate/react-signals";
 
 import { EGlobalCommand } from "@/constants/commands";
@@ -21,6 +9,18 @@ import {
 } from "@/constants/id";
 import { EGlobalQuery } from "@/constants/queries";
 import { ThemeService } from "@/services/ThemeService";
+import {
+  Inject,
+  Injectable,
+  OnActivated,
+  OnDeactivation,
+  OnQuery,
+  Optional,
+  OnEvent,
+  type Event,
+  OnCommand,
+  WireScope,
+} from "@/wirestate-react-signals";
 
 export interface ILogEntry {
   readonly id: number;
@@ -71,8 +71,6 @@ export class LoggerService {
 
     // [*] Pass safe lifecycle checks - can emit from deactivation.
     this.scope.emitEvent(`deactivating/${this.constructor.name}`);
-
-    this.clear();
   }
 
   public clear(): void {

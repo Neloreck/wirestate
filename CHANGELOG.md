@@ -11,9 +11,12 @@
 - Export missing methods typing for `@wirestate/core`
 - Extensive JSDoc coverage for wirestate packages
 - `createIocContainer`: Added ability to instantly provide and activate entries, targeted seeds
-- `IocProvider`: No nested logics, no seed provision anymore, just plain rough provider
-- `IocActivator`: Added separate activation component
+- `createInjectablesProvider`: Removed.
+- `IocProvider`: Removed
 - `useRootContainer`: Added separate hook for store management in React tree
+- `ContainerProvider`: Simpler provider for containers.
+- `SubContainerProvider`: Added component solving problems of removed `createInjectablesProvider`
+- `ContainerActivator`: Added separate activation component
 
 ## 0.6.3
 

@@ -1,7 +1,7 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, createIocContainer, CommandBus } from "@wirestate/core";
+import { Container, createContainer, CommandBus } from "@wirestate/core";
 
-import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { withContainerProvider } from "../test-utils/with-container-provider";
 import { OptionalCommandCaller } from "../types/commands";
 
 import { useOptionalCommandCaller } from "./use-optional-command-caller";
@@ -12,7 +12,7 @@ describe("useOptionalCommandCaller", () => {
   });
 
   it("should return null if no handler exists", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
 
     let caller: OptionalCommandCaller = null as unknown as OptionalCommandCaller;
 
@@ -22,14 +22,14 @@ describe("useOptionalCommandCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     expect(caller as unknown).toBeInstanceOf(Function);
     expect((caller as unknown as OptionalCommandCaller)("MISSING_CMD")).toBeNull();
   });
 
   it("should return descriptor if handler exists", async () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
 
     container.get(CommandBus).register("EXISTING_COMMAND", () => "ok");
 
@@ -41,7 +41,7 @@ describe("useOptionalCommandCaller", () => {
       return null;
     }
 
-    render(withIocProvider(<TestComponent />, container));
+    render(withContainerProvider(<TestComponent />, container));
 
     const descriptor = (caller as unknown as OptionalCommandCaller)("EXISTING_COMMAND");
 
