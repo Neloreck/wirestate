@@ -166,35 +166,57 @@ function DevTools() {
 
 ## Lit
 
-### @iocProvide
+### containerProvide / useContainerProvision
 
-Creates the root IoC container on a Lit element.
+Provide a root container to a Lit subtree.
+
+- Pass `container` to expose an existing container
+- Pass `options` to create a managed container for the host lifecycle
 
 ```ts
 import { LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
-import { iocProvide } from "@wirestate/lit";
+import { containerProvide, ContainerProviderController } from "@wirestate/lit";
+
+import { CartService } from "./CartService";
 
 @customElement("application-root")
 class ApplicationRoot extends LitElement {
-  @iocProvide({ seed: { someData: "value" } })
-  private ioc!: IocProviderController;
+  @containerProvide({
+    options: {
+      entries: [CartService],
+      activate: [CartService],
+      seed: { someData: "value" },
+    },
+  })
+  private container!: ContainerProviderController;
 }
 ```
 
-### @injectablesProvide
+### subContainerProvide / useSubContainerProvider
 
-Binds services to the element's container for the lifetime of the element.
-Expects IOC context to be provided on the tree above.
+Create a managed child container derived from the nearest parent container context.
+
+- The child container inherits parent bindings through the container hierarchy
+- The child container is recreated when the parent container changes
+- The child container is destroyed when the host disconnects
 
 ```ts
-import { iocProvide, injectablesProvide } from "@wirestate/lit";
+import { LitElement } from "lit";
+import { customElement } from "lit/decorators.js";
+import { subContainerProvide, SubContainerProviderController } from "@wirestate/lit";
+
 import { CartService } from "./CartService";
 
 @customElement("providing-element")
-class ProvidingElement extends ReactiveElement {
-  @injectablesProvide({ entries: [CartService] })
-  public servicesProvider!: InjectablesProviderController;
+class ProvidingElement extends LitElement {
+  @subContainerProvide({
+    options: {
+      entries: [CartService],
+      activate: [CartService],
+    },
+  })
+  public container!: SubContainerProviderController;
 }
 ```
 

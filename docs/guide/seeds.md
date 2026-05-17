@@ -176,13 +176,23 @@ export function Application() {
 ### Lit
 
 ```ts
+import { LitElement } from "lit";
+import { customElement } from "lit/decorators.js";
+import {
+  ContainerProviderController,
+  SubContainerProviderController,
+  useContainerProvision,
+  useSubContainerProvider,
+} from "@wirestate/lit";
+
 @customElement("counter-page")
 export class CounterPage extends LitElement {
-  public readonly ioc: IocProviderController = useIocProvision(this, { seed: { apiUrl: "https://api.example.com" } });
-  public readonly injectables: InjectablesProviderController = useInjectablesProvider(this, {
-    entries: [CounterService],
-    seeds: [[CounterService, { count: 42 }]],
-    into: () => this.ioc.value,
+  public readonly container: ContainerProviderController = useContainerProvision(this, {
+    options: {
+      seed: { apiUrl: "https://api.example.com" },
+      seeds: [[CounterService, { count: 42 }]],
+      entries: [CounterService],
+    },
   });
 }
 ```
