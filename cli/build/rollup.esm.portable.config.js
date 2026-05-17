@@ -35,7 +35,6 @@ const createPortableConfig = (entry, isDebug) => ({
     preserveModules: false,
     sourcemap: true,
     format: "es",
-    banner: "'use no memo';",
   },
   plugins: [
     babel({

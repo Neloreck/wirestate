@@ -26,7 +26,8 @@
     "docs:api": "typedoc",
     "docs:dev": "vitepress dev docs",
     "docs:build": "pnpm docs:api && vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "version:packages": "ts-node cli/deploy/bump-version.ts"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.6",
