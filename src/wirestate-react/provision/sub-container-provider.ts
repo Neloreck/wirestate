@@ -1,6 +1,6 @@
 import { applySeeds, bindEntry, Container, SeedEntries } from "@wirestate/core";
 import { InjectableEntries } from "@wirestate/core/types/privision";
-import { createElement, type ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { createElement, type ReactNode, useEffect, useRef, useState } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";

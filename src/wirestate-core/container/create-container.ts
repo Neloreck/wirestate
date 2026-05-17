@@ -1,6 +1,5 @@
 import { createBaseContainer } from "@wirestate/core/container/create-base-container";
 import { WireScope } from "@wirestate/core/container/wire-scope";
-import { SEED_TOKEN, SEEDS_TOKEN } from "@wirestate/core/seeds/tokens";
 import { Container, Newable, ServiceIdentifier } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -11,7 +10,7 @@ import { getEntryToken } from "../bind/get-entry-token";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { AnyObject } from "../types/general";
-import { SeedEntries, SeedsMap } from "../types/initial-state";
+import { SeedEntries } from "../types/initial-state";
 import { InjectableDescriptor } from "../types/privision";
 
 /**
