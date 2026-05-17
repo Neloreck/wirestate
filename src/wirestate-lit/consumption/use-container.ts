@@ -50,6 +50,7 @@ export function useContainer<E extends ReactiveControllerHost & HTMLElement>(hos
 
   new ContextConsumer(host, {
     context: ContainerContext,
+    subscribe: true,
     callback: (container) => {
       current.value = container;
     },

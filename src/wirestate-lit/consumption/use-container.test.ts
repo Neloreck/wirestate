@@ -32,4 +32,21 @@ describe("useContainer", () => {
 
     expect(element.container.value).toBe(container);
   });
+
+  it("should update the active container when parent context changes", () => {
+    const nextContainer: Container = mockContainer();
+
+    @customElement("test-use-container-updates-element")
+    class TestElement extends ReactiveElement {
+      public readonly container = useContainer(this);
+    }
+
+    const element: TestElement = new TestElement();
+
+    fixture.provider.appendChild(element);
+    expect(element.container.value).toBe(container);
+
+    fixture.contextProvider.setValue(nextContainer);
+    expect(element.container.value).toBe(nextContainer);
+  });
 });
