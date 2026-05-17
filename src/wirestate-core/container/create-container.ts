@@ -1,3 +1,5 @@
+import { createBaseContainer } from "@wirestate/core/container/create-base-container";
+import { WireScope } from "@wirestate/core/container/wire-scope";
 import { Container, Newable, ServiceIdentifier } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -5,25 +7,18 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { bindEntry } from "../bind/bind-entry";
 import { getEntryToken } from "../bind/get-entry-token";
-import { CommandBus } from "../commands/command-bus";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { EventBus } from "../events/event-bus";
-import { QueryBus } from "../queries/query-bus";
-import { applySeeds } from "../seeds/apply-seeds";
-import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 import { AnyObject } from "../types/general";
-import { SeedEntries, SeedsMap } from "../types/initial-state";
+import { SeedEntries } from "../types/initial-state";
 import { InjectableDescriptor } from "../types/privision";
 
-import { WireScope } from "./wire-scope";
-
 /**
- * Represents configuration options for {@link createIocContainer}.
+ * Represents configuration options for {@link createContainer}.
  *
  * @group Container
  */
-export interface CreateIocContainerOptions {
+export interface CreateContainerOptions {
   /**
    * Optional parent container.
    * Enables hierarchical resolution and sharing of bindings.
@@ -70,7 +65,7 @@ export interface CreateIocContainerOptions {
  *
  * @group Container
  *
- * @param options - {@link CreateIocContainerOptions} configuration.
+ * @param options - {@link CreateContainerOptions} configuration.
  * @returns A new Inversify {@link Container} instance.
  *
  * @example
@@ -87,7 +82,7 @@ export interface CreateIocContainerOptions {
  * bindService(container, MyService);
  * ```
  */
-export function createIocContainer(options: CreateIocContainerOptions = {}): Container {
+export function createContainer(options: CreateContainerOptions = {}): Container {
   dbg.info(prefix(__filename), "Creating IOC container:", { options });
 
   if (options.activate && options.activate.length) {
@@ -112,24 +107,13 @@ export function createIocContainer(options: CreateIocContainerOptions = {}): Con
 
   const container: Container = new Container({
     defaultScope: "Singleton",
-    parent: options.parent,
+    parent: createBaseContainer(options),
   });
-
-  container.bind(EventBus).toConstantValue(new EventBus());
-  container.bind(QueryBus).toConstantValue(new QueryBus());
-  container.bind(CommandBus).toConstantValue(new CommandBus());
 
   container
     .bind(WireScope)
     .toResolvedValue((): WireScope => new WireScope(container))
     .inTransientScope();
-
-  container.bind(SEEDS_TOKEN).toConstantValue(new Map() as SeedsMap);
-  container.bind(SEED_TOKEN).toConstantValue(options.seed ?? {});
-
-  if (options.seeds) {
-    applySeeds(container, options.seeds);
-  }
 
   dbg.info(prefix(__filename), "Injecting entries on creation:", { container, options });
 
@@ -144,8 +128,6 @@ export function createIocContainer(options: CreateIocContainerOptions = {}): Con
       container.get(entry);
     }
   }
-
-  dbg.info(prefix(__filename), "Created IOC container:", { container, options });
 
   return container;
 }

@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/lit",
-  "version": "0.7.0",
+  "version": "0.7.0-experimental.1",
   "description": "Lit elements integration for wirestate",
   "sideEffects": false,
   "author": "Syrotenko Igor",

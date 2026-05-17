@@ -1,14 +1,13 @@
-import { render, fireEvent, cleanup } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { Container, Newable } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 
 import { ErrorLogBoundary } from "@/fixtures/react-components/error-log-boundary";
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { withContainerProvider } from "../test-utils/with-container-provider";
 
 import { useInjection } from "./use-injection";
-import { useIocContext } from "./use-ioc-context";
 
 describe("useInjection", () => {
   function TestComponent({ token = GenericService as Newable<object> }) {
@@ -17,23 +16,11 @@ describe("useInjection", () => {
     return <div data-testid={"injectable-name"}>{service.constructor.name || String(service.constructor.name)}</div>;
   }
 
-  const TestComponentRevisionTrigger = () => {
-    const { setRevision } = useIocContext();
-
-    return (
-      <button data-testid={"revision-increment"} onClick={() => setRevision((r) => r + 1)}>
-        Increment revision
-      </button>
-    );
-  };
-
-  afterEach(cleanup);
-
   it("should crash if service is not resolved", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     const { getByText } = render(
-      withIocProvider(
+      withContainerProvider(
         <ErrorLogBoundary>
           <TestComponent />
         </ErrorLogBoundary>
@@ -50,44 +37,9 @@ describe("useInjection", () => {
       entries: [GenericService],
     });
 
-    const { getByTestId } = render(withIocProvider(<TestComponent />, container));
+    const { getByTestId } = render(withContainerProvider(<TestComponent />, container));
 
     expect(getByTestId("injectable-name").textContent).toBe("GenericService");
-  });
-
-  it("should re-resolve service when revision changes", () => {
-    const container: Container = mockContainer({
-      entries: [GenericService],
-    });
-
-    const originalGet = container.get.bind(container);
-    let resolveCount: number = 0;
-
-    jest.spyOn(container, "get").mockImplementation((token) => {
-      if (token === GenericService) {
-        resolveCount++;
-      }
-
-      return originalGet(token);
-    });
-
-    const { getByTestId } = render(
-      withIocProvider(
-        <ErrorLogBoundary>
-          <TestComponent />
-          <TestComponentRevisionTrigger />
-        </ErrorLogBoundary>,
-        container
-      )
-    );
-
-    expect(resolveCount).toBe(1);
-
-    fireEvent.click(getByTestId("revision-increment"));
-    expect(resolveCount).toBe(2);
-
-    fireEvent.click(getByTestId("revision-increment"));
-    expect(resolveCount).toBe(3);
   });
 
   it("should throw error when used outside of IocProvider", () => {
@@ -101,7 +53,9 @@ describe("useInjection", () => {
 
     consoleSpy.mockRestore();
 
-    expect(getByText(/Trying to access IOC context/)).toBeTruthy();
+    expect(
+      getByText(/Trying to access container context from React subtree not wrapped in <ContainerProvider>./)
+    ).toBeTruthy();
   });
 
   it("should memoize service instance", () => {
@@ -120,12 +74,12 @@ describe("useInjection", () => {
       return originalGet(token);
     });
 
-    const { rerender } = render(withIocProvider(<TestComponent />, container));
+    const { rerender } = render(withContainerProvider(<TestComponent />, container));
 
     expect(resolveCount).toBe(1);
 
     for (let i = 0; i < 10; i++) {
-      rerender(withIocProvider(<TestComponent />, container));
+      rerender(withContainerProvider(<TestComponent />, container));
     }
 
     // Should NOT re-resolve because container and revision didn't change.
@@ -139,11 +93,13 @@ describe("useInjection", () => {
       entries: [GenericService, AnotherService],
     });
 
-    const { rerender, getByTestId } = render(withIocProvider(<TestComponent token={GenericService} />, container));
+    const { rerender, getByTestId } = render(
+      withContainerProvider(<TestComponent token={GenericService} />, container)
+    );
 
     expect(getByTestId("injectable-name").textContent).toBe("GenericService");
 
-    rerender(withIocProvider(<TestComponent token={AnotherService} />, container));
+    rerender(withContainerProvider(<TestComponent token={AnotherService} />, container));
 
     expect(getByTestId("injectable-name").textContent).toBe("AnotherService");
   });

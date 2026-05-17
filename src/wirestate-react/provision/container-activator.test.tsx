@@ -3,11 +3,11 @@ import { Container, Injectable } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 import { StrictMode } from "react";
 
-import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { withContainerProvider } from "../test-utils/with-container-provider";
 
-import { IocActivator } from "./ioc-activator";
+import { ContainerActivator } from "./container-activator";
 
-describe("IocActivator", () => {
+describe("ContainerActivator", () => {
   @Injectable()
   class ServiceA {}
 
@@ -20,10 +20,10 @@ describe("IocActivator", () => {
 
   it("should render children", () => {
     const { getByText } = render(
-      withIocProvider(
-        <IocActivator activate={[ServiceA, ServiceB]}>
+      withContainerProvider(
+        <ContainerActivator activate={[ServiceA, ServiceB]}>
           <div>test-label</div>
-        </IocActivator>,
+        </ContainerActivator>,
         mockContainer({ entries: [ServiceA, ServiceB] })
       )
     );
@@ -35,7 +35,7 @@ describe("IocActivator", () => {
     const container: Container = mockContainer({ entries: [ServiceA, ServiceB] });
     const getSpy = jest.spyOn(container, "get");
 
-    render(withIocProvider(<IocActivator activate={[ServiceA, ServiceB]} />, container));
+    render(withContainerProvider(<ContainerActivator activate={[ServiceA, ServiceB]} />, container));
 
     expect(getServiceCallsCount(getSpy, ServiceA)).toBe(1);
     expect(getServiceCallsCount(getSpy, ServiceB)).toBe(1);
@@ -46,9 +46,9 @@ describe("IocActivator", () => {
     const getSpy = jest.spyOn(container, "get");
 
     render(
-      withIocProvider(
+      withContainerProvider(
         <StrictMode>
-          <IocActivator activate={[ServiceA, ServiceB]} />
+          <ContainerActivator activate={[ServiceA, ServiceB]} />
         </StrictMode>,
         container
       )
@@ -62,9 +62,11 @@ describe("IocActivator", () => {
     const container: Container = mockContainer({ entries: [ServiceA, ServiceB] });
     const getSpy = jest.spyOn(container, "get");
 
-    const { rerender } = render(withIocProvider(<IocActivator activate={[ServiceA, ServiceB]} />, container));
+    const { rerender } = render(
+      withContainerProvider(<ContainerActivator activate={[ServiceA, ServiceB]} />, container)
+    );
 
-    rerender(withIocProvider(<IocActivator activate={[ServiceA, ServiceB]} />, container));
+    rerender(withContainerProvider(<ContainerActivator activate={[ServiceA, ServiceB]} />, container));
 
     expect(getServiceCallsCount(getSpy, ServiceA)).toBe(1);
     expect(getServiceCallsCount(getSpy, ServiceB)).toBe(1);
@@ -77,9 +79,11 @@ describe("IocActivator", () => {
     const secondContainer: Container = mockContainer({ entries: [ServiceA, ServiceB] });
     const secondGetSpy = jest.spyOn(secondContainer, "get");
 
-    const { rerender } = render(withIocProvider(<IocActivator activate={[ServiceA, ServiceB]} />, firstContainer));
+    const { rerender } = render(
+      withContainerProvider(<ContainerActivator activate={[ServiceA, ServiceB]} />, firstContainer)
+    );
 
-    rerender(withIocProvider(<IocActivator activate={[ServiceA, ServiceB]} />, secondContainer));
+    rerender(withContainerProvider(<ContainerActivator activate={[ServiceA, ServiceB]} />, secondContainer));
 
     expect(getServiceCallsCount(firstGetSpy, ServiceA)).toBe(1);
     expect(getServiceCallsCount(firstGetSpy, ServiceB)).toBe(1);

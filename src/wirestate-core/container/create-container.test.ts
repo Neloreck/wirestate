@@ -7,12 +7,12 @@ import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 
-import { createIocContainer } from "./create-ioc-container";
+import { createContainer } from "./create-container";
 import { WireScope } from "./wire-scope";
 
-describe("createIocContainer", () => {
+describe("createContainer", () => {
   it("should create a container with default essentials", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
 
     expect(container).toBeInstanceOf(Container);
     expect(container.get(EventBus)).toBeInstanceOf(EventBus);
@@ -24,7 +24,7 @@ describe("createIocContainer", () => {
   });
 
   it("should bind core buses as singletons by default", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
 
     expect(container.get(EventBus)).toBeInstanceOf(EventBus);
     expect(container.get(EventBus)).toBe(container.get(EventBus));
@@ -35,14 +35,14 @@ describe("createIocContainer", () => {
   });
 
   it("should bind WireScope in transient scope", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
 
     expect(container.get(WireScope)).toBeInstanceOf(WireScope);
     expect(container.get(WireScope)).not.toBe(container.get(WireScope));
   });
 
   it("should bind WireScope with injected container", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
 
     expect(container.get(WireScope)).toBeInstanceOf(WireScope);
     expect(container.get(WireScope)).not.toBe(container.get(WireScope));
@@ -57,13 +57,13 @@ describe("createIocContainer", () => {
 
     parent.bind(PARENT_TOKEN).toConstantValue("parent-value");
 
-    const container: Container = createIocContainer({ parent });
+    const container: Container = createContainer({ parent });
 
     expect(container.get(PARENT_TOKEN)).toBe("parent-value");
   });
 
   it("should use Singleton as default scope for new bindings", () => {
-    const container: Container = createIocContainer();
+    const container: Container = createContainer();
 
     class TestService {}
 
@@ -73,14 +73,14 @@ describe("createIocContainer", () => {
   });
 
   it("should use provided seed", () => {
-    const container: Container = createIocContainer({ seed: { key: "value" } });
+    const container: Container = createContainer({ seed: { key: "value" } });
 
     expect(container.get(SEED_TOKEN)).toEqual({ key: "value" });
   });
 
   it("should use provided seeds", () => {
     const TEST_TOKEN: unique symbol = Symbol.for("TEST_TOKEN");
-    const container: Container = createIocContainer({
+    const container: Container = createContainer({
       seeds: [[TEST_TOKEN, { data: 123 }]],
     });
 
@@ -91,7 +91,7 @@ describe("createIocContainer", () => {
 
   it("should bind provided entries", () => {
     class TestService {}
-    const container: Container = createIocContainer({
+    const container: Container = createContainer({
       entries: [TestService],
     });
 
@@ -108,7 +108,7 @@ describe("createIocContainer", () => {
       }
     }
 
-    createIocContainer({
+    createContainer({
       entries: [TestService],
       activate: [TestService],
     });
@@ -118,7 +118,7 @@ describe("createIocContainer", () => {
 
   it("should throw error if activate is provided without entries", () => {
     expect(() =>
-      createIocContainer({
+      createContainer({
         activate: ["SomeService"],
       })
     ).toThrow("Supplied activation list while entries for binding are not provided.");
@@ -129,7 +129,7 @@ describe("createIocContainer", () => {
     class TestService {}
 
     expect(() =>
-      createIocContainer({
+      createContainer({
         entries: [TestService],
         activate: ["OtherService"],
       })

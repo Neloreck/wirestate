@@ -1,6 +1,6 @@
 import { ContextProvider } from "@lit/context";
 import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-element";
-import { createIocContainer, Container, applySharedSeed } from "@wirestate/core";
+import { createContainer, Container, applySharedSeed } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -65,7 +65,7 @@ export class IocProviderController<
   ) {
     this.host.addController(this);
 
-    this.container = container ?? createIocContainer();
+    this.container = container ?? createContainer();
     this.seed = seed;
 
     dbg.info(prefix(__filename), "Constructing:", {

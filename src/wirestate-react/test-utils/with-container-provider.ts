@@ -2,10 +2,10 @@ import { Container } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 import { createElement, ReactNode } from "react";
 
-import { IocProvider } from "../provision/ioc-provider";
+import { ContainerProvider } from "../provision/container-provider";
 
 /**
- * Wraps a React element tree with {@link IocProvider} for testing purposes.
+ * Wraps a React element tree with {@link ContainerProvider} for testing purposes.
  *
  * @remarks
  * This utility simplifies setting up the IoC context in unit tests. It automatically
@@ -15,7 +15,7 @@ import { IocProvider } from "../provision/ioc-provider";
  *
  * @param children - The React tree to be wrapped.
  * @param container - An optional Inversify container. Defaults to a new {@link mockContainer}.
- * @returns A React element wrapped in an {@link IocProvider}.
+ * @returns A React element wrapped in an {@link ContainerProvider}.
  *
  * @example
  * ```tsx
@@ -24,6 +24,6 @@ import { IocProvider } from "../provision/ioc-provider";
  * render(withIocProvider(<MyComponent />, container));
  * ```
  */
-export function withIocProvider(children: ReactNode, container: Container = mockContainer()) {
-  return createElement(IocProvider, { container }, children);
+export function withContainerProvider(children: ReactNode, container: Container = mockContainer()) {
+  return createElement(ContainerProvider, { container }, children);
 }

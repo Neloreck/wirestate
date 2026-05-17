@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { useContainer } from "../provision/use-container";
+import { useContainer } from "../context/use-container";
 import { OptionalQueryCaller } from "../types/queries";
 
 /**

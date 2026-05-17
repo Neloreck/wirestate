@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 
-import { createIocContainer } from "../container/create-ioc-container";
+import { mockContainer } from "../test-utils/mock-container";
 import { CommandStatus, CommandDescriptor } from "../types/commands";
 
 import { command } from "./command";
@@ -8,7 +8,7 @@ import { CommandBus } from "./command-bus";
 
 describe("command", () => {
   it("should dispatch a command on the container", async () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const handler = jest.fn((data: string) => data + "-result");
     const bus: CommandBus = container.get(CommandBus);
 

@@ -1,12 +1,11 @@
-import { Container, type ServiceIdentifier } from "@wirestate/core";
+import { Container, ServiceIdentifier } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { useContainer } from "../context/use-container";
 import { AnyObject, Optional } from "../types/general";
-
-import { useIocContext } from "./use-ioc-context";
 
 /**
  * Safely resolves a value from the container, returning a fallback or null if not bound.
@@ -15,7 +14,7 @@ import { useIocContext } from "./use-ioc-context";
  * Unlike {@link useInjection}, this hook does not throw if the dependency
  * is missing from the container.
  *
- * @group Provision
+ * @group Injection
  *
  * @template T - The type of the value being resolved.
  *
@@ -33,7 +32,7 @@ export function useOptionalInjection<T>(
   injectionId: ServiceIdentifier<T>,
   onFallback?: (container: Container) => T
 ): Optional<T> {
-  const { container, revision } = useIocContext();
+  const container: Container = useContainer();
 
   // Revision bump forces a container reset; force re-resolution to drop stale instances.
   return useMemo(() => {
@@ -41,7 +40,6 @@ export function useOptionalInjection<T>(
       dbg.info(prefix(__filename), "Resolving injection:", {
         token: injectionId,
         name: (injectionId as AnyObject)?.name ?? injectionId,
-        revision,
         container,
         onFallback,
       });
@@ -51,7 +49,6 @@ export function useOptionalInjection<T>(
       dbg.info(prefix(__filename), "Injection not found, using fallback handler:", {
         token: injectionId,
         name: (injectionId as AnyObject)?.name ?? injectionId,
-        revision,
         container,
         onFallback,
       });
@@ -61,12 +58,11 @@ export function useOptionalInjection<T>(
       dbg.info(prefix(__filename), "Injection not found, returning null:", {
         token: injectionId,
         name: (injectionId as AnyObject)?.name ?? injectionId,
-        revision,
         container,
         onFallback,
       });
 
       return null;
     }
-  }, [container, revision, injectionId]);
+  }, [container, injectionId]);
 }
