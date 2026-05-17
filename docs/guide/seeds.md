@@ -9,14 +9,14 @@ A single object available to all services in the container.
 Inject it via the `SEED` token or access from a `WireScope` instance.
 
 ```ts
-import { applySharedSeed, Container, createIocContainer, SEED } from "@wirestate/core";
+import { applySharedSeed, Container, createContainer, SEED } from "@wirestate/core";
 
 interface GlobalSeed {
   apiUrl: string;
   locale: string;
 }
 
-const container: Container = createIocContainer({
+const container: Container = createContainer({
   seed: { apiUrl: "https://api.example.com", locale: "en-US" } as GlobalSeed,
 });
 
@@ -54,11 +54,11 @@ export class ApiClient {
 ### React
 
 ```tsx
-import { applySharedSeed, createIocContainer, Container } from "@wirestate/core";
+import { applySharedSeed, createContainer, Container } from "@wirestate/core";
 import { IocProvider } from "@wirestate/react";
 import { CounterService } from "./CounterService";
 
-const container: Container = createIocContainer({
+const container: Container = createContainer({
   entries: [CounterService],
 });
 
@@ -108,9 +108,9 @@ Read them via `scope.getSeed(ServiceClass)` or `scope.getSeed("SEED_KEY")`.
 Returns `null` if no seed was provided for that service.
 
 ```ts
-import { Container, createIocContainer } from "@wirestate/core";
+import { Container, createContainer } from "@wirestate/core";
 
-const container: Container = createIocContainer({
+const container: Container = createContainer({
   seeds: [
     [CounterService, { count: 1000 }],
     ["SOME_KEY", "VALUE"],
@@ -151,11 +151,11 @@ export class CounterService {
 ### React
 
 ```tsx
-import { applySeeds, createIocContainer, Container } from "@wirestate/core";
+import { applySeeds, createContainer, Container } from "@wirestate/core";
 import { IocProvider } from "@wirestate/react";
 import { CounterService } from "./CounterService";
 
-const container: Container = createIocContainer({
+const container: Container = createContainer({
   seeds: [[CounterService, { count: 5 }]],
   entries: [CounterService],
 });
@@ -176,13 +176,21 @@ export function Application() {
 ### Lit
 
 ```ts
+import { LitElement } from "lit";
+import { customElement } from "lit/decorators.js";
+import {
+  ContainerProvider,
+  useContainerProvision,
+} from "@wirestate/lit";
+
 @customElement("counter-page")
 export class CounterPage extends LitElement {
-  public readonly ioc: IocProviderController = useIocProvision(this, { seed: { apiUrl: "https://api.example.com" } });
-  public readonly injectables: InjectablesProviderController = useInjectablesProvider(this, {
-    entries: [CounterService],
-    seeds: [[CounterService, { count: 42 }]],
-    into: () => this.ioc.value,
+  public readonly containerProvider: ContainerProvider = useContainerProvision(this, {
+    options: {
+      seed: { apiUrl: "https://api.example.com" },
+      seeds: [[CounterService, { count: 42 }]],
+      entries: [CounterService],
+    },
   });
 }
 ```

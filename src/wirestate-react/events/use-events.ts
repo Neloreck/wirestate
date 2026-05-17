@@ -1,7 +1,7 @@
 import { Container, EventBus, EventHandler, EventType } from "@wirestate/core";
 import { type MutableRefObject, useEffect, useRef } from "react";
 
-import { useContainer } from "../provision/use-container";
+import { useContainer } from "../context/use-container";
 
 /**
  * Subscribes a component to multiple event types on the {@link EventBus}.

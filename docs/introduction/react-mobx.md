@@ -69,10 +69,10 @@ Wrap state mutations in `@Action()` to batch MobX updates and keep reactions con
 `createInjectablesProvider` creates a React component that binds services into a child IoC container. `IocProvider` provides the root container.
 
 ```tsx
-import { Container, createIocContainer } from "@wirestate/core";
+import { Container, createContainer } from "@wirestate/core";
 import { IocProvider } from "@wirestate/react";
 
-const container: Container = createIocContainer({
+const container: Container = createContainer({
   entries: [CounterService, LoggerService],
 });
 
@@ -269,7 +269,7 @@ function ThemeToggle() {
 Pass initialization data to services when the provider mounts. Read seeds in `@OnActivated` and apply them inside an `@Action()` to keep MobX updates batched.
 
 ```tsx
-const container: Container = createIocContainer({
+const container: Container = createContainer({
   seeds: [[CounterService, { initialCount: 10 }]],
   entries: [CounterService],
 });

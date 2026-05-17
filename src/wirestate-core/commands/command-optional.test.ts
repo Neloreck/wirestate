@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 
-import { createIocContainer } from "../container/create-ioc-container";
+import { mockContainer } from "../test-utils/mock-container";
 import { CommandStatus, CommandDescriptor } from "../types/commands";
 import { Optional } from "../types/general";
 
@@ -9,7 +9,7 @@ import { commandOptional } from "./command-optional";
 
 describe("commandOptional", () => {
   it("should dispatch a command on the container if handler exists", async () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const handler = jest.fn((data: string) => data + "-result");
     const bus: CommandBus = container.get(CommandBus);
 
@@ -28,7 +28,7 @@ describe("commandOptional", () => {
   });
 
   it("should return null if no handler exists", () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const descriptor: Optional<CommandDescriptor> = commandOptional(container, "NON_EXISTENT", "data");
 
     expect(descriptor).toBeNull();

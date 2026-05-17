@@ -1,7 +1,8 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, CommandBus, createIocContainer, CommandDescriptor, CommandHandler } from "@wirestate/core";
+import { Container, CommandBus, CommandDescriptor, CommandHandler } from "@wirestate/core";
+import { mockContainer } from "@wirestate/core/test-utils";
 
-import { withIocProvider } from "../test-utils/with-ioc-provider";
+import { withContainerProvider } from "../test-utils/with-container-provider";
 
 import { useCommandHandler } from "./use-command-handler";
 
@@ -11,7 +12,7 @@ describe("useCommandHandler", () => {
   });
 
   it("should register handler and unregister on unmount", async () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const commandBus: CommandBus = container.get(CommandBus);
     const handler = jest.fn(() => Promise.resolve("async-data"));
 
@@ -23,7 +24,7 @@ describe("useCommandHandler", () => {
 
     expect(commandBus.has("HOOK_COMMAND")).toBe(false);
 
-    const { unmount } = render(withIocProvider(<TestComponent />, container));
+    const { unmount } = render(withContainerProvider(<TestComponent />, container));
 
     expect(commandBus.has("HOOK_COMMAND")).toBe(true);
 
@@ -40,7 +41,7 @@ describe("useCommandHandler", () => {
   });
 
   it("should update handler ref when handler changes", async () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const commandBus: CommandBus = container.get(CommandBus);
 
     const handler1 = jest.fn().mockReturnValue("first");
@@ -52,12 +53,12 @@ describe("useCommandHandler", () => {
       return null;
     }
 
-    const { rerender } = render(withIocProvider(<TestComponent handler={handler1} />, container));
+    const { rerender } = render(withContainerProvider(<TestComponent handler={handler1} />, container));
 
     await commandBus.command("UPDATE_COMMAND").task;
     expect(handler1).toHaveBeenCalled();
 
-    rerender(withIocProvider(<TestComponent handler={handler2} />, container));
+    rerender(withContainerProvider(<TestComponent handler={handler2} />, container));
 
     await commandBus.command("UPDATE_COMMAND").task;
     expect(handler2).toHaveBeenCalled();

@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/@wirestate/lit.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/lit)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/master/LICENSE)
 
-Lit elements integration for wirestate. Provides dependency injection and messaging for Lit components.
+Lit elements integration for wirestate. Provides container provisioning, dependency injection, and messaging for Lit components.
 
 ## Installation
 
@@ -18,25 +18,31 @@ npm install @wirestate/core @wirestate/lit lit reflect-metadata
   - **Events**: Subscribe to events from the global event bus using `@onEvent` or `useOnEvents`.
   - **Commands**: Register command handlers using `@onCommand` or `useOnCommand`.
   - **Queries**: Register query handlers using `@onQuery` or `useOnQuery`.
-- **Container Provisioning**: Provide and manage IoC containers within the Lit component tree using `@iocProvide` or `useIocProvision`.
-- **Service Binding**: Dynamically bind services to the container using `@injectablesProvide`, `useInjectablesProvider`, or `InjectablesProviderController`.
+- **Container Provisioning**: Provide and manage containers within the Lit component tree using `@containerProvide` or `useContainerProvision`.
+- **Sub-containers**: Create managed child containers derived from the parent context using `@subContainerProvide`, `useSubContainerProvider`, or `SubContainerProvider`.
 - **Test Utilities**: Simplified setup for unit testing components with IoC dependencies.
 
 ## Provisioning
 
-### `@iocProvide(options?)` / `useIocProvision(host, options?)`
+### `@containerProvide(options)` / `useContainerProvision(host, options)`
 
-Provides an IoC container to the component tree. It uses Lit Context to propagate the container to child elements.
+Provides a container to the component tree. It uses Lit Context to propagate the container to child elements.
+
+Pass `container` to expose an existing container, or pass `options` to create and manage one for the host lifecycle.
 
 ```typescript
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
-import { iocProvide, IocProviderController } from "@wirestate/lit";
+import { containerProvide, ContainerProvider } from "@wirestate/lit";
 
 @customElement("my-app")
 class MyApp extends LitElement {
-  @iocProvide()
-  private ioc!: IocProviderController;
+  @containerProvide({
+    options: {
+      seed: { someData: "value" },
+    },
+  })
+  private containerProvider!: ContainerProvider;
 
   render() {
     return html`<my-component></my-component>`;
@@ -44,23 +50,28 @@ class MyApp extends LitElement {
 }
 ```
 
-### `@injectablesProvide(options)` / `useInjectablesProvider(host, options)`
+### `@subContainerProvide(options)` / `useSubContainerProvider(host, options)`
 
-Binds a set of injectables to the nearest IoC container for the host element's lifetime. Entries are bound when the host connects and unbound when it disconnects.
+Creates a managed child container derived from the nearest parent container for the host element's lifetime. The child container is recreated when the parent container changes and destroyed when the host disconnects.
 
 Using the decorator (accessor):
 
 ```typescript
 import { LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
-import { injectablesProvide, InjectablesProviderController } from "@wirestate/lit";
+import { subContainerProvide, SubContainerProvider } from "@wirestate/lit";
 
 import { AuthService, UserService } from "./services";
 
 @customElement("my-app")
 class MyApp extends LitElement {
-  @injectablesProvide({ entries: [AuthService, UserService], activate: [AuthService] })
-  public services!: InjectablesProviderController<MyApp>;
+  @subContainerProvide({
+    options: {
+      entries: [AuthService, UserService],
+      activate: [AuthService],
+    },
+  })
+  public containerProvider!: SubContainerProvider;
 }
 ```
 
@@ -68,45 +79,52 @@ Using the hook:
 
 ```typescript
 import { LitElement } from "lit";
-import { useInjectablesProvider } from "@wirestate/lit";
+import { useSubContainerProvider } from "@wirestate/lit";
 
 import { AuthService, UserService } from "./services";
 
 class MyApp extends LitElement {
-  private services = useInjectablesProvider(this, {
-    entries: [AuthService, UserService],
-    activate: [AuthService],
+  private container = useSubContainerProvider(this, {
+    options: {
+      entries: [AuthService, UserService],
+      activate: [AuthService],
+    },
   });
 }
 ```
 
-Using the controller directly:
+Using the provider directly:
 
 ```typescript
 import { LitElement } from "lit";
-import { InjectablesProviderController } from "@wirestate/lit";
+import { SubContainerProvider } from "@wirestate/lit";
 
 import { AuthService, UserService } from "./services";
 
 class MyApp extends LitElement {
-  private services = new InjectablesProviderController(this, {
-    entries: [AuthService, UserService],
-    activate: [AuthService],
+  private containerProvider: SubContainerProvider = new SubContainerProvider(this, {
+    options: {
+      entries: [AuthService, UserService],
+      activate: [AuthService],
+    },
   });
 }
 ```
 
-To bind into a specific container instead of the nearest provider context, pass the `into` option:
+To seed the child container during creation, pass `seeds` inside `options`:
 
 ```typescript
 import { LitElement } from "lit";
-import { useInjectablesProvider } from "@wirestate/lit";
+import { useSubContainerProvider } from "@wirestate/lit";
 
 import { AuthService, UserService } from "./services";
 
 class MyApp extends LitElement {
-  private services = useInjectablesProvider(this, {
-    entries: [AuthService, UserService],
+  private provider: SubContainerProvider = useSubContainerProvider(this, {
+    options: {
+      entries: [AuthService, UserService],
+      seeds: [[AuthService, { role: "admin" }]],
+    },
   });
 }
 ```
@@ -115,7 +133,7 @@ class MyApp extends LitElement {
 
 ### `@injection(optionsOrId)` / `useInjection(host, optionsOrId)`
 
-Injects a service from the nearest IoC container. Supports both options object and direct service identifier.
+Injects a service from the nearest parent container. Supports both options object and direct service identifier.
 
 ```typescript
 import { LitElement, html } from "lit";
@@ -140,7 +158,7 @@ class MyComponent extends LitElement {
 }
 ```
 
-Using the controller:
+Using the hook:
 
 ```typescript
 import { LitElement, html } from "lit";
@@ -165,7 +183,7 @@ class MyComponent extends LitElement {
 
 ### Events
 
-Subscribe to events from the event bus using `@onEvent` decorator or `useOnEvents` controller.
+Subscribe to events from the event bus using `@onEvent` decorator or `useOnEvents` controller. Handlers follow the active container context when the nearest container changes.
 
 ```typescript
 import { LitElement } from "lit";
@@ -196,7 +214,7 @@ class MyListener extends LitElement {
 
 ### Commands
 
-Register a handler for a specific command type.
+Register a handler for a specific command type. Handlers follow the active container context when the nearest container changes.
 
 ```typescript
 import { LitElement } from "lit";
@@ -212,7 +230,7 @@ class MyCommander extends LitElement {
 
 ### Queries
 
-Register a handler for a specific query type.
+Register a handler for a specific query type. Handlers follow the active container context when the nearest container changes.
 
 ```typescript
 import { LitElement } from "lit";

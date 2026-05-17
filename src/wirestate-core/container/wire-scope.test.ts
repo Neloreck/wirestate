@@ -16,7 +16,6 @@ import { mockService } from "../test-utils/mock-service";
 import { CommandStatus, CommandDescriptor } from "../types/commands";
 import { MaybePromise, Optional } from "../types/general";
 
-import { createIocContainer } from "./create-ioc-container";
 import { WireScope } from "./wire-scope";
 
 describe("WireScope", () => {
@@ -37,14 +36,14 @@ describe("WireScope", () => {
   });
 
   it("should return container if activated", () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const scope: WireScope = new WireScope(container);
 
     expect(scope.getContainer()).toBe(container);
   });
 
   it("should resolve from container", () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const scope: WireScope = new WireScope(container);
 
     container.bind("TEST").toConstantValue("VALUE");
@@ -54,7 +53,7 @@ describe("WireScope", () => {
   });
 
   it("should resolve optional from container", () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const scope: WireScope = new WireScope(container);
 
     container.bind("TEST").toConstantValue("VALUE");
@@ -64,7 +63,7 @@ describe("WireScope", () => {
   });
 
   it("should emit events via event bus", () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const bus: EventBus = container.get(EventBus);
     const scope: WireScope = new WireScope(container);
 
@@ -87,7 +86,7 @@ describe("WireScope", () => {
   });
 
   it("should subscribe to events via scope", () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const bus: EventBus = container.get(EventBus);
     const scope: WireScope = new WireScope(container);
     const handler = jest.fn();
@@ -104,7 +103,7 @@ describe("WireScope", () => {
   });
 
   it("should unsubscribe from events via scope", () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const bus: EventBus = container.get(EventBus);
     const scope: WireScope = new WireScope(container);
     const handler = jest.fn();
@@ -121,7 +120,7 @@ describe("WireScope", () => {
   });
 
   it("should query data via query bus", () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
     const scope: WireScope = new WireScope(container);
 
@@ -142,7 +141,7 @@ describe("WireScope", () => {
   });
 
   it("should execute commands via command bus", async () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const bus: CommandBus = container.get(CommandBus);
     const scope: WireScope = new WireScope(container);
 
@@ -167,7 +166,7 @@ describe("WireScope", () => {
   });
 
   it("should execute optional commands via command bus", async () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const bus: CommandBus = container.get(CommandBus);
     const scope: WireScope = new WireScope(container);
 
@@ -191,7 +190,7 @@ describe("WireScope", () => {
   });
 
   it("should register query handler via scope", () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
     const scope: WireScope = new WireScope(container);
     const handler = jest.fn().mockReturnValue("result");
@@ -206,7 +205,7 @@ describe("WireScope", () => {
   });
 
   it("should register command handler via scope", async () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const bus: CommandBus = container.get(CommandBus);
     const scope: WireScope = new WireScope(container);
     const handler = jest.fn().mockReturnValue("result");
@@ -221,7 +220,7 @@ describe("WireScope", () => {
   });
 
   it("should unregister query handler via scope", () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
     const scope: WireScope = new WireScope(container);
     const handler = jest.fn().mockReturnValue("value");
@@ -236,7 +235,7 @@ describe("WireScope", () => {
   });
 
   it("should unregister command handler via scope", () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const bus: CommandBus = container.get(CommandBus);
     const scope: WireScope = new WireScope(container);
     const handler = jest.fn().mockReturnValue("value");
@@ -251,14 +250,14 @@ describe("WireScope", () => {
   });
 
   it("should get global seed from container", () => {
-    const container: Container = createIocContainer({ seed: { key: "val" } });
+    const container: Container = mockContainer({ seed: { key: "val" } });
     const scope: WireScope = new WireScope(container);
 
     expect(scope.getSeed()).toEqual({ key: "val" });
   });
 
   it("should get bound seed from container", () => {
-    const container: Container = createIocContainer();
+    const container: Container = mockContainer();
     const scope: WireScope = new WireScope(container);
 
     applySeeds(container, [[GenericService, { a: 1, b: 2 }]]);

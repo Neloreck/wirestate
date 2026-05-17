@@ -10,9 +10,9 @@
   "dependencies": {
     "@lit-labs/signals": "^0.2.0",
     "@lit/context": "^1.1.6",
-    "@wirestate/core": "^0.6.3",
-    "@wirestate/lit": "^0.6.1",
-    "@wirestate/lit-signals": "^0.6.1",
+    "@wirestate/core": "^0.7.0-experimental.3",
+    "@wirestate/lit": "^0.7.0-experimental.3",
+    "@wirestate/lit-signals": "^0.7.0-experimental.3",
     "inversify": "^8.1.0",
     "lit": "^3.3.2",
     "reflect-metadata": "^0.2.2"

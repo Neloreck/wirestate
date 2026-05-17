@@ -243,8 +243,8 @@ importers:
         specifier: '>=2.0.0'
         version: 2.1.2
       '@wirestate/core':
-        specifier: '>=0.6.0'
-        version: 0.6.0(reflect-metadata@0.2.2)(tslib@2.8.1)
+        specifier: '>=0.7.0-experimental.1'
+        version: 0.7.0-experimental.1(reflect-metadata@0.2.2)(tslib@2.8.1)
       reflect-metadata:
         specifier: '>=0.2.0'
         version: 0.2.2
@@ -264,8 +264,8 @@ importers:
   src/wirestate-react:
     dependencies:
       '@wirestate/core':
-        specifier: '>=0.6.0'
-        version: 0.6.0(reflect-metadata@0.2.2)(tslib@2.8.1)
+        specifier: '>=0.7.0-experimental.1'
+        version: 0.7.0-experimental.1(reflect-metadata@0.2.2)(tslib@2.8.1)
       react:
         specifier: '>=16.8.0'
         version: 16.14.0
@@ -2330,10 +2330,9 @@ packages:
   '@vueuse/shared@12.8.2':
     resolution: {integrity: sha512-dznP38YzxZoNloI0qpEfpkms8knDtaoQ6Y/sfS0L7Yki4zh40LFHEhur0odJC6xTHG5dxWVPiUWBXn+wCG2s5w==}
 
-  '@wirestate/core@0.6.0':
-    resolution: {integrity: sha512-zviRj1qw8V2IhcYKJ2S6GDrodoXtAxfkcalCqQSwqGweXATxt72U60mutQhR4eSrurGDfo+nbqq+e8tUvFgd3g==}
+  '@wirestate/core@0.7.0-experimental.1':
+    resolution: {integrity: sha512-DWuLWjMKWVCN32QwL8m8lNfIXWaCuFyOS8eWy77QJ85zpV0gPsx3+/F2UgPWcDXKuIwn8L8KXrdZcQy9CC92yw==}
     peerDependencies:
-      reflect-metadata: '>=0.2.0'
       tslib: '>=2.5.0'
 
   acorn-jsx@5.3.2:
@@ -7416,11 +7415,12 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@wirestate/core@0.6.0(reflect-metadata@0.2.2)(tslib@2.8.1)':
+  '@wirestate/core@0.7.0-experimental.1(reflect-metadata@0.2.2)(tslib@2.8.1)':
     dependencies:
       inversify: 8.1.0(reflect-metadata@0.2.2)
-      reflect-metadata: 0.2.2
       tslib: 2.8.1
+    transitivePeerDependencies:
+      - reflect-metadata
 
   acorn-jsx@5.3.2(acorn@8.16.0):
     dependencies:

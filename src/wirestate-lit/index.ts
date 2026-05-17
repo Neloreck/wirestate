@@ -3,7 +3,9 @@
  */
 
 export { injection, InjectionDecorator, InjectionOptions } from "./consumption/injection";
+export { useContainer, UseContainerValue } from "./consumption/use-container";
 export { useInjection, UseInjectionOptions, UseInjectionValue } from "./consumption/use-injection";
+export { useScope, UseScopeValue } from "./consumption/use-scope";
 
 export { onCommand, OnCommandDecorator } from "./commands/on-command";
 export { OnCommandController } from "./commands/on-command-controller";
@@ -17,14 +19,11 @@ export { onQuery, OnQueryDecorator } from "./queries/on-query";
 export { OnQueryController } from "./queries/on-query-controller";
 export { useOnQuery, UseOnQueryOptions } from "./queries/use-on-query";
 
-export { IocContextObject, IocContext } from "./context/ioc-context";
+export { ContainerContext } from "./context/container-context";
 
-export { iocProvide, IocProviderDecorator } from "./provision/ioc-provide";
-export { IocProviderController, IocProviderControllerOptions } from "./provision/ioc-provider-controller";
-export { injectablesProvide, InjectablesProviderDecorator } from "./provision/injectables-provide";
-export {
-  InjectablesProviderController,
-  InjectablesProviderControllerOptions,
-} from "./provision/injectables-provider-controller";
-export { useInjectablesProvider } from "./provision/use-injectables-provider";
-export { useIocProvision, UseIocProvisionOptions } from "./provision/use-ioc-provision";
+export { ContainerProvider, ContainerProviderOptions } from "./provision/container-provider";
+export { SubContainerProvider, SubContainerProviderOptions } from "./provision/sub-container-provider";
+export { containerProvide, ContainerProviderDecorator } from "./provision/container-provide";
+export { subContainerProvide, SubContainerProviderDecorator } from "./provision/sub-container-provide";
+export { useContainerProvision, UseContainerProvisionOptions } from "./provision/use-container-provision";
+export { useSubContainerProvider } from "./provision/use-sub-container-provider";

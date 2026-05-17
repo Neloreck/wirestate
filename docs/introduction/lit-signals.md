@@ -25,26 +25,24 @@ export class CounterService {
 
 ### 2. Provide the Container and Services
 
-Every Wirestate tree needs an IoC container (`useIocProvision`) and a controller that binds services (`useInjectablesProvider`).
-These hooks are applied to a Lit element that acts as the root.
+Every Wirestate tree needs a root container (`useContainerProvision`) and, when you want subtree-local services,
+a child-container provider (`useSubContainerProvider`). These hooks are applied to a Lit element that acts as the root.
 
 ```ts
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import {
-  useIocProvision,
-  useInjectablesProvider,
-  IocProviderController,
-  InjectablesProviderController,
+  ContainerProvider,
+  useContainerProvision,
 } from "@wirestate/lit";
 import { CounterService } from "./CounterService";
 
 @customElement("application-root")
 export class ApplicationRoot extends LitElement {
-  public readonly ioc: IocProviderController = useIocProvision(this);
-  public readonly injectables: InjectablesProviderController = useInjectablesProvider(this, {
-    entries: [CounterService],
-    into: () => this.ioc.value,
+  public readonly containerProvider: ContainerProvider = useContainerProvision(this, {
+    options: {
+      entries: [CounterService],
+    },
   });
 
   public render() {
@@ -53,8 +51,7 @@ export class ApplicationRoot extends LitElement {
 }
 ```
 
-`useIocProvision` creates the root container. `useInjectablesProvider` binds services into a child container and
-activates them when the element connects, deactivating them on disconnect.
+`useContainerProvision` creates the root container.
 
 ### 3. Inject and Use the Service
 
@@ -115,25 +112,19 @@ export class CounterService {
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import {
-  useIocProvision,
-  useInjectablesProvider,
-  IocProviderController,
-  InjectablesProviderController,
+  ContainerProvider,
+  useContainerProvision,
 } from "@wirestate/lit";
 import { CounterService } from "./CounterService";
 
 @customElement("application-root")
 export class ApplicationRoot extends LitElement {
-  // ...
-
-  public readonly ioc: IocProviderController = useIocProvision(this);
-  public readonly injectables: InjectablesProviderController = useInjectablesProvider(this, {
-    entries: [CounterService],
-    seeds: [[CounterService, { count: 100 }]],
-    into: () => this.ioc.value,
+  public readonly container: ContainerProvider = useContainerProvision(this, {
+    options: {
+      entries: [CounterService],
+      seeds: [[CounterService, { count: 100 }]],
+    },
   });
-
-  // ...
 }
 ```
 
@@ -147,8 +138,6 @@ import { onEvent, onQuery, onCommand } from "@wirestate/lit";
 
 @customElement("my-logger")
 export class MyLogger extends LitElement {
-  // ...
-
   @onEvent("COUNTER_INCREMENTED")
   private onCounterIncremented(event: Event<{ count: number }>): void {
     console.log("New count:", event.payload?.count);
@@ -163,7 +152,5 @@ export class MyLogger extends LitElement {
   private onDumpLogs(): void {
     console.log("Dumping logs on command");
   }
-
-  // ...
 }
 ```

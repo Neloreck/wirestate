@@ -1,7 +1,7 @@
 describe("Library test utils exports from wirestate-react/test-utils", () => {
   const testUtilsRoot = require("./test-utils");
 
-  const expectedTestUtilsExports: Array<string> = ["withIocProvider"];
+  const expectedTestUtilsExports: Array<string> = ["withContainerProvider"];
 
   const assertListIntersection = (first: Array<string>, second: Array<string>) => {
     first.forEach((it: string) => {

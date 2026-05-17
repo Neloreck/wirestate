@@ -1,7 +1,7 @@
 import { Container, Newable, ServiceIdentifier } from "inversify";
 
 import { getEntryToken } from "../bind/get-entry-token";
-import { createIocContainer } from "../container/create-ioc-container";
+import { createContainer } from "../container/create-container";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { AnyObject } from "../types/general";
@@ -64,7 +64,7 @@ export interface MockContainerOptions {
  * Mocks and configures an Inversify {@link Container} for testing.
  *
  * @remarks
- * This utility initializes a new container via {@link createIocContainer} and
+ * This utility initializes a new container via {@link createContainer} and
  * binds the provided `entries` using {@link mockBindEntry}. It can also
  * automatically resolve (activate) a subset of services.
  *
@@ -99,7 +99,7 @@ export function mockContainer(options: MockContainerOptions = {}): Container {
     }
   }
 
-  const container: Container = createIocContainer({ parent: options.parent, seeds: options.seeds, seed: options.seed });
+  const container: Container = createContainer({ parent: options.parent, seeds: options.seeds, seed: options.seed });
 
   for (const it of entries) {
     mockBindEntry(container, it, { skipLifecycle: skipLifecycle });

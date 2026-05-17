@@ -58,10 +58,10 @@ export class CounterService {
 Create application container and provided it via `IocProvider`.
 
 ```tsx
-import { Container, createIocContainer } from "@wirestate/core";
+import { Container, createContainer } from "@wirestate/core";
 import { IocProvider } from "@wirestate/react";
 
-const container: Container = createIocContainer({
+const container: Container = createContainer({
   entries: [CounterService, LoggerService],
 });
 
@@ -208,7 +208,7 @@ function ThemeToggle() {
 Pass initialization data to services in the container.
 
 ```tsx
-const container: Container = createIocContainer({
+const container: Container = createContainer({
   seeds: [[CounterService, { initialCount: 10 }]],
   entries: [CounterService],
 });

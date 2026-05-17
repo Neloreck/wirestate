@@ -1,6 +1,6 @@
 # Services
 
-A **Service** is an `@Injectable` class bound to an IoC container. It holds business logic, optionally reactive state,
+A **Service** is an `@Injectable` class bound to a container. It holds business logic, optional reactive state,
 and communicates with other services through injection or the messaging buses.
 
 ## Declaring a Service
@@ -22,28 +22,28 @@ export class UserService {
 
 ## Binding a Service
 
-`bindService` registers the class in singleton scope and wires up all lifecycle and messaging decorators.
+`bindService` registers the class in singleton scope and wires up lifecycle and messaging decorators.
 
 ```ts
-import { Container, createIocContainer, bindService } from "@wirestate/core";
+import { Container, bindService, createContainer } from "@wirestate/core";
 import { UserService } from "./UserService";
 
-const container: Container = createIocContainer();
+const container: Container = createContainer();
 
 bindService(container, UserService);
 
 const userService: UserService = container.get(UserService);
 ```
 
-In React and Lit integration, `createInjectablesProvider` / `useInjectablesProvider` / `@injectablesProvide` call `bindService`
-internally — you never call it manually in UI code.
+In React and Lit integration, `SubContainerProvider`, `useSubContainerProvider`, and `@subContainerProvide`
+bind service entries through `createContainer`, so you do not call `bindService` manually in UI code.
 
 ## Constructor Injection
 
 Inject dependencies by declaring typed constructor parameters with `@Inject`.
 
 ```ts
-import { Injectable, Inject } from "@wirestate/core";
+import { Inject, Injectable } from "@wirestate/core";
 
 @Injectable()
 export class OrderService {
@@ -58,11 +58,11 @@ export class OrderService {
 
 ## WireScope
 
-`WireScope` is a transient per-service bridge to the container's buses and seed data.
-Inject it when a service needs to emit events, dispatch commands/queries, or read seed data.
+`WireScope` is a transient bridge to the container's buses and seed data.
+Inject it when a service needs to emit events, dispatch commands or queries, or read seeds.
 
 ```ts
-import { Injectable, Inject, WireScope } from "@wirestate/core";
+import { Inject, Injectable, WireScope } from "@wirestate/core";
 
 @Injectable()
 export class CartService {
@@ -71,7 +71,6 @@ export class CartService {
     private readonly scope: WireScope
   ) {}
 
-  // Emit event, execute command, or read seed from scope.
   public checkout(): void {
     this.scope.emitEvent("CHECKOUT_STARTED");
   }
@@ -87,7 +86,7 @@ export class CartService {
 Runs after the service is resolved and bound. Use it to initialize reactive state from seeds, start subscriptions, or kick off async work.
 
 ```ts
-import { Injectable, Inject, OnActivated, WireScope } from "@wirestate/core";
+import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
 
 export interface FeedSeed {
   feedId: string;
@@ -113,10 +112,10 @@ export class FeedService {
 
 ### @OnDeactivation
 
-Runs when the container disposes the service (e.g., when a React provider unmounts). Cancel timers, close connections, and flush state here.
+Runs when the container disposes the service. Cancel timers, close connections, and flush state here.
 
 ```ts
-import { OnDeactivation } from "@wirestate/core";
+import { Injectable, OnActivated, OnDeactivation } from "@wirestate/core";
 
 @Injectable()
 export class PollingService {
@@ -137,11 +136,13 @@ export class PollingService {
 }
 ```
 
-### Disposing
+## Disposing
 
-`isDisposed` is a readonly boolean set to `true` after deactivation. Check it in async callbacks that outlive the service.
+`scope.isDisposed` becomes `true` after deactivation. Check it in async callbacks that may outlive the service.
 
 ```ts
+import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
+
 @Injectable()
 export class DataService {
   public constructor(
@@ -153,8 +154,6 @@ export class DataService {
   public async onActivated(): Promise<void> {
     const data = await fetch("/api/data").then((r) => r.json());
 
-    // On deactivation scopes are marked as disposed.
-    // So if deactivation already happened, async code here is working in already destroyed data service.
     if (!this.scope.isDisposed) {
       this.data.value = data;
     }
@@ -167,7 +166,7 @@ export class DataService {
 Use `forwardRef` to break circular constructor dependencies.
 
 ```ts
-import { Injectable, Inject, forwardRef } from "@wirestate/core";
+import { Inject, Injectable, forwardRef } from "@wirestate/core";
 
 @Injectable()
 export class ServiceA {
@@ -179,20 +178,22 @@ export class ServiceA {
 
 @Injectable()
 export class ServiceB {
-  constructor(
+  public constructor(
     @Inject(forwardRef(() => ServiceA))
     private readonly a: ServiceA
   ) {}
 }
 ```
 
-Prefer restructuring to removing cycles; `forwardRef` is a last resort.
+Prefer restructuring to removing cycles. `forwardRef` is a last resort.
 
 ## Lazy Resolution
 
 Use `scope.resolve` instead of constructor injection to defer resolution and break cycles without `forwardRef`.
 
 ```ts
+import { Inject, Injectable, WireScope } from "@wirestate/core";
+
 import { LoggerService } from "./LoggerService";
 
 @Injectable()
@@ -203,7 +204,6 @@ export class NotificationService {
   ) {}
 
   public notify(msg: string): void {
-    // Resolved during the call, not on construction:
     const logger: LoggerService = this.scope.resolve(LoggerService);
 
     logger.log(msg);
@@ -211,7 +211,7 @@ export class NotificationService {
 }
 ```
 
-`scope.resolveOptional(Token)` returns `null` if the token is not bound — safe for optional integrations.
+`scope.resolveOptional(Token)` returns `null` if the token is not bound.
 
 ## Binding Constants and Dynamic Values
 
@@ -220,11 +220,8 @@ import { bindConstant, bindDynamicValue } from "@wirestate/core";
 
 const API_URL = Symbol("API_URL");
 
-// Constant:
 bindConstant(container, API_URL, "https://api.example.com");
-
-// Factory:
 bindDynamicValue(container, API_URL, () => process.env.API_URL ?? "");
 ```
 
-Inject via `@Inject(API_URL)` in any service.
+Inject the token via `@Inject(API_URL)`.

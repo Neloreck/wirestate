@@ -1,4 +1,4 @@
-## 0.7.0
+## Unreleased
 
 - Add `useScope` in `@wirestate/react`
 - New lit elements modules - `@wirestate/lit` and `@wirestate/lit-signals`
@@ -10,10 +10,19 @@
 - Export more alias / methods from `@wirestate/react-mobx`
 - Export missing methods typing for `@wirestate/core`
 - Extensive JSDoc coverage for wirestate packages
-- `createIocContainer`: Added ability to instantly provide and activate entries, targeted seeds
-- `IocProvider`: No nested logics, no seed provision anymore, just plain rough provider
-- `IocActivator`: Added separate activation component
+- `createIocContainer`: Removed in favor of `createContainer`
+- `createContainer`: Added ability to instantly provide and activate entries, targeted seeds
+- `createInjectablesProvider`: Removed.
+- `IocProvider`: Removed
 - `useRootContainer`: Added separate hook for store management in React tree
+- `ContainerProvider`: Simpler provider for containers.
+- `SubContainerProvider`: Added component solving problems of removed `createInjectablesProvider`
+- `ContainerActivator`: Added separate activation component
+- Replace IoC-context provision APIs with `ContainerContext`, `containerProvide`, `ContainerProvider`, and `useContainerProvision`
+- Replace injectables-provider APIs with `subContainerProvide`, `SubContainerProvider`, and `useSubContainerProvider`
+- Provide plain `Container` values through Lit context instead of wrapper objects
+- Recreate managed child containers when the parent container context changes
+- Add `useContainer` and `useScope` consumers in `@wirestate/lit`
 
 ## 0.6.3
 

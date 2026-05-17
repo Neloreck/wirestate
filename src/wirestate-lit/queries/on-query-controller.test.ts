@@ -1,5 +1,6 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { QueryBus, createIocContainer, Container } from "@wirestate/core";
+import { QueryBus, Container } from "@wirestate/core";
+import { mockContainer } from "@wirestate/core/test-utils";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
@@ -64,26 +65,22 @@ describe("OnQueryController", () => {
     expect(await bus.query("ASYNC_QRY", 7)).toBe(21);
   });
 
-  it("should keep handler registered after context revision update", () => {
-    const container: Container = createIocContainer();
-    const bus: QueryBus = container.get(QueryBus);
+  it("should re-register when container context is updated", () => {
+    const firstContainer: Container = mockContainer();
+    const secondContainer: Container = mockContainer();
+    const bus: QueryBus = firstContainer.get(QueryBus);
     const element: TestConsumerElement = new TestConsumerElement();
     const handler = jest.fn(() => "test-result");
 
-    const { provider, contextProvider } = createLitProvision(container);
+    const { provider, contextProvider } = createLitProvision(firstContainer);
 
     new OnQueryController(element, "REVISION_QUERY", handler);
 
     provider.appendChild(element);
     expect(bus.has("REVISION_QUERY")).toBe(true);
 
-    contextProvider.setValue({ ...contextProvider.value, revision: 1000 });
-    expect(bus.has("REVISION_QUERY")).toBe(true);
-
-    const newContainer: Container = createIocContainer();
-
-    contextProvider.setValue({ ...contextProvider.value, container: newContainer });
-    expect(container.get(QueryBus).has("REVISION_QUERY")).toBe(false);
-    expect(newContainer.get(QueryBus).has("REVISION_QUERY")).toBe(true);
+    contextProvider.setValue(secondContainer);
+    expect(firstContainer.get(QueryBus).has("REVISION_QUERY")).toBe(false);
+    expect(secondContainer.get(QueryBus).has("REVISION_QUERY")).toBe(true);
   });
 });
