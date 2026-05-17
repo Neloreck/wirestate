@@ -67,4 +67,5 @@ target/
 .agents
 .claude
 .junie
+AGENTS.md
 skills-lock.json
