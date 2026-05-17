@@ -1,5 +1,4 @@
-import { Newable } from "@wirestate/core/index";
-import { ServiceIdentifier, bindingTypeValues, bindingScopeValues } from "inversify";
+import { ServiceIdentifier, bindingTypeValues, bindingScopeValues, Newable } from "inversify";
 
 /**
  * Inversify binding strategy types.
