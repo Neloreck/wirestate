@@ -22,6 +22,7 @@
 - Replace injectables-provider APIs with `subContainerProvide`, `SubContainerProvider`, and `useSubContainerProvider`
 - Provide plain `Container` values through Lit context instead of wrapper objects
 - Recreate managed child containers when the parent container context changes
+- Add `useContainer` and `useScope` consumers in `@wirestate/lit`
 
 ## 0.6.3
 
