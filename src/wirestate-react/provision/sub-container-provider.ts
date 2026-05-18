@@ -39,8 +39,9 @@ export interface SubContainerProviderProps {
    * Targeted seeds applied before entries are bound.
    *
    * @remarks
-   * Seed changes do not recreate the child container. Pass a React `key` to
-   * force a remount when you need to re-seed the subtree.
+   * Seed changes intentionally do not recreate the child container, because
+   * seed arrays are commonly passed inline. Pass a React `key` to force a
+   * remount when you need to re-seed the subtree.
    */
   readonly seeds?: SeedEntries;
 
@@ -65,7 +66,9 @@ export interface SubContainerProviderProps {
  * @remarks
  * The provider owns the child container. It disposes the previous child before
  * exposing a replacement, recreates on parent or `entries` changes, and revives
- * a cleaned child after React development remount cleanup.
+ * a cleaned child after React development remount cleanup. Seed changes are
+ * intentionally ignored for reuse decisions; pass a React `key` when new seeds
+ * should create a new scoped container.
  *
  * @group Provision
  *

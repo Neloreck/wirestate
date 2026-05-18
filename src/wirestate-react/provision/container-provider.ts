@@ -37,8 +37,11 @@ export interface ContainerProviderProps {
    *
    * @remarks
    * External container instances are never disposed by this provider. Managed
-   * containers created from options are disposed on unmount and recreated when
-   * the `entries` array changes by shallow comparison.
+   * containers created from options are disposed on unmount. Managed containers
+   * are intentionally recreated only when `parent` or `entries` changes by
+   * shallow comparison; inline `seed`, `seeds`, and `activate` values are not
+   * treated as recreation signals. Pass a React `key` to force a fresh managed
+   * container when those options should be re-applied.
    */
   readonly container: ContainerProviderSource;
 
@@ -57,8 +60,11 @@ export interface ContainerProviderProps {
  * - External mode: `container` is a prebuilt {@link Container}. The provider
  *   only passes it through context.
  * - Managed mode: `container` is {@link CreateContainerOptions}. The provider
- *   creates a container, owns its disposal, recreates it when `entries` change,
- *   and revives it after React development remount cleanup.
+ *   creates a container, owns its disposal, recreates it when `parent` or
+ *   `entries` change, and revives it after React development remount cleanup.
+ *   Other creation options are intentionally ignored for reuse decisions to
+ *   avoid remounting on common inline object/array props; use a React `key`
+ *   when a seed or activation change should create a new container.
  *
  * @group Provision
  *
@@ -77,7 +83,9 @@ export function ContainerProvider(props: ContainerProviderProps) {
 
 /**
  * Selects the provider state that should be exposed for the current source.
- * In the case of managed container, only change of entries and parent container cause re-creation.
+ * In the case of managed container, only changes of entries and parent container
+ * cause re-creation. This keeps inline seed/activation props from causing
+ * accidental container churn; callers can force recreation with a React `key`.
  *
  * @param current - Previously exposed state, if any.
  * @param source - Current container source prop.

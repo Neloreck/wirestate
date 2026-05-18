@@ -1,4 +1,3 @@
-import { CONTAINER_PARENT_TOKEN } from "@wirestate/core/container/tokens";
 import { Container } from "inversify";
 
 import { Injectable } from "../alias";
@@ -9,6 +8,7 @@ import { QueryBus } from "../queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 
 import { createContainer } from "./create-container";
+import { CONTAINER_PARENT_TOKEN } from "./tokens";
 import { WireScope } from "./wire-scope";
 
 describe("createContainer", () => {

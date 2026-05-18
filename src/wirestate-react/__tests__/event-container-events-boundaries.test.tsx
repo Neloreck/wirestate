@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { ContainerProvider, SubContainerProvider, useEventEmitter, useEventsHandler, useRootContainer } from "../index";
 
-describe("react event container boundaries integration (SubContainer essentials sharing)", () => {
+describe("react event container boundaries integration (SubContainer essentials isolation)", () => {
   const COUNTER_EVENT: string = "COUNTER_EVENT";
 
   afterEach(() => {
@@ -49,7 +49,7 @@ describe("react event container boundaries integration (SubContainer essentials 
     );
   }
 
-  it("events should be shared between parent and sub-containers", () => {
+  it("keeps events isolated between parent and sub-containers", () => {
     const { getByTestId, queryByTestId, rerender } = render(<Application showChild={true} />);
 
     fireEvent.click(getByTestId("root-emit"));

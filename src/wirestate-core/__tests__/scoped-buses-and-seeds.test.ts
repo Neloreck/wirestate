@@ -5,6 +5,7 @@ import {
   Inject,
   Injectable,
   OnCommand,
+  OnDeactivation,
   OnEvent,
   OnQuery,
   QueryBus,
@@ -14,6 +15,7 @@ import {
   emitEvent,
   query,
 } from "../index";
+import { Optional } from "../types/general";
 
 describe("core scoped buses and seeds integration (parent-child separation)", () => {
   const ADD_COMMAND: string = "ADD_COMMAND";
@@ -140,5 +142,175 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     expect(scope.getSeed()).toEqual({ appName: "wirestate" });
     expect(scope.getSeed(SETTINGS_TOKEN)).toEqual({ label: "targeted", offset: 7 });
     expect(scope.getSeed("MISSING_SEED")).toBeNull();
+  });
+
+  it("keeps scoped essentials available while services deactivate", async () => {
+    const DEACTIVATE_COMMAND: string = "DEACTIVATE_COMMAND";
+    const DEACTIVATE_EVENT: string = "DEACTIVATE_EVENT";
+    const DEACTIVATE_QUERY: string = "DEACTIVATE_QUERY";
+
+    const logs: Array<string> = [];
+
+    let commandTask: Optional<Promise<string>> = null as Optional<Promise<string>>;
+
+    @Injectable()
+    class CleanupService {
+      public constructor(
+        @Inject(WireScope)
+        private readonly scope: WireScope
+      ) {}
+
+      @OnDeactivation()
+      public onDeactivation(): void {
+        const settings: SettingsSeed = this.scope.getSeed(SETTINGS_TOKEN) as SettingsSeed;
+
+        logs.push(`seed:${settings.label}`);
+        this.scope.emitEvent(DEACTIVATE_EVENT, "cleanup");
+        logs.push(`query-result:${this.scope.queryData(DEACTIVATE_QUERY)}`);
+
+        commandTask = this.scope.executeCommand<string>(DEACTIVATE_COMMAND).task;
+      }
+
+      @OnCommand(DEACTIVATE_COMMAND)
+      public onCommand(): string {
+        logs.push("command");
+
+        return "command-result";
+      }
+
+      @OnQuery(DEACTIVATE_QUERY)
+      public onQuery(): string {
+        logs.push("query");
+
+        return "query-result";
+      }
+
+      @OnEvent(DEACTIVATE_EVENT)
+      public onEvent(event: { readonly payload?: string }): void {
+        logs.push(`event:${event.payload ?? "empty"}`);
+      }
+    }
+
+    const container: Container = createContainer({
+      entries: [CleanupService],
+      seeds: [[SETTINGS_TOKEN, { label: "cleanup-label", offset: 0 }]],
+      activate: [CleanupService],
+    });
+
+    container.unbindAll();
+
+    expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result"]);
+    expect(commandTask).not.toBeNull();
+
+    const commandResult: Optional<string> = await commandTask;
+
+    expect(commandResult).toBe("command-result");
+    expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
+
+    expect(container.get(EventBus).has()).toBe(false);
+    expect(container.get(QueryBus).has(DEACTIVATE_QUERY)).toBe(false);
+    expect(container.get(CommandBus).has(DEACTIVATE_COMMAND)).toBe(false);
+  });
+
+  it("keeps services able to communicate with each other while deactivating", async () => {
+    const PEER_DEACTIVATE_COMMAND: string = "PEER_DEACTIVATE_COMMAND";
+    const PEER_DEACTIVATE_EVENT: string = "PEER_DEACTIVATE_EVENT";
+    const PEER_DEACTIVATE_QUERY: string = "PEER_DEACTIVATE_QUERY";
+
+    const logs: Array<string> = [];
+    let commandTask: Optional<Promise<string>> = null as Optional<Promise<string>>;
+
+    const fromDeactivationPeerService: Array<unknown> = [];
+    const fromDeactivationCoordinatorService: Array<unknown> = [];
+
+    @Injectable()
+    class DeactivationPeerService {
+      public constructor(
+        @Inject(WireScope)
+        private readonly scope: WireScope
+      ) {}
+
+      @OnDeactivation()
+      public onDeactivation(): void {
+        logs.push("peer-deactivation");
+
+        fromDeactivationPeerService.push(
+          this.scope.resolve(WireScope),
+          this.scope.resolve(DeactivationCoordinatorService),
+          this.scope.resolve(DeactivationPeerService)
+        );
+      }
+
+      @OnCommand(PEER_DEACTIVATE_COMMAND)
+      public onCommand(value: string): string {
+        logs.push(`peer-command:${value}`);
+
+        return "peer-command-result";
+      }
+
+      @OnQuery(PEER_DEACTIVATE_QUERY)
+      public onQuery(value: string): string {
+        logs.push(`peer-query:${value}`);
+
+        return "peer-query-result";
+      }
+
+      @OnEvent(PEER_DEACTIVATE_EVENT)
+      public onEvent(event: { readonly payload?: string }): void {
+        logs.push(`peer-event:${event.payload ?? "empty"}`);
+      }
+    }
+
+    @Injectable()
+    class DeactivationCoordinatorService {
+      public constructor(
+        @Inject(WireScope)
+        private readonly scope: WireScope
+      ) {}
+
+      @OnDeactivation()
+      public onDeactivation(): void {
+        logs.push("coordinator-deactivation");
+        this.scope.emitEvent(PEER_DEACTIVATE_EVENT, "from-coordinator");
+        logs.push(`coordinator-query:${this.scope.queryData(PEER_DEACTIVATE_QUERY, "from-coordinator")}`);
+
+        commandTask = this.scope.executeCommand<string, string>(PEER_DEACTIVATE_COMMAND, "from-coordinator").task;
+
+        fromDeactivationCoordinatorService.push(
+          this.scope.resolve(WireScope),
+          this.scope.resolve(DeactivationCoordinatorService),
+          this.scope.resolve(DeactivationPeerService)
+        );
+      }
+    }
+
+    const container: Container = createContainer({
+      entries: [DeactivationCoordinatorService, DeactivationPeerService],
+      activate: [DeactivationCoordinatorService, DeactivationPeerService],
+    });
+
+    container.unbindAll();
+
+    expect(logs).toEqual([
+      "coordinator-deactivation",
+      "peer-event:from-coordinator",
+      "peer-query:from-coordinator",
+      "coordinator-query:peer-query-result",
+      "peer-deactivation",
+    ]);
+    expect(commandTask).not.toBeNull();
+
+    expect(await commandTask).toBe("peer-command-result");
+    expect(logs).toEqual([
+      "coordinator-deactivation",
+      "peer-event:from-coordinator",
+      "peer-query:from-coordinator",
+      "coordinator-query:peer-query-result",
+      "peer-deactivation",
+      "peer-command:from-coordinator",
+    ]);
+
+    expect(fromDeactivationCoordinatorService).toHaveLength(3);
+    expect(fromDeactivationPeerService).toHaveLength(3);
   });
 });

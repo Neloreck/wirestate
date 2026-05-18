@@ -1,4 +1,3 @@
-import { CONTAINER_PARENT_TOKEN } from "@wirestate/core/container/tokens";
 import { Container } from "inversify";
 
 import { bindService } from "../bind/bind-service";
@@ -8,6 +7,7 @@ import { QueryBus } from "../queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 
 import { createBaseContainer } from "./create-base-container";
+import { CONTAINER_PARENT_TOKEN } from "./tokens";
 
 describe("createBaseContainer", () => {
   it("should create a container with default essentials", () => {
