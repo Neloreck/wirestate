@@ -110,9 +110,10 @@ export function createContainer(options: CreateContainerOptions = {}): Container
 
   const container: Container = new Container({
     defaultScope: "Singleton",
-    parent: options.parent ? options.parent : createBaseContainer({ ...options, seeds: null, seed: null }),
+    parent: createBaseContainer({ ...options, seeds: null, seed: null }),
   });
 
+  container.bind(Container).toConstantValue(container);
   container.bind(SEEDS_TOKEN).toConstantValue(new Map() as SeedsMap);
   container.bind(SEED_TOKEN).toConstantValue(options.seed ?? {});
 

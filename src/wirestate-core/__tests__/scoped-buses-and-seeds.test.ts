@@ -91,7 +91,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     }
   }
 
-  it("keeps parent and child messaging in shared scope", async () => {
+  it("keeps parent and child messaging in separate scope", async () => {
     const parent: Container = createContainer({
       entries: [ParentCounterService, { id: PARENT_TOKEN, value: "root-value" }],
       seeds: [[SETTINGS_TOKEN, { label: "root-label", offset: 1 }]],
@@ -105,32 +105,28 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     });
 
     expect(child.get(PARENT_TOKEN)).toBe("root-value");
-    expect(child.get(EventBus)).toBe(parent.get(EventBus));
-    expect(child.get(CommandBus)).toBe(parent.get(CommandBus));
-    expect(child.get(QueryBus)).toBe(parent.get(QueryBus));
+    expect(child.get(EventBus)).not.toBe(parent.get(EventBus));
+    expect(child.get(CommandBus)).not.toBe(parent.get(CommandBus));
+    expect(child.get(QueryBus)).not.toBe(parent.get(QueryBus));
 
-    expect(await command(parent, ADD_COMMAND, 2).task).toBe(112);
-    expect(await command(child, ADD_COMMAND, 2).task).toBe(124);
-    expect(query(parent, COUNT_QUERY)).toBe("child-label:124");
-    expect(query(child, COUNT_QUERY)).toBe("child-label:124");
+    expect(await command(parent, ADD_COMMAND, 2).task).toBe(3);
+    expect(await command(child, ADD_COMMAND, 2).task).toBe(112);
+    expect(query(parent, COUNT_QUERY)).toBe("root-label:3");
+    expect(query(child, COUNT_QUERY)).toBe("child-label:112");
 
     emitEvent(parent, LOG_EVENT, "from-parent");
     emitEvent(child, LOG_EVENT, "from-child");
 
-    expect(parent.get(ParentCounterService).events).toEqual(["parent:from-parent", "parent:from-child"]);
-    expect(child.get(ChildCounterService).events).toEqual(["child:from-parent", "child:from-child"]);
+    expect(parent.get(ParentCounterService).events).toEqual(["parent:from-parent"]);
+    expect(child.get(ChildCounterService).events).toEqual(["child:from-child"]);
 
     child.unbindAll();
 
-    expect(await command(parent, ADD_COMMAND, 2).task).toBe(3);
-    expect(query(parent, COUNT_QUERY)).toBe("root-label:3");
+    expect(await command(parent, ADD_COMMAND, 2).task).toBe(6);
+    expect(query(parent, COUNT_QUERY)).toBe("root-label:6");
 
     emitEvent(parent, LOG_EVENT, "from-parent");
-    expect(parent.get(ParentCounterService).events).toEqual([
-      "parent:from-parent",
-      "parent:from-child",
-      "parent:from-parent",
-    ]);
+    expect(parent.get(ParentCounterService).events).toEqual(["parent:from-parent", "parent:from-parent"]);
   });
 
   it("uses the root seed separately from targeted seeds", () => {

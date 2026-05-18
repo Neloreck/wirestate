@@ -110,6 +110,8 @@ export function bindService<T extends object>(
   const whenBind: BindWhenOnFluentSyntax<T> = container.bind<T>(entry).to(entry).inSingletonScope();
 
   whenBind.onActivation((context, instance) => {
+    // todo: Respect async calls here.
+
     dbg.info(prefix(__filename), "Activating service:", {
       name: entry.name,
       context,
@@ -201,6 +203,8 @@ export function bindService<T extends object>(
   });
 
   whenBind.onDeactivation((instance) => {
+    // todo: Respect async calls here.
+
     dbg.info(prefix(__filename), "Deactivating service:", {
       name: entry.name,
       container,

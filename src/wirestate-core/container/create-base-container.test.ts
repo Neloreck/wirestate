@@ -1,3 +1,4 @@
+import { CONTAINER_PARENT_TOKEN } from "@wirestate/core/container/tokens";
 import { Container } from "inversify";
 
 import { bindService } from "../bind/bind-service";
@@ -13,6 +14,7 @@ describe("createBaseContainer", () => {
     const container: Container = createBaseContainer({});
 
     expect(container).toBeInstanceOf(Container);
+    expect(container.get(Container)).toBe(container);
     expect(container.get(EventBus)).toBeInstanceOf(EventBus);
     expect(container.get(QueryBus)).toBeInstanceOf(QueryBus);
     expect(container.get(CommandBus)).toBeInstanceOf(CommandBus);
@@ -42,6 +44,8 @@ describe("createBaseContainer", () => {
 
     const container: Container = createBaseContainer({ parent });
 
+    expect(container.get(CONTAINER_PARENT_TOKEN)).toBe(parent);
+    expect(container.get(Container)).toBe(container);
     expect(container.get(PARENT_TOKEN)).toBe("parent-value");
   });
 

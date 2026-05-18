@@ -9,6 +9,8 @@ import { SEEDS_TOKEN } from "../seeds/tokens";
 import { AnyObject, Maybe } from "../types/general";
 import { SeedEntries, SeedsMap } from "../types/initial-state";
 
+import { CONTAINER_PARENT_TOKEN } from "./tokens";
+
 /**
  * Represents configuration options for {@link createBaseContainer}.
  *
@@ -70,6 +72,8 @@ export function createBaseContainer(options: CreateBaseContainerOptions): Contai
     defaultScope: "Singleton",
   });
 
+  container.bind(CONTAINER_PARENT_TOKEN).toConstantValue(options.parent);
+  container.bind(Container).toConstantValue(container);
   container.bind(EventBus).toConstantValue(new EventBus());
   container.bind(QueryBus).toConstantValue(new QueryBus());
   container.bind(CommandBus).toConstantValue(new CommandBus());

@@ -55,12 +55,12 @@ describe("react event container boundaries integration (SubContainer essentials 
     fireEvent.click(getByTestId("root-emit"));
 
     expect(getByTestId("root-events").textContent).toBe("root:root");
-    expect(getByTestId("child-events").textContent).toBe("child:root");
+    expect(getByTestId("child-events").textContent).toBe("empty");
 
     fireEvent.click(getByTestId("child-emit"));
 
-    expect(getByTestId("root-events").textContent).toBe("root:root,root:child");
-    expect(getByTestId("child-events").textContent).toBe("child:root,child:child");
+    expect(getByTestId("root-events").textContent).toBe("root:root");
+    expect(getByTestId("child-events").textContent).toBe("child:child");
 
     rerender(<Application showChild={false} />);
 
@@ -68,7 +68,7 @@ describe("react event container boundaries integration (SubContainer essentials 
 
     fireEvent.click(getByTestId("root-emit"));
 
-    expect(getByTestId("root-events").textContent).toBe("root:root,root:child,root:root");
+    expect(getByTestId("root-events").textContent).toBe("root:root,root:root");
 
     rerender(<Application showChild={true} />);
 

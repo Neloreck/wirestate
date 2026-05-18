@@ -1,3 +1,4 @@
+import { CONTAINER_PARENT_TOKEN } from "@wirestate/core/container/tokens";
 import { Container } from "inversify";
 
 import { Injectable } from "../alias";
@@ -15,6 +16,7 @@ describe("createContainer", () => {
     const container: Container = createContainer();
 
     expect(container).toBeInstanceOf(Container);
+    expect(container.get(Container)).toBe(container);
     expect(container.get(EventBus)).toBeInstanceOf(EventBus);
     expect(container.get(QueryBus)).toBeInstanceOf(QueryBus);
     expect(container.get(CommandBus)).toBeInstanceOf(CommandBus);
@@ -59,16 +61,17 @@ describe("createContainer", () => {
 
     const container: Container = createContainer({ parent });
 
+    expect(container.get(CONTAINER_PARENT_TOKEN)).toBe(parent);
     expect(container.get(PARENT_TOKEN)).toBe("parent-value");
   });
 
-  it("should inherit Wirestate essentials from a Wirestate parent container", () => {
+  it("should isolate Wirestate essentials from a Wirestate parent container", () => {
     const parent: Container = createContainer();
     const container: Container = createContainer({ parent });
 
-    expect(container.get(EventBus)).toBe(parent.get(EventBus));
-    expect(container.get(QueryBus)).toBe(parent.get(QueryBus));
-    expect(container.get(CommandBus)).toBe(parent.get(CommandBus));
+    expect(container.get(EventBus)).not.toBe(parent.get(EventBus));
+    expect(container.get(QueryBus)).not.toBe(parent.get(QueryBus));
+    expect(container.get(CommandBus)).not.toBe(parent.get(CommandBus));
 
     expect(container.get(SEEDS_TOKEN)).not.toBe(parent.get(SEEDS_TOKEN));
     expect(container.get(SEEDS_TOKEN)).toEqual(parent.get(SEEDS_TOKEN));
