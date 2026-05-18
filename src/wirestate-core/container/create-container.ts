@@ -11,7 +11,7 @@ import { applySeeds } from "../seeds/apply-seeds";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 import { AnyObject } from "../types/general";
 import { SeedEntries, SeedsMap } from "../types/initial-state";
-import { InjectableDescriptor } from "../types/privision";
+import { InjectableDescriptor } from "../types/provision";
 
 import { createBaseContainer } from "./create-base-container";
 import { WireScope } from "./wire-scope";

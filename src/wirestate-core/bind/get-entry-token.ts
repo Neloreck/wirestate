@@ -1,6 +1,6 @@
 import { Newable, ServiceIdentifier } from "inversify";
 
-import { InjectableDescriptor } from "../types/privision";
+import { InjectableDescriptor } from "../types/provision";
 
 /**
  * Resolves the identifier for a given entry.

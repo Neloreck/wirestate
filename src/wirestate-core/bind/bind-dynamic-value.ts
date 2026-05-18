@@ -3,7 +3,7 @@ import { bindingScopeValues, BindInWhenOnFluentSyntax, BindWhenOnFluentSyntax, C
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { InjectableDescriptor } from "../types/privision";
+import { InjectableDescriptor } from "../types/provision";
 
 /**
  * Binds a dynamic value (factory-based) to an identifier in the container.

@@ -3,7 +3,7 @@ import { bindingTypeValues, Container, Newable } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { InjectableDescriptor } from "../types/privision";
+import { InjectableDescriptor } from "../types/provision";
 
 import { bindConstant } from "./bind-constant";
 import { bindDynamicValue } from "./bind-dynamic-value";

@@ -1,5 +1,5 @@
 import { Container, createContainer, SeedEntries } from "@wirestate/core";
-import { InjectableEntries } from "@wirestate/core/types/privision";
+import { InjectableEntries } from "@wirestate/core/types/provision";
 import { createElement, type ReactNode } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";

@@ -1,7 +1,7 @@
 import { Container } from "inversify";
 
 import { ScopeBindingType } from "../alias";
-import { InjectableDescriptor } from "../types/privision";
+import { InjectableDescriptor } from "../types/provision";
 
 import { bindConstant } from "./bind-constant";
 

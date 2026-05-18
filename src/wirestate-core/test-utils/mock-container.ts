@@ -6,7 +6,7 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { AnyObject } from "../types/general";
 import { SeedEntries } from "../types/initial-state";
-import { InjectableDescriptor } from "../types/privision";
+import { InjectableDescriptor } from "../types/provision";
 
 import { mockBindEntry } from "./mock-bind-entry";
 

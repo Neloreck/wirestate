@@ -39,7 +39,7 @@ export { OnActivated } from "./service/on-activated";
 export { OnDeactivation } from "./service/on-deactivation";
 
 export { SeedsMap, SeedEntries, SeedEntry, SeedKey } from "./types/initial-state";
-export { InjectableDescriptor } from "./types/privision";
+export { InjectableDescriptor } from "./types/provision";
 export { CommandStatus, CommandDescriptor, CommandHandler, CommandType, CommandUnregister } from "./types/commands";
 export { QueryHandler, QueryType, QueryUnregister } from "./types/queries";
 export { Event, EventHandler, EventType, EventUnsubscriber } from "./types/events";
