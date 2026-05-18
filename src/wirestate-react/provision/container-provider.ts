@@ -77,6 +77,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
 
 /**
  * Selects the provider state that should be exposed for the current source.
+ * In the case of managed container, only change of entries and parent container cause re-creation.
  *
  * @param current - Previously exposed state, if any.
  * @param source - Current container source prop.
@@ -95,7 +96,9 @@ function canReuseContainerState(
   return (
     current.owned &&
     !disposed.has(current.container) &&
-    shallowEqualArrays(source.entries ?? [], current.source instanceof Container ? [] : (current.source.entries ?? []))
+    !(current.source instanceof Container) &&
+    current.source.parent === source.parent &&
+    shallowEqualArrays(current.source.entries ?? [], source.entries ?? [])
   );
 }
 

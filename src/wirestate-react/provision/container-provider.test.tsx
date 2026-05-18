@@ -104,6 +104,43 @@ describe("ContainerProvider", () => {
     expect(getByTestId("value").textContent).toBe("stable");
   });
 
+  it("should recreate managed container when parent changes", () => {
+    const PARENT_TOKEN: string = "PARENT_TOKEN";
+    const firstParent: Container = new Container();
+    const secondParent: Container = new Container();
+    const containers: Array<Container> = [];
+
+    firstParent.bind(PARENT_TOKEN).toConstantValue("first-parent");
+    secondParent.bind(PARENT_TOKEN).toConstantValue("second-parent");
+
+    function TrackingConsumer() {
+      const container: Container = useContainer();
+      const value: string = useInjection(PARENT_TOKEN);
+
+      containers.push(container);
+
+      return <span data-testid={"value"}>{value}</span>;
+    }
+
+    const { getByTestId, rerender } = render(
+      <ContainerProvider container={{ parent: firstParent }}>
+        <TrackingConsumer />
+      </ContainerProvider>
+    );
+
+    expect(getByTestId("value").textContent).toBe("first-parent");
+
+    rerender(
+      <ContainerProvider container={{ parent: secondParent }}>
+        <TrackingConsumer />
+      </ContainerProvider>
+    );
+
+    expect(containers).toHaveLength(2);
+    expect(containers[1]).not.toBe(containers[0]);
+    expect(getByTestId("value").textContent).toBe("second-parent");
+  });
+
   it("should dispose previous managed container before activating replacement", () => {
     const lifecycleEvents: Array<string> = [];
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
