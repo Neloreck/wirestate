@@ -14,7 +14,6 @@ export { command } from "./commands/command";
 export { commandOptional } from "./commands/command-optional";
 export { OnCommand } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";
-
 export { createContainer, CreateContainerOptions } from "./container/create-container";
 export { WireScope } from "./container/wire-scope";
 
@@ -39,7 +38,7 @@ export { OnActivated } from "./service/on-activated";
 export { OnDeactivation } from "./service/on-deactivation";
 
 export { SeedsMap, SeedEntries, SeedEntry, SeedKey } from "./types/initial-state";
-export { InjectableDescriptor } from "./types/provision";
+export { InjectableDescriptor, InjectableEntries } from "./types/provision";
 export { CommandStatus, CommandDescriptor, CommandHandler, CommandType, CommandUnregister } from "./types/commands";
 export { QueryHandler, QueryType, QueryUnregister } from "./types/queries";
 export { Event, EventHandler, EventType, EventUnsubscriber } from "./types/events";

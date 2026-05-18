@@ -80,6 +80,7 @@ describe("Library exported API from wirestate-core", () => {
     "EventType",
     "EventUnsubscriber",
     "InjectableDescriptor",
+    "InjectableEntries",
     "OnActivated",
     "OnCommand",
     "OnDeactivation",
