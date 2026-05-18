@@ -62,6 +62,41 @@ describe("createContainer", () => {
     expect(container.get(PARENT_TOKEN)).toBe("parent-value");
   });
 
+  it("should inherit Wirestate essentials from a Wirestate parent container", () => {
+    const parent: Container = createContainer();
+    const container: Container = createContainer({ parent });
+
+    expect(container.get(EventBus)).toBe(parent.get(EventBus));
+    expect(container.get(QueryBus)).toBe(parent.get(QueryBus));
+    expect(container.get(CommandBus)).toBe(parent.get(CommandBus));
+
+    expect(container.get(SEEDS_TOKEN)).not.toBe(parent.get(SEEDS_TOKEN));
+    expect(container.get(SEEDS_TOKEN)).toEqual(parent.get(SEEDS_TOKEN));
+    expect(container.get(SEED_TOKEN)).not.toBe(parent.get(SEED_TOKEN));
+    expect(container.get(SEED_TOKEN)).toEqual(parent.get(SEED_TOKEN));
+  });
+
+  it("should resolve parent seed bindings when a parent container is provided", () => {
+    const TEST_TOKEN: unique symbol = Symbol.for("TEST_TOKEN");
+
+    const parent: Container = createContainer({
+      seed: { source: "parent" },
+      seeds: [[TEST_TOKEN, { source: "parent-token" }]],
+    });
+
+    const container: Container = createContainer({
+      parent,
+      seed: { source: "child" },
+      seeds: [[TEST_TOKEN, { source: "child-token" }]],
+    });
+
+    expect(parent.get(SEED_TOKEN)).toEqual({ source: "parent" });
+    expect(parent.get<Map<unknown, unknown>>(SEEDS_TOKEN).get(TEST_TOKEN)).toEqual({ source: "parent-token" });
+
+    expect(container.get(SEED_TOKEN)).toEqual({ source: "child" });
+    expect(container.get<Map<unknown, unknown>>(SEEDS_TOKEN).get(TEST_TOKEN)).toEqual({ source: "child-token" });
+  });
+
   it("should use Singleton as default scope for new bindings", () => {
     const container: Container = createContainer();
 

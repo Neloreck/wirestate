@@ -14,7 +14,7 @@ import { prefix } from "@/macroses/prefix.macro";
  * @group Context
  *
  * @param factory - Lazily creates the root container.
- * @param deps - Dependency list controlling when container is recreated.
+ * @param deps - Dependency list controlling when container is recreated, empty array by default.
  * @returns The memoized root container instance.
  *
  * @example
@@ -28,7 +28,7 @@ import { prefix } from "@/macroses/prefix.macro";
  * );
  * ```
  */
-export function useRootContainer(factory: () => Container, deps: Array<unknown>) {
+export function useRootContainer(factory: () => Container, deps: Array<unknown> = []) {
   return useMemo(() => {
     const container: Container = factory();
 

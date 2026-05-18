@@ -6,7 +6,7 @@ import { QueryBus } from "../queries/query-bus";
 import { applySeeds } from "../seeds/apply-seeds";
 import { SEED_TOKEN } from "../seeds/tokens";
 import { SEEDS_TOKEN } from "../seeds/tokens";
-import { AnyObject } from "../types/general";
+import { AnyObject, Maybe } from "../types/general";
 import { SeedEntries, SeedsMap } from "../types/initial-state";
 
 /**
@@ -25,12 +25,12 @@ export interface CreateBaseContainerOptions {
    * Initial data for the root seed.
    * Accessible via {@link WireScope.getSeed}() in services.
    */
-  readonly seed?: AnyObject;
+  readonly seed?: Maybe<AnyObject>;
 
   /**
    * Targeted seeds bound to specific injectables or tokens.
    */
-  readonly seeds?: SeedEntries;
+  readonly seeds?: Maybe<SeedEntries>;
 }
 
 /**

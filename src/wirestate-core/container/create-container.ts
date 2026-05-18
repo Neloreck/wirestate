@@ -1,5 +1,3 @@
-import { createBaseContainer } from "@wirestate/core/container/create-base-container";
-import { WireScope } from "@wirestate/core/container/wire-scope";
 import { Container, Newable, ServiceIdentifier } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -9,9 +7,14 @@ import { bindEntry } from "../bind/bind-entry";
 import { getEntryToken } from "../bind/get-entry-token";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
+import { applySeeds } from "../seeds/apply-seeds";
+import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 import { AnyObject } from "../types/general";
-import { SeedEntries } from "../types/initial-state";
+import { SeedEntries, SeedsMap } from "../types/initial-state";
 import { InjectableDescriptor } from "../types/privision";
+
+import { createBaseContainer } from "./create-base-container";
+import { WireScope } from "./wire-scope";
 
 /**
  * Represents configuration options for {@link createContainer}.
@@ -107,8 +110,15 @@ export function createContainer(options: CreateContainerOptions = {}): Container
 
   const container: Container = new Container({
     defaultScope: "Singleton",
-    parent: createBaseContainer(options),
+    parent: options.parent ? options.parent : createBaseContainer({ ...options, seeds: null, seed: null }),
   });
+
+  container.bind(SEEDS_TOKEN).toConstantValue(new Map() as SeedsMap);
+  container.bind(SEED_TOKEN).toConstantValue(options.seed ?? {});
+
+  if (options.seeds) {
+    applySeeds(container, options.seeds);
+  }
 
   container
     .bind(WireScope)
