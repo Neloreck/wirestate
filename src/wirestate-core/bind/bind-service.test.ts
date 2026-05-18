@@ -2,12 +2,14 @@ import { Container } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Injectable } from "../alias";
+import { Inject, Injectable } from "../alias";
 import { CommandBus } from "../commands/command-bus";
+import { WireScope } from "../container/wire-scope";
 import { EventBus } from "../events/event-bus";
 import { OnQuery } from "../queries/on-query";
 import { QueryBus } from "../queries/query-bus";
 import { OnActivated } from "../service/on-activated";
+import { OnDeactivation } from "../service/on-deactivation";
 import { mockContainer } from "../test-utils";
 import { CommandStatus } from "../types/commands";
 
@@ -19,6 +21,36 @@ describe("bindService", () => {
     @OnActivated()
     public async onActivated(): Promise<void> {
       throw new Error("async-fail");
+    }
+  }
+
+  @Injectable()
+  class SyncFailActivationService {
+    public wasResolved: boolean = false;
+
+    @OnActivated()
+    public onActivated(): void {
+      this.wasResolved = true;
+
+      throw new Error("sync-activation-fail");
+    }
+  }
+
+  @Injectable()
+  class SyncFailDeactivationService {
+    public constructor(
+      @Inject(WireScope)
+      public readonly scope: WireScope
+    ) {}
+
+    @OnDeactivation()
+    public onDeactivation(): void {
+      throw new Error("sync-deactivation-fail");
+    }
+
+    @OnQuery("SYNC_FAIL_DEACTIVATION_QUERY")
+    public onQuery(): string {
+      return "query-response";
     }
   }
 
@@ -96,6 +128,41 @@ describe("bindService", () => {
       "[wirestate] @OnActivated rejected for:",
       "AsyncFailService",
       "onActivated",
+      expect.any(Error)
+    );
+
+    consoleSpy.mockRestore();
+  });
+
+  it("should throw on failing @OnActivated methods without failing resolution", () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    const container: Container = mockContainer();
+
+    bindService(container, SyncFailActivationService);
+
+    expect(() => container.get(SyncFailActivationService)).toThrow("sync-activation-fail");
+
+    consoleSpy.mockRestore();
+  });
+
+  it("should catch and log failing @OnDeactivation methods while preserving cleanup", () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    const container: Container = mockContainer();
+
+    bindService(container, SyncFailDeactivationService);
+
+    const instance: SyncFailDeactivationService = container.get(SyncFailDeactivationService);
+
+    expect(container.get(QueryBus).query("SYNC_FAIL_DEACTIVATION_QUERY")).toBe("query-response");
+    expect(() => container.unbind(SyncFailDeactivationService)).not.toThrow();
+    expect(instance.scope.isDisposed).toBe(true);
+    expect(container.get(QueryBus).has("SYNC_FAIL_DEACTIVATION_QUERY")).toBe(false);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "[wirestate] @OnDeactivation failed for:",
+      "SyncFailDeactivationService",
+      "onDeactivation",
       expect.any(Error)
     );
 

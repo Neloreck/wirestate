@@ -30,28 +30,28 @@ export const QUERY_HANDLER_METADATA: WeakMap<object, Array<QueryHandlerMetadata>
 export const COMMAND_HANDLER_METADATA: WeakMap<object, Array<CommandHandlerMetadata>> = new WeakMap();
 
 /**
- * Registry of class constructors to their `@OnActivated`-decorated method names.
+ * Registry of class constructors to their `@OnActivated`-decorated method name.
  *
  * @remarks
- * This map is populated by the {@link OnActivated} decorator. Activation hooks are
- * executed in parent-to-child order during service initialization.
+ * This map is populated by the {@link OnActivated} decorator. A service class
+ * hierarchy may declare one activation hook.
  *
  * @group Service
  * @internal
  */
-export const ACTIVATED_HANDLER_METADATA: WeakMap<object, Array<string | symbol>> = new WeakMap();
+export const ACTIVATED_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakMap();
 
 /**
- * Registry of class constructors to their `@OnDeactivation`-decorated method names.
+ * Registry of class constructors to their `@OnDeactivation`-decorated method name.
  *
  * @remarks
- * This map is populated by the {@link OnDeactivation} decorator. Deactivation hooks are
- * executed in parent-to-child order during service disposal.
+ * This map is populated by the {@link OnDeactivation} decorator. A service class
+ * hierarchy may declare one deactivation hook.
  *
  * @group Service
  * @internal
  */
-export const DEACTIVATION_HANDLER_METADATA: WeakMap<object, Array<string | symbol>> = new WeakMap();
+export const DEACTIVATION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakMap();
 
 /**
  * Registry of class constructors to their declared event handlers.

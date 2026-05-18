@@ -1,8 +1,9 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
 import { ACTIVATED_HANDLER_METADATA } from "../registry";
-import { Maybe } from "../types/general";
 
 /**
  * Decorator for service methods that should be executed after the service instance is activated.
@@ -12,8 +13,8 @@ import { Maybe } from "../types/general";
  * is resolved from the container and its activation lifecycle hook is triggered.
  *
  * It is commonly used for initial setup, subscribing to events, or starting background tasks.
- * Multiple `@OnActivated` methods can exist in the same class hierarchy; they are executed
- * in parent-to-child order.
+ * A service class may declare only one `@OnActivated` method. If a base class already
+ * declares an activation hook, override that method without redecorating it.
  *
  * @group Service
  *
@@ -40,13 +41,13 @@ export function OnActivated(): MethodDecorator {
 
     const constructor = (target as object).constructor;
 
-    let list: Maybe<Array<string | symbol>> = ACTIVATED_HANDLER_METADATA.get(constructor);
-
-    if (!list) {
-      list = [];
-      ACTIVATED_HANDLER_METADATA.set(constructor, list);
+    if (ACTIVATED_HANDLER_METADATA.has(constructor)) {
+      throw new WirestateError(
+        ERROR_CODE_VALIDATION_ERROR,
+        `Only one @OnActivated method can be declared on service '${constructor.name}'.`
+      );
     }
 
-    list.push(propertyKey);
+    ACTIVATED_HANDLER_METADATA.set(constructor, propertyKey);
   };
 }

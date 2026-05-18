@@ -1,42 +1,54 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
 import { DEACTIVATION_HANDLER_METADATA } from "../registry";
 import { Maybe } from "../types/general";
 
 /**
- * Retrieves the names of methods decorated with {@link OnDeactivation} by traversing the prototype chain.
+ * Retrieves the method decorated with {@link OnDeactivation} by traversing the prototype chain.
  *
  * @remarks
- * This utility ensures that handlers are returned in parent-to-child order (base class handlers first),
- * maintaining a predictable cleanup sequence for inherited services.
+ * A service hierarchy may declare one deactivation hook. Subclasses can override
+ * a decorated base method without redecorating it; declaring another decorated
+ * method in the same hierarchy is a validation error.
  *
  * @group Service
  * @internal
  *
  * @param instance - The service instance to scan for deactivation handlers.
- * @returns A read-only array of method names (strings or symbols).
+ * @returns The method name (string or symbol), or `null` when no hook exists.
  *
  * @example
  * ```typescript
- * const methods = getDeactivationHandlerMetadata(myService);
- *
- * methods.forEach(methodName => (myService as any)[methodName]());
+ * const method = getDeactivationHandlerMetadata(myService);
+ * method && (myService as any)[method]();
  * ```
  */
-export function getDeactivationHandlerMetadata(instance: object): ReadonlyArray<string | symbol> {
+export function getDeactivationHandlerMetadata(instance: object): Maybe<string | symbol> {
   dbg.info(prefix(__filename), "Resolving OnDeactivation metadata:", { name: instance.constructor.name, instance });
 
   let constructor: unknown = instance.constructor;
 
-  const chain: Array<Array<string | symbol>> = [];
+  let handler: Maybe<string | symbol> = null;
+  let ownerName: Maybe<string> = null;
 
   // Traverse prototype chain up to Object/Function.
   while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
-    const own: Maybe<Array<string | symbol>> = DEACTIVATION_HANDLER_METADATA.get(constructor as object);
+    const own: Maybe<string | symbol> = DEACTIVATION_HANDLER_METADATA.get(constructor as object) ?? null;
 
-    if (own && own.length > 0) {
-      chain.push(own);
+    if (own) {
+      if (handler) {
+        throw new WirestateError(
+          ERROR_CODE_VALIDATION_ERROR,
+          `Only one @OnDeactivation method can be declared across service hierarchy '${instance.constructor.name}'. ` +
+            `Found '${String(handler)}' on '${ownerName ?? "unknown"}' and '${String(own)}' on '${constructor.name}'.`
+        );
+      }
+
+      handler = own;
+      ownerName = constructor.name;
     }
 
     constructor = Object.getPrototypeOf(constructor);
@@ -44,10 +56,10 @@ export function getDeactivationHandlerMetadata(instance: object): ReadonlyArray<
 
   dbg.info(prefix(__filename), "Resolved OnDeactivation metadata:", {
     name: instance.constructor.name,
-    chain,
+    handler,
+    ownerName,
     instance,
   });
 
-  // Reverse to ensure parent-first execution order.
-  return chain.reverse().flat();
+  return handler;
 }

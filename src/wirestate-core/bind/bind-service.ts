@@ -110,8 +110,6 @@ export function bindService<T extends object>(
   const whenBind: BindWhenOnFluentSyntax<T> = container.bind<T>(entry).to(entry).inSingletonScope();
 
   whenBind.onActivation((context, instance) => {
-    // todo: Respect async calls here.
-
     dbg.info(prefix(__filename), "Activating service:", {
       name: entry.name,
       context,
@@ -179,22 +177,21 @@ export function bindService<T extends object>(
         options,
       });
     } else {
-      // Call every `@OnActivated`-decorated method in base-to-derived order.
       // Fire-and-forget any async init so we stay synchronous from the
       // container's point of view.
-      for (const methodName of getActivatedHandlerMetadata(instance)) {
+      const methodName: Maybe<string | symbol> = getActivatedHandlerMetadata(instance);
+
+      if (methodName) {
         const method = (instance as unknown as Record<string | symbol, unknown>)[methodName];
 
-        if (typeof method !== "function") {
-          continue;
-        }
+        if (typeof method === "function") {
+          const result: MaybePromise<void> = (method as () => MaybePromise<void>).call(instance);
 
-        const result: MaybePromise<void> = (method as () => MaybePromise<void>).call(instance);
-
-        if (result && typeof (result as Promise<void>).then === "function") {
-          (result as Promise<void>).catch((error) => {
-            console.error("[wirestate] @OnActivated rejected for:", entry.name, String(methodName), error);
-          });
+          if (result && typeof (result as Promise<void>).then === "function") {
+            (result as Promise<void>).catch((error) => {
+              console.error("[wirestate] @OnActivated rejected for:", entry.name, String(methodName), error);
+            });
+          }
         }
       }
     }
@@ -203,13 +200,13 @@ export function bindService<T extends object>(
   });
 
   whenBind.onDeactivation((instance) => {
-    // todo: Respect async calls here.
-
     dbg.info(prefix(__filename), "Deactivating service:", {
       name: entry.name,
       container,
       instance,
     });
+
+    let deactivationMethodName: Maybe<string | symbol> = null;
 
     if (options?.isWithIgnoreLifecycle) {
       dbg.info(prefix(__filename), "Skip lifecycle @OnDeactivation method:", {
@@ -220,12 +217,30 @@ export function bindService<T extends object>(
         options,
       });
     } else {
-      // Call every `@OnDeactivation`-decorated method in base-to-derived order.
-      for (const methodName of getDeactivationHandlerMetadata(instance)) {
+      const methodName: Maybe<string | symbol> = getDeactivationHandlerMetadata(instance);
+
+      deactivationMethodName = methodName;
+
+      if (methodName) {
         const method: unknown = (instance as unknown as Record<string | symbol, unknown>)[methodName];
 
-        if (typeof method === "function") {
-          (method as () => void).call(instance);
+        try {
+          if (typeof method === "function") {
+            const result: MaybePromise<void> = (method as () => MaybePromise<void>).call(instance);
+
+            if (result && typeof (result as Promise<void>).then === "function") {
+              (result as Promise<void>).catch((error) => {
+                console.error("[wirestate] @OnDeactivation rejected for:", entry.name, String(methodName), error);
+              });
+            }
+          }
+        } catch (error) {
+          console.error(
+            "[wirestate] @OnDeactivation failed for:",
+            entry.name,
+            String(deactivationMethodName ?? "unknown"),
+            error
+          );
         }
       }
     }
