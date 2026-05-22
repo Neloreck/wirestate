@@ -67,7 +67,7 @@ export function useContainerProvisionState<TSource, TState extends ContainerProv
   stateRef.current = state;
 
   useEffect(() => {
-    let active: TState = state;
+    const active: TState = state;
 
     dbg.info(prefix(__filename), `${label} mounted:`, {
       container: active.container,
@@ -80,8 +80,7 @@ export function useContainerProvisionState<TSource, TState extends ContainerProv
         source: active.source,
       });
 
-      active = create(active.source);
-      stateRef.current = active;
+      stateRef.current = create(active.source);
 
       forceUpdate((version: number) => version + 1);
     }

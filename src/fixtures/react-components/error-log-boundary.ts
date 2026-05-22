@@ -1,7 +1,11 @@
 import { Optional } from "@wirestate/core/types/general";
 import { Component, createElement, ReactNode } from "react";
 
-export class ErrorLogBoundary extends Component {
+interface ErrorLogBoundaryProps {
+  readonly children?: ReactNode;
+}
+
+export class ErrorLogBoundary extends Component<ErrorLogBoundaryProps> {
   public state = { error: null as Optional<Error> };
 
   public componentDidCatch(error: Error): void {

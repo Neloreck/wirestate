@@ -54,8 +54,8 @@ describe("ContainerActivator", () => {
       )
     );
 
-    expect(getServiceCallsCount(getSpy, ServiceA)).toBe(2);
-    expect(getServiceCallsCount(getSpy, ServiceB)).toBe(2);
+    expect(getServiceCallsCount(getSpy, ServiceA)).toBe(1);
+    expect(getServiceCallsCount(getSpy, ServiceB)).toBe(1);
   });
 
   it("should not resolve services again on rerender with same container", () => {

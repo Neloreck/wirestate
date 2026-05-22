@@ -11,5 +11,10 @@ allowBuilds:
   core-js: true
   esbuild: true
   unrs-resolver: true
+overrides:
+  '@types/react': 19.2.15
+  '@types/react-dom': 19.2.3
+  react: 19.2.6
+  react-dom: 19.2.6
 minimumReleaseAgeExclude:
   - pnpm@11.1.3
