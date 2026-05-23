@@ -238,6 +238,27 @@ describe("SubContainerProvider", () => {
     expect(containers[1]).toBe(containers[0]);
     expect(getByTestId("value").textContent).toBe("stable");
   });
+
+  it("should recreate child container when activate changes", () => {
+    const parentContainer: Container = mockContainer();
+    const LifecycleService = createLifecycleService({ methods: ["activated"] });
+
+    const { rerender } = render(
+      <ContainerProvider container={parentContainer}>
+        <SubContainerProvider entries={[LifecycleService]} activate={false} />
+      </ContainerProvider>
+    );
+
+    expect(LifecycleService.EVENTS).toEqual(["activated"]);
+
+    rerender(
+      <ContainerProvider container={parentContainer}>
+        <SubContainerProvider entries={[LifecycleService]} activate={true} />
+      </ContainerProvider>
+    );
+
+    expect(LifecycleService.EVENTS).toEqual(["activated", "activated"]);
+  });
 });
 
 describe("SubContainerProvider lifecycle", () => {

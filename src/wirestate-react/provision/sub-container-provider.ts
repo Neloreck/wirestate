@@ -9,8 +9,8 @@ import {
   retainContainer,
   scheduleContainerDestruction,
 } from "../services/provision-lifecycle";
-import { Optional } from "../types/general";
-import { shallowEqualArrays } from "../utils/shallow-equal-arrays";
+import { AnyObject, Maybe, Optional } from "../types/general";
+import { shallowEqualActivation, shallowEqualArrays, shallowEqualObjects } from "../utils/shallow-equal";
 
 /**
  * Child-container inputs controlled by {@link SubContainerProvider}.
@@ -42,9 +42,8 @@ export interface SubContainerProviderProps {
    * Targeted seeds applied before entries are bound.
    *
    * @remarks
-   * Seed changes intentionally do not recreate the child container, because
-   * seed arrays are commonly passed inline. Pass a React `key` to force a
-   * remount when you need to re-seed the subtree.
+   * Seed changes recreate the child container when the seed entries change by
+   * shallow comparison.
    */
   readonly seeds?: SeedEntries;
 
@@ -52,8 +51,8 @@ export interface SubContainerProviderProps {
    * Services or descriptors bound inside the child container.
    *
    * @remarks
-   * The child container is recreated when this array changes by shallow
-   * comparison or when the parent container changes.
+   * The child container is recreated when provider inputs change by shallow
+   * comparison.
    */
   readonly entries: InjectableEntries;
 
@@ -76,9 +75,8 @@ export interface SubContainerProviderProps {
  * Provides a child container derived from the nearest parent container.
  *
  * @remarks
- * The provider owns the child container. It recreates on parent or `entries`
- * changes. Seed changes are intentionally ignored for reuse decisions; pass a
- * React `key` when new seeds should create a new scoped container.
+ * The provider owns the child container. It recreates when the normalized
+ * source inputs change by shallow comparison.
  *
  * @group Provision
  *
@@ -103,7 +101,10 @@ export function SubContainerProvider(props: SubContainerProviderProps) {
   }));
 
   const needsReplacement: boolean =
-    state.source.parent !== source.parent || !shallowEqualArrays(state.source.entries, source.entries);
+    state.source.parent !== source.parent ||
+    !shallowEqualObjects(state.source.seeds as Maybe<AnyObject>, source.seeds as Maybe<AnyObject>) ||
+    !shallowEqualArrays(state.source.entries, source.entries) ||
+    !shallowEqualActivation(state.source.activate, source.activate);
 
   let activeState: SubContainerState = state;
 

@@ -1,4 +1,4 @@
-import { Injectable } from "../../wirestate-core/alias";
+import { Injectable, type Newable } from "../../wirestate-core/alias";
 import { OnActivated } from "../../wirestate-core/service/on-activated";
 import { OnDeactivation } from "../../wirestate-core/service/on-deactivation";
 import { OnDeprovision } from "../../wirestate-react/services/on-deprovision";
@@ -54,6 +54,55 @@ export interface CreateLifecycleServiceOptions {
 }
 
 /**
+ * Instance shape created by {@link createLifecycleService}.
+ *
+ * @internal
+ */
+export interface LifecycleServiceInstance {
+  /**
+   * Records service activation when enabled.
+   */
+  onActivated(): void;
+
+  /**
+   * Records service deactivation when enabled.
+   */
+  onDeactivation(): void;
+
+  /**
+   * Records provider provisioning when enabled.
+   */
+  onProvision(): void;
+
+  /**
+   * Records provider deprovisioning when enabled.
+   */
+  onDeprovision(): void;
+}
+
+/**
+ * Injectable service class returned by {@link createLifecycleService}.
+ *
+ * @internal
+ */
+export interface LifecycleServiceType extends Newable<LifecycleServiceInstance> {
+  /**
+   * Resolves the suffix appended to emitted lifecycle events.
+   */
+  readonly SUFFIX: () => string;
+
+  /**
+   * Lifecycle callbacks that append events when invoked.
+   */
+  readonly METHODS: Array<ActivationLifecycleEvent>;
+
+  /**
+   * Event log written by the generated lifecycle service.
+   */
+  readonly EVENTS: Array<string>;
+}
+
+/**
  * Creates an injectable service class that records lifecycle events.
  *
  * @remarks
@@ -71,7 +120,7 @@ export interface CreateLifecycleServiceOptions {
  * @param options - Event log, enabled callbacks, and optional event suffix.
  * @returns Injectable service class configured for lifecycle-order assertions.
  */
-export function createLifecycleService(options: CreateLifecycleServiceOptions = {}) {
+export function createLifecycleService(options: CreateLifecycleServiceOptions = {}): LifecycleServiceType {
   const { methods, suffix, events } = options;
 
   @Injectable()

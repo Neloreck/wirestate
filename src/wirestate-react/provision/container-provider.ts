@@ -10,8 +10,8 @@ import {
   retainContainer,
   scheduleContainerDestruction,
 } from "../services/provision-lifecycle";
-import { Maybe, Optional } from "../types/general";
-import { shallowEqualArrays } from "../utils/shallow-equal-arrays";
+import { AnyObject, Maybe, Optional } from "../types/general";
+import { shallowEqualActivation, shallowEqualArrays, shallowEqualObjects } from "../utils/shallow-equal";
 
 /**
  * Represents props accepted by {@link ContainerProvider}.
@@ -38,10 +38,8 @@ export interface ContainerProviderProps {
    * @remarks
    * Managed containers created from config are disposed on unmount and activate
    * all entries by default unless `activate` is provided explicitly. Managed
-   * containers are intentionally recreated only when `parent` or `entries`
-   * change by shallow comparison; inline `seed` and `seeds` values are not
-   * treated as recreation signals. Pass a React `key` to force a fresh managed
-   * container when those options should be re-applied.
+   * containers are recreated when the normalized config changes by shallow
+   * comparison.
    */
   readonly config?: ContainerConfig;
 
@@ -69,7 +67,7 @@ interface ContainerProviderState {
  *   passes it through context, runs provision hooks, and never disposes it.
  * - Managed: `config` is {@link ContainerConfig}. The provider
  *   creates a container, activates entries by default, owns its disposal, and
- *   recreates it when `parent` or `entries` change.
+ *   recreates it when the normalized config changes by shallow comparison.
  *
  * @group Provision
  *
@@ -105,12 +103,15 @@ export function ContainerProvider(props: ContainerProviderProps) {
   const ownedRef = useRef<boolean>(owned);
 
   const lifecycleRef = useRef<Optional<ProvisionLifecycle>>(null);
+  const normalizedSource: Maybe<ContainerConfig> = managedSource
+    ? { ...managedSource, activate: managedSource.activate ?? true }
+    : null;
 
   const [state, setState] = useState<Optional<ContainerProviderState>>(() =>
-    managedSource
+    normalizedSource
       ? {
-          container: createContainer({ ...managedSource, activate: managedSource.activate ?? true }),
-          source: managedSource,
+          container: createContainer(normalizedSource),
+          source: normalizedSource,
         }
       : null
   );
@@ -124,17 +125,20 @@ export function ContainerProvider(props: ContainerProviderProps) {
 
   const needsReplacement: boolean = Boolean(
     state &&
-    managedSource &&
-    (state.source.parent !== managedSource?.parent ||
-      !shallowEqualArrays(state.source.entries ?? [], managedSource.entries ?? []))
+      normalizedSource &&
+      (state.source.parent !== normalizedSource.parent ||
+        !shallowEqualObjects(state.source.seed, normalizedSource.seed) ||
+        !shallowEqualObjects(state.source.seeds as Maybe<AnyObject>, normalizedSource.seeds as Maybe<AnyObject>) ||
+        !shallowEqualArrays(state.source.entries, normalizedSource.entries) ||
+        !shallowEqualActivation(state.source.activate, normalizedSource.activate))
   );
 
   let activeState: Optional<ContainerProviderState> = state;
 
-  if (needsReplacement && managedSource) {
+  if (needsReplacement && normalizedSource) {
     activeState = {
-      container: createContainer({ ...managedSource, activate: managedSource.activate ?? true }),
-      source: managedSource,
+      container: createContainer(normalizedSource),
+      source: normalizedSource,
     };
 
     setState(activeState);

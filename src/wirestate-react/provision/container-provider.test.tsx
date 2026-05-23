@@ -155,6 +155,45 @@ describe("ContainerProvider", () => {
     expect(getByTestId("value").textContent).toBe("second-parent");
   });
 
+  it("should recreate managed container when activate changes", () => {
+    const LifecycleService = createLifecycleService({ methods: ["activated"] });
+
+    const { rerender } = render(
+      <ContainerProvider config={{ entries: [LifecycleService], activate: false }} />
+    );
+
+    expect(LifecycleService.EVENTS).toEqual(["activated"]);
+
+    rerender(<ContainerProvider config={{ entries: [LifecycleService], activate: true }} />);
+
+    expect(LifecycleService.EVENTS).toEqual(["activated", "activated"]);
+  });
+
+  it("should recreate managed container when seed changes", () => {
+    const containers: Array<Container> = [];
+
+    function TrackingConsumer() {
+      containers.push(useContainer());
+
+      return null;
+    }
+
+    const { rerender } = render(
+      <ContainerProvider config={{ seed: { value: "first" } }}>
+        <TrackingConsumer />
+      </ContainerProvider>
+    );
+
+    rerender(
+      <ContainerProvider config={{ seed: { value: "second" } }}>
+        <TrackingConsumer />
+      </ContainerProvider>
+    );
+
+    expect(containers).toHaveLength(2);
+    expect(containers[1]).not.toBe(containers[0]);
+  });
+
   it("should dispose previous managed container when replacement commits", async () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
     const containers: Array<Container> = [];
