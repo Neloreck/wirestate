@@ -1,4 +1,4 @@
-import { Container, createContainer, SeedEntries } from "@wirestate/core";
+import { Container, ContainerActivation, createContainer, SeedEntries } from "@wirestate/core";
 import { InjectableEntries } from "@wirestate/core/types/provision";
 import { createElement, type ReactNode, useEffect, useRef, useState } from "react";
 
@@ -21,6 +21,7 @@ import { shallowEqualArrays } from "../utils/shallow-equal-arrays";
 interface SubContainerSource {
   readonly parent: Container;
   readonly seeds?: SeedEntries;
+  readonly activate: ContainerActivation;
   readonly entries: InjectableEntries;
 }
 
@@ -58,6 +59,15 @@ export interface SubContainerProviderProps {
   readonly entries: InjectableEntries;
 
   /**
+   * Services to resolve immediately.
+   *
+   * @remarks
+   * Pass an array to activate specific services. Listed services must also be
+   * present in the `entries` array. Pass `true` to activate all provided entries.
+   */
+  readonly activate?: ContainerActivation;
+
+  /**
    * React subtree that receives the child container.
    */
   readonly children?: ReactNode;
@@ -77,23 +87,20 @@ export interface SubContainerProviderProps {
  * @returns A React context provider for the child container.
  */
 export function SubContainerProvider(props: SubContainerProviderProps) {
-  const parent: Container = useContainer();
-
   const lifecycleRef = useRef<Optional<ProvisionLifecycle>>(null);
   const latestSourceRef = useRef<SubContainerSource>(null);
 
+  const parent: Container = useContainer();
+
   const source: SubContainerSource = {
-    parent,
+    parent: parent,
+    activate: props.activate ?? true,
     entries: props.entries,
     seeds: props.seeds,
   };
 
   const [state, setState] = useState<SubContainerState>(() => ({
-    container: createContainer({
-      entries: source.entries,
-      parent: source.parent,
-      seeds: source.seeds,
-    }),
+    container: createContainer(source),
     source,
   }));
 
@@ -114,11 +121,7 @@ export function SubContainerProvider(props: SubContainerProviderProps) {
       const nextSource: SubContainerSource = latestSourceRef.current as SubContainerSource;
 
       setState({
-        container: createContainer({
-          entries: nextSource.entries,
-          parent: nextSource.parent,
-          seeds: nextSource.seeds,
-        }),
+        container: createContainer(nextSource),
         source: nextSource,
       });
     } else {

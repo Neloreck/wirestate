@@ -328,7 +328,13 @@ describe("SubContainerProvider lifecycle", () => {
       </StrictMode>
     );
 
-    expect(events).toEqual(["activated-first", "provision-first", "deprovision-first", "provision-first"]);
+    expect(events).toEqual([
+      "activated-first",
+      "activated-first",
+      "provision-first",
+      "deprovision-first",
+      "provision-first",
+    ]);
 
     rerender(
       <StrictMode>
@@ -339,6 +345,7 @@ describe("SubContainerProvider lifecycle", () => {
     );
 
     expect(events).toEqual([
+      "activated-first",
       "activated-first",
       "provision-first",
       "deprovision-first",
@@ -351,9 +358,10 @@ describe("SubContainerProvider lifecycle", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(events).toEqual([
+      "activated-first", // [strict mode] Additional creation, dropped right after construction.
       "activated-first",
-      "provision-first",
-      "deprovision-first",
+      "provision-first", // [strict mode] Strict mode cycle to shake off side effects.
+      "deprovision-first", // [strict mode] Strict mode cycle to shake off side effects.
       "provision-first",
       "deprovision-first",
       "activated-second",

@@ -81,9 +81,12 @@ export function ContainerProvider(props: ContainerProviderProps) {
   const latestManagedSourceRef = useRef<Optional<CreateContainerOptions>>(null);
 
   const [state, setState] = useState<Optional<ContainerProviderState>>(() =>
-    owned
-      ? { container: createContainer(source as CreateContainerOptions), source: source as CreateContainerOptions }
-      : null
+    source instanceof Container
+      ? null
+      : {
+          container: createContainer({ ...source, activate: source.activate ?? true }),
+          source: source,
+        }
   );
 
   const managedSource: Optional<CreateContainerOptions> = owned ? (source as CreateContainerOptions) : null;
@@ -103,7 +106,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
     const lifecycle: ProvisionLifecycle = (lifecycleRef.current ??= {
       pendingDestruction: new Map(),
       provisionedServices: new Map(),
-    });
+    } as ProvisionLifecycle);
 
     retainContainer(state.container, lifecycle);
 
@@ -111,7 +114,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
       const nextSource: CreateContainerOptions = latestManagedSourceRef.current!;
 
       setState({
-        container: createContainer(nextSource),
+        container: createContainer({ ...nextSource, activate: nextSource.activate ?? true }),
         source: nextSource,
       });
     } else {
