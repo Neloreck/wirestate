@@ -1,6 +1,8 @@
 import { render } from "@testing-library/react";
-import { Container, Injectable, OnActivated, OnDeactivation } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 import { StrictMode } from "react";
+
+import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { useContainer } from "../context/use-container";
 import { useInjection } from "../injection/use-injection";
@@ -143,70 +145,6 @@ describe("ContainerProvider", () => {
     expect(getByTestId("value").textContent).toBe("second-parent");
   });
 
-  it("should activate replacement before disposing previous managed container", async () => {
-    const lifecycleEvents: Array<string> = [];
-    const CONFIG_TOKEN: string = "CONFIG_TOKEN";
-
-    @Injectable()
-    class LifecycleService {
-      @OnActivated()
-      public onActivated(): void {
-        lifecycleEvents.push("activate");
-      }
-
-      @OnDeactivation()
-      public onDeactivation(): void {
-        lifecycleEvents.push("deactivate");
-      }
-    }
-
-    const { rerender } = render(
-      <ContainerProvider
-        container={{
-          activate: [LifecycleService],
-          entries: [LifecycleService],
-        }}
-      />
-    );
-
-    expect(lifecycleEvents).toEqual(["activate"]);
-
-    rerender(
-      <ContainerProvider
-        container={{
-          activate: [LifecycleService],
-          entries: [LifecycleService, { id: CONFIG_TOKEN, value: "next" }],
-        }}
-      />
-    );
-
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(lifecycleEvents).toEqual(["activate", "activate", "deactivate"]);
-  });
-
-  it("should not activate not required on creation phase", () => {
-    const lifecycleEvents: Array<string> = [];
-
-    @Injectable()
-    class LifecycleService {
-      @OnActivated()
-      public onActivated(): void {
-        lifecycleEvents.push("activate");
-      }
-    }
-
-    render(
-      <ContainerProvider
-        container={{
-          entries: [LifecycleService],
-        }}
-      />
-    );
-
-    expect(lifecycleEvents).toEqual([]);
-  });
-
   it("should dispose previous managed container when replacement commits", async () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
     const containers: Array<Container> = [];
@@ -288,5 +226,162 @@ describe("ContainerProvider", () => {
     );
 
     expect(getByTestId("value").textContent).toBe("strict");
+  });
+});
+
+describe("ContainerProvider lifecycle", () => {
+  const CONFIG_TOKEN: string = "CONFIG_TOKEN";
+
+  it("should call expected lifecycle on regular mount", () => {
+    const { lifecycleEvents, LifecycleService } = createLifecycleService();
+
+    render(
+      <ContainerProvider
+        container={{
+          entries: [LifecycleService],
+        }}
+      />
+    );
+
+    expect(lifecycleEvents).toEqual(["activated", "provision"]);
+  });
+
+  it("should activate replacement before disposing previous managed container", async () => {
+    const { lifecycleEvents, LifecycleService } = createLifecycleService(["activated", "deactivation"]);
+
+    const { rerender } = render(
+      <ContainerProvider
+        container={{
+          activate: [LifecycleService],
+          entries: [LifecycleService],
+        }}
+      />
+    );
+
+    expect(lifecycleEvents).toEqual(["activated"]);
+
+    rerender(
+      <ContainerProvider
+        container={{
+          activate: [LifecycleService],
+          entries: [LifecycleService, { id: CONFIG_TOKEN, value: "next" }],
+        }}
+      />
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(lifecycleEvents).toEqual(["activated", "activated", "deactivation"]);
+  });
+
+  it("should not provision the same managed container twice on stable rerender", async () => {
+    const { lifecycleEvents, LifecycleService } = createLifecycleService(["provision", "deprovision"]);
+    const entry = { id: CONFIG_TOKEN, value: "stable" };
+
+    const { rerender } = render(
+      <ContainerProvider
+        container={{
+          entries: [LifecycleService, entry],
+        }}
+      />
+    );
+
+    for (let it = 0; it < 10; it++) {
+      rerender(
+        <ContainerProvider
+          container={{
+            entries: [LifecycleService, entry],
+          }}
+        />
+      );
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(lifecycleEvents).toEqual(["provision"]);
+  });
+
+  it("should have predicted lifecycle order in normal mode", async () => {
+    const { lifecycleEvents, LifecycleService } = createLifecycleService();
+
+    const { rerender } = render(
+      <ContainerProvider
+        container={{
+          entries: [LifecycleService],
+        }}
+      />
+    );
+
+    expect(lifecycleEvents).toEqual(["activated", "provision"]);
+
+    rerender(
+      <ContainerProvider
+        container={{
+          entries: [LifecycleService, { id: CONFIG_TOKEN, value: "next" }],
+        }}
+      />
+    );
+
+    expect(lifecycleEvents).toEqual(["activated", "provision", "deprovision", "activated", "provision"]);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(lifecycleEvents).toEqual([
+      "activated",
+      "provision",
+      "deprovision",
+      "activated",
+      "provision",
+      "deactivation",
+    ]);
+  });
+
+  it("should have predicted lifecycle order in strict mode", async () => {
+    const { lifecycleEvents, LifecycleService } = createLifecycleService();
+
+    const { rerender } = render(
+      <StrictMode>
+        <ContainerProvider
+          container={{
+            entries: [LifecycleService],
+          }}
+        />
+      </StrictMode>
+    );
+
+    expect(lifecycleEvents).toEqual(["activated", "provision", "deprovision", "provision"]);
+
+    rerender(
+      <StrictMode>
+        <ContainerProvider
+          container={{
+            entries: [LifecycleService, { id: CONFIG_TOKEN, value: "next" }],
+          }}
+        />
+      </StrictMode>
+    );
+
+    expect(lifecycleEvents).toEqual([
+      "activated",
+      "provision",
+      "deprovision",
+      "provision",
+      "deprovision",
+      "activated",
+      "provision",
+    ]);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(lifecycleEvents).toEqual([
+      "activated",
+      "provision",
+      "deprovision",
+      "provision",
+      "deprovision",
+      "activated",
+      "provision",
+      "deactivation",
+    ]);
   });
 });

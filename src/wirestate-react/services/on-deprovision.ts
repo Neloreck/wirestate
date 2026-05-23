@@ -13,8 +13,8 @@ const DEPROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakM
  * with {@link getDeprovisionHandlerMetadata} and invoke the method when the
  * committed provider is replaced or removed.
  *
- * A class may declare only one deprovision hook. If a base class declares one,
- * override that method without redecorating it.
+ * A class may declare only one deprovision hook name. If a base class declares
+ * one, subclasses may override and redecorate that same method name.
  *
  * @group Provision
  *
@@ -22,9 +22,9 @@ const DEPROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakM
  *
  * @example
  * ```typescript
- * class MyProvider {
- *   @onDeprovision()
- *   public deprovision(): void {
+ * class SomeService {
+ *   @OnDeprovision()
+ *   public onDeprovision(): void {
  *     // provider removed
  *   }
  * }

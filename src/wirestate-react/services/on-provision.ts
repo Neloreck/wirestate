@@ -13,8 +13,8 @@ const PROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakMap
  * with {@link getProvisionHandlerMetadata} and invoke the method after React
  * commits the provider.
  *
- * A class may declare only one provision hook. If a base class declares one,
- * override that method without redecorating it.
+ * A class may declare only one provision hook name. If a base class declares
+ * one, subclasses may override and redecorate that same method name.
  *
  * @group Provision
  *
@@ -22,9 +22,9 @@ const PROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakMap
  *
  * @example
  * ```typescript
- * class MyProvider {
- *   @onProvision()
- *   public provision(): void {
+ * class SomeService {
+ *   @OnProvision()
+ *   public onProvision(): void {
  *     // provider committed
  *   }
  * }
