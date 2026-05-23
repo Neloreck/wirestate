@@ -44,5 +44,5 @@ export function Provider({ children }: PropsWithChildren) {
     [],
   );
 
-  return <ContainerProvider container={config}>{children}</ContainerProvider>;
+  return <ContainerProvider config={config}>{children}</ContainerProvider>;
 }

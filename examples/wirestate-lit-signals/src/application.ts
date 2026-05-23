@@ -31,7 +31,7 @@ export class Application extends LitElement {
   ];
 
   @containerProvide({
-    options: {
+    config: {
       seeds: [
         [CounterService, { count: 10 }],
         [LoggerService, { enabled: true }],
