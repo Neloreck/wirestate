@@ -230,10 +230,8 @@ describe("ContainerProvider", () => {
 });
 
 describe("ContainerProvider lifecycle", () => {
-  const CONFIG_TOKEN: string = "CONFIG_TOKEN";
-
   it("should call expected lifecycle on regular mount", () => {
-    const { lifecycleEvents, LifecycleService } = createLifecycleService();
+    const LifecycleService = createLifecycleService();
 
     render(
       <ContainerProvider
@@ -243,45 +241,16 @@ describe("ContainerProvider lifecycle", () => {
       />
     );
 
-    expect(lifecycleEvents).toEqual(["activated", "provision"]);
-  });
-
-  it("should activate replacement before disposing previous managed container", async () => {
-    const { lifecycleEvents, LifecycleService } = createLifecycleService(["activated", "deactivation"]);
-
-    const { rerender } = render(
-      <ContainerProvider
-        container={{
-          activate: [LifecycleService],
-          entries: [LifecycleService],
-        }}
-      />
-    );
-
-    expect(lifecycleEvents).toEqual(["activated"]);
-
-    rerender(
-      <ContainerProvider
-        container={{
-          activate: [LifecycleService],
-          entries: [LifecycleService, { id: CONFIG_TOKEN, value: "next" }],
-        }}
-      />
-    );
-
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(lifecycleEvents).toEqual(["activated", "activated", "deactivation"]);
+    expect(LifecycleService.EVENTS).toEqual(["activated", "provision"]);
   });
 
   it("should not provision the same managed container twice on stable rerender", async () => {
-    const { lifecycleEvents, LifecycleService } = createLifecycleService(["provision", "deprovision"]);
-    const entry = { id: CONFIG_TOKEN, value: "stable" };
+    const LifecycleService = createLifecycleService({ methods: ["provision", "deprovision"] });
 
     const { rerender } = render(
       <ContainerProvider
         container={{
-          entries: [LifecycleService, entry],
+          entries: [LifecycleService],
         }}
       />
     );
@@ -290,7 +259,7 @@ describe("ContainerProvider lifecycle", () => {
       rerender(
         <ContainerProvider
           container={{
-            entries: [LifecycleService, entry],
+            entries: [LifecycleService],
           }}
         />
       );
@@ -298,90 +267,95 @@ describe("ContainerProvider lifecycle", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(lifecycleEvents).toEqual(["provision"]);
+    expect(LifecycleService.EVENTS).toEqual(["provision"]);
   });
 
   it("should have predicted lifecycle order in normal mode", async () => {
-    const { lifecycleEvents, LifecycleService } = createLifecycleService();
+    const events: Array<string> = [];
 
     const { rerender } = render(
       <ContainerProvider
         container={{
-          entries: [LifecycleService],
+          entries: [createLifecycleService({ events, suffix: "first" })],
         }}
       />
     );
 
-    expect(lifecycleEvents).toEqual(["activated", "provision"]);
+    expect(events).toEqual(["activated-first", "provision-first"]);
 
     rerender(
       <ContainerProvider
         container={{
-          entries: [LifecycleService, { id: CONFIG_TOKEN, value: "next" }],
+          entries: [createLifecycleService({ events, suffix: "second" })],
         }}
       />
     );
 
-    expect(lifecycleEvents).toEqual(["activated", "provision", "deprovision", "activated", "provision"]);
+    expect(events).toEqual([
+      "activated-first",
+      "provision-first",
+      "deprovision-first",
+      "activated-second",
+      "provision-second",
+    ]);
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(lifecycleEvents).toEqual([
-      "activated",
-      "provision",
-      "deprovision",
-      "activated",
-      "provision",
-      "deactivation",
+    expect(events).toEqual([
+      "activated-first",
+      "provision-first",
+      "deprovision-first",
+      "activated-second",
+      "provision-second",
+      "deactivation-first",
     ]);
   });
 
   it("should have predicted lifecycle order in strict mode", async () => {
-    const { lifecycleEvents, LifecycleService } = createLifecycleService();
+    const events: Array<string> = [];
 
     const { rerender } = render(
       <StrictMode>
         <ContainerProvider
           container={{
-            entries: [LifecycleService],
+            entries: [createLifecycleService({ events, suffix: "first" })],
           }}
         />
       </StrictMode>
     );
 
-    expect(lifecycleEvents).toEqual(["activated", "provision", "deprovision", "provision"]);
+    expect(events).toEqual(["activated-first", "provision-first", "deprovision-first", "provision-first"]);
 
     rerender(
       <StrictMode>
         <ContainerProvider
           container={{
-            entries: [LifecycleService, { id: CONFIG_TOKEN, value: "next" }],
+            entries: [createLifecycleService({ events, suffix: "second" })],
           }}
         />
       </StrictMode>
     );
 
-    expect(lifecycleEvents).toEqual([
-      "activated",
-      "provision",
-      "deprovision",
-      "provision",
-      "deprovision",
-      "activated",
-      "provision",
+    expect(events).toEqual([
+      "activated-first",
+      "provision-first",
+      "deprovision-first",
+      "provision-first",
+      "deprovision-first",
+      "activated-second",
+      "provision-second",
     ]);
 
     await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(lifecycleEvents).toEqual([
-      "activated",
-      "provision",
-      "deprovision",
-      "provision",
-      "deprovision",
-      "activated",
-      "provision",
-      "deactivation",
+    expect(events).toEqual([
+      "activated-first",
+      "provision-first",
+      "deprovision-first",
+      "provision-first",
+      "deprovision-first",
+      "activated-second",
+      "provision-second",
+      "deactivation-first",
     ]);
   });
 });

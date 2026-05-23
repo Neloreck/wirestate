@@ -9,51 +9,62 @@ import { OnProvision } from "../../wirestate-react/services/on-provision";
  */
 export type ActivationLifecycleEvent = "activated" | "deactivation" | "provision" | "deprovision";
 
+export interface CreateLifecycleServiceOptions {
+  methods?: Array<ActivationLifecycleEvent>;
+  suffix?: string;
+  events?: Array<string>;
+}
+
 /**
  * Creates a service class that records selected lifecycle events.
  *
+ * @param options - Todo;.
  * @internal
  *
- * @param methods - Lifecycle events that should be recorded.
- * @param suffix
  * @returns The service class and shared event log.
  */
-export function createLifecycleService(
-  methods: ReadonlyArray<ActivationLifecycleEvent> = ["activated", "deactivation", "provision", "deprovision"],
-  suffix: string = ""
-) {
-  const lifecycleEvents: Array<string> = [];
+export function createLifecycleService(options: CreateLifecycleServiceOptions = {}) {
+  const { methods, suffix, events } = options;
 
   @Injectable()
   class LifecycleService {
+    public static readonly SUFFIX: string = suffix ? "-" + suffix : "";
+    public static readonly METHODS: Array<ActivationLifecycleEvent> = methods ?? [
+      "activated",
+      "deactivation",
+      "provision",
+      "deprovision",
+    ];
+    public static readonly EVENTS: Array<string> = events ?? [];
+
     @OnActivated()
     public onActivated(): void {
-      if (methods.includes("activated")) {
-        lifecycleEvents.push("activated" + suffix);
+      if (LifecycleService.METHODS.includes("activated")) {
+        LifecycleService.EVENTS.push("activated" + LifecycleService.SUFFIX);
       }
     }
 
     @OnDeactivation()
     public onDeactivation(): void {
-      if (methods.includes("deactivation")) {
-        lifecycleEvents.push("deactivation" + suffix);
+      if (LifecycleService.METHODS.includes("deactivation")) {
+        LifecycleService.EVENTS.push("deactivation" + LifecycleService.SUFFIX);
       }
     }
 
     @OnProvision()
     public onProvision(): void {
-      if (methods.includes("provision")) {
-        lifecycleEvents.push("provision" + suffix);
+      if (LifecycleService.METHODS.includes("provision")) {
+        LifecycleService.EVENTS.push("provision" + LifecycleService.SUFFIX);
       }
     }
 
     @OnDeprovision()
     public onDeprovision(): void {
-      if (methods.includes("deprovision")) {
-        lifecycleEvents.push("deprovision" + suffix);
+      if (LifecycleService.METHODS.includes("deprovision")) {
+        LifecycleService.EVENTS.push("deprovision" + LifecycleService.SUFFIX);
       }
     }
   }
 
-  return { LifecycleService, lifecycleEvents };
+  return LifecycleService;
 }
