@@ -49,14 +49,14 @@ import { CounterService, LoggerService } from "./services";
 
 export function Application() {
   return (
-    <ContainerProvider container={{ entries: [CounterService, LoggerService] }}>
+    <ContainerProvider config={{ entries: [CounterService, LoggerService] }}>
       <SomeComponent />
     </ContainerProvider>
   );
 }
 ```
 
-When `container` is options, `ContainerProvider` creates and owns the container. Managed React containers activate all
+When `config` is provided, `ContainerProvider` creates and owns the container. Managed React containers activate all
 provided entries by default; pass `activate: false` to bind without eager activation, or pass an array to activate only
 specific entries.
 

@@ -15,8 +15,8 @@ npm install @wirestate/core @wirestate/react reflect-metadata
 
 ### `ContainerProvider`
 
-Root provider. Exposes the top-level container to the React tree. Pass either an existing container instance or
-`createContainer(...)` options.
+Root provider. Exposes the top-level container to the React tree. Pass either an existing `container` instance or
+managed `createContainer(...)` `config`.
 
 When `container` is a prebuilt container instance, activation is controlled by the `createContainer` call that built it:
 
@@ -39,7 +39,7 @@ export function Application() {
 }
 ```
 
-When `container` is options, `ContainerProvider` creates and owns the container. Managed containers activate all provided
+When `config` is provided, `ContainerProvider` creates and owns the container. Managed containers activate all provided
 entries by default; pass `activate: false` to bind without eager activation, or pass an array to activate only specific entries.
 
 ```tsx
@@ -48,7 +48,7 @@ import { CounterService, LoggerService } from "./services";
 
 export function Application() {
   return (
-    <ContainerProvider container={{ entries: [CounterService, LoggerService] }}>
+    <ContainerProvider config={{ entries: [CounterService, LoggerService] }}>
       <SomeComponent />
     </ContainerProvider>
   );

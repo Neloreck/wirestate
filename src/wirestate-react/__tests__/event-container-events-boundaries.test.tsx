@@ -36,7 +36,7 @@ describe("react event container boundaries integration (SubContainer essentials 
     const config: ContainerConfig = useMemo(() => ({}), []);
 
     return (
-      <ContainerProvider container={config}>
+      <ContainerProvider config={config}>
         <EventPanel name={"root"} />
 
         {showChild ? (

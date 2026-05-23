@@ -10,38 +10,40 @@ import {
   retainContainer,
   scheduleContainerDestruction,
 } from "../services/provision-lifecycle";
-import { Optional } from "../types/general";
+import { Maybe, Optional } from "../types/general";
 import { shallowEqualArrays } from "../utils/shallow-equal-arrays";
 
 /**
- * Describes how {@link ContainerProvider} receives its root container.
+ * Represents props accepted by {@link ContainerProvider}.
  *
  * @remarks
- * Pass an existing {@link Container} when ownership lives outside React. Pass
- * {@link ContainerConfig} when the provider should create and dispose a
- * managed container for the subtree.
- */
-type ContainerProviderSource = Container | ContainerConfig;
-
-/**
- * Represents props accepted by {@link ContainerProvider}.
+ * Provide either an external `container` or managed creation `config`, but
+ * never both at the same time.
  *
  * @group Provision
  */
 export interface ContainerProviderProps {
   /**
-   * Container instance or options used to create one.
+   * External container instance to provide as-is.
    *
    * @remarks
-   * External container instances are never disposed by this provider. Managed
-   * containers created from options are disposed on unmount and activate all
-   * entries by default unless `activate` is provided explicitly. Managed
+   * External container instances are provisioned by this provider, but never
+   * disposed.
+   */
+  readonly container?: Container;
+
+  /**
+   * Managed container creation options.
+   *
+   * @remarks
+   * Managed containers created from config are disposed on unmount and activate
+   * all entries by default unless `activate` is provided explicitly. Managed
    * containers are intentionally recreated only when `parent` or `entries`
-   * changes by shallow comparison; inline `seed` and `seeds` values are not
+   * change by shallow comparison; inline `seed` and `seeds` values are not
    * treated as recreation signals. Pass a React `key` to force a fresh managed
    * container when those options should be re-applied.
    */
-  readonly container: ContainerProviderSource;
+  readonly config?: ContainerConfig;
 
   /**
    * React subtree that receives the active container.
@@ -65,7 +67,7 @@ interface ContainerProviderState {
  *
  * - External: `container` is a prebuilt {@link Container}. The provider only
  *   passes it through context, runs provision hooks, and never disposes it.
- * - Managed: `container` is {@link ContainerConfig}. The provider
+ * - Managed: `config` is {@link ContainerConfig}. The provider
  *   creates a container, activates entries by default, owns its disposal, and
  *   recreates it when `parent` or `entries` change.
  *
@@ -75,32 +77,61 @@ interface ContainerProviderState {
  * @returns A React context provider for the active container.
  */
 export function ContainerProvider(props: ContainerProviderProps) {
-  const source: ContainerProviderSource = props.container;
-  const owned: boolean = !(source instanceof Container);
+  if (!props.container && !props.config) {
+    throw new WirestateError(
+      ERROR_CODE_VALIDATION_ERROR,
+      "ContainerProvider requires a valid container instance or creation config."
+    );
+  } else if (props.container && props.config) {
+    throw new WirestateError(
+      ERROR_CODE_VALIDATION_ERROR,
+      "ContainerProvider requires only container or valid config object to be provided."
+    );
+  } else if (props.container !== undefined && !(props.container instanceof Container)) {
+    throw new WirestateError(
+      ERROR_CODE_VALIDATION_ERROR,
+      "ContainerProvider requires a valid container instance or creation config."
+    );
+  } else if (props.container !== undefined && props.config && typeof props.config !== "object") {
+    throw new WirestateError(
+      ERROR_CODE_VALIDATION_ERROR,
+      "ContainerProvider requires a valid container instance or creation config."
+    );
+  }
+
+  const managedSource: Maybe<ContainerConfig> = props.config;
+  const externalContainer: Maybe<Container> = props.container;
+  const owned: boolean = Boolean(managedSource);
   const ownedRef = useRef<boolean>(owned);
 
   const lifecycleRef = useRef<Optional<ProvisionLifecycle>>(null);
 
   const [state, setState] = useState<Optional<ContainerProviderState>>(() =>
-    source instanceof Container
-      ? null
-      : {
-          container: createContainer({ ...source, activate: source.activate ?? true }),
-          source: source,
+    managedSource
+      ? {
+          container: createContainer({ ...managedSource, activate: managedSource.activate ?? true }),
+          source: managedSource,
         }
+      : null
   );
 
-  const managedSource: Optional<ContainerConfig> = owned ? (source as ContainerConfig) : null;
-  const externalContainer: Optional<Container> = owned ? null : (source as Container);
-  const needsReplacement: boolean =
-    state !== null &&
-    managedSource !== null &&
+  if (ownedRef.current !== owned) {
+    throw new WirestateError(
+      ERROR_CODE_VALIDATION_ERROR,
+      "ContainerProvider cannot switch between external and managed container modes. Pass a React key to remount the provider."
+    );
+  }
+
+  const needsReplacement: boolean = Boolean(
+    state &&
+    managedSource &&
     (state.source.parent !== managedSource?.parent ||
-      !shallowEqualArrays(state.source.entries ?? [], managedSource.entries ?? []));
+      !shallowEqualArrays(state.source.entries ?? [], managedSource.entries ?? []))
+  );
 
   let activeState: Optional<ContainerProviderState> = state;
 
-  if (needsReplacement && managedSource !== null) {
+  if (needsReplacement && managedSource) {
     activeState = {
       container: createContainer({ ...managedSource, activate: managedSource.activate ?? true }),
       source: managedSource,
@@ -109,8 +140,8 @@ export function ContainerProvider(props: ContainerProviderProps) {
     setState(activeState);
   }
 
-  const activeContainer: Container = activeState === null ? (externalContainer as Container) : activeState.container;
-  const activeEntries = activeState === null ? getContainerEntries(activeContainer) : activeState.source.entries;
+  const activeContainer: Container = activeState ? activeState.container : (externalContainer as Container);
+  const activeEntries = activeState ? activeState.source.entries : getContainerEntries(activeContainer);
 
   useEffect(() => {
     const lifecycle: ProvisionLifecycle = (lifecycleRef.current ??= {
@@ -129,13 +160,6 @@ export function ContainerProvider(props: ContainerProviderProps) {
       }
     };
   }, [activeContainer, activeEntries, owned]);
-
-  if (ownedRef.current !== owned) {
-    throw new WirestateError(
-      ERROR_CODE_VALIDATION_ERROR,
-      "ContainerProvider cannot switch between external and managed container modes. Pass a React key to remount the provider."
-    );
-  }
 
   return createElement(ContainerReactContext.Provider, { value: activeContainer }, props.children ?? null);
 }
