@@ -8,6 +8,8 @@ import { ERROR_CODE_BINDING_SCOPE } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { InjectableDescriptor } from "../types/provision";
 
+import { registerContainerEntry } from "./bind-register";
+
 /**
  * Binds a constant value to a service identifier in the container.
  *
@@ -47,5 +49,11 @@ export function bindConstant<T>(container: Container, entry: InjectableDescripto
     throw new WirestateError(ERROR_CODE_BINDING_SCOPE, "Provided unexpected binding scope for constant value.");
   }
 
-  return container.bind<T>(entry.id as ServiceIdentifier<T>).toConstantValue(entry.value as T);
+  const binding: BindWhenOnFluentSyntax<T> = container
+    .bind<T>(entry.id as ServiceIdentifier<T>)
+    .toConstantValue(entry.value as T);
+
+  registerContainerEntry(container, entry);
+
+  return binding;
 }

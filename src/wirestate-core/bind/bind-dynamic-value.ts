@@ -5,6 +5,8 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { InjectableDescriptor } from "../types/provision";
 
+import { registerContainerEntry } from "./bind-register";
+
 /**
  * Binds a dynamic value (factory-based) to an identifier in the container.
  *
@@ -44,6 +46,8 @@ export function bindDynamicValue<T>(container: Container, entry: InjectableDescr
 
     return entry.value;
   }) as BindInWhenOnFluentSyntax<T>;
+
+  registerContainerEntry(container, entry);
 
   if (!entry.scopeBindingType) {
     return binding;

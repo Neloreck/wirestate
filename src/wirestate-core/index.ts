@@ -7,6 +7,7 @@ export * from "./alias";
 export { bindConstant } from "./bind/bind-constant";
 export { bindDynamicValue } from "./bind/bind-dynamic-value";
 export { bindEntry, BindEntryOptions } from "./bind/bind-entry";
+export { getContainerEntries } from "./bind/bind-register";
 export { bindService, BindServiceOptions } from "./bind/bind-service";
 export { getEntryToken } from "./bind/get-entry-token";
 

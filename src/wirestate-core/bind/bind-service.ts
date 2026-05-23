@@ -13,8 +13,8 @@ import { QueryBus } from "../queries/query-bus";
 import {
   COMMAND_UNREGISTERS_BY_SERVICE,
   CONTAINER_REFS_BY_SERVICE,
-  QUERY_UNREGISTERS_BY_SERVICE,
   EVENT_UNSUBSCRIBERS_BY_SERVICE,
+  QUERY_UNREGISTERS_BY_SERVICE,
   WIRE_SCOPES_BY_SERVICE,
 } from "../registry";
 import { getActivatedHandlerMetadata } from "../service/on-activated";
@@ -23,6 +23,8 @@ import { CommandHandler, CommandUnregister } from "../types/commands";
 import { EventHandler, EventUnsubscriber } from "../types/events";
 import { Maybe, MaybePromise, Optional } from "../types/general";
 import { QueryHandler, QueryUnregister } from "../types/queries";
+
+import { registerContainerEntry } from "./bind-register";
 
 /**
  * Represents options for {@link bindService}.
@@ -258,6 +260,8 @@ export function bindService<T extends object>(
 
     CONTAINER_REFS_BY_SERVICE.delete(instance);
   });
+
+  registerContainerEntry(container, entry);
 }
 
 /**
