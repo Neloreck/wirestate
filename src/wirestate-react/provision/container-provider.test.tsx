@@ -68,8 +68,9 @@ describe("ContainerProvider", () => {
       </ContainerProvider>
     );
 
-    expect(containers).toHaveLength(2);
-    expect(containers[1]).not.toBe(containers[0]);
+    expect(containers).toHaveLength(3);
+    expect(containers[1]).toBe(containers[0]);
+    expect(containers[2]).not.toBe(containers[0]);
     expect(getByTestId("value").textContent).toBe("second");
   });
 
@@ -136,12 +137,13 @@ describe("ContainerProvider", () => {
       </ContainerProvider>
     );
 
-    expect(containers).toHaveLength(2);
-    expect(containers[1]).not.toBe(containers[0]);
+    expect(containers).toHaveLength(3);
+    expect(containers[1]).toBe(containers[0]);
+    expect(containers[2]).not.toBe(containers[0]);
     expect(getByTestId("value").textContent).toBe("second-parent");
   });
 
-  it("should dispose previous managed container before activating replacement", () => {
+  it("should activate replacement before disposing previous managed container", async () => {
     const lifecycleEvents: Array<string> = [];
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
 
@@ -178,7 +180,94 @@ describe("ContainerProvider", () => {
       />
     );
 
-    expect(lifecycleEvents).toEqual(["activate", "deactivate", "activate"]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(lifecycleEvents).toEqual(["activate", "activate", "deactivate"]);
+  });
+
+  it("should not activate not required on creation phase", () => {
+    const lifecycleEvents: Array<string> = [];
+
+    @Injectable()
+    class LifecycleService {
+      @OnActivated()
+      public onActivated(): void {
+        lifecycleEvents.push("activate");
+      }
+    }
+
+    render(
+      <ContainerProvider
+        container={{
+          entries: [LifecycleService],
+        }}
+      />
+    );
+
+    expect(lifecycleEvents).toEqual([]);
+  });
+
+  it("should dispose previous managed container when replacement commits", async () => {
+    const CONFIG_TOKEN: string = "CONFIG_TOKEN";
+    const containers: Array<Container> = [];
+
+    function TrackingConsumer() {
+      containers.push(useContainer());
+
+      return null;
+    }
+
+    const { rerender } = render(
+      <ContainerProvider container={{ entries: [{ id: CONFIG_TOKEN, value: "first" }] }}>
+        <TrackingConsumer />
+      </ContainerProvider>
+    );
+
+    const unbindAllSpy = jest.spyOn(containers[0], "unbindAll");
+
+    rerender(
+      <ContainerProvider container={{ entries: [{ id: CONFIG_TOKEN, value: "second" }] }}>
+        <TrackingConsumer />
+      </ContainerProvider>
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(unbindAllSpy).toHaveBeenCalledTimes(1);
+    expect(containers).toHaveLength(3);
+  });
+
+  it("should dispose previous managed container when replacement commits in strict mode", () => {
+    const CONFIG_TOKEN: string = "CONFIG_TOKEN";
+    const containers: Array<Container> = [];
+
+    function TrackingConsumer() {
+      containers.push(useContainer());
+
+      return null;
+    }
+
+    const { rerender } = render(
+      <StrictMode>
+        <ContainerProvider container={{ entries: [{ id: CONFIG_TOKEN, value: "first" }] }}>
+          <TrackingConsumer />
+        </ContainerProvider>
+      </StrictMode>
+    );
+
+    rerender(
+      <StrictMode>
+        <ContainerProvider container={{ entries: [{ id: CONFIG_TOKEN, value: "second" }] }}>
+          <TrackingConsumer />
+        </ContainerProvider>
+      </StrictMode>
+    );
+
+    expect(containers).toHaveLength(6);
+
+    expect(containers[0]).toBe(containers[1]);
+    expect(containers[2]).toBe(containers[3]);
+    expect(containers[4]).toBe(containers[5]);
   });
 
   it("should recreate managed container with strict mode", () => {

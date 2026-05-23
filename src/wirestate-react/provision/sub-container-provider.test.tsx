@@ -129,14 +129,16 @@ describe("SubContainerProvider", () => {
     );
 
     const firstContainer: Container = containers[0];
-    const secondContainer: Container = containers[1];
+    const staleContainer: Container = containers[1];
+    const secondContainer: Container = containers[2];
 
     expect(getByTestId("value").textContent).toBe("second");
-    expect(containers).toHaveLength(2);
+    expect(containers).toHaveLength(3);
+    expect(staleContainer).toBe(firstContainer);
     expect(secondContainer).not.toBe(firstContainer);
   });
 
-  it("should recreate child container when parent container changes with same entries", () => {
+  it("should recreate child container when parent container changes with same entries", async () => {
     const PARENT_TOKEN: string = "PARENT_TOKEN";
     const firstParent: Container = mockContainer();
     const secondParent: Container = mockContainer();
@@ -191,13 +193,17 @@ describe("SubContainerProvider", () => {
     );
 
     const firstChildContainer: Container = containers[0];
-    const secondChildContainer: Container = containers[1];
+    const staleChildContainer: Container = containers[1];
+    const secondChildContainer: Container = containers[2];
 
-    expect(containers).toHaveLength(2);
+    expect(containers).toHaveLength(3);
+    expect(staleChildContainer).toBe(firstChildContainer);
     expect(secondChildContainer).not.toBe(firstChildContainer);
     expect(getByTestId("value").textContent).toBe("stable|second-parent");
     expect(secondChildContainer.get(PARENT_TOKEN)).toBe("second-parent");
-    expect(lifecycleEvents).toEqual(["activate", "deactivate", "activate"]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(lifecycleEvents).toEqual(["activate", "activate", "deactivate"]);
   });
 
   it("should keep child container when entries are shallow-equal", () => {
@@ -234,7 +240,7 @@ describe("SubContainerProvider", () => {
     expect(getByTestId("value").textContent).toBe("stable");
   });
 
-  it("should dispose previous container before activating next instance", () => {
+  it("should dispose previous container when replacement commits", async () => {
     const parentContainer: Container = mockContainer();
     const lifecycleEvents: Array<string> = [];
 
@@ -267,6 +273,8 @@ describe("SubContainerProvider", () => {
       </ContainerProvider>
     );
 
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
     rerender(
       <ContainerProvider container={parentContainer}>
         <SubContainerProvider entries={[LifecycleService, { id: CONFIG_TOKEN, value: "second" }]}>
@@ -274,6 +282,8 @@ describe("SubContainerProvider", () => {
         </SubContainerProvider>
       </ContainerProvider>
     );
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
     rerender(
       <ContainerProvider container={parentContainer}>
@@ -283,6 +293,8 @@ describe("SubContainerProvider", () => {
       </ContainerProvider>
     );
 
-    expect(lifecycleEvents).toEqual(["activate", "deactivate", "activate", "deactivate", "activate"]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(lifecycleEvents).toEqual(["activate", "activate", "deactivate", "activate", "deactivate"]);
   });
 });

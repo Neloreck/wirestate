@@ -1,22 +1,11 @@
 import { Container, createContainer, SeedEntries } from "@wirestate/core";
 import { InjectableEntries } from "@wirestate/core/types/provision";
-import { createElement, type ReactNode } from "react";
-
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
+import { createElement, type ReactNode, useEffect, useRef, useState } from "react";
 
 import { ContainerReactContext } from "../context/container-context";
 import { useContainer } from "../context/use-container";
+import { Optional } from "../types/general";
 import { shallowEqualArrays } from "../utils/shallow-equal-arrays";
-
-import { ContainerProvisionState, useContainerProvisionState } from "./use-container-provision-state";
-
-/**
- * Runtime snapshot currently exposed by {@link SubContainerProvider}.
- *
- * @internal
- */
-type SubContainerState = ContainerProvisionState<SubContainerSource>;
 
 /**
  * Child-container inputs controlled by {@link SubContainerProvider}.
@@ -27,6 +16,14 @@ interface SubContainerSource {
   readonly parent: Container;
   readonly seeds?: SeedEntries;
   readonly entries: InjectableEntries;
+}
+
+/**
+ * Active child-container state stored in component state.
+ */
+interface SubContainerState {
+  readonly container: Container;
+  readonly source: SubContainerSource;
 }
 
 /**
@@ -64,11 +61,9 @@ export interface SubContainerProviderProps {
  * Provides a child container derived from the nearest parent container.
  *
  * @remarks
- * The provider owns the child container. It disposes the previous child before
- * exposing a replacement, recreates on parent or `entries` changes, and revives
- * a cleaned child after React development remount cleanup. Seed changes are
- * intentionally ignored for reuse decisions; pass a React `key` when new seeds
- * should create a new scoped container.
+ * The provider owns the child container. It recreates on parent or `entries`
+ * changes. Seed changes are intentionally ignored for reuse decisions; pass a
+ * React `key` when new seeds should create a new scoped container.
  *
  * @group Provision
  *
@@ -77,65 +72,69 @@ export interface SubContainerProviderProps {
  */
 export function SubContainerProvider(props: SubContainerProviderProps) {
   const parent: Container = useContainer();
-
   const source: SubContainerSource = {
-    entries: props.entries,
     parent,
+    entries: props.entries,
     seeds: props.seeds,
   };
 
-  const state: SubContainerState = useContainerProvisionState(source, {
-    create: createSubContainerState,
-    label: "SubContainerProvider",
-    reuse: canReuseSubContainerState,
-  });
+  const pendingDestructionRef = useRef<Optional<Map<Container, ReturnType<typeof setTimeout>>>>(null);
+
+  const [state, setState] = useState<SubContainerState>(() => ({
+    container: createContainer({
+      entries: source.entries,
+      parent: source.parent,
+      seeds: source.seeds,
+    }),
+    source,
+  }));
+
+  useEffect(() => {
+    let pending = pendingDestructionRef.current;
+
+    if (!pending) {
+      pending = new Map();
+      pendingDestructionRef.current = pending;
+    }
+
+    const timeout = pending.get(state.container) ?? null;
+
+    if (timeout) {
+      clearTimeout(timeout);
+      pending.delete(state.container);
+    }
+
+    const needsReplacement: boolean =
+      state.source.parent !== source.parent || !shallowEqualArrays(state.source.entries, source.entries);
+
+    if (needsReplacement) {
+      setState({
+        container: createContainer({
+          entries: source.entries,
+          parent: source.parent,
+          seeds: source.seeds,
+        }),
+        source,
+      });
+    }
+
+    return () => {
+      const container = state.container;
+      const destruction = pendingDestructionRef.current!;
+
+      if (destruction.has(container)) {
+        return;
+      }
+
+      destruction.set(
+        container,
+        setTimeout(() => {
+          destruction.delete(container);
+          container.unbindAll();
+        }, 0)
+      );
+    };
+  }, [state, source.entries, source.parent]);
 
   return createElement(ContainerReactContext.Provider, { value: state.container }, props.children ?? null);
-}
-
-/**
- * Selects the child-container state that should be exposed for this render.
- *
- * @param current - Previously exposed state, if any.
- * @param source - Current provider source.
- * @param disposed - Child containers already disposed by this provider.
- * @returns Existing or replacement child-container state.
- */
-function canReuseSubContainerState(
-  current: SubContainerState,
-  source: SubContainerSource,
-  disposed: WeakSet<Container>
-): boolean {
-  return (
-    !disposed.has(current.container) &&
-    current.source.parent === source.parent &&
-    shallowEqualArrays(source.entries, current.source.entries)
-  );
-}
-
-/**
- * Creates a child container, applies seeds, and binds entries.
- *
- * @param source - Parent container plus child bindings.
- * @returns Child-container state ready for context.
- */
-function createSubContainerState(source: SubContainerSource): SubContainerState {
-  const container: Container = createContainer({
-    entries: source.entries,
-    parent: source.parent,
-    seeds: source.seeds,
-  });
-
-  dbg.info(prefix(__filename), "Constructing new container state:", {
-    parent: source.parent,
-    container,
-    seeds: source.seeds,
-    entries: source.entries,
-  });
-
-  return {
-    source,
-    container,
-    owned: true,
-  };
 }
