@@ -1,5 +1,4 @@
-import { Container, ContainerActivation, createContainer, SeedEntries } from "@wirestate/core";
-import { InjectableEntries } from "@wirestate/core/types/provision";
+import { Container, ContainerActivation, createContainer, SeedEntries, InjectableEntries } from "@wirestate/core";
 import { createElement, type ReactNode, useEffect, useRef, useState } from "react";
 
 import { ContainerReactContext } from "../context/container-context";

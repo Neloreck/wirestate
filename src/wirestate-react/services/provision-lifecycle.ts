@@ -1,5 +1,4 @@
-import { Container, getEntryToken, ServiceIdentifier } from "@wirestate/core";
-import { InjectableEntries } from "@wirestate/core/types/provision";
+import { Container, getEntryToken, ServiceIdentifier, InjectableEntries } from "@wirestate/core";
 
 import { Maybe, MaybePromise } from "../types/general";
 

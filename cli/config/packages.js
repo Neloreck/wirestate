@@ -31,7 +31,10 @@ export const PACKAGES = [
   },
   {
     name: "wirestate-lit",
-    entries: [path.resolve(SRC_PATH, "wirestate-lit/index.ts")],
+    entries: [
+      path.resolve(SRC_PATH, "wirestate-lit/index.ts"),
+      path.resolve(SRC_PATH, "wirestate-lit/test-utils.ts"),
+    ],
     external: [...EXTERNAL_DEPENDENCIES, "lit", "@wirestate/core"],
   },
   {
