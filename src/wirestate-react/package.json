@@ -23,6 +23,10 @@
     },
     "./test-utils": {
       "types": "./test-utils.d.ts",
+      "import": {
+        "production": "./esm/production/test-utils.js",
+        "default": "./esm/development/test-utils.js"
+      },
       "require": {
         "production": "./cjs/production/test-utils.js",
         "default": "./cjs/development/test-utils.js"
