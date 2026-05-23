@@ -23,6 +23,9 @@ import "reflect-metadata";
 
 Services are plain classes decorated with `@Injectable`. Each service may inject a `WireScope` which provides access to the event, command, and query buses and to other services in the container.
 
+`@OnActivated` and `@OnDeactivation` methods are invoked during the synchronous Inversify lifecycle. If they return a
+promise, Wirestate does not block container resolution or disposal.
+
 ```ts
 import { Injectable, Inject, WireScope } from "@wirestate/core";
 

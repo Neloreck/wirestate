@@ -8,6 +8,7 @@ import { InjectableDescriptor } from "../types/provision";
 import { bindConstant } from "./bind-constant";
 import { bindDynamicValue } from "./bind-dynamic-value";
 import { bindService, type BindServiceOptions } from "./bind-service";
+import { validateInjectableDescriptor } from "./validate-injectable-descriptor";
 
 /**
  * Represents options for {@link bindEntry}.
@@ -80,6 +81,8 @@ export function bindEntry<T extends object = object>(
     return;
   }
 
+  validateInjectableDescriptor(entry);
+
   if (!entry.bindingType || entry.bindingType === bindingTypeValues.ConstantValue) {
     bindConstant(container, entry);
 
@@ -97,11 +100,10 @@ export function bindEntry<T extends object = object>(
     return;
   }
 
-  dbg.info(prefix(__filename), "Binding entry with fallback:", {
+  dbg.info(prefix(__filename), "Binding instance entry:", {
     entry,
     container,
   });
 
-  // Default: treat as class descriptor (Instance binding).
   bindService(container, entry.value as unknown as Newable<T>, options);
 }

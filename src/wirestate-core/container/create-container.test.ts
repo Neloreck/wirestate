@@ -116,6 +116,25 @@ describe("createContainer", () => {
     expect(container.get(SEED_TOKEN)).toEqual({ key: "value" });
   });
 
+  it("should preserve falsy targeted seed values", () => {
+    const container: Container = createContainer({
+      seeds: [
+        ["FALSE_SEED", false],
+        ["ZERO_SEED", 0],
+        ["EMPTY_STRING_SEED", ""],
+        ["NULL_SEED", null],
+      ],
+    });
+
+    const scope: WireScope = container.get(WireScope);
+
+    expect(scope.getSeed("FALSE_SEED")).toBe(false);
+    expect(scope.getSeed("ZERO_SEED")).toBe(0);
+    expect(scope.getSeed("EMPTY_STRING_SEED")).toBe("");
+    expect(scope.getSeed("NULL_SEED")).toBeNull();
+    expect(scope.getSeed("MISSING_SEED")).toBeNull();
+  });
+
   it("should use provided seeds", () => {
     const TEST_TOKEN: unique symbol = Symbol.for("TEST_TOKEN");
     const container: Container = createContainer({

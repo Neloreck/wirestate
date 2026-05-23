@@ -9,6 +9,7 @@ import { WirestateError } from "../error/wirestate-error";
 import { InjectableDescriptor } from "../types/provision";
 
 import { registerContainerEntry } from "./bind-register";
+import { validateConstantDescriptor } from "./validate-injectable-descriptor";
 
 /**
  * Binds a constant value to a service identifier in the container.
@@ -38,6 +39,8 @@ import { registerContainerEntry } from "./bind-register";
  * ```
  */
 export function bindConstant<T>(container: Container, entry: InjectableDescriptor): BindWhenOnFluentSyntax<T> {
+  validateConstantDescriptor(entry);
+
   dbg.info(prefix(__filename), "Binding constant:", {
     id: entry.id,
     value: entry.value,

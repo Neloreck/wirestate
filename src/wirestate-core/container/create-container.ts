@@ -132,7 +132,7 @@ export function createContainer(options: CreateContainerOptions = {}): Container
       if (!entryTokens.includes(eager)) {
         throw new WirestateError(
           ERROR_CODE_VALIDATION_ERROR,
-          `createInjectablesProvider: '${String(eager)}' is listed in 'activate' but was not provided in 'entries'.`
+          `createContainer: '${String(eager)}' is listed in 'activate' but was not provided in 'entries'.`
         );
       }
     }

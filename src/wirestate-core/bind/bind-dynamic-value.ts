@@ -6,6 +6,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { InjectableDescriptor } from "../types/provision";
 
 import { registerContainerEntry } from "./bind-register";
+import { validateDynamicValueDescriptor } from "./validate-injectable-descriptor";
 
 /**
  * Binds a dynamic value (factory-based) to an identifier in the container.
@@ -34,13 +35,15 @@ import { registerContainerEntry } from "./bind-register";
  * ```
  */
 export function bindDynamicValue<T>(container: Container, entry: InjectableDescriptor): BindWhenOnFluentSyntax<T> {
+  validateDynamicValueDescriptor(entry);
+
   dbg.info(prefix(__filename), "Binding constant:", {
     entry,
     container,
   });
 
   const binding: BindInWhenOnFluentSyntax<T> = container.bind(entry.id).toDynamicValue(() => {
-    if (entry.factory) {
+    if (Object.prototype.hasOwnProperty.call(entry, "factory") && entry.factory) {
       return entry.factory();
     }
 

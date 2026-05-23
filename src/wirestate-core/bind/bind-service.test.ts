@@ -15,6 +15,10 @@ import { CommandStatus } from "../types/commands";
 
 import { bindService } from "./bind-service";
 
+interface ReflectMetadata {
+  getMetadata?: (metadataKey: string, target: object) => unknown;
+}
+
 describe("bindService", () => {
   @Injectable()
   class AsyncFailService {
@@ -181,5 +185,26 @@ describe("bindService", () => {
     expect(() => container.get(QueryBus).query("CORRUPTED_QUERY")).toThrow(
       "No query handler registered in container for type: 'CORRUPTED_QUERY'."
     );
+  });
+
+  it("should throw a readable error when reflect-metadata is not installed", () => {
+    @Injectable()
+    class ServiceWithoutMetadataPolyfill {}
+
+    const reflectMetadata: ReflectMetadata = Reflect as ReflectMetadata;
+    const originalGetMetadata = reflectMetadata.getMetadata;
+    const container: Container = mockContainer();
+
+    try {
+      delete reflectMetadata.getMetadata;
+
+      bindService(container, ServiceWithoutMetadataPolyfill);
+
+      expect(() => container.get(ServiceWithoutMetadataPolyfill)).toThrow(
+        'reflect-metadata is required for Wirestate service activation. Import "reflect-metadata" once at your application entry point before creating Wirestate containers.'
+      );
+    } finally {
+      reflectMetadata.getMetadata = originalGetMetadata;
+    }
   });
 });

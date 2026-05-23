@@ -6,6 +6,8 @@ import { prefix } from "@/macroses/prefix.macro";
 import { CommandBus } from "../commands/command-bus";
 import { getCommandHandlerMetadata } from "../commands/get-command-handler-metadata";
 import { WireScope } from "../container/wire-scope";
+import { ERROR_CODE_REFLECT_METADATA_MISSING } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
 import { buildEventDispatcher } from "../events/build-event-dispatcher";
 import { EventBus } from "../events/event-bus";
 import { getQueryHandlerMetadata } from "../queries/get-query-handler-metadata";
@@ -25,6 +27,10 @@ import { Maybe, MaybePromise, Optional } from "../types/general";
 import { QueryHandler, QueryUnregister } from "../types/queries";
 
 import { registerContainerEntry } from "./bind-register";
+
+interface ReflectWithMetadata {
+  readonly getMetadata?: (metadataKey: string, target: object) => unknown;
+}
 
 /**
  * Represents options for {@link bindService}.
@@ -389,7 +395,16 @@ function detachCommandUnregister<T extends object>(service: T): void {
  * @param Service - Service constructor.
  */
 function attachWireScopes<T extends object>(service: T, Service: Newable<T>): void {
-  const paramTypes = Reflect.getMetadata("design:paramtypes", Service) as Array<unknown> | undefined;
+  const getMetadata = (Reflect as ReflectWithMetadata).getMetadata;
+
+  if (!getMetadata) {
+    throw new WirestateError(
+      ERROR_CODE_REFLECT_METADATA_MISSING,
+      'reflect-metadata is required for Wirestate service activation. Import "reflect-metadata" once at your application entry point before creating Wirestate containers.'
+    );
+  }
+
+  const paramTypes = getMetadata("design:paramtypes", Service) as Array<unknown> | undefined;
 
   if (!paramTypes?.some((type) => type === WireScope)) {
     return;
