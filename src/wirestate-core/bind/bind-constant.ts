@@ -1,15 +1,44 @@
-import { BindWhenOnFluentSyntax, Container, type ServiceIdentifier } from "inversify";
+import { bindingTypeValues, BindWhenOnFluentSyntax, Container, type ServiceIdentifier } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { ScopeBindingType } from "../alias";
-import { ERROR_CODE_BINDING_SCOPE } from "../error/error-code";
+import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { InjectableDescriptor } from "../types/provision";
 
 import { registerContainerEntry } from "./bind-register";
-import { validateConstantDescriptor } from "./validate-injectable-descriptor";
+import { validateInjectableDescriptor } from "./validate-injectable-descriptor";
+
+/**
+ * Validates that a descriptor can be bound by {@link bindConstant}.
+ *
+ * @group Bind
+ * @internal
+ *
+ * @param entry - Descriptor to validate.
+ *
+ * @throws {@link WirestateError} If the descriptor is missing a token, uses a non-constant binding type,
+ * or omits the `value` field.
+ */
+function validateConstantDescriptor(entry: InjectableDescriptor): void {
+  validateInjectableDescriptor(entry);
+
+  if (entry.bindingType !== undefined && entry.bindingType !== bindingTypeValues.ConstantValue) {
+    throw new WirestateError(
+      ERROR_CODE_INVALID_ARGUMENTS,
+      `bindConstant expected binding type '${bindingTypeValues.ConstantValue}'.`
+    );
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(entry, "value")) {
+    throw new WirestateError(
+      ERROR_CODE_INVALID_ARGUMENTS,
+      "Constant value descriptor must provide a 'value' property."
+    );
+  }
+}
 
 /**
  * Binds a constant value to a service identifier in the container.

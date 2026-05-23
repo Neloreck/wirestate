@@ -1,12 +1,60 @@
-import { bindingScopeValues, BindInWhenOnFluentSyntax, BindWhenOnFluentSyntax, Container } from "inversify";
+import {
+  bindingScopeValues,
+  bindingTypeValues,
+  BindInWhenOnFluentSyntax,
+  BindWhenOnFluentSyntax,
+  Container,
+} from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
 import { InjectableDescriptor } from "../types/provision";
 
 import { registerContainerEntry } from "./bind-register";
-import { validateDynamicValueDescriptor } from "./validate-injectable-descriptor";
+import { validateInjectableDescriptor } from "./validate-injectable-descriptor";
+
+/**
+ * Validates that a descriptor can be bound by {@link bindDynamicValue}.
+ *
+ * @group Bind
+ * @internal
+ *
+ * @param entry - Descriptor to validate.
+ *
+ * @throws {@link WirestateError} If the descriptor is missing a token, uses a non-dynamic binding type,
+ * omits both `factory` and `value`, or provides a non-function `factory`.
+ */
+function validateDynamicValueDescriptor(entry: InjectableDescriptor): void {
+  validateInjectableDescriptor(entry);
+
+  if (entry.bindingType !== undefined && entry.bindingType !== bindingTypeValues.DynamicValue) {
+    throw new WirestateError(
+      ERROR_CODE_INVALID_ARGUMENTS,
+      `bindDynamicValue expected binding type '${bindingTypeValues.DynamicValue}'.`
+    );
+  }
+
+  if (
+    !Object.prototype.hasOwnProperty.call(entry, "factory") &&
+    !Object.prototype.hasOwnProperty.call(entry, "value")
+  ) {
+    throw new WirestateError(
+      ERROR_CODE_INVALID_ARGUMENTS,
+      "Dynamic value descriptor must provide either a 'factory' or 'value' property."
+    );
+  }
+
+  if (
+    Object.prototype.hasOwnProperty.call(entry, "factory") &&
+    entry.factory !== undefined &&
+    typeof entry.factory !== "function"
+  ) {
+    throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, "Dynamic value descriptor 'factory' must be a function.");
+  }
+}
 
 /**
  * Binds a dynamic value (factory-based) to an identifier in the container.

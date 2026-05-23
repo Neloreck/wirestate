@@ -1,5 +1,8 @@
 import { Container, getEntryToken, ServiceIdentifier, InjectableEntries } from "@wirestate/core";
 
+import { dbg } from "@/macroses/dbg.macro";
+import { prefix } from "@/macroses/prefix.macro";
+
 import { Maybe, MaybePromise } from "../types/general";
 
 import { getDeprovisionHandlerMetadata } from "./on-deprovision";
@@ -12,7 +15,14 @@ import { getProvisionHandlerMetadata } from "./on-provision";
  * @internal
  */
 export interface ProvisionLifecycle {
+  /**
+   * Containers waiting for delayed destruction after React cleanup.
+   */
   readonly pendingDestruction: Map<Container, ReturnType<typeof setTimeout>>;
+
+  /**
+   * Services resolved for provider lifecycle hooks by container.
+   */
   readonly provisionedServices: Map<Container, Array<object>>;
 }
 
@@ -29,6 +39,8 @@ export function retainContainer(container: Container, lifecycle: ProvisionLifecy
   const timeout: Maybe<ReturnType<typeof setTimeout>> = lifecycle.pendingDestruction.get(container);
 
   if (timeout) {
+    dbg.info(prefix(__filename), "Retaining container:", { container });
+
     clearTimeout(timeout);
     lifecycle.pendingDestruction.delete(container);
   }
@@ -53,7 +65,16 @@ export function provisionContainer(
     return;
   }
 
-  lifecycle.provisionedServices.set(container, provisionServices(container, entries));
+  const services: Array<object> = provisionServices(container, entries);
+
+  if (services.length) {
+    dbg.info(prefix(__filename), "Provisioning container:", {
+      container,
+      services,
+    });
+  }
+
+  lifecycle.provisionedServices.set(container, services);
 }
 
 /**
@@ -69,6 +90,13 @@ export function deprovisionContainer(container: Container, lifecycle: ProvisionL
   const services: Maybe<Array<object>> = lifecycle.provisionedServices.get(container);
 
   if (services) {
+    if (services.length) {
+      dbg.info(prefix(__filename), "Deprovisioning container:", {
+        container,
+        services,
+      });
+    }
+
     deprovisionServices(services);
     lifecycle.provisionedServices.delete(container);
   }
@@ -90,9 +118,13 @@ export function scheduleContainerDestruction(container: Container, lifecycle: Pr
 
   deprovisionContainer(container, lifecycle);
 
+  dbg.info(prefix(__filename), "Scheduling container destruction:", { container });
+
   lifecycle.pendingDestruction.set(
     container,
     setTimeout(() => {
+      dbg.info(prefix(__filename), "Destroying container:", { container });
+
       lifecycle.pendingDestruction.delete(container);
       container.unbindAll();
     }, 0)
@@ -153,6 +185,14 @@ export function deprovisionServices(services: ReadonlyArray<object>): void {
   }
 }
 
+/**
+ * Checks whether a service token declares provider lifecycle metadata.
+ *
+ * @internal
+ *
+ * @param token - Entry token to inspect.
+ * @returns True when the token is a service constructor with provision or deprovision metadata.
+ */
 function hasProviderLifecycleMetadata(token: ServiceIdentifier): boolean {
   if (typeof token !== "function") {
     return false;
@@ -167,12 +207,28 @@ function hasProviderLifecycleMetadata(token: ServiceIdentifier): boolean {
   return Boolean(getProvisionHandlerMetadata(prototype) || getDeprovisionHandlerMetadata(prototype));
 }
 
+/**
+ * Calls a provider lifecycle handler and reports synchronous or asynchronous failures.
+ *
+ * @internal
+ *
+ * @param service - Service instance that owns the handler.
+ * @param methodName - Handler method name.
+ * @param decoratorName - Decorator name used in diagnostics.
+ */
 function callLifecycleHandler(service: object, methodName: string | symbol, decoratorName: string): void {
   const method: unknown = (service as Record<string | symbol, unknown>)[methodName];
 
   if (typeof method !== "function") {
     return;
   }
+
+  dbg.info(prefix(__filename), "Calling provider lifecycle handler:", {
+    name: service.constructor.name,
+    service,
+    methodName,
+    decoratorName,
+  });
 
   try {
     const result: MaybePromise<void> = (method as () => MaybePromise<void>).call(service);
