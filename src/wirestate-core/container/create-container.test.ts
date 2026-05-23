@@ -154,6 +154,49 @@ describe("createContainer", () => {
     expect(activated).toBe(true);
   });
 
+  it("should activate all provided entries when activate is true", () => {
+    const lifecycleEvents: Array<string> = [];
+
+    @Injectable()
+    class FirstService {
+      public constructor() {
+        lifecycleEvents.push("first");
+      }
+    }
+
+    @Injectable()
+    class SecondService {
+      public constructor() {
+        lifecycleEvents.push("second");
+      }
+    }
+
+    createContainer({
+      entries: [FirstService, SecondService],
+      activate: true,
+    });
+
+    expect(lifecycleEvents).toEqual(["first", "second"]);
+  });
+
+  it("should not activate provided entries when activate is false", () => {
+    let activated: boolean = false;
+
+    @Injectable()
+    class TestService {
+      public constructor() {
+        activated = true;
+      }
+    }
+
+    createContainer({
+      entries: [TestService],
+      activate: false,
+    });
+
+    expect(activated).toBe(false);
+  });
+
   it("should throw error if activate is provided without entries", () => {
     expect(() =>
       createContainer({

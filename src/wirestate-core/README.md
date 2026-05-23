@@ -228,16 +228,23 @@ import {
 
 Creates a configured IoC container for testing. Accepts an optional object:
 
-| Option          | Type                                     | Description                                   |
-| --------------- | ---------------------------------------- | --------------------------------------------- |
-| `entries`       | `Array<Newable \| InjectableDescriptor>` | Services or descriptors to bind               |
-| `activate`      | `Array<ServiceIdentifier>`               | Tokens to resolve immediately after binding   |
-| `skipLifecycle` | `boolean`                                | Skip `@OnActivated` / `@OnDeactivation` hooks |
+| Option          | Type                                     | Description                                                                            |
+| --------------- | ---------------------------------------- | -------------------------------------------------------------------------------------- |
+| `entries`       | `Array<Newable \| InjectableDescriptor>` | Services or descriptors to bind                                                        |
+| `activate`      | `boolean \| Array<ServiceIdentifier>`    | `true` to resolve all entries, or specific tokens to resolve immediately after binding |
+| `skipLifecycle` | `boolean`                                | Skip `@OnActivated` / `@OnDeactivation` hooks                                          |
 
 ```ts
 const container = mockContainer({
   entries: [CounterService, LoggerService],
   activate: [CounterService],
+});
+```
+
+```ts
+const container = mockContainer({
+  entries: [CounterService, LoggerService],
+  activate: true,
 });
 ```
 

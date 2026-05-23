@@ -1,6 +1,13 @@
 import { ContextProvider } from "@lit/context";
 import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-element";
-import { Container, createContainer, CreateContainerOptions, WirestateError } from "@wirestate/core";
+import {
+  Container,
+  createContainer,
+  CreateContainerOptions,
+  getEntryToken,
+  ServiceIdentifier,
+  WirestateError,
+} from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -106,12 +113,15 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
         this.value = createContainer(this.options);
         this.destroyed = false;
       } else {
-        if (this.options?.activate) {
+        const activate: ReadonlyArray<ServiceIdentifier> =
+          (this.options.activate === true ? this.options.entries?.map(getEntryToken) : this.options.activate) || [];
+
+        if (activate.length) {
           dbg.info(prefix(__filename), "Activating managed container:", {
             container: this.value,
           });
 
-          for (const entry of this.options.activate) {
+          for (const entry of activate) {
             this.value.get(entry);
           }
         }

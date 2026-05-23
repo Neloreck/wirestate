@@ -2,11 +2,11 @@ import { ContextConsumer, ContextProvider } from "@lit/context";
 import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-element";
 import {
   Container,
+  ContainerActivation,
   createContainer,
   InjectableDescriptor,
   Newable,
   SeedEntries,
-  ServiceIdentifier,
 } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -36,9 +36,9 @@ export interface SubContainerProviderOptions {
     readonly entries: ReadonlyArray<Newable<object> | InjectableDescriptor>;
 
     /**
-     * List of service identifiers to activate (get from container) immediately after binding.
+     * Services to activate (get from container) immediately after binding.
      */
-    readonly activate?: ReadonlyArray<ServiceIdentifier>;
+    readonly activate?: ContainerActivation;
 
     /**
      * Seed data to apply to the container before binding.

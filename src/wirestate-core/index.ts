@@ -14,7 +14,7 @@ export { command } from "./commands/command";
 export { commandOptional } from "./commands/command-optional";
 export { OnCommand } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";
-export { createContainer, CreateContainerOptions } from "./container/create-container";
+export { createContainer, ContainerActivation, CreateContainerOptions } from "./container/create-container";
 export { WireScope } from "./container/wire-scope";
 
 export { WirestateError } from "./error/wirestate-error";

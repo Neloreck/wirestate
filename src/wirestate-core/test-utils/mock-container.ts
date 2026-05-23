@@ -1,7 +1,7 @@
 import { Container, Newable, ServiceIdentifier } from "inversify";
 
 import { getEntryToken } from "../bind/get-entry-token";
-import { createContainer } from "../container/create-container";
+import { ContainerActivation, createContainer } from "../container/create-container";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { AnyObject } from "../types/general";
@@ -41,13 +41,14 @@ export interface MockContainerOptions {
   readonly entries?: Array<Newable<object> | InjectableDescriptor>;
 
   /**
-   * List of injection identifiers to immediately activate after binding.
+   * Services to resolve immediately after binding.
    *
    * @remarks
-   * Activating a service triggers its resolution and `@OnActivated` hooks.
-   * All identifiers must correspond to entries provided in the `entries` list.
+   * Pass an array to activate specific services. All identifiers must
+   * correspond to entries provided in the `entries` list. Pass `true` to
+   * activate all provided entries.
    */
-  readonly activate?: Array<ServiceIdentifier>;
+  readonly activate?: ContainerActivation;
 
   /**
    * Whether to skip the activation lifecycle for all bound services.
@@ -66,7 +67,7 @@ export interface MockContainerOptions {
  * @remarks
  * This utility initializes a new container via {@link createContainer} and
  * binds the provided `entries` using {@link mockBindEntry}. It can also
- * automatically resolve (activate) a subset of services.
+ * automatically resolve (activate) all or a subset of services.
  *
  * @group Test-utils
  *
@@ -79,12 +80,15 @@ export interface MockContainerOptions {
  * ```typescript
  * const container: Container = mockContainer({
  *   entries: [UserService, AuthService],
- *   activate: [AuthService]
+ *   activate: true
  * });
  * ```
  */
 export function mockContainer(options: MockContainerOptions = {}): Container {
-  const { activate = [], entries = [], skipLifecycle } = options;
+  const { entries = [], skipLifecycle } = options;
+
+  const activate: ReadonlyArray<ServiceIdentifier> =
+    (options.activate === true ? entries.map(getEntryToken) : options.activate) || [];
 
   if (activate.length) {
     const serviceTokens: Array<ServiceIdentifier> = entries.map((s) => getEntryToken(s));

@@ -17,6 +17,11 @@ import { createBaseContainer } from "./create-base-container";
 import { WireScope } from "./wire-scope";
 
 /**
+ * Describes which services should be resolved immediately after entries are bound.
+ */
+export type ContainerActivation = boolean | ReadonlyArray<ServiceIdentifier>;
+
+/**
  * Represents configuration options for {@link createContainer}.
  *
  * @group Container
@@ -51,9 +56,10 @@ export interface CreateContainerOptions {
    * Services to resolve immediately.
    *
    * @remarks
-   * Listed services must also be present in the `entries` array.
+   * Pass an array to activate specific services. Listed services must also be
+   * present in the `entries` array. Pass `true` to activate all provided entries.
    */
-  readonly activate?: ReadonlyArray<ServiceIdentifier>;
+  readonly activate?: ContainerActivation;
 }
 
 /**
@@ -84,11 +90,24 @@ export interface CreateContainerOptions {
  *
  * bindService(container, MyService);
  * ```
+ *
+ * @example
+ * ```typescript
+ * const container: Container = createContainer({
+ *   entries: [CounterService, LoggerService],
+ *   activate: true
+ * });
+ *
+ * bindService(container, MyService);
+ * ```
  */
 export function createContainer(options: CreateContainerOptions = {}): Container {
   dbg.info(prefix(__filename), "Creating IOC container:", { options });
 
-  if (options.activate && options.activate.length) {
+  const activate: ReadonlyArray<ServiceIdentifier> =
+    (options.activate === true ? options.entries?.map(getEntryToken) : options.activate) || [];
+
+  if (activate.length) {
     if (!options.entries?.length) {
       throw new WirestateError(
         ERROR_CODE_VALIDATION_ERROR,
@@ -98,7 +117,7 @@ export function createContainer(options: CreateContainerOptions = {}): Container
 
     const entryTokens: ReadonlyArray<ServiceIdentifier> = options.entries.map(getEntryToken);
 
-    for (const eager of options.activate) {
+    for (const eager of activate) {
       if (!entryTokens.includes(eager)) {
         throw new WirestateError(
           ERROR_CODE_VALIDATION_ERROR,
@@ -134,10 +153,8 @@ export function createContainer(options: CreateContainerOptions = {}): Container
     }
   }
 
-  if (options.activate) {
-    for (const entry of options.activate) {
-      container.get(entry);
-    }
+  for (const entry of activate) {
+    container.get(entry);
   }
 
   return container;

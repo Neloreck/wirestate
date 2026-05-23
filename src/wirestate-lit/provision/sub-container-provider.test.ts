@@ -91,6 +91,43 @@ describe("SubContainerProvider", () => {
     expect(lifecycleEvents).toEqual(["activate"]);
   });
 
+  it("should activate all configured entries when activate is true", () => {
+    fixture = createLitProvision();
+
+    const lifecycleEvents: Array<string> = [];
+
+    @Injectable()
+    class FirstService {
+      @OnActivated()
+      public onActivated(): void {
+        lifecycleEvents.push("first");
+      }
+    }
+
+    @Injectable()
+    class SecondService {
+      @OnActivated()
+      public onActivated(): void {
+        lifecycleEvents.push("second");
+      }
+    }
+
+    const element: TestProviderElement = new TestProviderElement();
+
+    new SubContainerProvider(element, {
+      options: {
+        activate: true,
+        entries: [FirstService, SecondService],
+      },
+    });
+
+    expect(lifecycleEvents).toEqual([]);
+
+    fixture.provider.appendChild(element);
+
+    expect(lifecycleEvents).toEqual(["first", "second"]);
+  });
+
   it("should destroy child container on disconnect and recreate it on reconnect", () => {
     fixture = createLitProvision();
 

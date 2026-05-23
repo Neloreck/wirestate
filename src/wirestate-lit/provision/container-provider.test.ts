@@ -189,4 +189,41 @@ describe("ContainerProvider", () => {
 
     expect(lifecycleEvents).toEqual(["activate", "deactivate", "activate", "deactivate"]);
   });
+
+  it("should activate all managed entries when activate is true", () => {
+    const lifecycleEvents: Array<string> = [];
+
+    @Injectable()
+    class FirstService {
+      @OnActivated()
+      public onActivated(): void {
+        lifecycleEvents.push("first");
+      }
+    }
+
+    @Injectable()
+    class SecondService {
+      @OnActivated()
+      public onActivated(): void {
+        lifecycleEvents.push("second");
+      }
+    }
+
+    const element: TestProviderElement = new TestProviderElement();
+
+    new ContainerProvider(element, {
+      options: {
+        activate: true,
+        entries: [FirstService, SecondService],
+      },
+    });
+
+    expect(lifecycleEvents).toEqual([]);
+
+    document.body.appendChild(element);
+
+    expect(lifecycleEvents).toEqual(["first", "second"]);
+
+    element.remove();
+  });
 });
