@@ -450,8 +450,12 @@ export class WireScope {
       key: (seed as AnyObject)?.name ?? seed,
     });
 
-    return seed
-      ? (this.getContainer().get<SeedsMap>(SEEDS_TOKEN).get(seed) as T) || null
-      : this.getContainer().get<T>(SEED_TOKEN);
+    if (seed === undefined) {
+      return this.getContainer().get<T>(SEED_TOKEN);
+    } else {
+      const seeds: SeedsMap = this.getContainer().get<SeedsMap>(SEEDS_TOKEN);
+
+      return seeds.has(seed) ? (seeds.get(seed) as T) : null;
+    }
   }
 }

@@ -266,6 +266,22 @@ describe("WireScope", () => {
     expect(scope.getSeed("NOT_EXISTING")).toBeNull();
   });
 
+  it("should get falsy bound seeds from container", () => {
+    const container: Container = mockContainer();
+    const scope: WireScope = new WireScope(container);
+
+    applySeeds(container, [
+      ["FALSE_SEED", false],
+      ["ZERO_SEED", 0],
+      ["EMPTY_STRING_SEED", ""],
+    ]);
+
+    expect(scope.getSeed("FALSE_SEED")).toBe(false);
+    expect(scope.getSeed("ZERO_SEED")).toBe(0);
+    expect(scope.getSeed("EMPTY_STRING_SEED")).toBe("");
+    expect(scope.getSeed("NOT_EXISTING")).toBeNull();
+  });
+
   it("should support full handler lifecycle: register on activation and unregister on deactivation without throwing", async () => {
     @Injectable()
     class ServiceWithManualSubs {
