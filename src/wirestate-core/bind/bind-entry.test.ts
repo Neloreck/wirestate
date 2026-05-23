@@ -7,6 +7,7 @@ import { mockContainer } from "../test-utils/mock-container";
 import { InjectableDescriptor } from "../types/provision";
 
 import { bindEntry } from "./bind-entry";
+import { getContainerEntries } from "./bind-register";
 
 describe("bindEntry", () => {
   it("should bind a service class directly", () => {
@@ -92,6 +93,22 @@ describe("bindEntry", () => {
     expect(container.isBound(GenericService)).toBe(true);
   });
 
+  it("should bind an instance descriptor to its descriptor id", () => {
+    const container: Container = mockContainer();
+    const TOKEN: unique symbol = Symbol("generic-service");
+    const entry: InjectableDescriptor = {
+      bindingType: bindingTypeValues.Instance,
+      id: TOKEN,
+      value: GenericService,
+    };
+
+    bindEntry(container, entry);
+
+    expect(container.isBound(TOKEN)).toBe(true);
+    expect(container.get(TOKEN)).toBeInstanceOf(GenericService);
+    expect(getContainerEntries(container)).toEqual([entry]);
+  });
+
   it("should throw for unknown bindingType", () => {
     const container: Container = mockContainer();
 
@@ -128,9 +145,7 @@ describe("bindEntry", () => {
     const container: Container = mockContainer();
     const entry = { value: "my-value" } as unknown as InjectableDescriptor;
 
-    expect(() => bindEntry(container, entry)).toThrow(
-      expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
-    );
+    expect(() => bindEntry(container, entry)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() => bindEntry(container, entry)).toThrow("Injectable descriptor must provide an 'id' token.");
   });
 

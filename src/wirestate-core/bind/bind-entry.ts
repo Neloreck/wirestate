@@ -1,4 +1,4 @@
-import { bindingTypeValues, Container, Newable } from "inversify";
+import { bindingTypeValues, Container, Newable, ServiceIdentifier } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -9,7 +9,7 @@ import { InjectableDescriptor } from "../types/provision";
 
 import { bindConstant } from "./bind-constant";
 import { bindDynamicValue } from "./bind-dynamic-value";
-import { bindService, type BindServiceOptions } from "./bind-service";
+import { bindService, bindServiceWithToken, type BindServiceOptions } from "./bind-service";
 import { validateInjectableDescriptor } from "./validate-injectable-descriptor";
 
 const SUPPORTED_BINDING_TYPES: ReadonlyArray<string> = [
@@ -144,5 +144,11 @@ export function bindEntry<T extends object = object>(
     container,
   });
 
-  bindService(container, entry.value as unknown as Newable<T>, options);
+  bindServiceWithToken(
+    container,
+    entry.id as ServiceIdentifier<T>,
+    entry.value as unknown as Newable<T>,
+    entry,
+    options
+  );
 }

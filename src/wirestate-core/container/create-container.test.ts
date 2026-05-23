@@ -1,4 +1,4 @@
-import { Container } from "inversify";
+import { bindingTypeValues, Container } from "inversify";
 
 import { Injectable } from "../alias";
 import { bindService } from "../bind/bind-service";
@@ -171,6 +171,32 @@ describe("createContainer", () => {
     });
 
     expect(activated).toBe(true);
+  });
+
+  it("should activate instance descriptors by descriptor id", () => {
+    const TOKEN: unique symbol = Symbol("test-service");
+    let activated: boolean = false;
+
+    @Injectable()
+    class TestService {
+      public constructor() {
+        activated = true;
+      }
+    }
+
+    const container: Container = createContainer({
+      entries: [
+        {
+          bindingType: bindingTypeValues.Instance,
+          id: TOKEN,
+          value: TestService,
+        },
+      ],
+      activate: [TOKEN],
+    });
+
+    expect(activated).toBe(true);
+    expect(container.get(TOKEN)).toBeInstanceOf(TestService);
   });
 
   it("should activate all provided entries when activate is true", () => {

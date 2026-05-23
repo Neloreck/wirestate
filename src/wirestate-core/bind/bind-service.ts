@@ -1,4 +1,4 @@
-import { BindWhenOnFluentSyntax, Container, type Newable } from "inversify";
+import { BindWhenOnFluentSyntax, Container, ServiceIdentifier, type Newable } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -24,6 +24,7 @@ import { getDeactivationHandlerMetadata } from "../service/on-deactivation";
 import { CommandHandler, CommandUnregister } from "../types/commands";
 import { EventHandler, EventUnsubscriber } from "../types/events";
 import { Maybe, MaybePromise, Optional } from "../types/general";
+import { InjectableEntries } from "../types/provision";
 import { QueryHandler, QueryUnregister } from "../types/queries";
 
 import { registerContainerEntry } from "./bind-register";
@@ -104,8 +105,33 @@ export function bindService<T extends object>(
   entry: Newable<T>,
   options?: BindServiceOptions
 ): void {
+  bindServiceWithToken(container, entry, entry, entry, options);
+}
+
+/**
+ * Binds a service class behind a custom token while preserving Wirestate lifecycle wiring.
+ *
+ * @group Bind
+ * @internal
+ *
+ * @template T - Type of the service instance.
+ *
+ * @param container - Target Inversify {@link Container}.
+ * @param token - Service identifier used to resolve the binding.
+ * @param entry - Service class constructor.
+ * @param registeredEntry - Entry recorded as container-owned.
+ * @param options - Configuration options for the binding.
+ */
+export function bindServiceWithToken<T extends object>(
+  container: Container,
+  token: ServiceIdentifier<T>,
+  entry: Newable<T>,
+  registeredEntry: InjectableEntries[number],
+  options?: BindServiceOptions
+): void {
   dbg.info(prefix(__filename), "Binding service:", {
     name: entry.name,
+    token,
     entry,
     options,
     container,
@@ -115,7 +141,7 @@ export function bindService<T extends object>(
   // `.onDeactivation` call per chain, so we register them on the container
   // itself instead — this also works correctly if a later call rebinds the
   // same token.
-  const whenBind: BindWhenOnFluentSyntax<T> = container.bind<T>(entry).to(entry).inSingletonScope();
+  const whenBind: BindWhenOnFluentSyntax<T> = container.bind<T>(token).to(entry).inSingletonScope();
 
   whenBind.onActivation((context, instance) => {
     dbg.info(prefix(__filename), "Activating service:", {
@@ -267,7 +293,7 @@ export function bindService<T extends object>(
     CONTAINER_REFS_BY_SERVICE.delete(instance);
   });
 
-  registerContainerEntry(container, entry);
+  registerContainerEntry(container, registeredEntry);
 }
 
 /**
