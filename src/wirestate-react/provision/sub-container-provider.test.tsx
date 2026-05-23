@@ -253,6 +253,41 @@ describe("SubContainerProvider lifecycle", () => {
     expect(LifecycleService.EVENTS).toEqual(["activated", "provision"]);
   });
 
+  it("should preserve external parent lifecycle while provisioning child container", async () => {
+    let index: number = 0;
+
+    const ParentLifecycleService = createLifecycleService({ suffix: () => `parent-${++index}` });
+    const ChildLifecycleService = createLifecycleService({ suffix: () => `child-${++index}` });
+    const parentContainer: Container = mockContainer({ entries: [ParentLifecycleService], activate: true });
+    const unbindAllSpy = jest.spyOn(parentContainer, "unbindAll");
+
+    const { unmount } = render(
+      <ContainerProvider container={parentContainer}>
+        <SubContainerProvider entries={[ChildLifecycleService]} />
+      </ContainerProvider>
+    );
+
+    expect(ParentLifecycleService.EVENTS).toEqual(["activated-parent-1", "provision-parent-4"]);
+    expect(ChildLifecycleService.EVENTS).toEqual(["activated-child-2", "provision-child-3"]);
+
+    unmount();
+
+    expect(ParentLifecycleService.EVENTS).toEqual(["activated-parent-1", "provision-parent-4", "deprovision-parent-5"]);
+    expect(ChildLifecycleService.EVENTS).toEqual(["activated-child-2", "provision-child-3", "deprovision-child-6"]);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(ParentLifecycleService.EVENTS).toEqual(["activated-parent-1", "provision-parent-4", "deprovision-parent-5"]);
+    expect(ChildLifecycleService.EVENTS).toEqual([
+      "activated-child-2",
+      "provision-child-3",
+      "deprovision-child-6",
+      "deactivation-child-7",
+    ]);
+
+    expect(unbindAllSpy).not.toHaveBeenCalled();
+  });
+
   it("should not provision the same child container twice on stable rerender", () => {
     const parentContainer: Container = mockContainer();
     const LifecycleService = createLifecycleService({ methods: ["provision", "deprovision"] });

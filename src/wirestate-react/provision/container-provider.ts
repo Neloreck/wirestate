@@ -1,9 +1,10 @@
-import { Container, createContainer, CreateContainerOptions, WirestateError } from "@wirestate/core";
+import { Container, createContainer, CreateContainerOptions, getContainerEntries, WirestateError } from "@wirestate/core";
 import { createElement, ReactNode, useEffect, useRef, useState } from "react";
 
 import { ContainerReactContext } from "../context/container-context";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import {
+  deprovisionContainer,
   provisionContainer,
   ProvisionLifecycle,
   retainContainer,
@@ -63,7 +64,7 @@ interface ContainerProviderState {
  * Two modes are supported:
  *
  * - External: `container` is a prebuilt {@link Container}. The provider only
- *   passes it through context and never disposes it.
+ *   passes it through context, runs provision hooks, and never disposes it.
  * - Managed: `container` is {@link CreateContainerOptions}. The provider
  *   creates a container, activates entries by default, owns its disposal, and
  *   recreates it when `parent` or `entries` change.
@@ -90,6 +91,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
   );
 
   const managedSource: Optional<CreateContainerOptions> = owned ? (source as CreateContainerOptions) : null;
+  const externalContainer: Optional<Container> = owned ? null : (source as Container);
   const needsReplacement: boolean =
     state !== null &&
     managedSource !== null &&
@@ -107,21 +109,27 @@ export function ContainerProvider(props: ContainerProviderProps) {
     setState(activeState);
   }
 
-  useEffect(() => {
-    if (!owned || activeState === null) {
-      return;
-    }
+  const activeContainer: Container =
+    activeState === null ? (externalContainer as Container) : activeState.container;
+  const activeEntries = activeState === null ? getContainerEntries(activeContainer) : activeState.source.entries;
 
+  useEffect(() => {
     const lifecycle: ProvisionLifecycle = (lifecycleRef.current ??= {
       pendingDestruction: new Map(),
       provisionedServices: new Map(),
     } as ProvisionLifecycle);
 
-    retainContainer(activeState.container, lifecycle);
-    provisionContainer(activeState.container, lifecycle, activeState.source.entries);
+    retainContainer(activeContainer, lifecycle);
+    provisionContainer(activeContainer, lifecycle, activeEntries);
 
-    return () => scheduleContainerDestruction(activeState.container, lifecycle);
-  }, [activeState, owned]);
+    return () => {
+      if (owned) {
+        scheduleContainerDestruction(activeContainer, lifecycle);
+      } else {
+        deprovisionContainer(activeContainer, lifecycle);
+      }
+    };
+  }, [activeContainer, activeEntries, owned]);
 
   if (ownedRef.current !== owned) {
     throw new WirestateError(
@@ -132,7 +140,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
 
   return createElement(
     ContainerReactContext.Provider,
-    { value: owned ? (activeState as ContainerProviderState).container : (source as Container) },
+    { value: activeContainer },
     props.children ?? null
   );
 }
