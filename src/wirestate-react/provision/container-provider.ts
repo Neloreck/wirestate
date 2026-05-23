@@ -3,6 +3,12 @@ import { createElement, ReactNode, useEffect, useRef, useState } from "react";
 
 import { ContainerReactContext } from "../context/container-context";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
+import {
+  provisionContainer,
+  ProvisionLifecycle,
+  retainContainer,
+  scheduleContainerDestruction,
+} from "../services/provision-lifecycle";
 import { Optional } from "../types/general";
 import { shallowEqualArrays } from "../utils/shallow-equal-arrays";
 
@@ -70,7 +76,9 @@ export function ContainerProvider(props: ContainerProviderProps) {
   const source: ContainerProviderSource = props.container;
   const owned: boolean = !(source instanceof Container);
   const ownedRef = useRef<boolean>(owned);
-  const pendingDestructionRef = useRef<Optional<Map<Container, ReturnType<typeof setTimeout>>>>(null);
+
+  const lifecycleRef = useRef<Optional<ProvisionLifecycle>>(null);
+  const latestManagedSourceRef = useRef<Optional<CreateContainerOptions>>(null);
 
   const [state, setState] = useState<Optional<ContainerProviderState>>(() =>
     owned
@@ -78,58 +86,40 @@ export function ContainerProvider(props: ContainerProviderProps) {
       : null
   );
 
+  const managedSource: Optional<CreateContainerOptions> = owned ? (source as CreateContainerOptions) : null;
+  const needsReplacement: boolean =
+    state !== null &&
+    managedSource !== null &&
+    (state.source.parent !== managedSource?.parent ||
+      !shallowEqualArrays(state.source.entries ?? [], managedSource.entries ?? []));
+
+  latestManagedSourceRef.current = managedSource;
+
   useEffect(() => {
     if (!owned || state === null) {
       return;
     }
 
-    const managedSource: CreateContainerOptions = source as CreateContainerOptions;
-    const needsReplacement: boolean =
-      state.source.parent !== (source as CreateContainerOptions).parent ||
-      !shallowEqualArrays(state.source.entries ?? [], managedSource.entries ?? []);
+    const lifecycle: ProvisionLifecycle = (lifecycleRef.current ??= {
+      pendingDestruction: new Map(),
+      provisionedServices: new Map(),
+    });
 
-    let pending = pendingDestructionRef.current;
-
-    if (!pending) {
-      pending = new Map();
-      pendingDestructionRef.current = pending;
-    }
-
-    const timeout = pending.get(state.container) ?? null;
-
-    if (timeout) {
-      clearTimeout(timeout);
-      pending.delete(state.container);
-    }
+    retainContainer(state.container, lifecycle);
 
     if (needsReplacement) {
+      const nextSource: CreateContainerOptions = latestManagedSourceRef.current!;
+
       setState({
-        container: createContainer(managedSource),
-        source: source as CreateContainerOptions,
+        container: createContainer(nextSource),
+        source: nextSource,
       });
+    } else {
+      provisionContainer(state.container, lifecycle, state.source.entries);
     }
 
-    return () => {
-      const container = state.container;
-      const destruction = pendingDestructionRef.current!;
-
-      if (destruction.has(container)) {
-        return;
-      }
-
-      destruction.set(
-        container,
-        setTimeout(() => {
-          destruction.delete(container);
-          container.unbindAll();
-        }, 0)
-      );
-    };
-  }, [
-    state,
-    owned ? (source as CreateContainerOptions).parent : null,
-    owned ? (source as CreateContainerOptions).entries : null,
-  ]);
+    return () => scheduleContainerDestruction(state.container, lifecycle);
+  }, [needsReplacement, owned, state]);
 
   if (ownedRef.current !== owned) {
     throw new WirestateError(

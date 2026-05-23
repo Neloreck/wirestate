@@ -4,6 +4,12 @@ import { createElement, type ReactNode, useEffect, useRef, useState } from "reac
 
 import { ContainerReactContext } from "../context/container-context";
 import { useContainer } from "../context/use-container";
+import {
+  provisionContainer,
+  ProvisionLifecycle,
+  retainContainer,
+  scheduleContainerDestruction,
+} from "../services/provision-lifecycle";
 import { Optional } from "../types/general";
 import { shallowEqualArrays } from "../utils/shallow-equal-arrays";
 
@@ -72,13 +78,15 @@ export interface SubContainerProviderProps {
  */
 export function SubContainerProvider(props: SubContainerProviderProps) {
   const parent: Container = useContainer();
+
+  const lifecycleRef = useRef<Optional<ProvisionLifecycle>>(null);
+  const latestSourceRef = useRef<SubContainerSource>(null);
+
   const source: SubContainerSource = {
     parent,
     entries: props.entries,
     seeds: props.seeds,
   };
-
-  const pendingDestructionRef = useRef<Optional<Map<Container, ReturnType<typeof setTimeout>>>>(null);
 
   const [state, setState] = useState<SubContainerState>(() => ({
     container: createContainer({
@@ -89,52 +97,36 @@ export function SubContainerProvider(props: SubContainerProviderProps) {
     source,
   }));
 
+  const needsReplacement: boolean =
+    state.source.parent !== source.parent || !shallowEqualArrays(state.source.entries, source.entries);
+
+  latestSourceRef.current = source;
+
   useEffect(() => {
-    let pending = pendingDestructionRef.current;
+    const lifecycle: ProvisionLifecycle = (lifecycleRef.current ||= {
+      pendingDestruction: new Map(),
+      provisionedServices: new Map(),
+    });
 
-    if (!pending) {
-      pending = new Map();
-      pendingDestructionRef.current = pending;
-    }
-
-    const timeout = pending.get(state.container) ?? null;
-
-    if (timeout) {
-      clearTimeout(timeout);
-      pending.delete(state.container);
-    }
-
-    const needsReplacement: boolean =
-      state.source.parent !== source.parent || !shallowEqualArrays(state.source.entries, source.entries);
+    retainContainer(state.container, lifecycle);
 
     if (needsReplacement) {
+      const nextSource: SubContainerSource = latestSourceRef.current as SubContainerSource;
+
       setState({
         container: createContainer({
-          entries: source.entries,
-          parent: source.parent,
-          seeds: source.seeds,
+          entries: nextSource.entries,
+          parent: nextSource.parent,
+          seeds: nextSource.seeds,
         }),
-        source,
+        source: nextSource,
       });
+    } else {
+      provisionContainer(state.container, lifecycle, state.source.entries);
     }
 
-    return () => {
-      const container = state.container;
-      const destruction = pendingDestructionRef.current!;
-
-      if (destruction.has(container)) {
-        return;
-      }
-
-      destruction.set(
-        container,
-        setTimeout(() => {
-          destruction.delete(container);
-          container.unbindAll();
-        }, 0)
-      );
-    };
-  }, [state, source.entries, source.parent]);
+    return () => scheduleContainerDestruction(state.container, lifecycle);
+  }, [needsReplacement, state]);
 
   return createElement(ContainerReactContext.Provider, { value: state.container }, props.children ?? null);
 }
