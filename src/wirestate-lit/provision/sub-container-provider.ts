@@ -29,7 +29,7 @@ export interface SubContainerProviderOptions {
    * host connects, destroyed when the host disconnects, and recreated when the
    * parent context changes or the host reconnects.
    */
-  readonly options: {
+  readonly config: {
     /**
      * List of service entries to bind to the container.
      */
@@ -63,7 +63,7 @@ export interface SubContainerProviderOptions {
  * ```typescript
  * class MyComponent extends LitElement {
  *   private container = new SubContainerProvider(this, {
- *     options: {
+ *     config: {
  *       entries: [AuthService, UserService],
  *       activate: [AuthService],
  *       seeds: [[AuthService, { role: "admin" }]],
@@ -77,7 +77,7 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
   implements ReactiveController
 {
   protected readonly consumer: ContextConsumer<typeof ContainerContext, E>;
-  protected readonly options: SubContainerProviderOptions["options"];
+  protected readonly config: SubContainerProviderOptions["config"];
 
   protected parent: Maybe<Container> = null;
   protected destroyed: boolean = true;
@@ -93,7 +93,7 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
 
     dbg.info(prefix(__filename), "Constructing:", { host, options });
 
-    this.options = options.options;
+    this.config = options.config;
 
     this.consumer = new ContextConsumer(host, {
       context: ContainerContext,
@@ -154,13 +154,13 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
    */
   protected createContainer(): void {
     const container: Container = createContainer({
-      ...this.options,
+      ...this.config,
       parent: this.parent as Container,
     });
 
     dbg.info(prefix(__filename), "Creating container:", {
       parent: this.parent,
-      options: this.options,
+      config: this.config,
       container,
     });
 

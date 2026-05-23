@@ -35,7 +35,7 @@ describe("SubContainerProvider", () => {
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
     const provider: SubContainerProvider = new SubContainerProvider(element, {
-      options: {
+      config: {
         entries: [{ id: CONFIG_TOKEN, value: "child-value" }],
       },
     });
@@ -77,7 +77,7 @@ describe("SubContainerProvider", () => {
 
     const element: TestProviderElement = new TestProviderElement();
     const provider: SubContainerProvider = new SubContainerProvider(element, {
-      options: {
+      config: {
         activate: [LifecycleService],
         entries: [LifecycleService],
       },
@@ -115,7 +115,7 @@ describe("SubContainerProvider", () => {
     const element: TestProviderElement = new TestProviderElement();
 
     new SubContainerProvider(element, {
-      options: {
+      config: {
         activate: true,
         entries: [FirstService, SecondService],
       },
@@ -148,7 +148,7 @@ describe("SubContainerProvider", () => {
 
     const element: TestProviderElement = new TestProviderElement();
     const provider: SubContainerProvider = new SubContainerProvider(element, {
-      options: {
+      config: {
         activate: [LifecycleService],
         entries: [LifecycleService, { id: CONFIG_TOKEN, value: "stable" }],
       },
@@ -201,7 +201,7 @@ describe("SubContainerProvider", () => {
 
     const element: TestProviderElement = new TestProviderElement();
     const provider: SubContainerProvider = new SubContainerProvider(element, {
-      options: {
+      config: {
         activate: [LifecycleService],
         entries: [LifecycleService, { id: CONFIG_TOKEN, value: "child-value" }],
       },
@@ -230,7 +230,7 @@ describe("SubContainerProvider", () => {
     const element: TestProviderElement = new TestProviderElement();
 
     new SubContainerProvider(element, {
-      options: {
+      config: {
         entries: [{ id: CONFIG_TOKEN, value: "child-value" }],
       },
     });

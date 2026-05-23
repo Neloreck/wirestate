@@ -14,7 +14,7 @@ describe("subContainerProvide", () => {
   @customElement("ws-sub-container-provide-decorated")
   class DecoratedElement extends ReactiveElement {
     @subContainerProvide({
-      options: {
+      config: {
         entries: [{ id: CONFIG_TOKEN, value: "child-value" }],
       },
     })

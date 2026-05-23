@@ -32,7 +32,7 @@ describe("useSubContainerProvider", () => {
 
     const element: TestConsumerElement = new TestConsumerElement();
     const provider: SubContainerProvider = useSubContainerProvider(element, {
-      options: {
+      config: {
         entries: [{ id: CONFIG_TOKEN, value: "child-value" }],
       },
     });
