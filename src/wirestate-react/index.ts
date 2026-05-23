@@ -24,6 +24,9 @@ export { useQueryHandler } from "./queries/use-query-handler";
 export { useSyncQueryCaller } from "./queries/use-sync-query-caller";
 export { useOptionalSyncQueryCaller } from "./queries/use-optional-sync-query-caller";
 
+export { OnDeprovision } from "./services/on-deprovision";
+export { OnProvision } from "./services/on-provision";
+
 export { OptionalCommandCaller, CommandCaller } from "./types/commands";
 export { EventEmitter } from "./types/events";
 export {

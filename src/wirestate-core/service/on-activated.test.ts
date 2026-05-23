@@ -1,6 +1,6 @@
 import { ACTIVATED_HANDLER_METADATA } from "../registry";
 
-import { OnActivated } from "./on-activated";
+import { getActivatedHandlerMetadata, OnActivated } from "./on-activated";
 
 describe("OnActivated", () => {
   it("should register metadata for generic service classes", () => {
@@ -24,5 +24,35 @@ describe("OnActivated", () => {
 
       return MyService;
     }).toThrow("Only one @OnActivated method can be declared on service 'MyService'.");
+  });
+
+  it("should allow redecorating the same activation method across a hierarchy", () => {
+    class BaseService {
+      @OnActivated()
+      public onActivated(): void {}
+    }
+
+    class ChildService extends BaseService {
+      @OnActivated()
+      public override onActivated(): void {}
+    }
+
+    expect(getActivatedHandlerMetadata(new ChildService())).toBe("onActivated");
+  });
+
+  it("should reject different activation handlers across a hierarchy", () => {
+    class BaseService {
+      @OnActivated()
+      public first(): void {}
+    }
+
+    class ChildService extends BaseService {
+      @OnActivated()
+      public second(): void {}
+    }
+
+    expect(() => getActivatedHandlerMetadata(new ChildService())).toThrow(
+      "Only one @OnActivated method can be declared across service hierarchy 'ChildService'."
+    );
   });
 });

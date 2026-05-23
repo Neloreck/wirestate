@@ -17,8 +17,8 @@ import {
   EVENT_UNSUBSCRIBERS_BY_SERVICE,
   WIRE_SCOPES_BY_SERVICE,
 } from "../registry";
-import { getActivatedHandlerMetadata } from "../service/get-activated-handler-metadata";
-import { getDeactivationHandlerMetadata } from "../service/get-deactivation-handler-metadata";
+import { getActivatedHandlerMetadata } from "../service/on-activated";
+import { getDeactivationHandlerMetadata } from "../service/on-deactivation";
 import { CommandHandler, CommandUnregister } from "../types/commands";
 import { EventHandler, EventUnsubscriber } from "../types/events";
 import { Maybe, MaybePromise, Optional } from "../types/general";

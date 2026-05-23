@@ -1,6 +1,6 @@
 import { DEACTIVATION_HANDLER_METADATA } from "../registry";
 
-import { OnDeactivation } from "./on-deactivation";
+import { getDeactivationHandlerMetadata, OnDeactivation } from "./on-deactivation";
 
 describe("OnDeactivation", () => {
   it("should register metadata for generic class", () => {
@@ -24,5 +24,35 @@ describe("OnDeactivation", () => {
 
       return MyService;
     }).toThrow("Only one @OnDeactivation method can be declared on service 'MyService'.");
+  });
+
+  it("should allow redecorating the same deactivation method across a hierarchy", () => {
+    class BaseService {
+      @OnDeactivation()
+      public onDeactivation(): void {}
+    }
+
+    class ChildService extends BaseService {
+      @OnDeactivation()
+      public override onDeactivation(): void {}
+    }
+
+    expect(getDeactivationHandlerMetadata(new ChildService())).toBe("onDeactivation");
+  });
+
+  it("should reject different deactivation handlers across a hierarchy", () => {
+    class BaseService {
+      @OnDeactivation()
+      public first(): void {}
+    }
+
+    class ChildService extends BaseService {
+      @OnDeactivation()
+      public second(): void {}
+    }
+
+    expect(() => getDeactivationHandlerMetadata(new ChildService())).toThrow(
+      "Only one @OnDeactivation method can be declared across service hierarchy 'ChildService'."
+    );
   });
 });
