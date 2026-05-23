@@ -74,6 +74,7 @@ describe("Library exported API from wirestate-core", () => {
     "CommandType",
     "CommandUnregister",
     "ContainerActivation",
+    "ContainerConfig",
     "CreateContainerOptions",
     "Event",
     "EventBus",
