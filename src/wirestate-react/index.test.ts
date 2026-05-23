@@ -3,8 +3,6 @@ describe("Library exported API from wirestate-react", () => {
 
   const expectedLibExports: Array<string> = [
     "CommandCaller",
-    "ContainerActivator",
-    "ContainerActivatorProps",
     "ContainerProvider",
     "ContainerProviderProps",
     "EventEmitter",

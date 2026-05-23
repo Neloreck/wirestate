@@ -15,7 +15,6 @@ export { useInjection } from "./injection/use-injection";
 export { useOptionalInjection } from "./injection/use-optional-injection";
 
 export { SubContainerProvider, SubContainerProviderProps } from "./provision/sub-container-provider";
-export { ContainerActivator, ContainerActivatorProps } from "./provision/container-activator";
 export { ContainerProvider, ContainerProviderProps } from "./provision/container-provider";
 
 export { useQueryCaller } from "./queries/use-query-caller";

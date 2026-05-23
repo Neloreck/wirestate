@@ -44,30 +44,24 @@ Use child containers to isolate a subtree of services (e.g., a modal, a wizard s
 `ContainerProvider` provides the root container for the React tree. It must be the outermost Wirestate provider.
 
 ```tsx
-import { Container, createContainer } from "@wirestate/core";
-import { ContainerActivator, ContainerProvider, useRootContainer } from "@wirestate/react";
+import { ContainerProvider } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 export function Application() {
-  const container: Container = useRootContainer(
-    () =>
-      createContainer({
-        entries: [CounterService, LoggerService],
-      }),
-    []
-  );
-
   return (
-    <ContainerProvider container={container}>
-      <ContainerActivator activate={[LoggerService]}>
-        <SomeComponent />
-      </ContainerActivator>
+    <ContainerProvider container={{ entries: [CounterService, LoggerService] }}>
+      <SomeComponent />
     </ContainerProvider>
   );
 }
 ```
 
-`useRootContainer` is useful when the root container should be created inside a component and recreated only when dependencies change.
+When `container` is options, `ContainerProvider` creates and owns the container. Managed React containers activate all
+provided entries by default; pass `activate: false` to bind without eager activation, or pass an array to activate only
+specific entries.
+
+`useRootContainer` is still useful when a root container should be created inside a component but owned outside provider
+options.
 
 For globally declared container outside of the React rendering tree, use a prebuilt container:
 
@@ -123,26 +117,8 @@ export function Application() {
 ```
 
 Services bound at a higher provider are available to child providers through Inversify's container hierarchy.
-
-### ContainerActivator
-
-`ContainerActivator` resolves listed services from the current container before rendering children.
-Use it when services are already bound and should be activated eagerly for a subtree.
-
-```tsx
-import { ContainerActivator } from "@wirestate/react";
-import { CartService, CheckoutService } from "./services";
-
-export function CheckoutPage() {
-  return (
-    <ContainerActivator activate={[CartService, CheckoutService]}>
-      <CheckoutFlow />
-    </ContainerActivator>
-  );
-}
-```
-
-Activation runs once per container instance and runs again when the container instance changes.
+Child React containers also activate all provided entries by default. Pass `activate: false` or an array of entry tokens to
+`SubContainerProvider` when a scoped branch needs different activation behavior.
 
 ### Passing Seeds to a Provider
 

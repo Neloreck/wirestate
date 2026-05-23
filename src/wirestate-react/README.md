@@ -18,7 +18,7 @@ npm install @wirestate/core @wirestate/react reflect-metadata
 Root provider. Exposes the top-level container to the React tree. Pass either an existing container instance or
 `createContainer(...)` options.
 
-With globally declared container:
+When `container` is a prebuilt container instance, activation is controlled by the `createContainer` call that built it:
 
 ```tsx
 import { createContainer, Container } from "@wirestate/core";
@@ -39,27 +39,17 @@ export function Application() {
 }
 ```
 
-With locally declared container:
+When `container` is options, `ContainerProvider` creates and owns the container. Managed containers activate all provided
+entries by default; pass `activate: false` to bind without eager activation, or pass an array to activate only specific entries.
 
 ```tsx
-import { createContainer, Container } from "@wirestate/core";
-import { ContainerActivator, ContainerProvider, useRootContainer } from "@wirestate/react";
+import { ContainerProvider } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 export function Application() {
-  const container: Container = useRootContainer(
-    () =>
-      createContainer({
-        entries: [CounterService, LoggerService],
-      }),
-    []
-  );
-
   return (
-    <ContainerProvider container={container}>
-      <ContainerActivator activate={[LoggerService]}>
-        <SomeComponent />
-      </ContainerActivator>
+    <ContainerProvider container={{ entries: [CounterService, LoggerService] }}>
+      <SomeComponent />
     </ContainerProvider>
   );
 }
@@ -69,6 +59,7 @@ export function Application() {
 
 Creates and memoizes a root container for the component instance.
 The factory runs again only when `deps` change or on dev mode HMR refreshment.
+Use it when you want to own container creation outside of `ContainerProvider` options.
 
 ```tsx
 import { Container, createContainer } from "@wirestate/core";
@@ -95,6 +86,7 @@ function Root() {
 
 Creates a child container scoped to a subtree.
 Use it under `ContainerProvider` when a branch needs its own service bindings or per-service seeds.
+Child containers activate all provided entries by default; pass `activate: false` or a token array to override that.
 
 ```tsx
 import { ReactNode } from "react";
@@ -120,30 +112,11 @@ export function CounterPage() {
 
 **Props:**
 
-| Prop      | Type                | Description                                                                    |
-| --------- | ------------------- | ------------------------------------------------------------------------------ |
-| `entries` | `InjectableEntries` | Services or binding descriptors to add to the child container.                 |
-| `seeds`   | `SeedEntries`       | Per-service seeds, e.g. `[[CounterService, { count: 10 }]]`. Applied on mount. |
-
-### `ContainerActivator`
-
-Resolves a list of already bound services from the current container before rendering children.
-Useful when services should be eagerly activated for a subtree.
-
-```tsx
-import { ContainerActivator } from "@wirestate/react";
-import { CounterService, LoggerService } from "./services";
-
-export function CounterPage() {
-  return (
-    <ContainerActivator activate={[CounterService, LoggerService]}>
-      <CounterView />
-    </ContainerActivator>
-  );
-}
-```
-
-`ContainerActivator` runs activation once per container instance. If the container changes, activation runs again.
+| Prop       | Type                                  | Description                                                                    |
+| ---------- | ------------------------------------- | ------------------------------------------------------------------------------ |
+| `entries`  | `InjectableEntries`                   | Services or binding descriptors to add to the child container.                 |
+| `seeds`    | `SeedEntries`                         | Per-service seeds, e.g. `[[CounterService, { count: 10 }]]`. Applied on mount. |
+| `activate` | `boolean \| Array<ServiceIdentifier>` | `true` by default. Pass `false` or specific entry tokens to control activation. |
 
 ## Injection hooks
 

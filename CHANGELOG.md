@@ -17,7 +17,6 @@
 - `useRootContainer`: Added separate hook for store management in React tree
 - `ContainerProvider`: Simpler provider for containers.
 - `SubContainerProvider`: Added component solving problems of removed `createInjectablesProvider`
-- `ContainerActivator`: Added separate activation component
 - Replace IoC-context provision APIs with `ContainerContext`, `containerProvide`, `ContainerProvider`, and `useContainerProvision`
 - Replace injectables-provider APIs with `subContainerProvide`, `SubContainerProvider`, and `useSubContainerProvider`
 - Provide plain `Container` values through Lit context instead of wrapper objects

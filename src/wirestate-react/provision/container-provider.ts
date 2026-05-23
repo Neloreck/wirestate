@@ -33,11 +33,12 @@ export interface ContainerProviderProps {
    *
    * @remarks
    * External container instances are never disposed by this provider. Managed
-   * containers created from options are disposed on unmount. Managed containers
-   * are intentionally recreated only when `parent` or `entries` changes by
-   * shallow comparison; inline `seed` and `seeds` values are not treated as
-   * recreation signals. Pass a React `key` to force a fresh managed container
-   * when those options should be re-applied.
+   * containers created from options are disposed on unmount and activate all
+   * entries by default unless `activate` is provided explicitly. Managed
+   * containers are intentionally recreated only when `parent` or `entries`
+   * changes by shallow comparison; inline `seed` and `seeds` values are not
+   * treated as recreation signals. Pass a React `key` to force a fresh managed
+   * container when those options should be re-applied.
    */
   readonly container: ContainerProviderSource;
 
@@ -64,8 +65,8 @@ interface ContainerProviderState {
  * - External: `container` is a prebuilt {@link Container}. The provider only
  *   passes it through context and never disposes it.
  * - Managed: `container` is {@link CreateContainerOptions}. The provider
- *   creates a container, owns its disposal, and recreates it when `parent` or
- *   `entries` change.
+ *   creates a container, activates entries by default, owns its disposal, and
+ *   recreates it when `parent` or `entries` change.
  *
  * @group Provision
  *
