@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render } from "@testing-library/react";
-import { CreateContainerOptions } from "@wirestate/core";
+import { ContainerConfig } from "@wirestate/core";
 import { useMemo, useState } from "react";
 
 import { ContainerProvider, SubContainerProvider, useEventEmitter, useEventsHandler } from "../index";
@@ -33,10 +33,10 @@ describe("react event container boundaries integration (SubContainer essentials 
   }
 
   function Application({ showChild }: { readonly showChild: boolean }) {
-    const options: CreateContainerOptions = useMemo(() => ({}), []);
+    const config: ContainerConfig = useMemo(() => ({}), []);
 
     return (
-      <ContainerProvider container={options}>
+      <ContainerProvider container={config}>
         <EventPanel name={"root"} />
 
         {showChild ? (

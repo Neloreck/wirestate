@@ -1,4 +1,4 @@
-import { Container, createContainer, CreateContainerOptions, getContainerEntries, WirestateError } from "@wirestate/core";
+import { Container, createContainer, ContainerConfig, getContainerEntries, WirestateError } from "@wirestate/core";
 import { createElement, ReactNode, useEffect, useRef, useState } from "react";
 
 import { ContainerReactContext } from "../context/container-context";
@@ -18,10 +18,10 @@ import { shallowEqualArrays } from "../utils/shallow-equal-arrays";
  *
  * @remarks
  * Pass an existing {@link Container} when ownership lives outside React. Pass
- * {@link CreateContainerOptions} when the provider should create and dispose a
+ * {@link ContainerConfig} when the provider should create and dispose a
  * managed container for the subtree.
  */
-type ContainerProviderSource = Container | CreateContainerOptions;
+type ContainerProviderSource = Container | ContainerConfig;
 
 /**
  * Represents props accepted by {@link ContainerProvider}.
@@ -54,7 +54,7 @@ export interface ContainerProviderProps {
  */
 interface ContainerProviderState {
   readonly container: Container;
-  readonly source: CreateContainerOptions;
+  readonly source: ContainerConfig;
 }
 
 /**
@@ -65,7 +65,7 @@ interface ContainerProviderState {
  *
  * - External: `container` is a prebuilt {@link Container}. The provider only
  *   passes it through context, runs provision hooks, and never disposes it.
- * - Managed: `container` is {@link CreateContainerOptions}. The provider
+ * - Managed: `container` is {@link ContainerConfig}. The provider
  *   creates a container, activates entries by default, owns its disposal, and
  *   recreates it when `parent` or `entries` change.
  *
@@ -90,7 +90,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
         }
   );
 
-  const managedSource: Optional<CreateContainerOptions> = owned ? (source as CreateContainerOptions) : null;
+  const managedSource: Optional<ContainerConfig> = owned ? (source as ContainerConfig) : null;
   const externalContainer: Optional<Container> = owned ? null : (source as Container);
   const needsReplacement: boolean =
     state !== null &&
@@ -109,8 +109,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
     setState(activeState);
   }
 
-  const activeContainer: Container =
-    activeState === null ? (externalContainer as Container) : activeState.container;
+  const activeContainer: Container = activeState === null ? (externalContainer as Container) : activeState.container;
   const activeEntries = activeState === null ? getContainerEntries(activeContainer) : activeState.source.entries;
 
   useEffect(() => {
@@ -138,9 +137,5 @@ export function ContainerProvider(props: ContainerProviderProps) {
     );
   }
 
-  return createElement(
-    ContainerReactContext.Provider,
-    { value: activeContainer },
-    props.children ?? null
-  );
+  return createElement(ContainerReactContext.Provider, { value: activeContainer }, props.children ?? null);
 }

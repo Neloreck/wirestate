@@ -3,7 +3,7 @@ import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-elemen
 import {
   Container,
   createContainer,
-  CreateContainerOptions,
+  ContainerConfig,
   getEntryToken,
   ServiceIdentifier,
   WirestateError,
@@ -43,7 +43,7 @@ export interface ContainerProviderOptions {
    * eager activation, activated when the host connects, disposed when it
    * disconnects, and recreated on the next reconnect.
    */
-  readonly options?: CreateContainerOptions;
+  readonly config?: ContainerConfig;
 }
 
 /**
@@ -54,7 +54,7 @@ export interface ContainerProviderOptions {
  *
  * - External mode: `container` is an existing {@link Container}. The
  *   provider passes it through context and does not alter its lifecycle.
- * - Managed mode: `options` is {@link CreateContainerOptions}. The provider
+ * - Managed mode: `options` is {@link ContainerConfig}. The provider
  *   creates a container during construction without eager activation,
  *   activates configured entries when the host connects, disposes the
  *   container when the host disconnects, and recreates it on reconnect.
@@ -65,7 +65,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
   extends ContextProvider<typeof ContainerContext, E>
   implements ReactiveController
 {
-  protected readonly options: Maybe<CreateContainerOptions>;
+  protected readonly config: Maybe<ContainerConfig>;
 
   protected destroyed: boolean = false;
 
@@ -76,12 +76,12 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
    * @param options.options - Managed container creation options.
    */
   public constructor(host: E, options: ContainerProviderOptions) {
-    if (!options.container && !options.options) {
+    if (!options.container && !options.config) {
       throw new WirestateError(
         ERROR_CODE_INVALID_ARGUMENTS,
         "ContainerProvider requires a valid container instance or creation options."
       );
-    } else if (options.container && options.options) {
+    } else if (options.container && options.config) {
       throw new WirestateError(
         ERROR_CODE_INVALID_ARGUMENTS,
         "ContainerProvider requires only container or valid options object to be provided."
@@ -90,31 +90,31 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
 
     super(host, {
       context: ContainerContext,
-      initialValue: options.container ? options.container : createContainer({ ...options.options, activate: [] }),
+      initialValue: options.container ? options.container : createContainer({ ...options.config, activate: [] }),
     });
 
-    this.options = options.options;
+    this.config = options.config;
 
     dbg.info(prefix(__filename), "Constructed:", {
       host: this.host,
       source: options.container,
       container: this.value,
-      options: this.options,
+      options: this.config,
     });
   }
 
   public hostConnected(): void {
-    if (this.options) {
+    if (this.config) {
       if (this.destroyed) {
         dbg.info(prefix(__filename), "Creating and activating managed container:", {
           container: this.value,
         });
 
-        this.value = createContainer(this.options);
+        this.value = createContainer(this.config);
         this.destroyed = false;
       } else {
         const activate: ReadonlyArray<ServiceIdentifier> =
-          (this.options.activate === true ? this.options.entries?.map(getEntryToken) : this.options.activate) || [];
+          (this.config.activate === true ? this.config.entries?.map(getEntryToken) : this.config.activate) || [];
 
         if (activate.length) {
           dbg.info(prefix(__filename), "Activating managed container:", {
@@ -132,7 +132,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
   }
 
   public hostDisconnected(): void {
-    if (this.options) {
+    if (this.config) {
       dbg.info(prefix(__filename), "Destroying managed container:", {
         container: this.value,
       });

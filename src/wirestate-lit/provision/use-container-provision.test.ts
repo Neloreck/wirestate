@@ -31,7 +31,7 @@ describe("useContainerProvision hook", () => {
 
   it("should create a managed container from creation options", () => {
     const element: TestProviderElement = new TestProviderElement();
-    const provider: ContainerProvider = useContainerProvision(element, { options: {} });
+    const provider: ContainerProvider = useContainerProvision(element, { config: {} });
 
     document.body.appendChild(element);
 

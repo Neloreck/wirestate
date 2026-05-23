@@ -114,7 +114,7 @@ describe("ContainerProvider", () => {
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
-      options: {
+      config: {
         entries: [{ id: CONFIG_TOKEN, value: "managed" }],
       },
     });
@@ -159,7 +159,7 @@ describe("ContainerProvider", () => {
 
     const element: TestProviderElement = new TestProviderElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
-      options: {
+      config: {
         activate: [LifecycleService],
         entries: [LifecycleService],
       },
@@ -212,7 +212,7 @@ describe("ContainerProvider", () => {
     const element: TestProviderElement = new TestProviderElement();
 
     new ContainerProvider(element, {
-      options: {
+      config: {
         activate: true,
         entries: [FirstService, SecondService],
       },
