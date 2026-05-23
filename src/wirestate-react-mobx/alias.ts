@@ -55,6 +55,8 @@ export {
   ObservableMap,
   ObservableSet,
   Reaction,
+  defineProperty,
+  ownKeys,
   autorun,
   comparer,
   configure,
@@ -71,7 +73,6 @@ export {
   has,
   intercept,
   isAction,
-  isBoxedObservable,
   isComputed,
   isComputedProp,
   isFlow,
@@ -82,6 +83,7 @@ export {
   isObservableObject,
   isObservableProp,
   isObservableSet,
+  isBoxedObservable,
   keys,
   makeAutoObservable,
   makeObservable,
@@ -108,17 +110,17 @@ export {
  * @see {@link https://mobx.js.org/react-integration.html}
  */
 export {
-  observer,
-  enableStaticRendering,
   Observer,
-  observerBatching,
+  clearTimers,
+  enableStaticRendering,
   isObserverBatched,
   isUsingStaticRendering,
-  useObserver,
+  observer,
+  observerBatching,
+  useAsObservableSource,
   useLocalObservable,
   useLocalStore,
-  useAsObservableSource,
-  clearTimers,
+  useObserver,
 } from "mobx-react-lite";
 
 /**
@@ -129,6 +131,16 @@ export {
  */
 export function Action(): IActionFactory {
   return action;
+}
+
+/**
+ * @group Mobx-alias
+ * @see {@link https://mobx.js.org/README.html}
+ *
+ * @returns Action decorator.
+ */
+export function BoundAction() {
+  return action.bound;
 }
 
 /**
