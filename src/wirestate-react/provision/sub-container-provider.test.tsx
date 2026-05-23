@@ -132,12 +132,10 @@ describe("SubContainerProvider", () => {
     );
 
     const firstContainer: Container = containers[0];
-    const staleContainer: Container = containers[1];
-    const secondContainer: Container = containers[2];
+    const secondContainer: Container = containers[1];
 
     expect(getByTestId("value").textContent).toBe("second");
-    expect(containers).toHaveLength(3);
-    expect(staleContainer).toBe(firstContainer);
+    expect(containers).toHaveLength(2);
     expect(secondContainer).not.toBe(firstContainer);
   });
 
@@ -196,11 +194,9 @@ describe("SubContainerProvider", () => {
     );
 
     const firstChildContainer: Container = containers[0];
-    const staleChildContainer: Container = containers[1];
-    const secondChildContainer: Container = containers[2];
+    const secondChildContainer: Container = containers[1];
 
-    expect(containers).toHaveLength(3);
-    expect(staleChildContainer).toBe(firstChildContainer);
+    expect(containers).toHaveLength(2);
     expect(secondChildContainer).not.toBe(firstChildContainer);
     expect(getByTestId("value").textContent).toBe("stable|second-parent");
     expect(secondChildContainer.get(PARENT_TOKEN)).toBe("second-parent");
@@ -299,8 +295,8 @@ describe("SubContainerProvider lifecycle", () => {
     expect(events).toEqual([
       "activated-first",
       "provision-first",
-      "deprovision-first",
       "activated-second",
+      "deprovision-first",
       "provision-second",
     ]);
 
@@ -309,8 +305,8 @@ describe("SubContainerProvider lifecycle", () => {
     expect(events).toEqual([
       "activated-first",
       "provision-first",
-      "deprovision-first",
       "activated-second",
+      "deprovision-first",
       "provision-second",
       "deactivation-first",
     ]);
@@ -350,8 +346,8 @@ describe("SubContainerProvider lifecycle", () => {
       "provision-first",
       "deprovision-first",
       "provision-first",
-      "deprovision-first",
       "activated-second",
+      "deprovision-first",
       "provision-second",
     ]);
 
@@ -363,8 +359,8 @@ describe("SubContainerProvider lifecycle", () => {
       "provision-first", // [strict mode] Strict mode cycle to shake off side effects.
       "deprovision-first", // [strict mode] Strict mode cycle to shake off side effects.
       "provision-first",
-      "deprovision-first",
       "activated-second",
+      "deprovision-first",
       "provision-second",
       "deactivation-first",
     ]);

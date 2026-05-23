@@ -70,9 +70,8 @@ describe("ContainerProvider", () => {
       </ContainerProvider>
     );
 
-    expect(containers).toHaveLength(3);
-    expect(containers[1]).toBe(containers[0]);
-    expect(containers[2]).not.toBe(containers[0]);
+    expect(containers).toHaveLength(2);
+    expect(containers[1]).not.toBe(containers[0]);
     expect(getByTestId("value").textContent).toBe("second");
   });
 
@@ -139,9 +138,8 @@ describe("ContainerProvider", () => {
       </ContainerProvider>
     );
 
-    expect(containers).toHaveLength(3);
-    expect(containers[1]).toBe(containers[0]);
-    expect(containers[2]).not.toBe(containers[0]);
+    expect(containers).toHaveLength(2);
+    expect(containers[1]).not.toBe(containers[0]);
     expect(getByTestId("value").textContent).toBe("second-parent");
   });
 
@@ -172,7 +170,7 @@ describe("ContainerProvider", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(unbindAllSpy).toHaveBeenCalledTimes(1);
-    expect(containers).toHaveLength(3);
+    expect(containers).toHaveLength(2);
   });
 
   it("should dispose previous managed container when replacement commits in strict mode", () => {
@@ -201,11 +199,11 @@ describe("ContainerProvider", () => {
       </StrictMode>
     );
 
-    expect(containers).toHaveLength(6);
+    expect(containers).toHaveLength(4);
 
     expect(containers[0]).toBe(containers[1]);
     expect(containers[2]).toBe(containers[3]);
-    expect(containers[4]).toBe(containers[5]);
+    expect(containers[2]).not.toBe(containers[0]);
   });
 
   it("should recreate managed container with strict mode", () => {
@@ -294,8 +292,8 @@ describe("ContainerProvider lifecycle", () => {
     expect(events).toEqual([
       "activated-first",
       "provision-first",
-      "deprovision-first",
       "activated-second",
+      "deprovision-first",
       "provision-second",
     ]);
 
@@ -304,8 +302,8 @@ describe("ContainerProvider lifecycle", () => {
     expect(events).toEqual([
       "activated-first",
       "provision-first",
-      "deprovision-first",
       "activated-second",
+      "deprovision-first",
       "provision-second",
       "deactivation-first",
     ]);
@@ -348,8 +346,8 @@ describe("ContainerProvider lifecycle", () => {
       "provision-first",
       "deprovision-first",
       "provision-first",
-      "deprovision-first",
       "activated-second",
+      "deprovision-first",
       "provision-second",
     ]);
 
@@ -360,8 +358,8 @@ describe("ContainerProvider lifecycle", () => {
       "provision-first", // [strict mode] Strict mode cycle to shake off side effects.
       "deprovision-first", // [strict mode] Strict mode cycle to shake off side effects.
       "provision-first",
-      "deprovision-first",
       "activated-second",
+      "deprovision-first",
       "provision-second",
       "deactivation-first",
     ]);

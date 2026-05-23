@@ -88,7 +88,6 @@ export interface SubContainerProviderProps {
  */
 export function SubContainerProvider(props: SubContainerProviderProps) {
   const lifecycleRef = useRef<Optional<ProvisionLifecycle>>(null);
-  const latestSourceRef = useRef<SubContainerSource>(null);
 
   const parent: Container = useContainer();
 
@@ -107,7 +106,16 @@ export function SubContainerProvider(props: SubContainerProviderProps) {
   const needsReplacement: boolean =
     state.source.parent !== source.parent || !shallowEqualArrays(state.source.entries, source.entries);
 
-  latestSourceRef.current = source;
+  let activeState: SubContainerState = state;
+
+  if (needsReplacement) {
+    activeState = {
+      container: createContainer(source),
+      source,
+    };
+
+    setState(activeState);
+  }
 
   useEffect(() => {
     const lifecycle: ProvisionLifecycle = (lifecycleRef.current ||= {
@@ -115,21 +123,11 @@ export function SubContainerProvider(props: SubContainerProviderProps) {
       provisionedServices: new Map(),
     });
 
-    retainContainer(state.container, lifecycle);
+    retainContainer(activeState.container, lifecycle);
+    provisionContainer(activeState.container, lifecycle, activeState.source.entries);
 
-    if (needsReplacement) {
-      const nextSource: SubContainerSource = latestSourceRef.current as SubContainerSource;
+    return () => scheduleContainerDestruction(activeState.container, lifecycle);
+  }, [activeState]);
 
-      setState({
-        container: createContainer(nextSource),
-        source: nextSource,
-      });
-    } else {
-      provisionContainer(state.container, lifecycle, state.source.entries);
-    }
-
-    return () => scheduleContainerDestruction(state.container, lifecycle);
-  }, [needsReplacement, state]);
-
-  return createElement(ContainerReactContext.Provider, { value: state.container }, props.children ?? null);
+  return createElement(ContainerReactContext.Provider, { value: activeState.container }, props.children ?? null);
 }

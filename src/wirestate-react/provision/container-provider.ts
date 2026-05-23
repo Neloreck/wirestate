@@ -79,7 +79,6 @@ export function ContainerProvider(props: ContainerProviderProps) {
   const ownedRef = useRef<boolean>(owned);
 
   const lifecycleRef = useRef<Optional<ProvisionLifecycle>>(null);
-  const latestManagedSourceRef = useRef<Optional<CreateContainerOptions>>(null);
 
   const [state, setState] = useState<Optional<ContainerProviderState>>(() =>
     source instanceof Container
@@ -97,10 +96,19 @@ export function ContainerProvider(props: ContainerProviderProps) {
     (state.source.parent !== managedSource?.parent ||
       !shallowEqualArrays(state.source.entries ?? [], managedSource.entries ?? []));
 
-  latestManagedSourceRef.current = managedSource;
+  let activeState: Optional<ContainerProviderState> = state;
+
+  if (needsReplacement && managedSource !== null) {
+    activeState = {
+      container: createContainer({ ...managedSource, activate: managedSource.activate ?? true }),
+      source: managedSource,
+    };
+
+    setState(activeState);
+  }
 
   useEffect(() => {
-    if (!owned || state === null) {
+    if (!owned || activeState === null) {
       return;
     }
 
@@ -109,21 +117,11 @@ export function ContainerProvider(props: ContainerProviderProps) {
       provisionedServices: new Map(),
     } as ProvisionLifecycle);
 
-    retainContainer(state.container, lifecycle);
+    retainContainer(activeState.container, lifecycle);
+    provisionContainer(activeState.container, lifecycle, activeState.source.entries);
 
-    if (needsReplacement) {
-      const nextSource: CreateContainerOptions = latestManagedSourceRef.current!;
-
-      setState({
-        container: createContainer({ ...nextSource, activate: nextSource.activate ?? true }),
-        source: nextSource,
-      });
-    } else {
-      provisionContainer(state.container, lifecycle, state.source.entries);
-    }
-
-    return () => scheduleContainerDestruction(state.container, lifecycle);
-  }, [needsReplacement, owned, state]);
+    return () => scheduleContainerDestruction(activeState.container, lifecycle);
+  }, [activeState, owned]);
 
   if (ownedRef.current !== owned) {
     throw new WirestateError(
@@ -134,7 +132,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
 
   return createElement(
     ContainerReactContext.Provider,
-    { value: owned ? (state as ContainerProviderState).container : (source as Container) },
+    { value: owned ? (activeState as ContainerProviderState).container : (source as Container) },
     props.children ?? null
   );
 }
