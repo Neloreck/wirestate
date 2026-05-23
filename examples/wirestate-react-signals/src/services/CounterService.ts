@@ -9,6 +9,7 @@ import {
   OnDeactivation,
   WireScope,
 } from "@wirestate/core";
+import { OnDeprovision, OnProvision } from "@wirestate/react";
 import { signal, computed, Signal } from "@wirestate/react-signals";
 
 import { EGlobalEvent } from "@/constants/events";
@@ -53,17 +54,29 @@ export class CounterService {
     console.info(`[${this.constructor.name}] Activated`);
 
     this.initializeFromSeed();
-
-    // [*] Pass safe lifecycle checks - can emit from activation.
-    this.scope.emitEvent(`activated/${this.constructor.name}`);
   }
 
   @OnDeactivation()
   public onDeactivation(): void {
-    console.info(`[${this.constructor.name}] Deactivating`);
+    console.info(`[${this.constructor.name}] Deactivation`);
+  }
 
-    // [*] Pass safe lifecycle checks - can emit from deactivation.
-    this.scope.emitEvent(`deactivating/${this.constructor.name}`);
+  @OnProvision()
+  public onProvision(): void {
+    console.info(`[${this.constructor.name}] Provision`);
+
+    this.scope.emitEvent(`provision/${this.constructor.name}`, {
+      at: new Date(),
+    });
+  }
+
+  @OnDeprovision()
+  public onDeprovision(): void {
+    console.info(`[${this.constructor.name}] Deprovision`);
+
+    this.scope.emitEvent(`deprovision/${this.constructor.name}`, {
+      at: new Date(),
+    });
   }
 
   private initializeFromSeed(): void {

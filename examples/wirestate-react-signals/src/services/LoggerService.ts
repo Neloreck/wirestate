@@ -10,6 +10,7 @@ import {
   OnCommand,
   WireScope,
 } from "@wirestate/core";
+import { OnDeprovision, OnProvision } from "@wirestate/react";
 import { signal, Signal } from "@wirestate/react-signals";
 
 import { EGlobalCommand } from "@/constants/commands";
@@ -56,21 +57,33 @@ export class LoggerService {
 
   @OnActivated()
   public onActivated(): void {
-    console.info(
-      `[${this.constructor.name}] Activated — listening for events, seed:`,
-      this.scope.getSeed(LoggerService),
-    );
-
-    // [*] Pass safe lifecycle checks - can emit from activation.
-    this.scope.emitEvent(`activated/${this.constructor.name}`);
+    console.info(`[${this.constructor.name}] Activated:`);
   }
 
   @OnDeactivation()
   public onDeactivation(): void {
-    console.info(`[${this.constructor.name}] Deactivating`);
+    console.info(`[${this.constructor.name}] Deactivation`);
+  }
 
-    // [*] Pass safe lifecycle checks - can emit from deactivation.
-    this.scope.emitEvent(`deactivating/${this.constructor.name}`);
+  @OnProvision()
+  public onProvision(): void {
+    console.info(
+      `[${this.constructor.name}] Provision — listening for events, seed:`,
+      this.scope.getSeed(LoggerService),
+    );
+
+    this.scope.emitEvent(`provision/${this.constructor.name}`, {
+      at: new Date(),
+    });
+  }
+
+  @OnDeprovision()
+  public onDeprovision(): void {
+    console.info(`[${this.constructor.name}] Deprovision`);
+
+    this.scope.emitEvent(`deprovision/${this.constructor.name}`, {
+      at: new Date(),
+    });
 
     this.clear();
   }
@@ -117,7 +130,7 @@ export class LoggerService {
   // [*] pass check - subscribe to all events if needed, no declaration - no sub
   @OnEvent()
   public onEvents(event: Event): void {
-    setTimeout(() => this.saveEventLogEntry(event));
+    this.saveEventLogEntry(event);
   }
 
   @OnEvent([

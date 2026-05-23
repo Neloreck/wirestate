@@ -6,6 +6,7 @@ import {
   SEED,
   WireScope,
 } from "@wirestate/core";
+import { OnDeprovision, OnProvision } from "@wirestate/react";
 import { Action, Observable, makeObservable } from "@wirestate/react-mobx";
 
 import { EGlobalEvent } from "@/constants/events";
@@ -36,17 +37,32 @@ export class ThemeService {
       `[${this.constructor.name}] Activated with theme:`,
       this.theme,
     );
-
-    // [*] Pass safe lifecycle checks - can emit from activation.
-    this.scope.emitEvent(`activated/${this.constructor.name}`);
   }
 
   @OnDeactivation()
   public onDeactivation(): void {
-    console.info(`[${this.constructor.name}] Deactivating`);
+    console.info(`[${this.constructor.name}] Deactivation`);
+  }
 
-    // [*] Pass safe lifecycle checks - can emit from deactivation.
-    this.scope.emitEvent(`deactivating/${this.constructor.name}`);
+  @OnProvision()
+  public onProvision(): void {
+    console.info(
+      `[${this.constructor.name}] Provision with theme:`,
+      this.theme,
+    );
+
+    this.scope.emitEvent(`provision/${this.constructor.name}`, {
+      at: new Date(),
+    });
+  }
+
+  @OnDeprovision()
+  public onDeprovision(): void {
+    console.info(`[${this.constructor.name}] Deprovision`);
+
+    this.scope.emitEvent(`deprovision/${this.constructor.name}`, {
+      at: new Date(),
+    });
   }
 
   @Action()
