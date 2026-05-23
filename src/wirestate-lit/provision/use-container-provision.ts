@@ -14,7 +14,7 @@ export type UseContainerProvisionOptions = ContainerProviderOptions;
  *
  * @remarks
  * Pass `container` to expose an external `Container` without taking
- * ownership. Pass `options` to create a managed container during
+ * ownership. Pass `config` to create a managed container during
  * construction, activate configured entries on connect, destroy it on
  * disconnect, and recreate it on reconnect.
  *
@@ -23,14 +23,14 @@ export type UseContainerProvisionOptions = ContainerProviderOptions;
  * @param host - The host element.
  * @param options - Provisioning options.
  * @param options.container - External container instance to provide.
- * @param options.options - Managed container creation options.
+ * @param options.config - Managed container creation config.
  * @returns An instance of {@link ContainerProvider}.
  *
  * @example
  * ```typescript
  * class MyRootElement extends LitElement {
  *   private containerProvider: ContainerProvider = useContainerProvision(this, {
- *     options: {
+ *     config: {
  *       entries: [LoggerService],
  *       activate: [LoggerService],
  *     },

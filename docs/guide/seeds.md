@@ -186,10 +186,11 @@ import {
 @customElement("counter-page")
 export class CounterPage extends LitElement {
   public readonly containerProvider: ContainerProvider = useContainerProvision(this, {
-    options: {
+    config: {
       seed: { apiUrl: "https://api.example.com" },
       seeds: [[CounterService, { count: 42 }]],
       entries: [CounterService],
+      activate: [CounterService],
     },
   });
 }

@@ -40,7 +40,7 @@ import { CounterService } from "./CounterService";
 @customElement("application-root")
 export class ApplicationRoot extends LitElement {
   public readonly containerProvider: ContainerProvider = useContainerProvision(this, {
-    options: {
+    config: {
       entries: [CounterService],
     },
   });
@@ -120,8 +120,9 @@ import { CounterService } from "./CounterService";
 @customElement("application-root")
 export class ApplicationRoot extends LitElement {
   public readonly container: ContainerProvider = useContainerProvision(this, {
-    options: {
+    config: {
       entries: [CounterService],
+      activate: [CounterService],
       seeds: [[CounterService, { count: 100 }]],
     },
   });

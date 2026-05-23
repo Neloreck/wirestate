@@ -27,7 +27,7 @@ const container: Container = createContainer({
 ## Child Containers
 
 Pass `parent` to create a child container. Child containers inherit parent bindings but maintain independent
-buses — events emitted in a child do not bubble to the parent.
+buses - events emitted in a child do not bubble to the parent.
 
 ```ts
 const child: Container = createContainer({ parent: container });
@@ -57,8 +57,13 @@ export function Application() {
 ```
 
 When `config` is provided, `ContainerProvider` creates and owns the container. Managed React containers activate all
-provided entries by default; pass `activate: false` to bind without eager activation, or pass an array to activate only
+provided entries by default; pass `activate: false` to skip core eager activation, or pass an array to activate only
 specific entries.
+
+React provider lifecycle hooks are separate from eager activation. Services decorated with `@OnProvision` or
+`@OnDeprovision` are resolved when the provider commits so their provider hooks can run, even when `activate: false` is
+used. Managed containers are deprovisioned before disposal; external containers are deprovisioned when the provider
+unmounts or switches containers, but the provider never calls `unbindAll()` for them.
 
 For globally declared container outside of the React rendering tree, use a prebuilt container:
 
@@ -148,7 +153,7 @@ function DevTools() {
 Provide a root container to a Lit subtree.
 
 - Pass `container` to expose an existing container
-- Pass `options` to create a managed container for the host lifecycle
+- Pass `config` to create a managed container for the host lifecycle
 
 ```ts
 import { LitElement } from "lit";
@@ -160,7 +165,7 @@ import { CartService } from "./CartService";
 @customElement("application-root")
 class ApplicationRoot extends LitElement {
   @containerProvide({
-    options: {
+    config: {
       entries: [CartService],
       activate: [CartService],
       seed: { someData: "value" },

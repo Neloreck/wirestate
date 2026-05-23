@@ -18,7 +18,8 @@ npm install @wirestate/core @wirestate/react reflect-metadata
 Root provider. Exposes the top-level container to the React tree. Pass either an existing `container` instance or
 managed `createContainer(...)` `config`.
 
-When `container` is a prebuilt container instance, activation is controlled by the `createContainer` call that built it:
+When `container` is a prebuilt container instance, the provider uses it as-is and never disposes it. React provider
+lifecycle hooks still run for entries registered through Wirestate binding helpers.
 
 ```tsx
 import { createContainer, Container } from "@wirestate/core";
@@ -40,7 +41,7 @@ export function Application() {
 ```
 
 When `config` is provided, `ContainerProvider` creates and owns the container. Managed containers activate all provided
-entries by default; pass `activate: false` to bind without eager activation, or pass an array to activate only specific entries.
+entries by default; pass `activate: false` to skip core eager activation, or pass an array to activate only specific entries.
 
 ```tsx
 import { ContainerProvider } from "@wirestate/react";
@@ -90,6 +91,33 @@ export function CounterPage() {
 | `entries`  | `InjectableEntries`                   | Services or binding descriptors to add to the child container.                 |
 | `seeds`    | `SeedEntries`                         | Per-service seeds, e.g. `[[CounterService, { count: 10 }]]`. Applied on mount. |
 | `activate` | `boolean \| Array<ServiceIdentifier>` | `true` by default. Pass `false` or specific entry tokens to control activation. |
+
+## Provider lifecycle
+
+`@OnProvision` and `@OnDeprovision` run when a React provider commits, unmounts, or replaces its container.
+They are useful for services that need UI-scoped setup separate from core `@OnActivated` / `@OnDeactivation`.
+
+```ts
+import { Injectable } from "@wirestate/core";
+import { OnDeprovision, OnProvision } from "@wirestate/react";
+
+@Injectable()
+export class LoggerService {
+  @OnProvision()
+  public onProvision(): void {
+    // provider committed
+  }
+
+  @OnDeprovision()
+  public onDeprovision(): void {
+    // provider removed or replaced
+  }
+}
+```
+
+Provider lifecycle services are resolved so their hooks can run, even when `activate: false` skips general eager
+activation. Managed providers deprovision before disposing their container; external containers are deprovisioned but
+remain owned by the caller.
 
 ## Injection hooks
 

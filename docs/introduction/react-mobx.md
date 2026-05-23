@@ -266,7 +266,7 @@ function ThemeToggle() {
 
 ### Seed Data
 
-Pass initialization data to services when the provider mounts. Read seeds in `@OnActivated` and apply them inside an `@Action()` to keep MobX updates batched.
+Pass initialization data to services when they activate. Read seeds in `@OnActivated` and apply them inside an `@Action()` to keep MobX updates batched.
 
 ```tsx
 const container: Container = createContainer({

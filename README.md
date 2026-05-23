@@ -5,7 +5,7 @@
 
 State management framework based on InversifyJS dependency injection.
 Organizes application logic into injectable services that communicate through events, commands, and queries.
-Reactivity is handled externally — use MobX, Signals, or your own solution.
+Reactivity is handled externally - use MobX, Signals, or your own solution.
 
 ## Packages
 

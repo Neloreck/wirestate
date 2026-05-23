@@ -9,9 +9,9 @@ const DEPROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakM
  * Decorator for methods that should run when a React provider is deprovisioned.
  *
  * @remarks
- * The decorator only records the method name. Provider code can retrieve it
- * with {@link getDeprovisionHandlerMetadata} and invoke the method when the
- * committed provider is replaced or removed.
+ * The decorator only records the method name. Provider code retrieves that
+ * metadata internally and invokes the method when the committed provider is
+ * replaced or removed.
  *
  * A class may declare only one deprovision hook name. If a base class declares
  * one, subclasses may override and redecorate that same method name.

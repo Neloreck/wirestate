@@ -9,9 +9,8 @@ const PROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakMap
  * Decorator for methods that should run when a React provider is committed.
  *
  * @remarks
- * The decorator only records the method name. Provider code can retrieve it
- * with {@link getProvisionHandlerMetadata} and invoke the method after React
- * commits the provider.
+ * The decorator only records the method name. Provider code retrieves that
+ * metadata internally and invokes the method after React commits the provider.
  *
  * A class may declare only one provision hook name. If a base class declares
  * one, subclasses may override and redecorate that same method name.

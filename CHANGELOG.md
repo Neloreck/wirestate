@@ -12,10 +12,13 @@
 - Extensive JSDoc coverage for wirestate packages
 - `createIocContainer`: Removed in favor of `createContainer`
 - `createContainer`: Added ability to instantly provide and activate entries, targeted seeds
+- `ContainerConfig`: Added public alias for reusable container creation configuration.
+- `getContainerEntries`: Added public helper for inspecting entries registered through Wirestate binding helpers.
 - `createInjectablesProvider`: Removed.
 - `IocProvider`: Removed
-- `ContainerProvider`: Simpler provider for containers.
-- `SubContainerProvider`: Added component solving problems of removed `createInjectablesProvider`
+- `ContainerProvider`: Split React props into external `container` and managed `config`, activate managed entries by default, and provision registered provider lifecycle services.
+- `SubContainerProvider`: Added component solving problems of removed `createInjectablesProvider`; child providers activate entries by default and support `activate` overrides.
+- `OnProvision` / `OnDeprovision`: Added React provider lifecycle decorators for services that need provider commit/removal hooks.
 - Replace IoC-context provision APIs with `ContainerContext`, `containerProvide`, `ContainerProvider`, and `useContainerProvision`
 - Replace injectables-provider APIs with `subContainerProvide`, `SubContainerProvider`, and `useSubContainerProvider`
 - Provide plain `Container` values through Lit context instead of wrapper objects

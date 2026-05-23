@@ -20,7 +20,7 @@ import { Maybe } from "../types/general";
  * Represents options for the {@link ContainerProvider}.
  *
  * @remarks
- * Provide either an external `container` or managed creation `options`, but
+ * Provide either an external `container` or managed creation `config`, but
  * never both at the same time.
  *
  * @group Provision
@@ -54,7 +54,7 @@ export interface ContainerProviderOptions {
  *
  * - External mode: `container` is an existing {@link Container}. The
  *   provider passes it through context and does not alter its lifecycle.
- * - Managed mode: `options` is {@link ContainerConfig}. The provider
+ * - Managed mode: `config` is {@link ContainerConfig}. The provider
  *   creates a container during construction without eager activation,
  *   activates configured entries when the host connects, disposes the
  *   container when the host disconnects, and recreates it on reconnect.
@@ -73,18 +73,18 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
    * @param host - The host element.
    * @param options - Provisioning options.
    * @param options.container - External container instance to provide.
-   * @param options.options - Managed container creation options.
+   * @param options.config - Managed container creation config.
    */
   public constructor(host: E, options: ContainerProviderOptions) {
     if (!options.container && !options.config) {
       throw new WirestateError(
         ERROR_CODE_INVALID_ARGUMENTS,
-        "ContainerProvider requires a valid container instance or creation options."
+        "ContainerProvider requires a valid container instance or creation config."
       );
     } else if (options.container && options.config) {
       throw new WirestateError(
         ERROR_CODE_INVALID_ARGUMENTS,
-        "ContainerProvider requires only container or valid options object to be provided."
+        "ContainerProvider requires only container or valid config object to be provided."
       );
     }
 

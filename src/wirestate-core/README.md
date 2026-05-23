@@ -162,7 +162,8 @@ export class OtherService {
 ```
 
 Seeds are applied via `applySeeds` / `applySharedSeed` and removed via `unapplySeeds`.
-In React, pass them as `seed` or `seeds` props to the provider — see `@wirestate/react`.
+For managed React containers, pass `seed` or `seeds` inside `ContainerProvider` `config`. For external containers, pass
+seeds to `createContainer` or apply them before services are activated.
 
 ## Lifecycle
 

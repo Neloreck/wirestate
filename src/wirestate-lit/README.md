@@ -28,7 +28,7 @@ npm install @wirestate/core @wirestate/lit lit reflect-metadata
 
 Provides a container to the component tree. It uses Lit Context to propagate the container to child elements.
 
-Pass `container` to expose an existing container, or pass `options` to create and manage one for the host lifecycle.
+Pass `container` to expose an existing container, or pass `config` to create and manage one for the host lifecycle.
 
 ```typescript
 import { LitElement, html } from "lit";
@@ -38,7 +38,7 @@ import { containerProvide, ContainerProvider } from "@wirestate/lit";
 @customElement("my-app")
 class MyApp extends LitElement {
   @containerProvide({
-    options: {
+    config: {
       seed: { someData: "value" },
     },
   })

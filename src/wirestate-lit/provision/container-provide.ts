@@ -33,7 +33,7 @@ export interface ContainerProviderDecorator<E extends ReactiveElement = Reactive
  *
  * - Pass `container` to expose an external container without taking
  *   ownership.
- * - Pass `options` to create a managed container during construction,
+ * - Pass `config` to create a managed container during construction,
  *   activate configured entries on connect, destroy it on disconnect, and
  *   recreate it on reconnect.
  *
@@ -41,14 +41,14 @@ export interface ContainerProviderDecorator<E extends ReactiveElement = Reactive
  *
  * @param options - Provisioning options.
  * @param options.container - External container instance to provide.
- * @param options.options - Managed container creation options.
+ * @param options.config - Managed container creation config.
  * @returns An instance of {@link ContainerProviderDecorator}.
  *
  * @example
  * ```typescript
  * class MyRootElement extends LitElement {
  *   @containerProvide({
- *     options: {
+ *     config: {
  *       seed: { someData: "value" },
  *       entries: [LoggerService],
  *     },
