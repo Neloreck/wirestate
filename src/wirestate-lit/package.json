@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/lit",
-  "version": "0.7.0-experimental.4",
+  "version": "0.7.0-experimental.5",
   "description": "Lit elements integration for wirestate",
   "sideEffects": false,
   "author": "Syrotenko Igor",
@@ -47,7 +47,7 @@
   ],
   "dependencies": {},
   "peerDependencies": {
-    "@wirestate/core": ">=0.7.0-experimental.3",
+    "@wirestate/core": ">=0.7.0-experimental.4",
     "@lit/reactive-element": ">=2.0.0",
     "@lit/context": ">=1.0.0",
     "reflect-metadata": ">=0.2.0",
