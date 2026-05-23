@@ -3,7 +3,6 @@ export { useOptionalCommandCaller } from "./commands/use-optional-command-caller
 export { useCommandHandler } from "./commands/use-command-handler";
 
 export { useContainer } from "./context/use-container";
-export { useRootContainer } from "./context/use-root-container";
 export { useScope } from "./context/use-scope";
 
 export { useEvent } from "./events/use-event";

@@ -14,7 +14,6 @@
 - `createContainer`: Added ability to instantly provide and activate entries, targeted seeds
 - `createInjectablesProvider`: Removed.
 - `IocProvider`: Removed
-- `useRootContainer`: Added separate hook for store management in React tree
 - `ContainerProvider`: Simpler provider for containers.
 - `SubContainerProvider`: Added component solving problems of removed `createInjectablesProvider`
 - Replace IoC-context provision APIs with `ContainerContext`, `containerProvide`, `ContainerProvider`, and `useContainerProvision`

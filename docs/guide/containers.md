@@ -60,9 +60,6 @@ When `container` is options, `ContainerProvider` creates and owns the container.
 provided entries by default; pass `activate: false` to bind without eager activation, or pass an array to activate only
 specific entries.
 
-`useRootContainer` is still useful when a root container should be created inside a component but owned outside provider
-options.
-
 For globally declared container outside of the React rendering tree, use a prebuilt container:
 
 ```tsx

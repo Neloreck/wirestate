@@ -55,33 +55,6 @@ export function Application() {
 }
 ```
 
-### `useRootContainer(factory, deps)`
-
-Creates and memoizes a root container for the component instance.
-The factory runs again only when `deps` change or on dev mode HMR refreshment.
-Use it when you want to own container creation outside of `ContainerProvider` options.
-
-```tsx
-import { Container, createContainer } from "@wirestate/core";
-import { ContainerProvider, useRootContainer } from "@wirestate/react";
-
-function Root() {
-  const container: Container = useRootContainer(
-    () =>
-      createContainer({
-        entries: [CounterService, LoggerService],
-      }),
-    []
-  );
-
-  return (
-    <ContainerProvider container={container}>
-      <SomeComponent />
-    </ContainerProvider>
-  );
-}
-```
-
 ### `SubContainerProvider`
 
 Creates a child container scoped to a subtree.

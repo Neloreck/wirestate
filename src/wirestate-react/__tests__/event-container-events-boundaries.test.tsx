@@ -1,9 +1,8 @@
 import { cleanup, fireEvent, render } from "@testing-library/react";
-import { createContainer } from "@wirestate/core";
-import { Container } from "inversify";
-import { useState } from "react";
+import { CreateContainerOptions } from "@wirestate/core";
+import { useMemo, useState } from "react";
 
-import { ContainerProvider, SubContainerProvider, useEventEmitter, useEventsHandler, useRootContainer } from "../index";
+import { ContainerProvider, SubContainerProvider, useEventEmitter, useEventsHandler } from "../index";
 
 describe("react event container boundaries integration (SubContainer essentials isolation)", () => {
   const COUNTER_EVENT: string = "COUNTER_EVENT";
@@ -34,10 +33,10 @@ describe("react event container boundaries integration (SubContainer essentials 
   }
 
   function Application({ showChild }: { readonly showChild: boolean }) {
-    const container: Container = useRootContainer(() => createContainer(), []);
+    const options: CreateContainerOptions = useMemo(() => ({}), []);
 
     return (
-      <ContainerProvider container={container}>
+      <ContainerProvider container={options}>
         <EventPanel name={"root"} />
 
         {showChild ? (
