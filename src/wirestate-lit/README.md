@@ -66,7 +66,7 @@ import { AuthService, UserService } from "./services";
 @customElement("my-app")
 class MyApp extends LitElement {
   @subContainerProvide({
-    options: {
+    config: {
       entries: [AuthService, UserService],
       activate: [AuthService],
     },
@@ -85,7 +85,7 @@ import { AuthService, UserService } from "./services";
 
 class MyApp extends LitElement {
   private container = useSubContainerProvider(this, {
-    options: {
+    config: {
       entries: [AuthService, UserService],
       activate: [AuthService],
     },
@@ -103,7 +103,7 @@ import { AuthService, UserService } from "./services";
 
 class MyApp extends LitElement {
   private containerProvider: SubContainerProvider = new SubContainerProvider(this, {
-    options: {
+    config: {
       entries: [AuthService, UserService],
       activate: [AuthService],
     },
@@ -111,7 +111,7 @@ class MyApp extends LitElement {
 }
 ```
 
-To seed the child container during creation, pass `seeds` inside `options`:
+To seed the child container during creation, pass `seeds` inside `config`:
 
 ```typescript
 import { LitElement } from "lit";
@@ -121,7 +121,7 @@ import { AuthService, UserService } from "./services";
 
 class MyApp extends LitElement {
   private provider: SubContainerProvider = useSubContainerProvider(this, {
-    options: {
+    config: {
       entries: [AuthService, UserService],
       seeds: [[AuthService, { role: "admin" }]],
     },

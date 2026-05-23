@@ -37,14 +37,14 @@ export interface SubContainerProviderDecorator<T extends ReactiveElement = React
  * @group Provision
  *
  * @param options - Provisioning options.
- * @param options.options - Child-container creation options.
+ * @param options.config - Child-container creation options.
  * @returns An instance of {@link SubContainerProviderDecorator}.
  *
  * @example
  * ```typescript
  * class MyComponent extends LitElement {
  *   @subContainerProvide({
- *     options: {
+ *     config: {
  *       entries: [AuthService, UserService],
  *       activate: [AuthService],
  *     },

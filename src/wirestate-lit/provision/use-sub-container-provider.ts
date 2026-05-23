@@ -14,14 +14,14 @@ import { SubContainerProvider, SubContainerProviderOptions } from "./sub-contain
  *
  * @param host - The host element.
  * @param options - Provisioning options.
- * @param options.options - Child-container creation options.
+ * @param options.config - Child-container creation options.
  * @returns An instance of {@link SubContainerProvider}.
  *
  * @example
  * ```typescript
  * class MyComponent extends LitElement {
  *   private containerProvider: SubContainerProvider = useSubContainerProvider(this, {
- *     options: {
+ *     config: {
  *       entries: [AuthService, UserService],
  *     },
  *   });

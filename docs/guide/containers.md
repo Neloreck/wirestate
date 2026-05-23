@@ -193,7 +193,7 @@ import { CartService } from "./CartService";
 @customElement("providing-element")
 class ProvidingElement extends LitElement {
   @subContainerProvide({
-    options: {
+    config: {
       entries: [CartService],
       activate: [CartService],
     },
