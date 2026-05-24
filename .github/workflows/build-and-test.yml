@@ -56,7 +56,7 @@ jobs:
 
       - name: Archive build artifacts
         working-directory: target/
-        run: zip -qq -r package.zip dist/ pkg/
+        run: zip -qq -r package.zip dist/ pkg/ coverage/
 
       - name: Upload build package
         uses: actions/upload-artifact@v7
