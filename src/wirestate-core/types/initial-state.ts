@@ -1,4 +1,4 @@
-import { Newable } from "inversify";
+import { Newable } from "../alias";
 
 /**
  * Represents a lookup key for service seeds.

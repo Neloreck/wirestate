@@ -1,5 +1,4 @@
-import { Newable, ServiceIdentifier } from "inversify";
-
+import { Newable, ServiceIdentifier } from "../alias";
 import { InjectableDescriptor } from "../types/provision";
 
 /**

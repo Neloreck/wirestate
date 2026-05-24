@@ -1,5 +1,4 @@
-import { Container } from "inversify";
-
+import { Container } from "../alias";
 import { bindService } from "../bind/bind-service";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";

@@ -1,7 +1,6 @@
-import { Container } from "inversify";
-
 import { GenericService } from "@/fixtures/services/generic-service";
 
+import { Container } from "../alias";
 import { InjectableDescriptor } from "../types/provision";
 
 import { getContainerEntries, registerContainerEntry } from "./bind-register";

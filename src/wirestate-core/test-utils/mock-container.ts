@@ -1,5 +1,4 @@
-import { Container, Newable, ServiceIdentifier } from "inversify";
-
+import { Container, Newable, ServiceIdentifier } from "../alias";
 import { getEntryToken } from "../bind/get-entry-token";
 import { ContainerActivation, createContainer } from "../container/create-container";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";

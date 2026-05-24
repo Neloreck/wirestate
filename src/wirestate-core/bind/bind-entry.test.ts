@@ -1,8 +1,6 @@
-import { Container } from "inversify";
-
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { ScopeBindingType, BindingType } from "../alias";
+import { Container, ScopeBindingType, BindingType } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { mockContainer } from "../test-utils/mock-container";
 import { InjectableDescriptor } from "../types/provision";

@@ -37,7 +37,6 @@
     "manager",
     "mobx",
     "react",
-    "inversify",
     "ioc",
     "di",
     "dependency-injection",

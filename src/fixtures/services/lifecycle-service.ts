@@ -1,4 +1,4 @@
-import { Injectable, type Newable } from "../../wirestate-core/alias";
+import { Injectable } from "../../wirestate-core/alias";
 import { OnActivated } from "../../wirestate-core/service/on-activated";
 import { OnDeactivation } from "../../wirestate-core/service/on-deactivation";
 import { OnDeprovision } from "../../wirestate-react/services/on-deprovision";

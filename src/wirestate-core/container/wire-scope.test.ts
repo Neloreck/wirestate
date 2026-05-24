@@ -1,8 +1,6 @@
-import { Container } from "inversify";
-
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Inject, Injectable } from "../alias";
+import { Container, Inject, Injectable } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { ERROR_CODE_ACCESS_AFTER_DISPOSAL, ERROR_CODE_ACCESS_BEFORE_ACTIVATION } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";

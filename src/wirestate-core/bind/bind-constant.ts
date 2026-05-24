@@ -1,8 +1,7 @@
-import { BindWhenOnFluentSyntax, Container, type ServiceIdentifier } from "inversify";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { BindWhenOnFluentSyntax, Container, type ServiceIdentifier } from "../alias";
 import { BindingType, ScopeBindingType } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";

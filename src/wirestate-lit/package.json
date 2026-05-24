@@ -48,7 +48,6 @@
     "lit",
     "lit-element",
     "web-components",
-    "inversify",
     "ioc",
     "di",
     "dependency-injection",

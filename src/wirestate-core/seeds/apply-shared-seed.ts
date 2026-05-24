@@ -1,8 +1,7 @@
-import { Container } from "inversify";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { Container } from "../alias";
 import { AnyObject } from "../types/general";
 
 import { SEED_TOKEN } from "./tokens";

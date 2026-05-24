@@ -1,6 +1,4 @@
-import { Container } from "inversify";
-
-import { BindingType, ScopeBindingType } from "../alias";
+import { Container, BindingType, ScopeBindingType } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { AnyObject } from "../types/general";
 import { InjectableDescriptor } from "../types/provision";

@@ -1,4 +1,4 @@
-import { ServiceIdentifier, bindingTypeValues, bindingScopeValues, Newable } from "inversify";
+import { ServiceIdentifier, bindingTypeValues, bindingScopeValues, Newable } from "../alias";
 
 /**
  * Inversify binding strategy types.

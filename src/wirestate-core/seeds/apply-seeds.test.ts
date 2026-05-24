@@ -1,7 +1,6 @@
-import { Container } from "inversify";
-
 import { GenericService } from "@/fixtures/services/generic-service";
 
+import { Container } from "../alias";
 import { mockContainer } from "../test-utils/mock-container";
 import { SeedsMap } from "../types/initial-state";
 

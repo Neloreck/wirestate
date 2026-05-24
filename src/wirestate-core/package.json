@@ -1,7 +1,7 @@
 {
   "name": "@wirestate/core",
   "version": "0.7.0-experimental.6",
-  "description": "Store management library core based on inversify",
+  "description": "State management core with InversifyJS dependency injection",
   "sideEffects": false,
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/neloreck/wirestate#readme",
@@ -41,15 +41,21 @@
     "url": "https://github.com/neloreck/wirestate/issues"
   },
   "keywords": [
+    "wirestate",
+    "state-management",
     "class-based",
-    "context",
     "declarative",
-    "management",
-    "manager",
+    "framework-agnostic",
     "inversify",
+    "inversifyjs",
     "ioc",
     "di",
     "dependency-injection",
+    "service-container",
+    "event-bus",
+    "command-bus",
+    "query-bus",
+    "scoped-services",
     "state",
     "store",
     "typescript"

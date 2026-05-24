@@ -1,4 +1,4 @@
-import { Newable } from "inversify";
+import { Newable } from "../alias";
 
 import { mockBindService } from "./mock-bind-service";
 import { mockContainer } from "./mock-container";

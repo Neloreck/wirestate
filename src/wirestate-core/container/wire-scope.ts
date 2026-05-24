@@ -1,8 +1,7 @@
-import { injectable, Container, ServiceIdentifier } from "inversify";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { Injectable, Container, ServiceIdentifier } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { ERROR_CODE_ACCESS_AFTER_DISPOSAL, ERROR_CODE_ACCESS_BEFORE_ACTIVATION } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
@@ -26,7 +25,7 @@ import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
  *
  * @group Container
  */
-@injectable()
+@Injectable()
 export class WireScope {
   /**
    * Whether the scope was deactivated and disposed from the container.

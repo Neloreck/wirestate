@@ -1,5 +1,4 @@
-import { Container, type Newable } from "inversify";
-
+import { Container, type Newable } from "../alias";
 import { bindService } from "../bind/bind-service";
 
 /**

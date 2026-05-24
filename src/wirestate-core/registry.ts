@@ -1,5 +1,4 @@
-import { Container } from "inversify";
-
+import { Container } from "./alias";
 import { WireScope } from "./container/wire-scope";
 import { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
 import { EventHandlerMetadata, EventUnsubscriber } from "./types/events";

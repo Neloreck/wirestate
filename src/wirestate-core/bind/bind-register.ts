@@ -1,5 +1,4 @@
-import { Container } from "inversify";
-
+import { Container } from "../alias";
 import { CONTAINER_ENTRIES } from "../registry";
 import { Maybe } from "../types/general";
 import { InjectableEntries } from "../types/provision";

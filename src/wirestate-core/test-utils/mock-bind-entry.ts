@@ -1,5 +1,4 @@
-import { Container, type Newable } from "inversify";
-
+import { Container, type Newable } from "../alias";
 import { bindEntry } from "../bind/bind-entry";
 import { InjectableDescriptor } from "../types/provision";
 

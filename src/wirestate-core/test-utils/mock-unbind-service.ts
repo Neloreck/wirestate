@@ -1,4 +1,4 @@
-import { Container, type Newable } from "inversify";
+import { Container, type Newable } from "../alias";
 
 /**
  * Unbinds a service from the IoC container.

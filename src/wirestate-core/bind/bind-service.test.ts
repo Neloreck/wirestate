@@ -1,8 +1,6 @@
-import { Container } from "inversify";
-
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Inject, Injectable } from "../alias";
+import { Container, Inject, Injectable } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { WireScope } from "../container/wire-scope";
 import { EventBus } from "../events/event-bus";

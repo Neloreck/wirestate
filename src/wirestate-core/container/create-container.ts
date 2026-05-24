@@ -1,8 +1,7 @@
-import { Container, Newable, ServiceIdentifier } from "inversify";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { Container, Newable, ServiceIdentifier } from "../alias";
 import { bindEntry } from "../bind/bind-entry";
 import { getEntryToken } from "../bind/get-entry-token";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";

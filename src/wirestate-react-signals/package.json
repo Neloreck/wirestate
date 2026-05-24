@@ -37,7 +37,6 @@
     "manager",
     "signals",
     "react",
-    "inversify",
     "ioc",
     "di",
     "dependency-injection",

@@ -1,6 +1,4 @@
-import { Container } from "inversify";
-
-import { BindingType, Injectable } from "../alias";
+import { BindingType, Container, Injectable } from "../alias";
 import { bindService } from "../bind/bind-service";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";

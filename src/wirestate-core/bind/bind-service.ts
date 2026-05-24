@@ -1,8 +1,7 @@
-import { BindWhenOnFluentSyntax, Container, ServiceIdentifier, type Newable } from "inversify";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { BindWhenOnFluentSyntax, Container, ServiceIdentifier, type Newable } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { getCommandHandlerMetadata } from "../commands/get-command-handler-metadata";
 import { WireScope } from "../container/wire-scope";

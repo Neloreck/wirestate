@@ -1,5 +1,4 @@
-import { Container } from "inversify";
-
+import { Container } from "../alias";
 import { mockContainer } from "../test-utils/mock-container";
 import { SeedsMap } from "../types/initial-state";
 

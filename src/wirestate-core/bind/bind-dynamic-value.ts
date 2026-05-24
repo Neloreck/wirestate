@@ -1,9 +1,7 @@
-import { BindInWhenOnFluentSyntax, BindWhenOnFluentSyntax, Container } from "inversify";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ScopeBindingType, BindingType } from "../alias";
+import { BindInWhenOnFluentSyntax, BindWhenOnFluentSyntax, Container, ScopeBindingType, BindingType } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { InjectableDescriptor } from "../types/provision";
