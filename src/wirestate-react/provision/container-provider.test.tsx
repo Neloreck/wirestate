@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { BindingType, Container, createContainer } from "@wirestate/core";
+import { BindingType, Container, ContainerConfig, createContainer } from "@wirestate/core";
 import { StrictMode } from "react";
 
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
@@ -53,6 +53,14 @@ describe("ContainerProvider", () => {
     expect(() => render(<ContainerProvider container={new Container()} config={{}} />)).toThrow(
       "ContainerProvider requires only container or valid config object to be provided."
     );
+  });
+
+  it("should reject invalid managed config values", () => {
+    for (const config of ["bad", null, []]) {
+      expect(() => render(<ContainerProvider config={config as ContainerConfig} />)).toThrow(
+        "ContainerProvider requires a valid container instance or creation config."
+      );
+    }
   });
 
   it("should recreate managed container when entries change", () => {

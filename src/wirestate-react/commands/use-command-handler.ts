@@ -1,7 +1,8 @@
 import { Container, CommandBus, CommandHandler, CommandType } from "@wirestate/core";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 import { useContainer } from "../context/use-container";
+import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect";
 
 /**
  * Registers a command handler for the component's lifetime.
@@ -32,11 +33,11 @@ export function useCommandHandler<R = unknown, D = unknown>(type: CommandType, h
   const handlerRef = useRef<CommandHandler<D, R>>(handler);
 
   // Sync ref with the latest closure on every render.
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     handlerRef.current = handler;
   });
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     return container.get(CommandBus).register<D, R>(type, (data) => handlerRef.current(data));
   }, [container, type]);
 }

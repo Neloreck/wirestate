@@ -1,6 +1,7 @@
 import { render } from "@testing-library/react";
 import { Container, QueryBus } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
+import { useLayoutEffect } from "react";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
 import { AnyObject } from "../types/general";
@@ -106,6 +107,38 @@ describe("useQueryHandler", () => {
     unmount();
 
     expect(bus.has("QUERY")).toBe(false);
+  });
+
+  it("should call latest handler when query is dispatched during rerender layout effects", () => {
+    const container: Container = mockContainer();
+    const bus: QueryBus = container.get(QueryBus);
+
+    let result: unknown;
+
+    const handler1 = jest.fn(() => "result1");
+    const handler2 = jest.fn(() => "result2");
+
+    function TestComponent({ fire, handler }: { fire: boolean; handler: () => string }) {
+      useQueryHandler("IMMEDIATE_QUERY", handler);
+
+      useLayoutEffect(() => {
+        if (fire) {
+          result = bus.query("IMMEDIATE_QUERY");
+        }
+      }, [fire]);
+
+      return null;
+    }
+
+    const { rerender } = render(withContainerProvider(<TestComponent fire={false} handler={handler1} />, container));
+
+    expect(result).toBeUndefined();
+
+    rerender(withContainerProvider(<TestComponent fire={true} handler={handler2} />, container));
+
+    expect(result).toBe("result2");
+    expect(handler1).not.toHaveBeenCalled();
+    expect(handler2).toHaveBeenCalled();
   });
 
   it("should support async handlers", async () => {

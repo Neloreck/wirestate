@@ -1,6 +1,7 @@
 import { render, cleanup, act } from "@testing-library/react";
 import { Container, EventBus } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
+import { useLayoutEffect } from "react";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
 
@@ -62,5 +63,32 @@ describe("useEventsHandler", () => {
     act(() => bus.emit("H"));
 
     expect(handler).toHaveBeenCalledTimes(3);
+  });
+
+  it("should use latest handler when event is emitted during rerender layout effects", () => {
+    const container: Container = mockContainer();
+    const bus: EventBus = container.get(EventBus);
+
+    const handler1 = jest.fn();
+    const handler2 = jest.fn();
+
+    function TestComponent({ fire, handler }: { fire: boolean; handler: jest.Mock }) {
+      useEventsHandler(handler);
+
+      useLayoutEffect(() => {
+        if (fire) {
+          bus.emit("A", "payload");
+        }
+      }, [fire]);
+
+      return null;
+    }
+
+    const { rerender } = render(withContainerProvider(<TestComponent fire={false} handler={handler1} />, container));
+
+    rerender(withContainerProvider(<TestComponent fire={true} handler={handler2} />, container));
+
+    expect(handler1).not.toHaveBeenCalled();
+    expect(handler2).toHaveBeenCalledWith({ type: "A", payload: "payload" });
   });
 });

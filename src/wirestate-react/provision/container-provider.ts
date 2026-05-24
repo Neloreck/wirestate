@@ -78,22 +78,25 @@ interface ContainerProviderState {
  * @returns A React context provider for the active container.
  */
 export function ContainerProvider(props: ContainerProviderProps) {
-  if (!props.container && !props.config) {
+  const configValue: unknown = props.config;
+  const hasConfig: boolean = configValue !== undefined;
+
+  if (hasConfig && (configValue === null || typeof configValue !== "object" || Array.isArray(configValue))) {
     throw new WirestateError(
       ERROR_CODE_VALIDATION_ERROR,
       "ContainerProvider requires a valid container instance or creation config."
     );
-  } else if (props.container && props.config) {
+  } else if (!props.container && !hasConfig) {
+    throw new WirestateError(
+      ERROR_CODE_VALIDATION_ERROR,
+      "ContainerProvider requires a valid container instance or creation config."
+    );
+  } else if (props.container && hasConfig) {
     throw new WirestateError(
       ERROR_CODE_VALIDATION_ERROR,
       "ContainerProvider requires only container or valid config object to be provided."
     );
   } else if (props.container !== undefined && !(props.container instanceof Container)) {
-    throw new WirestateError(
-      ERROR_CODE_VALIDATION_ERROR,
-      "ContainerProvider requires a valid container instance or creation config."
-    );
-  } else if (props.container !== undefined && props.config && typeof props.config !== "object") {
     throw new WirestateError(
       ERROR_CODE_VALIDATION_ERROR,
       "ContainerProvider requires a valid container instance or creation config."

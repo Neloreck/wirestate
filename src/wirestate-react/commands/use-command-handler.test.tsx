@@ -1,8 +1,10 @@
 import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus, CommandDescriptor, CommandHandler } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
+import { useLayoutEffect } from "react";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
+import { Optional } from "../types/general";
 
 import { useCommandHandler } from "./use-command-handler";
 
@@ -61,6 +63,36 @@ describe("useCommandHandler", () => {
     rerender(withContainerProvider(<TestComponent handler={handler2} />, container));
 
     await commandBus.command("UPDATE_COMMAND").task;
+    expect(handler2).toHaveBeenCalled();
+  });
+
+  it("should call latest handler when command is dispatched during rerender layout effects", async () => {
+    const container: Container = mockContainer();
+    const commandBus: CommandBus = container.get(CommandBus);
+    let task: Optional<Promise<unknown>> = null;
+
+    const handler1 = jest.fn().mockReturnValue("first");
+    const handler2 = jest.fn().mockReturnValue("second");
+
+    function TestComponent({ fire, handler }: { fire: boolean; handler: CommandHandler }) {
+      useCommandHandler("IMMEDIATE_COMMAND", handler);
+
+      useLayoutEffect(() => {
+        if (fire) {
+          task = commandBus.command("IMMEDIATE_COMMAND").task;
+        }
+      }, [fire]);
+
+      return null;
+    }
+
+    const { rerender } = render(withContainerProvider(<TestComponent fire={false} handler={handler1} />, container));
+
+    rerender(withContainerProvider(<TestComponent fire={true} handler={handler2} />, container));
+
+    await task;
+
+    expect(handler1).not.toHaveBeenCalled();
     expect(handler2).toHaveBeenCalled();
   });
 });

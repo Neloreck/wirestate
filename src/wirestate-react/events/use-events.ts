@@ -1,7 +1,8 @@
 import { Container, EventBus, EventHandler, EventType } from "@wirestate/core";
-import { type MutableRefObject, useEffect, useRef } from "react";
+import { RefObject, useRef } from "react";
 
 import { useContainer } from "../context/use-container";
+import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect";
 
 /**
  * Subscribes a component to multiple event types on the {@link EventBus}.
@@ -24,16 +25,16 @@ import { useContainer } from "../context/use-container";
  * ```
  */
 export function useEvents(types: ReadonlyArray<EventType>, handler: EventHandler): void {
-  const typesRef: MutableRefObject<ReadonlyArray<EventType>> = useRef(types);
-  const handlerRef: MutableRefObject<EventHandler> = useRef(handler);
+  const typesRef: RefObject<ReadonlyArray<EventType>> = useRef(types);
+  const handlerRef: RefObject<EventHandler> = useRef(handler);
   const container: Container = useContainer();
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     typesRef.current = types;
     handlerRef.current = handler;
   });
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     return container.get(EventBus).subscribe((event) => {
       if (typesRef.current.includes(event.type)) {
         handlerRef.current?.(event);

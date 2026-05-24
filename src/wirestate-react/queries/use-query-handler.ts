@@ -1,7 +1,8 @@
 import { Container, QueryBus, QueryHandler, QueryType } from "@wirestate/core";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
 import { useContainer } from "../context/use-container";
+import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect";
 
 /**
  * Registers a query handler for the component's lifetime.
@@ -34,11 +35,11 @@ export function useQueryHandler<R = unknown, D = unknown, T extends QueryType = 
   const container: Container = useContainer();
   const handlerRef = useRef<QueryHandler<D, R>>(handler);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     handlerRef.current = handler;
   });
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     return container.get(QueryBus).register<D, R>(type, (data) => handlerRef.current(data));
   }, [container, type]);
 }
