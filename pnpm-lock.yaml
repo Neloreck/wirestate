@@ -1,7 +1,7 @@
 lockfileVersion: '9.0'
 
 settings:
-  autoInstallPeers: true
+  autoInstallPeers: false
   excludeLinksFromLockfile: false
 
 overrides:
@@ -50,6 +50,15 @@ importers:
       '@eslint/js':
         specifier: ^9.39.4
         version: 9.39.4
+      '@lit-labs/signals':
+        specifier: ^0.2.0
+        version: 0.2.0
+      '@lit/context':
+        specifier: ^1.1.6
+        version: 1.1.6
+      '@lit/reactive-element':
+        specifier: ^2.1.2
+        version: 2.1.2
       '@preact/signals-react':
         specifier: ^3.10.0
         version: 3.10.0(react@19.2.6)
@@ -164,6 +173,9 @@ importers:
       mobx-react-lite:
         specifier: ^4.1.1
         version: 4.1.1(mobx@6.15.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      ncp:
+        specifier: ^2.0.0
+        version: 2.0.0
       pnpm:
         specifier: ^11.1.3
         version: 11.1.3
@@ -197,6 +209,9 @@ importers:
       rollup-plugin-visualizer:
         specifier: ^6.0.11
         version: 6.0.11(rollup@4.60.2)
+      signal-polyfill:
+        specifier: ^0.2.2
+        version: 0.2.2
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@25.6.0)(typescript@6.0.3)
@@ -217,94 +232,25 @@ importers:
         version: 8.59.1(eslint@9.39.4)(typescript@6.0.3)
       vitepress:
         specifier: ^1.6.4
-        version: 1.6.4(@algolia/client-search@5.52.1)(@types/node@25.6.0)(@types/react@19.2.15)(postcss@8.5.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(search-insights@2.17.3)(terser@5.17.6)(typescript@6.0.3)
+        version: 1.6.4(@algolia/client-search@5.52.1)(@types/node@25.6.0)(@types/react@19.2.15)(postcss@8.5.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(terser@5.17.6)(typescript@6.0.3)
 
-  cli:
-    devDependencies:
-      colors:
-        specifier: ^1.4.0
-        version: 1.4.0
-      ncp:
-        specifier: ^2.0.0
-        version: 2.0.0
-      react:
-        specifier: 19.2.6
-        version: 19.2.6
-      react-dom:
-        specifier: 19.2.6
-        version: 19.2.6(react@19.2.6)
-      rollup-plugin-clear:
-        specifier: ^2.0.7
-        version: 2.0.7
+  cli: {}
 
   src/wirestate-core:
     dependencies:
       inversify:
         specifier: ^8.1.0
         version: 8.1.0(reflect-metadata@0.2.2)
-      reflect-metadata:
-        specifier: '>=0.2.0'
-        version: 0.2.2
-      tslib:
-        specifier: '>=2.5.0'
-        version: 2.8.1
 
-  src/wirestate-lit:
-    dependencies:
-      '@lit/context':
-        specifier: '>=1.0.0'
-        version: 1.1.6
-      '@lit/reactive-element':
-        specifier: '>=2.0.0'
-        version: 2.1.2
-      '@wirestate/core':
-        specifier: '>=0.7.0-experimental.5'
-        version: 0.7.0-experimental.5(reflect-metadata@0.2.2)(tslib@2.8.1)
-      reflect-metadata:
-        specifier: '>=0.2.0'
-        version: 0.2.2
-      tslib:
-        specifier: '>=2.5.0'
-        version: 2.8.1
+  src/wirestate-lit: {}
 
-  src/wirestate-lit-signals:
-    dependencies:
-      '@lit-labs/signals':
-        specifier: '>=0.2.0'
-        version: 0.2.0
-      signal-polyfill:
-        specifier: '>=0.2.0'
-        version: 0.2.2
+  src/wirestate-lit-signals: {}
 
-  src/wirestate-react:
-    dependencies:
-      '@wirestate/core':
-        specifier: '>=0.7.0-experimental.5'
-        version: 0.7.0-experimental.5(reflect-metadata@0.2.2)(tslib@2.8.1)
-      react:
-        specifier: 19.2.6
-        version: 19.2.6
-      reflect-metadata:
-        specifier: '>=0.2.0'
-        version: 0.2.2
-      tslib:
-        specifier: '>=2.5.0'
-        version: 2.8.1
+  src/wirestate-react: {}
 
-  src/wirestate-react-mobx:
-    dependencies:
-      mobx:
-        specifier: '>=6.0.0'
-        version: 6.15.0
-      mobx-react-lite:
-        specifier: '>=4.0.0'
-        version: 4.1.1(mobx@6.15.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+  src/wirestate-react-mobx: {}
 
-  src/wirestate-react-signals:
-    dependencies:
-      '@preact/signals-react':
-        specifier: '>=3.0.0'
-        version: 3.10.0(react@19.2.6)
+  src/wirestate-react-signals: {}
 
 packages:
 
@@ -1548,9 +1494,6 @@ packages:
   '@jridgewell/source-map@0.3.2':
     resolution: {integrity: sha512-m7O9o2uR8k2ObDysZYzdfhb08VuEml5oWGiosa1VdaPZ/A6QyPkAJuwN0Q1lhULOf6B7MtQmHENS743hWtCrgw==}
 
-  '@jridgewell/sourcemap-codec@1.4.14':
-    resolution: {integrity: sha512-XPSJHWmi394fuUuzDnGz1wiKqWfo1yXecHQMRf2l6hztTO+nPru658AyDngaBe7isIxEkRsPR3FZh+s7iVa4Uw==}
-
   '@jridgewell/sourcemap-codec@1.5.0':
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
 
@@ -2332,11 +2275,6 @@ packages:
   '@vueuse/shared@12.8.2':
     resolution: {integrity: sha512-dznP38YzxZoNloI0qpEfpkms8knDtaoQ6Y/sfS0L7Yki4zh40LFHEhur0odJC6xTHG5dxWVPiUWBXn+wCG2s5w==}
 
-  '@wirestate/core@0.7.0-experimental.5':
-    resolution: {integrity: sha512-INumQZHz0Uw+h4TSmMoR2E/ApksvSdV72Qxa4rSB9B2t2qJcZiTC/dFB+9LNkjZ1+D/74Yd/peaeQ7fEYoKw0A==}
-    peerDependencies:
-      tslib: '>=2.5.0'
-
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
     peerDependencies:
@@ -2651,10 +2589,6 @@ packages:
 
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
-
-  colors@1.4.0:
-    resolution: {integrity: sha512-a+UqTh4kgZg/SlGvfbzDHpgRu7AAQOmmqRHJnxhRZICKFUT91brVhNNt58CMWU9PsBbv3PDCZUHbVxuDiH2mtA==}
-    engines: {node: '>=0.1.90'}
 
   comma-separated-tokens@2.0.3:
     resolution: {integrity: sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==}
@@ -4156,10 +4090,6 @@ packages:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
 
-  picomatch@4.0.2:
-    resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
-    engines: {node: '>=12'}
-
   picomatch@4.0.4:
     resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
     engines: {node: '>=12'}
@@ -4424,9 +4354,6 @@ packages:
 
   scheduler@0.27.0:
     resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
-
-  search-insights@2.17.3:
-    resolution: {integrity: sha512-RQPdCYTa8A68uM2jwxoY842xDhvx3E5LFL1LxvxCNMev4o5mLuokczhzjAgGwUZBAmOKZknArSxLKmXtIi2AxQ==}
 
   semver@5.7.2:
     resolution: {integrity: sha512-cBznnQ9KjJqU67B52RMC65CMarK2600WFnbkcaiwWq3xy/5haFJlshgnpjovMVJ+Hff49d8GEn0b87C5pDQ10g==}
@@ -5041,19 +4968,18 @@ snapshots:
       '@algolia/requester-fetch': 5.52.1
       '@algolia/requester-node-http': 5.52.1
 
-  '@algolia/autocomplete-core@1.17.7(@algolia/client-search@5.52.1)(algoliasearch@5.52.1)(search-insights@2.17.3)':
+  '@algolia/autocomplete-core@1.17.7(@algolia/client-search@5.52.1)(algoliasearch@5.52.1)':
     dependencies:
-      '@algolia/autocomplete-plugin-algolia-insights': 1.17.7(@algolia/client-search@5.52.1)(algoliasearch@5.52.1)(search-insights@2.17.3)
+      '@algolia/autocomplete-plugin-algolia-insights': 1.17.7(@algolia/client-search@5.52.1)(algoliasearch@5.52.1)
       '@algolia/autocomplete-shared': 1.17.7(@algolia/client-search@5.52.1)(algoliasearch@5.52.1)
     transitivePeerDependencies:
       - '@algolia/client-search'
       - algoliasearch
       - search-insights
 
-  '@algolia/autocomplete-plugin-algolia-insights@1.17.7(@algolia/client-search@5.52.1)(algoliasearch@5.52.1)(search-insights@2.17.3)':
+  '@algolia/autocomplete-plugin-algolia-insights@1.17.7(@algolia/client-search@5.52.1)(algoliasearch@5.52.1)':
     dependencies:
       '@algolia/autocomplete-shared': 1.17.7(@algolia/client-search@5.52.1)(algoliasearch@5.52.1)
-      search-insights: 2.17.3
     transitivePeerDependencies:
       - '@algolia/client-search'
       - algoliasearch
@@ -6114,9 +6040,9 @@ snapshots:
 
   '@docsearch/css@3.8.2': {}
 
-  '@docsearch/js@3.8.2(@algolia/client-search@5.52.1)(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(search-insights@2.17.3)':
+  '@docsearch/js@3.8.2(@algolia/client-search@5.52.1)(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
-      '@docsearch/react': 3.8.2(@algolia/client-search@5.52.1)(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(search-insights@2.17.3)
+      '@docsearch/react': 3.8.2(@algolia/client-search@5.52.1)(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       preact: 10.29.1
     transitivePeerDependencies:
       - '@algolia/client-search'
@@ -6125,9 +6051,9 @@ snapshots:
       - react-dom
       - search-insights
 
-  '@docsearch/react@3.8.2(@algolia/client-search@5.52.1)(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(search-insights@2.17.3)':
+  '@docsearch/react@3.8.2(@algolia/client-search@5.52.1)(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
-      '@algolia/autocomplete-core': 1.17.7(@algolia/client-search@5.52.1)(algoliasearch@5.52.1)(search-insights@2.17.3)
+      '@algolia/autocomplete-core': 1.17.7(@algolia/client-search@5.52.1)(algoliasearch@5.52.1)
       '@algolia/autocomplete-preset-algolia': 1.17.7(@algolia/client-search@5.52.1)(algoliasearch@5.52.1)
       '@docsearch/css': 3.8.2
       algoliasearch: 5.52.1
@@ -6135,7 +6061,6 @@ snapshots:
       '@types/react': 19.2.15
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
-      search-insights: 2.17.3
     transitivePeerDependencies:
       - '@algolia/client-search'
 
@@ -6554,13 +6479,13 @@ snapshots:
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.0
+      '@jridgewell/sourcemap-codec': 1.5.5
       '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/gen-mapping@0.3.8':
     dependencies:
       '@jridgewell/set-array': 1.2.1
-      '@jridgewell/sourcemap-codec': 1.5.0
+      '@jridgewell/sourcemap-codec': 1.5.5
       '@jridgewell/trace-mapping': 0.3.25
 
   '@jridgewell/remapping@2.3.5':
@@ -6577,8 +6502,6 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
 
-  '@jridgewell/sourcemap-codec@1.4.14': {}
-
   '@jridgewell/sourcemap-codec@1.5.0': {}
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
@@ -6586,7 +6509,7 @@ snapshots:
   '@jridgewell/trace-mapping@0.3.25':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.0
-      '@jridgewell/sourcemap-codec': 1.5.0
+      '@jridgewell/sourcemap-codec': 1.5.5
 
   '@jridgewell/trace-mapping@0.3.31':
     dependencies:
@@ -6596,7 +6519,7 @@ snapshots:
   '@jridgewell/trace-mapping@0.3.9':
     dependencies:
       '@jridgewell/resolve-uri': 3.1.0
-      '@jridgewell/sourcemap-codec': 1.4.14
+      '@jridgewell/sourcemap-codec': 1.5.5
 
   '@lit-labs/signals@0.2.0':
     dependencies:
@@ -7351,13 +7274,6 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@wirestate/core@0.7.0-experimental.5(reflect-metadata@0.2.2)(tslib@2.8.1)':
-    dependencies:
-      inversify: 8.1.0(reflect-metadata@0.2.2)
-      tslib: 2.8.1
-    transitivePeerDependencies:
-      - reflect-metadata
-
   acorn-jsx@5.3.2(acorn@8.16.0):
     dependencies:
       acorn: 8.16.0
@@ -7755,8 +7671,6 @@ snapshots:
       color-name: 1.1.4
 
   color-name@1.1.4: {}
-
-  colors@1.4.0: {}
 
   comma-separated-tokens@2.0.3: {}
 
@@ -9644,8 +9558,6 @@ snapshots:
 
   picomatch@2.3.1: {}
 
-  picomatch@4.0.2: {}
-
   picomatch@4.0.4: {}
 
   pify@4.0.1: {}
@@ -9869,7 +9781,7 @@ snapshots:
   rollup-plugin-visualizer@6.0.11(rollup@4.60.2):
     dependencies:
       open: 8.4.2
-      picomatch: 4.0.2
+      picomatch: 4.0.4
       source-map: 0.7.4
       yargs: 17.7.2
     optionalDependencies:
@@ -9934,8 +9846,6 @@ snapshots:
       xmlchars: 2.2.0
 
   scheduler@0.27.0: {}
-
-  search-insights@2.17.3: {}
 
   semver@5.7.2: {}
 
@@ -10443,10 +10353,10 @@ snapshots:
       fsevents: 2.3.3
       terser: 5.17.6
 
-  vitepress@1.6.4(@algolia/client-search@5.52.1)(@types/node@25.6.0)(@types/react@19.2.15)(postcss@8.5.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(search-insights@2.17.3)(terser@5.17.6)(typescript@6.0.3):
+  vitepress@1.6.4(@algolia/client-search@5.52.1)(@types/node@25.6.0)(@types/react@19.2.15)(postcss@8.5.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(terser@5.17.6)(typescript@6.0.3):
     dependencies:
       '@docsearch/css': 3.8.2
-      '@docsearch/js': 3.8.2(@algolia/client-search@5.52.1)(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(search-insights@2.17.3)
+      '@docsearch/js': 3.8.2(@algolia/client-search@5.52.1)(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@iconify-json/simple-icons': 1.2.81
       '@shikijs/core': 2.5.0
       '@shikijs/transformers': 2.5.0

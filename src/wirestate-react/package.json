@@ -57,7 +57,7 @@
   ],
   "dependencies": {},
   "peerDependencies": {
-    "@wirestate/core": ">=0.7.0-experimental.5",
+    "@wirestate/core": ">=0.7.0-experimental.6",
     "react": ">=16.8.0 <20.0.0",
     "reflect-metadata": ">=0.2.0",
     "tslib": ">=2.5.0"

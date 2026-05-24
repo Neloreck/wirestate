@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -7,22 +8,35 @@ import * as rimraf from "rimraf";
 import { DIST_ROOT, PKG_ROOT, PROJECT_ROOT } from "../config/build.constants";
 import { PACKAGES } from "../config/packages";
 
-const ncpAsync = (source: string, destination: string): Promise<void> =>
-  new Promise((resolve, reject) => ncp(source, destination, (err) => (err ? reject(err) : resolve())));
+function ncpAsync(source: string, destination: string): Promise<void> {
+  return new Promise((resolve, reject) => ncp(source, destination, (err) => (err ? reject(err) : resolve())));
+}
 
-const copyFile = (source: string, destination: string): void => {
+function copyFile(source: string, destination: string): void {
   if (fs.existsSync(source)) {
     fs.copyFileSync(source, destination);
   }
-};
+}
 
-const ensureDir = (dir: string): void => {
+function ensureDir(dir: string): void {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-};
+}
 
-async function stagePackage(pkgName: string): Promise<void> {
+function getCommitHash(): string {
+  return execSync("git rev-parse HEAD", { cwd: PROJECT_ROOT, encoding: "utf8" }).trim();
+}
+
+function applyBuildMetadata(manifestPath: string, commit: string): void {
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8")) as Record<string, unknown>;
+
+  manifest.wirestateCommit = commit;
+
+  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+}
+
+async function stagePackage(pkgName: string, commit: string): Promise<void> {
   const pkgSrcDir = path.resolve(PROJECT_ROOT, "src", pkgName);
   const pkgDistDir = path.resolve(DIST_ROOT, pkgName);
   const pkgOutDir = path.resolve(PKG_ROOT, pkgName);
@@ -58,14 +72,20 @@ async function stagePackage(pkgName: string): Promise<void> {
   copyFile(path.resolve(PROJECT_ROOT, "LICENSE"), path.resolve(pkgOutDir, "LICENSE"));
   copyFile(fs.existsSync(pkgReadme) ? pkgReadme : rootReadme, path.resolve(pkgOutDir, "README.md"));
   copyFile(path.resolve(PROJECT_ROOT, "CHANGELOG.md"), path.resolve(pkgOutDir, "CHANGELOG.md"));
-  copyFile(path.resolve(pkgSrcDir, "package.json"), path.resolve(pkgOutDir, "package.json"));
+
+  const pkgManifest = path.resolve(pkgOutDir, "package.json");
+
+  copyFile(path.resolve(pkgSrcDir, "package.json"), pkgManifest);
+  applyBuildMetadata(pkgManifest, commit);
 }
 
 async function main(): Promise<void> {
+  const commit: string = getCommitHash();
+
   for (const pkg of PACKAGES) {
     console.log(`Staging package: ${pkg.name}`);
 
-    await stagePackage(pkg.name);
+    await stagePackage(pkg.name, commit);
 
     console.log(`  -> target/pkg/${pkg.name}`);
   }
