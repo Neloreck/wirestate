@@ -156,6 +156,8 @@ Provide a root container to a Lit subtree.
 
 - Pass `container` to expose an existing container
 - Pass `config` to create a managed container for the host lifecycle
+- Managed Lit containers activate all provided entries by default; pass `activate: false` to skip eager activation, or
+  pass an array to activate only specific entries
 - Lit providers run `@OnProvision` while connected and `@OnDeprovision` before disconnect cleanup
 
 ```ts
@@ -170,7 +172,6 @@ class ApplicationRoot extends LitElement {
   @containerProvide({
     config: {
       entries: [CartService],
-      activate: [CartService],
       seed: { someData: "value" },
     },
   })
@@ -187,6 +188,8 @@ Create a managed child container derived from the nearest parent container conte
 - The child container is recreated when the parent container changes
 - The child container is destroyed when the host disconnects
 - The child container is deprovisioned before it is destroyed
+- Managed Lit child containers activate all provided entries by default; pass `activate: false` or a token array to
+  override that
 
 ```ts
 import { LitElement } from "lit";
@@ -200,7 +203,6 @@ class ProvidingElement extends LitElement {
   @subContainerProvide({
     config: {
       entries: [CartService],
-      activate: [CartService],
     },
   })
   public containerProvider!: SubContainerProvider;

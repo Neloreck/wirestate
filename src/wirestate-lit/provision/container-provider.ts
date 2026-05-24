@@ -6,10 +6,9 @@ import {
   createContainer,
   deprovisionContainer,
   getContainerEntries,
-  getEntryToken,
   provisionContainer,
-  ServiceIdentifier,
   type ProvisionLifecycle,
+  validateContainerConfig,
   WirestateError,
 } from "@wirestate/core";
 
@@ -45,8 +44,9 @@ export interface ContainerProviderOptions {
    *
    * @remarks
    * The managed container is created when the host connects, disposed when it
-   * disconnects, and recreated on the next reconnect. The provider value is
-   * `undefined` while the host is disconnected.
+   * disconnects, and recreated on the next reconnect. Managed containers
+   * activate all entries by default unless `activate` is provided explicitly.
+   * The provider value is `undefined` while the host is disconnected.
    */
   readonly config?: ContainerConfig;
 }
@@ -62,8 +62,8 @@ export interface ContainerProviderOptions {
  *   lifecycle hooks, and never disposes it.
  * - Managed mode: `config` is {@link ContainerConfig}. The provider
  *   creates a container when the host connects, disposes the container when
- *   the host disconnects, runs provider lifecycle hooks while connected, and
- *   recreates it on reconnect.
+ *   the host disconnects, activates all entries by default, runs provider
+ *   lifecycle hooks while connected, and recreates it on reconnect.
  *
  * The context value is only published while the host is connected. Before the
  * first connection and after disconnection, the provider value is `undefined`.
@@ -96,15 +96,18 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
         ERROR_CODE_INVALID_ARGUMENTS,
         "ContainerProvider requires only container or valid config object to be provided."
       );
-    }
-
-    if (options.config) {
-      validateConfig(options.config);
+    } else if (options.config) {
+      validateContainerConfig(options.config);
+    } else if (!(options.container instanceof Container)) {
+      throw new WirestateError(
+        ERROR_CODE_INVALID_ARGUMENTS,
+        "ContainerProvider requires a valid container instance or creation config."
+      );
     }
 
     super(host, { context: ContainerContext });
 
-    this.config = options.config;
+    this.config = options.config ? { ...options.config, activate: options.config.activate ?? true } : null;
     this.container = options.container;
 
     dbg.info(prefix(__filename), "Constructed:", {
@@ -184,16 +187,16 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
       );
     }
 
-    validateConfig(config);
+    validateContainerConfig(config);
 
-    this.config = config;
+    this.config = { ...config, activate: config.activate ?? true };
 
     if (this.host.isConnected) {
       if (this.container) {
         this.destroyManagedContainer(this.container);
       }
 
-      const container: Container = createContainer(config);
+      const container: Container = createContainer(this.config);
 
       this.container = container;
       super.setValue(container);
@@ -214,39 +217,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
       container,
     });
 
-    container.unbindAll();
     this.container = null;
-  }
-}
-
-/**
- * Validates managed container activation options.
- *
- * @param config - Container creation options to validate.
- */
-function validateConfig(config: ContainerConfig): void {
-  const activate: ReadonlyArray<ServiceIdentifier> =
-    (config.activate === true ? config.entries?.map(getEntryToken) : config.activate) || [];
-
-  if (!activate.length) {
-    return;
-  }
-
-  if (!config.entries?.length) {
-    throw new WirestateError(
-      ERROR_CODE_INVALID_ARGUMENTS,
-      "Supplied activation list while entries for binding are not provided."
-    );
-  }
-
-  const entryTokens: ReadonlyArray<ServiceIdentifier> = config.entries.map(getEntryToken);
-
-  for (const eager of activate) {
-    if (!entryTokens.includes(eager)) {
-      throw new WirestateError(
-        ERROR_CODE_INVALID_ARGUMENTS,
-        `createContainer: '${String(eager)}' is listed in 'activate' but was not provided in 'entries'.`
-      );
-    }
+    container.unbindAll();
   }
 }

@@ -41,6 +41,14 @@ describe("ContainerProvider", () => {
     expect(controller.value).toBeUndefined();
   });
 
+  it("should reject invalid external container values", () => {
+    const element: TestProviderElement = new TestProviderElement();
+
+    expect(() => new ContainerProvider(element, { container: {} as Container })).toThrow(
+      "ContainerProvider requires a valid container instance or creation config."
+    );
+  });
+
   it("should provide container to child consumers", () => {
     const element: TestProviderElement = new TestProviderElement();
     const container: Container = mockContainer();
@@ -542,6 +550,50 @@ describe("ContainerProvider", () => {
     document.body.appendChild(element);
 
     expect(lifecycleEvents).toEqual(["first", "second"]);
+
+    element.remove();
+  });
+
+  it("should activate all managed entries by default", () => {
+    const events: Array<string> = [];
+    const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
+    const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
+
+    const element: TestProviderElement = new TestProviderElement();
+
+    new ContainerProvider(element, { config: { entries: [FirstService, SecondService] } });
+
+    expect(events).toEqual([]);
+
+    document.body.appendChild(element);
+
+    expect(events).toEqual(["activated-first", "activated-second", "provision-first", "provision-second"]);
+
+    element.remove();
+  });
+
+  it("should not activate managed entries when activate is false", () => {
+    const events: Array<string> = [];
+
+    @Injectable()
+    class PlainService {
+      public constructor() {
+        events.push("activate");
+      }
+    }
+
+    const element: TestProviderElement = new TestProviderElement();
+
+    new ContainerProvider(element, {
+      config: {
+        activate: false,
+        entries: [PlainService],
+      },
+    });
+
+    document.body.appendChild(element);
+
+    expect(events).toEqual([]);
 
     element.remove();
   });

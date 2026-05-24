@@ -190,7 +190,6 @@ export class CounterPage extends LitElement {
       seed: { apiUrl: "https://api.example.com" },
       seeds: [[CounterService, { count: 42 }]],
       entries: [CounterService],
-      activate: [CounterService],
     },
   });
 }

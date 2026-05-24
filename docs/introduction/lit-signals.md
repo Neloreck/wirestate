@@ -51,7 +51,9 @@ export class ApplicationRoot extends LitElement {
 }
 ```
 
-`useContainerProvision` creates and publishes the root container when the host element connects.
+`useContainerProvision` creates and publishes the root container when the host element connects. Managed Lit containers
+activate all provided entries by default; pass `activate: false` to skip eager activation, or pass an array to activate
+only specific entries.
 
 ### 3. Inject and Use the Service
 
@@ -122,7 +124,6 @@ export class ApplicationRoot extends LitElement {
   public readonly container: ContainerProvider = useContainerProvision(this, {
     config: {
       entries: [CounterService],
-      activate: [CounterService],
       seeds: [[CounterService, { count: 100 }]],
     },
   });

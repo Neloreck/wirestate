@@ -1,6 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, createContainer } from "@wirestate/core";
+import { Container, createContainer, Injectable } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
@@ -91,6 +91,17 @@ describe("SubContainerProvider", () => {
     expect(events).toEqual(["activated"]);
   });
 
+  it("should validate activation entries before a parent context is received", () => {
+    @Injectable()
+    class LifecycleService {}
+
+    const element: TestProviderElement = new TestProviderElement();
+
+    expect(
+      () => new SubContainerProvider(element, { config: { activate: ["MissingService"], entries: [LifecycleService] } })
+    ).toThrow("is listed in 'activate' but was not provided in 'entries'.");
+  });
+
   it("should provision child containers and deprovision before disposal", () => {
     fixture = createLitProvision();
 
@@ -164,6 +175,35 @@ describe("SubContainerProvider", () => {
       "deactivation-second",
     ]);
     expect(provider.value).toBeUndefined();
+  });
+
+  it("should validate replacement config before replacing the active child container", () => {
+    fixture = createLitProvision();
+
+    const { LifecycleService, events } = createLifecycleService({
+      methods: ["activated", "deactivation"],
+    });
+
+    const element: TestProviderElement = new TestProviderElement();
+    const provider: SubContainerProvider = new SubContainerProvider(element, {
+      config: { entries: [LifecycleService] },
+    });
+
+    fixture.provider.appendChild(element);
+
+    const firstContainer: Container = provider.value;
+
+    expect(events).toEqual(["activated"]);
+
+    expect(() =>
+      provider.setConfig({
+        activate: ["MissingService"],
+        entries: [LifecycleService],
+      })
+    ).toThrow("is listed in 'activate' but was not provided in 'entries'.");
+
+    expect(provider.value).toBe(firstContainer);
+    expect(events).toEqual(["activated"]);
   });
 
   it("should only store replacement config when setConfig is called before first mount", () => {
@@ -265,6 +305,49 @@ describe("SubContainerProvider", () => {
     fixture.provider.appendChild(element);
 
     expect(events).toEqual(["activated-first", "activated-second"]);
+  });
+
+  it("should activate all configured entries by default", () => {
+    fixture = createLitProvision();
+
+    const events: Array<string> = [];
+    const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
+    const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
+
+    const element: TestProviderElement = new TestProviderElement();
+
+    new SubContainerProvider(element, {
+      config: {
+        entries: [FirstService, SecondService],
+      },
+    });
+
+    expect(events).toEqual([]);
+
+    fixture.provider.appendChild(element);
+
+    expect(events).toEqual(["activated-first", "activated-second", "provision-first", "provision-second"]);
+  });
+
+  it("should not activate configured entries when activate is false", () => {
+    fixture = createLitProvision();
+
+    const events: Array<string> = [];
+
+    @Injectable()
+    class PlainService {
+      public constructor() {
+        events.push("activate");
+      }
+    }
+
+    const element: TestProviderElement = new TestProviderElement();
+
+    new SubContainerProvider(element, { config: { activate: false, entries: [PlainService] } });
+
+    fixture.provider.appendChild(element);
+
+    expect(events).toEqual([]);
   });
 
   it("should destroy child container on disconnect and recreate it on reconnect", () => {

@@ -11,6 +11,7 @@ import {
   provisionContainer,
   SeedEntries,
   type ProvisionLifecycle,
+  validateContainerConfig,
   WirestateError,
 } from "@wirestate/core";
 
@@ -44,6 +45,10 @@ export interface SubContainerProviderOptions {
 
     /**
      * Services to activate (get from container) immediately after binding.
+     *
+     * @remarks
+     * Defaults to `true`, activating all provided entries. Pass `false` to skip
+     * eager activation, or pass an array to activate specific entries.
      */
     readonly activate?: ContainerActivation;
 
@@ -63,7 +68,8 @@ export interface SubContainerProviderOptions {
  * {@link ContainerContext}. When connected, it creates a child container using
  * the latest parent context, provides it to descendants, destroys it when the
  * host disconnects, runs provider lifecycle hooks while connected, and
- * replaces it whenever the parent container changes.
+ * replaces it whenever the parent container changes. Child containers activate
+ * all provided entries by default unless `activate` is provided explicitly.
  *
  * The context value is only published while the host is connected. Before the
  * first connection and after disconnection, the provider value is `undefined`.
@@ -76,7 +82,6 @@ export interface SubContainerProviderOptions {
  *   private container = new SubContainerProvider(this, {
  *     config: {
  *       entries: [AuthService, UserService],
- *       activate: [AuthService],
  *       seeds: [[AuthService, { role: "admin" }]],
  *     },
  *   });
@@ -106,7 +111,9 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
 
     dbg.info(prefix(__filename), "Constructing:", { host, options });
 
-    this.config = options.config;
+    validateContainerConfig(options.config);
+
+    this.config = { ...options.config, activate: options.config.activate ?? true };
 
     this.consumer = new ContextConsumer(host, {
       context: ContainerContext,
@@ -179,7 +186,9 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
    * @param config - Child-container creation options to use from now on.
    */
   public setConfig(config: SubContainerProviderOptions["config"]): void {
-    this.config = config;
+    validateContainerConfig(config);
+
+    this.config = { ...config, activate: config.activate ?? true };
 
     if (this.host.isConnected && !this.destroyed) {
       this.destroyContainer();

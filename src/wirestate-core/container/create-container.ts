@@ -4,8 +4,6 @@ import { prefix } from "@/macroses/prefix.macro";
 import { Container, Newable, ServiceIdentifier } from "../alias";
 import { bindEntry } from "../bind/bind-entry";
 import { getEntryToken } from "../bind/get-entry-token";
-import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
-import { WirestateError } from "../error/wirestate-error";
 import { applySeeds } from "../seeds/apply-seeds";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 import { AnyObject } from "../types/general";
@@ -13,6 +11,7 @@ import { SeedEntries, SeedsMap } from "../types/initial-state";
 import { InjectableDescriptor } from "../types/provision";
 
 import { createBaseContainer } from "./create-base-container";
+import { validateContainerConfig } from "./validate-container-config";
 import { WireScope } from "./wire-scope";
 
 /**
@@ -114,28 +113,10 @@ export type ContainerConfig = CreateContainerOptions;
 export function createContainer(options: CreateContainerOptions = {}): Container {
   dbg.info(prefix(__filename), "Creating IOC container:", { options });
 
+  validateContainerConfig(options);
+
   const activate: ReadonlyArray<ServiceIdentifier> =
     (options.activate === true ? options.entries?.map(getEntryToken) : options.activate) || [];
-
-  if (activate.length) {
-    if (!options.entries?.length) {
-      throw new WirestateError(
-        ERROR_CODE_VALIDATION_ERROR,
-        "Supplied activation list while entries for binding are not provided."
-      );
-    }
-
-    const entryTokens: ReadonlyArray<ServiceIdentifier> = options.entries.map(getEntryToken);
-
-    for (const eager of activate) {
-      if (!entryTokens.includes(eager)) {
-        throw new WirestateError(
-          ERROR_CODE_VALIDATION_ERROR,
-          `createContainer: '${String(eager)}' is listed in 'activate' but was not provided in 'entries'.`
-        );
-      }
-    }
-  }
 
   const container: Container = new Container({
     defaultScope: "Singleton",

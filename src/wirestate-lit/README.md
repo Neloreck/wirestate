@@ -29,19 +29,24 @@ npm install @wirestate/core @wirestate/lit lit reflect-metadata
 Provides a container to the component tree. It uses Lit Context to propagate the container to child elements.
 
 Pass `container` to expose an existing container, or pass `config` to create and manage one for the host lifecycle.
-Both modes run core provider lifecycle hooks while the host is connected. External containers are deprovisioned on
-disconnect, but they are never disposed by Lit. The provider value is only published while the host is connected;
-before first connect and after disconnect, `ContainerProvider.value` is `undefined`.
+Managed Lit containers activate all provided entries by default; pass `activate: false` to skip eager activation, or pass
+an array to activate only specific entries. Both modes run core provider lifecycle hooks while the host is connected.
+External containers are deprovisioned on disconnect, but they are never disposed by Lit. The provider value is only
+published while the host is connected; before first connect and after disconnect, `ContainerProvider.value` is
+`undefined`.
 
 ```typescript
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { containerProvide, ContainerProvider } from "@wirestate/lit";
 
+import { AuthService, UserService } from "./services";
+
 @customElement("my-app")
 class MyApp extends LitElement {
   @containerProvide({
     config: {
+      entries: [AuthService, UserService],
       seed: { someData: "value" },
     },
   })
@@ -55,7 +60,10 @@ class MyApp extends LitElement {
 
 ### `@subContainerProvide(options)` / `useSubContainerProvider(host, options)`
 
-Creates a managed child container derived from the nearest parent container for the host element's lifetime. The child container is created when the host connects, recreated when the parent container changes, and destroyed when the host disconnects. Before first connect and after disconnect, `SubContainerProvider.value` is `undefined`.
+Creates a managed child container derived from the nearest parent container for the host element's lifetime. The child
+container is created when the host connects, recreated when the parent container changes, and destroyed when the host
+disconnects. Child containers activate all provided entries by default; pass `activate: false` or an array to activate
+only specific entries. Before first connect and after disconnect, `SubContainerProvider.value` is `undefined`.
 
 Using the decorator (accessor):
 
@@ -71,7 +79,6 @@ class MyApp extends LitElement {
   @subContainerProvide({
     config: {
       entries: [AuthService, UserService],
-      activate: [AuthService],
     },
   })
   public containerProvider!: SubContainerProvider;
@@ -90,7 +97,6 @@ class MyApp extends LitElement {
   private container = useSubContainerProvider(this, {
     config: {
       entries: [AuthService, UserService],
-      activate: [AuthService],
     },
   });
 }
@@ -108,7 +114,6 @@ class MyApp extends LitElement {
   private containerProvider: SubContainerProvider = new SubContainerProvider(this, {
     config: {
       entries: [AuthService, UserService],
-      activate: [AuthService],
     },
   });
 }

@@ -118,6 +118,7 @@ describe("Library exported API from wirestate-core", () => {
     "provisionContainer",
     "provisionServices",
     "unapplySeeds",
+    "validateContainerConfig",
   ];
 
   const assertListIntersection = (first: Array<string>, second: Array<string>) => {

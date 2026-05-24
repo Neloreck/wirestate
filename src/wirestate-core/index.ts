@@ -19,6 +19,7 @@ export {
   ContainerConfig,
   CreateContainerOptions,
 } from "./container/create-container";
+export { validateContainerConfig } from "./container/validate-container-config";
 export { WireScope } from "./container/wire-scope";
 
 export { WirestateError } from "./error/wirestate-error";
