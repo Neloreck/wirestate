@@ -15,7 +15,7 @@ npm install @wirestate/core @wirestate/lit lit reflect-metadata
 
 - **Dependency Injection**: Inject services from the IoC container using `@injection` decorator or `useInjection` controller.
 - **Messaging**:
-  - **Events**: Subscribe to events from the global event bus using `@onEvent` or `useOnEvents`.
+  - **Events**: Subscribe to events from the active container's event bus using `@onEvent` or `useOnEvents`.
   - **Commands**: Register command handlers using `@onCommand` or `useOnCommand`.
   - **Queries**: Register query handlers using `@onQuery` or `useOnQuery`.
 - **Container Provisioning**: Provide and manage containers within the Lit component tree using `@containerProvide` or `useContainerProvision`.
