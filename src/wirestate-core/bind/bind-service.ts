@@ -4,9 +4,8 @@ import { prefix } from "@/macroses/prefix.macro";
 import { BindWhenOnFluentSyntax, Container, ServiceIdentifier, type Newable } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { getCommandHandlerMetadata } from "../commands/get-command-handler-metadata";
+import { hasWireScopeInjection } from "../container/has-wire-scope-injection";
 import { WireScope } from "../container/wire-scope";
-import { ERROR_CODE_REFLECT_METADATA_MISSING } from "../error/error-code";
-import { WirestateError } from "../error/wirestate-error";
 import { buildEventDispatcher } from "../events/build-event-dispatcher";
 import { EventBus } from "../events/event-bus";
 import { getQueryHandlerMetadata } from "../queries/get-query-handler-metadata";
@@ -27,10 +26,6 @@ import { InjectableEntries } from "../types/provision";
 import { QueryHandler, QueryUnregister } from "../types/queries";
 
 import { registerContainerEntry } from "./bind-register";
-
-interface ReflectWithMetadata {
-  readonly getMetadata?: (metadataKey: string, target: object) => unknown;
-}
 
 /**
  * Represents options for {@link bindService}.
@@ -420,18 +415,7 @@ function detachCommandUnregister<T extends object>(service: T): void {
  * @param Service - Service constructor.
  */
 function attachWireScopes<T extends object>(service: T, Service: Newable<T>): void {
-  const getMetadata = (Reflect as ReflectWithMetadata).getMetadata;
-
-  if (!getMetadata) {
-    throw new WirestateError(
-      ERROR_CODE_REFLECT_METADATA_MISSING,
-      'reflect-metadata is required for Wirestate service activation. Import "reflect-metadata" once at your application entry point before creating Wirestate containers.'
-    );
-  }
-
-  const paramTypes = getMetadata("design:paramtypes", Service) as Array<unknown> | undefined;
-
-  if (!paramTypes?.some((type) => type === WireScope)) {
+  if (!hasWireScopeInjection(Service, { isRequired: true })) {
     return;
   }
 
@@ -454,7 +438,7 @@ function attachWireScopes<T extends object>(service: T, Service: Newable<T>): vo
  * Marks all injected WireScope instances for this service as disposed and removes
  * the stored references.
  *
- * Todo: Simplify this part..
+ * Todo: Simplify this part.
  *
  * @internal
  *
@@ -469,6 +453,7 @@ function detachWireScopes<T extends object>(service: T): void {
 
   for (const scope of scopes) {
     (scope as { isDisposed: boolean }).isDisposed = true;
+    (scope as { isDeprovisioned: boolean }).isDeprovisioned = true;
     (scope as unknown as { container: Optional<Container> }).container = null;
   }
 

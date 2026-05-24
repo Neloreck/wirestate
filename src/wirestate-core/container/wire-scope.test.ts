@@ -40,6 +40,25 @@ describe("WireScope", () => {
     expect(scope.getContainer()).toBe(container);
   });
 
+  it("should report inactive state after disposal or deprovision", () => {
+    const container: Container = mockContainer();
+    const scope: WireScope = new WireScope(container);
+
+    expect(scope.isInactive).toBe(false);
+
+    (scope as { isDeprovisioned: boolean }).isDeprovisioned = false;
+    expect(scope.isInactive).toBe(false);
+
+    (scope as { isDeprovisioned: boolean }).isDeprovisioned = true;
+    expect(scope.isInactive).toBe(true);
+
+    (scope as { isDeprovisioned: null }).isDeprovisioned = null;
+    expect(scope.isInactive).toBe(false);
+
+    (scope as { isDisposed: boolean }).isDisposed = true;
+    expect(scope.isInactive).toBe(true);
+  });
+
   it("should resolve from container", () => {
     const container: Container = mockContainer();
     const scope: WireScope = new WireScope(container);

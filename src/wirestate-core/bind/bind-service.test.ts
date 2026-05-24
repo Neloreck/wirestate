@@ -78,6 +78,8 @@ describe("bindService", () => {
 
     expect(instance.isActivated).toBe(true);
     expect(instance.scope.isDisposed).toBe(false);
+    expect(instance.scope.isDeprovisioned).toBeNull();
+    expect(instance.scope.isInactive).toBe(false);
 
     // Test event from external source.
     container.get(EventBus).emit("TEST_STRING_EVENT", "string-event-data");
@@ -95,9 +97,12 @@ describe("bindService", () => {
     expect(await container.get(CommandBus).command("TEST_SYNC_COMMAND", 800).task).toBe(1800);
 
     // Test deactivation.
+    (instance.scope as { isDeprovisioned: boolean }).isDeprovisioned = false;
     container.unbind(GenericService);
     expect(instance.isActivated).toBe(false);
     expect(instance.scope.isDisposed).toBe(true);
+    expect(instance.scope.isDeprovisioned).toBe(true);
+    expect(instance.scope.isInactive).toBe(true);
 
     // Verify query handler is removed
     expect(() => container.get(QueryBus).query("TEST_QUERY")).toThrow();
@@ -112,6 +117,7 @@ describe("bindService", () => {
 
     expect(instance.isActivated).toBe(false);
     expect(instance.scope.isDisposed).toBe(false);
+    expect(instance.scope.isInactive).toBe(false);
   });
 
   it("should handle async @OnActivated and catch errors", async () => {
@@ -160,6 +166,7 @@ describe("bindService", () => {
     expect(container.get(QueryBus).query("SYNC_FAIL_DEACTIVATION_QUERY")).toBe("query-response");
     expect(() => container.unbind(SyncFailDeactivationService)).not.toThrow();
     expect(instance.scope.isDisposed).toBe(true);
+    expect(instance.scope.isInactive).toBe(true);
     expect(container.get(QueryBus).has("SYNC_FAIL_DEACTIVATION_QUERY")).toBe(false);
     expect(consoleSpy).toHaveBeenCalledWith(
       "[wirestate] @OnDeactivation failed for:",

@@ -29,10 +29,37 @@ import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 export class WireScope {
   /**
    * Whether the scope was deactivated and disposed from the container.
+   *
+   * @remarks
+   * This becomes `true` after service deactivation, usually when an owned
+   * container is disposed. It remains `false` when only provider ownership ends.
    */
   public readonly isDisposed: boolean = false;
 
+  /**
+   * Whether the scope has been removed from provider ownership.
+   *
+   * @remarks
+   * `null` means the scope has not reached a provider provision cycle yet.
+   * `false` means the scope is currently owned by a provider. `true` means the
+   * provider deprovisioned it.
+   */
+  public readonly isDeprovisioned: Optional<boolean> = null;
+
   public constructor(private readonly container: Optional<Container>) {}
+
+  /**
+   * Whether this scope should stop user work because its service or provider lifecycle ended.
+   *
+   * @remarks
+   * Use this as the default async-work guard. It is `true` when either
+   * {@link isDisposed} is `true` or {@link isDeprovisioned} is `true`.
+   *
+   * @returns True when the scope was disposed or fully deprovisioned.
+   */
+  public get isInactive(): boolean {
+    return this.isDisposed || this.isDeprovisioned === true;
+  }
 
   /**
    * Provides direct access to the underlying Inversify {@link Container}.

@@ -32,6 +32,8 @@ Provides a container to the component tree. It uses Lit Context to propagate the
 Pass `container` to expose an existing container, or pass `config` to create and manage one for the host lifecycle.
 Managed Lit containers activate all provided entries by default; pass `activate: false` to skip eager activation, or pass
 an array to activate only specific entries. Both modes run core provider lifecycle hooks while the host is connected.
+Services that inject `WireScope` also receive provider deprovision state updates, even when they do not declare provider
+lifecycle hooks.
 External containers are deprovisioned on disconnect, but they are never disposed by Lit. The provider value is only
 published while the host is connected; before first connect and after disconnect, `ContainerProvider.value` is
 `undefined`.
@@ -142,6 +144,8 @@ class MyApp extends LitElement {
 
 `@OnProvision` and `@OnDeprovision` run when Lit root or child providers connect, disconnect, or replace a managed child
 container. Import them from `@wirestate/core` so the same service can be used by React and Lit providers.
+Injected `WireScope` instances expose `isDeprovisioned` for provider ownership state and `isInactive` as the usual guard
+for async work that should stop after provider deprovision or service disposal.
 
 ```typescript
 import { Injectable, OnDeprovision, OnProvision } from "@wirestate/core";

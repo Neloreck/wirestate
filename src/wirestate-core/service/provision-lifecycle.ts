@@ -3,7 +3,9 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { BindingType, Container, ServiceIdentifier } from "../alias";
 import { getEntryToken } from "../bind/get-entry-token";
-import { Maybe, MaybePromise } from "../types/general";
+import { hasWireScopeInjection } from "../container/has-wire-scope-injection";
+import { WIRE_SCOPES_BY_SERVICE } from "../registry";
+import { Maybe, MaybePromise, Optional } from "../types/general";
 import { InjectableEntries } from "../types/provision";
 
 import { getDeprovisionHandlerMetadata } from "./on-deprovision";
@@ -73,12 +75,14 @@ export function deprovisionContainer(container: Container, lifecycle: ProvisionL
 }
 
 /**
- * Resolves services that declare provider lifecycle hooks, then calls their provision hook.
+ * Resolves services that declare provider lifecycle hooks or receive WireScope, then calls provision hooks.
  *
  * @remarks
  * Provisioning is intentionally split into two phases: all provider lifecycle
- * services are first resolved so activation completes, then `@OnProvision`
- * hooks run in entry order.
+ * participants are first resolved so activation completes, then `@OnProvision`
+ * hooks run in entry order for services that declare them. Services that inject
+ * `WireScope` participate even without provider hooks so their scope
+ * deprovision state can be tracked.
  *
  * @group Service
  *
@@ -94,14 +98,20 @@ export function provisionServices(container: Container, entries: InjectableEntri
     const token: ServiceIdentifier = getEntryToken(entry);
     const metadataToken: ServiceIdentifier = getProviderLifecycleMetadataToken(entry);
 
-    if (!visited.has(token) && hasProviderLifecycleMetadata(metadataToken)) {
+    if (!visited.has(token) && isProviderLifecycleParticipant(metadataToken)) {
       visited.add(token);
       services.push(container.get(token) as object);
     }
   }
 
   for (const service of services) {
+    markServiceDeprovisionStatus(service, null);
+  }
+
+  for (const service of services) {
     const methodName: Maybe<string | symbol> = getProvisionHandlerMetadata(service);
+
+    markServiceDeprovisionStatus(service, false);
 
     if (methodName) {
       callLifecycleHandler(service, methodName, "@OnProvision");
@@ -125,6 +135,29 @@ export function deprovisionServices(services: ReadonlyArray<object>): void {
     if (methodName) {
       callLifecycleHandler(services[index], methodName, "@OnDeprovision");
     }
+
+    markServiceDeprovisionStatus(services[index], true);
+  }
+}
+
+/**
+ * Marks all scopes injected into a provider lifecycle service with deprovision status.
+ *
+ * @internal
+ *
+ * @param service - Service instance resolved for provider lifecycle.
+ * @param isDeprovisioned - Whether the service has left provider ownership, or null before provision reaches it.
+ */
+function markServiceDeprovisionStatus(service: object, isDeprovisioned: Optional<boolean>): void {
+  const scopes: Maybe<ReadonlyArray<{ readonly isDeprovisioned: boolean | null }>> =
+    WIRE_SCOPES_BY_SERVICE.get(service);
+
+  if (!scopes) {
+    return;
+  }
+
+  for (const scope of scopes) {
+    (scope as { isDeprovisioned: Optional<boolean> }).isDeprovisioned = isDeprovisioned;
   }
 }
 
@@ -145,25 +178,24 @@ function getProviderLifecycleMetadataToken(entry: InjectableEntries[number]): Se
 }
 
 /**
- * Checks whether a service token declares provider lifecycle metadata.
+ * Checks whether a service token should participate in provider lifecycle state.
  *
  * @internal
  *
  * @param token - Entry token to inspect.
- * @returns True when the token is a service constructor with provision or deprovision metadata.
+ * @returns True when the token is a service constructor with provider lifecycle metadata or WireScope injection.
  */
-function hasProviderLifecycleMetadata(token: ServiceIdentifier): boolean {
+function isProviderLifecycleParticipant(token: ServiceIdentifier): boolean {
   if (typeof token !== "function") {
     return false;
   }
 
   const prototype: Maybe<object> = token.prototype as Maybe<object>;
 
-  if (!prototype) {
-    return false;
-  }
-
-  return Boolean(getProvisionHandlerMetadata(prototype) || getDeprovisionHandlerMetadata(prototype));
+  return prototype
+    ? Boolean(getProvisionHandlerMetadata(prototype) || getDeprovisionHandlerMetadata(prototype)) ||
+        hasWireScopeInjection(token)
+    : false;
 }
 
 /**

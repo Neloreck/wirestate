@@ -116,8 +116,9 @@ export class LoggerService {
 ```
 
 Provider lifecycle services are resolved so their hooks can run, even when `activate: false` skips general eager
-activation. Managed providers deprovision before disposing their container; external containers are deprovisioned but
-remain owned by the caller.
+activation. Services that inject `WireScope` also participate so `scope.isDeprovisioned` and `scope.isInactive` reflect
+provider ownership even without provider hooks. Managed providers deprovision before disposing their container;
+external containers are deprovisioned but remain owned by the caller.
 
 ## Injection hooks
 
@@ -252,6 +253,9 @@ Returns the nearest `Container` instance. Useful for advanced manual resolution.
 ### `useScope()`
 
 Returns the current `WireScope` linked to the nearest container.
+
+Use `scope.isInactive` as the usual async guard in services; it becomes `true` after service disposal or provider
+deprovision.
 
 ## Test utilities
 

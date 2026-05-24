@@ -1,4 +1,5 @@
-import { Injectable } from "../../wirestate-core/alias";
+import { Inject, Injectable } from "../../wirestate-core/alias";
+import { WireScope } from "../../wirestate-core/container/wire-scope";
 import { OnActivated } from "../../wirestate-core/service/on-activated";
 import { OnDeactivation } from "../../wirestate-core/service/on-deactivation";
 import { OnDeprovision } from "../../wirestate-core/service/on-deprovision";
@@ -88,6 +89,11 @@ export function createLifecycleService(options: CreateLifecycleServiceOptions = 
       "deprovision",
     ];
     public static readonly EVENTS: Array<string> = events ?? [];
+
+    public constructor(
+      @Inject(WireScope)
+      public readonly scope: WireScope
+    ) {}
 
     @OnActivated()
     public onActivated(): void {

@@ -27,7 +27,8 @@ Services are plain classes decorated with `@Injectable`. Each service may inject
 `@OnActivated` and `@OnDeactivation` methods are invoked during the synchronous Inversify lifecycle. If they return a
 promise, Wirestate does not block container resolution or disposal.
 `@OnProvision` and `@OnDeprovision` methods are invoked by framework providers such as React and Lit when a container
-is attached to or detached from a UI subtree.
+is attached to or detached from a UI subtree. Services that inject `WireScope` also participate in provider
+deprovision state tracking, even when they do not declare provider lifecycle hooks.
 
 ```ts
 import { Injectable, Inject, WireScope } from "@wirestate/core";
@@ -210,29 +211,38 @@ export class PollingService {
 `@OnDeprovision` runs before that provider removes or replaces the container; external containers are not disposed by
 the provider.
 
+Injected `WireScope` instances expose lifecycle state for async guards:
+
+- `scope.isDisposed` becomes `true` after service deactivation.
+- `scope.isDeprovisioned` is `null` before provider provisioning reaches the service, `false` while it is provider-owned, and `true` after provider deprovision.
+- `scope.isInactive` is `true` when either disposal or deprovision ended the service's usable lifecycle.
+
 ## WireScope API
 
 `WireScope` is injected per-service and exposes:
 
-| Method                                    | Description                                                               |
-| ----------------------------------------- |---------------------------------------------------------------------------|
-| `getContainer()`                          | Access the raw IoC container                                              |
-| `resolve(token)`                          | Resolve a service or value by token                                       |
-| `resolveOptional(token)`                  | Resolve a service or value, returns `null` if not bound                   |
-| `getSeed(token?)`                         | Get the per-service or shared seed                                        |
-| `emitEvent(type, payload?, from?)`        | Emit an event                                                             |
-| `subscribeToEvent(handler)`               | Subscribe a handler to all events; returns unsubscribe function           |
-| `unsubscribeFromEvent(handler)`           | Remove a specific event subscription by handler reference                 |
-| `queryData(type, data?)`                  | Dispatch a synchronous query and return the result                        |
-| `queryDataAsync(type, data?)`             | Dispatch a query and return the result as a promise                       |
-| `queryOptionalData(type, data?)`          | Dispatch a synchronous query; returns `null` if no handler is registered  |
-| `queryOptionalDataAsync(type, data?)`     | Dispatch a query as a promise; returns `null` if no handler is registered |
-| `registerQueryHandler(type, handler)`     | Register a query handler; returns unregister function                     |
-| `unregisterQueryHandler(type, handler)`   | Remove a specific query handler by type and reference                     |
-| `executeCommand(type, data?)`             | Dispatch a command and return a descriptor                                |
-| `executeOptionalCommand(type, data?)`     | Dispatch a command; returns `null` if no handler is registered            |
-| `registerCommandHandler(type, handler)`   | Register a command handler; returns unregister function                   |
-| `unregisterCommandHandler(type, handler)` | Remove a specific command handler by type and reference                   |
+| Member                                    | Description                                                                                 |
+| ----------------------------------------- |---------------------------------------------------------------------------------------------|
+| `isDisposed`                              | `true` after service deactivation                                                           |
+| `isDeprovisioned`                         | `null` before provider provisioning, `false` while owned, `true` after provider deprovision |
+| `isInactive`                              | `true` when `isDisposed` or `isDeprovisioned === true`                                      |
+| `getContainer()`                          | Access the raw IoC container                                                                |
+| `resolve(token)`                          | Resolve a service or value by token                                                         |
+| `resolveOptional(token)`                  | Resolve a service or value, returns `null` if not bound                                     |
+| `getSeed(token?)`                         | Get the per-service or shared seed                                                          |
+| `emitEvent(type, payload?, from?)`        | Emit an event                                                                               |
+| `subscribeToEvent(handler)`               | Subscribe a handler to all events; returns unsubscribe function                             |
+| `unsubscribeFromEvent(handler)`           | Remove a specific event subscription by handler reference                                   |
+| `queryData(type, data?)`                  | Dispatch a synchronous query and return the result                                          |
+| `queryDataAsync(type, data?)`             | Dispatch a query and return the result as a promise                                         |
+| `queryOptionalData(type, data?)`          | Dispatch a synchronous query; returns `null` if no handler is registered                    |
+| `queryOptionalDataAsync(type, data?)`     | Dispatch a query as a promise; returns `null` if no handler is registered                   |
+| `registerQueryHandler(type, handler)`     | Register a query handler; returns unregister function                                       |
+| `unregisterQueryHandler(type, handler)`   | Remove a specific query handler by type and reference                                       |
+| `executeCommand(type, data?)`             | Dispatch a command and return a descriptor                                                  |
+| `executeOptionalCommand(type, data?)`     | Dispatch a command; returns `null` if no handler is registered                              |
+| `registerCommandHandler(type, handler)`   | Register a command handler; returns unregister function                                     |
+| `unregisterCommandHandler(type, handler)` | Remove a specific command handler by type and reference                                     |
 
 ## Test utilities
 

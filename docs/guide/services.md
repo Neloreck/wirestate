@@ -77,7 +77,13 @@ export class CartService {
 }
 ```
 
-`WireScope` is only valid between `@OnActivated` and `@OnDeactivation`. Accessing it outside this window throws `WirestateError`.
+`WireScope` container access is only valid between `@OnActivated` and `@OnDeactivation`. Accessing the container after
+deactivation throws `WirestateError`; provider deprovision does not make the scope throw by itself.
+It also exposes lifecycle flags for async guards:
+
+- `scope.isDisposed` becomes `true` after service deactivation.
+- `scope.isDeprovisioned` is `null` before provider provisioning reaches the service, `false` while it is provider-owned, and `true` after provider deprovision.
+- `scope.isInactive` is `true` when the scope is either disposed or deprovisioned.
 
 ## Lifecycle
 
@@ -139,9 +145,10 @@ export class PollingService {
 }
 ```
 
-## Disposing
+## Inactive Scopes
 
-`scope.isDisposed` becomes `true` after deactivation. Check it in async callbacks that may outlive the service.
+Use `scope.isInactive` in async callbacks that may outlive the service or the provider that owns it.
+It covers both service disposal and provider deprovision.
 
 ```ts
 import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
@@ -157,7 +164,7 @@ export class DataService {
   public async onActivated(): Promise<void> {
     const data = await fetch("/api/data").then((r) => r.json());
 
-    if (!this.scope.isDisposed) {
+    if (!this.scope.isInactive) {
       this.data.value = data;
     }
   }
@@ -188,8 +195,12 @@ export class PanelService {
 ```
 
 Provider hooks run only for entries registered through Wirestate binding helpers, including entries passed to
-`createContainer`, `ContainerProvider` `config`, or `SubContainerProvider`. Managed React and Lit containers run
-`@OnDeprovision` before disposal; external containers run provider deprovision without being disposed by the provider.
+`createContainer`, `ContainerProvider` `config`, or `SubContainerProvider`. Services that inject `WireScope` participate
+in provider deprovision state tracking even without `@OnProvision` or `@OnDeprovision`.
+
+Managed React and Lit containers run `@OnDeprovision` before disposal; external containers run provider deprovision
+without being disposed by the provider. During provider provisioning, `scope.isDeprovisioned` resets to `null`, becomes
+`false` when the service reaches provisioning, and becomes `true` after provider deprovision.
 
 ## Circular Dependencies
 
