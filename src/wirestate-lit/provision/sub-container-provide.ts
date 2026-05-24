@@ -31,8 +31,8 @@ export interface SubContainerProviderDecorator<T extends ReactiveElement = React
  *
  * @remarks
  * The child container is created from the current parent context when the host
- * connects, destroyed when it disconnects, and recreated when the parent
- * container changes.
+ * connects, provider lifecycle hooks run while connected, destroyed when it
+ * disconnects, and recreated when the parent container changes.
  *
  * @group Provision
  *

@@ -4,9 +4,13 @@ import {
   Container,
   ContainerActivation,
   createContainer,
+  deprovisionContainer,
+  getContainerEntries,
   InjectableDescriptor,
   Newable,
+  provisionContainer,
   SeedEntries,
+  type ProvisionLifecycle,
 } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -55,7 +59,8 @@ export interface SubContainerProviderOptions {
  * The provider always owns a child container derived from the nearest parent
  * {@link ContainerContext}. When connected, it creates a child container using
  * the latest parent context, provides it to descendants, destroys it when the
- * host disconnects, and replaces it whenever the parent container changes.
+ * host disconnects, runs provider lifecycle hooks while connected, and
+ * replaces it whenever the parent container changes.
  *
  * @group Provision
  *
@@ -76,6 +81,8 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
   extends ContextProvider<typeof ContainerContext, E>
   implements ReactiveController
 {
+  protected readonly lifecycle: ProvisionLifecycle = new Map();
+
   protected readonly consumer: ContextConsumer<typeof ContainerContext, E>;
   protected readonly config: SubContainerProviderOptions["config"];
 
@@ -166,6 +173,8 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
 
     this.destroyed = false;
     this.value = container;
+
+    provisionContainer(container, this.lifecycle, getContainerEntries(container));
   }
 
   /**
@@ -177,6 +186,8 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
         parent: this.parent,
         container: this.value,
       });
+
+      deprovisionContainer(this.value, this.lifecycle);
 
       this.value.unbindAll();
       this.destroyed = true;

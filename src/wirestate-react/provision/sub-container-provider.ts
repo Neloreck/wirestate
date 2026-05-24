@@ -1,16 +1,19 @@
-import { Container, ContainerActivation, createContainer, SeedEntries, InjectableEntries } from "@wirestate/core";
+import {
+  Container,
+  ContainerActivation,
+  createContainer,
+  InjectableEntries,
+  provisionContainer,
+  SeedEntries,
+} from "@wirestate/core";
 import { createElement, type ReactNode, useEffect, useRef, useState } from "react";
 
 import { ContainerReactContext } from "../context/container-context";
 import { useContainer } from "../context/use-container";
-import {
-  provisionContainer,
-  ProvisionLifecycle,
-  retainContainer,
-  scheduleContainerDestruction,
-} from "../services/provision-lifecycle";
 import { AnyObject, Maybe, Optional } from "../types/general";
 import { shallowEqualActivation, shallowEqualArrays, shallowEqualObjects } from "../utils/shallow-equal";
+
+import { ProvisionLifecycle, retainContainer, scheduleContainerDestruction } from "./provision-lifecycle";
 
 /**
  * Child-container inputs controlled by {@link SubContainerProvider}.
@@ -124,7 +127,7 @@ export function SubContainerProvider(props: SubContainerProviderProps) {
     });
 
     retainContainer(activeState.container, lifecycle);
-    provisionContainer(activeState.container, lifecycle, activeState.source.entries);
+    provisionContainer(activeState.container, lifecycle.provisionedServices, activeState.source.entries);
 
     return () => scheduleContainerDestruction(activeState.container, lifecycle);
   }, [activeState]);

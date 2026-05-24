@@ -1,17 +1,20 @@
-import { Container, createContainer, ContainerConfig, getContainerEntries, WirestateError } from "@wirestate/core";
+import {
+  Container,
+  ContainerConfig,
+  createContainer,
+  deprovisionContainer,
+  getContainerEntries,
+  provisionContainer,
+  WirestateError,
+} from "@wirestate/core";
 import { createElement, ReactNode, useEffect, useRef, useState } from "react";
 
 import { ContainerReactContext } from "../context/container-context";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
-import {
-  deprovisionContainer,
-  provisionContainer,
-  ProvisionLifecycle,
-  retainContainer,
-  scheduleContainerDestruction,
-} from "../services/provision-lifecycle";
 import { AnyObject, Maybe, Optional } from "../types/general";
 import { shallowEqualActivation, shallowEqualArrays, shallowEqualObjects } from "../utils/shallow-equal";
+
+import { ProvisionLifecycle, retainContainer, scheduleContainerDestruction } from "./provision-lifecycle";
 
 /**
  * Represents props accepted by {@link ContainerProvider}.
@@ -125,12 +128,12 @@ export function ContainerProvider(props: ContainerProviderProps) {
 
   const needsReplacement: boolean = Boolean(
     state &&
-      normalizedSource &&
-      (state.source.parent !== normalizedSource.parent ||
-        !shallowEqualObjects(state.source.seed, normalizedSource.seed) ||
-        !shallowEqualObjects(state.source.seeds as Maybe<AnyObject>, normalizedSource.seeds as Maybe<AnyObject>) ||
-        !shallowEqualArrays(state.source.entries, normalizedSource.entries) ||
-        !shallowEqualActivation(state.source.activate, normalizedSource.activate))
+    normalizedSource &&
+    (state.source.parent !== normalizedSource.parent ||
+      !shallowEqualObjects(state.source.seed, normalizedSource.seed) ||
+      !shallowEqualObjects(state.source.seeds as Maybe<AnyObject>, normalizedSource.seeds as Maybe<AnyObject>) ||
+      !shallowEqualArrays(state.source.entries, normalizedSource.entries) ||
+      !shallowEqualActivation(state.source.activate, normalizedSource.activate))
   );
 
   let activeState: Optional<ContainerProviderState> = state;
@@ -154,13 +157,13 @@ export function ContainerProvider(props: ContainerProviderProps) {
     } as ProvisionLifecycle);
 
     retainContainer(activeContainer, lifecycle);
-    provisionContainer(activeContainer, lifecycle, activeEntries);
+    provisionContainer(activeContainer, lifecycle.provisionedServices, activeEntries);
 
     return () => {
       if (owned) {
         scheduleContainerDestruction(activeContainer, lifecycle);
       } else {
-        deprovisionContainer(activeContainer, lifecycle);
+        deprovisionContainer(activeContainer, lifecycle.provisionedServices);
       }
     };
   }, [activeContainer, activeEntries, owned]);

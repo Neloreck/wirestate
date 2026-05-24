@@ -1,6 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
-import { BindingType, Container, Injectable, OnActivated, OnDeactivation } from "@wirestate/core";
+import { BindingType, Container, createContainer, Injectable, OnActivated, OnDeactivation } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 import { customElement } from "lit/decorators.js";
 
@@ -111,6 +111,32 @@ describe("ContainerProvider", () => {
     expect(unbindAllSpy).not.toHaveBeenCalled();
   });
 
+  it("should provision and deprovision external containers without disposing them", () => {
+    const element: TestProviderElement = new TestProviderElement();
+    const { LifecycleService, events } = createLifecycleService();
+    const container: Container = createContainer({
+      activate: [LifecycleService],
+      entries: [LifecycleService],
+    });
+    const unbindAllSpy = jest.spyOn(container, "unbindAll");
+
+    expect(events).toEqual(["activated"]);
+
+    new ContainerProvider(element, {
+      container,
+    });
+
+    document.body.appendChild(element);
+
+    expect(events).toEqual(["activated", "provision"]);
+
+    element.remove();
+
+    expect(events).toEqual(["activated", "provision", "deprovision"]);
+    expect(unbindAllSpy).not.toHaveBeenCalled();
+    expect(container.isBound(LifecycleService)).toBe(true);
+  });
+
   it("should create managed container on connect and provide it to child consumers", () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
     const element: TestProviderElement = new TestProviderElement();
@@ -143,6 +169,35 @@ describe("ContainerProvider", () => {
     element.remove();
   });
 
+  it("should provision managed containers and deprovision before disposal", () => {
+    const element: TestProviderElement = new TestProviderElement();
+    const { LifecycleService, events } = createLifecycleService();
+    const controller: ContainerProvider = new ContainerProvider(element, {
+      config: {
+        entries: [LifecycleService],
+      },
+    });
+
+    expect(events).toEqual([]);
+
+    document.body.appendChild(element);
+
+    const firstContainer: Container = controller.value;
+
+    expect(events).toEqual(["activated", "provision"]);
+
+    element.remove();
+
+    expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
+
+    document.body.appendChild(element);
+
+    expect(controller.value).not.toBe(firstContainer);
+    expect(events).toEqual(["activated", "provision", "deprovision", "deactivation", "activated", "provision"]);
+
+    element.remove();
+  });
+
   it("should validate managed activation entries before first connect", () => {
     @Injectable()
     class LifecycleService {}
@@ -162,8 +217,16 @@ describe("ContainerProvider", () => {
 
   it("should activate true descriptor entries before first connect", () => {
     const events: Array<string> = [];
-    const { LifecycleService: DirectService } = createLifecycleService({ suffix: "direct", events });
-    const { LifecycleService: DescriptorService } = createLifecycleService({ suffix: "descriptor", events });
+    const { LifecycleService: DirectService } = createLifecycleService({
+      events,
+      methods: ["activated"],
+      suffix: "direct",
+    });
+    const { LifecycleService: DescriptorService } = createLifecycleService({
+      events,
+      methods: ["activated"],
+      suffix: "descriptor",
+    });
 
     const element: TestProviderElement = new TestProviderElement();
     const controller: ContainerProvider = new ContainerProvider(element, {

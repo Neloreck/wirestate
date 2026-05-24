@@ -81,7 +81,8 @@ export class CartService {
 
 ## Lifecycle
 
-Core lifecycle follows service activation and disposal. React provider lifecycle follows provider commit and removal.
+Core lifecycle follows service activation and disposal. Provider lifecycle follows React or Lit provider attachment and
+removal.
 
 ### @OnActivated
 
@@ -163,15 +164,14 @@ export class DataService {
 }
 ```
 
-## React Provider Lifecycle
+## Provider Lifecycle
 
-React providers also support `@OnProvision` and `@OnDeprovision` from `@wirestate/react`.
-Use them for work tied to a React provider being committed or removed, such as connecting UI-scoped subscriptions that
-should follow a `ContainerProvider` or `SubContainerProvider`.
+React and Lit providers support `@OnProvision` and `@OnDeprovision` from `@wirestate/core`.
+Use them for work tied to a provider being connected, committed, removed, or replaced, such as connecting UI-scoped
+subscriptions that should follow a `ContainerProvider` or `SubContainerProvider`.
 
 ```ts
-import { Injectable } from "@wirestate/core";
-import { OnDeprovision, OnProvision } from "@wirestate/react";
+import { Injectable, OnDeprovision, OnProvision } from "@wirestate/core";
 
 @Injectable()
 export class PanelService {
@@ -188,8 +188,8 @@ export class PanelService {
 ```
 
 Provider hooks run only for entries registered through Wirestate binding helpers, including entries passed to
-`createContainer`, `ContainerProvider` `config`, or `SubContainerProvider`. Managed React containers run
-`@OnDeprovision` before disposal; external containers run provider deprovision without being disposed by React.
+`createContainer`, `ContainerProvider` `config`, or `SubContainerProvider`. Managed React and Lit containers run
+`@OnDeprovision` before disposal; external containers run provider deprovision without being disposed by the provider.
 
 ## Circular Dependencies
 

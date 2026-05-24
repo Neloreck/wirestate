@@ -4,8 +4,12 @@ import {
   Container,
   ContainerConfig,
   createContainer,
+  deprovisionContainer,
+  getContainerEntries,
   getEntryToken,
+  provisionContainer,
   ServiceIdentifier,
+  type ProvisionLifecycle,
   WirestateError,
 } from "@wirestate/core";
 
@@ -31,7 +35,7 @@ export interface ContainerProviderOptions {
    *
    * @remarks
    * External containers are never activated, recreated, or disposed by this
-   * provider.
+   * provider. Provider lifecycle hooks run while the host is connected.
    */
   readonly container?: Container;
 
@@ -53,11 +57,13 @@ export interface ContainerProviderOptions {
  * The provider supports two modes:
  *
  * - External mode: `container` is an existing {@link Container}. The
- *   provider passes it through context and does not alter its lifecycle.
+ *   provider passes it through context, runs provider lifecycle hooks, and
+ *   never disposes it.
  * - Managed mode: `config` is {@link ContainerConfig}. The provider
  *   creates a container during construction without eager activation,
  *   activates configured entries when the host connects, disposes the
- *   container when the host disconnects, and recreates it on reconnect.
+ *   container when the host disconnects, runs provider lifecycle hooks while
+ *   connected, and recreates it on reconnect.
  *
  * @group Provision
  */
@@ -65,6 +71,8 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
   extends ContextProvider<typeof ContainerContext, E>
   implements ReactiveController
 {
+  protected readonly lifecycle: ProvisionLifecycle = new Map();
+
   protected readonly config: Maybe<ContainerConfig>;
 
   protected destroyed: boolean = false;
@@ -152,10 +160,14 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
       }
     }
 
+    provisionContainer(this.value, this.lifecycle, getContainerEntries(this.value));
+
     super.hostConnected();
   }
 
   public hostDisconnected(): void {
+    deprovisionContainer(this.value, this.lifecycle);
+
     if (this.config) {
       dbg.info(prefix(__filename), "Destroying managed container:", {
         container: this.value,

@@ -1,144 +1,84 @@
-import { BindingType, Container, getEntryToken, ServiceIdentifier, InjectableEntries } from "@wirestate/core";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { BindingType, Container, ServiceIdentifier } from "../alias";
+import { getEntryToken } from "../bind/get-entry-token";
 import { Maybe, MaybePromise } from "../types/general";
+import { InjectableEntries } from "../types/provision";
 
 import { getDeprovisionHandlerMetadata } from "./on-deprovision";
 import { getProvisionHandlerMetadata } from "./on-provision";
 
 /**
- * Tracks provider lifecycle state for containers owned by React providers.
+ * Tracks provider lifecycle services by container for framework adapters.
  *
- * @group Provision
- * @internal
+ * @group Service
  */
-export interface ProvisionLifecycle {
-  /**
-   * Containers waiting for delayed destruction after React cleanup.
-   */
-  readonly pendingDestruction: Map<Container, ReturnType<typeof setTimeout>>;
-
-  /**
-   * Services resolved for provider lifecycle hooks by container.
-   */
-  readonly provisionedServices: Map<Container, Array<object>>;
-}
-
-/**
- * Cancels delayed destruction for a container that survived a React effect cleanup.
- *
- * @group Provision
- * @internal
- *
- * @param container - Container to retain.
- * @param lifecycle - Provider lifecycle state.
- */
-export function retainContainer(container: Container, lifecycle: ProvisionLifecycle): void {
-  const timeout: Maybe<ReturnType<typeof setTimeout>> = lifecycle.pendingDestruction.get(container);
-
-  if (timeout) {
-    dbg.info(prefix(__filename), "Retaining container:", { container });
-
-    clearTimeout(timeout);
-    lifecycle.pendingDestruction.delete(container);
-  }
-}
+export type ProvisionLifecycle = Map<Container, Array<object>>;
 
 /**
  * Resolves provider lifecycle services and calls their provision hooks once per provision cycle.
  *
- * @group Provision
- * @internal
+ * @remarks
+ * Framework adapters call this when a container becomes available to a UI
+ * subtree. Lifecycle services are resolved even if the container was not
+ * otherwise eagerly activated, so `@OnActivated` still runs before
+ * `@OnProvision`.
+ *
+ * @group Service
  *
  * @param container - Container that owns the entries.
  * @param lifecycle - Provider lifecycle state.
- * @param entries - Entries controlled by the React provider.
+ * @param entries - Entries controlled by the provider.
  */
 export function provisionContainer(
   container: Container,
   lifecycle: ProvisionLifecycle,
   entries: InjectableEntries = []
 ): void {
-  if (lifecycle.provisionedServices.has(container)) {
+  if (lifecycle.has(container)) {
     return;
   }
 
   const services: Array<object> = provisionServices(container, entries);
 
-  if (services.length) {
-    dbg.info(prefix(__filename), "Provisioning container:", {
-      container,
-      services,
-    });
-  }
+  dbg.info(prefix(__filename), "Provisioning container:", {
+    container,
+    services,
+  });
 
-  lifecycle.provisionedServices.set(container, services);
+  lifecycle.set(container, services);
 }
 
 /**
  * Calls deprovision hooks for services provisioned in the current provision cycle.
  *
- * @group Provision
- * @internal
+ * @group Service
  *
  * @param container - Container being removed from provider ownership.
  * @param lifecycle - Provider lifecycle state.
  */
 export function deprovisionContainer(container: Container, lifecycle: ProvisionLifecycle): void {
-  const services: Maybe<Array<object>> = lifecycle.provisionedServices.get(container);
+  const services: Maybe<Array<object>> = lifecycle.get(container);
 
   if (services) {
-    if (services.length) {
-      dbg.info(prefix(__filename), "Deprovisioning container:", {
-        container,
-        services,
-      });
-    }
+    dbg.info(prefix(__filename), "Deprovisioning container:", {
+      container,
+      services,
+    });
 
     deprovisionServices(services);
-    lifecycle.provisionedServices.delete(container);
+    lifecycle.delete(container);
   }
-}
-
-/**
- * Schedules container disposal after React has had a chance to recommit the same container.
- *
- * @group Provision
- * @internal
- *
- * @param container - Container to dispose if it is not retained.
- * @param lifecycle - Provider lifecycle state.
- */
-export function scheduleContainerDestruction(container: Container, lifecycle: ProvisionLifecycle): void {
-  if (lifecycle.pendingDestruction.has(container)) {
-    return;
-  }
-
-  deprovisionContainer(container, lifecycle);
-
-  dbg.info(prefix(__filename), "Scheduling container destruction:", { container });
-
-  lifecycle.pendingDestruction.set(
-    container,
-    setTimeout(() => {
-      dbg.info(prefix(__filename), "Destroying container:", { container });
-
-      lifecycle.pendingDestruction.delete(container);
-      container.unbindAll();
-    }, 0)
-  );
 }
 
 /**
  * Resolves services that declare provider lifecycle hooks and calls their provision hook.
  *
- * @group Provision
- * @internal
+ * @group Service
  *
  * @param container - Container that owns the entries.
- * @param entries - Entries controlled by the React provider.
+ * @param entries - Entries controlled by the provider.
  * @returns Services that were resolved for provider lifecycle management.
  */
 export function provisionServices(container: Container, entries: InjectableEntries = []): Array<object> {
@@ -169,6 +109,23 @@ export function provisionServices(container: Container, entries: InjectableEntri
 }
 
 /**
+ * Calls deprovision hooks for services previously resolved by {@link provisionServices}.
+ *
+ * @group Service
+ *
+ * @param services - Services resolved during provider provisioning.
+ */
+export function deprovisionServices(services: ReadonlyArray<object>): void {
+  for (let index: number = services.length - 1; index >= 0; index -= 1) {
+    const methodName: Maybe<string | symbol> = getDeprovisionHandlerMetadata(services[index]);
+
+    if (methodName) {
+      callLifecycleHandler(services[index], methodName, "@OnDeprovision");
+    }
+  }
+}
+
+/**
  * Resolves the constructor that can own provider lifecycle metadata.
  *
  * @internal
@@ -182,24 +139,6 @@ function getProviderLifecycleMetadataToken(entry: InjectableEntries[number]): Se
   }
 
   return getEntryToken(entry);
-}
-
-/**
- * Calls deprovision hooks for services previously resolved by {@link provisionServices}.
- *
- * @group Provision
- * @internal
- *
- * @param services - Services resolved during provider provisioning.
- */
-export function deprovisionServices(services: ReadonlyArray<object>): void {
-  for (let index: number = services.length - 1; index >= 0; index -= 1) {
-    const methodName: Maybe<string | symbol> = getDeprovisionHandlerMetadata(services[index]);
-
-    if (methodName) {
-      callLifecycleHandler(services[index], methodName, "@OnDeprovision");
-    }
-  }
 }
 
 /**
@@ -253,7 +192,7 @@ function callLifecycleHandler(service: object, methodName: string | symbol, deco
     if (result && typeof (result as Promise<void>).then === "function") {
       (result as Promise<void>).catch((error) => {
         console.error(
-          `[wirestate-react] ${decoratorName} rejected for:`,
+          "[wirestate] " + decoratorName + " rejected for:",
           service.constructor.name,
           String(methodName),
           error
@@ -261,11 +200,6 @@ function callLifecycleHandler(service: object, methodName: string | symbol, deco
       });
     }
   } catch (error) {
-    console.error(
-      `[wirestate-react] ${decoratorName} failed for:`,
-      service.constructor.name,
-      String(methodName),
-      error
-    );
+    console.error("[wirestate] " + decoratorName + " failed for:", service.constructor.name, String(methodName), error);
   }
 }

@@ -1,21 +1,24 @@
-import { WirestateError } from "@wirestate/core";
+import { dbg } from "@/macroses/dbg.macro";
+import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
+import { PROVISION_HANDLER_METADATA } from "../registry";
 import { Maybe } from "../types/general";
 
-const PROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakMap();
-
 /**
- * Decorator for methods that should run when a React provider is committed.
+ * Decorator for service methods that should run when a framework provider exposes the service's container.
  *
  * @remarks
- * The decorator only records the method name. Provider code retrieves that
- * metadata internally and invokes the method after React commits the provider.
+ * Provider adapters call `@OnProvision` when a container is attached to a UI
+ * subtree, for example by React or Lit `ContainerProvider` and
+ * `SubContainerProvider` implementations. Use it for setup tied to provider
+ * presence rather than container/service activation.
  *
- * A class may declare only one provision hook name. If a base class declares
- * one, subclasses may override and redecorate that same method name.
+ * A service class may declare only one provision hook name. If a base class
+ * declares one, subclasses may override and redecorate that same method name.
  *
- * @group Provision
+ * @group Service
  *
  * @returns A method decorator function.
  *
@@ -24,13 +27,20 @@ const PROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakMap
  * class SomeService {
  *   @OnProvision()
  *   public onProvision(): void {
- *     // provider committed
+ *     // container is provided to a framework subtree
  *   }
  * }
  * ```
  */
 export function OnProvision(): MethodDecorator {
   return (target, propertyKey) => {
+    dbg.info(prefix(__filename), "Attaching OnProvision metadata:", {
+      name: (target as object).constructor.name,
+      propertyKey,
+      target,
+      constructor: (target as object).constructor,
+    });
+
     const constructor = (target as object).constructor;
 
     if (PROVISION_HANDLER_METADATA.has(constructor)) {
@@ -48,18 +58,20 @@ export function OnProvision(): MethodDecorator {
  * Retrieves the method decorated with {@link OnProvision} by traversing the prototype chain.
  *
  * @remarks
- * A provider hierarchy may declare one provision hook name. Subclasses can
+ * A service hierarchy may declare one provision hook name. Subclasses can
  * override a decorated base method and may redecorate that same method name;
  * declaring a different decorated method in the same hierarchy is a validation
  * error.
  *
- * @group Provision
+ * @group Service
  * @internal
  *
- * @param instance - The provider instance to scan for provision handlers.
+ * @param instance - The service instance to scan for provision handlers.
  * @returns The method name, or `null` when no hook exists.
  */
 export function getProvisionHandlerMetadata(instance: object): Maybe<string | symbol> {
+  dbg.info(prefix(__filename), "Resolving OnProvision metadata:", { name: instance.constructor.name, instance });
+
   let constructor: unknown = instance.constructor;
   let handler: Maybe<string | symbol> = null;
   let ownerName: Maybe<string> = null;
@@ -82,6 +94,13 @@ export function getProvisionHandlerMetadata(instance: object): Maybe<string | sy
 
     constructor = Object.getPrototypeOf(constructor);
   }
+
+  dbg.info(prefix(__filename), "Resolved OnProvision metadata:", {
+    name: instance.constructor.name,
+    handler,
+    ownerName,
+    instance,
+  });
 
   return handler;
 }

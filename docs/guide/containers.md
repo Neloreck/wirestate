@@ -61,9 +61,9 @@ provided entries by default; pass `activate: false` to skip core eager activatio
 specific entries.
 
 React provider lifecycle hooks are separate from eager activation. Services decorated with `@OnProvision` or
-`@OnDeprovision` are resolved when the provider commits so their provider hooks can run, even when `activate: false` is
-used. Managed containers are deprovisioned before disposal; external containers are deprovisioned when the provider
-unmounts or switches containers, but the provider never calls `unbindAll()` for them.
+`@OnDeprovision` from `@wirestate/core` are resolved when the provider commits so their provider hooks can run, even
+when `activate: false` is used. Managed containers are deprovisioned before disposal; external containers are
+deprovisioned when the provider unmounts or switches containers, but the provider never calls `unbindAll()` for them.
 
 For a globally declared container outside the React rendering tree, use a prebuilt container:
 
@@ -156,6 +156,7 @@ Provide a root container to a Lit subtree.
 
 - Pass `container` to expose an existing container
 - Pass `config` to create a managed container for the host lifecycle
+- Lit providers run `@OnProvision` while connected and `@OnDeprovision` before disconnect cleanup
 
 ```ts
 import { LitElement } from "lit";
@@ -184,6 +185,7 @@ Create a managed child container derived from the nearest parent container conte
 - The child container inherits parent bindings through the container hierarchy
 - The child container is recreated when the parent container changes
 - The child container is destroyed when the host disconnects
+- The child container is deprovisioned before it is destroyed
 
 ```ts
 import { LitElement } from "lit";

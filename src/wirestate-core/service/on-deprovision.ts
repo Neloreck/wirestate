@@ -1,22 +1,24 @@
-import { WirestateError } from "@wirestate/core";
+import { dbg } from "@/macroses/dbg.macro";
+import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
+import { DEPROVISION_HANDLER_METADATA } from "../registry";
 import { Maybe } from "../types/general";
 
-const DEPROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakMap();
-
 /**
- * Decorator for methods that should run when a React provider is deprovisioned.
+ * Decorator for service methods that should run before a framework provider stops exposing the service's container.
  *
  * @remarks
- * The decorator only records the method name. Provider code retrieves that
- * metadata internally and invokes the method when the committed provider is
- * replaced or removed.
+ * Provider adapters call `@OnDeprovision` when a container is detached from a
+ * UI subtree, for example by React or Lit `ContainerProvider` and
+ * `SubContainerProvider` implementations. Use it to clean up work started by
+ * `@OnProvision`.
  *
- * A class may declare only one deprovision hook name. If a base class declares
- * one, subclasses may override and redecorate that same method name.
+ * A service class may declare only one deprovision hook name. If a base class
+ * declares one, subclasses may override and redecorate that same method name.
  *
- * @group Provision
+ * @group Service
  *
  * @returns A method decorator function.
  *
@@ -25,13 +27,20 @@ const DEPROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakM
  * class SomeService {
  *   @OnDeprovision()
  *   public onDeprovision(): void {
- *     // provider removed
+ *     // container is no longer provided to a framework subtree
  *   }
  * }
  * ```
  */
 export function OnDeprovision(): MethodDecorator {
   return (target, propertyKey) => {
+    dbg.info(prefix(__filename), "Attaching OnDeprovision metadata:", {
+      name: (target as object).constructor.name,
+      propertyKey,
+      target,
+      constructor: (target as object).constructor,
+    });
+
     const constructor = (target as object).constructor;
 
     if (DEPROVISION_HANDLER_METADATA.has(constructor)) {
@@ -49,18 +58,20 @@ export function OnDeprovision(): MethodDecorator {
  * Retrieves the method decorated with {@link OnDeprovision} by traversing the prototype chain.
  *
  * @remarks
- * A provider hierarchy may declare one deprovision hook name. Subclasses can
+ * A service hierarchy may declare one deprovision hook name. Subclasses can
  * override a decorated base method and may redecorate that same method name;
  * declaring a different decorated method in the same hierarchy is a validation
  * error.
  *
- * @group Provision
+ * @group Service
  * @internal
  *
- * @param instance - The provider instance to scan for deprovision handlers.
+ * @param instance - The service instance to scan for deprovision handlers.
  * @returns The method name, or `null` when no hook exists.
  */
 export function getDeprovisionHandlerMetadata(instance: object): Maybe<string | symbol> {
+  dbg.info(prefix(__filename), "Resolving OnDeprovision metadata:", { name: instance.constructor.name, instance });
+
   let constructor: unknown = instance.constructor;
   let handler: Maybe<string | symbol> = null;
   let ownerName: Maybe<string> = null;
@@ -83,6 +94,13 @@ export function getDeprovisionHandlerMetadata(instance: object): Maybe<string | 
 
     constructor = Object.getPrototypeOf(constructor);
   }
+
+  dbg.info(prefix(__filename), "Resolved OnDeprovision metadata:", {
+    name: instance.constructor.name,
+    handler,
+    ownerName,
+    instance,
+  });
 
   return handler;
 }

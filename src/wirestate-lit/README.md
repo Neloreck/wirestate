@@ -29,6 +29,8 @@ npm install @wirestate/core @wirestate/lit lit reflect-metadata
 Provides a container to the component tree. It uses Lit Context to propagate the container to child elements.
 
 Pass `container` to expose an existing container, or pass `config` to create and manage one for the host lifecycle.
+Both modes run core provider lifecycle hooks while the host is connected. External containers are deprovisioned on
+disconnect, but they are never disposed by Lit.
 
 ```typescript
 import { LitElement, html } from "lit";
@@ -126,6 +128,28 @@ class MyApp extends LitElement {
       seeds: [[AuthService, { role: "admin" }]],
     },
   });
+}
+```
+
+## Provider lifecycle
+
+`@OnProvision` and `@OnDeprovision` run when Lit root or child providers connect, disconnect, or replace a managed child
+container. Import them from `@wirestate/core` so the same service can be used by React and Lit providers.
+
+```typescript
+import { Injectable, OnDeprovision, OnProvision } from "@wirestate/core";
+
+@Injectable()
+export class PanelService {
+  @OnProvision()
+  public onProvision(): void {
+    // provider connected
+  }
+
+  @OnDeprovision()
+  public onDeprovision(): void {
+    // provider disconnected or replaced
+  }
 }
 ```
 

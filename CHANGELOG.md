@@ -26,7 +26,7 @@
 - `IocProvider`: Removed
 - `ContainerProvider`: Split React props into external `container` and managed `config`, activate managed entries by default, and provision registered provider lifecycle services
 - `SubContainerProvider`: Added component solving problems of removed `createInjectablesProvider`; child providers activate entries by default and support `activate` overrides
-- `OnProvision` / `OnDeprovision`: Added React provider lifecycle decorators for services that need provider commit/removal hooks
+- `OnProvision` / `OnDeprovision`: UI lib rendering lifecycle separated from IOC lifecycle
 - Replace IoC-context provision APIs with `ContainerContext`, `containerProvide`, `ContainerProvider`, and `useContainerProvision`
 - Replace injectables-provider APIs with `subContainerProvide`, `SubContainerProvider`, and `useSubContainerProvider`
 - Provide plain `Container` values through Lit context instead of wrapper objects

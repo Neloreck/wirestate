@@ -1,8 +1,8 @@
 import { Injectable } from "../../wirestate-core/alias";
 import { OnActivated } from "../../wirestate-core/service/on-activated";
 import { OnDeactivation } from "../../wirestate-core/service/on-deactivation";
-import { OnDeprovision } from "../../wirestate-react/services/on-deprovision";
-import { OnProvision } from "../../wirestate-react/services/on-provision";
+import { OnDeprovision } from "../../wirestate-core/service/on-deprovision";
+import { OnProvision } from "../../wirestate-core/service/on-provision";
 
 /**
  * Lifecycle callback names supported by {@link createLifecycleService}.
@@ -62,9 +62,8 @@ export interface CreateLifecycleServiceOptions {
  * {@link CreateLifecycleServiceOptions.events} when multiple generated classes
  * should write to one shared log.
  *
- * Provision and deprovision hooks come from React provider lifecycle
- * decorators. Activation and deactivation hooks come from core service
- * lifecycle decorators.
+ * Provision, deprovision, activation, and deactivation hooks come from core
+ * service lifecycle decorators.
  *
  * @internal
  *

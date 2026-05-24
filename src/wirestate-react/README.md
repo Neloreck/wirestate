@@ -96,10 +96,10 @@ export function CounterPage() {
 
 `@OnProvision` and `@OnDeprovision` run when a React provider commits, unmounts, or replaces its container.
 They are useful for services that need UI-scoped setup separate from core `@OnActivated` / `@OnDeactivation`.
+Import them from `@wirestate/core` for services shared across React and Lit.
 
 ```ts
-import { Injectable } from "@wirestate/core";
-import { OnDeprovision, OnProvision } from "@wirestate/react";
+import { Injectable, OnDeprovision, OnProvision } from "@wirestate/core";
 
 @Injectable()
 export class LoggerService {

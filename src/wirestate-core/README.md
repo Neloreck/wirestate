@@ -5,7 +5,8 @@
 
 Core package for Wirestate.
 Provides the DI container, service primitives, and event/command/query buses.
-React integration is in [`@wirestate/react`](https://www.npmjs.com/package/@wirestate/react).
+React integration is in [`@wirestate/react`](https://www.npmjs.com/package/@wirestate/react), and Lit integration is
+in [`@wirestate/lit`](https://www.npmjs.com/package/@wirestate/lit).
 
 ## Installation
 
@@ -25,6 +26,8 @@ Services are plain classes decorated with `@Injectable`. Each service may inject
 
 `@OnActivated` and `@OnDeactivation` methods are invoked during the synchronous Inversify lifecycle. If they return a
 promise, Wirestate does not block container resolution or disposal.
+`@OnProvision` and `@OnDeprovision` methods are invoked by framework providers such as React and Lit when a container
+is attached to or detached from a UI subtree.
 
 ```ts
 import { Injectable, Inject, WireScope } from "@wirestate/core";
@@ -171,11 +174,12 @@ seeds to `createContainer` or apply them before services are activated.
 ## Lifecycle
 
 ```ts
-import { OnActivated, OnDeactivation } from "@wirestate/core";
+import { OnActivated, OnDeactivation, OnDeprovision, OnProvision } from "@wirestate/core";
 
 @Injectable()
 export class PollingService {
   private timer?: ReturnType<typeof setInterval>;
+  private ubsubscribe?: () => void;
 
   @OnActivated()
   public onActivated(): void {
@@ -186,11 +190,25 @@ export class PollingService {
   public onDeactivation(): void {
     clearInterval(this.timer);
   }
+
+  @OnProvision()
+  public onProvision(): void {
+    this.ubsubscribe = connectToProviderScopedResource();
+  }
+
+  @OnDeprovision()
+  public onDeprovision(): void {
+    this.ubsubscribe?.();
+    this.ubsubscribe = undefined;
+  }
 }
 ```
 
 `@OnActivated` runs after the service is bound and all dependencies are resolved.
 `@OnDeactivation` runs when the container scope is disposed.
+`@OnProvision` runs when a React or Lit provider exposes the container to a subtree.
+`@OnDeprovision` runs before that provider removes or replaces the container; external containers are not disposed by
+the provider.
 
 ## WireScope API
 

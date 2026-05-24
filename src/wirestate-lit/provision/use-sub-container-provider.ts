@@ -8,7 +8,8 @@ import { SubContainerProvider, SubContainerProviderOptions } from "./sub-contain
  * @remarks
  * The child container is derived from the current parent
  * {@link ContainerContext}, recreated when that parent context changes, and
- * destroyed when the host disconnects.
+ * destroyed when the host disconnects. Provider lifecycle hooks run while the
+ * child container is connected.
  *
  * @group Provision
  *
