@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/react",
-  "version": "0.7.0-experimental.6",
+  "version": "0.7.0-experimental.7",
   "description": "React alias and adapters for wirestate",
   "sideEffects": false,
   "author": "Syrotenko Igor",
@@ -57,7 +57,7 @@
   ],
   "dependencies": {},
   "peerDependencies": {
-    "@wirestate/core": ">=0.7.0-experimental.6",
+    "@wirestate/core": ">=0.7.0-experimental.7",
     "react": ">=16.8.0 <20.0.0",
     "reflect-metadata": ">=0.2.0",
     "tslib": ">=2.5.0"
