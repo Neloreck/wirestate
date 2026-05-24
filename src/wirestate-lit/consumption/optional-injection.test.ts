@@ -141,6 +141,50 @@ describe("optionalInjection", () => {
     expect(element.value).toBe("options-fallback");
   });
 
+  it("should use separate fallback parameter with options object", () => {
+    const container: Container = mockContainer();
+    const token: ServiceIdentifier<string> = Symbol("optional-token");
+
+    fixture = createLitProvision(container);
+
+    @customElement("test-optional-injection-options-parameter-fallback-element")
+    class TestOptionsParameterFallbackElement extends ReactiveElement {
+      @optionalInjection({ injectionId: token }, () => 30)
+      public value: string | number = 0;
+    }
+
+    const element: TestOptionsParameterFallbackElement = new TestOptionsParameterFallbackElement();
+
+    fixture.provider.appendChild(element);
+
+    expect(element.value).toBe(30);
+  });
+
+  it("should prefer options fallback over separate fallback parameter", () => {
+    const container: Container = mockContainer();
+    const token: ServiceIdentifier<string> = Symbol("optional-token");
+
+    fixture = createLitProvision(container);
+
+    @customElement("test-optional-injection-options-fallback-priority-element")
+    class TestOptionsFallbackPriorityElement extends ReactiveElement {
+      @optionalInjection(
+        {
+          injectionId: token,
+          onFallback: () => "options-fallback",
+        },
+        () => "parameter-fallback"
+      )
+      public value: Optional<string> = null;
+    }
+
+    const element: TestOptionsFallbackPriorityElement = new TestOptionsFallbackPriorityElement();
+
+    fixture.provider.appendChild(element);
+
+    expect(element.value).toBe("options-fallback");
+  });
+
   it("should type fallback values from options object separately from injection values", () => {
     const container: Container = mockContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
