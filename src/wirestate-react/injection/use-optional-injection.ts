@@ -5,7 +5,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { useContainer } from "../context/use-container";
-import { AnyObject, Optional } from "../types/general";
+import { AnyObject } from "../types/general";
 
 /**
  * Safely resolves a value from the container, returning a fallback or null if not bound.
@@ -17,21 +17,22 @@ import { AnyObject, Optional } from "../types/general";
  * @group Injection
  *
  * @template T - The type of the value being resolved.
+ * @template F - The type returned by the fallback function.
  *
  * @param injectionId - The service identifier (string, symbol, or constructor).
  * @param onFallback - Optional function called to provide a value if the token is not bound.
  *
- * @returns The resolved value, the result of the fallback function, or `null`.
+ * @returns The resolved value, the result of the fallback function, or `null` when no fallback is provided.
  *
  * @example
  * ```tsx
  * const logger = useOptionalInjection(FileLogger, (container) => container.get(ConsoleLoggerService));
  * ```
  */
-export function useOptionalInjection<T>(
+export function useOptionalInjection<T, F = null>(
   injectionId: ServiceIdentifier<T>,
-  onFallback?: (container: Container) => T
-): Optional<T> {
+  onFallback?: (container: Container) => F
+): T | F {
   const container: Container = useContainer();
 
   // Revision bump forces a container reset; force re-resolution to drop stale instances.
@@ -62,7 +63,7 @@ export function useOptionalInjection<T>(
         onFallback,
       });
 
-      return null;
+      return null as F;
     }
   }, [container, injectionId]);
 }

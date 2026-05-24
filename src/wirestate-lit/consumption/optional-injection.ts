@@ -15,9 +15,9 @@ import type { OptionalInjectionFallback } from "./use-optional-injection";
  *
  * @group Consumption
  */
-export interface OptionalInjectionDecorator<T> {
+export interface OptionalInjectionDecorator<T, F = null> {
   // Standard:
-  <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V extends Optional<T>>(
+  <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V extends T | F>(
     value: ClassAccessorDecoratorTarget<C, V>,
     context: ClassAccessorDecoratorContext<C, V>
   ): void;
@@ -25,7 +25,7 @@ export interface OptionalInjectionDecorator<T> {
   <K extends PropertyKey, Proto extends Interface<Omit<ReactiveElement, "renderRoot">>>(
     protoOrDescriptor: Proto,
     name?: K
-  ): FieldMustMatchProvidedType<Proto, K, Optional<T>>;
+  ): FieldMustMatchProvidedType<Proto, K, T | F>;
 }
 
 /**
@@ -33,7 +33,7 @@ export interface OptionalInjectionDecorator<T> {
  *
  * @group Consumption
  */
-export interface OptionalInjectionOptions<T> {
+export interface OptionalInjectionOptions<T, F = null> {
   /**
    * The service identifier to inject.
    */
@@ -49,7 +49,7 @@ export interface OptionalInjectionOptions<T> {
   /**
    * Provides a value when the service identifier is not bound.
    */
-  onFallback?: OptionalInjectionFallback<T>;
+  onFallback?: OptionalInjectionFallback<F>;
 }
 
 /**
@@ -60,6 +60,9 @@ export interface OptionalInjectionOptions<T> {
  * is missing from the container and no fallback is provided.
  *
  * @group Consumption
+ *
+ * @template T - The type of the value being resolved.
+ * @template F - The type returned by the fallback function.
  *
  * @param optionsOrInjectionId - Injection options or service identifier.
  * @param onFallback - Optional function called to provide a value if the token is not bound.
@@ -73,28 +76,28 @@ export interface OptionalInjectionOptions<T> {
  * }
  * ```
  */
-export function optionalInjection<T>(
-  optionsOrInjectionId: OptionalInjectionOptions<T> | ServiceIdentifier<T>,
-  onFallback?: OptionalInjectionFallback<T>
-): OptionalInjectionDecorator<T> {
-  const options: OptionalInjectionOptions<T> =
+export function optionalInjection<T, F = null>(
+  optionsOrInjectionId: OptionalInjectionOptions<T, F> | ServiceIdentifier<T>,
+  onFallback?: OptionalInjectionFallback<F>
+): OptionalInjectionDecorator<T, F> {
+  const options: OptionalInjectionOptions<T, F> =
     typeof optionsOrInjectionId === "object" && optionsOrInjectionId !== null && "injectionId" in optionsOrInjectionId
       ? optionsOrInjectionId
       : { injectionId: optionsOrInjectionId as ServiceIdentifier<T>, onFallback };
 
   return ((
-    protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, Optional<T>>,
-    nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, Optional<T>>
+    protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, T | F>,
+    nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, T | F>
   ): void => {
     const { injectionId, once } = options;
-    const fallback: Optional<OptionalInjectionFallback<T>> = options.onFallback ?? onFallback ?? null;
+    const fallback: Optional<OptionalInjectionFallback<F>> = options.onFallback ?? onFallback ?? null;
 
-    const resolve = (container: Container): Optional<T> => {
+    const resolve = (container: Container): T | F => {
       if (container.isBound(injectionId)) {
         return container.get(injectionId);
       }
 
-      return fallback ? fallback(container) : null;
+      return fallback ? fallback(container) : (null as F);
     };
 
     // Standard decorators branch.
@@ -120,5 +123,5 @@ export function optionalInjection<T>(
         });
       });
     }
-  }) as OptionalInjectionDecorator<T>;
+  }) as OptionalInjectionDecorator<T, F>;
 }

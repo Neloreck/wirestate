@@ -57,6 +57,21 @@ describe("useOptionalInjection", () => {
     expect(getByTestId("result").textContent).toBe("fallback-value");
   });
 
+  it("should type fallback values separately from injection values", () => {
+    const container: Container = mockContainer();
+    const token: ServiceIdentifier<string> = Symbol("optional-token");
+
+    function FallbackComponent() {
+      const data: string | number = useOptionalInjection(token, () => 10);
+
+      return <div data-testid={"result"}>{data}</div>;
+    }
+
+    const { getByTestId } = render(withContainerProvider(<FallbackComponent />, container));
+
+    expect(getByTestId("result").textContent).toBe("10");
+  });
+
   it("should provide container to onFallback", () => {
     const container: Container = mockContainer();
     const unboundToken: unique symbol = Symbol("unbound-token");

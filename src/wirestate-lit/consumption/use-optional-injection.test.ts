@@ -73,6 +73,26 @@ describe("useOptionalInjection", () => {
     expect(element.data.value).toBe("fallback-value");
   });
 
+  it("should type fallback values separately from injection values", () => {
+    const container: Container = mockContainer();
+    const token: ServiceIdentifier<string> = Symbol("optional-token");
+
+    fixture = createLitProvision(container);
+
+    @customElement("test-use-optional-injection-typed-fallback-element")
+    class TestTypedFallbackElement extends ReactiveElement {
+      public data = useOptionalInjection(this, token, () => 10);
+    }
+
+    const element = new TestTypedFallbackElement();
+    const value: string | number = element.data.value;
+
+    fixture.provider.appendChild(element);
+
+    expect(value).toBeNull();
+    expect(element.data.value).toBe(10);
+  });
+
   it("should provide container to onFallback", () => {
     const container: Container = mockContainer();
     const unboundToken: unique symbol = Symbol("unbound-token");
@@ -113,6 +133,29 @@ describe("useOptionalInjection", () => {
     fixture.provider.appendChild(element);
 
     expect(element.data.value).toBe("options-fallback");
+  });
+
+  it("should type fallback values from options object separately from injection values", () => {
+    const container: Container = mockContainer();
+    const token: ServiceIdentifier<string> = Symbol("optional-token");
+
+    fixture = createLitProvision(container);
+
+    @customElement("test-use-optional-injection-typed-options-element")
+    class TestTypedOptionsElement extends ReactiveElement {
+      public data = useOptionalInjection(this, {
+        injectionId: token,
+        onFallback: () => 20,
+      });
+    }
+
+    const element = new TestTypedOptionsElement();
+    const value: string | number = element.data.value;
+
+    fixture.provider.appendChild(element);
+
+    expect(value).toBeNull();
+    expect(element.data.value).toBe(20);
   });
 
   it("should expose initial value until context resolves", () => {

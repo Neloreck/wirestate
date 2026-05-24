@@ -20,7 +20,7 @@ export type OptionalInjectionFallback<T> = (container: Container) => T;
  *
  * @group Consumption
  */
-export interface UseOptionalInjectionOptions<T> {
+export interface UseOptionalInjectionOptions<T, F = null> {
   /**
    * Resolve only the first context value.
    *
@@ -32,7 +32,7 @@ export interface UseOptionalInjectionOptions<T> {
   /**
    * Initial value before the service is fetched.
    */
-  value?: Optional<T>;
+  value?: T | F;
   /**
    * The service identifier to inject.
    */
@@ -40,7 +40,7 @@ export interface UseOptionalInjectionOptions<T> {
   /**
    * Provides a value when the service identifier is not bound.
    */
-  onFallback?: OptionalInjectionFallback<T>;
+  onFallback?: OptionalInjectionFallback<F>;
 }
 
 /**
@@ -48,7 +48,7 @@ export interface UseOptionalInjectionOptions<T> {
  *
  * @group Consumption
  */
-export interface UseOptionalInjectionValue<T> {
+export interface UseOptionalInjectionValue<T, F = null> {
   /**
    * The service identifier used for injection.
    */
@@ -56,7 +56,7 @@ export interface UseOptionalInjectionValue<T> {
   /**
    * The injected service instance, fallback value, or `null`.
    */
-  value: Optional<T>;
+  value: T | F;
 }
 
 /**
@@ -67,6 +67,9 @@ export interface UseOptionalInjectionValue<T> {
  * is missing from the container.
  *
  * @group Consumption
+ *
+ * @template T - The type of the value being resolved.
+ * @template F - The type returned by the fallback function.
  *
  * @param host - The host element.
  * @param optionsOrInjectionId - Injection options or service identifier.
@@ -84,18 +87,18 @@ export interface UseOptionalInjectionValue<T> {
  * }
  * ```
  */
-export function useOptionalInjection<T>(
+export function useOptionalInjection<T, F = null>(
   host: ReactiveControllerHost & HTMLElement,
-  optionsOrInjectionId: UseOptionalInjectionOptions<T> | ServiceIdentifier<T>,
-  onFallback?: OptionalInjectionFallback<T>
-): UseOptionalInjectionValue<T> {
-  const options: UseOptionalInjectionOptions<T> =
+  optionsOrInjectionId: UseOptionalInjectionOptions<T, F> | ServiceIdentifier<T>,
+  onFallback?: OptionalInjectionFallback<F>
+): UseOptionalInjectionValue<T, F> {
+  const options: UseOptionalInjectionOptions<T, F> =
     typeof optionsOrInjectionId === "object" && optionsOrInjectionId !== null && "injectionId" in optionsOrInjectionId
       ? optionsOrInjectionId
       : { injectionId: optionsOrInjectionId as ServiceIdentifier<T>, onFallback };
 
   const { injectionId, once, value } = options;
-  const fallback: Optional<OptionalInjectionFallback<T>> = options.onFallback ?? onFallback ?? null;
+  const fallback: Optional<OptionalInjectionFallback<F>> = options.onFallback ?? onFallback ?? null;
 
   dbg.info(prefix(__filename), "Creating:", {
     host,
@@ -103,7 +106,10 @@ export function useOptionalInjection<T>(
     injectionId,
   });
 
-  const current: UseOptionalInjectionValue<T> = { value: value ?? null, injectionId };
+  const current: UseOptionalInjectionValue<T, F> = {
+    value: (value === undefined ? null : value) as T | F,
+    injectionId,
+  };
 
   new ContextConsumer(host, {
     context: ContainerContext,
@@ -135,7 +141,7 @@ export function useOptionalInjection<T>(
           onFallback: fallback,
         });
 
-        current.value = null;
+        current.value = null as F;
       }
     },
   });
