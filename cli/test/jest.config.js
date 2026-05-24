@@ -4,8 +4,10 @@ module.exports = {
   coveragePathIgnorePatterns: ["/node_modules/", "/fixtures/", "/types/", "/examples/", "/target/", "/__tests__/"],
   collectCoverage: true,
   coverageDirectory: "<rootDir>/target/coverage",
+  coverageReporters: ["json", "lcov", "clover"],
   setupFilesAfterEnv: [path.resolve(__dirname, "setup_tests.js")],
   rootDir: "../..",
+  roots: ["<rootDir>/cli", "<rootDir>/src"],
   transform: {
     "^.+\\.[t|j]sx?$": ["babel-jest", { configFile: path.resolve(__dirname, "babel.test.config.js") }],
   },
