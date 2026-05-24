@@ -11,12 +11,14 @@ import {
   provisionContainer,
   SeedEntries,
   type ProvisionLifecycle,
+  WirestateError,
 } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { ContainerContext } from "../context/container-context";
+import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { Maybe } from "../types/general";
 
 /**
@@ -31,7 +33,8 @@ export interface SubContainerProviderOptions {
    * @remarks
    * The child container is created from the current parent context when the
    * host connects, destroyed when the host disconnects, and recreated when the
-   * parent context changes or the host reconnects.
+   * parent context changes or the host reconnects. The provider value is
+   * `undefined` while the host is disconnected.
    */
   readonly config: {
     /**
@@ -62,6 +65,9 @@ export interface SubContainerProviderOptions {
  * host disconnects, runs provider lifecycle hooks while connected, and
  * replaces it whenever the parent container changes.
  *
+ * The context value is only published while the host is connected. Before the
+ * first connection and after disconnection, the provider value is `undefined`.
+ *
  * @group Provision
  *
  * @example
@@ -84,7 +90,7 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
   protected readonly lifecycle: ProvisionLifecycle = new Map();
 
   protected readonly consumer: ContextConsumer<typeof ContainerContext, E>;
-  protected readonly config: SubContainerProviderOptions["config"];
+  protected config: SubContainerProviderOptions["config"];
 
   protected parent: Maybe<Container> = null;
   protected destroyed: boolean = true;
@@ -137,11 +143,6 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
       destroyed: this.destroyed,
     });
 
-    if (this.parent && (this.destroyed || !this.value)) {
-      this.destroyContainer();
-      this.createContainer();
-    }
-
     super.hostConnected();
   }
 
@@ -153,6 +154,37 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
     });
 
     this.destroyContainer();
+
+    super.setValue(undefined as unknown as Container);
+  }
+
+  public setValue(container: Container, force?: boolean): void {
+    void container;
+    void force;
+
+    throw new WirestateError(
+      ERROR_CODE_INVALID_ARGUMENTS,
+      "SubContainerProvider owns its child container. Use `setConfig(config)` to replace the managed child container."
+    );
+  }
+
+  /**
+   * Replaces the managed child-container config.
+   *
+   * @remarks
+   * When the provider is not currently provisioning a child container, the
+   * config is stored for the next connect. When it is active, the current child
+   * container is deprovisioned, destroyed, and recreated from the new config.
+   *
+   * @param config - Child-container creation options to use from now on.
+   */
+  public setConfig(config: SubContainerProviderOptions["config"]): void {
+    this.config = config;
+
+    if (this.host.isConnected && !this.destroyed) {
+      this.destroyContainer();
+      this.createContainer();
+    }
   }
 
   /**
@@ -172,7 +204,7 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
     });
 
     this.destroyed = false;
-    this.value = container;
+    super.setValue(container);
 
     provisionContainer(container, this.lifecycle, getContainerEntries(container));
   }

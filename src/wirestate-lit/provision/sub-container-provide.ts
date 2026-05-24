@@ -34,6 +34,10 @@ export interface SubContainerProviderDecorator<T extends ReactiveElement = React
  * connects, provider lifecycle hooks run while connected, destroyed when it
  * disconnects, and recreated when the parent container changes.
  *
+ * The child container value is published through Lit context only while the
+ * host is connected. Before the first connection and after disconnection, the
+ * provider value is `undefined`.
+ *
  * @group Provision
  *
  * @param options - Provisioning options.

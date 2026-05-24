@@ -26,11 +26,11 @@ describe("containerProvide", () => {
     Array.from(document.body.childNodes).forEach((it) => it.remove());
   });
 
-  it("should expose an ContainerProvider instance immediately after construction", () => {
+  it("should expose a ContainerProvider instance immediately and publish values while connected", () => {
     const element: DecoratedElement = new DecoratedElement();
 
     expect(element.containerProvider).toBeInstanceOf(ContainerProvider);
-    expect(element.containerProvider.value).toBeInstanceOf(Container);
+    expect(element.containerProvider.value).toBeUndefined();
 
     document.body.appendChild(element);
     expect(element.containerProvider).toBeInstanceOf(ContainerProvider);
@@ -38,7 +38,7 @@ describe("containerProvide", () => {
 
     element.remove();
     expect(element.containerProvider).toBeInstanceOf(ContainerProvider);
-    expect(element.containerProvider.value).toBeInstanceOf(Container);
+    expect(element.containerProvider.value).toBeUndefined();
   });
 
   it("should provide container to child elements", () => {

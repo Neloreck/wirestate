@@ -11,6 +11,10 @@ import { SubContainerProvider, SubContainerProviderOptions } from "./sub-contain
  * destroyed when the host disconnects. Provider lifecycle hooks run while the
  * child container is connected.
  *
+ * The child container value is published through Lit context only while the
+ * host is connected. Before the first connection and after disconnection, the
+ * provider value is `undefined`.
+ *
  * @group Provision
  *
  * @param host - The host element.

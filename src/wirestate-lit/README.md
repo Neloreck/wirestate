@@ -30,7 +30,8 @@ Provides a container to the component tree. It uses Lit Context to propagate the
 
 Pass `container` to expose an existing container, or pass `config` to create and manage one for the host lifecycle.
 Both modes run core provider lifecycle hooks while the host is connected. External containers are deprovisioned on
-disconnect, but they are never disposed by Lit.
+disconnect, but they are never disposed by Lit. The provider value is only published while the host is connected;
+before first connect and after disconnect, `ContainerProvider.value` is `undefined`.
 
 ```typescript
 import { LitElement, html } from "lit";
@@ -54,7 +55,7 @@ class MyApp extends LitElement {
 
 ### `@subContainerProvide(options)` / `useSubContainerProvider(host, options)`
 
-Creates a managed child container derived from the nearest parent container for the host element's lifetime. The child container is recreated when the parent container changes and destroyed when the host disconnects.
+Creates a managed child container derived from the nearest parent container for the host element's lifetime. The child container is created when the host connects, recreated when the parent container changes, and destroyed when the host disconnects. Before first connect and after disconnect, `SubContainerProvider.value` is `undefined`.
 
 Using the decorator (accessor):
 

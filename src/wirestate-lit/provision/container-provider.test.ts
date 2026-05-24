@@ -4,6 +4,7 @@ import { BindingType, Container, createContainer, Injectable, OnActivated, OnDea
 import { mockContainer } from "@wirestate/core/test-utils";
 import { customElement } from "lit/decorators.js";
 
+import { GenericService } from "@/fixtures/services/generic-service";
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { ContainerContext } from "../context/container-context";
@@ -29,11 +30,15 @@ describe("ContainerProvider", () => {
       container: container,
     });
 
+    expect(controller.value).toBeUndefined();
+
     document.body.appendChild(element);
 
     expect(controller.value).toBe(container);
 
     element.remove();
+
+    expect(controller.value).toBeUndefined();
   });
 
   it("should provide container to child consumers", () => {
@@ -43,6 +48,8 @@ describe("ContainerProvider", () => {
     const controller: ContainerProvider = new ContainerProvider(element, {
       container,
     });
+
+    expect(controller.value).toBeUndefined();
 
     document.body.appendChild(element);
 
@@ -63,6 +70,8 @@ describe("ContainerProvider", () => {
     expect(receivedContext).toBe(container);
 
     element.remove();
+
+    expect(controller.value).toBeUndefined();
   });
 
   it("should propagate external container value updates to child consumers", () => {
@@ -73,6 +82,8 @@ describe("ContainerProvider", () => {
     const controller: ContainerProvider = new ContainerProvider(element, {
       container: initialContainer,
     });
+
+    expect(controller.value).toBeUndefined();
 
     document.body.appendChild(element);
 
@@ -94,6 +105,8 @@ describe("ContainerProvider", () => {
     expect(controller.value).toBe(nextContainer);
 
     element.remove();
+
+    expect(controller.value).toBeUndefined();
   });
 
   it("should not dispose provided external container on disconnect", () => {
@@ -109,6 +122,23 @@ describe("ContainerProvider", () => {
     element.remove();
 
     expect(unbindAllSpy).not.toHaveBeenCalled();
+  });
+
+  it("should store external container updates while disconnected without publishing values", () => {
+    const element: TestProviderElement = new TestProviderElement();
+    const initialContainer: Container = mockContainer();
+    const nextContainer: Container = mockContainer();
+    const controller: ContainerProvider = new ContainerProvider(element, { container: initialContainer });
+
+    controller.setValue(nextContainer);
+
+    expect(controller.value).toBeUndefined();
+
+    document.body.appendChild(element);
+
+    expect(controller.value).toBe(nextContainer);
+
+    element.remove();
   });
 
   it("should provision and deprovision external containers without disposing them", () => {
@@ -137,20 +167,72 @@ describe("ContainerProvider", () => {
     expect(container.isBound(LifecycleService)).toBe(true);
   });
 
+  it("should deprovision previous external containers and provision replacement values", () => {
+    const events: Array<string> = [];
+    const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
+    const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
+
+    const firstContainer: Container = createContainer({ entries: [FirstService] });
+    const secondContainer: Container = createContainer({ entries: [SecondService] });
+
+    const firstUnbindAllSpy = jest.spyOn(firstContainer, "unbindAll");
+    const secondUnbindAllSpy = jest.spyOn(secondContainer, "unbindAll");
+
+    const element: TestProviderElement = new TestProviderElement();
+    const controller: ContainerProvider = new ContainerProvider(element, { container: firstContainer });
+
+    document.body.appendChild(element);
+
+    expect(events).toEqual(["activated-first", "provision-first"]);
+
+    controller.setValue(secondContainer);
+
+    expect(events).toEqual([
+      "activated-first",
+      "provision-first",
+      "deprovision-first",
+      "activated-second",
+      "provision-second",
+    ]);
+
+    element.remove();
+
+    expect(events).toEqual([
+      "activated-first",
+      "provision-first",
+      "deprovision-first",
+      "activated-second",
+      "provision-second",
+      "deprovision-second",
+    ]);
+    expect(controller.value).toBeUndefined();
+    expect(firstUnbindAllSpy).not.toHaveBeenCalled();
+    expect(secondUnbindAllSpy).not.toHaveBeenCalled();
+  });
+
+  it("should reject config updates for external container providers", () => {
+    const element: TestProviderElement = new TestProviderElement();
+    const controller: ContainerProvider = new ContainerProvider(element, { container: mockContainer() });
+
+    expect(() => controller.setConfig({ entries: [] })).toThrow(
+      "ContainerProvider uses an external container. Use `setValue(container)` to replace it."
+    );
+  });
+
   it("should create managed container on connect and provide it to child consumers", () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
-      config: {
-        entries: [{ id: CONFIG_TOKEN, value: "managed" }],
-      },
+      config: { entries: [{ id: CONFIG_TOKEN, value: "managed" }] },
     });
+
+    expect(controller.value).toBeUndefined();
+
+    document.body.appendChild(element);
 
     expect(controller.value).toBeInstanceOf(Container);
     expect(controller.value.get(CONFIG_TOKEN)).toBe("managed");
-
-    document.body.appendChild(element);
 
     let receivedContext: Maybe<Container>;
 
@@ -167,6 +249,8 @@ describe("ContainerProvider", () => {
     expect(receivedContext).toBe(controller.value);
 
     element.remove();
+
+    expect(controller.value).toBeUndefined();
   });
 
   it("should provision managed containers and deprovision before disposal", () => {
@@ -189,6 +273,7 @@ describe("ContainerProvider", () => {
     element.remove();
 
     expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
+    expect(controller.value).toBeUndefined();
 
     document.body.appendChild(element);
 
@@ -196,6 +281,126 @@ describe("ContainerProvider", () => {
     expect(events).toEqual(["activated", "provision", "deprovision", "deactivation", "activated", "provision"]);
 
     element.remove();
+  });
+
+  it("should reject direct container replacement for managed providers", () => {
+    const element: TestProviderElement = new TestProviderElement();
+    const controller: ContainerProvider = new ContainerProvider(element, { config: { entries: [GenericService] } });
+
+    expect(() => controller.setValue(mockContainer())).toThrow(
+      "ContainerProvider owns managed containers. Use `setConfig(config)` to replace the managed container."
+    );
+  });
+
+  it("should deprovision previous managed containers and provision updated config", () => {
+    const events: Array<string> = [];
+    const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
+    const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
+
+    const element: TestProviderElement = new TestProviderElement();
+    const controller: ContainerProvider = new ContainerProvider(element, { config: { entries: [FirstService] } });
+
+    document.body.appendChild(element);
+
+    const firstContainer: Container = controller.value;
+
+    expect(events).toEqual(["activated-first", "provision-first"]);
+
+    controller.setConfig({ entries: [SecondService] });
+
+    expect(controller.value).not.toBe(firstContainer);
+    expect(events).toEqual([
+      "activated-first",
+      "provision-first",
+      "deprovision-first",
+      "deactivation-first",
+      "activated-second",
+      "provision-second",
+    ]);
+
+    element.remove();
+
+    expect(events).toEqual([
+      "activated-first",
+      "provision-first",
+      "deprovision-first",
+      "deactivation-first",
+      "activated-second",
+      "provision-second",
+      "deprovision-second",
+      "deactivation-second",
+    ]);
+  });
+
+  it("should store replacement managed config before first connect", () => {
+    const events: Array<string> = [];
+    const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
+    const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
+
+    const element: TestProviderElement = new TestProviderElement();
+    const controller: ContainerProvider = new ContainerProvider(element, { config: { entries: [FirstService] } });
+
+    controller.setConfig({ entries: [SecondService] });
+
+    expect(events).toEqual([]);
+    expect(controller.value).toBeUndefined();
+
+    document.body.appendChild(element);
+
+    expect(controller.value.get(SecondService)).toBeInstanceOf(SecondService);
+    expect(events).toEqual(["activated-second", "provision-second"]);
+
+    element.remove();
+  });
+
+  it("should replace managed config while disconnected and provision it on reconnect", () => {
+    const events: Array<string> = [];
+    const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
+    const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
+
+    const element: TestProviderElement = new TestProviderElement();
+    const controller: ContainerProvider = new ContainerProvider(element, { config: { entries: [FirstService] } });
+
+    document.body.appendChild(element);
+
+    const firstContainer: Container = controller.value;
+
+    expect(events).toEqual(["activated-first", "provision-first"]);
+
+    element.remove();
+
+    expect(events).toEqual(["activated-first", "provision-first", "deprovision-first", "deactivation-first"]);
+    expect(controller.value).toBeUndefined();
+
+    controller.setConfig({ entries: [SecondService] });
+
+    expect(events).toEqual(["activated-first", "provision-first", "deprovision-first", "deactivation-first"]);
+    expect(controller.value).toBeUndefined();
+
+    document.body.appendChild(element);
+
+    expect(controller.value).not.toBe(firstContainer);
+    expect(events).toEqual([
+      "activated-first",
+      "provision-first",
+      "deprovision-first",
+      "deactivation-first",
+      "activated-second",
+      "provision-second",
+    ]);
+
+    element.remove();
+
+    expect(events).toEqual([
+      "activated-first",
+      "provision-first",
+      "deprovision-first",
+      "deactivation-first",
+      "activated-second",
+      "provision-second",
+      "deprovision-second",
+      "deactivation-second",
+    ]);
   });
 
   it("should validate managed activation entries before first connect", () => {
@@ -243,7 +448,7 @@ describe("ContainerProvider", () => {
       },
     });
 
-    expect(controller.value).toBeInstanceOf(Container);
+    expect(controller.value).toBeUndefined();
     expect(events).toEqual([]);
 
     document.body.appendChild(element);
@@ -279,7 +484,7 @@ describe("ContainerProvider", () => {
     });
 
     expect(lifecycleEvents).toEqual([]);
-    expect(controller.value).toBeInstanceOf(Container);
+    expect(controller.value).toBeUndefined();
 
     document.body.appendChild(element);
 
@@ -290,6 +495,7 @@ describe("ContainerProvider", () => {
     element.remove();
 
     expect(lifecycleEvents).toEqual(["activate", "deactivate"]);
+    expect(controller.value).toBeUndefined();
 
     document.body.appendChild(element);
 

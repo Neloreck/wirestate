@@ -42,6 +42,8 @@ describe("SubContainerProvider", () => {
       },
     });
 
+    expect(provider.value).toBeUndefined();
+
     fixture.provider.appendChild(element);
 
     let receivedContext: Maybe<Container>;
@@ -62,6 +64,10 @@ describe("SubContainerProvider", () => {
     expect(provider.value.get(PARENT_TOKEN)).toBe("parent-value");
     expect(parent.isBound(CONFIG_TOKEN)).toBe(false);
     expect(receivedContext).toBe(provider.value);
+
+    element.remove();
+
+    expect(provider.value).toBeUndefined();
   });
 
   it("should activate configured entries when the child container is created", () => {
@@ -91,7 +97,7 @@ describe("SubContainerProvider", () => {
     const { LifecycleService, events } = createLifecycleService();
     const element: TestProviderElement = new TestProviderElement();
 
-    new SubContainerProvider(element, {
+    const provider: SubContainerProvider = new SubContainerProvider(element, {
       config: {
         entries: [LifecycleService],
       },
@@ -106,6 +112,128 @@ describe("SubContainerProvider", () => {
     element.remove();
 
     expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
+    expect(provider.value).toBeUndefined();
+  });
+
+  it("should reject direct child container replacement values", () => {
+    const element: TestProviderElement = new TestProviderElement();
+    const provider: SubContainerProvider = new SubContainerProvider(element, {
+      config: { entries: [{ id: CONFIG_TOKEN, value: "child-value" }] },
+    });
+
+    expect(() => provider.setValue(createContainer({ entries: [{ id: CONFIG_TOKEN, value: "next-value" }] }))).toThrow(
+      "SubContainerProvider owns its child container. Use `setConfig(config)` to replace the managed child container."
+    );
+  });
+
+  it("should deprovision previous child containers and provision updated config", () => {
+    const events: Array<string> = [];
+    const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
+    const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
+
+    const element: TestProviderElement = new TestProviderElement();
+    const provider: SubContainerProvider = new SubContainerProvider(element, { config: { entries: [FirstService] } });
+
+    fixture = createLitProvision();
+
+    fixture.provider.appendChild(element);
+
+    expect(events).toEqual(["activated-first", "provision-first"]);
+
+    provider.setConfig({ entries: [SecondService] });
+
+    expect(events).toEqual([
+      "activated-first",
+      "provision-first",
+      "deprovision-first",
+      "deactivation-first",
+      "activated-second",
+      "provision-second",
+    ]);
+
+    element.remove();
+
+    expect(events).toEqual([
+      "activated-first",
+      "provision-first",
+      "deprovision-first",
+      "deactivation-first",
+      "activated-second",
+      "provision-second",
+      "deprovision-second",
+      "deactivation-second",
+    ]);
+    expect(provider.value).toBeUndefined();
+  });
+
+  it("should only store replacement config when setConfig is called before first mount", () => {
+    const events: Array<string> = [];
+    const { LifecycleService: ManagedService } = createLifecycleService({ events, suffix: "managed" });
+    const { LifecycleService: ReplacementService } = createLifecycleService({ events, suffix: "replacement" });
+
+    const element: TestProviderElement = new TestProviderElement();
+    const provider: SubContainerProvider = new SubContainerProvider(element, { config: { entries: [ManagedService] } });
+
+    fixture = createLitProvision();
+
+    provider.setConfig({ entries: [ReplacementService] });
+
+    expect(events).toEqual([]);
+    expect(provider.value).toBeUndefined();
+
+    fixture.provider.appendChild(element);
+
+    expect(provider.value.get(ReplacementService)).toBeInstanceOf(ReplacementService);
+    expect(events).toEqual(["activated-replacement", "provision-replacement"]);
+
+    element.remove();
+    expect(events).toEqual([
+      "activated-replacement",
+      "provision-replacement",
+      "deprovision-replacement",
+      "deactivation-replacement",
+    ]);
+    expect(provider.value).toBeUndefined();
+  });
+
+  it("should only store replacement config while unmounted and ignore parent changes while disconnected", () => {
+    const firstParent: Container = createContainer({ entries: [{ id: PARENT_TOKEN, value: "first-parent" }] });
+    const secondParent: Container = createContainer({ entries: [{ id: PARENT_TOKEN, value: "second-parent" }] });
+
+    fixture = createLitProvision(firstParent);
+
+    const events: Array<string> = [];
+    const { LifecycleService: ManagedService } = createLifecycleService({ events, suffix: "managed" });
+    const { LifecycleService: ReplacementService } = createLifecycleService({ events, suffix: "replacement" });
+
+    const element: TestProviderElement = new TestProviderElement();
+    const provider: SubContainerProvider = new SubContainerProvider(element, { config: { entries: [ManagedService] } });
+
+    fixture.provider.appendChild(element);
+
+    expect(provider.value.get(PARENT_TOKEN)).toBe("first-parent");
+    expect(events).toEqual(["activated-managed", "provision-managed"]);
+
+    element.remove();
+
+    expect(events).toEqual(["activated-managed", "provision-managed", "deprovision-managed", "deactivation-managed"]);
+
+    provider.setConfig({ entries: [ReplacementService] });
+    fixture.contextProvider.value = secondParent;
+
+    expect(provider.value).toBeUndefined();
+    expect(events).toEqual(["activated-managed", "provision-managed", "deprovision-managed", "deactivation-managed"]);
+
+    fixture.provider.appendChild(element);
+
+    expect(events).toEqual([
+      "activated-managed",
+      "provision-managed",
+      "deprovision-managed",
+      "deactivation-managed",
+      "activated-replacement",
+      "provision-replacement",
+    ]);
   });
 
   it("should activate all configured entries when activate is true", () => {
@@ -162,6 +290,7 @@ describe("SubContainerProvider", () => {
     element.remove();
 
     expect(events).toEqual(["activated", "deactivation"]);
+    expect(provider.value).toBeUndefined();
 
     fixture.provider.appendChild(element);
 

@@ -29,9 +29,11 @@ describe("useContainerProvision hook", () => {
     expect(provider).toBeInstanceOf(ContainerProvider);
   });
 
-  it("should create a managed container from creation options", () => {
+  it("should create a managed container from creation options when connected", () => {
     const element: TestProviderElement = new TestProviderElement();
     const provider: ContainerProvider = useContainerProvision(element, { config: {} });
+
+    expect(provider.value).toBeUndefined();
 
     document.body.appendChild(element);
 
@@ -39,6 +41,8 @@ describe("useContainerProvision hook", () => {
     expect(provider.value).toBeInstanceOf(Container);
 
     element.remove();
+
+    expect(provider.value).toBeUndefined();
   });
 
   it("should use the provided container", () => {
@@ -46,11 +50,15 @@ describe("useContainerProvision hook", () => {
     const element: TestProviderElement = new TestProviderElement();
     const provider: ContainerProvider = useContainerProvision(element, { container });
 
+    expect(provider.value).toBeUndefined();
+
     document.body.appendChild(element);
 
     expect(provider.value).toBe(container);
 
     element.remove();
+
+    expect(provider.value).toBeUndefined();
   });
 
   it("should provide IocContext to child consumers", () => {

@@ -35,7 +35,8 @@ export interface ContainerProviderOptions {
    *
    * @remarks
    * External containers are never activated, recreated, or disposed by this
-   * provider. Provider lifecycle hooks run while the host is connected.
+   * provider. They are published through context while the host is connected.
+   * Provider lifecycle hooks run while the host is connected.
    */
   readonly container?: Container;
 
@@ -43,9 +44,9 @@ export interface ContainerProviderOptions {
    * Managed container creation options.
    *
    * @remarks
-   * The managed container is created during provider construction without
-   * eager activation, activated when the host connects, disposed when it
-   * disconnects, and recreated on the next reconnect.
+   * The managed container is created when the host connects, disposed when it
+   * disconnects, and recreated on the next reconnect. The provider value is
+   * `undefined` while the host is disconnected.
    */
   readonly config?: ContainerConfig;
 }
@@ -57,13 +58,15 @@ export interface ContainerProviderOptions {
  * The provider supports two modes:
  *
  * - External mode: `container` is an existing {@link Container}. The
- *   provider passes it through context, runs provider lifecycle hooks, and
- *   never disposes it.
+ *   provider passes it through context while connected, runs provider
+ *   lifecycle hooks, and never disposes it.
  * - Managed mode: `config` is {@link ContainerConfig}. The provider
- *   creates a container during construction without eager activation,
- *   activates configured entries when the host connects, disposes the
- *   container when the host disconnects, runs provider lifecycle hooks while
- *   connected, and recreates it on reconnect.
+ *   creates a container when the host connects, disposes the container when
+ *   the host disconnects, runs provider lifecycle hooks while connected, and
+ *   recreates it on reconnect.
+ *
+ * The context value is only published while the host is connected. Before the
+ * first connection and after disconnection, the provider value is `undefined`.
  *
  * @group Provision
  */
@@ -73,9 +76,8 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
 {
   protected readonly lifecycle: ProvisionLifecycle = new Map();
 
-  protected readonly config: Maybe<ContainerConfig>;
-
-  protected destroyed: boolean = false;
+  protected config: Maybe<ContainerConfig>;
+  protected container: Maybe<Container>;
 
   /**
    * @param host - The host element.
@@ -96,85 +98,155 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
       );
     }
 
-    const activate: ReadonlyArray<ServiceIdentifier> = options.config
-      ? (options.config.activate === true ? options.config.entries?.map(getEntryToken) : options.config.activate) || []
-      : [];
-
-    if (options.config && activate.length) {
-      if (!options.config.entries?.length) {
-        throw new WirestateError(
-          ERROR_CODE_INVALID_ARGUMENTS,
-          "Supplied activation list while entries for binding are not provided."
-        );
-      }
-
-      const entryTokens: ReadonlyArray<ServiceIdentifier> = options.config.entries.map(getEntryToken);
-
-      for (const eager of activate) {
-        if (!entryTokens.includes(eager)) {
-          throw new WirestateError(
-            ERROR_CODE_INVALID_ARGUMENTS,
-            `createContainer: '${String(eager)}' is listed in 'activate' but was not provided in 'entries'.`
-          );
-        }
-      }
+    if (options.config) {
+      validateConfig(options.config);
     }
 
-    super(host, {
-      context: ContainerContext,
-      initialValue: options.container ? options.container : createContainer({ ...options.config, activate: [] }),
-    });
+    super(host, { context: ContainerContext });
 
     this.config = options.config;
+    this.container = options.container;
 
     dbg.info(prefix(__filename), "Constructed:", {
       host: this.host,
-      source: options.container,
-      container: this.value,
+      container: this.container,
       options: this.config,
     });
   }
 
   public hostConnected(): void {
-    if (this.config) {
-      if (this.destroyed) {
-        dbg.info(prefix(__filename), "Creating and activating managed container:", {
-          container: this.value,
-        });
+    const container: Container = this.config
+      ? (this.container = createContainer(this.config))
+      : (this.container as Container);
 
-        this.value = createContainer(this.config);
-        this.destroyed = false;
-      } else {
-        const activate: ReadonlyArray<ServiceIdentifier> =
-          (this.config.activate === true ? this.config.entries?.map(getEntryToken) : this.config.activate) || [];
+    super.setValue(container);
 
-        if (activate.length) {
-          dbg.info(prefix(__filename), "Activating managed container:", {
-            container: this.value,
-          });
-
-          for (const entry of activate) {
-            this.value.get(entry);
-          }
-        }
-      }
-    }
-
-    provisionContainer(this.value, this.lifecycle, getContainerEntries(this.value));
+    provisionContainer(container, this.lifecycle, getContainerEntries(container));
 
     super.hostConnected();
   }
 
   public hostDisconnected(): void {
-    deprovisionContainer(this.value, this.lifecycle);
+    const container: Container = this.container as Container;
 
     if (this.config) {
-      dbg.info(prefix(__filename), "Destroying managed container:", {
-        container: this.value,
-      });
+      this.destroyManagedContainer(container);
+    } else {
+      deprovisionContainer(container, this.lifecycle);
+    }
 
-      this.value.unbindAll();
-      this.destroyed = true;
+    super.setValue(undefined as unknown as Container);
+  }
+
+  public setValue(container: Container, force?: boolean): void {
+    if (this.config) {
+      throw new WirestateError(
+        ERROR_CODE_INVALID_ARGUMENTS,
+        "ContainerProvider owns managed containers. Use `setConfig(config)` to replace the managed container."
+      );
+    }
+
+    const previous: Maybe<Container> = this.container;
+
+    this.container = container;
+
+    if (this.host.isConnected) {
+      if (Object.is(previous, container)) {
+        super.setValue(container, force);
+      } else {
+        if (previous) {
+          deprovisionContainer(previous, this.lifecycle);
+        }
+
+        super.setValue(container, force);
+
+        provisionContainer(container, this.lifecycle, getContainerEntries(container));
+      }
+    }
+  }
+
+  /**
+   * Replaces the managed container config.
+   *
+   * @remarks
+   * External-container providers cannot switch to managed mode. Connected
+   * managed providers deprovision and dispose the current container, then
+   * create and provision a replacement. Disconnected managed providers store
+   * the config for the next connection without publishing a value.
+   *
+   * @param config - Container creation options to use from now on.
+   */
+  public setConfig(config: ContainerConfig): void {
+    if (!this.config) {
+      throw new WirestateError(
+        ERROR_CODE_INVALID_ARGUMENTS,
+        "ContainerProvider uses an external container. Use `setValue(container)` to replace it."
+      );
+    }
+
+    validateConfig(config);
+
+    this.config = config;
+
+    if (this.host.isConnected) {
+      if (this.container) {
+        this.destroyManagedContainer(this.container);
+      }
+
+      const container: Container = createContainer(config);
+
+      this.container = container;
+      super.setValue(container);
+
+      provisionContainer(container, this.lifecycle, getContainerEntries(container));
+    }
+  }
+
+  /**
+   * Destroys the currently owned managed container.
+   *
+   * @param container - Managed container to deprovision and dispose.
+   */
+  protected destroyManagedContainer(container: Container): void {
+    deprovisionContainer(container, this.lifecycle);
+
+    dbg.info(prefix(__filename), "Destroying managed container:", {
+      container,
+    });
+
+    container.unbindAll();
+    this.container = null;
+  }
+}
+
+/**
+ * Validates managed container activation options.
+ *
+ * @param config - Container creation options to validate.
+ */
+function validateConfig(config: ContainerConfig): void {
+  const activate: ReadonlyArray<ServiceIdentifier> =
+    (config.activate === true ? config.entries?.map(getEntryToken) : config.activate) || [];
+
+  if (!activate.length) {
+    return;
+  }
+
+  if (!config.entries?.length) {
+    throw new WirestateError(
+      ERROR_CODE_INVALID_ARGUMENTS,
+      "Supplied activation list while entries for binding are not provided."
+    );
+  }
+
+  const entryTokens: ReadonlyArray<ServiceIdentifier> = config.entries.map(getEntryToken);
+
+  for (const eager of activate) {
+    if (!entryTokens.includes(eager)) {
+      throw new WirestateError(
+        ERROR_CODE_INVALID_ARGUMENTS,
+        `createContainer: '${String(eager)}' is listed in 'activate' but was not provided in 'entries'.`
+      );
     }
   }
 }

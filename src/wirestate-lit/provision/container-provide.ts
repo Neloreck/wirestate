@@ -33,9 +33,13 @@ export interface ContainerProviderDecorator<E extends ReactiveElement = Reactive
  *
  * - Pass `container` to expose an external container without taking
  *   ownership.
- * - Pass `config` to create a managed container during construction,
- *   activate configured entries on connect, run provider lifecycle hooks while
- *   connected, destroy it on disconnect, and recreate it on reconnect.
+ * - Pass `config` to create a managed container when the host connects, run
+ *   provider lifecycle hooks while connected, destroy it on disconnect, and
+ *   recreate it on reconnect.
+ *
+ * The container value is published through Lit context only while the host is
+ * connected. Before the first connection and after disconnection, the provider
+ * value is `undefined`.
  *
  * @group Provision
  *

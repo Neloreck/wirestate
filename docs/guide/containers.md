@@ -183,6 +183,7 @@ class ApplicationRoot extends LitElement {
 Create a managed child container derived from the nearest parent container context.
 
 - The child container inherits parent bindings through the container hierarchy
+- The child container is created when the host connects to an ancestor container context
 - The child container is recreated when the parent container changes
 - The child container is destroyed when the host disconnects
 - The child container is deprovisioned before it is destroyed

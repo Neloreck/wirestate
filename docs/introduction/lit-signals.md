@@ -51,7 +51,7 @@ export class ApplicationRoot extends LitElement {
 }
 ```
 
-`useContainerProvision` creates the root container.
+`useContainerProvision` creates and publishes the root container when the host element connects.
 
 ### 3. Inject and Use the Service
 
