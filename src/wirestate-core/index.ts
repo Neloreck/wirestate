@@ -11,8 +11,6 @@ export { getContainerEntries } from "./bind/bind-register";
 export { bindService, BindServiceOptions } from "./bind/bind-service";
 export { getEntryToken } from "./bind/get-entry-token";
 
-export { command } from "./commands/command";
-export { commandOptional } from "./commands/command-optional";
 export { OnCommand } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";
 export {

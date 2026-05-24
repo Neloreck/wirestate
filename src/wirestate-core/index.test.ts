@@ -106,8 +106,6 @@ describe("Library exported API from wirestate-core", () => {
     "bindDynamicValue",
     "bindEntry",
     "bindService",
-    "command",
-    "commandOptional",
     "createContainer",
     "getContainerEntries",
     "getEntryToken",
