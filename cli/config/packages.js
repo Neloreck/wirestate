@@ -2,6 +2,8 @@ import * as path from "node:path";
 
 import { SRC_PATH, EXTERNAL_DEPENDENCIES } from "./build.constants";
 
+export const STABLE_PACKAGE_VERSION_PATTERN = /^\d+\.\d+\.\d+$/;
+
 export const PACKAGES = [
   {
     name: "wirestate-core",
@@ -31,10 +33,7 @@ export const PACKAGES = [
   },
   {
     name: "wirestate-lit",
-    entries: [
-      path.resolve(SRC_PATH, "wirestate-lit/index.ts"),
-      path.resolve(SRC_PATH, "wirestate-lit/test-utils.ts"),
-    ],
+    entries: [path.resolve(SRC_PATH, "wirestate-lit/index.ts"), path.resolve(SRC_PATH, "wirestate-lit/test-utils.ts")],
     external: [...EXTERNAL_DEPENDENCIES, "lit", "@wirestate/core"],
   },
   {

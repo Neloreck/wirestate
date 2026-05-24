@@ -1,15 +1,13 @@
-import { execSync } from "node:child_process";
-import * as path from "node:path";
+import { publishPackages, readPublishPackages, resolvePublishTag } from "./publish.utils";
 
-import { PKG_ROOT } from "../config/build.constants";
-import { PACKAGES } from "../config/packages";
+if (require.main === module) {
+  try {
+    const tag = resolvePublishTag(process.argv.slice(2));
+    const packages = readPublishPackages();
 
-const tag = process.argv.includes("--tag") ? process.argv[process.argv.indexOf("--tag") + 1] : undefined;
-
-for (const pkg of PACKAGES) {
-  const pkgDir = path.resolve(PKG_ROOT, pkg.name);
-  const tagArg = tag ? ` --tag ${tag}` : "";
-
-  console.log(`Publishing ${pkg.name}${tag ? ` [${tag}]` : ""}...`);
-  execSync(`npm publish --access public${tagArg}`, { cwd: pkgDir, stdio: "inherit" });
+    publishPackages(packages, tag);
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : error);
+    process.exit(1);
+  }
 }
