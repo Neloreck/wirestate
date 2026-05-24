@@ -1,0 +1,144 @@
+import { ContextConsumer } from "@lit/context";
+import { ReactiveControllerHost } from "@lit/reactive-element";
+import { Container, ServiceIdentifier } from "@wirestate/core";
+
+import { dbg } from "@/macroses/dbg.macro";
+import { prefix } from "@/macroses/prefix.macro";
+
+import { ContainerContext } from "../context/container-context";
+import { AnyObject, Optional } from "../types/general";
+
+/**
+ * Provides a fallback value when an optional injection is not bound.
+ *
+ * @group Consumption
+ */
+export type OptionalInjectionFallback<T> = (container: Container) => T;
+
+/**
+ * Represents options for the {@link useOptionalInjection} hook.
+ *
+ * @group Consumption
+ */
+export interface UseOptionalInjectionOptions<T> {
+  /**
+   * Resolve only the first context value.
+   *
+   * @remarks
+   * If true, the service will not update when the container context changes.
+   * Defaults to `false`.
+   */
+  once?: boolean;
+  /**
+   * Initial value before the service is fetched.
+   */
+  value?: Optional<T>;
+  /**
+   * The service identifier to inject.
+   */
+  injectionId: ServiceIdentifier<T>;
+  /**
+   * Provides a value when the service identifier is not bound.
+   */
+  onFallback?: OptionalInjectionFallback<T>;
+}
+
+/**
+ * Represents result of the {@link useOptionalInjection} hook.
+ *
+ * @group Consumption
+ */
+export interface UseOptionalInjectionValue<T> {
+  /**
+   * The service identifier used for injection.
+   */
+  injectionId: ServiceIdentifier<T>;
+  /**
+   * The injected service instance, fallback value, or `null`.
+   */
+  value: Optional<T>;
+}
+
+/**
+ * Hook (controller) to optionally inject a service from the IoC container.
+ *
+ * @remarks
+ * Unlike {@link useInjection}, this hook does not throw if the dependency
+ * is missing from the container.
+ *
+ * @group Consumption
+ *
+ * @param host - The host element.
+ * @param optionsOrInjectionId - Injection options or service identifier.
+ * @param onFallback - Optional function called to provide a value if the token is not bound.
+ * @returns An instance of {@link UseOptionalInjectionValue}.
+ *
+ * @example
+ * ```typescript
+ * class MyElement extends LitElement {
+ *   private logger = useOptionalInjection(this, FileLogger, (container) => container.get(ConsoleLoggerService));
+ *
+ *   render() {
+ *     return html`<div>${this.logger.value?.getName() ?? "No logger"}</div>`;
+ *   }
+ * }
+ * ```
+ */
+export function useOptionalInjection<T>(
+  host: ReactiveControllerHost & HTMLElement,
+  optionsOrInjectionId: UseOptionalInjectionOptions<T> | ServiceIdentifier<T>,
+  onFallback?: OptionalInjectionFallback<T>
+): UseOptionalInjectionValue<T> {
+  const options: UseOptionalInjectionOptions<T> =
+    typeof optionsOrInjectionId === "object" && optionsOrInjectionId !== null && "injectionId" in optionsOrInjectionId
+      ? optionsOrInjectionId
+      : { injectionId: optionsOrInjectionId as ServiceIdentifier<T>, onFallback };
+
+  const { injectionId, once, value } = options;
+  const fallback: Optional<OptionalInjectionFallback<T>> = options.onFallback ?? onFallback ?? null;
+
+  dbg.info(prefix(__filename), "Creating:", {
+    host,
+    once,
+    injectionId,
+  });
+
+  const current: UseOptionalInjectionValue<T> = { value: value ?? null, injectionId };
+
+  new ContextConsumer(host, {
+    context: ContainerContext,
+    subscribe: !once,
+    callback: (container) => {
+      if (container.isBound(injectionId)) {
+        dbg.info(prefix(__filename), "Resolving injection:", {
+          token: injectionId,
+          name: (injectionId as AnyObject)?.name ?? injectionId,
+          container,
+          onFallback: fallback,
+        });
+
+        current.value = container.get(injectionId);
+      } else if (fallback) {
+        dbg.info(prefix(__filename), "Injection not found, using fallback handler:", {
+          token: injectionId,
+          name: (injectionId as AnyObject)?.name ?? injectionId,
+          container,
+          onFallback: fallback,
+        });
+
+        current.value = fallback(container);
+      } else {
+        dbg.info(prefix(__filename), "Injection not found, returning null:", {
+          token: injectionId,
+          name: (injectionId as AnyObject)?.name ?? injectionId,
+          container,
+          onFallback: fallback,
+        });
+
+        current.value = null;
+      }
+    },
+  });
+
+  return current;
+}

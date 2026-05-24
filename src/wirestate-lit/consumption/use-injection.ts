@@ -79,8 +79,8 @@ export interface UseInjectionValue<T> {
  * }
  * ```
  */
-export function useInjection<T extends object, E extends ReactiveControllerHost & HTMLElement>(
-  host: E,
+export function useInjection<T>(
+  host: ReactiveControllerHost & HTMLElement,
   optionsOrInjectionId: UseInjectionOptions<T> | ServiceIdentifier<T>
 ): UseInjectionValue<T> {
   const options: UseInjectionOptions<T> =

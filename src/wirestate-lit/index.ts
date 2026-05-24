@@ -3,8 +3,19 @@
  */
 
 export { injection, InjectionDecorator, InjectionOptions } from "./consumption/injection";
+export {
+  optionalInjection,
+  OptionalInjectionDecorator,
+  OptionalInjectionOptions,
+} from "./consumption/optional-injection";
 export { useContainer, UseContainerValue } from "./consumption/use-container";
 export { useInjection, UseInjectionOptions, UseInjectionValue } from "./consumption/use-injection";
+export {
+  OptionalInjectionFallback,
+  useOptionalInjection,
+  UseOptionalInjectionOptions,
+  UseOptionalInjectionValue,
+} from "./consumption/use-optional-injection";
 export { useScope, UseScopeValue } from "./consumption/use-scope";
 
 export { onCommand, OnCommandDecorator } from "./commands/on-command";

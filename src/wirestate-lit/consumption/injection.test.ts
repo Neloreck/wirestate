@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container } from "@wirestate/core";
+import { bindConstant, Container } from "@wirestate/core";
 import { mockContainer, mockService } from "@wirestate/core/test-utils";
 import { customElement } from "lit/decorators.js";
 
@@ -52,5 +52,48 @@ describe("injection", () => {
 
     expect(element.service).toBeInstanceOf(GenericService);
     expect(element.service.getValue()).toBe("test-value");
+  });
+
+  it("should inject string constants from symbol tokens", () => {
+    const API_URL: unique symbol = Symbol("api-url");
+
+    bindConstant<string>(fixture.container, {
+      id: API_URL,
+      value: "https://api.example.com",
+    });
+
+    @customElement("test-injection-string-constant-element")
+    class TestStringConstantElement extends ReactiveElement {
+      @injection<string>(API_URL)
+      public apiUrl!: string;
+    }
+
+    const element: TestStringConstantElement = new TestStringConstantElement();
+
+    fixture.provider.appendChild(element);
+
+    expect(element.apiUrl).toBe("https://api.example.com");
+  });
+
+  it("should inject symbol constants from string tokens", () => {
+    const STATUS_TOKEN: string = "status-token";
+    const READY_STATUS: unique symbol = Symbol("ready-status");
+
+    bindConstant<symbol>(fixture.container, {
+      id: STATUS_TOKEN,
+      value: READY_STATUS,
+    });
+
+    @customElement("test-injection-symbol-constant-element")
+    class TestSymbolConstantElement extends ReactiveElement {
+      @injection<symbol>(STATUS_TOKEN)
+      public status!: symbol;
+    }
+
+    const element: TestSymbolConstantElement = new TestSymbolConstantElement();
+
+    fixture.provider.appendChild(element);
+
+    expect(element.status).toBe(READY_STATUS);
   });
 });

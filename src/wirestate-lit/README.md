@@ -209,6 +209,29 @@ class MyComponent extends LitElement {
 }
 ```
 
+### `@optionalInjection(optionsOrId, onFallback?)` / `useOptionalInjection(host, optionsOrId, onFallback?)`
+
+Safely resolves a service from the nearest parent container. Returns `null` when the service is not bound, or calls the
+fallback function when one is provided.
+
+```typescript
+import { LitElement, html } from "lit";
+import { optionalInjection, useOptionalInjection } from "@wirestate/lit";
+
+import { ConsoleLoggerService, LoggerService } from "./services";
+
+class MyComponent extends LitElement {
+  @optionalInjection(LoggerService, (container) => container.get(ConsoleLoggerService))
+  private decoratedLogger: LoggerService | null = null;
+
+  private logger = useOptionalInjection(this, LoggerService, (container) => container.get(ConsoleLoggerService));
+
+  render() {
+    return html`<div>${this.logger.value?.getName() ?? "No logger"}</div>`;
+  }
+}
+```
+
 ## Messaging
 
 ### Events
