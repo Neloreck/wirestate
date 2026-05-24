@@ -40,7 +40,7 @@ npm install @wirestate/react-signals @preact/signals-react
 npm install @wirestate/core @wirestate/lit reflect-metadata
 
 # With Signals reactivity
-npm install @wirestate/lit-signals @lit-labs/signals
+npm install @wirestate/lit-signals @lit-labs/signals signal-polyfill
 ```
 
 Import `reflect-metadata` once at the application entry point before any other wirestate imports.

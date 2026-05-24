@@ -4,11 +4,11 @@ Wirestate consists of a core package and UI-specific bindings.
 
 ## 1. Choose your core and bindings
 
-| UI    | Reactivity | Packages to Install                           |
-|-------|------------|-----------------------------------------------|
-| React | Signals    | `@wirestate/core` `@wirestate/react` `@wirestate/react-signals` `reflect-metadata` |
-| React | MobX       | `@wirestate/core` `@wirestate/react` `@wirestate/react-mobx` `reflect-metadata`    |
-| Lit   | Signals    | `@wirestate/core` `@wirestate/lit` `@wirestate/lit-signals` `reflect-metadata`     |
+| UI    | Reactivity | Packages to Install                                                                                                  |
+|-------|------------|----------------------------------------------------------------------------------------------------------------------|
+| React | Signals    | `@wirestate/core` `@wirestate/react` `@wirestate/react-signals` `reflect-metadata`                                   |
+| React | MobX       | `@wirestate/core` `@wirestate/react` `@wirestate/react-mobx` `reflect-metadata`                                      |
+| Lit   | Signals    | `@wirestate/core` `@wirestate/lit` `@wirestate/lit-signals` `@lit-labs/signals` `signal-polyfill` `reflect-metadata` |
 
 ## 2. Install
 
@@ -35,7 +35,7 @@ npm install --save @wirestate/react-mobx mobx mobx-react-lite
 
 ```bash
 npm install --save @wirestate/core @wirestate/lit reflect-metadata
-npm install --save @wirestate/lit-signals @lit-labs/signals
+npm install --save @wirestate/lit-signals @lit-labs/signals signal-polyfill
 ```
 
 ## 3. Requirements

@@ -8,7 +8,7 @@ Re-exports `@lit-labs/signals` for use with wirestate services in Lit elements.
 ## Installation
 
 ```bash
-npm install @wirestate/lit-signals @lit-labs/signals
+npm install @wirestate/lit-signals @lit-labs/signals signal-polyfill
 ```
 
 ## Usage
