@@ -11,8 +11,7 @@ import { AnyObject } from "../types/general";
  * Resolves a service or constant from the active container.
  *
  * @remarks
- * This hook automatically re-resolves the dependency if the container's
- * revision changes (e.g., due to re-binding in a provider).
+ * This hook re-resolves the dependency when the active container or token changes.
  *
  * @group Injection
  *

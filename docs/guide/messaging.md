@@ -1,6 +1,6 @@
 # Messaging
 
-Wirestate provides three message-passing patterns. All three buses live on the container and are scoped to it — child containers have independent buses.
+Wirestate provides three message-passing patterns. All three buses live on the container and are scoped to it. Child containers have independent buses.
 
 | Pattern | Direction           | Cardinality | Return                       |
 | ------- | ------------------- | ----------- |------------------------------|
@@ -54,7 +54,7 @@ The third `from` argument identifies the emitter (defaults to the scope instance
 this.scope.emitEvent("CART_ITEM_ADDED", item, this);
 ```
 
-### Subscribing — Services
+### Subscribing - Services
 
 `@OnEvent` registers a method as a subscriber. The method receives the full `Event<Payload>` object.
 
@@ -77,7 +77,7 @@ export class AnalyticsService {
     this.syncCart();
   }
 
-  // Catch-all — receives every event on the bus:
+  // Catch-all - receives every event on the bus:
   @OnEvent()
   private onAnyEvent(event: Event): void {
     console.debug("[analytics-debug]", event.type);
@@ -89,7 +89,7 @@ export class AnalyticsService {
 
 Subscriptions are automatically registered on activation and unregistered on deactivation.
 
-### Subscribing — React
+### Subscribing - React
 
 ```tsx
 import { useEvent, useEvents, useEventsHandler, useEventEmitter } from "@wirestate/react";
@@ -117,12 +117,12 @@ emit("USER_PINGED");
 ## Commands
 
 Commands are named, one-way write operations dispatched to exactly one registered handler.
-Wirestate throws `WirestateError` if no handler is registered — use `executeOptionalCommand` / `useOptionalCommandCaller` when the handler may be absent.
+Wirestate throws `WirestateError` if no handler is registered. Use `executeOptionalCommand` / `useOptionalCommandCaller` when the handler may be absent.
 
 The caller receives a `CommandDescriptor` immediately; the actual work happens asynchronously.
 Check `descriptor.status` (`pending` -> `settled` | `error`) or `await descriptor.task`.
 
-### Registering — Services
+### Registering - Services
 
 ```ts
 import { Injectable, OnCommand } from "@wirestate/core";
@@ -141,14 +141,14 @@ export class AuthService {
 }
 ```
 
-### Dispatching — Services
+### Dispatching - Services
 
 ```ts
 const descriptor: CommandDescriptor = this.scope.executeCommand("LOGOUT");
 await descriptor.task; // resolves when handler settles
 ```
 
-Optional dispatch — returns `null` if no handler is bound:
+Optional dispatch returns `null` if no handler is bound:
 
 ```ts
 const descriptor: CommandDescriptor | null = this.scope.executeOptionalCommand("LOGOUT");
@@ -158,7 +158,7 @@ if (descriptor) {
 }
 ```
 
-### Dispatching — React
+### Dispatching - React
 
 ```tsx
 import { useCommandCaller, useOptionalCommandCaller, CommandCaller } from "@wirestate/react";
@@ -199,9 +199,9 @@ function SearchPanel() {
 ## Queries
 
 Queries are synchronous or asynchronous request-response calls. The last registered handler wins (shadows earlier ones).
-Wirestate throws if no handler is registered — use optional variants when needed.
+Wirestate throws `WirestateError` if no handler is registered. Use optional variants when needed.
 
-### Registering — Services
+### Registering - Services
 
 ```ts
 import { Injectable, OnQuery } from "@wirestate/core";
@@ -228,23 +228,23 @@ export class SettingsService {
 }
 ```
 
-### Dispatching — Services
+### Dispatching - Services
 
 ```ts
-// Sync — returns result directly:
+// Sync - returns result directly:
 const theme = this.scope.queryData<string>("GET_THEME");
 
-// Async — returns Promise:
+// Async - returns Promise:
 const profile = await this.scope.queryDataAsync<UserProfile>("FETCH_USER_PROFILE", userId);
 
-// Optional — returns null if no handler:
+// Optional - returns null if no handler:
 const config = this.scope.queryOptionalData<Config>("GET_CONFIG");
 
-// Optional async — resolves null if no handler:
+// Optional async - resolves null if no handler:
 const remoteConfig = await this.scope.queryOptionalDataAsync<Config>("FETCH_CONFIG");
 ```
 
-### Dispatching — React
+### Dispatching - React
 
 ```tsx
 import { AsyncQueryCaller, QueryCaller, useAsyncQueryCaller, useQueryCaller } from "@wirestate/react";

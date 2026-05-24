@@ -105,7 +105,7 @@ class SomeComponent extends ReactiveElement {
 
 Per-service seeds scope initialization data to a specific service or by unique identifier key.
 Read them via `scope.getSeed(ServiceClass)` or `scope.getSeed("SEED_KEY")`.
-Returns `null` if no seed was provided for that service.
+Returns `null` if no seed was provided for that key.
 
 ```ts
 import { Container, createContainer } from "@wirestate/core";

@@ -37,11 +37,11 @@ export interface InjectionOptions<T> {
    */
   injectionId: ServiceIdentifier<T>;
   /**
-   * Whether to subscribe to container changes.
+   * Resolve only the first context value.
    *
    * @remarks
-   * If true, the property will be updated if the container in the context changes.
-   * Defaults to false.
+   * If true, the property will not update when the container context changes.
+   * Defaults to `false`.
    */
   once?: boolean;
 }

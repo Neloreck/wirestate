@@ -17,7 +17,7 @@ import { SEEDS_TOKEN } from "./tokens";
  * @group Seeds
  *
  * @param container - The Inversify {@link Container} to clean up.
- * @param seeds - The targeted {@link SeedEntries} to remove.
+ * @param seeds - Targeted seed entries to remove.
  *
  * @example
  * ```typescript

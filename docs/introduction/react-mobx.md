@@ -2,7 +2,7 @@
 
 ## Basic Usage
 
-The core of Wirestate is the **Service** — an `@Injectable` class holding state and logic.
+The core of Wirestate is the **Service** - an `@Injectable` class holding state and logic.
 
 ### Creating a Service
 
@@ -215,7 +215,8 @@ export class AuthService {
 ```
 
 ```tsx
-import { useCommandCaller, CommandCaller, CommandDescriptor } from "@wirestate/react";
+import { CommandDescriptor } from "@wirestate/core";
+import { CommandCaller, useCommandCaller } from "@wirestate/react";
 
 function LogoutButton() {
   const callCommand: CommandCaller = useCommandCaller();
@@ -276,9 +277,11 @@ const container: Container = createContainer({
 ```
 
 ```tsx
-<ContainerProvider container={container}>
-  <Application />
-</ContainerProvider>
+return (
+  <ContainerProvider container={container}>
+    <Application />
+  </ContainerProvider>
+);
 ```
 
 ```ts
@@ -319,7 +322,7 @@ export class CounterService {
 
 ### Testing
 
-Services are plain classes — test them without a UI framework.
+Services are plain classes - test them without a UI framework.
 
 ```ts
 import { mockContainer } from "@wirestate/core/test-utils";

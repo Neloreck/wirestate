@@ -15,11 +15,11 @@ import { Optional } from "../types/general";
  */
 export interface UseInjectionOptions<T> {
   /**
-   * Whether to subscribe to container changes.
+   * Resolve only the first context value.
    *
    * @remarks
-   * If true, the service will be fetched only once when the controller is created.
-   * Defaults to false.
+   * If true, the service will not update when the container context changes.
+   * Defaults to `false`.
    */
   once?: boolean;
   /**

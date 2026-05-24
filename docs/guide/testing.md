@@ -2,7 +2,7 @@
 
 Services are plain TypeScript classes. Business logic tests do not need React, Lit, or DOM setup.
 
-## Unit Testing — No Container
+## Unit Testing - No Container
 
 For pure logic with no DI dependencies, instantiate directly.
 
@@ -21,7 +21,7 @@ test("logs a message", () => {
 });
 ```
 
-## mockService — Single Service
+## mockService - Single Service
 
 `mockService` binds one service to a fresh container and returns its instance. Handles lifecycle automatically.
 
@@ -44,7 +44,7 @@ Skip lifecycle hooks (`@OnActivated` / `@OnDeactivation`) when you only want to 
 const service = mockService(CounterService, mockContainer(), { skipLifecycle: true });
 ```
 
-## mockContainer — Multiple Services
+## mockContainer - Multiple Services
 
 `mockContainer` binds multiple services and their dependencies into one container. Use `activate` to trigger `@OnActivated` on specific services before the test runs.
 
@@ -60,7 +60,7 @@ test("counter emits event on increment", () => {
   });
 
   const counter = container.get(CounterService);
-  const events: string[] = [];
+  const events: Array<string> = [];
 
   container.get(EventBus).subscribe((event) => events.push(event.type));
 
@@ -82,7 +82,7 @@ test("cart uses mocked api client", async () => {
   const container = mockContainer({ entries: [CartService] });
   const mockApi = { post: jest.fn().mockResolvedValue({ ok: true }) };
 
-  bindConstant(container, ApiClient, mockApi as unknown as ApiClient);
+  bindConstant(container, { id: ApiClient, value: mockApi as unknown as ApiClient });
 
   const cart = container.get(CartService);
   await cart.checkout();
@@ -102,7 +102,7 @@ const container = mockContainer({ entries: [LoggerService] });
 
 mockBindService(container, CounterService);
 
-// later — swap out the implementation
+// later - swap out the implementation
 mockUnbindService(container, CounterService);
 mockBindService(container, CounterService, { skipLifecycle: true });
 ```

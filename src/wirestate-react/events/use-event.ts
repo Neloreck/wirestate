@@ -19,7 +19,7 @@ import { useContainer } from "../context/use-container";
  * @example
  * ```tsx
  * useEvent("USER_LOGGED_IN", (event) => {
- *   console.log("User logged in:,", event);
+ *   console.log("User logged in:", event);
  * });
  * ```
  */

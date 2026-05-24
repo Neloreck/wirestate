@@ -20,7 +20,7 @@ import { Maybe } from "../types/general";
  * @example
  * ```tsx
  * useEventsHandler((event) => {
- *   console.log('Event receieved:', event.type, event.payload);
+ *   console.log("Event received:", event.type, event.payload);
  * });
  * ```
  */

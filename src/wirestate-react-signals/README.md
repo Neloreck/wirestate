@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/@wirestate/react-signals.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react-signals)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/master/LICENSE)
 
-Re-exports `@preact/signals-react` for use with wirestate services.
+Re-exports `@preact/signals-react` for use with Wirestate services.
 
 ## Installation
 

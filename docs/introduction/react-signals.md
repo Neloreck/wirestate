@@ -2,7 +2,7 @@
 
 ## Basic Usage
 
-The core of Wirestate is the **Service** — an `@Injectable` class holding state and logic.
+The core of Wirestate is the **Service** - an `@Injectable` class holding state and logic.
 
 ### Creating a Service
 
@@ -14,7 +14,7 @@ import { signal, Signal } from "@wirestate/react-signals";
 
 @Injectable()
 export class CounterService {
-  public readonly count: Signal = signal(0);
+  public readonly count: Signal<number> = signal(0);
 
   public increment(): void {
     this.count.value += 1;
@@ -39,7 +39,7 @@ export class LoggerService {
 
 @Injectable()
 export class CounterService {
-  public readonly count: Signal = signal(0);
+  public readonly count: Signal<number> = signal(0);
 
   public constructor(
     @Inject(LoggerService)
@@ -98,7 +98,7 @@ import { signal, Signal } from "@wirestate/react-signals";
 
 @Injectable()
 export class CounterService {
-  public readonly count: Signal = signal(0);
+  public readonly count: Signal<number> = signal(0);
 
   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
@@ -153,7 +153,8 @@ export class AuthService {
 ```
 
 ```tsx
-import { useCommandCaller, CommandCaller, CommandDescriptor } from "@wirestate/react";
+import { CommandDescriptor } from "@wirestate/core";
+import { CommandCaller, useCommandCaller } from "@wirestate/react";
 
 function LogoutButton() {
   const callCommand: CommandCaller = useCommandCaller();
@@ -230,7 +231,7 @@ export interface CounterSeed {
 
 @Injectable()
 export class CounterService {
-  public readonly count: Signal = signal(0);
+  public readonly count: Signal<number> = signal(0);
 
   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
@@ -247,7 +248,7 @@ export class CounterService {
 
 ### Testing
 
-Services are plain classes — test them without a UI framework.
+Services are plain classes - test them without a UI framework.
 
 ```ts
 import { mockContainer, mockService } from "@wirestate/core/test-utils";

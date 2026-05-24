@@ -1,14 +1,14 @@
 # About Wirestate
 
-Wirestate is a framework for building application logic using Dependency Injection and reactivity.
-It separates your business logic from the UI layer, making it easier to scale, test and maintain.
+Wirestate is a TypeScript framework for application logic built on InversifyJS and external reactivity.
+It keeps state and workflows outside UI code.
 
 ## Why Wirestate?
 
-- **Rendering Agnostic Logic**: Write services, use them in React, Lit, or with other rendering libraries using custom integration.
-- **DI and IOC**: Built on top of InversifyJS, providing a powerful and flexible dependency injection system.
+- **UI-Separated Logic**: Keep services outside components, with React, Lit, or custom adapters managing UI lifecycle.
+- **DI and IoC**: Built on InversifyJS.
 - **Reactivity Choice**: Use MobX, Signals, or any other reactive library that fits your needs.
-- **Test-Driven**: Designed to be easily testable.
+- **Testable Services**: Test business logic without rendering UI.
 
 ## Quick Example (React + Signals)
 

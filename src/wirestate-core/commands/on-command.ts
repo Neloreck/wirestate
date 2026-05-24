@@ -9,8 +9,8 @@ import { Maybe } from "../types/general";
  * Decorator for service methods that handle a specific command.
  *
  * @remarks
- * Methods decorated with `@OnCommand` are automatically registered as command handlers
- * when the service is bound via {@link bindService}.
+ * Methods decorated with `@OnCommand` are registered as command handlers when
+ * the service activates through {@link bindService}.
  *
  * @group Commands
  *

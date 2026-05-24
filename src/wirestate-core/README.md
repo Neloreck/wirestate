@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/@wirestate/core.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/core)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/master/LICENSE)
 
-Core package for wirestate.
+Core package for Wirestate.
 Provides the DI container, service primitives, and event/command/query buses.
 React integration is in [`@wirestate/react`](https://www.npmjs.com/package/@wirestate/react).
 
@@ -13,7 +13,7 @@ React integration is in [`@wirestate/react`](https://www.npmjs.com/package/@wire
 npm install @wirestate/core reflect-metadata
 ```
 
-Import `reflect-metadata` once at your application entry point, before any wirestate imports:
+Import `reflect-metadata` once at your application entry point, before any Wirestate imports:
 
 ```ts
 import "reflect-metadata";
@@ -149,13 +149,13 @@ Seeds pass initial data to services when they are activated.
 ```ts
 import { SEED, Injectable, Inject } from "@wirestate/core";
 
-// Shared seed — same object injected into all services in the tree:
+// Shared seed - same object injected into all services in the tree:
 @Injectable()
 export class MyService {
   public constructor(@Inject(SEED) private seed: { theme: string }) {}
 }
 
-// Per-service seed — each service gets its own seed value:
+// Per-service seed - each service gets its own seed value:
 @Injectable()
 export class OtherService {
   public constructor(@Inject(WireScope) scope: WireScope) {
@@ -278,7 +278,7 @@ Removes a service binding from the container. Useful for overriding registration
 
 ```ts
 mockUnbindService(container, CounterService);
-mockBindEntry(container, { token: CounterService, useValue: fakeCounter });
+mockBindEntry(container, { id: CounterService, value: fakeCounter });
 ```
 
 ## License

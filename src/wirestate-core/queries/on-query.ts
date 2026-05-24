@@ -9,8 +9,8 @@ import { QueryHandlerMetadata, QueryType } from "../types/queries";
  * Decorator for service methods that respond to a query.
  *
  * @remarks
- * Methods decorated with `@OnQuery` are automatically registered as query handlers
- * when the service is bound via {@link bindService}.
+ * Methods decorated with `@OnQuery` are registered as query handlers when the
+ * service activates through {@link bindService}.
  *
  * Unlike events, queries MUST be handled by exactly one handler. If multiple handlers
  * are registered for the same query type, the most recent one (usually the most

@@ -52,7 +52,7 @@ export interface BindServiceOptions {
  *
  * @remarks
  * Binds the class in singleton scope and configures Inversify activation/deactivation hooks to:
- * - Manage the `IS_DISPOSED` lifecycle state flag.
+ * - Track activation state for injected {@link WireScope} instances.
  * - Trigger `@OnActivated` and `@OnDeactivation` decorated methods.
  * - Register/unregister `@OnCommand`, `@OnEvent` and `@OnQuery` handlers.
  * - Set up event dispatching and bus subscriptions.
@@ -91,7 +91,7 @@ export interface BindServiceOptions {
  *   }
  *
  *   @OnQuery("DATE_NOW")
- *   private onQueryDateNow(): void {
+ *   private onQueryDateNow(): Date {
  *     return new Date();
  *   }
  * }
@@ -138,7 +138,7 @@ export function bindServiceWithToken<T extends object>(
 
   // Inversify's fluent binding API only allows a single `.onActivation` /
   // `.onDeactivation` call per chain, so we register them on the container
-  // itself instead — this also works correctly if a later call rebinds the
+  // itself instead - this also works correctly if a later call rebinds the
   // same token.
   const whenBind: BindWhenOnFluentSyntax<T> = container.bind<T>(token).to(entry).inSingletonScope();
 
@@ -296,7 +296,7 @@ export function bindServiceWithToken<T extends object>(
 }
 
 /**
- * Attaches a event subscription to a service.
+ * Attaches an event subscription to a service.
  *
  * @internal
  *

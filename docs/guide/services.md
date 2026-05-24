@@ -246,12 +246,17 @@ export class NotificationService {
 ## Binding Constants and Dynamic Values
 
 ```ts
-import { bindConstant, bindDynamicValue } from "@wirestate/core";
+import { BindingType, bindConstant, bindDynamicValue } from "@wirestate/core";
 
 const API_URL = Symbol("API_URL");
+const CURRENT_TIME = Symbol("CURRENT_TIME");
 
-bindConstant(container, API_URL, "https://api.example.com");
-bindDynamicValue(container, API_URL, () => process.env.API_URL ?? "");
+bindConstant(container, { id: API_URL, value: "https://api.example.com" });
+bindDynamicValue(container, {
+  id: CURRENT_TIME,
+  bindingType: BindingType.DynamicValue,
+  factory: () => new Date(),
+});
 ```
 
-Inject the token via `@Inject(API_URL)`.
+Inject tokens via `@Inject(API_URL)`.

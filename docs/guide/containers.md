@@ -65,7 +65,7 @@ React provider lifecycle hooks are separate from eager activation. Services deco
 used. Managed containers are deprovisioned before disposal; external containers are deprovisioned when the provider
 unmounts or switches containers, but the provider never calls `unbindAll()` for them.
 
-For globally declared container outside of the React rendering tree, use a prebuilt container:
+For a globally declared container outside the React rendering tree, use a prebuilt container:
 
 ```tsx
 import { Container, createContainer } from "@wirestate/core";
@@ -125,7 +125,9 @@ Child React containers also activate all provided entries by default. Pass `acti
 ### Passing Seeds to a Provider
 
 ```tsx
-const SEEDS = [[CartService, { items: hydratedItems }]];
+import { SeedEntries } from "@wirestate/core";
+
+const SEEDS: SeedEntries = [[CartService, { items: hydratedItems }]];
 
 <SubContainerProvider entries={[CartService, CheckoutService]} seeds={SEEDS}>
   <CheckoutFlow />

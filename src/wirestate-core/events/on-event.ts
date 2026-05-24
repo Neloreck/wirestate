@@ -9,8 +9,8 @@ import { Maybe, Optional } from "../types/general";
  * Decorator for service methods that respond to events.
  *
  * @remarks
- * Methods decorated with `@OnEvent` are automatically registered as subscribers
- * when the service is bound via {@link bindService}.
+ * Methods decorated with `@OnEvent` are registered as subscribers when the
+ * service activates through {@link bindService}.
  *
  * You can specify one or more event types to handle. If `types` is omitted,
  * the method acts as a catch-all handler for all events broadcasted to the {@link EventBus}.

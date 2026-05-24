@@ -25,7 +25,7 @@ import { AnyObject, Optional } from "../types/general";
  *
  * @example
  * ```tsx
- * const logger = useOptionalInjection(FileLogger, (container) => container.get(ConsoleLoggerService);
+ * const logger = useOptionalInjection(FileLogger, (container) => container.get(ConsoleLoggerService));
  * ```
  */
 export function useOptionalInjection<T>(

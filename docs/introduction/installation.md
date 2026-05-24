@@ -12,8 +12,7 @@ Wirestate consists of a core package and UI-specific bindings.
 
 ## 2. Install
 
-To use wirestate you will need `@wirestate/core` and specific binding packages depending on rendering and 
-state management libraries you use.
+Wirestate needs `@wirestate/core` plus binding packages for your renderer and state library.
 
 Select <ins>one of</ins> the variants matching your setup below:
 

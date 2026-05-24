@@ -17,7 +17,7 @@ import { SEEDS_TOKEN } from "./tokens";
  * @group Seeds
  *
  * @param container - The Inversify {@link Container} where seeds should be applied.
- * @param seeds - An array of {@link SeedEntries} to add to the container.
+ * @param seeds - Seed entries to add to the container.
  *
  * @example
  * ```typescript
