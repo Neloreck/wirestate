@@ -9,10 +9,11 @@ on:
         description: "Publish with the experimental npm tag"
         required: true
         type: boolean
-        default: false
+        default: true
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: publish-packages
@@ -45,7 +46,6 @@ jobs:
         with:
           ref: ${{ env.PUBLISH_BRANCH }}
 
-
       - uses: pnpm/action-setup@v6
         name: Install pnpm
         with:
@@ -54,7 +54,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 23
+          node-version: 24
           cache: 'pnpm'
           registry-url: https://registry.npmjs.org
 
@@ -62,6 +62,4 @@ jobs:
         run: pnpm install
 
       - name: Publish packages
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: pnpm ${{ env.PUBLISH_SCRIPT }}
