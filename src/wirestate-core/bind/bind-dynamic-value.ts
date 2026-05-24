@@ -1,14 +1,9 @@
-import {
-  bindingScopeValues,
-  bindingTypeValues,
-  BindInWhenOnFluentSyntax,
-  BindWhenOnFluentSyntax,
-  Container,
-} from "inversify";
+import { BindInWhenOnFluentSyntax, BindWhenOnFluentSyntax, Container } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { ScopeBindingType, BindingType } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { InjectableDescriptor } from "../types/provision";
@@ -30,10 +25,10 @@ import { validateInjectableDescriptor } from "./validate-injectable-descriptor";
 function validateDynamicValueDescriptor(entry: InjectableDescriptor): void {
   validateInjectableDescriptor(entry);
 
-  if (entry.bindingType !== undefined && entry.bindingType !== bindingTypeValues.DynamicValue) {
+  if (entry.bindingType !== undefined && entry.bindingType !== BindingType.DynamicValue) {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
-      `bindDynamicValue expected binding type '${bindingTypeValues.DynamicValue}'.`
+      `bindDynamicValue expected binding type '${BindingType.DynamicValue}'.`
     );
   }
 
@@ -102,9 +97,9 @@ export function bindDynamicValue<T>(container: Container, entry: InjectableDescr
 
   if (!entry.scopeBindingType) {
     return binding;
-  } else if (entry.scopeBindingType === bindingScopeValues.Transient) {
+  } else if (entry.scopeBindingType === ScopeBindingType.Transient) {
     return binding.inTransientScope();
-  } else if (entry.scopeBindingType === bindingScopeValues.Request) {
+  } else if (entry.scopeBindingType === ScopeBindingType.Request) {
     return binding.inRequestScope();
   } else {
     return binding.inSingletonScope();

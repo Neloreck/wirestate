@@ -1,9 +1,9 @@
-import { bindingTypeValues, BindWhenOnFluentSyntax, Container, type ServiceIdentifier } from "inversify";
+import { BindWhenOnFluentSyntax, Container, type ServiceIdentifier } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ScopeBindingType } from "../alias";
+import { BindingType, ScopeBindingType } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { InjectableDescriptor } from "../types/provision";
@@ -25,10 +25,10 @@ import { validateInjectableDescriptor } from "./validate-injectable-descriptor";
 function validateConstantDescriptor(entry: InjectableDescriptor): void {
   validateInjectableDescriptor(entry);
 
-  if (entry.bindingType !== undefined && entry.bindingType !== bindingTypeValues.ConstantValue) {
+  if (entry.bindingType !== undefined && entry.bindingType !== BindingType.ConstantValue) {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
-      `bindConstant expected binding type '${bindingTypeValues.ConstantValue}'.`
+      `bindConstant expected binding type '${BindingType.ConstantValue}'.`
     );
   }
 

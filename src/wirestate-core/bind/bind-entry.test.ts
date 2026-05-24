@@ -1,7 +1,8 @@
-import { bindingScopeValues, bindingTypeValues, Container } from "inversify";
+import { Container } from "inversify";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
+import { ScopeBindingType, BindingType } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { mockContainer } from "../test-utils/mock-container";
 import { InjectableDescriptor } from "../types/provision";
@@ -25,7 +26,7 @@ describe("bindEntry", () => {
     bindEntry(container, {
       id: TOKEN,
       value: { key: "value" },
-      bindingType: bindingTypeValues.ConstantValue,
+      bindingType: BindingType.ConstantValue,
     });
 
     expect(container.get(TOKEN)).toEqual({ key: "value" });
@@ -49,8 +50,8 @@ describe("bindEntry", () => {
     bindEntry(container, {
       id: TOKEN,
       value: null,
-      bindingType: bindingTypeValues.DynamicValue,
-      scopeBindingType: bindingScopeValues.Transient,
+      bindingType: BindingType.DynamicValue,
+      scopeBindingType: ScopeBindingType.Transient,
       factory: () => {
         callCount++;
 
@@ -70,7 +71,7 @@ describe("bindEntry", () => {
     bindEntry(container, {
       id: TOKEN,
       value: Math.random(),
-      bindingType: bindingTypeValues.DynamicValue,
+      bindingType: BindingType.DynamicValue,
     });
 
     const first: number = container.get(TOKEN);
@@ -85,7 +86,7 @@ describe("bindEntry", () => {
     const container: Container = mockContainer();
 
     bindEntry(container, {
-      bindingType: bindingTypeValues.Instance,
+      bindingType: BindingType.Instance,
       id: GenericService,
       value: GenericService,
     });
@@ -97,7 +98,7 @@ describe("bindEntry", () => {
     const container: Container = mockContainer();
     const TOKEN: unique symbol = Symbol("generic-service");
     const entry: InjectableDescriptor = {
-      bindingType: bindingTypeValues.Instance,
+      bindingType: BindingType.Instance,
       id: TOKEN,
       value: GenericService,
     };
@@ -127,14 +128,14 @@ describe("bindEntry", () => {
 
     expect(() =>
       bindEntry(container, {
-        bindingType: bindingTypeValues.Factory,
+        bindingType: BindingType.Factory,
         id: "factory-entry",
         value: () => "factory-value",
       })
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindEntry(container, {
-        bindingType: bindingTypeValues.Factory,
+        bindingType: BindingType.Factory,
         id: "factory-entry",
         value: () => "factory-value",
       })
@@ -182,7 +183,7 @@ describe("bindEntry", () => {
 
     expect(() =>
       bindEntry(container, {
-        bindingType: bindingTypeValues.DynamicValue,
+        bindingType: BindingType.DynamicValue,
         id: "missing-dynamic",
       })
     ).toThrow("Dynamic value descriptor must provide either a 'factory' or 'value' property.");
@@ -193,7 +194,7 @@ describe("bindEntry", () => {
 
     expect(() =>
       bindEntry(container, {
-        bindingType: bindingTypeValues.DynamicValue,
+        bindingType: BindingType.DynamicValue,
         // @ts-ignore
         factory: "not-a-function",
         id: "bad-factory",
@@ -201,7 +202,7 @@ describe("bindEntry", () => {
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindEntry(container, {
-        bindingType: bindingTypeValues.DynamicValue,
+        bindingType: BindingType.DynamicValue,
         // @ts-ignore
         factory: "not-a-function",
         id: "bad-factory",
@@ -214,14 +215,14 @@ describe("bindEntry", () => {
 
     expect(() =>
       bindEntry(container, {
-        bindingType: bindingTypeValues.Instance,
+        bindingType: BindingType.Instance,
         id: GenericService,
         value: "not-a-constructor",
       })
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindEntry(container, {
-        bindingType: bindingTypeValues.Instance,
+        bindingType: BindingType.Instance,
         id: GenericService,
         value: "not-a-constructor",
       })

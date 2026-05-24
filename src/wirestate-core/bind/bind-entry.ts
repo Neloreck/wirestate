@@ -1,8 +1,9 @@
-import { bindingTypeValues, Container, Newable, ServiceIdentifier } from "inversify";
+import { Container, Newable, ServiceIdentifier } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { BindingType } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { InjectableDescriptor } from "../types/provision";
@@ -13,9 +14,9 @@ import { bindService, bindServiceWithToken, type BindServiceOptions } from "./bi
 import { validateInjectableDescriptor } from "./validate-injectable-descriptor";
 
 const SUPPORTED_BINDING_TYPES: ReadonlyArray<string> = [
-  bindingTypeValues.ConstantValue,
-  bindingTypeValues.DynamicValue,
-  bindingTypeValues.Instance,
+  BindingType.ConstantValue,
+  BindingType.DynamicValue,
+  BindingType.Instance,
   // ? -> "Factory" | "ResolvedValue" | "ServiceRedirection";
 ];
 
@@ -32,7 +33,7 @@ const SUPPORTED_BINDING_TYPES: ReadonlyArray<string> = [
 function validateEntryDescriptor(entry: InjectableDescriptor): void {
   validateInjectableDescriptor(entry);
 
-  const bindingType: string = entry.bindingType ?? bindingTypeValues.ConstantValue;
+  const bindingType: string = entry.bindingType ?? BindingType.ConstantValue;
 
   if (!SUPPORTED_BINDING_TYPES.includes(bindingType)) {
     throw new WirestateError(
@@ -41,7 +42,7 @@ function validateEntryDescriptor(entry: InjectableDescriptor): void {
     );
   }
 
-  if (bindingType === bindingTypeValues.Instance && typeof entry.value !== "function") {
+  if (bindingType === BindingType.Instance && typeof entry.value !== "function") {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
       "Instance descriptor 'value' must be a service constructor."
@@ -122,13 +123,13 @@ export function bindEntry<T extends object = object>(
 
   validateEntryDescriptor(entry);
 
-  if (!entry.bindingType || entry.bindingType === bindingTypeValues.ConstantValue) {
+  if (!entry.bindingType || entry.bindingType === BindingType.ConstantValue) {
     bindConstant(container, entry);
 
     return;
   }
 
-  if (entry.bindingType === bindingTypeValues.DynamicValue) {
+  if (entry.bindingType === BindingType.DynamicValue) {
     dbg.info(prefix(__filename), "Binding dynamic value entry:", {
       entry,
       container,

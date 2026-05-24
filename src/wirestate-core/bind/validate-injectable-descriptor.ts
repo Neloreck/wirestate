@@ -1,5 +1,4 @@
-import { bindingScopeValues, bindingTypeValues } from "inversify";
-
+import { BindingType, ScopeBindingType } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { InjectableDescriptor } from "../types/provision";
@@ -19,14 +18,14 @@ export function validateInjectableDescriptor(entry: InjectableDescriptor): void 
     throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, "Injectable descriptor must provide an 'id' token.");
   }
 
-  if (entry.bindingType !== undefined && !Object.values(bindingTypeValues).includes(entry.bindingType)) {
+  if (entry.bindingType !== undefined && !Object.values(BindingType).includes(entry.bindingType)) {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
       `Injectable descriptor has unknown binding type '${String(entry.bindingType)}'.`
     );
   }
 
-  if (entry.scopeBindingType !== undefined && !Object.values(bindingScopeValues).includes(entry.scopeBindingType)) {
+  if (entry.scopeBindingType !== undefined && !Object.values(ScopeBindingType).includes(entry.scopeBindingType)) {
     throw new WirestateError(
       ERROR_CODE_BINDING_SCOPE,
       `Injectable descriptor has unknown scope binding type '${String(entry.scopeBindingType)}'.`

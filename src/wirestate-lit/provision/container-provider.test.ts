@@ -1,8 +1,10 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, Injectable, OnActivated, OnDeactivation } from "@wirestate/core";
+import { BindingType, Container, Injectable, OnActivated, OnDeactivation } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 import { customElement } from "lit/decorators.js";
+
+import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { ContainerContext } from "../context/container-context";
 import { Maybe } from "../types/general";
@@ -137,6 +139,54 @@ describe("ContainerProvider", () => {
     element.appendChild(child);
 
     expect(receivedContext).toBe(controller.value);
+
+    element.remove();
+  });
+
+  it("should validate managed activation entries before first connect", () => {
+    @Injectable()
+    class LifecycleService {}
+
+    const element: TestProviderElement = new TestProviderElement();
+
+    expect(
+      () =>
+        new ContainerProvider(element, {
+          config: {
+            activate: ["MissingService"],
+            entries: [LifecycleService],
+          },
+        })
+    ).toThrow("is listed in 'activate' but was not provided in 'entries'.");
+  });
+
+  it("should activate true descriptor entries before first connect", () => {
+    const events: Array<string> = [];
+    const { LifecycleService: DirectService } = createLifecycleService({ suffix: "direct", events });
+    const { LifecycleService: DescriptorService } = createLifecycleService({ suffix: "descriptor", events });
+
+    const element: TestProviderElement = new TestProviderElement();
+    const controller: ContainerProvider = new ContainerProvider(element, {
+      config: {
+        activate: true,
+        entries: [
+          DirectService,
+          {
+            bindingType: BindingType.Instance,
+            id: "DESCRIPTOR",
+            value: DescriptorService,
+          },
+        ],
+      },
+    });
+
+    expect(controller.value).toBeInstanceOf(Container);
+    expect(events).toEqual([]);
+
+    document.body.appendChild(element);
+
+    expect(events).toEqual(["activated-direct", "activated-descriptor"]);
+    expect(controller.value.get("DESCRIPTOR")).toBeInstanceOf(DescriptorService);
 
     element.remove();
   });

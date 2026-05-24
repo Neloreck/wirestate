@@ -1,6 +1,6 @@
-import { bindingTypeValues, Container } from "inversify";
+import { Container } from "inversify";
 
-import { ScopeBindingType } from "../alias";
+import { BindingType, ScopeBindingType } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { InjectableDescriptor } from "../types/provision";
 
@@ -72,14 +72,14 @@ describe("bindConstant", () => {
 
     expect(() =>
       bindConstant(container, {
-        bindingType: bindingTypeValues.DynamicValue,
+        bindingType: BindingType.DynamicValue,
         id: "my-token",
         value: "my-value",
       })
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindConstant(container, {
-        bindingType: bindingTypeValues.DynamicValue,
+        bindingType: BindingType.DynamicValue,
         id: "my-token",
         value: "my-value",
       })

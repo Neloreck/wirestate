@@ -1,6 +1,6 @@
-import { bindingTypeValues, Container } from "inversify";
+import { Container } from "inversify";
 
-import { Injectable } from "../alias";
+import { BindingType, Injectable } from "../alias";
 import { bindService } from "../bind/bind-service";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
@@ -187,7 +187,7 @@ describe("createContainer", () => {
     const container: Container = createContainer({
       entries: [
         {
-          bindingType: bindingTypeValues.Instance,
+          bindingType: BindingType.Instance,
           id: TOKEN,
           value: TestService,
         },

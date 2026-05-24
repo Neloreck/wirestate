@@ -2,8 +2,8 @@ import { ContextProvider } from "@lit/context";
 import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-element";
 import {
   Container,
-  createContainer,
   ContainerConfig,
+  createContainer,
   getEntryToken,
   ServiceIdentifier,
   WirestateError,
@@ -86,6 +86,30 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
         ERROR_CODE_INVALID_ARGUMENTS,
         "ContainerProvider requires only container or valid config object to be provided."
       );
+    }
+
+    const activate: ReadonlyArray<ServiceIdentifier> = options.config
+      ? (options.config.activate === true ? options.config.entries?.map(getEntryToken) : options.config.activate) || []
+      : [];
+
+    if (options.config && activate.length) {
+      if (!options.config.entries?.length) {
+        throw new WirestateError(
+          ERROR_CODE_INVALID_ARGUMENTS,
+          "Supplied activation list while entries for binding are not provided."
+        );
+      }
+
+      const entryTokens: ReadonlyArray<ServiceIdentifier> = options.config.entries.map(getEntryToken);
+
+      for (const eager of activate) {
+        if (!entryTokens.includes(eager)) {
+          throw new WirestateError(
+            ERROR_CODE_INVALID_ARGUMENTS,
+            `createContainer: '${String(eager)}' is listed in 'activate' but was not provided in 'entries'.`
+          );
+        }
+      }
     }
 
     super(host, {
