@@ -16,30 +16,35 @@ describe("provision lifecycle", () => {
     const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
     const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
 
-    const container: Container = createContainer({
-      activate: false,
-      entries: [FirstService, SecondService],
-    });
+    const container: Container = createContainer({ activate: false, entries: [FirstService, SecondService] });
     const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle, [FirstService, SecondService]);
 
-    expect(events).toEqual([
-      "activated-first",
-      "provision-first",
-      "activated-second",
-      "provision-second",
-    ]);
+    expect(events).toEqual(["activated-first", "activated-second", "provision-first", "provision-second"]);
 
     deprovisionContainer(container, lifecycle);
 
     expect(events).toEqual([
       "activated-first",
-      "provision-first",
       "activated-second",
+      "provision-first",
       "provision-second",
       "deprovision-second",
       "deprovision-first",
+    ]);
+
+    container.unbindAll();
+
+    expect(events).toEqual([
+      "activated-first",
+      "activated-second",
+      "provision-first",
+      "provision-second",
+      "deprovision-second",
+      "deprovision-first",
+      "deactivation-first",
+      "deactivation-second",
     ]);
   });
 

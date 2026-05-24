@@ -73,7 +73,12 @@ export function deprovisionContainer(container: Container, lifecycle: ProvisionL
 }
 
 /**
- * Resolves services that declare provider lifecycle hooks and calls their provision hook.
+ * Resolves services that declare provider lifecycle hooks, then calls their provision hook.
+ *
+ * @remarks
+ * Provisioning is intentionally split into two phases: all provider lifecycle
+ * services are first resolved so activation completes, then `@OnProvision`
+ * hooks run in entry order.
  *
  * @group Service
  *
@@ -89,20 +94,18 @@ export function provisionServices(container: Container, entries: InjectableEntri
     const token: ServiceIdentifier = getEntryToken(entry);
     const metadataToken: ServiceIdentifier = getProviderLifecycleMetadataToken(entry);
 
-    if (visited.has(token) || !hasProviderLifecycleMetadata(metadataToken)) {
-      continue;
+    if (!visited.has(token) && hasProviderLifecycleMetadata(metadataToken)) {
+      visited.add(token);
+      services.push(container.get(token) as object);
     }
+  }
 
-    visited.add(token);
-
-    const service: object = container.get(token) as object;
+  for (const service of services) {
     const methodName: Maybe<string | symbol> = getProvisionHandlerMetadata(service);
 
     if (methodName) {
       callLifecycleHandler(service, methodName, "@OnProvision");
     }
-
-    services.push(service);
   }
 
   return services;
