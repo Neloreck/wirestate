@@ -4,7 +4,7 @@
   "description": "Lit elements integration for wirestate",
   "sideEffects": false,
   "author": "Syrotenko Igor",
-  "homepage": "https://github.com/neloreck/wirestate#readme",
+  "homepage": "https://github.com/Neloreck/wirestate#readme",
   "license": "MIT",
   "main": "./cjs/development/index.js",
   "module": "./esm/development/index.js",
@@ -35,10 +35,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/neloreck/wirestate.git"
+    "url": "git+https://github.com/Neloreck/wirestate.git"
   },
   "bugs": {
-    "url": "https://github.com/neloreck/wirestate/issues"
+    "url": "https://github.com/Neloreck/wirestate/issues"
   },
   "keywords": [
     "class-based",
