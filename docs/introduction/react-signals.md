@@ -1,5 +1,12 @@
 # React Signals Usage
 
+## Installation
+
+```bash
+npm install --save @wirestate/core reflect-metadata
+npm install --save wirestate/react @wirestate/react-signals @preact/signals-react
+```
+
 ## Basic Usage
 
 The core of Wirestate is the **Service** - an `@Injectable` class holding state and logic.

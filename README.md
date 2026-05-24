@@ -38,6 +38,7 @@ npm install @wirestate/react-signals @preact/signals-react
 ```bash
 # Core + Lit integration
 npm install @wirestate/core @wirestate/lit reflect-metadata
+npm install lit @lit/context @lit/reactive-element 
 
 # With Signals reactivity
 npm install @wirestate/lit-signals @lit-labs/signals signal-polyfill

@@ -6,7 +6,7 @@ Wirestate consists of a core package and UI-specific bindings.
 
 | UI    | Reactivity | Packages to Install                                                                                                                                         |
 | ----- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| React | Signals    | `@wirestate/core` `@wirestate/react` `@wirestate/react-signals` `reflect-metadata`                                                                          |
+| React | Signals    | `@wirestate/core` `@wirestate/react` `@wirestate/react-signals` `@preact/signals-react` `reflect-metadata`                                                  |
 | React | MobX       | `@wirestate/core` `@wirestate/react` `@wirestate/react-mobx` `reflect-metadata`                                                                             |
 | Lit   | Signals    | `@wirestate/core` `@wirestate/lit` `@wirestate/lit-signals` `@lit/context` `@lit/reactive-element` `@lit-labs/signals` `signal-polyfill` `reflect-metadata` |
 
@@ -33,7 +33,7 @@ npm install --save @wirestate/react-mobx mobx mobx-react-lite
 ### 2.C `Lit` with `signals`
 
 ```bash
-npm install --save @wirestate/core @wirestate/lit reflect-metadata
+npm install --save @wirestate/core @wirestate/lit @lit/context @lit/reactive-element reflect-metadata
 npm install --save @wirestate/lit-signals @lit-labs/signals signal-polyfill
 ```
 

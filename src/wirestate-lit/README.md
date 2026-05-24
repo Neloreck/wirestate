@@ -8,7 +8,8 @@ Wirestate integration for Lit elements. Provides container provisioning, depende
 ## Installation
 
 ```bash
-npm install @wirestate/core @wirestate/lit lit reflect-metadata
+npm install @wirestate/core @wirestate/lit reflect-metadata
+npm install lit @lit/context @lit/reactive-element
 ```
 
 ## Features
