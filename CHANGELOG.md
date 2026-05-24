@@ -1,5 +1,13 @@
 ## Unreleased
 
+- `bindConstant`, `bindDynamicValue`, and `bindEntry`: validate injectable descriptors and throw `WirestateError` for invalid binding config
+- `bindEntry`: support class bindings behind custom `id` tokens while preserving Wirestate lifecycle wiring
+- `bindService`: report missing `reflect-metadata` with a dedicated `WirestateError`; declare `reflect-metadata` as a core peer dependency
+- `WireScope.getSeed`: preserve falsy targeted seed values and return `null` only when the targeted seed is missing
+- React providers: recreate managed containers when normalized `seed`, `seeds`, `entries`, or `activate` config changes
+- Add ESM package export entries for `@wirestate/core/test-utils` and `@wirestate/react/test-utils`
+- Add `@wirestate/lit/test-utils` package build and export entries
+- `@wirestate/react-mobx`: export missing MobX aliases
 - Add `useScope` in `@wirestate/react`
 - New lit elements modules - `@wirestate/lit` and `@wirestate/lit-signals`
 - `EventBus`: add `unsubscribe` method for explicit handler removal by reference
@@ -12,13 +20,13 @@
 - Extensive JSDoc coverage for wirestate packages
 - `createIocContainer`: Removed in favor of `createContainer`
 - `createContainer`: Added ability to instantly provide and activate entries, targeted seeds
-- `ContainerConfig`: Added public alias for reusable container creation configuration.
-- `getContainerEntries`: Added public helper for inspecting entries registered through Wirestate binding helpers.
-- `createInjectablesProvider`: Removed.
+- `ContainerConfig`: Added public alias for reusable container creation configuration
+- `getContainerEntries`: Added public helper for inspecting entries registered through Wirestate binding helpers
+- `createInjectablesProvider`: Removed
 - `IocProvider`: Removed
-- `ContainerProvider`: Split React props into external `container` and managed `config`, activate managed entries by default, and provision registered provider lifecycle services.
-- `SubContainerProvider`: Added component solving problems of removed `createInjectablesProvider`; child providers activate entries by default and support `activate` overrides.
-- `OnProvision` / `OnDeprovision`: Added React provider lifecycle decorators for services that need provider commit/removal hooks.
+- `ContainerProvider`: Split React props into external `container` and managed `config`, activate managed entries by default, and provision registered provider lifecycle services
+- `SubContainerProvider`: Added component solving problems of removed `createInjectablesProvider`; child providers activate entries by default and support `activate` overrides
+- `OnProvision` / `OnDeprovision`: Added React provider lifecycle decorators for services that need provider commit/removal hooks
 - Replace IoC-context provision APIs with `ContainerContext`, `containerProvide`, `ContainerProvider`, and `useContainerProvision`
 - Replace injectables-provider APIs with `subContainerProvide`, `SubContainerProvider`, and `useSubContainerProvider`
 - Provide plain `Container` values through Lit context instead of wrapper objects
