@@ -1,4 +1,4 @@
-name: build-and-test
+name: Build and Test
 
 on:
   push:
@@ -30,6 +30,7 @@ jobs:
         with:
           node-version: 23
           cache: 'pnpm'
+          registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
         run: pnpm install

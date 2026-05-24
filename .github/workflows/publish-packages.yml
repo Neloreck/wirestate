@@ -1,0 +1,67 @@
+name: Publish Packages
+
+run-name: Publish ${{ inputs.experimental && 'experimental' || 'normal' }} packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      experimental:
+        description: "Publish with the experimental npm tag"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-packages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: npm-publish
+    env:
+      PUBLISH_BRANCH: ${{ 'main' }}
+      PUBLISH_SCRIPT: ${{ inputs.experimental && 'deploy:experimental' || 'deploy' }}
+
+    steps:
+      - name: Require repository admin permissions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          permission="$(gh api repos/${{ github.repository }}/collaborators/${{ github.actor }}/permission --jq .permission 2>/dev/null || true)"
+
+          if [ "${permission}" != "admin" ]; then
+            echo "::error::Only repository admins can publish packages. ${{ github.actor }} has '${permission:-none}' permissions."
+            exit 1
+          fi
+
+      - name: Checkout publish branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ env.PUBLISH_BRANCH }}
+
+
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 23
+          cache: 'pnpm'
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Publish packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: pnpm ${{ env.PUBLISH_SCRIPT }}
