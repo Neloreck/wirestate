@@ -23,6 +23,7 @@ if (require.main === module) {
     const packages: Array<PackageRecord> = readPackages();
     const currentVersion: string = ensureLockstepVersions(packages);
     const nextVersion: string = resolveNextVersion(currentVersion, target);
+    const wirestatePackagesNames: Set<string> = new Set(packages.map((pkg) => pkg.displayName));
 
     if (currentVersion === nextVersion) {
       console.log(`Packages already use version ${nextVersion}.`);
@@ -33,7 +34,7 @@ if (require.main === module) {
 
     for (const pkg of packages) {
       if (!dryRun) {
-        writeVersion(pkg, nextVersion);
+        writeVersion(pkg, nextVersion, wirestatePackagesNames);
       }
 
       console.log(`- ${pkg.displayName}`);

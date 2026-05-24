@@ -89,7 +89,30 @@ export function ensureLockstepVersions(packages: Array<PackageRecord>): string {
   return packages[0].version;
 }
 
-export function writeVersion(pkg: PackageRecord, nextVersion: string): void {
+export function updateInternalPeerDependencies(
+  manifest: Record<string, unknown>,
+  internalPackageNames: Set<string>,
+  nextVersion: string
+): void {
+  const peerDependencies = manifest.peerDependencies;
+
+  if (!peerDependencies || typeof peerDependencies !== "object" || Array.isArray(peerDependencies)) {
+    return;
+  }
+
+  const peerDependencyMap = peerDependencies as Record<string, unknown>;
+
+  for (const [dependencyName, dependencyVersion] of Object.entries(peerDependencyMap)) {
+    if (!internalPackageNames.has(dependencyName) || typeof dependencyVersion !== "string") {
+      continue;
+    }
+
+    peerDependencyMap[dependencyName] = nextVersion.includes("-") ? nextVersion : `^${nextVersion}`;
+  }
+}
+
+export function writeVersion(pkg: PackageRecord, nextVersion: string, internalPackageNames: Set<string>): void {
   pkg.manifest.version = nextVersion;
+  updateInternalPeerDependencies(pkg.manifest, internalPackageNames, nextVersion);
   fs.writeFileSync(pkg.manifestPath, `${JSON.stringify(pkg.manifest, null, 2)}\n`);
 }
