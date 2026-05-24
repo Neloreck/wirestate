@@ -11,6 +11,12 @@ Re-exports `@preact/signals-react` for use with Wirestate services.
 npm install @wirestate/react-signals @preact/signals-react
 ```
 
+For a full Wirestate React + Signals app, install the core and React packages too:
+
+```bash
+npm install @wirestate/core @wirestate/react @wirestate/react-signals @preact/signals-react reflect-metadata
+```
+
 For automatic component subscription without manual `useSignal` calls, add the Babel or SWC transform:
 
 ```bash

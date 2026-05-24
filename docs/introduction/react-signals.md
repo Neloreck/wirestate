@@ -4,7 +4,7 @@
 
 ```bash
 npm install --save @wirestate/core reflect-metadata
-npm install --save wirestate/react @wirestate/react-signals @preact/signals-react
+npm install --save @wirestate/react @wirestate/react-signals @preact/signals-react
 ```
 
 ## Basic Usage
