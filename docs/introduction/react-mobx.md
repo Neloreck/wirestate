@@ -249,16 +249,16 @@ export class ThemeService {
 ```
 
 ```tsx
-import { useSyncQueryCaller, SyncQueryCaller } from "@wirestate/react";
+import { QueryCaller, useQueryCaller } from "@wirestate/react";
 import { useCallback, useState } from "react";
 
 function ThemeToggle() {
   const [theme, setTheme] = useState<string>("unknown");
-  const query: SyncQueryCaller = useSyncQueryCaller();
+  const query: QueryCaller = useQueryCaller();
 
   const onQueryTheme = useCallback(() => {
     setTheme(query("CURRENT_THEME"));
-  }, []);
+  }, [query]);
 
   return <button onClick={onQueryTheme}>Theme: {theme}</button>;
 }
@@ -278,7 +278,7 @@ const container: Container = createContainer({
 ```tsx
 <ContainerProvider container={container}>
   <Application />
-</ContainerProvider>;
+</ContainerProvider>
 ```
 
 ```ts

@@ -6,9 +6,9 @@ Wirestate consists of a core package and UI-specific bindings.
 
 | UI    | Reactivity | Packages to Install                           |
 |-------|------------|-----------------------------------------------|
-| React | Signals    | `@wirestate/react` `@wirestate/react-signals` |
-| React | MobX       | `@wirestate/react` `@wirestate/react-mobx`    |
-| Lit   | Signals    | `@wirestate/lit` `@wirestate/lit-signals`     |
+| React | Signals    | `@wirestate/core` `@wirestate/react` `@wirestate/react-signals` `reflect-metadata` |
+| React | MobX       | `@wirestate/core` `@wirestate/react` `@wirestate/react-mobx` `reflect-metadata`    |
+| Lit   | Signals    | `@wirestate/core` `@wirestate/lit` `@wirestate/lit-signals` `reflect-metadata`     |
 
 ## 2. Install
 
@@ -20,22 +20,22 @@ Select <ins>one of</ins> the variants matching your setup below:
 ### 2.A `React` with `signals`
 
 ```bash
-npm install --save @wirestate/core @wirestate/react
+npm install --save @wirestate/core @wirestate/react reflect-metadata
 npm install --save @wirestate/react-signals @preact/signals-react
 ```
 
 ### 2.B `React` with `MobX`
 
 ```bash
-npm install --save @wirestate/core @wirestate/react
+npm install --save @wirestate/core @wirestate/react reflect-metadata
 npm install --save @wirestate/react-mobx mobx mobx-react-lite
 ```
 
 ### 2.C `Lit` with `signals`
 
 ```bash
-npm install --save @wirestate/core @wirestate/lit
-npm install --save @wirestate/lit-signals @preact/signals-core
+npm install --save @wirestate/core @wirestate/lit reflect-metadata
+npm install --save @wirestate/lit-signals @lit-labs/signals
 ```
 
 ## 3. Requirements

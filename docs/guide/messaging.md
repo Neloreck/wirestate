@@ -2,11 +2,11 @@
 
 Wirestate provides three message-passing patterns. All three buses live on the container and are scoped to it — child containers have independent buses.
 
-| Pattern | Direction           | Cardinality | Return                     |
-| ------- | ------------------- | ----------- | -------------------------- |
-| Event   | Emit -> subscribers | 1 -> many   | void                       |
-| Command | Caller -> handler   | 1 -> 1      | `CommandDescriptor`        |
-| Query   | Caller -> handler   | 1 -> 1      | result \ `Promise<result>` |
+| Pattern | Direction           | Cardinality | Return                       |
+| ------- | ------------------- | ----------- |------------------------------|
+| Event   | Emit -> subscribers | 1 -> many   | void                         |
+| Command | Caller -> handler   | 1 -> 1      | `CommandDescriptor`          |
+| Query   | Caller -> handler   | 1 -> 1      | result or `Promise<result>`  |
 
 
 ## Choosing a Pattern
@@ -235,34 +235,37 @@ export class SettingsService {
 const theme = this.scope.queryData<string>("GET_THEME");
 
 // Async — returns Promise:
-const profile = await this.scope.queryData<UserProfile>("FETCH_USER_PROFILE", userId);
+const profile = await this.scope.queryDataAsync<UserProfile>("FETCH_USER_PROFILE", userId);
 
 // Optional — returns null if no handler:
 const config = this.scope.queryOptionalData<Config>("GET_CONFIG");
+
+// Optional async — resolves null if no handler:
+const remoteConfig = await this.scope.queryOptionalDataAsync<Config>("FETCH_CONFIG");
 ```
 
 ### Dispatching — React
 
 ```tsx
-import { useQueryCaller, useSyncQueryCaller, useOptionalQueryCaller, QueryCaller } from "@wirestate/react";
+import { AsyncQueryCaller, QueryCaller, useAsyncQueryCaller, useQueryCaller } from "@wirestate/react";
 
 function ProfileCard({ userId }: { userId: string }) {
   // ...
 
-  const query: QueryCaller = useQueryCaller();
+  const queryAsync: AsyncQueryCaller = useAsyncQueryCaller();
 
   const loadProfile = async () => {
-    const profile = await query<UserProfile>("FETCH_USER_PROFILE", userId);
+    const profile = await queryAsync<UserProfile>("FETCH_USER_PROFILE", userId);
 
     setProfile(profile);
   };
 
   // ...
 
-  const syncQuery = useSyncQueryCaller();
+  const query: QueryCaller = useQueryCaller();
 
-  const refreshTheme = async () => {
-    const theme = syncQuery<string>("GET_THEME");
+  const refreshTheme = () => {
+    const theme = query<string>("GET_THEME");
 
     setTheme(theme);
   };

@@ -90,7 +90,7 @@ describe("WireScope", () => {
     expect(bus.subscribe).toHaveBeenCalledWith(handler);
     expect(typeof unsubscribe).toBe("function");
 
-    bus.emit({ type: "TEST" });
+    bus.emit("TEST");
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
@@ -107,7 +107,7 @@ describe("WireScope", () => {
 
     expect(bus.unsubscribe).toHaveBeenCalledWith(handler);
 
-    bus.emit({ type: "TEST" });
+    bus.emit("TEST");
     expect(handler).not.toHaveBeenCalled();
   });
 

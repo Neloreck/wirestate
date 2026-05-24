@@ -1,9 +1,7 @@
-import { AnyObject } from "@wirestate/core/types/general";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { EventHandler, EventType, EventUnsubscriber, Event } from "../types/events";
+import { Event, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 
 /**
  * Orchestrates event broadcasting to multiple subscribers.
@@ -35,11 +33,7 @@ export class EventBus {
    *
    * @example
    * ```typescript
-   * eventBus.emit({
-   *   type: "USER_LOGGED_IN",
-   *   payload: { userId: "123" },
-   *   from: AuthService
-   * });
+   * eventBus.emit("USER_LOGGED_IN", { userId: "123" }, AuthService);
    * ```
    */
   public emit<P = unknown, T extends EventType = EventType, F = unknown>(type: T, payload?: P, from?: F): void {
@@ -48,13 +42,16 @@ export class EventBus {
 
     for (const handler of snapshot) {
       try {
-        const event: Event = {
+        const event: Event<P, T, F> = {
           type,
-          payload,
         };
 
+        if (payload !== undefined) {
+          (event as { payload: P }).payload = payload;
+        }
+
         if (from !== undefined) {
-          (event as AnyObject).from = from;
+          (event as { from: F }).from = from;
         }
 
         handler(event);

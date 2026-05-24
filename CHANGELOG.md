@@ -32,6 +32,11 @@
 - Provide plain `Container` values through Lit context instead of wrapper objects
 - Recreate managed child containers when the parent container context changes
 - Add `useContainer` and `useScope` consumers in `@wirestate/lit`
+- Remove low-value core shortcut helpers: `command`, `commandOptional`, `emitEvent`, `query`, and `queryOptional`; use `WireScope` or the container-scoped buses directly
+- `EventBus.emit`: use `(type, payload?, from?)` arguments, matching `WireScope.emitEvent` and React event emitters
+- `QueryBus`: make `query` / `queryOptional` synchronous by default and add `queryAsync` / `queryOptionalAsync` for Promise-normalized calls
+- `WireScope`: add `queryDataAsync` and `queryOptionalDataAsync`
+- `@wirestate/react`: replace `useSyncQueryCaller` / `useOptionalSyncQueryCaller` with `useQueryCaller` / `useOptionalQueryCaller`; add `useAsyncQueryCaller` / `useOptionalAsyncQueryCaller` for Promise-normalized calls
 
 ## 0.6.3
 

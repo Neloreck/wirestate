@@ -112,7 +112,7 @@ export class AnotherService {
 }
 ```
 
-Use `commandOptional` when a handler may not be registered — returns `null` instead of throwing.
+Use `executeOptionalCommand` from `WireScope` or `CommandBus.commandOptional` when a handler may not be registered; both return `null` instead of throwing.
 
 ## Queries
 
@@ -136,8 +136,8 @@ export class AnotherService {
   public constructor(@Inject(WireScope) private scope: WireScope) {}
 
   public async someActionRequiringItems(): Promise<void> {
-    const asyncItems: Array<string> = await this.scope.queryData("STORE_ITEMS");
-    const syncItems: Array<string> = await this.scope.queryData("STORE_ITEMS");
+    const syncItems: Array<string> = this.scope.queryData("STORE_ITEMS");
+    const asyncItems: Array<string> = await this.scope.queryDataAsync("STORE_ITEMS");
   }
 }
 ```
@@ -196,23 +196,25 @@ export class PollingService {
 
 `WireScope` is injected per-service and exposes:
 
-| Method                                    | Description                                                     |
-| ----------------------------------------- | --------------------------------------------------------------- |
-| `getContainer()`                          | Access the raw IoC container                                    |
-| `resolve(token)`                          | Resolve a service or value by token                             |
-| `resolveOptional(token)`                  | Resolve a service or value, returns `null` if not bound         |
-| `getSeed(token?)`                         | Get the per-service or shared seed                              |
-| `emitEvent(type, payload?, from?)`        | Emit an event                                                   |
-| `subscribeToEvent(handler)`               | Subscribe a handler to all events; returns unsubscribe function |
-| `unsubscribeFromEvent(handler)`           | Remove a specific event subscription by handler reference       |
-| `queryData(type, data?)`                  | Dispatch a query and return the result                          |
-| `queryOptionalData(type, data?)`          | Dispatch a query; returns `null` if no handler is registered    |
-| `registerQueryHandler(type, handler)`     | Register a query handler; returns unregister function           |
-| `unregisterQueryHandler(type, handler)`   | Remove a specific query handler by type and reference           |
-| `executeCommand(type, data?)`             | Dispatch a command and return a descriptor                      |
-| `executeOptionalCommand(type, data?)`     | Dispatch a command; returns `null` if no handler is registered  |
-| `registerCommandHandler(type, handler)`   | Register a command handler; returns unregister function         |
-| `unregisterCommandHandler(type, handler)` | Remove a specific command handler by type and reference         |
+| Method                                    | Description                                                               |
+| ----------------------------------------- |---------------------------------------------------------------------------|
+| `getContainer()`                          | Access the raw IoC container                                              |
+| `resolve(token)`                          | Resolve a service or value by token                                       |
+| `resolveOptional(token)`                  | Resolve a service or value, returns `null` if not bound                   |
+| `getSeed(token?)`                         | Get the per-service or shared seed                                        |
+| `emitEvent(type, payload?, from?)`        | Emit an event                                                             |
+| `subscribeToEvent(handler)`               | Subscribe a handler to all events; returns unsubscribe function           |
+| `unsubscribeFromEvent(handler)`           | Remove a specific event subscription by handler reference                 |
+| `queryData(type, data?)`                  | Dispatch a synchronous query and return the result                        |
+| `queryDataAsync(type, data?)`             | Dispatch a query and return the result as a promise                       |
+| `queryOptionalData(type, data?)`          | Dispatch a synchronous query; returns `null` if no handler is registered  |
+| `queryOptionalDataAsync(type, data?)`     | Dispatch a query as a promise; returns `null` if no handler is registered |
+| `registerQueryHandler(type, handler)`     | Register a query handler; returns unregister function                     |
+| `unregisterQueryHandler(type, handler)`   | Remove a specific query handler by type and reference                     |
+| `executeCommand(type, data?)`             | Dispatch a command and return a descriptor                                |
+| `executeOptionalCommand(type, data?)`     | Dispatch a command; returns `null` if no handler is registered            |
+| `registerCommandHandler(type, handler)`   | Register a command handler; returns unregister function                   |
+| `unregisterCommandHandler(type, handler)` | Remove a specific command handler by type and reference                   |
 
 ## Test utilities
 

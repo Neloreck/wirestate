@@ -13,6 +13,52 @@ describe("EventBus", () => {
     expect(handler).toHaveBeenCalledWith({ type: "TEST", payload: 42 });
   });
 
+  it("should omit payload and from fields when they are undefined", () => {
+    const bus: EventBus = new EventBus();
+    const handler = jest.fn();
+
+    bus.subscribe(handler);
+    bus.emit("TEST", undefined, undefined);
+
+    const event = handler.mock.calls[0][0];
+
+    expect(event).toStrictEqual({ type: "TEST" });
+    expect(Object.prototype.hasOwnProperty.call(event, "payload")).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(event, "from")).toBe(false);
+  });
+
+  it("should omit only undefined fields while preserving provided fields", () => {
+    const bus: EventBus = new EventBus();
+    const handler = jest.fn();
+
+    bus.subscribe(handler);
+    bus.emit("TEST_WITH_SOURCE", undefined, "source");
+    bus.emit("TEST_WITH_PAYLOAD", 42, undefined);
+
+    const sourceEvent = handler.mock.calls[0][0];
+    const payloadEvent = handler.mock.calls[1][0];
+
+    expect(sourceEvent).toStrictEqual({ type: "TEST_WITH_SOURCE", from: "source" });
+    expect(Object.prototype.hasOwnProperty.call(sourceEvent, "payload")).toBe(false);
+
+    expect(payloadEvent).toStrictEqual({ type: "TEST_WITH_PAYLOAD", payload: 42 });
+    expect(Object.prototype.hasOwnProperty.call(payloadEvent, "from")).toBe(false);
+  });
+
+  it("should preserve falsy payload and from values when they are not undefined", () => {
+    const bus: EventBus = new EventBus();
+    const handler = jest.fn();
+
+    bus.subscribe(handler);
+    bus.emit("NULL_VALUES", null, null);
+    bus.emit("ZERO_VALUES", 0, 0);
+    bus.emit("FALSE_VALUES", false, false);
+
+    expect(handler).toHaveBeenNthCalledWith(1, { type: "NULL_VALUES", payload: null, from: null });
+    expect(handler).toHaveBeenNthCalledWith(2, { type: "ZERO_VALUES", payload: 0, from: 0 });
+    expect(handler).toHaveBeenNthCalledWith(3, { type: "FALSE_VALUES", payload: false, from: false });
+  });
+
   it("should support multiple subscribers", () => {
     const bus: EventBus = new EventBus();
     const handler1 = jest.fn();

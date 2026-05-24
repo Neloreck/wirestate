@@ -186,7 +186,7 @@ useEventsHandler((event) => {
 
 ### `useCommandCaller()`
 
-Returns a function that dispatches a command and waits for its result.
+Returns a function that dispatches a command and returns a descriptor for its task.
 
 ```tsx
 const call = useCommandCaller();
@@ -214,18 +214,24 @@ useCommandHandler("SCROLL_TOP", () => {
 
 ### `useQueryCaller()`
 
-Returns an async function that calls a query handler and resolves its return value.
+Returns a function that calls a synchronous query handler and returns its value directly.
 
 ```tsx
 const query = useQueryCaller();
-const items = await query("GET_ITEMS");
+const items = query("GET_ITEMS");
 ```
 
-### `useSyncQueryCaller()`
+### `useAsyncQueryCaller()`
 
-Same as `useQueryCaller` but calls a synchronous handler.
+Returns a function that calls a query handler and resolves its return value as a promise. It accepts both synchronous
+and asynchronous handlers.
 
-### `useOptionalQueryCaller()` / `useOptionalSyncQueryCaller()`
+```tsx
+const queryAsync = useAsyncQueryCaller();
+const items = await queryAsync("GET_ITEMS");
+```
+
+### `useOptionalQueryCaller()` / `useOptionalAsyncQueryCaller()`
 
 Return `null` when no handler is registered instead of throwing.
 

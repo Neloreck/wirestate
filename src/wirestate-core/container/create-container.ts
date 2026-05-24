@@ -63,7 +63,7 @@ export interface CreateContainerOptions {
 }
 
 /**
- * Configuration object accepted by {@link createContainer}.
+ * Represents configuration object accepted by {@link createContainer}.
  *
  * @remarks
  * Alias for {@link CreateContainerOptions}. Prefer this name when storing or
@@ -74,7 +74,7 @@ export interface CreateContainerOptions {
 export type ContainerConfig = CreateContainerOptions;
 
 /**
- * Creates an Inversify IoC container pre-configured with Wirestate essentials.
+ * Creates an Inversify {@link Container} pre-configured with Wirestate essentials.
  *
  * @remarks
  * The container is initialized with:
