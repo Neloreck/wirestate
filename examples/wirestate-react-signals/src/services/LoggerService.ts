@@ -2,15 +2,16 @@ import {
   Inject,
   Injectable,
   OnActivated,
+  OnCommand,
   OnDeactivation,
+  OnDeprovision,
+  OnEvent,
+  OnProvision,
   OnQuery,
   Optional,
-  OnEvent,
-  type Event,
-  OnCommand,
   WireScope,
+  type Event,
 } from "@wirestate/core";
-import { OnDeprovision, OnProvision } from "@wirestate/react";
 import { signal, Signal } from "@wirestate/react-signals";
 
 import { EGlobalCommand } from "@/constants/commands";
@@ -127,16 +128,12 @@ export class LoggerService {
     return dump;
   }
 
-  // [*] pass check - subscribe to all events if needed, no declaration - no sub
   @OnEvent()
   public onEvents(event: Event): void {
     this.saveEventLogEntry(event);
   }
 
-  @OnEvent([
-    /* [*] Pass extensive check - allow multiple events passing here in array: */
-    EGlobalEvent.COUNTER_RESET,
-  ])
+  @OnEvent([EGlobalEvent.COUNTER_RESET])
   public onReset(event: Event): void {
     this.log(
       `[${this.constructor.name}] Observed [onReset] event:`,

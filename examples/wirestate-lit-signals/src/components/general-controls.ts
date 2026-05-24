@@ -104,12 +104,10 @@ export class GeneralControls extends LitElement {
       at: Date.now(),
     });
 
-    // [*] Pass check - command registered and scheduled as async while descriptor creation is sync.
     console.info("[general-controls] Dump data task scheduled:", {
       status: command.status,
     });
 
-    // [*] Pass check - command descriptor returns async task to get result.
     command.task.then((result: unknown) => {
       console.info("[general-controls] Dump data result:", {
         result,

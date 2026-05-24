@@ -9,6 +9,8 @@ import {
   OnEvent,
   OnCommand,
   OnQuery,
+  OnProvision,
+  OnDeprovision,
 } from "@wirestate/core";
 import { signal, State } from "@wirestate/lit-signals";
 
@@ -53,21 +55,29 @@ export class LoggerService {
 
   @OnActivated()
   public onActivated(): void {
-    console.info(
-      `[${this.constructor.name}] Activated — listening for events, seed:`,
-      this.scope.getSeed(LoggerService)
-    );
-
-    // [*] Pass safe lifecycle checks - can emit from activation.
-    this.scope.emitEvent(`activated/${this.constructor.name}`);
+    console.info(`[${this.constructor.name}] Activated`);
   }
 
   @OnDeactivation()
   public onDeactivation(): void {
-    console.info(`[${this.constructor.name}] Deactivating`);
+    console.info(`[${this.constructor.name}] Deactivation`);
+  }
 
-    // [*] Pass safe lifecycle checks - can emit from deactivation.
-    this.scope.emitEvent(`deactivating/${this.constructor.name}`);
+  @OnProvision()
+  public onProvision(): void {
+    console.info(
+      `[${this.constructor.name}] Provision — listening for events, seed:`,
+      this.scope.getSeed(LoggerService)
+    );
+
+    this.scope.emitEvent(`provision/${this.constructor.name}`);
+  }
+
+  @OnDeprovision()
+  public onDeprovision(): void {
+    console.info(`[${this.constructor.name}] Deprovision`);
+
+    this.scope.emitEvent(`deprovision/${this.constructor.name}`);
 
     this.clear();
   }
@@ -111,7 +121,6 @@ export class LoggerService {
     return dump;
   }
 
-  // [*] pass check - subscribe to all events if needed, no declaration - no sub
   @OnEvent()
   public onEvents(event: Event): void {
     console.info(`[${this.constructor.name}] Event received:`, event);
@@ -119,10 +128,7 @@ export class LoggerService {
     this.saveEventLogEntry(event);
   }
 
-  @OnEvent([
-    /* [*] Pass extensive check - allow multiple events passing here in array: */
-    EGlobalEvent.COUNTER_RESET,
-  ])
+  @OnEvent([EGlobalEvent.COUNTER_RESET])
   public onReset(event: Event): void {
     this.log(`[${this.constructor.name}] Observed [onReset] event:`, event.type);
   }

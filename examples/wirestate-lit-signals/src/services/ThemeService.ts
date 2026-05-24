@@ -1,4 +1,13 @@
-import { Inject, Injectable, OnActivated, OnDeactivation, SEED, WireScope } from "@wirestate/core";
+import {
+  Inject,
+  Injectable,
+  OnActivated,
+  OnDeactivation,
+  OnDeprovision,
+  OnProvision,
+  SEED,
+  WireScope,
+} from "@wirestate/core";
 import { signal, State } from "@wirestate/lit-signals";
 
 import { EGlobalEvent } from "@/constants/events";
@@ -20,18 +29,26 @@ export class ThemeService {
 
   @OnActivated()
   public onActivated(): void {
-    console.info(`[${this.constructor.name}] Activated with theme:`, this.theme.get());
-
-    // [*] Pass safe lifecycle checks - can emit from activation.
-    this.scope.emitEvent(`activated/${this.constructor.name}`);
+    console.info(`[${this.constructor.name}] Activated`);
   }
 
   @OnDeactivation()
   public onDeactivation(): void {
-    console.info(`[${this.constructor.name}] Deactivating`);
+    console.info(`[${this.constructor.name}] Deactivation`);
+  }
 
-    // [*] Pass safe lifecycle checks - can emit from deactivation.
-    this.scope.emitEvent(`deactivating/${this.constructor.name}`);
+  @OnProvision()
+  public onProvision(): void {
+    console.info(`[${this.constructor.name}] Provision with theme:`, this.theme.get());
+
+    this.scope.emitEvent(`provision/${this.constructor.name}`);
+  }
+
+  @OnDeprovision()
+  public onDeprovision(): void {
+    console.info(`[${this.constructor.name}] Deprovision`);
+
+    this.scope.emitEvent(`deprovision/${this.constructor.name}`);
   }
 
   public toggleTheme(): void {

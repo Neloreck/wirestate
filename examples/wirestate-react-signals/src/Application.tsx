@@ -19,17 +19,14 @@ export function Application() {
   const themeService: ThemeService = useInjection(ThemeService);
   const globalConfig: object = useInjection(GLOBAL_CONFIG);
 
-  // [*] Pass reactivity subscription for specific global event in React tree.
   useEvent(EGlobalEvent.COUNTER_RESET, () => {
     console.info("[Application] Counter was reset (specific event)");
   });
 
-  // [*] Pass reactivity subscription for specific global events in React tree.
   useEvents([EGlobalEvent.COUNTER_RESET], () => {
     console.info("[Application] Counter was reset (array of events)");
   });
 
-  // [*] Pass reactivity subscription for all events in React tree.
   useEventsHandler((event) => {
     console.info(
       "[Application] Log all events:",
@@ -39,7 +36,6 @@ export function Application() {
     );
   });
 
-  // [*] Pass reactivity check from service, sync DOM and state on signal change.
   useEffect(() => {
     document.documentElement.dataset.theme = themeService.theme.value;
   }, [themeService.theme.value]);

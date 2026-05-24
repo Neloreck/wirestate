@@ -33,19 +33,17 @@ export class Application extends LitElement {
   @containerProvide({
     config: {
       seeds: [
-        [CounterService, { count: 10 }],
         [LoggerService, { enabled: true }],
+        [CounterService, { count: 25 }],
       ],
       entries: [
         LoggerService,
         CounterService,
         ThemeService,
-        // [*] Pass DI check - allow injecting static values / configs.
         {
           id: GLOBAL_CONFIG,
           value: { first: 1, second: 2, third: null, random: Math.random() },
         },
-        // [*] Pass DI check - allow injecting dynamic values / configs.
         {
           id: GLOBAL_DYNAMIC_CONFIG,
           value: { random: Math.random(), another: true },
@@ -53,7 +51,6 @@ export class Application extends LitElement {
           scopeBindingType: ScopeBindingType.Singleton,
         },
       ],
-      activate: [LoggerService],
     },
   })
   public readonly containerProvider!: ContainerProvider;

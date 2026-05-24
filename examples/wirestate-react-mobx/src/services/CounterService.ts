@@ -1,14 +1,15 @@
 import {
-  SEED,
   Inject,
   Injectable,
-  OnQuery,
-  OnEvent,
   OnActivated,
   OnDeactivation,
+  OnDeprovision,
+  OnEvent,
+  OnProvision,
+  OnQuery,
+  SEED,
   WireScope,
 } from "@wirestate/core";
-import { OnDeprovision, OnProvision } from "@wirestate/react";
 import {
   Action,
   Computed,

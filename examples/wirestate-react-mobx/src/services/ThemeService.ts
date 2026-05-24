@@ -3,10 +3,11 @@ import {
   Injectable,
   OnActivated,
   OnDeactivation,
+  OnDeprovision,
+  OnProvision,
   SEED,
   WireScope,
 } from "@wirestate/core";
-import { OnDeprovision, OnProvision } from "@wirestate/react";
 import { Action, Observable, makeObservable } from "@wirestate/react-mobx";
 
 import { EGlobalEvent } from "@/constants/events";

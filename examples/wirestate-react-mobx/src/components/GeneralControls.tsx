@@ -22,18 +22,15 @@ export const GeneralControls = observer(() => {
   const executeCommand: CommandCaller = useCommandCaller();
   const emitEvent: EventEmitter = useEventEmitter();
 
-  // [*] Pass ability to call commands from UI.
   const onDumpData = useCallback(() => {
     const command = executeCommand(EGlobalCommand.DUMP_DATA, {
       at: Date.now(),
     });
 
-    // [*] Pass check - command registered and scheduled as async while descriptor creation is sync.
     console.info("[GeneralControls] Dump data task scheduled:", {
       status: command.status,
     });
 
-    // [*] Pass check - command descriptor returns async task to get result.
     command.task.then((result: unknown) => {
       console.info("[GeneralControls] Dump data result:", {
         result,
@@ -42,7 +39,6 @@ export const GeneralControls = observer(() => {
     });
   }, [executeCommand]);
 
-  // [*] Pass ability to emit events from UI.
   const onUserPinged = useCallback(() => {
     emitEvent(EGlobalEvent.USER_PINGED, { at: Date.now() });
   }, [emitEvent]);

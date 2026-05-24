@@ -1,13 +1,13 @@
 import "./QueriesData.css";
 
 import {
+  type AsyncQueryCaller,
   type QueryCaller,
-  type SyncQueryCaller,
+  useAsyncQueryCaller,
   useInjection,
   useOptionalInjection,
   useQueryCaller,
   useQueryHandler,
-  useSyncQueryCaller,
 } from "@wirestate/react";
 import { observer } from "@wirestate/react-mobx";
 import { useCallback, useState } from "react";
@@ -27,27 +27,23 @@ export const QueriesData = observer(() => {
   const [summary, setSummary] = useState<Optional<ICounterSummary>>(null);
 
   const themeService: ThemeService = useInjection(ThemeService);
-  // [*] Pass ability to use optional injections.
   const loggerService: Optional<LoggerService> =
     useOptionalInjection(LoggerService);
 
-  // [*] Pass ability to dispatch queries from UI and get sync/async data.
   const queryData: QueryCaller = useQueryCaller();
-  const querySyncData: SyncQueryCaller = useSyncQueryCaller();
+  const queryAsyncData: AsyncQueryCaller = useAsyncQueryCaller();
 
-  // [*] Pass ability to declare handler to get sync data.
   const onPullSummary = useCallback(() => {
-    const value: ICounterSummary = querySyncData<ICounterSummary>(
+    const value: ICounterSummary = queryData<ICounterSummary>(
       ECounterServiceQuery.GET_COUNTER_SUMMARY,
       { value: "some-data" },
     );
 
     setSummary(value);
-  }, [querySyncData]);
+  }, [queryData]);
 
-  // [*] Pass ability to declare handler to get async data.
   const onFetchSnapshot = useCallback(async () => {
-    const value: ICounterSnapshot = await queryData<ICounterSnapshot>(
+    const value: ICounterSnapshot = await queryAsyncData<ICounterSnapshot>(
       ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT,
     );
 
@@ -56,9 +52,8 @@ export const QueriesData = observer(() => {
     if (loggerService) {
       loggerService.log(`[QueriesData] Fetched snapshot:`, value);
     }
-  }, [queryData, loggerService]);
+  }, [queryAsyncData, loggerService]);
 
-  // [*] Pass ability to declare a query handler from the React tree.
   useQueryHandler<Theme>(
     EGlobalQuery.GET_ACTIVE_THEME,
     () => themeService.theme,

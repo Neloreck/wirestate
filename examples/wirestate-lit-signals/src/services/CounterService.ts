@@ -1,4 +1,15 @@
-import { Inject, Injectable, OnActivated, OnDeactivation, OnEvent, WireScope, Event, OnQuery } from "@wirestate/core";
+import {
+  Inject,
+  Injectable,
+  OnActivated,
+  OnDeactivation,
+  OnEvent,
+  WireScope,
+  Event,
+  OnQuery,
+  OnProvision,
+  OnDeprovision,
+} from "@wirestate/core";
 import { signal, State, computed } from "@wirestate/lit-signals";
 
 import { EGlobalEvent } from "@/constants/events";
@@ -21,28 +32,37 @@ export class CounterService {
     private readonly scope: WireScope,
     @Inject(LoggerService)
     private readonly loggerService: LoggerService
-  ) {
-    const seed = scope.getSeed<CounterServiceSeed>(CounterService);
+  ) {}
 
-    console.log(`[${this.constructor.name}] constructing with seed:`, seed);
+  @OnActivated()
+  public onActivated(): void {
+    console.log(`[${this.constructor.name}] Activated`);
+
+    const seed = this.scope.getSeed<CounterServiceSeed>(CounterService);
 
     if (typeof seed?.count === "number") {
-      console.log(`[${this.constructor.name}] apply seed count:`, seed.count);
+      console.log(`[${this.constructor.name}] Apply seed count:`, seed.count);
       this.count.set(seed.count);
     }
   }
 
-  @OnActivated()
-  public onActivated(): void {
-    console.log(`[${this.constructor.name}] onActivated`);
-
-    // [*] Pass safe lifecycle checks - can emit from activation.
-    this.scope.emitEvent(`activated/${this.constructor.name}`);
-  }
-
   @OnDeactivation()
   public onDeactivation(): void {
-    console.log(`[${this.constructor.name}] onDeactivation`);
+    console.log(`[${this.constructor.name}] Deactivation`);
+  }
+
+  @OnProvision()
+  public onProvision(): void {
+    console.log(`[${this.constructor.name}] Provision`);
+
+    this.scope.emitEvent(`provision/${this.constructor.name}`);
+  }
+
+  @OnDeprovision()
+  public onDeprovision(): void {
+    console.log(`[${this.constructor.name}] Deprovision`);
+
+    this.scope.emitEvent(`deprovision/${this.constructor.name}`);
   }
 
   public reset(): void {
@@ -63,7 +83,7 @@ export class CounterService {
     this.count.set(this.count.get() + (event.payload ?? 1));
   }
 
-  /*
+  /**
    * Synchronous query handler. Any caller — another service, a React
    * component via `useQueryCaller`, or `query()` from bootstrap — can pull
    * a fresh summary on demand.
@@ -78,7 +98,7 @@ export class CounterService {
     };
   }
 
-  /*
+  /**
    * Async query handler — simulates a network round-trip. Callers can
    * simply `await` the return of `queryData` / `useQueryCaller` without
    * caring whether the responder is sync or async.
