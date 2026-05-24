@@ -1,16 +1,18 @@
 import { render } from "@testing-library/react";
-import { Container, Newable } from "@wirestate/core";
+import { Container, Injectable, Newable } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 
 import { ErrorLogBoundary } from "@/fixtures/react-components/error-log-boundary";
-import { GenericService } from "@/fixtures/services/generic-service";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
 
 import { useInjection } from "./use-injection";
 
 describe("useInjection", () => {
-  function TestComponent({ token = GenericService as Newable<object> }) {
+  @Injectable()
+  class SimpleService {}
+
+  function TestComponent({ token = SimpleService as Newable<object> }) {
     const service = useInjection(token);
 
     return <div data-testid={"injectable-name"}>{service.constructor.name || String(service.constructor.name)}</div>;
@@ -33,13 +35,11 @@ describe("useInjection", () => {
   });
 
   it("should resolve bound service from container", () => {
-    const container: Container = mockContainer({
-      entries: [GenericService],
-    });
+    const container: Container = mockContainer({ entries: [SimpleService] });
 
     const { getByTestId } = render(withContainerProvider(<TestComponent />, container));
 
-    expect(getByTestId("injectable-name").textContent).toBe("GenericService");
+    expect(getByTestId("injectable-name").textContent).toBe("SimpleService");
   });
 
   it("should throw error when used outside of ContainerProvider", () => {
@@ -59,15 +59,13 @@ describe("useInjection", () => {
   });
 
   it("should memoize service instance", () => {
-    const container: Container = mockContainer({
-      entries: [GenericService],
-    });
+    const container: Container = mockContainer({ entries: [SimpleService] });
 
     const originalGet = container.get.bind(container);
     let resolveCount = 0;
 
     jest.spyOn(container, "get").mockImplementation((token) => {
-      if (token === GenericService) {
+      if (token === SimpleService) {
         resolveCount++;
       }
 
@@ -90,14 +88,12 @@ describe("useInjection", () => {
     class AnotherService {}
 
     const container: Container = mockContainer({
-      entries: [GenericService, AnotherService],
+      entries: [SimpleService, AnotherService],
     });
 
-    const { rerender, getByTestId } = render(
-      withContainerProvider(<TestComponent token={GenericService} />, container)
-    );
+    const { rerender, getByTestId } = render(withContainerProvider(<TestComponent token={SimpleService} />, container));
 
-    expect(getByTestId("injectable-name").textContent).toBe("GenericService");
+    expect(getByTestId("injectable-name").textContent).toBe("SimpleService");
 
     rerender(withContainerProvider(<TestComponent token={AnotherService} />, container));
 
