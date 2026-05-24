@@ -5,28 +5,28 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { useContainer } from "../context/use-container";
-import { OptionalQueryCaller } from "../types/queries";
+import { OptionalQueryExecutor } from "../types/queries";
 
 /**
  * Returns a stable function to dispatch optional synchronous queries on the active container.
  *
  * @remarks
- * The returned dispatcher is memoized using `useCallback` and stays stable
+ * The returned executor is memoized using `useCallback` and stays stable
  * for the lifetime of the container. It returns `null` instead of throwing
- * if no handler is registered. Use {@link useOptionalAsyncQueryCaller} when
- * callers should consistently receive a Promise.
+ * if no handler is registered. Use {@link useOptionalAsyncQueryExecutor} when
+ * consumers should consistently receive a Promise.
  *
  * @group Queries
  *
- * @returns An optional query dispatcher function.
+ * @returns An optional query executor function.
  *
  * @example
  * ```tsx
- * const queryOptional: OptionalQueryCaller = useOptionalQueryCaller();
+ * const queryOptional: OptionalQueryExecutor = useOptionalQueryExecutor();
  * const settings: UserSettings | null = queryOptional(GET_USER_SETTINGS, { id: 1 });
  * ```
  */
-export function useOptionalQueryCaller(): OptionalQueryCaller {
+export function useOptionalQueryExecutor(): OptionalQueryExecutor {
   const container: Container = useContainer();
 
   return useCallback(
@@ -39,5 +39,5 @@ export function useOptionalQueryCaller(): OptionalQueryCaller {
       return container.get(QueryBus).queryOptional(type, data);
     },
     [container]
-  ) as OptionalQueryCaller;
+  ) as OptionalQueryExecutor;
 }

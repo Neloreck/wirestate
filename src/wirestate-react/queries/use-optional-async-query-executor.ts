@@ -5,27 +5,27 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { useContainer } from "../context/use-container";
-import { OptionalAsyncQueryCaller } from "../types/queries";
+import { OptionalAsyncQueryExecutor } from "../types/queries";
 
 /**
  * Returns a stable function to dispatch optional async-capable queries on the active container.
  *
  * @remarks
- * The returned dispatcher is memoized using `useCallback` and stays stable
+ * The returned executor is memoized using `useCallback` and stays stable
  * for the lifetime of the container. It returns `null` instead of throwing
  * if no handler is registered and uses {@link QueryBus.queryOptionalAsync} internally.
  *
  * @group Queries
  *
- * @returns An optional async query dispatcher function.
+ * @returns An optional async query executor function.
  *
  * @example
  * ```tsx
- * const queryOptionalAsync: OptionalAsyncQueryCaller = useOptionalAsyncQueryCaller();
+ * const queryOptionalAsync: OptionalAsyncQueryExecutor = useOptionalAsyncQueryExecutor();
  * const settings: UserSettings | null = await queryOptionalAsync(GET_USER_SETTINGS, { id: 1 });
  * ```
  */
-export function useOptionalAsyncQueryCaller(): OptionalAsyncQueryCaller {
+export function useOptionalAsyncQueryExecutor(): OptionalAsyncQueryExecutor {
   const container: Container = useContainer();
 
   return useCallback(
@@ -38,5 +38,5 @@ export function useOptionalAsyncQueryCaller(): OptionalAsyncQueryCaller {
       return container.get(QueryBus).queryOptionalAsync(type, data);
     },
     [container]
-  ) as OptionalAsyncQueryCaller;
+  ) as OptionalAsyncQueryExecutor;
 }

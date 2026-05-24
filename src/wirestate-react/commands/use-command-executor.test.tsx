@@ -3,33 +3,33 @@ import { Container, CommandBus, CommandStatus, CommandDescriptor } from "@wirest
 import { mockContainer } from "@wirestate/core/test-utils";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
-import { CommandCaller } from "../types/commands";
+import { CommandExecutor } from "../types/commands";
 import { Optional } from "../types/general";
 
-import { useCommandCaller } from "./use-command-caller";
+import { useCommandExecutor } from "./use-command-executor";
 
-describe("useCommandCaller", () => {
+describe("useCommandExecutor", () => {
   afterEach(() => {
     cleanup();
   });
 
-  it("should return a caller that dispatches commands", async () => {
+  it("should return an executor that dispatches commands", async () => {
     const container: Container = mockContainer();
     const handler = jest.fn((data: string) => data + "-result");
 
     container.get(CommandBus).register("TEST_COMMAND", handler);
 
-    let caller: Optional<CommandCaller> = null;
+    let executor: Optional<CommandExecutor> = null;
 
     function TestComponent() {
-      caller = useCommandCaller();
+      executor = useCommandExecutor();
 
       return null;
     }
 
     render(withContainerProvider(<TestComponent />, container));
 
-    const descriptor: CommandDescriptor = (caller as unknown as CommandCaller)("TEST_COMMAND", "some-data");
+    const descriptor: CommandDescriptor = (executor as unknown as CommandExecutor)("TEST_COMMAND", "some-data");
 
     expect(descriptor.status).toBe(CommandStatus.PENDING);
 
@@ -41,17 +41,17 @@ describe("useCommandCaller", () => {
 
   it("should throw on unhandled commands", async () => {
     const container: Container = mockContainer();
-    let caller: CommandCaller = null as unknown as CommandCaller;
+    let executor: CommandExecutor = null as unknown as CommandExecutor;
 
     function TestComponent() {
-      caller = useCommandCaller();
+      executor = useCommandExecutor();
 
       return null;
     }
 
     render(withContainerProvider(<TestComponent />, container));
 
-    expect(() => (caller as unknown as CommandCaller)("NOT_EXISTING", 1000)).toThrow(
+    expect(() => (executor as unknown as CommandExecutor)("NOT_EXISTING", 1000)).toThrow(
       "No command handler registered in container for type: 'NOT_EXISTING'."
     );
   });

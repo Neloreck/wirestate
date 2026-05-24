@@ -14,9 +14,10 @@
 - Add core `OnProvision` and `OnDeprovision` decorators plus `provisionContainer`, `deprovisionContainer`, `provisionServices`, and `deprovisionServices`.
 - Add explicit handler cleanup APIs: `EventBus.unsubscribe`, `CommandBus.unregister`, and `QueryBus.unregister`.
 - Add `WireScope` event, command, and query registration helpers, including unsubscribe/unregister methods and async query helpers.
+- Add `WireScope.isDeprovisioned` and `WireScope.isInactive` lifecycle flags for async guards across provider deprovision and service disposal.
 - Add `useScope` and context-level `useContainer` exports in `@wirestate/react`.
 - Add React `SubContainerProvider` for managed child container provisioning.
-- Add React `useAsyncQueryCaller` and `useOptionalAsyncQueryCaller` for Promise-normalized query calls.
+- Add React `useAsyncQueryExecutor` and `useOptionalAsyncQueryExecutor` for Promise-normalized query calls.
 - Add ESM/CJS package export entries for `@wirestate/core/test-utils` and `@wirestate/react/test-utils`.
 - Add React `withContainerProvider` test utility and expand `mockContainer` coverage in core test utilities.
 - Add centralized Inversify alias exports from `@wirestate/core`, including the missing `decorate` export.
@@ -27,11 +28,13 @@
 
 - Replace `createIocContainer` with `createContainer` and align public docs/examples around the new container API.
 - Split activation and provision into separate lifecycle phases so framework rendering lifecycles are no longer coupled to service activation.
+- Track provider deprovision state for services that inject `WireScope`, even when they do not declare `@OnProvision` or `@OnDeprovision`.
 - Move provider lifecycle decorators and lifecycle execution helpers from framework packages into `@wirestate/core`.
 - Give each container its own `EventBus`, `CommandBus`, `QueryBus`, and `WireScope` essentials while preserving inherited parent bindings.
 - Keep command and query handlers stack-based so unregistering a handler restores the previous handler for that type.
-- Make `QueryBus.query` and `QueryBus.queryOptional` synchronous by default, with `queryAsync` and `queryOptionalAsync` for Promise-normalized callers.
-- Update React query hooks to match the sync/async split: `useQueryCaller`, `useOptionalQueryCaller`, `useAsyncQueryCaller`, and `useOptionalAsyncQueryCaller`.
+- Make `QueryBus.query` and `QueryBus.queryOptional` synchronous by default, with `queryAsync` and `queryOptionalAsync` for Promise-normalized consumers.
+- Rename React command/query executor APIs from the earlier `Caller` naming to `Executor`: `CommandExecutor`, `OptionalCommandExecutor`, `QueryExecutor`, `AsyncQueryExecutor`, `OptionalQueryExecutor`, `OptionalAsyncQueryExecutor`, `useCommandExecutor`, `useOptionalCommandExecutor`, `useQueryExecutor`, `useOptionalQueryExecutor`, `useAsyncQueryExecutor`, and `useOptionalAsyncQueryExecutor`.
+- Update React query hooks to match the sync/async split: `useQueryExecutor`, `useOptionalQueryExecutor`, `useAsyncQueryExecutor`, and `useOptionalAsyncQueryExecutor`.
 - Change `EventBus.emit` to accept `(type, payload?, from?)`, matching `WireScope.emitEvent` and React event emitters.
 - Simplify event payload typing and event dispatch construction.
 - Split React `ContainerProvider` props into external `container` mode and managed `config` mode.
@@ -43,6 +46,7 @@
 - Replace Lit `options` naming with `config`, publish plain `Container` values through context, and recreate managed child containers when the parent context changes.
 - Normalize Lit managed provider activation to `true`, validate Lit provider lifecycle config, and keep context publication tied to host connection state.
 - Preserve named Inversify instances when framework providers resolve lifecycle services.
+- Share WireScope constructor-injection metadata detection between service binding and provider lifecycle resolution.
 - Validate injectable descriptors in `bindConstant`, `bindDynamicValue`, `bindEntry`, and `bindService`, throwing `WirestateError` for invalid binding config.
 - Support class bindings behind custom `id` tokens in `bindEntry` while preserving Wirestate lifecycle registration.
 - Move container config validation into core with `validateContainerConfig` so React and Lit providers share the same rules.
@@ -71,12 +75,13 @@
 - Remove React `IocProvider`, `createInjectablesProvider`, `useIocContext`, and provider-local `useContainer` / `useInjection` / `useOptionalInjection` paths in favor of context and provider APIs exported from `@wirestate/react`.
 - Remove experimental React `useRootContainer` and `useContainerRevision`.
 - Remove low-value core shortcut helpers: `command`, `commandOptional`, `emitEvent`, `query`, and `queryOptional`.
-- Remove `useSyncQueryCaller` and `useOptionalSyncQueryCaller`; use `useQueryCaller` / `useOptionalQueryCaller` for sync results and async hooks for Promise-normalized results.
+- Remove `useSyncQueryCaller` and `useOptionalSyncQueryCaller`; use `useQueryExecutor` / `useOptionalQueryExecutor` for sync results and async executor hooks for Promise-normalized results.
 
 ### Documentation and Tooling
 
 - Add the VitePress docs site, Typedoc generation, API docs source-link plugin, docs workflows, and guide pages for containers, services, seeds, messaging, testing, React MobX, React Signals, and Lit Signals.
 - Add and update README files for core, React, Lit, React MobX, React Signals, Lit Signals, portable bundles, and the root project.
+- Document WireScope lifecycle state, provider deprovision tracking, and `scope.isInactive` async guard usage.
 - Add installation guidance for `signal-polyfill` in Lit Signals setup.
 - Add a standalone Lit Signals example app and update React MobX / React Signals examples for the new provider and messaging APIs.
 - Add package version bump scripts and run configurations for docs and package workflows.

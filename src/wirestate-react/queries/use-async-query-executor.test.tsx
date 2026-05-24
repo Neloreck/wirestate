@@ -3,12 +3,12 @@ import { Container, QueryBus } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
-import { AsyncQueryCaller } from "../types/queries";
+import { AsyncQueryExecutor } from "../types/queries";
 
-import { useAsyncQueryCaller } from "./use-async-query-caller";
+import { useAsyncQueryExecutor } from "./use-async-query-executor";
 
-describe("useAsyncQueryCaller", () => {
-  it("should return a caller that dispatches sync queries as promises", async () => {
+describe("useAsyncQueryExecutor", () => {
+  it("should return an executor that dispatches sync queries as promises", async () => {
     const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((data: string) => data + "-result");
@@ -17,17 +17,17 @@ describe("useAsyncQueryCaller", () => {
 
     jest.spyOn(bus, "queryAsync");
 
-    let caller: AsyncQueryCaller = null as unknown as AsyncQueryCaller;
+    let executor: AsyncQueryExecutor = null as unknown as AsyncQueryExecutor;
 
     function TestComponent() {
-      caller = useAsyncQueryCaller();
+      executor = useAsyncQueryExecutor();
 
       return null;
     }
 
     render(withContainerProvider(<TestComponent />, container));
 
-    const result: string = await (caller as AsyncQueryCaller)("TEST_QUERY", "some-data");
+    const result: string = await (executor as AsyncQueryExecutor)("TEST_QUERY", "some-data");
 
     expect(result).toBe("some-data-result");
     expect(handler).toHaveBeenCalledWith("some-data");
@@ -40,17 +40,17 @@ describe("useAsyncQueryCaller", () => {
 
     bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
 
-    let caller = null as unknown as AsyncQueryCaller;
+    let executor = null as unknown as AsyncQueryExecutor;
 
     function TestComponent() {
-      caller = useAsyncQueryCaller();
+      executor = useAsyncQueryExecutor();
 
       return null;
     }
 
     render(withContainerProvider(<TestComponent />, container));
 
-    const result: string = await (caller as AsyncQueryCaller)("ASYNC_QUERY", "value");
+    const result: string = await (executor as AsyncQueryExecutor)("ASYNC_QUERY", "value");
 
     expect(result).toBe("value-async");
   });
@@ -61,28 +61,28 @@ describe("useAsyncQueryCaller", () => {
 
     jest.spyOn(bus, "queryAsync");
 
-    let caller = null as unknown as AsyncQueryCaller;
+    let executor = null as unknown as AsyncQueryExecutor;
 
     function TestComponent() {
-      caller = useAsyncQueryCaller();
+      executor = useAsyncQueryExecutor();
 
       return null;
     }
 
     render(withContainerProvider(<TestComponent />, container));
 
-    await expect((caller as AsyncQueryCaller)("NOT_EXISTING", "data")).rejects.toThrow(
+    await expect((executor as AsyncQueryExecutor)("NOT_EXISTING", "data")).rejects.toThrow(
       "No query handler registered in container for type: 'NOT_EXISTING'."
     );
     expect(bus.queryAsync).toHaveBeenCalledWith("NOT_EXISTING", "data");
   });
 
-  it("should return a stable caller between re-renders", () => {
+  it("should return a stable executor between re-renders", () => {
     const container: Container = mockContainer();
-    const callers: Array<AsyncQueryCaller> = [];
+    const executors: Array<AsyncQueryExecutor> = [];
 
     function TestComponent() {
-      callers.push(useAsyncQueryCaller());
+      executors.push(useAsyncQueryExecutor());
 
       return null;
     }
@@ -91,8 +91,8 @@ describe("useAsyncQueryCaller", () => {
 
     rerender(withContainerProvider(<TestComponent />, container));
 
-    expect(callers).toHaveLength(2);
-    expect(callers[0]).toBe(callers[1]);
+    expect(executors).toHaveLength(2);
+    expect(executors[0]).toBe(executors[1]);
   });
 
   it("should support symbol query types", async () => {
@@ -102,16 +102,16 @@ describe("useAsyncQueryCaller", () => {
 
     bus.register(type, () => "symbol-result");
 
-    let caller = null as unknown as AsyncQueryCaller;
+    let executor = null as unknown as AsyncQueryExecutor;
 
     function TestComponent() {
-      caller = useAsyncQueryCaller();
+      executor = useAsyncQueryExecutor();
 
       return null;
     }
 
     render(withContainerProvider(<TestComponent />, container));
 
-    await expect((caller as AsyncQueryCaller)(type)).resolves.toBe("symbol-result");
+    await expect((executor as AsyncQueryExecutor)(type)).resolves.toBe("symbol-result");
   });
 });

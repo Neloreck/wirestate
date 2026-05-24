@@ -185,21 +185,21 @@ useEventsHandler((event) => {
 
 ## Command hooks
 
-### `useCommandCaller()`
+### `useCommandExecutor()`
 
 Returns a function that dispatches a command and returns a descriptor for its task.
 
 ```tsx
-const call = useCommandCaller();
+const executeCommand = useCommandExecutor();
 
 async function handleClick() {
-  await call("LOGIN", { username: "alice" }).task;
+  await executeCommand("LOGIN", { username: "alice" }).task;
 }
 ```
 
-### `useOptionalCommandCaller()`
+### `useOptionalCommandExecutor()`
 
-Same as `useCommandCaller` but returns `null` if no handler is registered.
+Same as `useCommandExecutor` but returns `null` if no handler is registered.
 
 ### `useCommandHandler(type, handler)`
 
@@ -213,26 +213,26 @@ useCommandHandler("SCROLL_TOP", () => {
 
 ## Query hooks
 
-### `useQueryCaller()`
+### `useQueryExecutor()`
 
 Returns a function that calls a synchronous query handler and returns its value directly.
 
 ```tsx
-const query = useQueryCaller();
+const query = useQueryExecutor();
 const items = query("GET_ITEMS");
 ```
 
-### `useAsyncQueryCaller()`
+### `useAsyncQueryExecutor()`
 
 Returns a function that calls a query handler and resolves its return value as a promise. It accepts both synchronous
 and asynchronous handlers.
 
 ```tsx
-const queryAsync = useAsyncQueryCaller();
+const queryAsync = useAsyncQueryExecutor();
 const items = await queryAsync("GET_ITEMS");
 ```
 
-### `useOptionalQueryCaller()` / `useOptionalAsyncQueryCaller()`
+### `useOptionalQueryExecutor()` / `useOptionalAsyncQueryExecutor()`
 
 Return `null` when no handler is registered instead of throwing.
 

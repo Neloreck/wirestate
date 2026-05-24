@@ -5,27 +5,27 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { useContainer } from "../context/use-container";
-import { QueryCaller } from "../types/queries";
+import { QueryExecutor } from "../types/queries";
 
 /**
  * Returns a stable function to dispatch synchronous queries on the active container.
  *
  * @remarks
- * The returned dispatcher is memoized using `useCallback` and stays stable
+ * The returned executor is memoized using `useCallback` and stays stable
  * for the lifetime of the container. It uses {@link QueryBus.query} internally.
- * Use {@link useAsyncQueryCaller} when callers should consistently receive a Promise.
+ * Use {@link useAsyncQueryExecutor} when consumers should consistently receive a Promise.
  *
  * @group Queries
  *
- * @returns A query dispatcher function.
+ * @returns A query executor function.
  *
  * @example
  * ```tsx
- * const query: QueryCaller = useQueryCaller();
+ * const query: QueryExecutor = useQueryExecutor();
  * const result: UserProfile = query(GET_USER_PROFILE, { id: 123 });
  * ```
  */
-export function useQueryCaller(): QueryCaller {
+export function useQueryExecutor(): QueryExecutor {
   const container: Container = useContainer();
 
   return useCallback(
@@ -38,5 +38,5 @@ export function useQueryCaller(): QueryCaller {
       return container.get(QueryBus).query(type, data);
     },
     [container]
-  ) as QueryCaller;
+  ) as QueryExecutor;
 }

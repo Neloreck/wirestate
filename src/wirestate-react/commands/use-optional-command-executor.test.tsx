@@ -3,11 +3,11 @@ import { Container, CommandBus } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
-import { OptionalCommandCaller } from "../types/commands";
+import { OptionalCommandExecutor } from "../types/commands";
 
-import { useOptionalCommandCaller } from "./use-optional-command-caller";
+import { useOptionalCommandExecutor } from "./use-optional-command-executor";
 
-describe("useOptionalCommandCaller", () => {
+describe("useOptionalCommandExecutor", () => {
   afterEach(() => {
     cleanup();
   });
@@ -15,18 +15,18 @@ describe("useOptionalCommandCaller", () => {
   it("should return null if no handler exists", () => {
     const container: Container = mockContainer();
 
-    let caller: OptionalCommandCaller = null as unknown as OptionalCommandCaller;
+    let executor: OptionalCommandExecutor = null as unknown as OptionalCommandExecutor;
 
     function TestComponent() {
-      caller = useOptionalCommandCaller();
+      executor = useOptionalCommandExecutor();
 
       return null;
     }
 
     render(withContainerProvider(<TestComponent />, container));
 
-    expect(caller as unknown).toBeInstanceOf(Function);
-    expect((caller as unknown as OptionalCommandCaller)("MISSING_CMD")).toBeNull();
+    expect(executor as unknown).toBeInstanceOf(Function);
+    expect((executor as unknown as OptionalCommandExecutor)("MISSING_CMD")).toBeNull();
   });
 
   it("should return descriptor if handler exists", async () => {
@@ -34,17 +34,17 @@ describe("useOptionalCommandCaller", () => {
 
     container.get(CommandBus).register("EXISTING_COMMAND", () => "ok");
 
-    let caller: OptionalCommandCaller = null as unknown as OptionalCommandCaller;
+    let executor: OptionalCommandExecutor = null as unknown as OptionalCommandExecutor;
 
     function TestComponent() {
-      caller = useOptionalCommandCaller();
+      executor = useOptionalCommandExecutor();
 
       return null;
     }
 
     render(withContainerProvider(<TestComponent />, container));
 
-    const descriptor = (caller as unknown as OptionalCommandCaller)("EXISTING_COMMAND");
+    const descriptor = (executor as unknown as OptionalCommandExecutor)("EXISTING_COMMAND");
 
     expect(descriptor).not.toBeNull();
     expect(await descriptor!.task).toBe("ok");

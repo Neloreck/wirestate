@@ -200,7 +200,7 @@ function CounterLogger() {
 
 ### Commands
 
-Commands are named write operations dispatched to a single registered handler. The caller gets a `CommandDescriptor` to track async completion.
+Commands are named write operations dispatched to a single registered handler. The executor returns a `CommandDescriptor` to track async completion.
 
 ```ts
 import { Injectable, OnCommand } from "@wirestate/core";
@@ -216,13 +216,13 @@ export class AuthService {
 
 ```tsx
 import { CommandDescriptor } from "@wirestate/core";
-import { CommandCaller, useCommandCaller } from "@wirestate/react";
+import { CommandExecutor, useCommandExecutor } from "@wirestate/react";
 
 function LogoutButton() {
-  const callCommand: CommandCaller = useCommandCaller();
+  const executeCommand: CommandExecutor = useCommandExecutor();
 
   const handleClick = async () => {
-    const descriptor: CommandDescriptor = callCommand("LOGOUT");
+    const descriptor: CommandDescriptor = executeCommand("LOGOUT");
 
     await descriptor.task;
   };
@@ -233,7 +233,7 @@ function LogoutButton() {
 
 ### Queries
 
-Queries are synchronous or asynchronous request-response calls. One handler answers; callers receive the result directly.
+Queries are synchronous or asynchronous request-response calls. One handler answers; the executor returns the result directly.
 
 ```ts
 import { Injectable, OnQuery } from "@wirestate/core";
@@ -250,12 +250,12 @@ export class ThemeService {
 ```
 
 ```tsx
-import { QueryCaller, useQueryCaller } from "@wirestate/react";
+import { QueryExecutor, useQueryExecutor } from "@wirestate/react";
 import { useCallback, useState } from "react";
 
 function ThemeToggle() {
   const [theme, setTheme] = useState<string>("unknown");
-  const query: QueryCaller = useQueryCaller();
+  const query: QueryExecutor = useQueryExecutor();
 
   const onQueryTheme = useCallback(() => {
     setTheme(query("CURRENT_THEME"));

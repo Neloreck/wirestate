@@ -20,7 +20,7 @@ export type QueryResponder<R = unknown, D = unknown> = (data?: D) => MaybePromis
  * Represents signature for a function that dispatches synchronous queries and returns their result.
  *
  * @remarks
- * Typically returned by {@link useQueryCaller}.
+ * Typically returned by {@link useQueryExecutor}.
  *
  * @group Queries
  *
@@ -33,13 +33,13 @@ export type QueryResponder<R = unknown, D = unknown> = (data?: D) => MaybePromis
  *
  * @returns The synchronous query result.
  */
-export type QueryCaller = <R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D) => R;
+export type QueryExecutor = <R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D) => R;
 
 /**
  * Represents signature for a function that dispatches queries and returns their result as a Promise.
  *
  * @remarks
- * Typically returned by {@link useAsyncQueryCaller}.
+ * Typically returned by {@link useAsyncQueryExecutor}.
  *
  * @group Queries
  *
@@ -52,7 +52,7 @@ export type QueryCaller = <R = unknown, D = unknown, T extends QueryType = Query
  *
  * @returns A Promise resolving to the query result.
  */
-export type AsyncQueryCaller = <R = unknown, D = unknown, T extends QueryType = QueryType>(
+export type AsyncQueryExecutor = <R = unknown, D = unknown, T extends QueryType = QueryType>(
   type: T,
   data?: D
 ) => Promise<R>;
@@ -61,7 +61,7 @@ export type AsyncQueryCaller = <R = unknown, D = unknown, T extends QueryType = 
  * Represents signature for a function that dispatches optional synchronous queries.
  *
  * @remarks
- * Typically returned by {@link useOptionalQueryCaller}. Returns `null` when
+ * Typically returned by {@link useOptionalQueryExecutor}. Returns `null` when
  * no handler is registered.
  *
  * @group Queries
@@ -75,7 +75,7 @@ export type AsyncQueryCaller = <R = unknown, D = unknown, T extends QueryType = 
  *
  * @returns The synchronous query result, or `null` if no handler was found.
  */
-export type OptionalQueryCaller = <R = unknown, D = unknown, T extends QueryType = QueryType>(
+export type OptionalQueryExecutor = <R = unknown, D = unknown, T extends QueryType = QueryType>(
   type: T,
   data?: D
 ) => Optional<R>;
@@ -84,7 +84,7 @@ export type OptionalQueryCaller = <R = unknown, D = unknown, T extends QueryType
  * Represents signature for a function that dispatches optional queries and returns their result as a Promise.
  *
  * @remarks
- * Typically returned by {@link useOptionalAsyncQueryCaller}. Returns `null`
+ * Typically returned by {@link useOptionalAsyncQueryExecutor}. Returns `null`
  * when no handler is registered.
  *
  * @group Queries
@@ -98,7 +98,7 @@ export type OptionalQueryCaller = <R = unknown, D = unknown, T extends QueryType
  *
  * @returns A Promise resolving to the query result, or `null` if no handler was found.
  */
-export type OptionalAsyncQueryCaller = <R = unknown, D = unknown, T extends QueryType = QueryType>(
+export type OptionalAsyncQueryExecutor = <R = unknown, D = unknown, T extends QueryType = QueryType>(
   type: T,
   data?: D
 ) => Promise<Optional<R>>;

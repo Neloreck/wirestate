@@ -2,20 +2,20 @@
 
 Wirestate provides three message-passing patterns. All three buses live on the container and are scoped to it. Child containers have independent buses.
 
-| Pattern | Direction           | Cardinality | Return                       |
-| ------- | ------------------- | ----------- |------------------------------|
-| Event   | Emit -> subscribers | 1 -> many   | void                         |
-| Command | Caller -> handler   | 1 -> 1      | `CommandDescriptor`          |
-| Query   | Caller -> handler   | 1 -> 1      | result or `Promise<result>`  |
+| Pattern | Direction              | Cardinality | Return                      |
+| ------- | ---------------------- | ----------- | --------------------------- |
+| Event   | Emitter -> subscribers | 1 -> many   | void                        |
+| Command | Executor -> handler    | 1 -> 1      | `CommandDescriptor`         |
+| Query   | Executor -> handler    | 1 -> 1      | result or `Promise<result>` |
 
 
 ## Choosing a Pattern
 
-| Use     | When                                                                                      |
-| ------- | ----------------------------------------------------------------------------------------- |
-| Event   | Notification that something happened. Callers don't care who's listening or if anyone is. |
-| Command | Trigger a side-effectful operation. Caller wants to know when it finishes.                |
-| Query   | Read data owned by another service without creating a direct dependency.                  |
+| Use     | When                                                                                       |
+| ------- |--------------------------------------------------------------------------------------------|
+| Event   | Notification that something happened. Emitters don't care who's listening or if anyone is. |
+| Command | Trigger a side-effectful operation. The executor returns completion state.                 |
+| Query   | Read data owned by another service without creating a direct dependency.                   |
 
 
 ## Events
@@ -117,9 +117,9 @@ emit("USER_PINGED");
 ## Commands
 
 Commands are named, one-way write operations dispatched to exactly one registered handler.
-Wirestate throws `WirestateError` if no handler is registered. Use `executeOptionalCommand` / `useOptionalCommandCaller` when the handler may be absent.
+Wirestate throws `WirestateError` if no handler is registered. Use `executeOptionalCommand` / `useOptionalCommandExecutor` when the handler may be absent.
 
-The caller receives a `CommandDescriptor` immediately; the actual work happens asynchronously.
+The executor returns a `CommandDescriptor` immediately; the actual work happens asynchronously.
 Check `descriptor.status` (`pending` -> `settled` | `error`) or `await descriptor.task`.
 
 ### Registering - Services
@@ -161,15 +161,15 @@ if (descriptor) {
 ### Dispatching - React
 
 ```tsx
-import { useCommandCaller, useOptionalCommandCaller, CommandCaller } from "@wirestate/react";
+import { useCommandExecutor, useOptionalCommandExecutor, CommandExecutor } from "@wirestate/react";
 
 function LogoutButton() {
-  const callCommand: CommandCaller = useCommandCaller();
+  const executeCommand: CommandExecutor = useCommandExecutor();
 
   return (
     <button
       onClick={() => {
-        const descriptor = callCommand("LOGOUT");
+        const descriptor = executeCommand("LOGOUT");
 
         descriptor.task.then(() => navigate("/login"));
       }}
@@ -247,12 +247,12 @@ const remoteConfig = await this.scope.queryOptionalDataAsync<Config>("FETCH_CONF
 ### Dispatching - React
 
 ```tsx
-import { AsyncQueryCaller, QueryCaller, useAsyncQueryCaller, useQueryCaller } from "@wirestate/react";
+import { AsyncQueryExecutor, QueryExecutor, useAsyncQueryExecutor, useQueryExecutor } from "@wirestate/react";
 
 function ProfileCard({ userId }: { userId: string }) {
   // ...
 
-  const queryAsync: AsyncQueryCaller = useAsyncQueryCaller();
+  const queryAsync: AsyncQueryExecutor = useAsyncQueryExecutor();
 
   const loadProfile = async () => {
     const profile = await queryAsync<UserProfile>("FETCH_USER_PROFILE", userId);
@@ -262,7 +262,7 @@ function ProfileCard({ userId }: { userId: string }) {
 
   // ...
 
-  const query: QueryCaller = useQueryCaller();
+  const query: QueryExecutor = useQueryExecutor();
 
   const refreshTheme = () => {
     const theme = query<string>("GET_THEME");

@@ -5,31 +5,31 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { useContainer } from "../context/use-container";
-import { OptionalCommandCaller } from "../types/commands";
+import { OptionalCommandExecutor } from "../types/commands";
 
 /**
  * Returns a stable function to dispatch optional commands on the active container.
  *
  * @remarks
- * Similar to {@link useCommandCaller}, but returns `null` instead of throwing
+ * Similar to {@link useCommandExecutor}, but returns `null` instead of throwing
  * {WirestateError} if no handler is registered for the command type.
  * Uses {@link CommandBus.commandOptional} internally.
  *
  * @group Commands
  *
- * @returns An optional command dispatcher function.
+ * @returns An optional command executor function.
  *
  * @example
  * ```tsx
- * const callOptional: OptionalCommandCaller = useOptionalCommandCaller();
- * const descriptor: CommandDescriptor<string> | null = callOptional("OPTIONAL_COMMAND", data);
+ * const executeOptionalCommand: OptionalCommandExecutor = useOptionalCommandExecutor();
+ * const descriptor: CommandDescriptor<string> | null = executeOptionalCommand("OPTIONAL_COMMAND", data);
  *
  * if (descriptor) {
  *   const result: string = await descriptor.task;
  * }
  * ```
  */
-export function useOptionalCommandCaller(): OptionalCommandCaller {
+export function useOptionalCommandExecutor(): OptionalCommandExecutor {
   const container: Container = useContainer();
 
   return useCallback(

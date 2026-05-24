@@ -3,57 +3,57 @@ import { Container, QueryBus } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
-import { Optional } from "../types/general";
-import { OptionalQueryCaller } from "../types/queries";
+import { QueryExecutor } from "../types/queries";
 
-import { useOptionalQueryCaller } from "./use-optional-query-caller";
+import { useQueryExecutor } from "./use-query-executor";
 
-describe("useOptionalQueryCaller", () => {
-  it("should return a caller that dispatches queries", () => {
+describe("useQueryExecutor", () => {
+  it("should return an executor that dispatches queries", () => {
     const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((data: string) => data + "-result");
 
     bus.register("TEST_QUERY", handler);
 
-    jest.spyOn(bus, "queryOptional");
+    jest.spyOn(bus, "query");
 
-    let caller: Optional<OptionalQueryCaller> = null as Optional<OptionalQueryCaller>;
+    let executor: QueryExecutor = null as unknown as QueryExecutor;
 
     function TestComponent() {
-      caller = useOptionalQueryCaller();
+      executor = useQueryExecutor();
 
       return null;
     }
 
     render(withContainerProvider(<TestComponent />, container));
 
-    const result: Optional<string> = (caller as OptionalQueryCaller)("TEST_QUERY", "some-data");
+    const result: string = (executor as QueryExecutor)("TEST_QUERY", "some-data");
 
     expect(result).toBe("some-data-result");
     expect(handler).toHaveBeenCalledWith("some-data");
-    expect(bus.queryOptional).toHaveBeenCalledWith("TEST_QUERY", "some-data");
+    expect(bus.query).toHaveBeenCalledWith("TEST_QUERY", "some-data");
   });
 
-  it("should return null on unhandled queries", () => {
+  it("should throw on unhandled queries", () => {
     const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
-    let caller: Optional<OptionalQueryCaller> = null as Optional<OptionalQueryCaller>;
 
-    jest.spyOn(bus, "queryOptional");
+    jest.spyOn(bus, "query");
+
+    let executor = null as unknown as QueryExecutor;
 
     function TestComponent() {
-      caller = useOptionalQueryCaller();
+      executor = useQueryExecutor();
 
       return null;
     }
 
     render(withContainerProvider(<TestComponent />, container));
 
-    const result: Optional<string> = (caller as OptionalQueryCaller)("NOT_EXISTING", "data");
-
-    expect(result).toBeNull();
-    expect(bus.queryOptional).toHaveBeenCalledWith("NOT_EXISTING", "data");
+    expect(() => (executor as QueryExecutor)("NOT_EXISTING", "data")).toThrow(
+      "No query handler registered in container for type: 'NOT_EXISTING'."
+    );
+    expect(bus.query).toHaveBeenCalledWith("NOT_EXISTING", "data");
   });
 
   it("should return promise values when the active handler returns a Promise", async () => {
@@ -62,30 +62,27 @@ describe("useOptionalQueryCaller", () => {
 
     bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
 
-    let caller: Optional<OptionalQueryCaller> = null as Optional<OptionalQueryCaller>;
+    let executor = null as unknown as QueryExecutor;
 
     function TestComponent() {
-      caller = useOptionalQueryCaller();
+      executor = useQueryExecutor();
 
       return null;
     }
 
     render(withContainerProvider(<TestComponent />, container));
 
-    const result: Optional<Promise<string>> = (caller as OptionalQueryCaller)<Promise<string>, string>(
-      "ASYNC_QUERY",
-      "value"
-    );
+    const result: Promise<string> = (executor as QueryExecutor)<Promise<string>, string>("ASYNC_QUERY", "value");
 
     await expect(result).resolves.toBe("value-async");
   });
 
-  it("should return a stable caller between re-renders", () => {
+  it("should return a stable executor between re-renders", () => {
     const container: Container = mockContainer();
-    const callers: Array<OptionalQueryCaller> = [];
+    const executors: Array<QueryExecutor> = [];
 
     function TestComponent() {
-      callers.push(useOptionalQueryCaller());
+      executors.push(useQueryExecutor());
 
       return null;
     }
@@ -94,27 +91,27 @@ describe("useOptionalQueryCaller", () => {
 
     rerender(withContainerProvider(<TestComponent />, container));
 
-    expect(callers).toHaveLength(2);
-    expect(callers[0]).toBe(callers[1]);
+    expect(executors).toHaveLength(2);
+    expect(executors[0]).toBe(executors[1]);
   });
 
   it("should support symbol query types", () => {
     const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
-    const type: unique symbol = Symbol("optional-query");
+    const type: unique symbol = Symbol("test-query");
 
     bus.register(type, () => "symbol-result");
 
-    let caller: Optional<OptionalQueryCaller> = null as Optional<OptionalQueryCaller>;
+    let executor = null as unknown as QueryExecutor;
 
     function TestComponent() {
-      caller = useOptionalQueryCaller();
+      executor = useQueryExecutor();
 
       return null;
     }
 
     render(withContainerProvider(<TestComponent />, container));
 
-    expect((caller as OptionalQueryCaller)(type)).toBe("symbol-result");
+    expect((executor as QueryExecutor)(type)).toBe("symbol-result");
   });
 });

@@ -1,5 +1,5 @@
-export { useCommandCaller } from "./commands/use-command-caller";
-export { useOptionalCommandCaller } from "./commands/use-optional-command-caller";
+export { useCommandExecutor } from "./commands/use-command-executor";
+export { useOptionalCommandExecutor } from "./commands/use-optional-command-executor";
 export { useCommandHandler } from "./commands/use-command-handler";
 
 export { useContainer } from "./context/use-container";
@@ -16,18 +16,18 @@ export { useOptionalInjection } from "./injection/use-optional-injection";
 export { SubContainerProvider, SubContainerProviderProps } from "./provision/sub-container-provider";
 export { ContainerProvider, ContainerProviderProps } from "./provision/container-provider";
 
-export { useQueryCaller } from "./queries/use-query-caller";
-export { useAsyncQueryCaller } from "./queries/use-async-query-caller";
-export { useOptionalQueryCaller } from "./queries/use-optional-query-caller";
-export { useOptionalAsyncQueryCaller } from "./queries/use-optional-async-query-caller";
+export { useQueryExecutor } from "./queries/use-query-executor";
+export { useAsyncQueryExecutor } from "./queries/use-async-query-executor";
+export { useOptionalQueryExecutor } from "./queries/use-optional-query-executor";
+export { useOptionalAsyncQueryExecutor } from "./queries/use-optional-async-query-executor";
 export { useQueryHandler } from "./queries/use-query-handler";
 
-export { OptionalCommandCaller, CommandCaller } from "./types/commands";
+export { OptionalCommandExecutor, CommandExecutor } from "./types/commands";
 export { EventEmitter } from "./types/events";
 export {
   QueryResponder,
-  QueryCaller,
-  AsyncQueryCaller,
-  OptionalQueryCaller,
-  OptionalAsyncQueryCaller,
+  QueryExecutor,
+  AsyncQueryExecutor,
+  OptionalQueryExecutor,
+  OptionalAsyncQueryExecutor,
 } from "./types/queries";
