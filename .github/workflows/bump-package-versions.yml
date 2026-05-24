@@ -1,6 +1,6 @@
 name: Bump Package Versions
 
-run-name: Bump packages to ${{ inputs.target }} on ${{ inputs.branch }}
+run-name: Bump packages to ${{ inputs.target }} on ${{ github.ref_name }}
 
 on:
   workflow_dispatch:
@@ -9,17 +9,12 @@ on:
         description: "Version target: major, minor, patch, or x.y.z[-tag]"
         required: true
         type: string
-      branch:
-        description: "Branch to update"
-        required: true
-        type: string
-        default: main
 
 permissions:
   contents: write
 
 concurrency:
-  group: bump-package-versions-${{ inputs.branch }}
+  group: bump-package-versions-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -41,10 +36,14 @@ jobs:
             exit 1
           fi
 
-      - name: Checkout target branch
+      - name: Require branch workflow ref
+        if: github.ref_type != 'branch'
+        run: |
+          echo "::error::Package version bumps must run from a branch ref."
+          exit 1
+
+      - name: Checkout workflow branch
         uses: actions/checkout@v6
-        with:
-          ref: ${{ inputs.branch }}
 
       - uses: pnpm/action-setup@v6
         name: Install pnpm
@@ -78,7 +77,7 @@ jobs:
       - name: Commit package version bump
         if: steps.manifest-changes.outputs.changed == 'true'
         env:
-          TARGET_BRANCH: ${{ inputs.branch }}
+          TARGET_BRANCH: ${{ github.ref_name }}
           TARGET_VERSION: ${{ inputs.target }}
         run: |
           git config user.name "github-actions[bot]"
