@@ -1,0 +1,92 @@
+name: Bump Package Versions
+
+run-name: Bump packages to ${{ inputs.target }} on ${{ inputs.branch }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Version target: major, minor, patch, or x.y.z[-tag]"
+        required: true
+        type: string
+      branch:
+        description: "Branch to update"
+        required: true
+        type: string
+        default: main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bump-package-versions-${{ inputs.branch }}
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    name: Bump package versions
+    runs-on: ubuntu-latest
+    env:
+      PACKAGE_MANIFEST_PATHSPEC: ":(glob)src/**/package.json"
+
+    steps:
+      - name: Require repository admin permissions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          permission="$(gh api repos/${{ github.repository }}/collaborators/${{ github.actor }}/permission --jq .permission 2>/dev/null || true)"
+
+          if [ "${permission}" != "admin" ]; then
+            echo "::error::Only repository admins can bump package versions. ${{ github.actor }} has '${permission:-none}' permissions."
+            exit 1
+          fi
+
+      - name: Checkout target branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.branch }}
+
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'pnpm'
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Bump package versions
+        env:
+          TARGET_VERSION: ${{ inputs.target }}
+        run: pnpm version:packages "${TARGET_VERSION}"
+
+      - name: Detect manifest changes
+        id: manifest-changes
+        run: |
+          if git diff --quiet -- "${PACKAGE_MANIFEST_PATHSPEC}"; then
+            echo "changed=false" >> "${GITHUB_OUTPUT}"
+          else
+            echo "changed=true" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Commit package version bump
+        if: steps.manifest-changes.outputs.changed == 'true'
+        env:
+          TARGET_BRANCH: ${{ inputs.branch }}
+          TARGET_VERSION: ${{ inputs.target }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "${PACKAGE_MANIFEST_PATHSPEC}"
+          git commit -m "chore: bump wirestate packages to ${TARGET_VERSION}"
+          git push origin "HEAD:${TARGET_BRANCH}"
+
+      - name: Report unchanged version
+        if: steps.manifest-changes.outputs.changed == 'false'
+        run: echo "Package manifests already match the requested version target."
