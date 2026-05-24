@@ -129,17 +129,17 @@ describe("core service shadowing and cleanup integration", () => {
 
     const bus: EventBus = container.get(EventBus);
 
-    bus.emit({ type: TOUCH_EVENT, payload: "one" });
+    bus.emit(TOUCH_EVENT, "one");
     expect(events).toEqual(["primary:one", "secondary:one"]);
     expect(bus.has()).toBe(true);
 
     container.unbind(SecondaryHandlerService);
-    bus.emit({ type: TOUCH_EVENT, payload: "two" });
+    bus.emit(TOUCH_EVENT, "two");
 
     expect(events).toEqual(["primary:one", "secondary:one", "primary:two"]);
 
     container.unbind(PrimaryHandlerService);
-    bus.emit({ type: TOUCH_EVENT, payload: "three" });
+    bus.emit(TOUCH_EVENT, "three");
 
     expect(events).toEqual(["primary:one", "secondary:one", "primary:two"]);
     expect(bus.has()).toBe(false);

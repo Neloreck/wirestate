@@ -25,11 +25,11 @@ describe("useEvents", () => {
 
     render(withContainerProvider(<TestComponent />, container));
 
-    act(() => bus.emit({ type: "V", payload: { a: "v", b: 1 } }));
-    act(() => bus.emit({ type: "W", payload: { a: "w", b: 2 } }));
-    act(() => bus.emit({ type: "X", payload: { a: "x", b: 3 } }));
-    act(() => bus.emit({ type: "Y", payload: { a: "y", b: 4 } }));
-    act(() => bus.emit({ type: "Z", payload: { a: "z", b: 5 } }));
+    act(() => bus.emit("V", { a: "v", b: 1 }));
+    act(() => bus.emit("W", { a: "w", b: 2 }));
+    act(() => bus.emit("X", { a: "x", b: 3 }));
+    act(() => bus.emit("Y", { a: "y", b: 4 }));
+    act(() => bus.emit("Z", { a: "z", b: 5 }));
 
     expect(handler).toHaveBeenCalledTimes(2);
     expect(handler).toHaveBeenCalledWith({ type: "X", payload: { a: "x", b: 3 } });
@@ -47,23 +47,23 @@ describe("useEvents", () => {
       return null;
     }
 
-    act(() => bus.emit({ type: "A" }));
-    act(() => bus.emit({ type: "B" }));
-    act(() => bus.emit({ type: "C" }));
+    act(() => bus.emit("A"));
+    act(() => bus.emit("B"));
+    act(() => bus.emit("C"));
 
     const { unmount } = render(withContainerProvider(<TestComponent />, container));
 
-    act(() => bus.emit({ type: "A" }));
-    act(() => bus.emit({ type: "B" }));
-    act(() => bus.emit({ type: "C" }));
+    act(() => bus.emit("A"));
+    act(() => bus.emit("B"));
+    act(() => bus.emit("C"));
 
     expect(handler).toHaveBeenCalledTimes(2);
 
     unmount();
 
-    act(() => bus.emit({ type: "A" }));
-    act(() => bus.emit({ type: "B" }));
-    act(() => bus.emit({ type: "C" }));
+    act(() => bus.emit("A"));
+    act(() => bus.emit("B"));
+    act(() => bus.emit("C"));
 
     expect(handler).toHaveBeenCalledTimes(2);
   });

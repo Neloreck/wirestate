@@ -113,8 +113,8 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     expect(parent.get(QueryBus).query(COUNT_QUERY)).toBe("root-label:3");
     expect(child.get(QueryBus).query(COUNT_QUERY)).toBe("child-label:112");
 
-    parent.get(EventBus).emit({ type: LOG_EVENT, payload: "from-parent" });
-    child.get(EventBus).emit({ type: LOG_EVENT, payload: "from-child" });
+    parent.get(EventBus).emit(LOG_EVENT, "from-parent");
+    child.get(EventBus).emit(LOG_EVENT, "from-child");
 
     expect(parent.get(ParentCounterService).events).toEqual(["parent:from-parent"]);
     expect(child.get(ChildCounterService).events).toEqual(["child:from-child"]);
@@ -124,7 +124,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     expect(await parent.get(CommandBus).command(ADD_COMMAND, 2).task).toBe(6);
     expect(parent.get(QueryBus).query(COUNT_QUERY)).toBe("root-label:6");
 
-    parent.get(EventBus).emit({ type: LOG_EVENT, payload: "from-parent" });
+    parent.get(EventBus).emit(LOG_EVENT, "from-parent");
     expect(parent.get(ParentCounterService).events).toEqual(["parent:from-parent", "parent:from-parent"]);
   });
 

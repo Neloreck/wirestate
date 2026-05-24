@@ -82,7 +82,7 @@ describe("bindService", () => {
     expect(instance.scope.isDisposed).toBe(false);
 
     // Test event from external source.
-    container.get(EventBus).emit({ type: "TEST_STRING_EVENT", payload: "string-event-data" });
+    container.get(EventBus).emit("TEST_STRING_EVENT", "string-event-data");
     expect(instance.isTestStringEventReceived).toBe(true);
     expect(instance.testStingEventPayload).toBe("string-event-data");
 

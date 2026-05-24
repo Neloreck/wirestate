@@ -73,16 +73,8 @@ describe("WireScope", () => {
     scope.emitEvent("TEST_SECOND_EVENT", "string-data", window);
 
     expect(bus.emit).toHaveBeenCalledTimes(2);
-    expect(bus.emit).toHaveBeenCalledWith({
-      type: "TEST_FIRST_EVENT",
-      payload: { data: 1 },
-      from: scope,
-    });
-    expect(bus.emit).toHaveBeenCalledWith({
-      type: "TEST_SECOND_EVENT",
-      payload: "string-data",
-      from: window,
-    });
+    expect(bus.emit).toHaveBeenCalledWith("TEST_FIRST_EVENT", { data: 1 }, scope);
+    expect(bus.emit).toHaveBeenCalledWith("TEST_SECOND_EVENT", "string-data", window);
   });
 
   it("should subscribe to events via scope", () => {

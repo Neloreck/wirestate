@@ -8,7 +8,7 @@ describe("EventBus", () => {
     const handler = jest.fn();
 
     bus.subscribe(handler);
-    bus.emit({ type: "TEST", payload: 42 });
+    bus.emit("TEST", 42);
 
     expect(handler).toHaveBeenCalledWith({ type: "TEST", payload: 42 });
   });
@@ -20,7 +20,7 @@ describe("EventBus", () => {
 
     bus.subscribe(handler1);
     bus.subscribe(handler2);
-    bus.emit({ type: "TEST" });
+    bus.emit("TEST");
 
     expect(handler1).toHaveBeenCalledTimes(1);
     expect(handler2).toHaveBeenCalledTimes(1);
@@ -33,7 +33,7 @@ describe("EventBus", () => {
     const unsubscribe: EventUnsubscriber = bus.subscribe(handler);
 
     unsubscribe();
-    bus.emit({ type: "TEST" });
+    bus.emit("TEST");
 
     expect(handler).not.toHaveBeenCalled();
   });
@@ -52,7 +52,7 @@ describe("EventBus", () => {
     bus.subscribe(firstHandler);
     bus.subscribe(errorHandler);
     bus.subscribe(secondHandler);
-    bus.emit({ type: "TEST" });
+    bus.emit("TEST");
 
     expect(firstHandler).toHaveBeenCalled();
     expect(errorHandler).toHaveBeenCalled();
@@ -70,8 +70,8 @@ describe("EventBus", () => {
     bus.subscribe(handler);
     bus.unsubscribe(handler);
 
-    bus.emit({ type: "TEST" });
-    bus.emit({ type: "TEST" });
+    bus.emit("TEST");
+    bus.emit("TEST");
 
     expect(handler).not.toHaveBeenCalled();
   });
@@ -92,7 +92,7 @@ describe("EventBus", () => {
     bus.subscribe(handlerB);
     bus.unsubscribe(handlerA);
 
-    bus.emit({ type: "TEST" });
+    bus.emit("TEST");
 
     expect(handlerA).not.toHaveBeenCalled();
     expect(handlerB).toHaveBeenCalledTimes(1);
@@ -106,7 +106,7 @@ describe("EventBus", () => {
     bus.subscribe(firstHandler);
     bus.subscribe(secondHandler);
     bus.clear();
-    bus.emit({ type: "TEST" });
+    bus.emit("TEST");
 
     expect(firstHandler).not.toHaveBeenCalled();
     expect(secondHandler).not.toHaveBeenCalled();

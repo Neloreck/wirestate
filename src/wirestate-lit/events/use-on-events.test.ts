@@ -33,14 +33,14 @@ describe("useOnEvents", () => {
 
     provider.appendChild(element);
 
-    bus.emit({ type: "TEST_EVENT", payload: "test-payload" });
+    bus.emit("TEST_EVENT", "test-payload");
 
     expect(handler).toHaveBeenCalledTimes(1);
     expect(handler).toHaveBeenCalledWith({ type: "TEST_EVENT", payload: "test-payload" });
 
     element.remove();
 
-    bus.emit({ type: "TEST_EVENT" });
+    bus.emit("TEST_EVENT");
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
@@ -55,10 +55,10 @@ describe("useOnEvents", () => {
 
     provider.appendChild(element);
 
-    bus.emit({ type: "OTHER" });
+    bus.emit("OTHER");
     expect(handler).not.toHaveBeenCalled();
 
-    bus.emit({ type: "SPECIFIC_EVENT_TYPE" });
+    bus.emit("SPECIFIC_EVENT_TYPE");
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
@@ -73,13 +73,13 @@ describe("useOnEvents", () => {
 
     provider.appendChild(element);
 
-    bus.emit({ type: "C" });
+    bus.emit("C");
     expect(handler).not.toHaveBeenCalled();
 
-    bus.emit({ type: "A" });
+    bus.emit("A");
     expect(handler).toHaveBeenCalledTimes(1);
 
-    bus.emit({ type: "B" });
+    bus.emit("B");
     expect(handler).toHaveBeenCalledTimes(2);
   });
 
@@ -94,13 +94,13 @@ describe("useOnEvents", () => {
 
     provider.appendChild(element);
 
-    bus.emit({ type: "ANY_EVENT" });
+    bus.emit("ANY_EVENT");
     expect(handler).toHaveBeenCalledTimes(1);
 
-    bus.emit({ type: "ANOTHER_EVENT" });
+    bus.emit("ANOTHER_EVENT");
     expect(handler).toHaveBeenCalledTimes(2);
 
-    bus.emit({ type: "AND_ANOTHER_EVENT" });
+    bus.emit("AND_ANOTHER_EVENT");
     expect(handler).toHaveBeenCalledTimes(3);
   });
 });

@@ -1,7 +1,9 @@
+import { AnyObject } from "@wirestate/core/types/general";
+
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Event, EventHandler, EventType, EventUnsubscriber } from "../types/events";
+import { EventHandler, EventType, EventUnsubscriber, Event } from "../types/events";
 
 /**
  * Orchestrates event broadcasting to multiple subscribers.
@@ -27,7 +29,9 @@ export class EventBus {
    * @template T - Type of the event identifier.
    * @template F - Type of the event source.
    *
-   * @param event - The event object to broadcast.
+   * @param type - Event identifier.
+   * @param payload - Optional data associated with the event.
+   * @param from - Optional source identifier.
    *
    * @example
    * ```typescript
@@ -38,12 +42,21 @@ export class EventBus {
    * });
    * ```
    */
-  public emit<P = unknown, T extends EventType = EventType, F = unknown>(event: Event<P, T, F>): void {
+  public emit<P = unknown, T extends EventType = EventType, F = unknown>(type: T, payload?: P, from?: F): void {
     // Snapshot prevents concurrent modification errors if handlers sub/unsub during emit.
     const snapshot: Array<EventHandler> = Array.from(this.handlers);
 
     for (const handler of snapshot) {
       try {
+        const event: Event = {
+          type,
+          payload,
+        };
+
+        if (from !== undefined) {
+          (event as AnyObject).from = from;
+        }
+
         handler(event);
       } catch (error) {
         // Prevent one failing listener from stalling the entire bus.

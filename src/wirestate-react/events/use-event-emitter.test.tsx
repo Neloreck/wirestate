@@ -29,11 +29,7 @@ describe("useEventEmitter", () => {
 
     (emitter as EventEmitter)("TEST_EVENT", { foo: "bar" }, "source");
 
-    expect(bus.emit).toHaveBeenCalledWith({
-      type: "TEST_EVENT",
-      payload: { foo: "bar" },
-      from: "source",
-    });
+    expect(bus.emit).toHaveBeenCalledWith("TEST_EVENT", { foo: "bar" }, "source");
     expect(handler).toHaveBeenCalledWith({
       type: "TEST_EVENT",
       payload: { foo: "bar" },

@@ -39,7 +39,7 @@ export function useEventEmitter<P = unknown, T extends EventType = EventType>():
         from,
       });
 
-      container.get(EventBus).emit({ type, payload, from });
+      container.get(EventBus).emit(type, payload, from);
     },
     [container]
   );

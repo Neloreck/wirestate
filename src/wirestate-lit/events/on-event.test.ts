@@ -62,7 +62,7 @@ describe("onEvent", () => {
     jest.spyOn(element, "onMultipleEvents");
     jest.spyOn(element, "onSpecificEvent");
 
-    bus.emit({ type: "SPECIFIC_EVENT", payload: 10 });
+    bus.emit("SPECIFIC_EVENT", 10);
 
     expect(element.onSpecificEvent).toHaveBeenCalledTimes(1);
     expect(element.onSpecificEvent).toHaveBeenCalledWith({ type: "SPECIFIC_EVENT", payload: 10 });
@@ -70,21 +70,21 @@ describe("onEvent", () => {
     expect(element.onAllEvents).toHaveBeenCalledWith({ type: "SPECIFIC_EVENT", payload: 10 });
     expect(element.onMultipleEvents).toHaveBeenCalledTimes(0);
 
-    bus.emit({ type: "OTHER_EVENT" });
+    bus.emit("OTHER_EVENT");
 
     expect(element.onAllEvents).toHaveBeenCalledTimes(2);
     expect(element.onAllEvents).toHaveBeenCalledWith({ type: "OTHER_EVENT" });
     expect(element.onSpecificEvent).toHaveBeenCalledTimes(1);
     expect(element.onMultipleEvents).toHaveBeenCalledTimes(0);
 
-    bus.emit({ type: "EVENT_A", payload: "event-a-payload" });
+    bus.emit("EVENT_A", "event-a-payload");
 
     expect(element.onMultipleEvents).toHaveBeenCalledTimes(1);
     expect(element.onMultipleEvents).toHaveBeenCalledWith({ type: "EVENT_A", payload: "event-a-payload" });
     expect(element.onAllEvents).toHaveBeenCalledTimes(3);
     expect(element.onSpecificEvent).toHaveBeenCalledTimes(1);
 
-    bus.emit({ type: "EVENT_B", payload: "event-b-payload" });
+    bus.emit("EVENT_B", "event-b-payload");
 
     expect(element.onMultipleEvents).toHaveBeenCalledTimes(2);
     expect(element.onMultipleEvents).toHaveBeenCalledWith({ type: "EVENT_B", payload: "event-b-payload" });

@@ -24,9 +24,9 @@ describe("useEvent", () => {
 
     render(withContainerProvider(<TestComponent />, container));
 
-    act(() => bus.emit({ type: "X" }));
-    act(() => bus.emit({ type: "Y", payload: 1 }));
-    act(() => bus.emit({ type: "Z", payload: { a: 1, b: 2 } }));
+    act(() => bus.emit("X"));
+    act(() => bus.emit("Y", 1));
+    act(() => bus.emit("z", { a: 1, b: 2 }));
 
     expect(handler).toHaveBeenCalledTimes(1);
     expect(handler).toHaveBeenCalledWith({ type: "Y", payload: 1 });
@@ -43,21 +43,21 @@ describe("useEvent", () => {
       return null;
     }
 
-    act(() => bus.emit({ type: "X" }));
+    act(() => bus.emit("X"));
 
     const { unmount } = render(withContainerProvider(<TestComponent />, container));
 
-    act(() => bus.emit({ type: "X" }));
-    act(() => bus.emit({ type: "X" }));
-    act(() => bus.emit({ type: "X" }));
+    act(() => bus.emit("X"));
+    act(() => bus.emit("X"));
+    act(() => bus.emit("X"));
 
     expect(handler).toHaveBeenCalledTimes(3);
 
     unmount();
 
-    act(() => bus.emit({ type: "X" }));
-    act(() => bus.emit({ type: "X" }));
-    act(() => bus.emit({ type: "X" }));
+    act(() => bus.emit("X"));
+    act(() => bus.emit("X"));
+    act(() => bus.emit("X"));
 
     expect(handler).toHaveBeenCalledTimes(3);
   });

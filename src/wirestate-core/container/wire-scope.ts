@@ -150,11 +150,7 @@ export class WireScope {
 
     this.getContainer()
       .get(EventBus)
-      .emit({
-        type,
-        payload,
-        from: from === undefined ? this : from,
-      });
+      .emit(type, payload, from === undefined ? this : from);
   }
 
   /**
