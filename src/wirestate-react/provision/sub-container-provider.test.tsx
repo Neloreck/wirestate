@@ -1,5 +1,6 @@
 import { render } from "@testing-library/react";
 import {
+  BindingType,
   CommandBus,
   Container,
   EventBus,
@@ -131,12 +132,9 @@ describe("SubContainerProvider", () => {
       </ContainerProvider>
     );
 
-    const firstContainer: Container = containers[0];
-    const secondContainer: Container = containers[1];
-
     expect(getByTestId("value").textContent).toBe("second");
     expect(containers).toHaveLength(2);
-    expect(secondContainer).not.toBe(firstContainer);
+    expect(containers[0]).not.toBe(containers[1]);
   });
 
   it("should recreate child container when parent container changes with same entries", async () => {
@@ -241,7 +239,7 @@ describe("SubContainerProvider", () => {
 
   it("should recreate child container when activate changes", () => {
     const parentContainer: Container = mockContainer();
-    const LifecycleService = createLifecycleService({ methods: ["activated"] });
+    const { LifecycleService, events } = createLifecycleService({ methods: ["activated"] });
 
     const { rerender } = render(
       <ContainerProvider container={parentContainer}>
@@ -249,7 +247,7 @@ describe("SubContainerProvider", () => {
       </ContainerProvider>
     );
 
-    expect(LifecycleService.EVENTS).toEqual(["activated"]);
+    expect(events).toEqual(["activated"]);
 
     rerender(
       <ContainerProvider container={parentContainer}>
@@ -257,13 +255,39 @@ describe("SubContainerProvider", () => {
       </ContainerProvider>
     );
 
-    expect(LifecycleService.EVENTS).toEqual(["activated", "activated"]);
+    expect(events).toEqual(["activated", "activated"]);
   });
 });
 
 describe("SubContainerProvider lifecycle", () => {
+  it("should call provider lifecycle for instance descriptors bound behind custom tokens", () => {
+    const parentContainer: Container = mockContainer();
+    const TOKEN: unique symbol = Symbol("lifecycle-service");
+    const { LifecycleService } = createLifecycleService({ methods: ["provision", "deprovision"] });
+
+    const { unmount } = render(
+      <ContainerProvider container={parentContainer}>
+        <SubContainerProvider
+          entries={[
+            {
+              bindingType: BindingType.Instance,
+              id: TOKEN,
+              value: LifecycleService,
+            },
+          ]}
+        />
+      </ContainerProvider>
+    );
+
+    expect(LifecycleService.EVENTS).toEqual(["provision"]);
+
+    unmount();
+
+    expect(LifecycleService.EVENTS).toEqual(["provision", "deprovision"]);
+  });
+
   it("should call expected lifecycle on regular mount", () => {
-    const LifecycleService = createLifecycleService();
+    const { LifecycleService } = createLifecycleService();
 
     render(
       <ContainerProvider container={mockContainer()}>
@@ -275,10 +299,9 @@ describe("SubContainerProvider lifecycle", () => {
   });
 
   it("should preserve external parent lifecycle while provisioning child container", async () => {
-    let index: number = 0;
-
-    const ParentLifecycleService = createLifecycleService({ suffix: () => `parent-${++index}` });
-    const ChildLifecycleService = createLifecycleService({ suffix: () => `child-${++index}` });
+    const events: Array<string> = [];
+    const { LifecycleService: ParentLifecycleService } = createLifecycleService({ events, suffix: "parent" });
+    const { LifecycleService: ChildLifecycleService } = createLifecycleService({ events, suffix: "child" });
     const parentContainer: Container = mockContainer({ entries: [ParentLifecycleService], activate: true });
     const unbindAllSpy = jest.spyOn(parentContainer, "unbindAll");
 
@@ -288,22 +311,29 @@ describe("SubContainerProvider lifecycle", () => {
       </ContainerProvider>
     );
 
-    expect(ParentLifecycleService.EVENTS).toEqual(["activated-parent-1", "provision-parent-4"]);
-    expect(ChildLifecycleService.EVENTS).toEqual(["activated-child-2", "provision-child-3"]);
+    expect(events).toEqual(["activated-parent", "activated-child", "provision-child", "provision-parent"]);
 
     unmount();
 
-    expect(ParentLifecycleService.EVENTS).toEqual(["activated-parent-1", "provision-parent-4", "deprovision-parent-5"]);
-    expect(ChildLifecycleService.EVENTS).toEqual(["activated-child-2", "provision-child-3", "deprovision-child-6"]);
+    expect(events).toEqual([
+      "activated-parent",
+      "activated-child",
+      "provision-child",
+      "provision-parent",
+      "deprovision-parent",
+      "deprovision-child",
+    ]);
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(ParentLifecycleService.EVENTS).toEqual(["activated-parent-1", "provision-parent-4", "deprovision-parent-5"]);
-    expect(ChildLifecycleService.EVENTS).toEqual([
-      "activated-child-2",
-      "provision-child-3",
-      "deprovision-child-6",
-      "deactivation-child-7",
+    expect(events).toEqual([
+      "activated-parent",
+      "activated-child",
+      "provision-child",
+      "provision-parent",
+      "deprovision-parent",
+      "deprovision-child",
+      "deactivation-child",
     ]);
 
     expect(unbindAllSpy).not.toHaveBeenCalled();
@@ -311,7 +341,7 @@ describe("SubContainerProvider lifecycle", () => {
 
   it("should not provision the same child container twice on stable rerender", () => {
     const parentContainer: Container = mockContainer();
-    const LifecycleService = createLifecycleService({ methods: ["provision", "deprovision"] });
+    const { LifecycleService, events } = createLifecycleService({ methods: ["provision", "deprovision"] });
 
     const { rerender } = render(
       <ContainerProvider container={parentContainer}>
@@ -327,16 +357,18 @@ describe("SubContainerProvider lifecycle", () => {
       );
     }
 
-    expect(LifecycleService.EVENTS).toEqual(["provision"]);
+    expect(events).toEqual(["provision"]);
   });
 
   it("should have predicted lifecycle order in normal mode", async () => {
     const parentContainer: Container = mockContainer();
     const events: Array<string> = [];
+    const { LifecycleService: FirstLifecycleService } = createLifecycleService({ events, suffix: "first" });
+    const { LifecycleService: SecondLifecycleService } = createLifecycleService({ events, suffix: "second" });
 
     const { rerender } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider entries={[createLifecycleService({ events, suffix: "first" })]} />
+        <SubContainerProvider entries={[FirstLifecycleService]} />
       </ContainerProvider>
     );
 
@@ -344,7 +376,7 @@ describe("SubContainerProvider lifecycle", () => {
 
     rerender(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider entries={[createLifecycleService({ events, suffix: "second" })]} />
+        <SubContainerProvider entries={[SecondLifecycleService]} />
       </ContainerProvider>
     );
 
@@ -371,11 +403,13 @@ describe("SubContainerProvider lifecycle", () => {
   it("should have predicted lifecycle order in strict mode", async () => {
     const parentContainer: Container = mockContainer();
     const events: Array<string> = [];
+    const { LifecycleService: FirstLifecycleService } = createLifecycleService({ events, suffix: "first" });
+    const { LifecycleService: SecondLifecycleService } = createLifecycleService({ events, suffix: "second" });
 
     const { rerender } = render(
       <StrictMode>
         <ContainerProvider container={parentContainer}>
-          <SubContainerProvider entries={[createLifecycleService({ events, suffix: "first" })]} />
+          <SubContainerProvider entries={[FirstLifecycleService]} />
         </ContainerProvider>
       </StrictMode>
     );
@@ -391,7 +425,7 @@ describe("SubContainerProvider lifecycle", () => {
     rerender(
       <StrictMode>
         <ContainerProvider container={parentContainer}>
-          <SubContainerProvider entries={[createLifecycleService({ events, suffix: "second" })]} />
+          <SubContainerProvider entries={[SecondLifecycleService]} />
         </ContainerProvider>
       </StrictMode>
     );

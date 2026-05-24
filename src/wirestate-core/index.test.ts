@@ -107,6 +107,7 @@ describe("Library exported API from wirestate-core", () => {
     "bindEntry",
     "bindService",
     "createContainer",
+    "decorate",
     "getContainerEntries",
     "getEntryToken",
     "unapplySeeds",

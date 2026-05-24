@@ -54,55 +54,6 @@ export interface CreateLifecycleServiceOptions {
 }
 
 /**
- * Instance shape created by {@link createLifecycleService}.
- *
- * @internal
- */
-export interface LifecycleServiceInstance {
-  /**
-   * Records service activation when enabled.
-   */
-  onActivated(): void;
-
-  /**
-   * Records service deactivation when enabled.
-   */
-  onDeactivation(): void;
-
-  /**
-   * Records provider provisioning when enabled.
-   */
-  onProvision(): void;
-
-  /**
-   * Records provider deprovisioning when enabled.
-   */
-  onDeprovision(): void;
-}
-
-/**
- * Injectable service class returned by {@link createLifecycleService}.
- *
- * @internal
- */
-export interface LifecycleServiceType extends Newable<LifecycleServiceInstance> {
-  /**
-   * Resolves the suffix appended to emitted lifecycle events.
-   */
-  readonly SUFFIX: () => string;
-
-  /**
-   * Lifecycle callbacks that append events when invoked.
-   */
-  readonly METHODS: Array<ActivationLifecycleEvent>;
-
-  /**
-   * Event log written by the generated lifecycle service.
-   */
-  readonly EVENTS: Array<string>;
-}
-
-/**
  * Creates an injectable service class that records lifecycle events.
  *
  * @remarks
@@ -120,7 +71,7 @@ export interface LifecycleServiceType extends Newable<LifecycleServiceInstance> 
  * @param options - Event log, enabled callbacks, and optional event suffix.
  * @returns Injectable service class configured for lifecycle-order assertions.
  */
-export function createLifecycleService(options: CreateLifecycleServiceOptions = {}): LifecycleServiceType {
+export function createLifecycleService(options: CreateLifecycleServiceOptions = {}) {
   const { methods, suffix, events } = options;
 
   @Injectable()
@@ -168,5 +119,5 @@ export function createLifecycleService(options: CreateLifecycleServiceOptions = 
     }
   }
 
-  return LifecycleService;
+  return { LifecycleService, events: LifecycleService.EVENTS, methods, suffix: LifecycleService.SUFFIX };
 }

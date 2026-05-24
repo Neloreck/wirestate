@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { Container, createContainer } from "@wirestate/core";
+import { BindingType, Container, createContainer } from "@wirestate/core";
 import { StrictMode } from "react";
 
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
@@ -156,17 +156,15 @@ describe("ContainerProvider", () => {
   });
 
   it("should recreate managed container when activate changes", () => {
-    const LifecycleService = createLifecycleService({ methods: ["activated"] });
+    const { LifecycleService, events } = createLifecycleService({ methods: ["activated"] });
 
-    const { rerender } = render(
-      <ContainerProvider config={{ entries: [LifecycleService], activate: false }} />
-    );
+    const { rerender } = render(<ContainerProvider config={{ entries: [LifecycleService], activate: false }} />);
 
-    expect(LifecycleService.EVENTS).toEqual(["activated"]);
+    expect(events).toEqual(["activated"]);
 
     rerender(<ContainerProvider config={{ entries: [LifecycleService], activate: true }} />);
 
-    expect(LifecycleService.EVENTS).toEqual(["activated", "activated"]);
+    expect(events).toEqual(["activated", "activated"]);
   });
 
   it("should recreate managed container when seed changes", () => {
@@ -279,28 +277,53 @@ describe("ContainerProvider", () => {
 });
 
 describe("ContainerProvider lifecycle", () => {
+  it("should call provider lifecycle for instance descriptors bound behind custom tokens", () => {
+    const TOKEN: unique symbol = Symbol("lifecycle-service");
+    const { LifecycleService, events } = createLifecycleService({ methods: ["provision", "deprovision"] });
+
+    const { unmount } = render(
+      <ContainerProvider
+        config={{
+          entries: [
+            {
+              bindingType: BindingType.Instance,
+              id: TOKEN,
+              value: LifecycleService,
+            },
+          ],
+        }}
+      />
+    );
+
+    expect(events).toEqual(["provision"]);
+
+    unmount();
+
+    expect(events).toEqual(["provision", "deprovision"]);
+  });
+
   it("should call provision lifecycle for external container without disposing it", async () => {
-    const LifecycleService = createLifecycleService();
+    const { LifecycleService, events } = createLifecycleService();
     const container: Container = createContainer({ entries: [LifecycleService] });
     const unbindAllSpy = jest.spyOn(container, "unbindAll");
 
     const { unmount } = render(<ContainerProvider container={container} />);
 
-    expect(LifecycleService.EVENTS).toEqual(["activated", "provision"]);
+    expect(events).toEqual(["activated", "provision"]);
 
     unmount();
 
-    expect(LifecycleService.EVENTS).toEqual(["activated", "provision", "deprovision"]);
+    expect(events).toEqual(["activated", "provision", "deprovision"]);
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(LifecycleService.EVENTS).toEqual(["activated", "provision", "deprovision"]);
+    expect(events).toEqual(["activated", "provision", "deprovision"]);
     expect(unbindAllSpy).not.toHaveBeenCalled();
     expect(container.isBound(LifecycleService)).toBe(true);
   });
 
   it("should not provision the same external container twice on stable rerender", () => {
-    const LifecycleService = createLifecycleService({ methods: ["provision", "deprovision"] });
+    const { LifecycleService, events } = createLifecycleService({ methods: ["provision", "deprovision"] });
     const container: Container = createContainer({ entries: [LifecycleService] });
 
     const { rerender, unmount } = render(<ContainerProvider container={container} />);
@@ -309,25 +332,25 @@ describe("ContainerProvider lifecycle", () => {
       rerender(<ContainerProvider container={container} />);
     }
 
-    expect(LifecycleService.EVENTS).toEqual(["provision"]);
+    expect(events).toEqual(["provision"]);
 
     unmount();
 
-    expect(LifecycleService.EVENTS).toEqual(["provision", "deprovision"]);
+    expect(events).toEqual(["provision", "deprovision"]);
   });
 
   it("should deprovision previous external container when container changes", () => {
     const events: Array<string> = [];
-    const FirstLifecycleService = createLifecycleService({ events, suffix: "first" });
-    const SecondLifecycleService = createLifecycleService({ events, suffix: "second" });
-    const firstContainer: Container = createContainer({ entries: [FirstLifecycleService] });
-    const secondContainer: Container = createContainer({ entries: [SecondLifecycleService] });
+    const { LifecycleService: FirstLifecycleService } = createLifecycleService({ events, suffix: "first" });
+    const { LifecycleService: SecondLifecycleService } = createLifecycleService({ events, suffix: "second" });
 
-    const { rerender } = render(<ContainerProvider container={firstContainer} />);
+    const { rerender } = render(
+      <ContainerProvider container={createContainer({ entries: [FirstLifecycleService] })} />
+    );
 
     expect(events).toEqual(["activated-first", "provision-first"]);
 
-    rerender(<ContainerProvider container={secondContainer} />);
+    rerender(<ContainerProvider container={createContainer({ entries: [SecondLifecycleService] })} />);
 
     expect(events).toEqual([
       "activated-first",
@@ -339,7 +362,7 @@ describe("ContainerProvider lifecycle", () => {
   });
 
   it("should call expected lifecycle on regular mount", () => {
-    const LifecycleService = createLifecycleService();
+    const { LifecycleService, events } = createLifecycleService();
 
     render(
       <ContainerProvider
@@ -349,11 +372,11 @@ describe("ContainerProvider lifecycle", () => {
       />
     );
 
-    expect(LifecycleService.EVENTS).toEqual(["activated", "provision"]);
+    expect(events).toEqual(["activated", "provision"]);
   });
 
   it("should not provision the same managed container twice on stable rerender", async () => {
-    const LifecycleService = createLifecycleService({ methods: ["provision", "deprovision"] });
+    const { LifecycleService, events } = createLifecycleService({ methods: ["provision", "deprovision"] });
 
     const { rerender } = render(
       <ContainerProvider
@@ -375,16 +398,18 @@ describe("ContainerProvider lifecycle", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(LifecycleService.EVENTS).toEqual(["provision"]);
+    expect(events).toEqual(["provision"]);
   });
 
   it("should have predicted lifecycle order in normal mode", async () => {
     const events: Array<string> = [];
+    const { LifecycleService: FirstLifecycleService } = createLifecycleService({ events, suffix: "first" });
+    const { LifecycleService: SecondLifecycleService } = createLifecycleService({ events, suffix: "second" });
 
     const { rerender } = render(
       <ContainerProvider
         config={{
-          entries: [createLifecycleService({ events, suffix: "first" })],
+          entries: [FirstLifecycleService],
         }}
       />
     );
@@ -394,7 +419,7 @@ describe("ContainerProvider lifecycle", () => {
     rerender(
       <ContainerProvider
         config={{
-          entries: [createLifecycleService({ events, suffix: "second" })],
+          entries: [SecondLifecycleService],
         }}
       />
     );
@@ -421,12 +446,14 @@ describe("ContainerProvider lifecycle", () => {
 
   it("should have predicted lifecycle order in strict mode", async () => {
     const events: Array<string> = [];
+    const { LifecycleService: FirstLifecycleService } = createLifecycleService({ events, suffix: "first" });
+    const { LifecycleService: SecondLifecycleService } = createLifecycleService({ events, suffix: "second" });
 
     const { rerender } = render(
       <StrictMode>
         <ContainerProvider
           config={{
-            entries: [createLifecycleService({ events, suffix: "first" })],
+            entries: [FirstLifecycleService],
           }}
         />
       </StrictMode>
@@ -444,7 +471,7 @@ describe("ContainerProvider lifecycle", () => {
       <StrictMode>
         <ContainerProvider
           config={{
-            entries: [createLifecycleService({ events, suffix: "second" })],
+            entries: [SecondLifecycleService],
           }}
         />
       </StrictMode>

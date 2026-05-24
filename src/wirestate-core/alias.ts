@@ -52,6 +52,7 @@ export {
   UnbindSync,
   bindingScopeValues,
   bindingTypeValues,
+  decorate,
 } from "inversify";
 
 /**

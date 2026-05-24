@@ -1,4 +1,4 @@
-import { Container, getEntryToken, ServiceIdentifier, InjectableEntries } from "@wirestate/core";
+import { BindingType, Container, getEntryToken, ServiceIdentifier, InjectableEntries } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -147,8 +147,9 @@ export function provisionServices(container: Container, entries: InjectableEntri
 
   for (const entry of entries) {
     const token: ServiceIdentifier = getEntryToken(entry);
+    const metadataToken: ServiceIdentifier = getProviderLifecycleMetadataToken(entry);
 
-    if (visited.has(token) || !hasProviderLifecycleMetadata(token)) {
+    if (visited.has(token) || !hasProviderLifecycleMetadata(metadataToken)) {
       continue;
     }
 
@@ -165,6 +166,22 @@ export function provisionServices(container: Container, entries: InjectableEntri
   }
 
   return services;
+}
+
+/**
+ * Resolves the constructor that can own provider lifecycle metadata.
+ *
+ * @internal
+ *
+ * @param entry - Entry registered on the provider container.
+ * @returns Service constructor for instance descriptors, otherwise the entry token.
+ */
+function getProviderLifecycleMetadataToken(entry: InjectableEntries[number]): ServiceIdentifier {
+  if (typeof entry !== "function" && entry.bindingType === BindingType.Instance && typeof entry.value === "function") {
+    return entry.value as ServiceIdentifier;
+  }
+
+  return getEntryToken(entry);
 }
 
 /**
