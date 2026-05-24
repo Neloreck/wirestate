@@ -11,7 +11,7 @@ import { QueryBus } from "../queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 import { CommandDescriptor, CommandHandler, CommandUnregister, CommandType } from "../types/commands";
 import { EventHandler, EventType, EventUnsubscriber } from "../types/events";
-import { Optional, AnyObject, MaybePromise } from "../types/general";
+import { Optional, AnyObject } from "../types/general";
 import { SeedKey, SeedsMap } from "../types/initial-state";
 import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 
@@ -197,7 +197,7 @@ export class WireScope {
   }
 
   /**
-   * Dispatches a query and waits for the result.
+   * Dispatches a synchronous query and returns the result.
    *
    * @template R - Type of the query result.
    * @template D - Type of the query data (payload).
@@ -205,24 +205,49 @@ export class WireScope {
    *
    * @param type - Query identifier.
    * @param data - Input data for the query handler.
-   * @returns The query result (can be a Promise).
+   * @returns The synchronous query result.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
    * @throws {@link WirestateError} If no query handler is registered.
    *
    * @example
    * ```typescript
-   * const user: User = await scope.queryData("GET_USER", { id: 1 });
+   * const user: User = scope.queryData("GET_USER", { id: 1 });
    * ```
    */
-  public queryData<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): MaybePromise<R> {
+  public queryData<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): R {
     dbg.info(prefix(__filename), "Query data:", { type, data });
 
     return this.getContainer().get(QueryBus).query<R, D>(type, data);
   }
 
   /**
-   * Dispatches a query and returns the result, or null if no handler is registered.
+   * Dispatches a query and returns the result as a Promise.
+   *
+   * @template R - Type of the query result.
+   * @template D - Type of the query data (payload).
+   * @template T - Type of the query identifier.
+   *
+   * @param type - Query identifier.
+   * @param data - Input data for the query handler.
+   * @returns A Promise resolving to the query result.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   * @throws {@link WirestateError} If no query handler is registered.
+   *
+   * @example
+   * ```typescript
+   * const user: User = await scope.queryDataAsync("GET_USER", { id: 1 });
+   * ```
+   */
+  public queryDataAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Promise<R> {
+    dbg.info(prefix(__filename), "Async query data:", { type, data });
+
+    return this.getContainer().get(QueryBus).queryAsync<R, D>(type, data);
+  }
+
+  /**
+   * Dispatches a synchronous query and returns the result, or null if no handler is registered.
    *
    * @template R - Type of the query result.
    * @template D - Type of the query data (payload).
@@ -236,16 +261,40 @@ export class WireScope {
    *
    * @example
    * ```typescript
-   * const config: Config | null = await scope.queryOptionalData("GET_CONFIG");
+   * const config: Config | null = scope.queryOptionalData("GET_CONFIG");
    * ```
    */
-  public queryOptionalData<R = unknown, D = unknown, T extends QueryType = QueryType>(
-    type: T,
-    data?: D
-  ): Optional<MaybePromise<R>> {
+  public queryOptionalData<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Optional<R> {
     dbg.info(prefix(__filename), "Query optional data:", { type, data });
 
     return this.getContainer().get(QueryBus).queryOptional<R, D>(type, data);
+  }
+
+  /**
+   * Dispatches a query and returns the result as a Promise, or null if no handler is registered.
+   *
+   * @template R - Type of the query result.
+   * @template D - Type of the query data (payload).
+   * @template T - Type of the query identifier.
+   *
+   * @param type - Query identifier.
+   * @param data - Input data for the query handler.
+   * @returns A Promise resolving to the query result or `null`.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * const config: Config | null = await scope.queryOptionalDataAsync("GET_CONFIG");
+   * ```
+   */
+  public queryOptionalDataAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(
+    type: T,
+    data?: D
+  ): Promise<Optional<R>> {
+    dbg.info(prefix(__filename), "Optional async query data:", { type, data });
+
+    return this.getContainer().get(QueryBus).queryOptionalAsync<R, D>(type, data);
   }
 
   /**

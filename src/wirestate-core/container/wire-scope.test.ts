@@ -14,7 +14,7 @@ import { OnDeactivation } from "../service/on-deactivation";
 import { mockContainer } from "../test-utils/mock-container";
 import { mockService } from "../test-utils/mock-service";
 import { CommandStatus, CommandDescriptor } from "../types/commands";
-import { MaybePromise, Optional } from "../types/general";
+import { Optional } from "../types/general";
 
 import { WireScope } from "./wire-scope";
 
@@ -129,7 +129,7 @@ describe("WireScope", () => {
     jest.spyOn(bus, "query");
     jest.spyOn(bus, "queryOptional");
 
-    const result: MaybePromise<string> = scope.queryData("TEST_QUERY", { param: 1 });
+    const result: string = scope.queryData("TEST_QUERY", { param: 1 });
 
     expect(result).toBe("result-from-bus");
     expect(bus.query).toHaveBeenCalledWith("TEST_QUERY", { param: 1 });
@@ -138,6 +138,27 @@ describe("WireScope", () => {
 
     expect(missing).toBeNull();
     expect(bus.queryOptional).toHaveBeenCalledWith("MISSING_QUERY", "string-value");
+  });
+
+  it("should query async data via query bus", async () => {
+    const container: Container = mockContainer();
+    const bus: QueryBus = container.get(QueryBus);
+    const scope: WireScope = new WireScope(container);
+
+    bus.register("TEST_SYNC_QUERY", () => "result-from-bus-1");
+    bus.register("TEST_ASYNC_QUERY", async () => "result-from-bus-2");
+
+    jest.spyOn(bus, "queryAsync");
+    jest.spyOn(bus, "queryOptionalAsync");
+
+    await expect(scope.queryDataAsync("TEST_SYNC_QUERY", { param: 100 })).resolves.toBe("result-from-bus-1");
+    expect(bus.queryAsync).toHaveBeenCalledWith("TEST_SYNC_QUERY", { param: 100 });
+
+    await expect(scope.queryDataAsync("TEST_ASYNC_QUERY", { param: 1000 })).resolves.toBe("result-from-bus-2");
+    expect(bus.queryAsync).toHaveBeenCalledWith("TEST_ASYNC_QUERY", { param: 1000 });
+
+    await expect(scope.queryOptionalDataAsync("MISSING_QUERY", "string-value")).resolves.toBeNull();
+    expect(bus.queryOptionalAsync).toHaveBeenCalledWith("MISSING_QUERY", "string-value");
   });
 
   it("should execute commands via command bus", async () => {

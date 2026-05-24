@@ -25,7 +25,6 @@ export { WireScope } from "./container/wire-scope";
 
 export { WirestateError } from "./error/wirestate-error";
 
-export { emitEvent } from "./events/emit-event";
 export { OnEvent } from "./events/on-event";
 export { EventBus } from "./events/event-bus";
 

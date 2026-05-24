@@ -109,7 +109,6 @@ describe("Library exported API from wirestate-core", () => {
     "command",
     "commandOptional",
     "createContainer",
-    "emitEvent",
     "getContainerEntries",
     "getEntryToken",
     "unapplySeeds",

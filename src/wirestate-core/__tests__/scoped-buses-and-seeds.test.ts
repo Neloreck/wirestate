@@ -12,7 +12,6 @@ import {
   WireScope,
   command,
   createContainer,
-  emitEvent,
 } from "../index";
 import { Optional } from "../types/general";
 
@@ -115,8 +114,8 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     expect(parent.get(QueryBus).query(COUNT_QUERY)).toBe("root-label:3");
     expect(child.get(QueryBus).query(COUNT_QUERY)).toBe("child-label:112");
 
-    emitEvent(parent, LOG_EVENT, "from-parent");
-    emitEvent(child, LOG_EVENT, "from-child");
+    parent.get(EventBus).emit({ type: LOG_EVENT, payload: "from-parent" });
+    child.get(EventBus).emit({ type: LOG_EVENT, payload: "from-child" });
 
     expect(parent.get(ParentCounterService).events).toEqual(["parent:from-parent"]);
     expect(child.get(ChildCounterService).events).toEqual(["child:from-child"]);
@@ -126,7 +125,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     expect(await command(parent, ADD_COMMAND, 2).task).toBe(6);
     expect(parent.get(QueryBus).query(COUNT_QUERY)).toBe("root-label:6");
 
-    emitEvent(parent, LOG_EVENT, "from-parent");
+    parent.get(EventBus).emit({ type: LOG_EVENT, payload: "from-parent" });
     expect(parent.get(ParentCounterService).events).toEqual(["parent:from-parent", "parent:from-parent"]);
   });
 

@@ -11,7 +11,6 @@ import {
   QueryBus,
   command,
   createContainer,
-  emitEvent,
 } from "../index";
 
 describe("core service shadowing and cleanup integration", () => {
@@ -129,21 +128,21 @@ describe("core service shadowing and cleanup integration", () => {
       activate: [PrimaryHandlerService, SecondaryHandlerService],
     });
 
-    const eventBus: EventBus = container.get(EventBus);
+    const bus: EventBus = container.get(EventBus);
 
-    emitEvent(container, TOUCH_EVENT, "one");
+    bus.emit({ type: TOUCH_EVENT, payload: "one" });
     expect(events).toEqual(["primary:one", "secondary:one"]);
-    expect(eventBus.has()).toBe(true);
+    expect(bus.has()).toBe(true);
 
     container.unbind(SecondaryHandlerService);
-    emitEvent(container, TOUCH_EVENT, "two");
+    bus.emit({ type: TOUCH_EVENT, payload: "two" });
 
     expect(events).toEqual(["primary:one", "secondary:one", "primary:two"]);
 
     container.unbind(PrimaryHandlerService);
-    emitEvent(container, TOUCH_EVENT, "three");
+    bus.emit({ type: TOUCH_EVENT, payload: "three" });
 
     expect(events).toEqual(["primary:one", "secondary:one", "primary:two"]);
-    expect(eventBus.has()).toBe(false);
+    expect(bus.has()).toBe(false);
   });
 });
