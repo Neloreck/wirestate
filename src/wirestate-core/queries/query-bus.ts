@@ -3,7 +3,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { Maybe, MaybePromise, Optional } from "../types/general";
+import { Maybe, Optional } from "../types/general";
 import { QueryHandler, QueryType, QueryUnregister } from "../types/queries";
 
 /**
@@ -100,11 +100,12 @@ export class QueryBus {
   }
 
   /**
-   * Dispatches a query to the last registered handler and returns the result.
+   * Dispatches a synchronous query to the last registered handler and returns the result.
    *
    * @remarks
-   * Query handlers can be synchronous or asynchronous. The result is returned as-is
-   * (or as a Promise if the handler is async).
+   * Query handlers may be registered as synchronous or asynchronous. This method
+   * returns the handler result as-is, typed as the expected synchronous result.
+   * Use {@link queryAsync} when callers should consistently receive a Promise.
    *
    * @template R - Type of the expected query result.
    * @template D - Type of the data (payload) passed to the query.
@@ -118,13 +119,43 @@ export class QueryBus {
    *
    * @example
    * ```typescript
-   * const user: User = await queryBus.query<User, string>("FIND_USER", "user-id-123");
+   * const user: User = queryBus.query<User, string>("FIND_USER", "user-id-123");
    * ```
    */
-  public query<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): MaybePromise<R> {
+  public query<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): R {
     const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
 
     // Always use the top of the stack (most recent registration) if handlers are available.
+    if (stack?.length) {
+      return (stack[stack.length - 1] as QueryHandler<D, R>)(data as D) as R;
+    }
+
+    throw new WirestateError(
+      ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER,
+      `No query handler registered in container for type: '${String(type)}'.`
+    );
+  }
+
+  /**
+   * Dispatches a query to the last registered handler and returns the result as a Promise.
+   *
+   * @remarks
+   * The active handler may return either a synchronous value or a Promise. Synchronous
+   * values are wrapped in the returned Promise.
+   *
+   * @template R - Type of the expected query result.
+   * @template D - Type of the data (payload) passed to the query.
+   * @template T - Type of the query identifier.
+   *
+   * @param type - Unique query identifier.
+   * @param data - Optional input data for the handler.
+   * @returns A Promise resolving to the query result.
+   *
+   * @throws {@link WirestateError} If no handler is registered for the given type.
+   */
+  public async queryAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Promise<R> {
+    const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
+
     if (stack?.length) {
       return (stack[stack.length - 1] as QueryHandler<D, R>)(data as D);
     }
@@ -136,7 +167,12 @@ export class QueryBus {
   }
 
   /**
-   * Dispatches a query if a handler exists, otherwise returns null.
+   * Dispatches a synchronous query if a handler exists, otherwise returns null.
+   *
+   * @remarks
+   * Query handlers may be registered as synchronous or asynchronous. This method
+   * returns the handler result as-is, typed as the expected synchronous result.
+   * Use {@link queryOptionalAsync} when callers should consistently receive a Promise.
    *
    * @template R - Type of the expected query result.
    * @template D - Type of the data (payload) passed to the query.
@@ -144,12 +180,33 @@ export class QueryBus {
    *
    * @param type - Unique query identifier.
    * @param data - Optional input data for the handler.
-   * @returns The query result, or `null` if no handler is found.
+   * @returns The synchronous query result, or `null` if no handler is found.
    */
-  public queryOptional<R = unknown, D = unknown, T extends QueryType = QueryType>(
+  public queryOptional<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Optional<R> {
+    const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
+
+    if (stack?.length) {
+      return (stack[stack.length - 1] as QueryHandler<D, R>)(data as D) as R;
+    }
+
+    return null;
+  }
+
+  /**
+   * Dispatches a query if a handler exists and returns the result as a Promise.
+   *
+   * @template R - Type of the expected query result.
+   * @template D - Type of the data (payload) passed to the query.
+   * @template T - Type of the query identifier.
+   *
+   * @param type - Unique query identifier.
+   * @param data - Optional input data for the handler.
+   * @returns A Promise resolving to the query result, or `null` if no handler is found.
+   */
+  public async queryOptionalAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(
     type: T,
     data?: D
-  ): Optional<MaybePromise<R>> {
+  ): Promise<Optional<R>> {
     const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
 
     if (stack?.length) {

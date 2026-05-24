@@ -3,7 +3,7 @@ import { Container, QueryBus } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
-import { AnyObject, MaybePromise } from "../types/general";
+import { AnyObject } from "../types/general";
 
 import { useQueryHandler } from "./use-query-handler";
 
@@ -25,7 +25,7 @@ describe("useQueryHandler", () => {
 
     expect(bus.has("TEST_QUERY")).toBe(true);
 
-    const result: MaybePromise<string> = bus.query("TEST_QUERY", "data");
+    const result: string = bus.query("TEST_QUERY", "data");
 
     expect(result).toBe("data-result");
     expect(handler).toHaveBeenCalledWith("data");
@@ -79,7 +79,7 @@ describe("useQueryHandler", () => {
     expect(bus.has("QUERY_B")).toBe(true);
   });
 
-  it("should call latest handler registered during render", async () => {
+  it("should call latest handler registered during render", () => {
     const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
     const handler1 = jest.fn().mockReturnValue("value1");
@@ -96,12 +96,12 @@ describe("useQueryHandler", () => {
     );
 
     expect(bus.has("QUERY")).toBe(true);
-    expect(await bus.query("QUERY")).toBe("value1");
+    expect(bus.query("QUERY")).toBe("value1");
 
     rerender(withContainerProvider(<TestComponent type={"QUERY"} handler={handler2} />, container));
 
     expect(bus.has("QUERY")).toBe(true);
-    expect(await bus.query("QUERY")).toBe("value2");
+    expect(bus.query("QUERY")).toBe("value2");
 
     unmount();
 
@@ -121,7 +121,7 @@ describe("useQueryHandler", () => {
 
     render(withContainerProvider(<TestComponent />, container));
 
-    const result: string = await bus.query<string>("ASYNC_QUERY", "input");
+    const result: string = await bus.queryAsync<string>("ASYNC_QUERY", "input");
 
     expect(result).toBe("input-async");
     expect(handler).toHaveBeenCalledWith("input");

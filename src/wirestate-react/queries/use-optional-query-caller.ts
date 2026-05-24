@@ -8,12 +8,13 @@ import { useContainer } from "../context/use-container";
 import { OptionalQueryCaller } from "../types/queries";
 
 /**
- * Returns a stable function to dispatch optional queries on the active container.
+ * Returns a stable function to dispatch optional synchronous queries on the active container.
  *
  * @remarks
  * The returned dispatcher is memoized using `useCallback` and stays stable
  * for the lifetime of the container. It returns `null` instead of throwing
- * if no handler is registered.
+ * if no handler is registered. Use {@link useOptionalAsyncQueryCaller} when
+ * callers should consistently receive a Promise.
  *
  * @group Queries
  *
@@ -22,7 +23,7 @@ import { OptionalQueryCaller } from "../types/queries";
  * @example
  * ```tsx
  * const queryOptional: OptionalQueryCaller = useOptionalQueryCaller();
- * const settings: UserSettings | null = await queryOptional(GET_USER_SETTINGS, { id: 1 });
+ * const settings: UserSettings | null = queryOptional(GET_USER_SETTINGS, { id: 1 });
  * ```
  */
 export function useOptionalQueryCaller(): OptionalQueryCaller {

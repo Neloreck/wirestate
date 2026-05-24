@@ -17,10 +17,10 @@ export { SubContainerProvider, SubContainerProviderProps } from "./provision/sub
 export { ContainerProvider, ContainerProviderProps } from "./provision/container-provider";
 
 export { useQueryCaller } from "./queries/use-query-caller";
+export { useAsyncQueryCaller } from "./queries/use-async-query-caller";
 export { useOptionalQueryCaller } from "./queries/use-optional-query-caller";
+export { useOptionalAsyncQueryCaller } from "./queries/use-optional-async-query-caller";
 export { useQueryHandler } from "./queries/use-query-handler";
-export { useSyncQueryCaller } from "./queries/use-sync-query-caller";
-export { useOptionalSyncQueryCaller } from "./queries/use-optional-sync-query-caller";
 
 export { OnDeprovision } from "./services/on-deprovision";
 export { OnProvision } from "./services/on-provision";
@@ -30,7 +30,7 @@ export { EventEmitter } from "./types/events";
 export {
   QueryResponder,
   QueryCaller,
+  AsyncQueryCaller,
   OptionalQueryCaller,
-  SyncQueryCaller,
-  OptionalSyncQueryCaller,
+  OptionalAsyncQueryCaller,
 } from "./types/queries";

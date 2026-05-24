@@ -13,7 +13,6 @@ import {
   command,
   createContainer,
   emitEvent,
-  query,
 } from "../index";
 import { Optional } from "../types/general";
 
@@ -113,8 +112,8 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     expect(await command(parent, ADD_COMMAND, 2).task).toBe(3);
     expect(await command(child, ADD_COMMAND, 2).task).toBe(112);
-    expect(query(parent, COUNT_QUERY)).toBe("root-label:3");
-    expect(query(child, COUNT_QUERY)).toBe("child-label:112");
+    expect(parent.get(QueryBus).query(COUNT_QUERY)).toBe("root-label:3");
+    expect(child.get(QueryBus).query(COUNT_QUERY)).toBe("child-label:112");
 
     emitEvent(parent, LOG_EVENT, "from-parent");
     emitEvent(child, LOG_EVENT, "from-child");
@@ -125,7 +124,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     child.unbindAll();
 
     expect(await command(parent, ADD_COMMAND, 2).task).toBe(6);
-    expect(query(parent, COUNT_QUERY)).toBe("root-label:6");
+    expect(parent.get(QueryBus).query(COUNT_QUERY)).toBe("root-label:6");
 
     emitEvent(parent, LOG_EVENT, "from-parent");
     expect(parent.get(ParentCounterService).events).toEqual(["parent:from-parent", "parent:from-parent"]);

@@ -56,14 +56,40 @@ describe("QueryBus", () => {
     expect(() => bus.query("TYPE")).toThrow("No query handler registered in container for type: 'TYPE'.");
   });
 
-  it("should handle async handlers", async () => {
+  it("should return promise values from query when the handler returns a Promise", async () => {
     const bus: QueryBus = new QueryBus();
 
     bus.register("ASYNC", async (data: number) => data * 2);
 
-    const result: number = await bus.query<number>("ASYNC", 5);
+    const result: Promise<number> = bus.query<Promise<number>, number>("ASYNC", 5);
+
+    await expect(result).resolves.toBe(10);
+  });
+
+  it("should handle async handlers through queryAsync", async () => {
+    const bus: QueryBus = new QueryBus();
+
+    bus.register("ASYNC", async (data: number) => data * 2);
+
+    const result: number = await bus.queryAsync<number>("ASYNC", 5);
 
     expect(result).toBe(10);
+  });
+
+  it("should wrap sync handler results through queryAsync", async () => {
+    const bus: QueryBus = new QueryBus();
+
+    bus.register("SYNC", (data: number) => data * 2);
+
+    await expect(bus.queryAsync<number>("SYNC", 5)).resolves.toBe(10);
+  });
+
+  it("should reject through queryAsync when no handler is registered", async () => {
+    const bus: QueryBus = new QueryBus();
+
+    await expect(bus.queryAsync("MISSING")).rejects.toThrow(
+      "No query handler registered in container for type: 'MISSING'."
+    );
   });
 
   it("should check if handler exists", () => {
@@ -135,14 +161,38 @@ describe("QueryBus", () => {
       expect(bus.queryOptional("MISSING")).toBeNull();
     });
 
-    it("should support async handlers", async () => {
+    it("should return promise values from queryOptional when the handler returns a Promise", async () => {
       const bus: QueryBus = new QueryBus();
 
       bus.register("ASYNC", async () => "async-value");
 
-      const result: Optional<string> = await bus.queryOptional("ASYNC");
+      const result: Optional<Promise<string>> = bus.queryOptional<Promise<string>>("ASYNC");
+
+      await expect(result).resolves.toBe("async-value");
+    });
+
+    it("should support async handlers through queryOptionalAsync", async () => {
+      const bus: QueryBus = new QueryBus();
+
+      bus.register("ASYNC", async () => "async-value");
+
+      const result: Optional<string> = await bus.queryOptionalAsync("ASYNC");
 
       expect(result).toBe("async-value");
+    });
+
+    it("should wrap sync handler results through queryOptionalAsync", async () => {
+      const bus: QueryBus = new QueryBus();
+
+      bus.register("SYNC", () => "sync-value");
+
+      await expect(bus.queryOptionalAsync("SYNC")).resolves.toBe("sync-value");
+    });
+
+    it("should resolve null through queryOptionalAsync when no handler is registered", async () => {
+      const bus: QueryBus = new QueryBus();
+
+      await expect(bus.queryOptionalAsync("MISSING")).resolves.toBeNull();
     });
 
     it("should support symbol query types", () => {

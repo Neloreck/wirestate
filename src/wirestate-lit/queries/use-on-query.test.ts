@@ -50,7 +50,8 @@ describe("useOnQuery", () => {
 
     provider.appendChild(element);
 
-    expect(await bus.query("TEST_QUERY_DATA", 5)).toBe(105);
+    await expect(bus.queryAsync("TEST_QUERY_DATA", 5)).resolves.toBe(105);
+    expect(bus.query("TEST_QUERY_DATA", 5)).toBe(105);
     expect(handler).toHaveBeenCalledWith(5);
   });
 });

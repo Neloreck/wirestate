@@ -15,7 +15,12 @@ export { command } from "./commands/command";
 export { commandOptional } from "./commands/command-optional";
 export { OnCommand } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";
-export { createContainer, ContainerActivation, ContainerConfig, CreateContainerOptions } from "./container/create-container";
+export {
+  createContainer,
+  ContainerActivation,
+  ContainerConfig,
+  CreateContainerOptions,
+} from "./container/create-container";
 export { WireScope } from "./container/wire-scope";
 
 export { WirestateError } from "./error/wirestate-error";
@@ -24,8 +29,6 @@ export { emitEvent } from "./events/emit-event";
 export { OnEvent } from "./events/on-event";
 export { EventBus } from "./events/event-bus";
 
-export { query } from "./queries/query";
-export { queryOptional } from "./queries/query-optional";
 export { QueryBus } from "./queries/query-bus";
 export { OnQuery } from "./queries/on-query";
 

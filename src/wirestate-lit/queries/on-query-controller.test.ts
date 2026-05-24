@@ -28,27 +28,27 @@ describe("OnQueryController", () => {
     const element: TestConsumerElement = new TestConsumerElement();
     const handler = jest.fn();
 
-    new OnQueryController(element, "TEST_QRY", handler);
-    expect(bus.has("TEST_QRY")).toBe(false);
+    new OnQueryController(element, "TEST_QUERY", handler);
+    expect(bus.has("TEST_QUERY")).toBe(false);
 
     provider.appendChild(element);
-    expect(bus.has("TEST_QRY")).toBe(true);
+    expect(bus.has("TEST_QUERY")).toBe(true);
 
     element.remove();
-    expect(bus.has("TEST_QRY")).toBe(false);
+    expect(bus.has("TEST_QUERY")).toBe(false);
   });
 
-  it("should invoke handler with correct data when query is dispatched", async () => {
+  it("should invoke handler with correct data when query is dispatched", () => {
     const { provider, container } = fixture;
 
     const bus: QueryBus = container.get(QueryBus);
     const element: TestConsumerElement = new TestConsumerElement();
     const handler = jest.fn((data: string) => data + "-result");
 
-    new OnQueryController(element, "DATA_QRY", handler);
+    new OnQueryController(element, "DATA_QUERY", handler);
     provider.appendChild(element);
 
-    expect(await bus.query("DATA_QRY", "payload")).toBe("payload-result");
+    expect(bus.query("DATA_QUERY", "payload")).toBe("payload-result");
     expect(handler).toHaveBeenCalledWith("payload");
   });
 
@@ -59,10 +59,10 @@ describe("OnQueryController", () => {
     const element: TestConsumerElement = new TestConsumerElement();
     const handler = jest.fn(async (data: number) => data * 3);
 
-    new OnQueryController(element, "ASYNC_QRY", handler);
+    new OnQueryController(element, "ASYNC_QUERY", handler);
     provider.appendChild(element);
 
-    expect(await bus.query("ASYNC_QRY", 7)).toBe(21);
+    await expect(bus.queryAsync("ASYNC_QUERY", 7)).resolves.toBe(21);
   });
 
   it("should re-register when container context is updated", () => {

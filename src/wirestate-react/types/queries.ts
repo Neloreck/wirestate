@@ -17,7 +17,7 @@ import { MaybePromise, Optional } from "./general";
 export type QueryResponder<R = unknown, D = unknown> = (data?: D) => MaybePromise<R>;
 
 /**
- * Represents signature for a function that dispatches queries and returns their result.
+ * Represents signature for a function that dispatches synchronous queries and returns their result.
  *
  * @remarks
  * Typically returned by {@link useQueryCaller}.
@@ -31,18 +31,15 @@ export type QueryResponder<R = unknown, D = unknown> = (data?: D) => MaybePromis
  * @param type - The query identifier.
  * @param data - Optional payload for the query.
  *
- * @returns The query result as a value or promise.
+ * @returns The synchronous query result.
  */
-export type QueryCaller = <R = unknown, D = unknown, T extends QueryType = QueryType>(
-  type: T,
-  data?: D
-) => MaybePromise<R>;
+export type QueryCaller = <R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D) => R;
 
 /**
- * Represents signature for a function that dispatches synchronous queries.
+ * Represents signature for a function that dispatches queries and returns their result as a Promise.
  *
  * @remarks
- * Typically returned by {@link useSyncQueryCaller}.
+ * Typically returned by {@link useAsyncQueryCaller}.
  *
  * @group Queries
  *
@@ -53,12 +50,15 @@ export type QueryCaller = <R = unknown, D = unknown, T extends QueryType = Query
  * @param type - The query identifier.
  * @param data - Optional payload for the query.
  *
- * @returns The query result directly.
+ * @returns A Promise resolving to the query result.
  */
-export type SyncQueryCaller = <R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D) => R;
+export type AsyncQueryCaller = <R = unknown, D = unknown, T extends QueryType = QueryType>(
+  type: T,
+  data?: D
+) => Promise<R>;
 
 /**
- * Represents signature for a function that dispatches optional queries.
+ * Represents signature for a function that dispatches optional synchronous queries.
  *
  * @remarks
  * Typically returned by {@link useOptionalQueryCaller}. Returns `null` when
@@ -73,18 +73,18 @@ export type SyncQueryCaller = <R = unknown, D = unknown, T extends QueryType = Q
  * @param type - The query identifier.
  * @param data - Optional payload for the query.
  *
- * @returns The query result, or `null` if no handler was found.
+ * @returns The synchronous query result, or `null` if no handler was found.
  */
 export type OptionalQueryCaller = <R = unknown, D = unknown, T extends QueryType = QueryType>(
   type: T,
   data?: D
-) => Optional<MaybePromise<R>>;
+) => Optional<R>;
 
 /**
- * Represents signature for a function that dispatches optional synchronous queries.
+ * Represents signature for a function that dispatches optional queries and returns their result as a Promise.
  *
  * @remarks
- * Typically returned by {@link useOptionalSyncQueryCaller}. Returns `null`
+ * Typically returned by {@link useOptionalAsyncQueryCaller}. Returns `null`
  * when no handler is registered.
  *
  * @group Queries
@@ -96,9 +96,9 @@ export type OptionalQueryCaller = <R = unknown, D = unknown, T extends QueryType
  * @param type - The query identifier.
  * @param data - Optional payload for the query.
  *
- * @returns The query result directly, or `null` if no handler was found.
+ * @returns A Promise resolving to the query result, or `null` if no handler was found.
  */
-export type OptionalSyncQueryCaller = <R = unknown, D = unknown, T extends QueryType = QueryType>(
+export type OptionalAsyncQueryCaller = <R = unknown, D = unknown, T extends QueryType = QueryType>(
   type: T,
   data?: D
-) => Optional<R>;
+) => Promise<Optional<R>>;

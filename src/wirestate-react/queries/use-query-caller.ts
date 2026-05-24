@@ -8,11 +8,12 @@ import { useContainer } from "../context/use-container";
 import { QueryCaller } from "../types/queries";
 
 /**
- * Returns a stable function to dispatch queries on the active container.
+ * Returns a stable function to dispatch synchronous queries on the active container.
  *
  * @remarks
  * The returned dispatcher is memoized using `useCallback` and stays stable
  * for the lifetime of the container. It uses {@link QueryBus.query} internally.
+ * Use {@link useAsyncQueryCaller} when callers should consistently receive a Promise.
  *
  * @group Queries
  *
@@ -21,7 +22,7 @@ import { QueryCaller } from "../types/queries";
  * @example
  * ```tsx
  * const query: QueryCaller = useQueryCaller();
- * const result: UserProfile = await query(GET_USER_PROFILE, { id: 123 });
+ * const result: UserProfile = query(GET_USER_PROFILE, { id: 123 });
  * ```
  */
 export function useQueryCaller(): QueryCaller {

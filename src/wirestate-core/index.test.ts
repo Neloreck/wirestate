@@ -112,8 +112,6 @@ describe("Library exported API from wirestate-core", () => {
     "emitEvent",
     "getContainerEntries",
     "getEntryToken",
-    "query",
-    "queryOptional",
     "unapplySeeds",
   ];
 

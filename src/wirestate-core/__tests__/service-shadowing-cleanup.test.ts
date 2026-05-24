@@ -12,7 +12,6 @@ import {
   command,
   createContainer,
   emitEvent,
-  query,
 } from "../index";
 
 describe("core service shadowing and cleanup integration", () => {
@@ -103,13 +102,13 @@ describe("core service shadowing and cleanup integration", () => {
     expect(lifecycle).toEqual(["primary:activated", "secondary:activated"]);
 
     expect(await command(container, FORMAT_COMMAND, "first").task).toBe("secondary:first");
-    expect(query(container, CURRENT_QUERY)).toBe("secondary:first");
+    expect(container.get(QueryBus).query(CURRENT_QUERY)).toBe("secondary:first");
 
     container.unbind(SecondaryHandlerService);
 
     expect(lifecycle).toEqual(["primary:activated", "secondary:activated", "secondary:deactivated"]);
     expect(await command(container, FORMAT_COMMAND, "second").task).toBe("primary:second");
-    expect(query(container, CURRENT_QUERY)).toBe("primary:second");
+    expect(container.get(QueryBus).query(CURRENT_QUERY)).toBe("primary:second");
 
     container.unbind(PrimaryHandlerService);
 
@@ -119,7 +118,7 @@ describe("core service shadowing and cleanup integration", () => {
     expect(() => command(container, FORMAT_COMMAND, "third")).toThrow(
       "No command handler registered in container for type: 'FORMAT_COMMAND'."
     );
-    expect(() => query(container, CURRENT_QUERY)).toThrow(
+    expect(() => container.get(QueryBus).query(CURRENT_QUERY)).toThrow(
       "No query handler registered in container for type: 'CURRENT_QUERY'."
     );
   });
