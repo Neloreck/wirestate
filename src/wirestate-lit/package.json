@@ -62,6 +62,5 @@
     "@lit/context": ">=1.0.0",
     "reflect-metadata": ">=0.2.0",
     "tslib": ">=2.5.0"
-  },
-  "optionalDependencies": {}
+  }
 }

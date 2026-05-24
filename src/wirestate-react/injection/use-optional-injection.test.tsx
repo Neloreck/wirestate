@@ -74,4 +74,56 @@ describe("useOptionalInjection", () => {
 
     expect(getByTestId("result").textContent).toBe("bound-value");
   });
+
+  it("should not re-trigger resolving in fallback changes (depend only on container changes)", () => {
+    const container: Container = mockContainer();
+    const token: unique symbol = Symbol("optional-token");
+
+    function FallbackComponent({ value }: { value: string }) {
+      const data: Optional<string> = useOptionalInjection(token, () => value);
+
+      return <div data-testid={"result"}>{data}</div>;
+    }
+
+    const { getByTestId, rerender } = render(withContainerProvider(<FallbackComponent value={"first"} />, container));
+
+    expect(getByTestId("result").textContent).toBe("first");
+
+    rerender(withContainerProvider(<FallbackComponent value={"second"} />, container));
+
+    expect(getByTestId("result").textContent).toBe("first");
+  });
+
+  it("should not re-resolve bound token when onFallback changes", () => {
+    const container: Container = mockContainer();
+    const token: unique symbol = Symbol("optional-token");
+    const originalGet = container.get.bind(container);
+    let resolveCount = 0;
+
+    container.bind(token).toConstantValue("bound-value");
+
+    jest.spyOn(container, "get").mockImplementation((injectionId) => {
+      if (injectionId === token) {
+        resolveCount++;
+      }
+
+      return originalGet(injectionId);
+    });
+
+    function FallbackComponent({ value }: { value: string }) {
+      const data: Optional<string> = useOptionalInjection(token, () => value);
+
+      return <div data-testid={"result"}>{data}</div>;
+    }
+
+    const { getByTestId, rerender } = render(withContainerProvider(<FallbackComponent value={"first"} />, container));
+
+    expect(getByTestId("result").textContent).toBe("bound-value");
+    expect(resolveCount).toBe(1);
+
+    rerender(withContainerProvider(<FallbackComponent value={"second"} />, container));
+
+    expect(getByTestId("result").textContent).toBe("bound-value");
+    expect(resolveCount).toBe(1);
+  });
 });
