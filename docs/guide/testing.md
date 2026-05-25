@@ -1,10 +1,8 @@
 # Testing
 
-Services are plain TypeScript classes. Business logic tests do not need React, Lit, or DOM setup.
+Services are TypeScript classes. Test plain logic directly. Use a container only when DI, lifecycle, seeds, or buses matter.
 
-## Unit Testing - No Container
-
-For pure logic with no DI dependencies, instantiate directly.
+## No Container
 
 ```ts
 import { LoggerService } from "./LoggerService";
@@ -21,9 +19,9 @@ test("logs a message", () => {
 });
 ```
 
-## mockService - Single Service
+## One Service
 
-`mockService` binds one service to a fresh container and returns its instance. Handles lifecycle automatically.
+`mockService` creates a mock container, binds the service, and returns the instance.
 
 ```ts
 import { mockService } from "@wirestate/core/test-utils";
@@ -38,20 +36,22 @@ test("increments count", () => {
 });
 ```
 
-Skip lifecycle hooks (`@OnActivated` / `@OnDeactivation`) when you only want to test methods in isolation:
+Skip lifecycle when the hook setup is noise for this test.
 
 ```ts
+import { mockContainer, mockService } from "@wirestate/core/test-utils";
+
 const service = mockService(CounterService, mockContainer(), { skipLifecycle: true });
 ```
 
-## mockContainer - Multiple Services
+## Several Services
 
-`mockContainer` binds multiple services and their dependencies into one container. Use `activate` to trigger `@OnActivated` on specific services before the test runs.
+`mockContainer` binds a group of services. Use `activate` when `@OnActivated` needs to run before assertions.
 
 ```ts
+import { EventBus } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
-import { LoggerService } from "./LoggerService";
-import { CounterService } from "./CounterService";
+import { CounterService, LoggerService } from "./services";
 
 test("counter emits event on increment", () => {
   const container = mockContainer({
@@ -60,7 +60,7 @@ test("counter emits event on increment", () => {
   });
 
   const counter = container.get(CounterService);
-  const events: Array<string> = [];
+  const events: Array<string | symbol> = [];
 
   container.get(EventBus).subscribe((event) => events.push(event.type));
 
@@ -70,53 +70,52 @@ test("counter emits event on increment", () => {
 });
 ```
 
-## Mocking Dependencies
+## Replace Dependencies
 
-Replace a service binding with a mock before resolving:
+Bind a constant under the dependency token before resolving the service under test.
 
 ```ts
-import { mockContainer } from "@wirestate/core/test-utils";
 import { bindConstant } from "@wirestate/core";
+import { mockContainer } from "@wirestate/core/test-utils";
 
 test("cart uses mocked api client", async () => {
   const container = mockContainer({ entries: [CartService] });
-  const mockApi = { post: jest.fn().mockResolvedValue({ ok: true }) };
+  const api = { post: jest.fn().mockResolvedValue({ ok: true }) };
 
-  bindConstant(container, { id: ApiClient, value: mockApi as unknown as ApiClient });
+  bindConstant(container, { id: ApiClient, value: api as unknown as ApiClient });
 
   const cart = container.get(CartService);
   await cart.checkout();
 
-  expect(mockApi.post).toHaveBeenCalledWith("/checkout", expect.anything());
+  expect(api.post).toHaveBeenCalledWith("/checkout", expect.anything());
 });
 ```
 
-## mockBindService and mockUnbindService
+## Rebind During A Test
 
-Use these when you need fine-grained control over which services are added or removed from an existing container mid-test.
+Use mock bind helpers when a test needs to swap implementations.
 
 ```ts
-import { mockBindService, mockUnbindService } from "@wirestate/core/test-utils";
+import { mockBindEntry, mockBindService, mockContainer, mockUnbindService } from "@wirestate/core/test-utils";
 
 const container = mockContainer({ entries: [LoggerService] });
+const fakeCounter = { increment: jest.fn() } as unknown as CounterService;
 
 mockBindService(container, CounterService);
-
-// later - swap out the implementation
 mockUnbindService(container, CounterService);
-mockBindService(container, CounterService, { skipLifecycle: true });
+mockBindEntry(container, { id: CounterService, value: fakeCounter });
 ```
 
-## React Testing
+## React
 
-Wrap a component tree with `withContainerProvider` to apply a test container without manually rendering `ContainerProvider`:
+`withContainerProvider` wraps a React tree with a test container.
 
 ```tsx
 import { render } from "@testing-library/react";
 import { mockContainer } from "@wirestate/core/test-utils";
 import { withContainerProvider } from "@wirestate/react/test-utils";
-import { CounterService } from "./CounterService";
 import { Counter } from "./Counter";
+import { CounterService } from "./CounterService";
 
 test("renders count", () => {
   const container = mockContainer({ entries: [CounterService], activate: [CounterService] });
@@ -124,5 +123,46 @@ test("renders count", () => {
   const { getByText } = render(withContainerProvider(<Counter />, container));
 
   expect(getByText("Count: 0")).toBeInTheDocument();
+});
+```
+
+## Lit
+
+`createLitProvision` creates a test host and publishes a container through Lit context.
+
+```ts
+import { mockContainer } from "@wirestate/core/test-utils";
+import { injection } from "@wirestate/lit";
+import { createLitProvision, LitProvisionFixture } from "@wirestate/lit/test-utils";
+import { LitElement } from "lit";
+import { customElement } from "lit/decorators.js";
+import { CounterService } from "./CounterService";
+
+@customElement("counter-view")
+class CounterView extends LitElement {
+  @injection(CounterService)
+  public counter!: CounterService;
+}
+
+describe("CounterView", () => {
+  let fixture: LitProvisionFixture;
+
+  beforeEach(() => {
+    const container = mockContainer({ entries: [CounterService], activate: [CounterService] });
+
+    fixture = createLitProvision(container);
+  });
+
+  afterEach(() => {
+    fixture.cleanup();
+  });
+
+  test("injects from the test container", () => {
+    const element = new CounterView();
+
+    fixture.provider.appendChild(element);
+
+    expect(element.counter).toBe(fixture.container.get(CounterService));
+  });
 });
 ```

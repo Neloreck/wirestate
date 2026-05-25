@@ -1,19 +1,8 @@
-# React Signals Usage
+# React Signals
 
-## Installation
+Use `@wirestate/react` for containers and hooks. Use `@wirestate/react-signals` for Preact Signals re-exports.
 
-```bash
-npm install --save @wirestate/core reflect-metadata
-npm install --save @wirestate/react @wirestate/react-signals @preact/signals-react
-```
-
-## Basic Usage
-
-The core of Wirestate is the **Service** - an `@Injectable` class holding state and logic.
-
-### Creating a Service
-
-Services hold a reactive state.
+## Service
 
 ```ts
 import { Injectable } from "@wirestate/core";
@@ -29,18 +18,16 @@ export class CounterService {
 }
 ```
 
-### Dependency Injection
-
-Services inject other services via constructor parameters.
+## Dependencies
 
 ```ts
-import { Injectable, Inject } from "@wirestate/core";
+import { Inject, Injectable } from "@wirestate/core";
 import { signal, Signal } from "@wirestate/react-signals";
 
 @Injectable()
 export class LoggerService {
   public log(...args: Array<unknown>): void {
-    console.log("[log]:", ...args);
+    console.log("[log]", ...args);
   }
 }
 
@@ -48,104 +35,72 @@ export class LoggerService {
 export class CounterService {
   public readonly count: Signal<number> = signal(0);
 
-  public constructor(
-    @Inject(LoggerService)
-    private readonly loggerService: LoggerService
-  ) {}
+  public constructor(@Inject(LoggerService) private readonly logger: LoggerService) {}
 
   public increment(): void {
-    this.loggerService.log("Incrementing counter value:", this.count.value + 1);
+    this.logger.log("increment", this.count.value + 1);
     this.count.value += 1;
   }
 }
 ```
 
-### Providing Services
-
-Create an application container and provide it via `ContainerProvider`.
+## Provider
 
 ```tsx
-import { Container, createContainer } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
-
-const container: Container = createContainer({
-  entries: [CounterService, LoggerService],
-});
+import { useMemo } from "react";
+import { CounterService, LoggerService } from "./services";
 
 export function Application() {
+  const config = useMemo(() => ({ entries: [CounterService, LoggerService] }), []);
+
   return (
-    <ContainerProvider container={container}>
+    <ContainerProvider config={config}>
       <Counter />
     </ContainerProvider>
   );
 }
 ```
 
-### Consuming Services
+## Component
+
+Signals re-render React consumers when read during render.
 
 ```tsx
 import { useInjection } from "@wirestate/react";
+import { CounterService } from "./CounterService";
 
 export function Counter() {
-  const counterService: CounterService = useInjection(CounterService);
+  const counter = useInjection(CounterService);
 
-  return <button onClick={() => counterService.increment()}>count: {counterService.count.value}</button>;
+  return <button onClick={() => counter.increment()}>Count: {counter.count.value}</button>;
 }
 ```
 
-## Advanced Patterns
-
-### Events
-
-Events are fire-and-forget messages broadcast to all subscribers in the same container. Emit from services via `WireScope`; subscribe with `@OnEvent` in another service or `useEvent` in React.
+## Events
 
 ```ts
-import { Injectable, Inject, WireScope } from "@wirestate/core";
-import { signal, Signal } from "@wirestate/react-signals";
+import { Event, Inject, Injectable, OnEvent, WireScope } from "@wirestate/core";
 
 @Injectable()
 export class CounterService {
-  public readonly count: Signal<number> = signal(0);
-
   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
   public increment(): void {
-    this.count.value += 1;
-    this.scope.emitEvent("COUNT_INCREMENTED", this.count.value);
+    this.scope.emitEvent("COUNT_INCREMENTED", 1);
   }
 }
-```
-
-```ts
-import { Injectable, OnEvent, Event } from "@wirestate/core";
 
 @Injectable()
 export class AnalyticsService {
   @OnEvent("COUNT_INCREMENTED")
-  private onCountIncremented(event: Event<number>): void {
-    console.log("Track count incremented:", event.payload);
+  public track(event: Event<number>): void {
+    console.log("count changed", event.payload);
   }
 }
 ```
 
-Subscribe in React components:
-
-```tsx
-import { Event } from "@wirestate/core";
-import { useEvent } from "@wirestate/react";
-
-function CounterLogger() {
-  useEvent("COUNT_INCREMENTED", (event: Event<number>) => {
-    console.log("Component received new count:", event.payload);
-  });
-
-  return null;
-}
-```
-
-### Commands
-
-Commands are named write operations dispatched to a single registered handler. The executor returns a `CommandDescriptor` to track async completion.
+## Commands
 
 ```ts
 import { Injectable, OnCommand } from "@wirestate/core";
@@ -153,119 +108,80 @@ import { Injectable, OnCommand } from "@wirestate/core";
 @Injectable()
 export class AuthService {
   @OnCommand("LOGOUT")
-  private async onLogout(): Promise<void> {
+  public async onLogout(): Promise<void> {
     await clearSession();
   }
 }
 ```
 
 ```tsx
-import { CommandDescriptor } from "@wirestate/core";
-import { CommandExecutor, useCommandExecutor } from "@wirestate/react";
+import { useCommandExecutor } from "@wirestate/react";
 
 function LogoutButton() {
-  const executeCommand: CommandExecutor = useCommandExecutor();
+  const command = useCommandExecutor();
 
-  const handleClick = async () => {
-    const descriptor: CommandDescriptor = executeCommand("LOGOUT");
-
-    await descriptor.task;
-  };
-
-  return <button onClick={handleClick}>Log out</button>;
+  return <button onClick={() => void command("LOGOUT").task}>Log out</button>;
 }
 ```
 
-### Queries
-
-Queries are synchronous or asynchronous request-response calls. One handler answers; the executor returns the result directly.
+## Queries
 
 ```ts
 import { Injectable, OnQuery } from "@wirestate/core";
 
 @Injectable()
 export class ThemeService {
-  private theme: string = "dark";
-
   @OnQuery("CURRENT_THEME")
   public onQueryTheme(): string {
-    return this.theme;
+    return "dark";
   }
 }
 ```
 
 ```tsx
-import { QueryExecutor, useQueryExecutor } from "@wirestate/react";
-import { useCallback, useState } from "react";
+import { useQueryExecutor } from "@wirestate/react";
 
-function ThemeToggle() {
-  const [theme, setTheme] = useState<string>("unknown");
+function ThemeButton() {
+  const query = useQueryExecutor();
 
-  const query: QueryExecutor = useQueryExecutor();
-
-  const onQueryTheme = useCallback(() => {
-    setTheme(query("CURRENT_THEME"));
-  }, [query]);
-
-  return <button onClick={onQueryTheme}>Theme: {theme}</button>;
+  return <button>Theme: {query<string>("CURRENT_THEME")}</button>;
 }
 ```
 
-### Seed Data
-
-Pass initialization data to services in the container.
+## Seeds
 
 ```tsx
-const container: Container = createContainer({
-  seeds: [[CounterService, { initialCount: 10 }]],
-  entries: [CounterService],
-});
+const config = useMemo(
+  () => ({
+    entries: [CounterService],
+    seeds: [[CounterService, { initialCount: 10 }]],
+  }),
+  []
+);
 ```
 
 ```tsx
-<ContainerProvider container={container}>
+<ContainerProvider config={config}>
   <Application />
-</ContainerProvider>;
+</ContainerProvider>
 ```
+
+Read targeted seeds in `@OnActivated`.
 
 ```ts
-import { Injectable, Inject, OnActivated, WireScope } from "@wirestate/core";
-import { signal, Signal } from "@wirestate/react-signals";
-
-export interface CounterSeed {
-  initialCount?: number;
-}
+import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
 
 @Injectable()
 export class CounterService {
-  public readonly count: Signal<number> = signal(0);
-
   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
   @OnActivated()
   public onActivated(): void {
-    const seed = this.scope.getSeed<CounterSeed>(CounterService);
+    const seed = this.scope.getSeed<{ initialCount?: number }>(CounterService);
 
     if (typeof seed?.initialCount === "number") {
       this.count.value = seed.initialCount;
     }
   }
 }
-```
-
-### Testing
-
-Services are plain classes - test them without a UI framework.
-
-```ts
-import { mockContainer, mockService } from "@wirestate/core/test-utils";
-
-test("increments counter", () => {
-  const container = mockContainer({ entries: [LoggerService, CounterService] });
-  const service = container.get(CounterService);
-
-  service.increment();
-
-  expect(service.count.value).toBe(1);
-});
 ```

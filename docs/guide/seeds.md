@@ -1,141 +1,78 @@
-# Seeds (Hydration)
+# Seeds
 
-Seeds pass an initial state into services at container creation time.
-They solve server-side rendering hydration, per-instance parameterization, and deterministic test setup without reaching for global state.
+Seeds are startup data for a container. Use them for SSR hydration, per-instance parameters, and deterministic tests.
 
-## Global Seed
+There are two kinds:
 
-A single object available to all services in the container.
-Inject it via the `SEED` token or access from a `WireScope` instance.
+- Shared seed: one object for the whole container.
+- Targeted seeds: values keyed by service class, string, or symbol.
+
+## Shared Seed
+
+Pass `seed` to `createContainer`. Read it with the `SEED` token or `scope.getSeed()`.
 
 ```ts
-import { applySharedSeed, Container, createContainer, SEED } from "@wirestate/core";
+import { Container, Inject, Injectable, SEED, createContainer } from "@wirestate/core";
 
-interface GlobalSeed {
+interface AppSeed {
   apiUrl: string;
   locale: string;
 }
 
-const container: Container = createContainer({
-  seed: { apiUrl: "https://api.example.com", locale: "en-US" } as GlobalSeed,
-});
-
-applySharedSeed(container, { apiUrl: "https://api2.example.com", locale: "en-GB" });
-
-const seed: GlobalSeed = container.get(SEED);
-```
-
-### Service
-
-```ts
-import { Injectable, Inject, SEED, WireScope } from "@wirestate/core";
-
 @Injectable()
-export class ApiClient {
-  public constructor(
-    @Inject(SEED)
-    private readonly seed: GlobalSeed,
-    @Inject(WireScope)
-    private readonly scope: WireScope
-  ) {}
+class ApiClient {
+  public constructor(@Inject(SEED) private readonly seed: AppSeed) {}
 
-  // Construction time resolution:
   public get baseUrl(): string {
     return this.seed.apiUrl;
   }
-
-  // Runtime resolution via scope:
-  public get baseUrlFromScope(): string {
-    return this.scope.getSeed<GlobalSeed>()!.apiUrl;
-  }
 }
-```
-
-### React
-
-```tsx
-import { applySharedSeed, createContainer, Container } from "@wirestate/core";
-import { ContainerProvider } from "@wirestate/react";
-import { CounterService } from "./CounterService";
 
 const container: Container = createContainer({
-  entries: [CounterService],
+  seed: { apiUrl: "https://api.example.com", locale: "en-US" } satisfies AppSeed,
+  entries: [ApiClient],
 });
-
-export function Application() {
-  useEffect(() => {
-    applySharedSeed(container, { apiUrl: "https://api.next.example.com", locale: "en-US" });
-  }, []);
-
-  return (
-    <ContainerProvider container={container}>
-      <RootPage />
-    </ContainerProvider>
-  );
-}
 ```
 
-```tsx
-import { SEED } from "@wirestate/core";
-import { useInjection } from "@wirestate/react";
-
-function SomeComponent() {
-  const seed: GlobalSeed = useInjection(SEED);
-
-  // ...
-}
-```
-
-### Lit
+Replace the shared seed with `applySharedSeed`.
 
 ```ts
-import { SEED } from "@wirestate/core";
-import { injection } from "@wirestate/lit";
+import { applySharedSeed } from "@wirestate/core";
 
-@customElement("some-component")
-class SomeComponent extends ReactiveElement {
-  @injection(SEED)
-  public seed!: GlobalSeed;
-
-  // ...
-}
+applySharedSeed(container, { apiUrl: "https://api.next.example.com", locale: "uk-UA" });
 ```
 
-## Per-Service Seeds
+## Targeted Seeds
 
-Per-service seeds scope initialization data to a specific service or by unique identifier key.
-Read them via `scope.getSeed(ServiceClass)` or `scope.getSeed("SEED_KEY")`.
-Returns `null` if no seed was provided for that key.
+Targeted seeds belong to one key. They do not touch the shared seed object.
 
 ```ts
 import { Container, createContainer } from "@wirestate/core";
 
 const container: Container = createContainer({
   seeds: [
-    [CounterService, { count: 1000 }],
-    ["SOME_KEY", "VALUE"],
+    [CounterService, { count: 10 }],
+    ["TENANT_ID", "tenant-a"],
   ],
+  entries: [CounterService],
 });
 ```
 
-### Service
+Read them through `WireScope`.
 
 ```ts
-import { Injectable, Inject, OnActivated, WireScope } from "@wirestate/core";
+import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
 import { signal, Signal } from "@wirestate/react-signals";
 
-export interface CounterSeed {
+interface CounterSeed {
   count?: number;
 }
 
 @Injectable()
 export class CounterService {
-  public count: Signal<number> = signal(0);
+  public readonly count: Signal<number> = signal(0);
 
-  public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope
-  ) {}
+  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
   @OnActivated()
   public onActivated(): void {
@@ -148,49 +85,46 @@ export class CounterService {
 }
 ```
 
-### React
+`scope.getSeed(Token)` returns `null` when no targeted seed exists. Falsy values are real values and stay preserved.
+
+## Provider Seeds
+
+React child containers can receive targeted seeds per subtree.
 
 ```tsx
-import { applySeeds, createContainer, Container } from "@wirestate/core";
-import { ContainerProvider } from "@wirestate/react";
-import { CounterService } from "./CounterService";
+import { SubContainerProvider } from "@wirestate/react";
 
-const container: Container = createContainer({
-  seeds: [[CounterService, { count: 5 }]],
-  entries: [CounterService],
-});
-
-export function Application() {
-  useEffect(() => {
-    applySeeds(container, [[CounterService, { count: 50 }]]);
-  }, []);
-
-  return (
-    <ContainerProvider container={container}>
-      <RootPage />
-    </ContainerProvider>
-  );
-}
+<SubContainerProvider entries={[CartService]} seeds={[[CartService, { items: hydratedItems }]]}>
+  <Cart />
+</SubContainerProvider>;
 ```
 
-### Lit
+Lit managed providers accept `seed` and `seeds` inside config.
 
 ```ts
 import { LitElement } from "lit";
-import { customElement } from "lit/decorators.js";
-import {
-  ContainerProvider,
-  useContainerProvision,
-} from "@wirestate/lit";
+import { ContainerProvider, useContainerProvision } from "@wirestate/lit";
 
-@customElement("counter-page")
-export class CounterPage extends LitElement {
-  public readonly containerProvider: ContainerProvider = useContainerProvision(this, {
+export class CounterRoot extends LitElement {
+  public readonly provider: ContainerProvider = useContainerProvision(this, {
     config: {
-      seed: { apiUrl: "https://api.example.com" },
+      seed: { locale: "en-US" },
       seeds: [[CounterService, { count: 42 }]],
       entries: [CounterService],
     },
   });
 }
 ```
+
+## Updating Seeds
+
+`applySeeds` updates targeted seeds in place. `unapplySeeds` removes targeted seeds by key.
+
+```ts
+import { applySeeds, unapplySeeds } from "@wirestate/core";
+
+applySeeds(container, [[CounterService, { count: 50 }]]);
+unapplySeeds(container, [[CounterService, null]]);
+```
+
+Seed updates do not rewind already-activated services. If a service reads seeds in `@OnActivated`, apply the seed before resolving the service.

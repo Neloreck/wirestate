@@ -55,7 +55,7 @@ import { useMemo } from "react";
 import { CounterService, LoggerService } from "./services";
 
 export function Application() {
-  const config = useMemo(() => ({ entries: [CounterService, LoggerService] }));
+  const config = useMemo(() => ({ entries: [CounterService, LoggerService] }), []);
 
   return (
     <ContainerProvider config={config}>

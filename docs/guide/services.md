@@ -1,11 +1,10 @@
 # Services
 
-A **Service** is an `@Injectable` class bound to a container. It holds business logic, optional reactive state,
-and communicates with other services through injection or the messaging buses.
+A service is an `@Injectable` class bound to a container. Put business logic there. Put UI rendering somewhere else.
 
-## Declaring a Service
+Services can hold reactive state, plain state, or no state. Wirestate does not care.
 
-Mark every class participating in the DI container with `@Injectable`.
+## Declare A Service
 
 ```ts
 import { Injectable } from "@wirestate/core";
@@ -14,15 +13,15 @@ import { Injectable } from "@wirestate/core";
 export class UserService {
   public currentUser: User | null = null;
 
-  public logCurrentUser(): void {
-    console.log("Current user:", this.currentUser);
+  public setUser(user: User): void {
+    this.currentUser = user;
   }
 }
 ```
 
-## Binding a Service
+## Bind A Service
 
-`bindService` registers the class in singleton scope and wires up lifecycle and messaging decorators.
+`bindService` registers the class as a singleton and wires lifecycle and messaging decorators.
 
 ```ts
 import { Container, bindService, createContainer } from "@wirestate/core";
@@ -32,15 +31,20 @@ const container: Container = createContainer();
 
 bindService(container, UserService);
 
-const userService: UserService = container.get(UserService);
+const users = container.get(UserService);
 ```
 
-In React and Lit integration, `SubContainerProvider`, `useSubContainerProvider`, and `@subContainerProvide`
-bind service entries through `createContainer`, so you do not call `bindService` manually in UI code.
+Most React and Lit code uses provider `entries` instead of calling `bindService` by hand.
+
+```tsx
+<ContainerProvider config={{ entries: [UserService] }}>
+  <App />
+</ContainerProvider>
+```
 
 ## Constructor Injection
 
-Inject dependencies by declaring typed constructor parameters with `@Inject`.
+Use `@Inject(Token)` for constructor dependencies. A token can be a class, string, or symbol.
 
 ```ts
 import { Inject, Injectable } from "@wirestate/core";
@@ -49,27 +53,23 @@ import { Inject, Injectable } from "@wirestate/core";
 export class OrderService {
   public constructor(
     @Inject(UserService)
-    private readonly userService: UserService,
+    private readonly users: UserService,
     @Inject(LoggerService)
-    private readonly loggerService: LoggerService
+    private readonly logger: LoggerService
   ) {}
 }
 ```
 
 ## WireScope
 
-`WireScope` is a transient bridge to the container's buses and seed data.
-Inject it when a service needs to emit events, dispatch commands or queries, or read seeds.
+Inject `WireScope` when a service needs the container edge: events, commands, queries, seeds, or lazy resolution.
 
 ```ts
 import { Inject, Injectable, WireScope } from "@wirestate/core";
 
 @Injectable()
 export class CartService {
-  public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope
-  ) {}
+  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
   public checkout(): void {
     this.scope.emitEvent("CHECKOUT_STARTED");
@@ -77,58 +77,36 @@ export class CartService {
 }
 ```
 
-`WireScope` container access is only valid between `@OnActivated` and `@OnDeactivation`. Accessing the container after
-deactivation throws `WirestateError`; provider deprovision does not make the scope throw by itself.
-It also exposes lifecycle flags for async guards:
+`WireScope` is transient. Each service gets its own handle.
 
 - `scope.isDisposed` becomes `true` after service deactivation.
-- `scope.isDeprovisioned` is `null` before provider provisioning reaches the service, `false` while it is provider-owned, and `true` after provider deprovision.
-- `scope.isInactive` is `true` when the scope is either disposed or deprovisioned.
-
-## Lifecycle
-
-Core lifecycle follows service activation and disposal. Provider lifecycle follows React or Lit provider attachment and
-removal.
-
-### @OnActivated
-
-Runs after the service is resolved and bound. Use it to initialize reactive state from seeds, start subscriptions, or kick off async work.
+- `scope.isDeprovisioned` tracks provider ownership: `null`, then `false`, then `true`.
+- `scope.isInactive` is the normal guard for async work that may finish late.
 
 ```ts
-import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
+@OnActivated()
+public async onActivated(): Promise<void> {
+  const data = await fetch("/api/data").then((r) => r.json());
 
-export interface FeedSeed {
-  feedId: string;
-}
-
-@Injectable()
-export class FeedService {
-  public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope
-  ) {}
-
-  @OnActivated()
-  public async onActivated(): Promise<void> {
-    const seed = this.scope.getSeed<FeedSeed>(FeedService);
-
-    if (seed?.feedId) {
-      await this.loadFeed(seed.feedId);
-    }
+  if (!this.scope.isInactive) {
+    this.data.value = data;
   }
 }
 ```
 
-### @OnDeactivation
+## Lifecycle
 
-Runs when the container disposes the service. Cancel timers, close connections, and flush state here.
+Service lifecycle follows the container.
+
+- `@OnActivated` runs when the service is first resolved.
+- `@OnDeactivation` runs when the service is unbound or the container is disposed.
 
 ```ts
 import { Injectable, OnActivated, OnDeactivation } from "@wirestate/core";
 
 @Injectable()
 export class PollingService {
-  private timerId: number = 0;
+  private timerId: ReturnType<typeof setInterval> | null = null;
 
   @OnActivated()
   public onActivated(): void {
@@ -139,135 +117,97 @@ export class PollingService {
   public onDeactivation(): void {
     if (this.timerId) {
       clearInterval(this.timerId);
-      this.timerId = 0;
+      this.timerId = null;
     }
   }
 }
 ```
 
-## Inactive Scopes
+Provider lifecycle follows React or Lit provider ownership.
 
-Use `scope.isInactive` in async callbacks that may outlive the service or the provider that owns it.
-It covers both service disposal and provider deprovision.
-
-```ts
-import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
-
-@Injectable()
-export class DataService {
-  public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope
-  ) {}
-
-  @OnActivated()
-  public async onActivated(): Promise<void> {
-    const data = await fetch("/api/data").then((r) => r.json());
-
-    if (!this.scope.isInactive) {
-      this.data.value = data;
-    }
-  }
-}
-```
-
-## Provider Lifecycle
-
-React and Lit providers support `@OnProvision` and `@OnDeprovision` from `@wirestate/core`.
-Use them for work tied to a provider being connected, committed, removed, or replaced, such as connecting UI-scoped
-subscriptions that should follow a `ContainerProvider` or `SubContainerProvider`.
+- `@OnProvision` runs when a provider exposes the container to a subtree.
+- `@OnDeprovision` runs before that provider removes or replaces it.
 
 ```ts
 import { Injectable, OnDeprovision, OnProvision } from "@wirestate/core";
+import { connectPanelChannel } from "./panel-channel";
 
 @Injectable()
 export class PanelService {
+  private unsubscribe: (() => void) | null = null;
+
   @OnProvision()
   public onProvision(): void {
-    // provider committed
+    this.unsubscribe = connectPanelChannel();
   }
 
   @OnDeprovision()
   public onDeprovision(): void {
-    // provider removed or replaced
+    this.unsubscribe?.();
+    this.unsubscribe = null;
   }
 }
 ```
 
-Provider hooks run only for entries registered through Wirestate binding helpers, including entries passed to
-`createContainer`, `ContainerProvider` `config`, or `SubContainerProvider`. Services that inject `WireScope` participate
-in provider deprovision state tracking even without `@OnProvision` or `@OnDeprovision`.
-
-Managed React and Lit containers run `@OnDeprovision` before disposal; external containers run provider deprovision
-without being disposed by the provider. During provider provisioning, `scope.isDeprovisioned` resets to `null`, becomes
-`false` when the service reaches provisioning, and becomes `true` after provider deprovision.
+Provider hooks only run for entries registered through Wirestate helpers: `createContainer({ entries })`, React
+`ContainerProvider` config, React `SubContainerProvider`, Lit providers, or direct `bindService` / `bindEntry`.
 
 ## Circular Dependencies
 
-Use `forwardRef` to break circular constructor dependencies.
+Avoid cycles when you can. If two services need each other immediately, the design is usually too tight.
+
+Use `forwardRef` when a constructor cycle is unavoidable.
 
 ```ts
 import { Inject, Injectable, forwardRef } from "@wirestate/core";
 
 @Injectable()
 export class ServiceA {
-  public constructor(
-    @Inject(forwardRef(() => ServiceB))
-    private readonly b: ServiceB
-  ) {}
+  public constructor(@Inject(forwardRef(() => ServiceB)) private readonly b: ServiceB) {}
 }
 
 @Injectable()
 export class ServiceB {
-  public constructor(
-    @Inject(forwardRef(() => ServiceA))
-    private readonly a: ServiceA
-  ) {}
+  public constructor(@Inject(forwardRef(() => ServiceA)) private readonly a: ServiceA) {}
 }
 ```
 
-Prefer restructuring to removing cycles. `forwardRef` is a last resort.
-
-## Lazy Resolution
-
-Use `scope.resolve` instead of constructor injection to defer resolution and break cycles without `forwardRef`.
+Use `scope.resolve(Token)` when the dependency is only needed later. That turns the startup handshake into a lazy lookup.
 
 ```ts
 import { Inject, Injectable, WireScope } from "@wirestate/core";
 
-import { LoggerService } from "./LoggerService";
-
 @Injectable()
 export class NotificationService {
-  public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope
-  ) {}
+  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
-  public notify(msg: string): void {
-    const logger: LoggerService = this.scope.resolve(LoggerService);
+  public notify(message: string): void {
+    const logger = this.scope.resolve(LoggerService);
 
-    logger.log(msg);
+    logger.log(message);
   }
 }
 ```
 
-`scope.resolveOptional(Token)` returns `null` if the token is not bound.
+`scope.resolveOptional(Token)` returns `null` when the token is not bound.
 
-## Binding Constants and Dynamic Values
+## Constants And Factories
+
+Use descriptors for non-class entries.
 
 ```ts
-import { BindingType, bindConstant, bindDynamicValue } from "@wirestate/core";
+import { BindingType, bindConstant, bindDynamicValue, createContainer } from "@wirestate/core";
 
 const API_URL = Symbol("API_URL");
-const CURRENT_TIME = Symbol("CURRENT_TIME");
+const DATE_NOW = Symbol("DATE_NOW");
+const container = createContainer();
 
 bindConstant(container, { id: API_URL, value: "https://api.example.com" });
 bindDynamicValue(container, {
-  id: CURRENT_TIME,
+  id: DATE_NOW,
   bindingType: BindingType.DynamicValue,
   factory: () => new Date(),
 });
 ```
 
-Inject tokens via `@Inject(API_URL)`.
+Inject descriptor tokens with `@Inject(API_URL)` or resolve them with `container.get(API_URL)`.

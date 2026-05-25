@@ -1,16 +1,14 @@
-# React MobX Usage
+# React MobX
 
-## Basic Usage
+Use `@wirestate/react` for containers and hooks. Use `@wirestate/react-mobx` for MobX and `mobx-react-lite` re-exports.
 
-The core of Wirestate is the **Service** - an `@Injectable` class holding state and logic.
+## Service
 
-### Creating a Service
-
-Services hold reactive state using MobX observables. Call `makeObservable(this)` in the constructor to activate the decorators.
+MobX decorators need `makeObservable(this)`.
 
 ```ts
 import { Injectable } from "@wirestate/core";
-import { Observable, makeObservable } from "@wirestate/react-mobx";
+import { Action, Observable, makeObservable } from "@wirestate/react-mobx";
 
 @Injectable()
 export class CounterService {
@@ -21,24 +19,23 @@ export class CounterService {
     makeObservable(this);
   }
 
+  @Action()
   public increment(): void {
     this.count += 1;
   }
 }
 ```
 
-### Dependency Injection
-
-Services inject other services via constructor parameters.
+## Dependencies
 
 ```ts
-import { Injectable, Inject } from "@wirestate/core";
-import { Observable, Action, makeObservable } from "@wirestate/react-mobx";
+import { Inject, Injectable } from "@wirestate/core";
+import { Action, Observable, makeObservable } from "@wirestate/react-mobx";
 
 @Injectable()
 export class LoggerService {
   public log(...args: Array<unknown>): void {
-    console.log("[log]:", ...args);
+    console.log("[log]", ...args);
   }
 }
 
@@ -47,271 +44,117 @@ export class CounterService {
   @Observable()
   public count: number = 0;
 
-  public constructor(
-    @Inject(LoggerService)
-    private readonly loggerService: LoggerService
-  ) {
+  public constructor(@Inject(LoggerService) private readonly logger: LoggerService) {
     makeObservable(this);
   }
 
   @Action()
   public increment(): void {
-    this.loggerService.log("Incrementing counter value:", this.count + 1);
+    this.logger.log("increment", this.count + 1);
     this.count += 1;
   }
 }
 ```
 
-Wrap state mutations in `@Action()` to batch MobX updates and keep reactions consistent.
-
-### Providing Services
-
-`ContainerProvider` provides the root container for the React tree.
+## Provider
 
 ```tsx
-import { Container, createContainer } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
-
-const container: Container = createContainer({
-  entries: [CounterService, LoggerService],
-});
+import { useMemo } from "react";
+import { CounterService, LoggerService } from "./services";
 
 export function Application() {
+  const config = useMemo(() => ({ entries: [CounterService, LoggerService] }), []);
+
   return (
-    <ContainerProvider container={container}>
+    <ContainerProvider config={config}>
       <Counter />
     </ContainerProvider>
   );
 }
 ```
 
-### Consuming Services
+## Component
 
-Wrap components in `observer` so they re-render when observed properties change.
+Wrap components that read observable state with `observer`.
 
 ```tsx
 import { useInjection } from "@wirestate/react";
 import { observer } from "@wirestate/react-mobx";
+import { CounterService } from "./CounterService";
 
-export const Counter = observer(function () {
-  const counterService: CounterService = useInjection(CounterService);
+export const Counter = observer(function Counter() {
+  const counter = useInjection(CounterService);
 
-  return <button onClick={() => counterService.increment()}>count: {counterService.count}</button>;
+  return <button onClick={() => counter.increment()}>Count: {counter.count}</button>;
 });
 ```
 
-## Advanced Patterns
-
-### Computed Values
-
-`@Computed()` derives a value from observables and caches it until dependencies change.
+## Computed Values
 
 ```ts
 import { Injectable } from "@wirestate/core";
-import { Observable, Computed, Action, makeObservable } from "@wirestate/react-mobx";
+import { Computed } from "@wirestate/react-mobx";
 
 @Injectable()
-export class CounterService {
-  @Observable()
-  public count: number = 0;
-
-  public constructor() {
-    makeObservable(this);
-  }
+export class CounterSErvice {
+  public count: number = 10;
 
   @Computed()
   public get isEven(): boolean {
     return this.count % 2 === 0;
   }
-
-  @Action()
-  public increment(): void {
-    this.count += 1;
-  }
 }
 ```
 
-```tsx
-export const Counter = observer(function Counter() {
-  const counterService: CounterService = useInjection(CounterService);
+## Messaging
 
-  return (
-    <button onClick={() => counterService.increment()}>
-      {counterService.count} ({counterService.isEven ? "even" : "odd"})
-    </button>
-  );
-});
-```
-
-### Events
-
-Events are fire-and-forget messages broadcast to all subscribers in the same container. Emit from services via `WireScope`; subscribe with `@OnEvent` in another service or `useEvent` in React.
+Events, commands, and queries are the same as the Signals guide. Reactivity does not change the bus model.
 
 ```ts
-import { Injectable, Inject, WireScope } from "@wirestate/core";
-import { Observable, Action, makeObservable } from "@wirestate/react-mobx";
-
-@Injectable()
-export class CounterService {
-  @Observable()
-  public count: number = 0;
-
-  public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope
-  ) {
-    makeObservable(this);
-  }
-
-  @Action()
-  public increment(): void {
-    this.count += 1;
-    this.scope.emitEvent("COUNT_INCREMENTED", this.count);
-  }
-}
-```
-
-```ts
-import { Injectable, OnEvent, Event } from "@wirestate/core";
-
-@Injectable()
-export class AnalyticsService {
-  @OnEvent("COUNT_INCREMENTED")
-  private onCountIncremented(event: Event<number>): void {
-    console.log("Track count incremented:", event.payload);
-  }
-}
-```
-
-Subscribe in React components:
-
-```tsx
-import { Event } from "@wirestate/core";
-import { useEvent } from "@wirestate/react";
-
-function CounterLogger() {
-  useEvent("COUNT_INCREMENTED", (event: Event<number>) => {
-    console.log("Component received new count:", event.payload);
-  });
-
-  return null;
-}
-```
-
-### Commands
-
-Commands are named write operations dispatched to a single registered handler. The executor returns a `CommandDescriptor` to track async completion.
-
-```ts
-import { Injectable, OnCommand } from "@wirestate/core";
+import { Inject, Injectable, OnCommand, OnQuery, WireScope } from "@wirestate/core";
 
 @Injectable()
 export class AuthService {
+  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+
   @OnCommand("LOGOUT")
-  private async onLogout(): Promise<void> {
+  public async onLogout(): Promise<void> {
     await clearSession();
   }
-}
-```
 
-```tsx
-import { CommandDescriptor } from "@wirestate/core";
-import { CommandExecutor, useCommandExecutor } from "@wirestate/react";
-
-function LogoutButton() {
-  const executeCommand: CommandExecutor = useCommandExecutor();
-
-  const handleClick = async () => {
-    const descriptor: CommandDescriptor = executeCommand("LOGOUT");
-
-    await descriptor.task;
-  };
-
-  return <button onClick={handleClick}>Log out</button>;
-}
-```
-
-### Queries
-
-Queries are synchronous or asynchronous request-response calls. One handler answers; the executor returns the result directly.
-
-```ts
-import { Injectable, OnQuery } from "@wirestate/core";
-
-@Injectable()
-export class ThemeService {
-  private theme: string = "dark";
-
-  @OnQuery("CURRENT_THEME")
-  public onQueryTheme(): string {
-    return this.theme;
+  @OnQuery("CURRENT_USER")
+  public onQueryCurrentUser(): User | null {
+    return this.scope.queryOptionalData<User>("SESSION_USER");
   }
 }
 ```
 
-```tsx
-import { QueryExecutor, useQueryExecutor } from "@wirestate/react";
-import { useCallback, useState } from "react";
+## Seeds
 
-function ThemeToggle() {
-  const [theme, setTheme] = useState<string>("unknown");
-  const query: QueryExecutor = useQueryExecutor();
-
-  const onQueryTheme = useCallback(() => {
-    setTheme(query("CURRENT_THEME"));
-  }, [query]);
-
-  return <button onClick={onQueryTheme}>Theme: {theme}</button>;
-}
-```
-
-### Seed Data
-
-Pass initialization data to services when they activate. Read seeds in `@OnActivated` and apply them inside an `@Action()` to keep MobX updates batched.
-
-```tsx
-const container: Container = createContainer({
-  seeds: [[CounterService, { initialCount: 10 }]],
-  entries: [CounterService],
-});
-```
-
-```tsx
-return (
-  <ContainerProvider container={container}>
-    <Application />
-  </ContainerProvider>
-);
-```
+Read seed data in `@OnActivated`. Mutate observables inside an action.
 
 ```ts
-import { Injectable, Inject, OnActivated, WireScope } from "@wirestate/core";
-import { Observable, Action, makeObservable } from "@wirestate/react-mobx";
-
-export interface CounterSeed {
-  initialCount?: number;
-}
+import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
+import { Action, Observable, makeObservable } from "@wirestate/react-mobx";
 
 @Injectable()
 export class CounterService {
   @Observable()
   public count: number = 0;
 
-  public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope
-  ) {
+  public constructor(@Inject(WireScope) private readonly scope: WireScope) {
     makeObservable(this);
   }
 
   @OnActivated()
   public onActivated(): void {
-    this.initializeFromSeed();
+    this.applySeed();
   }
 
   @Action()
-  private initializeFromSeed(): void {
-    const seed = this.scope.getSeed<CounterSeed>(CounterService);
+  private applySeed(): void {
+    const seed = this.scope.getSeed<{ initialCount?: number }>(CounterService);
 
     if (typeof seed?.initialCount === "number") {
       this.count = seed.initialCount;
@@ -320,19 +163,19 @@ export class CounterService {
 }
 ```
 
-### Testing
+```tsx
+import { useMemo } from "react";
 
-Services are plain classes - test them without a UI framework.
+const config = useMemo(() => ({
+  entries: [CounterService],
+  seeds: [[CounterService, { initialCount: 10 }]],
+}), [])
+```
 
-```ts
-import { mockContainer } from "@wirestate/core/test-utils";
-
-test("increments counter", () => {
-  const container = mockContainer({ entries: [LoggerService, CounterService] });
-  const service = container.get(CounterService);
-
-  service.increment();
-
-  expect(service.count).toBe(1);
-});
+```tsx
+<ContainerProvider
+  config={config}
+>
+  <Application />
+</ContainerProvider>
 ```
