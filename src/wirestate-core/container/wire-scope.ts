@@ -15,15 +15,30 @@ import { SeedKey, SeedsMap } from "../types/initial-state";
 import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 
 /**
- * A transient bridge providing services with access to Wirestate buses, lazy resolution, and seeds.
+ * Per-service handle for container work.
  *
  * @remarks
- * Every service bound via {@link bindService} receives its own unique `WireScope` instance.
- * It acts as a facade to the IoC container while enforcing lifecycle safety.
+ * Inject `WireScope` when a service needs buses, seeds, or lazy resolution.
  *
- * Methods are available only while the scope is "active" (after service activation and before deactivation).
+ * Each bound service gets its own transient scope. The scope is valid after
+ * service activation and before deactivation. After disposal it throws instead
+ * of letting dead services keep talking to the container.
  *
  * @group Container
+ *
+ * @example
+ * ```typescript
+ * import { Inject, Injectable, WireScope } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class CartService {
+ *   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+ *
+ *   public addItem(item: CartItem): void {
+ *     this.scope.emitEvent("CART_ITEM_ADDED", item);
+ *   }
+ * }
+ * ```
  */
 @Injectable()
 export class WireScope {
@@ -95,10 +110,12 @@ export class WireScope {
   }
 
   /**
-   * Lazily resolves a service or value from the container.
+   * Resolves a service or value from the container.
    *
    * @remarks
-   * Use this to break circular dependencies or for services that are not needed immediately.
+   * Use this for lazy work or to soften a circular dependency. Constructor
+   * injection is a handshake at startup; `resolve` is knocking only when you
+   * actually need the other service.
    *
    * @template T - Type of the service or value to resolve.
    *
@@ -219,7 +236,7 @@ export class WireScope {
   }
 
   /**
-   * Dispatches a synchronous query and returns the result.
+   * Dispatches a query and returns the handler result as-is.
    *
    * @template R - Type of the query result.
    * @template D - Type of the query data (payload).
@@ -227,7 +244,7 @@ export class WireScope {
    *
    * @param type - Query identifier.
    * @param data - Input data for the query handler.
-   * @returns The synchronous query result.
+   * @returns The query result.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
    * @throws {@link WirestateError} If no query handler is registered.
@@ -365,7 +382,7 @@ export class WireScope {
   }
 
   /**
-   * Dispatches a command and returns a descriptor to track its progress.
+   * Dispatches a command and returns progress.
    *
    * @template R - Type of the command result.
    * @template D - Type of the command payload.
@@ -373,7 +390,7 @@ export class WireScope {
    *
    * @param type - Command identifier.
    * @param data - Payload for the command.
-   * @returns A {@link CommandDescriptor}.
+   * @returns A descriptor with `status` and `task`.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
    * @throws {@link WirestateError} If no command handler is registered.
@@ -476,10 +493,10 @@ export class WireScope {
   }
 
   /**
-   * Retrieves the global seed object (initial state) from the container.
+   * Reads the shared seed object.
    *
    * @remarks
-   * Use this to access the entire seed object when no specific key is provided.
+   * Call without a key to get the one shared seed for this container.
    *
    * @template T - Expected type of the global seed object.
    * @returns The global seed object.
@@ -498,10 +515,10 @@ export class WireScope {
   public getSeed<T extends AnyObject>(): T;
 
   /**
-   * Retrieves a specific seed value by key from the container's seed map.
+   * Reads a targeted seed value.
    *
    * @remarks
-   * Use this to retrieve individual values registered in the seed map.
+   * Targeted seeds are keyed by service class, string, or symbol.
    *
    * @template T - Expected type of the seed value.
    * @param seed - Lookup key (identifier or token) for the seed.

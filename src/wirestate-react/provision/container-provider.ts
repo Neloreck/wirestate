@@ -17,11 +17,10 @@ import { shallowEqualActivation, shallowEqualArrays, shallowEqualObjects } from 
 import { ProvisionLifecycle, retainContainer, scheduleContainerDestruction } from "./provision-lifecycle";
 
 /**
- * Represents props accepted by {@link ContainerProvider}.
+ * Represents props for {@link ContainerProvider}.
  *
  * @remarks
- * Provide either an external `container` or managed creation `config`, but
- * never both at the same time.
+ * Pass either `container` or `config`. Passing both is an error.
  *
  * @group Provision
  */
@@ -64,18 +63,39 @@ interface ContainerProviderState {
  * Provides a root Wirestate container to a React subtree.
  *
  * @remarks
- * Two modes are supported:
+ * Two modes:
  *
- * - External: `container` is a prebuilt {@link Container}. The provider only
- *   passes it through context, runs provision hooks, and never disposes it.
- * - Managed: `config` is {@link ContainerConfig}. The provider
- *   creates a container, activates entries by default, owns its disposal, and
- *   recreates it when the normalized config changes by shallow comparison.
+ * - External `container`: passed through, provisioned, never disposed.
+ * - Managed `config`: created by the provider, provisioned, disposed on unmount.
+ *
+ * Managed containers activate all entries by default. Pass `activate: false`
+ * to keep them lazy.
  *
  * @group Provision
  *
  * @param props - Provider props.
- * @returns A React context provider for the active container.
+ * @returns React context provider for the active container.
+ * @throws {@link WirestateError} If props are invalid or provider mode changes.
+ *
+ * @example
+ * ```tsx
+ * import { Injectable } from "@wirestate/core";
+ * import { ContainerProvider } from "@wirestate/react";
+ * import { useMemo } from "react";
+ *
+ * @Injectable()
+ * class CounterService {}
+ *
+ * export function Application() {
+ *   const config = useMemo(() => ({ entries: [CounterService] }));
+ *
+ *   return (
+ *     <ContainerProvider config={config}>
+ *       <Counter />
+ *     </ContainerProvider>
+ *   );
+ * }
+ * ```
  */
 export function ContainerProvider(props: ContainerProviderProps) {
   const configValue: unknown = props.config;

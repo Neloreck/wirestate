@@ -7,21 +7,26 @@ import { AnyObject } from "../types/general";
 import { SEED_TOKEN } from "./tokens";
 
 /**
- * Rebinds the global shared seed object in the container.
+ * Replaces the shared seed object.
  *
  * @remarks
- * Unlike targeted seeds, there is only one shared seed object per container.
- * This function uses `rebind` to ensure the new shared seed replaces the previous one.
- * The shared seed is typically used for global configuration or common state.
+ * A container has one shared seed. Use it for app-wide config: locale,
+ * feature flags, API base URL. Targeted seeds live in a separate map.
  *
  * @group Seeds
  *
- * @param container - The Inversify {@link Container} to update.
- * @param seed - The new shared seed object.
+ * @param container - Container to update.
+ * @param seed - New shared seed object.
  *
  * @example
  * ```typescript
- * applySharedSeed(container, { theme: "dark", lang: "en" });
+ * import { SEED, applySharedSeed, createContainer } from "@wirestate/core";
+ *
+ * const container = createContainer({ seed: { locale: "en-US" } });
+ *
+ * applySharedSeed(container, { locale: "uk-UA" });
+ *
+ * const seed = container.get<{ locale: string }>(SEED);
  * ```
  */
 export function applySharedSeed(container: Container, seed: AnyObject): void {

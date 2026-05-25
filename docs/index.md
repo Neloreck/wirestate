@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: "Wirestate"
-  tagline: "DI framework with a reactivity-agnostic core"
+  tagline: "A DI foundation for service-owned state and workflows"
   actions:
     - theme: brand
       text: Get Started
@@ -14,9 +14,9 @@ hero:
 
 features:
   - title: Dependency Injection
-    details: Built on top of InversifyJS for clean and testable application logic.
-  - title: Reactivity Agnostic
-    details: Use MobX, Preact Signals, or any other reactive library.
-  - title: UI Agnostic
-    details: State and logic live outside React or Lit.
+    details: Inversify containers with Wirestate services, scoped buses, and seed data.
+  - title: Scoped Messaging
+    details: Events broadcast. Commands write. Queries read. Containers keep their own buses.
+  - title: Bring Reactivity
+    details: Use MobX, Preact Signals, Lit Signals, or plain TypeScript.
 ---

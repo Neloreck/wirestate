@@ -6,7 +6,7 @@ import { ContainerContext } from "../context/container-context";
 import { AnyObject, FieldMustMatchProvidedType, Interface } from "../types/general";
 
 /**
- * Represents definition of the injection decorator.
+ * Represents type returned by {@link injection}.
  *
  * @remarks
  * Supports both TC39 and legacy experimental decorators.
@@ -27,7 +27,7 @@ export interface InjectionDecorator<T> {
 }
 
 /**
- * Represents options for the {@link injection} decorator.
+ * Represents options for {@link injection}.
  *
  * @group Consumption
  */
@@ -47,12 +47,15 @@ export interface InjectionOptions<T> {
 }
 
 /**
- * Decorator to inject a service from the IoC container into a Lit element property.
+ * Injects a container value into a Lit element property.
+ *
+ * @remarks
+ * The property follows the nearest container context unless `once` is `true`.
  *
  * @group Consumption
  *
- * @param optionsOrInjectionId - Injection options or service identifier.
- * @returns An instance of {@link InjectionDecorator}.
+ * @param optionsOrInjectionId - Service token or options.
+ * @returns Lit property decorator.
  *
  * @example
  * ```typescript

@@ -6,7 +6,7 @@ import { AnyObject, Interface, MaybePromise } from "../types/general";
 import { OnQueryController } from "./on-query-controller";
 
 /**
- * Represents interface for the {@link onQuery} decorator.
+ * Represents type returned by {@link onQuery}.
  *
  * @remarks
  * Supports both TC39 and legacy experimental decorators.

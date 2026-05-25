@@ -1,22 +1,24 @@
 import { ERROR_CODE_GENERIC } from "./error-code";
 
 /**
- * Base error class for all Wirestate-related exceptions.
+ * Error type thrown by Wirestate APIs.
  *
  * @remarks
- * `WirestateError` provides structured error information, including a numeric error code
- * and a descriptive message. It is used throughout the library to signal lifecycle
- * violations, messaging failures, and configuration issues.
+ * Use `code` for programmatic checks and `message` for humans. Wirestate uses
+ * this for expected library failures: invalid config, missing handlers, and
+ * lifecycle access after disposal.
  *
  * @group Error
  *
  * @example
  * ```typescript
+ * import { WirestateError } from "@wirestate/core";
+ *
  * try {
  *   scope.getContainer();
  * } catch (error) {
  *   if (error instanceof WirestateError) {
- *     console.error(`Error code: ${error.code}`);
+ *     console.error(error.code, error.message);
  *   }
  * }
  * ```
@@ -36,10 +38,10 @@ export class WirestateError extends Error {
   public readonly message: string;
 
   /**
-   * Creates a new instance of WirestateError.
+   * Creates a Wirestate error.
    *
-   * @param code - Numeric identifier for the error (defaults to ERROR_CODE_GENERIC).
-   * @param detail - Optional descriptive message.
+   * @param code - Numeric error code.
+   * @param detail - Error message.
    */
   public constructor(code: number = ERROR_CODE_GENERIC, detail?: string) {
     super();

@@ -124,6 +124,8 @@ export {
 } from "mobx-react-lite";
 
 /**
+ * MobX `action` decorator alias.
+ *
  * @group Mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
@@ -134,6 +136,8 @@ export function Action(): IActionFactory {
 }
 
 /**
+ * MobX bound action decorator alias.
+ *
  * @group Mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
@@ -144,6 +148,8 @@ export function BoundAction() {
 }
 
 /**
+ * MobX `computed` decorator alias.
+ *
  * @group Mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
@@ -154,6 +160,8 @@ export function Computed(): IComputedFactory {
 }
 
 /**
+ * MobX `observable` decorator alias.
+ *
  * @group Mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
@@ -164,6 +172,8 @@ export function Observable(): IObservableFactory {
 }
 
 /**
+ * MobX shallow observable decorator alias.
+ *
  * @group Mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
@@ -174,6 +184,8 @@ export function ShallowObservable() {
 }
 
 /**
+ * MobX ref observable decorator alias.
+ *
  * @group Mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *
@@ -184,6 +196,8 @@ export function RefObservable() {
 }
 
 /**
+ * MobX deep observable decorator alias.
+ *
  * @group Mobx-alias
  * @see {@link https://mobx.js.org/README.html}
  *

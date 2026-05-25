@@ -7,27 +7,29 @@ import { DEPROVISION_HANDLER_METADATA } from "../registry";
 import { Maybe } from "../types/general";
 
 /**
- * Decorator for service methods that should run before a framework provider stops exposing the service's container.
+ * Runs before a framework provider stops exposing the container.
  *
  * @remarks
- * Provider adapters call `@OnDeprovision` when a container is detached from a
- * UI subtree, for example by React or Lit `ContainerProvider` and
- * `SubContainerProvider` implementations. Use it to clean up work started by
- * `@OnProvision`.
+ * React and Lit providers call this when a container leaves a UI subtree.
+ * This is provider lifetime, not service lifetime.
  *
- * A service class may declare only one deprovision hook name. If a base class
- * declares one, subclasses may override and redecorate that same method name.
+ * Use it to clean up work started by `@OnProvision`. A service hierarchy may
+ * have one deprovision hook name.
  *
  * @group Service
  *
- * @returns A method decorator function.
+ * @returns Method decorator.
  *
  * @example
  * ```typescript
- * class SomeService {
+ * import { Injectable, OnDeprovision } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class PanelService {
  *   @OnDeprovision()
  *   public onDeprovision(): void {
- *     // container is no longer provided to a framework subtree
+ *     this.stopPolling();
+ *     this.disconnect();
  *   }
  * }
  * ```

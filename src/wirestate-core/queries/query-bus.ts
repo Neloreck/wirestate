@@ -7,15 +7,26 @@ import { Maybe, Optional } from "../types/general";
 import { QueryHandler, QueryType, QueryUnregister } from "../types/queries";
 
 /**
- * Orchestrates query dispatching and handler registration.
+ * Dispatches named queries to one active handler.
  *
  * @remarks
- * The `QueryBus` provides a request-response mechanism for decoupled communication.
- * It supports handler shadowing: when multiple handlers are registered for the same type,
- * the last registered one (e.g., at the component level) takes priority over earlier ones
- * (e.g., at the global service level).
+ * Queries are reads: get current user, ask for a label, fetch cached state.
+ *
+ * Handlers are stacked by type. The newest handler wins. That lets a subtree
+ * temporarily answer a query, then unregister and reveal the older answer.
  *
  * @group Queries
+ *
+ * @example
+ * ```typescript
+ * import { QueryBus, createContainer } from "@wirestate/core";
+ *
+ * const container = createContainer();
+ * const bus = container.get(QueryBus);
+ * bus.register("CURRENT_USER", () => ({ id: "u1" }));
+ *
+ * const user = bus.query<{ id: string }>("CURRENT_USER");
+ * ```
  */
 export class QueryBus {
   /**
@@ -25,18 +36,17 @@ export class QueryBus {
   private readonly handlers: Map<QueryType, Array<QueryHandler>> = new Map();
 
   /**
-   * Registers a handler for a specific query type.
+   * Registers a query handler.
    *
    * @remarks
-   * If multiple handlers are registered for the same type, they are stored in a stack.
-   * The most recently registered handler will be used for resolution.
+   * Multiple handlers for one type form a stack. The newest handler answers.
    *
    * @template D - Type of the query input data.
    * @template R - Type of the query result.
    *
-   * @param type - Unique query identifier.
-   * @param handler - Function to execute when the query is dispatched.
-   * @returns A function to unregister the handler.
+   * @param type - Query token.
+   * @param handler - Query handler.
+   * @returns Function that unregisters this handler.
    *
    * @example
    * ```typescript
@@ -100,12 +110,11 @@ export class QueryBus {
   }
 
   /**
-   * Dispatches a synchronous query to the last registered handler and returns the result.
+   * Dispatches a query and returns the handler result as-is.
    *
    * @remarks
-   * Query handlers may be registered as synchronous or asynchronous. This method
-   * returns the handler result as-is, typed as the expected synchronous result.
-   * Use {@link queryAsync} when callers should consistently receive a Promise.
+   * If a handler returns a Promise, this method returns that Promise. Use
+   * {@link queryAsync} when the caller should always receive a Promise.
    *
    * @template R - Type of the expected query result.
    * @template D - Type of the data (payload) passed to the query.
@@ -137,11 +146,10 @@ export class QueryBus {
   }
 
   /**
-   * Dispatches a query to the last registered handler and returns the result as a Promise.
+   * Dispatches a query and Promise-wraps the result.
    *
    * @remarks
-   * The active handler may return either a synchronous value or a Promise. Synchronous
-   * values are wrapped in the returned Promise.
+   * Sync values are wrapped. Async values are passed through.
    *
    * @template R - Type of the expected query result.
    * @template D - Type of the data (payload) passed to the query.
@@ -167,12 +175,11 @@ export class QueryBus {
   }
 
   /**
-   * Dispatches a synchronous query if a handler exists, otherwise returns null.
+   * Dispatches a query if a handler exists.
    *
    * @remarks
-   * Query handlers may be registered as synchronous or asynchronous. This method
-   * returns the handler result as-is, typed as the expected synchronous result.
-   * Use {@link queryOptionalAsync} when callers should consistently receive a Promise.
+   * Returns the handler result as-is. Use {@link queryOptionalAsync} when the
+   * caller should always receive a Promise.
    *
    * @template R - Type of the expected query result.
    * @template D - Type of the data (payload) passed to the query.
@@ -193,7 +200,7 @@ export class QueryBus {
   }
 
   /**
-   * Dispatches a query if a handler exists and returns the result as a Promise.
+   * Dispatches an optional query and Promise-wraps the result.
    *
    * @template R - Type of the expected query result.
    * @template D - Type of the data (payload) passed to the query.

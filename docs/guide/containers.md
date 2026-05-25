@@ -1,141 +1,108 @@
 # Containers
 
+A container owns service instances, seed data, and the three message buses.
+
+Same container means same `EventBus`, `CommandBus`, and `QueryBus`. Child container means inherited bindings, separate buses.
+
 ## Root Container
 
-`createContainer` creates an Inversify container pre-bound with Wirestate's buses and tokens. All services in the same container share the same `EventBus`, `CommandBus`, and `QueryBus`.
-
 ```ts
-import { Container, createContainer, bindService } from "@wirestate/core";
+import { Container, Injectable, createContainer } from "@wirestate/core";
 
-const container: Container = createContainer({ seed: { apiUrl: "https://api.example.com" } });
+@Injectable()
+class UserService {}
 
-bindService(container, UserService);
-bindService(container, AuthService);
-```
+@Injectable()
+class AuthService {}
 
-You can provide bindings and services to activate directly in the options:
-
-```ts
 const container: Container = createContainer({
   seed: { apiUrl: "https://api.example.com" },
-  seeds: [[UserService, { cache: false }]],
-  entries: [UserService, { id: "CONFIG", value: { a: 1, b: 2 } }],
-  activate: [UserService],
+  entries: [UserService, AuthService],
+  activate: [AuthService],
 });
 ```
 
+`activate` controls eager resolution.
+
+- `true` resolves every entry.
+- `false` or omitted keeps services lazy.
+- An array resolves only listed tokens.
+
 ## Child Containers
 
-Pass `parent` to create a child container. Child containers inherit parent bindings but maintain independent
-buses - events emitted in a child do not bubble to the parent.
+Pass `parent` to create a child container.
 
 ```ts
-const child: Container = createContainer({ parent: container });
+import { Container, createContainer } from "@wirestate/core";
 
-bindService(child, CartService); // CartService scoped to child
+const child: Container = createContainer({
+  parent: container,
+  entries: [CartService],
+});
 ```
 
-Use child containers to isolate a subtree of services (e.g., a modal, a wizard step, a tenant-scoped feature).
+Child containers inherit parent bindings. Their buses and targeted seeds stay local. An event in a child does not bubble to the parent.
 
-## React
+Use child containers for modal state, checkout flows, tenant scope, or any branch that needs different services.
 
-### ContainerProvider
+## React Root Provider
 
-`ContainerProvider` provides the root container for the React tree. It must be the outermost Wirestate provider.
+Use `ContainerProvider` at the top of the Wirestate branch.
 
 ```tsx
 import { ContainerProvider } from "@wirestate/react";
+import { useMemo } from "react";
 import { CounterService, LoggerService } from "./services";
 
 export function Application() {
+  const config = useMemo(() => ({ entries: [CounterService, LoggerService] }));
+
   return (
-    <ContainerProvider config={{ entries: [CounterService, LoggerService] }}>
-      <SomeComponent />
+    <ContainerProvider config={config}>
+      <Counter />
     </ContainerProvider>
   );
 }
 ```
 
-When `config` is provided, `ContainerProvider` creates and owns the container. Managed React containers activate all
-provided entries by default; pass `activate: false` to skip core eager activation, or pass an array to activate only
-specific entries.
+With `config`, the provider owns the container. It creates it, provisions it, deprovisions it, and disposes it.
 
-React provider lifecycle hooks are separate from eager activation. Services decorated with `@OnProvision` or
-`@OnDeprovision` from `@wirestate/core`, and services that inject `WireScope`, are resolved when the provider commits
-so provider hooks and scope deprovision state can run even when `activate: false` is used. Managed containers are
-deprovisioned before disposal; external containers are deprovisioned when the provider unmounts or switches containers,
-but the provider never calls `unbindAll()` for them.
-
-For a globally declared container outside the React rendering tree, use a prebuilt container:
+With `container`, ownership stays with you. The provider provisions and deprovisions it, but never calls `unbindAll()`.
 
 ```tsx
 import { Container, createContainer } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
-import { CounterService, LoggerService } from "./services";
 
 const container: Container = createContainer({
   entries: [CounterService, LoggerService],
-  activate: [LoggerService],
 });
 
 export function Application() {
   return (
     <ContainerProvider container={container}>
-      <SomeComponent />
+      <Counter />
     </ContainerProvider>
   );
 }
 ```
 
-### SubContainerProvider
+## React Child Provider
 
-`SubContainerProvider` creates a child container under the current `ContainerProvider` and binds services for that subtree.
-Use it when a branch of the tree needs scoped services or per-service seeds.
+`SubContainerProvider` creates a managed child container under the nearest provider.
 
 ```tsx
 import { ReactNode } from "react";
 import { SubContainerProvider } from "@wirestate/react";
-import { CartService } from "./CartService";
-import { CheckoutService } from "./CheckoutService";
+import { CartService, CheckoutService } from "./services";
 
-export function CheckoutServicesProvider(props: { children?: ReactNode }) {
-  return (
-    <SubContainerProvider entries={[CartService, CheckoutService]}>
-      {props.children}
-    </SubContainerProvider>
-  );
+export function CheckoutScope(props: { children?: ReactNode }) {
+  return <SubContainerProvider entries={[CartService, CheckoutService]}>{props.children}</SubContainerProvider>;
 }
 ```
 
-```tsx
-export function Application() {
-  return (
-    <ContainerProvider container={container}>
-      <CheckoutServicesProvider>
-        <CheckoutFlow />
-      </CheckoutServicesProvider>
-    </ContainerProvider>
-  );
-}
-```
+## Direct React Access
 
-Services bound at a higher provider are available to child providers through Inversify's container hierarchy.
-Child React containers also activate all provided entries by default. Pass `activate: false` or an array of entry tokens to
-`SubContainerProvider` when a scoped branch needs different activation behavior.
-
-### Passing Seeds to a Provider
-
-```tsx
-import { SeedEntries } from "@wirestate/core";
-
-const SEEDS: SeedEntries = [[CartService, { items: hydratedItems }]];
-
-<SubContainerProvider entries={[CartService, CheckoutService]} seeds={SEEDS}>
-  <CheckoutFlow />
-</SubContainerProvider>;
-```
-
-### Accessing the Container Directly
+Prefer `useInjection` for normal service use. Reach for `useContainer` or `useScope` when you need the container edge.
 
 ```tsx
 import { Container, WireScope } from "@wirestate/core";
@@ -145,27 +112,18 @@ function DevTools() {
   const container: Container = useContainer();
   const scope: WireScope = useScope();
 
-  // ...
+  return <button onClick={() => scope.emitEvent("DEVTOOLS_OPENED")}>{String(container.isBound("DEBUG"))}</button>;
 }
 ```
 
-## Lit
+## Lit Root Provider
 
-### containerProvide / useContainerProvision
-
-Provide a root container to a Lit subtree.
-
-- Pass `container` to expose an existing container
-- Pass `config` to create a managed container for the host lifecycle
-- Managed Lit containers activate all provided entries by default; pass `activate: false` to skip eager activation, or
-  pass an array to activate only specific entries
-- Lit providers run `@OnProvision` while connected, track `WireScope.isDeprovisioned` for scoped services, and run `@OnDeprovision` before disconnect cleanup
+Lit uses decorators or controllers. Both create the same `ContainerProvider`.
 
 ```ts
 import { LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
-import { containerProvide, ContainerProvider } from "@wirestate/lit";
-
+import { ContainerProvider, containerProvide } from "@wirestate/lit";
 import { CartService } from "./CartService";
 
 @customElement("application-root")
@@ -173,34 +131,26 @@ class ApplicationRoot extends LitElement {
   @containerProvide({
     config: {
       entries: [CartService],
-      seed: { someData: "value" },
     },
   })
   private containerProvider!: ContainerProvider;
 }
 ```
 
-### subContainerProvide / useSubContainerProvider
+Managed Lit root containers are created on connect and disposed on disconnect. External containers are published while connected and never disposed by Lit.
 
-Create a managed child container derived from the nearest parent container context.
+## Lit Child Provider
 
-- The child container inherits parent bindings through the container hierarchy
-- The child container is created when the host connects to an ancestor container context
-- The child container is recreated when the parent container changes
-- The child container is destroyed when the host disconnects
-- The child container is deprovisioned before it is destroyed
-- Managed Lit child containers activate all provided entries by default; pass `activate: false` or a token array to
-  override that
+`subContainerProvide` and `useSubContainerProvider` create managed child containers from the nearest parent context.
 
 ```ts
 import { LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
-import { subContainerProvide, SubContainerProvider } from "@wirestate/lit";
-
+import { SubContainerProvider, subContainerProvide } from "@wirestate/lit";
 import { CartService } from "./CartService";
 
-@customElement("providing-element")
-class ProvidingElement extends LitElement {
+@customElement("checkout-scope")
+class CheckoutScope extends LitElement {
   @subContainerProvide({
     config: {
       entries: [CartService],
@@ -210,11 +160,13 @@ class ProvidingElement extends LitElement {
 }
 ```
 
-### @injection
+The child container is recreated when the parent context changes and destroyed when the host disconnects.
 
-Injects a service into a Lit element property from the nearest parent container.
+## Lit Injection
 
 ```ts
+import { LitElement, html } from "lit";
+import { customElement } from "lit/decorators.js";
 import { injection } from "@wirestate/lit";
 import { CartService } from "./CartService";
 
@@ -224,7 +176,7 @@ export class CartIcon extends LitElement {
   private cart!: CartService;
 
   public render() {
-    return html`<span>${this.cart.items.value.length}</span>`;
+    return html`<span>${this.cart.items.length}</span>`;
   }
 }
 ```

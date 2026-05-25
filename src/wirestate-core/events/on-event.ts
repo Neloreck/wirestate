@@ -6,36 +6,28 @@ import { EventHandlerMetadata, EventType } from "../types/events";
 import { Maybe, Optional } from "../types/general";
 
 /**
- * Decorator for service methods that respond to events.
+ * Marks a service method as an event handler.
  *
  * @remarks
- * Methods decorated with `@OnEvent` are registered as subscribers when the
- * service activates through {@link bindService}.
+ * The handler registers when the service activates and unregisters when the
+ * service deactivates.
  *
- * You can specify one or more event types to handle. If `types` is omitted,
- * the method acts as a catch-all handler for all events broadcasted to the {@link EventBus}.
+ * Omit `types` to receive every event in the container.
  *
  * @group Events
  *
- * @param types - Event identifier(s) to handle. If omitted, handles all events.
+ * @param types - Event token or tokens. Omit for all events.
  * @returns Method decorator.
  *
  * @example
  * ```typescript
+ * import { Event, Injectable, OnEvent } from "@wirestate/core";
+ *
+ * @Injectable()
  * class MyService {
  *   @OnEvent("USER_LOGGED_IN")
  *   private onLogin(event: Event<User>): void {
- *     console.log("User logged in:", event);
- *   }
- *
- *   @OnEvent(["LOGOUT", "SESSION_EXPIRED"])
- *   private onSessionEnd(event: Event): void {
- *     console.log("Specific event received:", event);
- *   }
- *
- *   @OnEvent()
- *   private onAnyEvent(event: Event): void {
- *     // Catch-all handler
+ *     console.log(event.payload.id);
  *   }
  * }
  * ```

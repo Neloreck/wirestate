@@ -9,13 +9,23 @@ import { ContainerContext } from "../context/container-context";
 import { Optional } from "../types/general";
 
 /**
- * Reactive controller that registers a query handler on the {@link QueryBus} for the host element's lifetime.
+ * Reactive controller that registers a query handler.
  *
  * @remarks
- * The handler is registered when the host connects and unregistered when it disconnects.
- * It automatically re-registers if the IoC container is updated.
+ * Registers on host connect. Unregisters on disconnect. Re-registers when the
+ * nearest container changes.
  *
  * @group Queries
+ *
+ * @example
+ * ```typescript
+ * import { LitElement } from "lit";
+ * import { OnQueryController } from "@wirestate/lit";
+ *
+ * class ThemeHost extends LitElement {
+ *   private readonly queryTheme = new OnQueryController(this, "CURRENT_THEME", () => "dark");
+ * }
+ * ```
  */
 export class OnQueryController<D = unknown, R = unknown> implements ReactiveController {
   private bus: Optional<QueryBus> = null;

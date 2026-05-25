@@ -1,62 +1,160 @@
 # About Wirestate
 
-Wirestate is a TypeScript framework for application logic built on InversifyJS and external reactivity.
-It keeps state and workflows outside UI code.
+Wirestate is a foundation for DI-backed TypeScript application architecture.
 
-## Why Wirestate?
+It gives a UI framework layer the pieces it needs but should not invent every time: scoped ownership, injectable
+services, lifecycle, local messaging, and hydration data.
 
-- **UI-Separated Logic**: Keep services outside components, with React, Lit, or custom adapters managing UI lifecycle.
-- **DI and IoC**: Built on InversifyJS.
-- **Reactivity Choice**: Use MobX, Signals, or any other reactive library that fits your needs.
-- **Testable Services**: Test business logic without rendering UI.
+Application logic lives in services. React and Lit adapters provide those services to component trees. Services talk
+through container-local events, commands, and queries instead of reaching across UI boundaries.
 
-## Quick Example (React + Signals)
+Reactivity stays outside the core. Use MobX, Preact Signals, Lit Signals, or plain TypeScript.
 
-### 1. Define a Service
+## What It Gives You
 
-```ts
+- Scoped containers for root apps, subtrees, tests, tenants, modals, and feature branches.
+- `@Injectable` services as state owners and workflow owners.
+- Lifecycle hooks for setup, cleanup, provider attach, and provider detach.
+- Container-local `EventBus`, `CommandBus`, and `QueryBus`.
+- Seeds for SSR hydration, deterministic tests, and per-subtree startup data.
+- React and Lit adapters that keep framework glue thin.
+
+## When It Fits
+
+- You want application logic outside React or Lit components.
+- You want service lifetime scoped to a container or subtree.
+- You want testable services without rendering UI.
+- You want DI without making the core pick a reactivity library.
+
+Wirestate fits complex applications where a page grows into a long-lived feature with its own state, workflows,
+and service boundaries.
+
+## Examples
+
+### React + Signals
+
+```tsx
 import { Injectable } from "@wirestate/core";
+import { ContainerProvider, useInjection } from "@wirestate/react";
 import { signal, Signal } from "@wirestate/react-signals";
 
 @Injectable()
-export class CounterService {
-  public count: Signal<number> = signal(0);
+class CounterService {
+  public readonly count: Signal<number> = signal(0);
 
   public increment(): void {
-    this.count.value++;
+    this.count.value += 1;
   }
 }
-```
-
-### 2. Provide the Service
-
-```tsx
-import { createContainer, Container } from "@wirestate/core";
-import { ContainerProvider } from "@wirestate/react";
-import { CounterService } from "./CounterService";
-
-const container: Container = createContainer({
-  entries: [CounterService],
-});
 
 export function Application() {
+  const config = useMemo(() => ({ entries: [CounterService] }));
+
   return (
-    <ContainerProvider container={container}>
+    <ContainerProvider config={config}>
       <Counter />
     </ContainerProvider>
   );
 }
+
+function Counter() {
+  const counterService = useInjection(CounterService);
+
+  return (
+    <button onClick={() => counterService.increment()}>
+      Count: {counterService.count.value}
+    </button>
+  );
+}
 ```
 
-### 3. Use the Service
+### React + MobX
 
 ```tsx
-import { useInjection } from "@wirestate/react";
-import { CounterService } from "./CounterService";
+import { Injectable } from "@wirestate/core";
+import { ContainerProvider, useInjection } from "@wirestate/react";
+import {
+  Action,
+  Observable,
+  makeObservable,
+  observer,
+} from "@wirestate/react-mobx";
 
-export function Counter() {
-  const counterService: CounterService = useInjection(CounterService);
+@Injectable()
+class CounterService {
+  @Observable()
+  public count: number = 0;
 
-  return <button onClick={() => counterService.increment()}>Count: {counterService.count.value}</button>;
+  public constructor() {
+    makeObservable(this);
+  }
+
+  @Action()
+  public increment(): void {
+    this.count += 1;
+  }
+}
+
+export function Application() {
+  const config = useMemo(() => ({ entries: [CounterService] }));
+
+  return (
+    <ContainerProvider config={config}>
+      <Counter />
+    </ContainerProvider>
+  );
+}
+
+const Counter = observer(function Counter() {
+  const counterService = useInjection(CounterService);
+
+  return (
+    <button onClick={() => counterService.increment()}>
+      Count: {counterService.count}
+    </button>
+  );
+});
+```
+
+### Lit + Signals
+
+```ts
+import { Injectable } from "@wirestate/core";
+import { ContainerProvider, containerProvide, injection } from "@wirestate/lit";
+import { signal, State, watch } from "@wirestate/lit-signals";
+import { html, LitElement } from "lit";
+import { customElement } from "lit/decorators.js";
+
+@Injectable()
+class CounterService {
+  public readonly count: State<number> = signal(0);
+
+  public increment(): void {
+    this.count.set(this.count.get() + 1);
+  }
+}
+
+@customElement("counter-application")
+class CounterApplication extends LitElement {
+  @containerProvide({ config: { entries: [CounterService] } })
+  private containerProvider!: ContainerProvider;
+
+  protected render() {
+    return html`<counter-button></counter-button>`;
+  }
+}
+
+@customElement("counter-button")
+class CounterButton extends LitElement {
+  @injection(CounterService)
+  private counterService!: CounterService;
+
+  protected render() {
+    return html`
+      <button @click=${() => this.counterService.increment()}>
+        Count: ${watch(this.counterService.count)}
+      </button>
+    `;
+  }
 }
 ```

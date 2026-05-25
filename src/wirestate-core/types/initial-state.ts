@@ -1,7 +1,7 @@
 import { Newable } from "../alias";
 
 /**
- * Represents a lookup key for service seeds.
+ * Represents a lookup key for targeted seed values.
  *
  * @remarks
  * Supports class constructors (for targeted seeds), strings, or symbols.
@@ -11,7 +11,7 @@ import { Newable } from "../alias";
 export type SeedKey = Newable | string | symbol;
 
 /**
- * Represents a key-value map for targeted seeds.
+ * Represents a map of targeted seed values.
  *
  * @remarks
  * Used to store initial state values that are injected into services
@@ -24,7 +24,7 @@ export type SeedKey = Newable | string | symbol;
 export type SeedsMap<T = unknown> = Map<SeedKey, T>;
 
 /**
- * Represents a single service-to-seed mapping entry.
+ * Represents a single targeted seed entry.
  *
  * @remarks
  * Represented as a readonly tuple of `[SeedKey, T]`.
@@ -36,7 +36,7 @@ export type SeedsMap<T = unknown> = Map<SeedKey, T>;
 export type SeedEntry<T = unknown> = readonly [SeedKey, T];
 
 /**
- * Represents a collection of seed entries.
+ * Represents a collection of targeted seed entries.
  *
  * @remarks
  * Used during container initialization to populate the {@link SeedsMap}.

@@ -55,8 +55,7 @@ function validateEntryDescriptor(entry: InjectableDescriptor): void {
  */
 export interface BindEntryOptions extends BindServiceOptions {
   /**
-   * If true, the service's lifecycle methods (like `@OnActivated`) will be ignored
-   * during the binding process.
+   * Skip service lifecycle hooks for class entries.
    *
    * @default `false`
    */
@@ -64,47 +63,44 @@ export interface BindEntryOptions extends BindServiceOptions {
 }
 
 /**
- * Binds an entry to the Inversify {@link Container} using the appropriate strategy.
+ * Binds a class or descriptor into a container.
  *
  * @remarks
- * This is a high-level dispatching function that selects the binding method based on the `entry` type:
- * - **Class Constructor**: Binds as a singleton service via {@link bindService}.
- * - **ConstantValue**: Binds a fixed value via {@link bindConstant}.
- * - **DynamicValue**: Binds a factory-generated value via {@link bindDynamicValue}.
- * - **Instance**: Binds a value as a class instance via {@link bindService}.
+ * `bindEntry` is the router behind `createContainer({ entries })`.
+ *
+ * It chooses the right binding helper:
+ *
+ * - Class constructor: singleton service via {@link bindService}.
+ * - `ConstantValue`: fixed value via {@link bindConstant}.
+ * - `DynamicValue`: factory value via {@link bindDynamicValue}.
+ * - `Instance`: service class behind a custom token.
  *
  * @group Bind
  *
- * @template T - Type of the object being bound.
+ * @template T - Bound object type.
  *
- * @param container - Target Inversify {@link Container}.
- * @param entry - Class constructor or {@link InjectableDescriptor} describing the service.
- * @param options - Optional binding configuration (primarily used for class-based services).
+ * @param container - Container to bind into.
+ * @param entry - Service class or descriptor.
+ * @param options - Binding options for class entries.
  *
- * @throws {@link WirestateError} If `entry.scopeBindingType` is not `Singleton` for constant values.
+ * @throws {@link WirestateError} If the descriptor is invalid.
  *
  * @example
  * ```typescript
- * // Binding a class constructor (defaults to singleton)
- * class MyService {}
+ * import { BindingType, Injectable, bindEntry, createContainer } from "@wirestate/core";
  *
- * bindEntry(container, MyService);
+ * const API_URL = Symbol("API_URL");
  *
- * // Binding a constant value
- * const API_URL: unique symbol = Symbol("API_URL");
+ * @Injectable()
+ * class UserService {}
  *
+ * const container = createContainer();
+ *
+ * bindEntry(container, UserService);
  * bindEntry(container, {
  *   id: API_URL,
- *   value: "https://api.example.com"
- * });
- *
- * // Binding a dynamic value (factory)
- * const CURRENT_TIME: unique symbol = Symbol("CURRENT_TIME");
- *
- * bindEntry(container, {
- *   id: CURRENT_TIME,
- *   bindingType: "DynamicValue",
- *   factory: () => new Date()
+ *   bindingType: BindingType.ConstantValue,
+ *   value: "https://api.example.com",
  * });
  * ```
  */

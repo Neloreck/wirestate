@@ -4,7 +4,7 @@ import { CommandHandler, CommandType } from "@wirestate/core";
 import { OnCommandController } from "./on-command-controller";
 
 /**
- * Represents options for the {@link useOnCommand} hook.
+ * Represents options for {@link useOnCommand}.
  *
  * @group Commands
  */
@@ -20,11 +20,11 @@ export interface UseOnCommandOptions<D = unknown, R = unknown> {
 }
 
 /**
- * Hook that registers a command handler for the host element's lifetime.
+ * Registers a command handler for the host element's lifetime.
  *
  * @group Commands
  *
- * @param host - The host element.
+ * @param host - Host element.
  * @param options - Command handling options.
  * @param options.type - The command type to listen for.
  * @param options.handler - The command handler function.

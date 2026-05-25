@@ -6,7 +6,7 @@ import { Optional } from "../types/general";
 import { OnEventController } from "./on-event-controller";
 
 /**
- * Represents options for the {@link useOnEvents} hook.
+ * Represents options for {@link useOnEvents}.
  *
  * @group Events
  */
@@ -22,15 +22,15 @@ export interface UseOnEventsOptions<E extends Event = Event> {
 }
 
 /**
- * Hook that subscribes to events for the host element's lifetime.
+ * Subscribes to events for the host element's lifetime.
  *
  * @group Events
  *
- * @param host - The host element.
+ * @param host - Host element.
  * @param options - Event handling options.
  * @param options.handler - Event handler function.
  * @param options.types - Event types to listen for, if null or undefined, all events will be handled.
- * @returns An instance of {@link OnEventController}.
+ * @returns Event controller.
  *
  * @example
  * ```typescript

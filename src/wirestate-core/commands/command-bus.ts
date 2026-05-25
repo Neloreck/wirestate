@@ -13,14 +13,27 @@ import {
 import { Maybe, Optional } from "../types/general";
 
 /**
- * Orchestrates command dispatching and handler registration.
+ * Dispatches named commands to one active handler.
  *
  * @remarks
- * The `CommandBus` provides a way to decouple command dispatchers from their handlers.
- * It supports handler shadowing: when multiple handlers are registered for the same type,
- * the last registered one takes priority.
+ * Commands are writes: save, login, reset, send. The caller gets a
+ * {@link CommandDescriptor} immediately and can await `descriptor.task`.
+ *
+ * Handlers are stacked by type. The newest handler wins. Unregister it and the
+ * previous handler takes over again.
  *
  * @group Commands
+ *
+ * @example
+ * ```typescript
+ * import { CommandBus } from "@wirestate/core";
+ *
+ * const bus = new CommandBus();
+ * bus.register("SAVE_USER", async (user: User) => saveUser(user));
+ *
+ * const command = bus.command<void, User>("SAVE_USER", user);
+ * await command.task;
+ * ```
  */
 export class CommandBus {
   /**
@@ -37,18 +50,18 @@ export class CommandBus {
   }
 
   /**
-   * Dispatches a command to the last registered handler.
+   * Dispatches a command to the newest handler.
    *
    * @remarks
-   * Execution is always asynchronous. The handler's return value is wrapped in a Promise.
-   * Returns a {@link CommandDescriptor} that tracks the execution status and task.
+   * The handler result is always wrapped in a Promise. The descriptor starts
+   * as `PENDING`, then becomes `SETTLED` or `ERROR`.
    *
    * @template R - Type of the command result.
    * @template D - Type of the command payload data.
    *
-   * @param type - Command identifier.
-   * @param data - Optional payload for the handler.
-   * @returns A descriptor for the executing command.
+   * @param type - Command token.
+   * @param data - Command payload.
+   * @returns Descriptor for the running command.
    *
    * @throws {@link WirestateError} If no handler is registered.
    *
@@ -92,14 +105,14 @@ export class CommandBus {
   }
 
   /**
-   * Dispatches a command if a handler exists, otherwise returns null.
+   * Dispatches a command if a handler exists.
    *
    * @template R - Type of the command result.
    * @template D - Type of the command payload data.
    *
    * @param type - Command identifier.
    * @param data - Optional payload for the handler.
-   * @returns A command descriptor, or `null` if no handler is found.
+   * @returns Command descriptor, or `null` when no handler exists.
    */
   public commandOptional<R = unknown, D = unknown>(type: CommandType, data?: D): Optional<CommandDescriptor<R>> {
     const stack: Maybe<Array<CommandHandler>> = this.handlers.get(type);
@@ -118,11 +131,10 @@ export class CommandBus {
   }
 
   /**
-   * Registers a handler for a specific command type.
+   * Registers a command handler.
    *
    * @remarks
-   * If multiple handlers are registered for the same type, they are stored in a stack.
-   * The most recently registered handler will be used for dispatching.
+   * Multiple handlers for one type form a stack. The newest handler is active.
    *
    * @template D - Type of the command payload data.
    * @template R - Type of the command execution result.

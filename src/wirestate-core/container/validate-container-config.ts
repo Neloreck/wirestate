@@ -6,15 +6,28 @@ import { WirestateError } from "../error/wirestate-error";
 import type { ContainerConfig } from "./create-container";
 
 /**
- * Validates a container creation config without creating a container.
+ * Checks a container config before creating a container.
  *
  * @remarks
- * Use this when a framework adapter stores config for later container
- * creation but should still fail fast on invalid activation options.
+ * Use it when an adapter stores config for later but still wants fast feedback.
  *
  * @group Container
  *
  * @param config - Container configuration to validate.
+ * @throws {@link WirestateError} If `activate` references a token missing from `entries`.
+ *
+ * @example
+ * ```typescript
+ * import { Injectable, validateContainerConfig } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class LoggerService {}
+ *
+ * validateContainerConfig({
+ *   entries: [LoggerService],
+ *   activate: [LoggerService],
+ * });
+ * ```
  */
 export function validateContainerConfig(config: ContainerConfig): void {
   const activate: ReadonlyArray<ServiceIdentifier> =

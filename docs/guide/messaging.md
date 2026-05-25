@@ -1,287 +1,252 @@
 # Messaging
 
-Wirestate provides three message-passing patterns. All three buses live on the container and are scoped to it. Child containers have independent buses.
+Wirestate has three bus patterns. Each container owns its own buses.
 
-| Pattern | Direction              | Cardinality | Return                      |
-| ------- | ---------------------- | ----------- | --------------------------- |
-| Event   | Emitter -> subscribers | 1 -> many   | void                        |
-| Command | Executor -> handler    | 1 -> 1      | `CommandDescriptor`         |
-| Query   | Executor -> handler    | 1 -> 1      | result or `Promise<result>` |
+| Pattern | Use it for       | Shape                                           |
+| ------- | ---------------- | ----------------------------------------------- |
+| Event   | "This happened." | One emitter, many subscribers, no return value. |
+| Command | "Do this."       | One executor, one handler, async descriptor.    |
+| Query   | "Give me this."  | One caller, one handler, returned value.        |
 
-
-## Choosing a Pattern
-
-| Use     | When                                                                                       |
-| ------- |--------------------------------------------------------------------------------------------|
-| Event   | Notification that something happened. Emitters don't care who's listening or if anyone is. |
-| Command | Trigger a side-effectful operation. The executor returns completion state.                 |
-| Query   | Read data owned by another service without creating a direct dependency.                   |
-
+Child containers keep independent buses. Parent services do not hear child events unless you wire that yourself.
 
 ## Events
 
-Events are fire-and-forget broadcasts. Any number of services or UI components can subscribe.
-Emitting always returns `void`; handlers run synchronously in subscription order.
-
-### Emitting
-
-Emit from a service via `WireScope`:
+Events are broadcast notifications.
 
 ```ts
-import { Injectable, Inject, WireScope } from "@wirestate/core";
+import { Event, Inject, Injectable, OnEvent, WireScope } from "@wirestate/core";
 
 @Injectable()
 export class CartService {
-  // ...
-
-  public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope
-  ) {}
+  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
   public addItem(item: CartItem): void {
-    this.items.value = [...this.items.value, item];
-    this.scope.emitEvent("CART_ITEM_ADDED", item);
+    this.scope.emitEvent("CART_ITEM_ADDED", item, this);
   }
-
-  // ...
 }
-```
-
-The third `from` argument identifies the emitter (defaults to the scope instance):
-
-```ts
-this.scope.emitEvent("CART_ITEM_ADDED", item, this);
-```
-
-### Subscribing - Services
-
-`@OnEvent` registers a method as a subscriber. The method receives the full `Event<Payload>` object.
-
-```ts
-import { Injectable, OnEvent, Event } from "@wirestate/core";
 
 @Injectable()
 export class AnalyticsService {
-  // ...
-
-  // Single event type:
   @OnEvent("CART_ITEM_ADDED")
-  private onCartItemAdded(event: Event<CartItem>): void {
+  public trackAdd(event: Event<CartItem>): void {
     this.track("add_to_cart", event.payload);
   }
-
-  // Multiple types:
-  @OnEvent(["CART_ITEM_ADDED", "CART_ITEM_REMOVED"])
-  private onCartChanged(): void {
-    this.syncCart();
-  }
-
-  // Catch-all - receives every event on the bus:
-  @OnEvent()
-  private onAnyEvent(event: Event): void {
-    console.debug("[analytics-debug]", event.type);
-  }
-
-  // ...
 }
 ```
 
-Subscriptions are automatically registered on activation and unregistered on deactivation.
+Useful details:
 
-### Subscribing - React
+- `@OnEvent("TYPE")` listens to one type.
+- `@OnEvent(["A", "B"])` listens to several types.
+- `@OnEvent()` listens to everything on that container's event bus.
+- A throwing handler is logged; the next handler still runs.
+
+React can subscribe and emit from components.
 
 ```tsx
-import { useEvent, useEvents, useEventsHandler, useEventEmitter } from "@wirestate/react";
+import { Event } from "@wirestate/core";
+import { useEvent, useEventEmitter } from "@wirestate/react";
 
-// Single type:
-useEvent("CART_ITEM_ADDED", (event) => {
-  console.log("Item added:", event.payload);
-});
+function CartLogger() {
+  const emit = useEventEmitter();
 
-// Multiple types:
-useEvents(["CART_ITEM_ADDED", "CART_ITEM_REMOVED"], (event) => {
-  console.log("Cart event:", event.type, event.payload);
-});
+  useEvent("CART_ITEM_ADDED", (event: Event<CartItem>) => {
+    console.log(event.payload);
+  });
 
-// Catch-all:
-useEventsHandler((event) => {
-  console.log("Any event:", event.type);
-});
+  return <button onClick={() => emit("CART_VIEWED")}>Open cart</button>;
+}
+```
 
-// emit from a component
-const emit = useEventEmitter();
-emit("USER_PINGED");
+Lit can do the same with element decorators.
+
+```ts
+import { Event, WireScope } from "@wirestate/core";
+import { LitElement, html } from "lit";
+import { customElement } from "lit/decorators.js";
+import { injection, onEvent } from "@wirestate/lit";
+
+@customElement("cart-logger")
+export class CartLogger extends LitElement {
+  @injection(WireScope)
+  private scope!: WireScope;
+
+  @onEvent("CART_ITEM_ADDED")
+  private log(event: Event<CartItem>): void {
+    console.log(event.payload);
+  }
+
+  public render() {
+    return html`<button @click=${() => this.scope.emitEvent("CART_VIEWED")}>Open cart</button>`;
+  }
+}
 ```
 
 ## Commands
 
-Commands are named, one-way write operations dispatched to exactly one registered handler.
-Wirestate throws `WirestateError` if no handler is registered. Use `executeOptionalCommand` / `useOptionalCommandExecutor` when the handler may be absent.
-
-The executor returns a `CommandDescriptor` immediately; the actual work happens asynchronously.
-Check `descriptor.status` (`pending` -> `settled` | `error`) or `await descriptor.task`.
-
-### Registering - Services
+Commands trigger write work. A command has one active handler. Newer registrations shadow older ones.
 
 ```ts
-import { Injectable, OnCommand } from "@wirestate/core";
+import { Inject, Injectable, OnCommand, WireScope } from "@wirestate/core";
 
 @Injectable()
 export class AuthService {
-  // ...
-
   @OnCommand("LOGOUT")
-  public async onLogout(): Promise<void> {
+  public async logout(): Promise<void> {
     await revokeSession();
-    this.user.value = null;
   }
+}
 
-  // ...
+@Injectable()
+export class HeaderService {
+  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+
+  public async logout(): Promise<void> {
+    const command = this.scope.executeCommand("LOGOUT");
+
+    await command.task;
+  }
 }
 ```
 
-### Dispatching - Services
+`executeCommand` throws `WirestateError` when no handler exists.
+
+Use optional commands when absence is normal.
 
 ```ts
-const descriptor: CommandDescriptor = this.scope.executeCommand("LOGOUT");
-await descriptor.task; // resolves when handler settles
-```
+const command = this.scope.executeOptionalCommand("REFRESH_DEVTOOLS");
 
-Optional dispatch returns `null` if no handler is bound:
-
-```ts
-const descriptor: CommandDescriptor | null = this.scope.executeOptionalCommand("LOGOUT");
-
-if (descriptor) {
-  await descriptor.task;
+if (command) {
+  await command.task;
 }
 ```
 
-### Dispatching - React
+React can dispatch or handle commands for component lifetime.
 
 ```tsx
-import { useCommandExecutor, useOptionalCommandExecutor, CommandExecutor } from "@wirestate/react";
-
-function LogoutButton() {
-  const executeCommand: CommandExecutor = useCommandExecutor();
-
-  return (
-    <button
-      onClick={() => {
-        const descriptor = executeCommand("LOGOUT");
-
-        descriptor.task.then(() => navigate("/login"));
-      }}
-    >
-      Log out
-    </button>
-  );
-}
-```
-
-### Handling in React
-
-Register a handler from a component for the lifetime of that component:
-
-```tsx
-import { useCommandHandler } from "@wirestate/react";
+import { useCommandExecutor, useCommandHandler } from "@wirestate/react";
 
 function SearchPanel() {
-  useCommandHandler("OPEN_SEARCH", () => {
-    setOpen(true);
-  });
+  const executeCommand = useCommandExecutor();
 
-  // ...
+  useCommandHandler("OPEN_SEARCH", () => setOpen(true));
+
+  return <button onClick={() => executeCommand("OPEN_SEARCH")}>Search</button>;
+}
+```
+
+Lit elements can dispatch and handle commands for their connected lifetime.
+
+```ts
+import { WireScope } from "@wirestate/core";
+import { LitElement, html } from "lit";
+import { customElement, state } from "lit/decorators.js";
+import { injection, onCommand } from "@wirestate/lit";
+
+@customElement("search-panel")
+export class SearchPanel extends LitElement {
+  @injection(WireScope)
+  private scope!: WireScope;
+
+  @state()
+  private open: boolean = false;
+
+  @onCommand("OPEN_SEARCH")
+  private openSearch(): void {
+    this.open = true;
+  }
+
+  public render() {
+    return html`
+      <button @click=${() => this.scope.executeCommand("OPEN_SEARCH")}>Search</button>
+      ${this.open ? html`<span>Open</span>` : null}
+    `;
+  }
 }
 ```
 
 ## Queries
 
-Queries are synchronous or asynchronous request-response calls. The last registered handler wins (shadows earlier ones).
-Wirestate throws `WirestateError` if no handler is registered. Use optional variants when needed.
-
-### Registering - Services
+Queries read data owned elsewhere. They return the handler result.
 
 ```ts
-import { Injectable, OnQuery } from "@wirestate/core";
+import { Inject, Injectable, OnQuery, WireScope } from "@wirestate/core";
 
 @Injectable()
-export class SettingsService {
-  // ...
-
+export class ThemeService {
   private theme: string = "dark";
 
-  // Sync handler:
-  @OnQuery("GET_THEME")
-  public getTheme(): string {
+  @OnQuery("CURRENT_THEME")
+  public currentTheme(): string {
     return this.theme;
   }
+}
 
-  // Async handler:
-  @OnQuery("FETCH_USER_PROFILE")
-  public async fetchProfile(userId: string): Promise<UserProfile> {
-    return fetchFromApi(`/users/${userId}`);
+@Injectable()
+export class ToolbarService {
+  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+
+  public getTheme(): string {
+    return this.scope.queryData<string>("CURRENT_THEME");
   }
-
-  // ...
 }
 ```
 
-### Dispatching - Services
+Choose the query call by return shape:
+
+- `queryData` returns the handler result as-is.
+- `queryDataAsync` always returns a Promise.
+- `queryOptionalData` returns `null` if no handler exists.
+- `queryOptionalDataAsync` combines both behaviors.
+
+React can call or answer queries.
+
+```tsx
+import { useQueryExecutor, useQueryHandler } from "@wirestate/react";
+
+function ThemeButton() {
+  const query = useQueryExecutor();
+
+  useQueryHandler("BUTTON_LABEL", () => "Save");
+
+  return <button>{query<string>("BUTTON_LABEL")}</button>;
+}
+```
+
+Lit elements can call or answer queries through the current container scope.
 
 ```ts
-// Sync - returns result directly:
-const theme = this.scope.queryData<string>("GET_THEME");
+import { WireScope } from "@wirestate/core";
+import { LitElement, html } from "lit";
+import { customElement, state } from "lit/decorators.js";
+import { injection, onQuery } from "@wirestate/lit";
 
-// Async - returns Promise:
-const profile = await this.scope.queryDataAsync<UserProfile>("FETCH_USER_PROFILE", userId);
+@customElement("theme-button")
+export class ThemeButton extends LitElement {
+  @injection(WireScope)
+  private scope!: WireScope;
 
-// Optional - returns null if no handler:
-const config = this.scope.queryOptionalData<Config>("GET_CONFIG");
+  @state()
+  private label: string = "Load label";
 
-// Optional async - resolves null if no handler:
-const remoteConfig = await this.scope.queryOptionalDataAsync<Config>("FETCH_CONFIG");
-```
+  @onQuery("BUTTON_LABEL")
+  private buttonLabel(): string {
+    return "Save";
+  }
 
-### Dispatching - React
+  private readLabel(): void {
+    this.label = this.scope.queryData<string>("BUTTON_LABEL");
+  }
 
-```tsx
-import { AsyncQueryExecutor, QueryExecutor, useAsyncQueryExecutor, useQueryExecutor } from "@wirestate/react";
-
-function ProfileCard({ userId }: { userId: string }) {
-  // ...
-
-  const queryAsync: AsyncQueryExecutor = useAsyncQueryExecutor();
-
-  const loadProfile = async () => {
-    const profile = await queryAsync<UserProfile>("FETCH_USER_PROFILE", userId);
-
-    setProfile(profile);
-  };
-
-  // ...
-
-  const query: QueryExecutor = useQueryExecutor();
-
-  const refreshTheme = () => {
-    const theme = query<string>("GET_THEME");
-
-    setTheme(theme);
-  };
-
-  // ...
+  public render() {
+    return html`<button @click=${() => this.readLabel()}>${this.label}</button>`;
+  }
 }
 ```
 
-Register a query handler from a component:
+## Handler Stacks
 
-```tsx
-import { useQueryHandler } from "@wirestate/react";
+Commands and queries use a stack per token. The newest handler wins.
 
-function DateWidget() {
-  useQueryHandler("GET_CURRENT_DATE", () => new Date());
-
-  // ...
-}
-```
+That matters in scoped UI. A child provider can override a query while a modal is open. When the modal unmounts, its handler unregisters and the parent answer becomes active again.

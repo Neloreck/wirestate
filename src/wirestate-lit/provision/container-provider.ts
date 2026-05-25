@@ -20,11 +20,10 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { Maybe } from "../types/general";
 
 /**
- * Represents options for the {@link ContainerProvider}.
+ * Represents options for {@link ContainerProvider}.
  *
  * @remarks
- * Provide either an external `container` or managed creation `config`, but
- * never both at the same time.
+ * Pass either `container` or `config`. Passing both is an error.
  *
  * @group Provision
  */
@@ -52,23 +51,34 @@ export interface ContainerProviderOptions {
 }
 
 /**
- * Provider that exposes an IoC container context to the host element and its children.
+ * Reactive controller that provides a root container through Lit context.
  *
  * @remarks
- * The provider supports two modes:
+ * Two modes:
  *
- * - External mode: `container` is an existing {@link Container}. The
- *   provider passes it through context while connected, runs provider
- *   lifecycle hooks, and never disposes it.
- * - Managed mode: `config` is {@link ContainerConfig}. The provider
- *   creates a container when the host connects, disposes the container when
- *   the host disconnects, activates all entries by default, runs provider
- *   lifecycle hooks while connected, and recreates it on reconnect.
+ * - External `container`: published while connected, provisioned, never disposed.
+ * - Managed `config`: created on connect, provisioned, disposed on disconnect.
  *
- * The context value is only published while the host is connected. Before the
- * first connection and after disconnection, the provider value is `undefined`.
+ * Managed containers activate all entries by default. Before connect and after
+ * disconnect, the context value is `undefined`.
  *
  * @group Provision
+ *
+ * @example
+ * ```typescript
+ * import { Injectable } from "@wirestate/core";
+ * import { ContainerProvider } from "@wirestate/lit";
+ * import { LitElement } from "lit";
+ *
+ * @Injectable()
+ * class CounterService {}
+ *
+ * class AppRoot extends LitElement {
+ *   private readonly provider = new ContainerProvider(this, {
+ *     config: { entries: [CounterService] },
+ *   });
+ * }
+ * ```
  */
 export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = ReactiveControllerHost & HTMLElement>
   extends ContextProvider<typeof ContainerContext, E>
@@ -173,9 +183,8 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
    *
    * @remarks
    * External-container providers cannot switch to managed mode. Connected
-   * managed providers deprovision and dispose the current container, then
-   * create and provision a replacement. Disconnected managed providers store
-   * the config for the next connection without publishing a value.
+   * managed providers replace the current container immediately. Disconnected
+   * managed providers store the config for the next connection.
    *
    * @param config - Container creation options to use from now on.
    */

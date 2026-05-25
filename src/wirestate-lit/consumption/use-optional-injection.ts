@@ -16,7 +16,7 @@ import { AnyObject, Optional } from "../types/general";
 export type OptionalInjectionFallback<T> = (container: Container) => T;
 
 /**
- * Represents options for the {@link useOptionalInjection} hook.
+ * Represents options for {@link useOptionalInjection}.
  *
  * @group Consumption
  */
@@ -44,7 +44,7 @@ export interface UseOptionalInjectionOptions<T, F = null> {
 }
 
 /**
- * Represents result of the {@link useOptionalInjection} hook.
+ * Represents value returned by {@link useOptionalInjection}.
  *
  * @group Consumption
  */
@@ -60,21 +60,20 @@ export interface UseOptionalInjectionValue<T, F = null> {
 }
 
 /**
- * Hook (controller) to optionally inject a service from the IoC container.
+ * Consumes a service if the nearest container has it.
  *
  * @remarks
- * Unlike {@link useInjection}, this hook does not throw if the dependency
- * is missing from the container.
+ * Missing token means fallback result, or `null` when no fallback exists.
  *
  * @group Consumption
  *
  * @template T - The type of the value being resolved.
  * @template F - The type returned by the fallback function.
  *
- * @param host - The host element.
- * @param optionsOrInjectionId - Injection options or service identifier.
- * @param onFallback - Optional function called to provide a value if the token is not bound.
- * @returns An instance of {@link UseOptionalInjectionValue}.
+ * @param host - Host element.
+ * @param optionsOrInjectionId - Service token or options.
+ * @param onFallback - Fallback for missing bindings.
+ * @returns Mutable injection holder.
  *
  * @example
  * ```typescript

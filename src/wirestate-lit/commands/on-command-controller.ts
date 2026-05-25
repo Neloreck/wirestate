@@ -9,13 +9,25 @@ import { ContainerContext } from "../context/container-context";
 import { Optional } from "../types/general";
 
 /**
- * Controller that registers a command handler for the host element's lifetime.
+ * Reactive controller that registers a command handler.
  *
  * @remarks
- * The handler is registered when the host connects and unregistered when it disconnects.
- * It automatically re-registers if the IoC container is updated.
+ * Registers on host connect. Unregisters on disconnect. Re-registers when the
+ * nearest container changes.
  *
  * @group Commands
+ *
+ * @example
+ * ```typescript
+ * import { LitElement } from "lit";
+ * import { OnCommandController } from "@wirestate/lit";
+ *
+ * class SaveButton extends LitElement {
+ *   private readonly saveCommand = new OnCommandController(this, "SAVE", (data: FormData) => {
+ *     console.log("save", data);
+ *   });
+ * }
+ * ```
  */
 export class OnCommandController<D = unknown, R = unknown> implements ReactiveController {
   private bus: Optional<CommandBus> = null;

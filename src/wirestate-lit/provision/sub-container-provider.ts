@@ -23,7 +23,7 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { Maybe } from "../types/general";
 
 /**
- * Represents options for the {@link SubContainerProvider}.
+ * Represents options for {@link SubContainerProvider}.
  *
  * @group Provision
  */
@@ -61,18 +61,14 @@ export interface SubContainerProviderOptions {
 }
 
 /**
- * Provider that exposes a managed child container for the host element's lifetime.
+ * Reactive controller that provides a managed child container.
  *
  * @remarks
- * The provider always owns a child container derived from the nearest parent
- * {@link ContainerContext}. When connected, it creates a child container using
- * the latest parent context, provides it to descendants, destroys it when the
- * host disconnects, runs provider lifecycle hooks while connected, and
- * replaces it whenever the parent container changes. Child containers activate
- * all provided entries by default unless `activate` is provided explicitly.
+ * The child container inherits parent bindings but owns its own buses, seeds,
+ * and lifecycle. It is recreated when the parent container changes.
  *
- * The context value is only published while the host is connected. Before the
- * first connection and after disconnection, the provider value is `undefined`.
+ * Child containers activate all entries by default unless `activate` is set.
+ * Before connect and after disconnect, the context value is `undefined`.
  *
  * @group Provision
  *

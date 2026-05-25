@@ -7,23 +7,30 @@ import { SeedEntries, SeedsMap } from "../types/initial-state";
 import { SEEDS_TOKEN } from "./tokens";
 
 /**
- * Applies targeted seeds to the container's internal seed map.
+ * Adds targeted seed values to a container.
  *
  * @remarks
- * This function updates the existing {@link SeedsMap} instance instead of replacing it.
- * This ensures that multiple providers can co-exist and contribute their own seeds
- * without overwriting each other's data.
+ * Targeted seeds are keyed by service class, string, or symbol. The existing
+ * seed map is updated in place so providers can add and remove their own
+ * entries without replacing everyone else's data.
  *
  * @group Seeds
  *
- * @param container - The Inversify {@link Container} where seeds should be applied.
- * @param seeds - Seed entries to add to the container.
+ * @param container - Container to update.
+ * @param seeds - Seed entries to add.
  *
  * @example
  * ```typescript
+ * import { Injectable, applySeeds, createContainer } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class CounterService {}
+ *
+ * const container = createContainer();
+ *
  * applySeeds(container, [
- *   [UserService, { initialUser: "admin" }],
- *   ["API_KEY", "12345"]
+ *   [CounterService, { count: 10 }],
+ *   ["API_URL", "https://api.example.com"],
  * ]);
  * ```
  */

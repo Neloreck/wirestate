@@ -8,7 +8,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { ContainerContext } from "../context/container-context";
 
 /**
- * Represents result of the {@link useContainer} hook.
+ * Represents value returned by {@link useContainer}.
  *
  * @group Consumption
  */
@@ -20,15 +20,15 @@ export interface UseContainerValue {
 }
 
 /**
- * Hook (consumer) to access the active container from the nearest parent context.
+ * Consumes the active container from the nearest Lit context.
  *
  * @remarks
  * The returned value updates when the nearest provided container changes.
  *
  * @group Consumption
  *
- * @param host - The host element.
- * @returns An instance of {@link UseContainerValue}.
+ * @param host - Host element.
+ * @returns Mutable container holder.
  *
  * @example
  * ```typescript

@@ -9,13 +9,25 @@ import { ContainerContext } from "../context/container-context";
 import { Optional } from "../types/general";
 
 /**
- * Controller that subscribes to events for the host element's lifetime.
+ * Reactive controller that subscribes to container events.
  *
  * @remarks
- * The handler is registered when the host connects and unregistered when it disconnects.
- * It automatically re-subscribes if the IoC container is updated.
+ * Registers on host connect. Unregisters on disconnect. Re-subscribes when the
+ * nearest container changes.
  *
  * @group Events
+ *
+ * @example
+ * ```typescript
+ * import { LitElement } from "lit";
+ * import { OnEventController } from "@wirestate/lit";
+ *
+ * class AuditLog extends LitElement {
+ *   private readonly events = new OnEventController(this, ["USER_LOGIN"], (event) => {
+ *     console.log(event.payload);
+ *   });
+ * }
+ * ```
  */
 export class OnEventController<E extends Event = Event> implements ReactiveController {
   private bus: Optional<EventBus> = null;

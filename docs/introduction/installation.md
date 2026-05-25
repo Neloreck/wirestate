@@ -1,53 +1,44 @@
 # Installation
 
-Wirestate consists of a core package and UI-specific bindings.
+Install the core package, one UI adapter, and the reactivity package you actually use.
 
-## 1. Choose your core and bindings
+## Packages
 
-| UI    | Reactivity | Packages to Install                                                                                                                                         |
-| ----- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| React | Signals    | `@wirestate/core` `@wirestate/react` `@wirestate/react-signals` `@preact/signals-react` `reflect-metadata`                                                  |
-| React | MobX       | `@wirestate/core` `@wirestate/react` `@wirestate/react-mobx` `reflect-metadata`                                                                             |
-| Lit   | Signals    | `@wirestate/core` `@wirestate/lit` `@wirestate/lit-signals` `@lit/context` `@lit/reactive-element` `@lit-labs/signals` `signal-polyfill` `reflect-metadata` |
+| Stack           | Packages                                                                                                                                                          |
+| --------------- |-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| React + Signals | `@wirestate/core` `@wirestate/react` `@wirestate/react-signals` `@preact/signals-react` `reflect-metadata`                                                        |
+| React + MobX    | `@wirestate/core` `@wirestate/react` `@wirestate/react-mobx` `mobx` `mobx-react-lite` `reflect-metadata`                                                          |
+| Lit + Signals   | `@wirestate/core` `@wirestate/lit` `@wirestate/lit-signals` `lit` `@lit/context` `@lit/reactive-element` `@lit-labs/signals` `signal-polyfill` `reflect-metadata` |
 
-## 2. Install
-
-Wirestate needs `@wirestate/core` plus binding packages for your renderer and state library.
-
-Select <ins>one of</ins> the variants matching your setup below:
-
-### 2.A `React` with `signals`
+### React + Signals
 
 ```bash
-npm install --save @wirestate/core @wirestate/react reflect-metadata
-npm install --save @wirestate/react-signals @preact/signals-react
+npm install @wirestate/core @wirestate/react @wirestate/react-signals @preact/signals-react reflect-metadata
 ```
 
-### 2.B `React` with `MobX`
+### React + MobX
 
 ```bash
-npm install --save @wirestate/core @wirestate/react reflect-metadata
-npm install --save @wirestate/react-mobx mobx mobx-react-lite
+npm install @wirestate/core @wirestate/react @wirestate/react-mobx mobx mobx-react-lite reflect-metadata
 ```
 
-### 2.C `Lit` with `signals`
+### Lit + Signals
 
 ```bash
-npm install --save @wirestate/core @wirestate/lit @lit/context @lit/reactive-element reflect-metadata
-npm install --save @wirestate/lit-signals @lit-labs/signals signal-polyfill
+npm install @wirestate/core @wirestate/lit @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/signals signal-polyfill reflect-metadata
 ```
 
-## 3. Requirements
+## Runtime Import
 
-You need to import `reflect-metadata` at the entry point of your application:
+Import `reflect-metadata` once, before decorated services are loaded.
 
 ```ts
 import "reflect-metadata";
 ```
 
-## 4. Setup
+## TypeScript
 
-Wirestate requires TypeScript with `experimentalDecorators` and `emitDecoratorMetadata` enabled in your `tsconfig.json`.
+Enable decorator metadata.
 
 ```json
 {

@@ -1,5 +1,5 @@
 /**
- * Represents any object with string or symbol keys.
+ * Represents an object with string or symbol keys.
  *
  * @group general-types
  */
@@ -7,7 +7,7 @@
 export type AnyObject = Record<string | symbol, any>;
 
 /**
- * Represents a function that returns a value of type `T`.
+ * Represents the function that returns `T`.
  *
  * @group general-types
  *
@@ -16,7 +16,7 @@ export type AnyObject = Record<string | symbol, any>;
 export type Callable<T> = () => T;
 
 /**
- * Represents a value that can be of type `T` or `null`.
+ * Represents value that can be `T` or `null`.
  *
  * @group general-types
  *
@@ -25,7 +25,7 @@ export type Callable<T> = () => T;
 export type Optional<T> = T | null;
 
 /**
- * Represents a value that can be of type `T` or a `Promise` resolving to `T`.
+ * Represents value that can be `T` or a Promise of `T`.
  *
  * @group general-types
  *
@@ -34,7 +34,7 @@ export type Optional<T> = T | null;
 export type MaybePromise<T> = T | Promise<T>;
 
 /**
- * Represents a value that can be of type `T`, `null`, or `undefined`.
+ * Represents value that can be `T`, `null`, or `undefined`.
  *
  * @group general-types
  *

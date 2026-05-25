@@ -6,23 +6,25 @@ import { Maybe } from "../types/general";
 import { QueryHandlerMetadata, QueryType } from "../types/queries";
 
 /**
- * Decorator for service methods that respond to a query.
+ * Marks a service method as a query handler.
  *
  * @remarks
- * Methods decorated with `@OnQuery` are registered as query handlers when the
- * service activates through {@link bindService}.
+ * The handler registers when the service activates and unregisters when the
+ * service deactivates.
  *
- * Unlike events, queries MUST be handled by exactly one handler. If multiple handlers
- * are registered for the same query type, the most recent one (usually the most
- * specific in terms of class hierarchy or registration order) will shadow the others.
+ * Queries answer reads. If several handlers use the same token, the newest one
+ * answers. Think stack of sticky notes: read the top note first.
  *
  * @group Queries
  *
- * @param type - Unique query identifier to handle.
+ * @param type - Query token.
  * @returns Method decorator.
  *
  * @example
  * ```typescript
+ * import { Injectable, OnQuery } from "@wirestate/core";
+ *
+ * @Injectable()
  * class UserProfileService {
  *   @OnQuery("GET_USER_AVATAR")
  *   private async onGetUserAvatar(userId: string): Promise<string> {

@@ -7,26 +7,27 @@ import { DEACTIVATION_HANDLER_METADATA } from "../registry";
 import { Maybe } from "../types/general";
 
 /**
- * Decorator for service methods that should be executed before the service instance is deactivated.
+ * Runs a service method during container deactivation.
  *
  * @remarks
- * Methods decorated with `@OnDeactivation` are automatically invoked when the service
- * is being removed from the container or when the container itself is being disposed.
+ * Deactivation happens when the container unbinds or disposes the service.
  *
- * It is commonly used for cleanup, unsubscribing from events, or stopping background tasks.
- * A service class may declare only one `@OnDeactivation` method. If a base class already
- * declares a deactivation hook, override that method without redecorating it.
+ * Use it to cancel timers, close sockets, and flush work. A service hierarchy
+ * may have one deactivation hook name.
  *
  * @group Service
  *
- * @returns A method decorator function.
+ * @returns Method decorator.
  *
  * @example
  * ```typescript
- * class MyService {
+ * import { Injectable, OnDeactivation } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class FeedService {
  *   @OnDeactivation()
  *   public onDeactivation(): void {
- *     console.log("Service deactivating!");
+ *     this.disposeResources();
  *   }
  * }
  * ```

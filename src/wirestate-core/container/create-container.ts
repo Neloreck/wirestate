@@ -15,99 +15,95 @@ import { validateContainerConfig } from "./validate-container-config";
 import { WireScope } from "./wire-scope";
 
 /**
- * Describes which services should be resolved immediately after entries are bound.
+ * Services to resolve right after binding.
+ *
+ * `true` resolves every entry. An array resolves only those tokens. `false` or
+ * `undefined` leaves services lazy.
  */
 export type ContainerActivation = boolean | ReadonlyArray<ServiceIdentifier>;
 
 /**
- * Represents configuration options for {@link createContainer}.
+ * Represents options for {@link createContainer}.
  *
  * @group Container
  */
 export interface CreateContainerOptions {
   /**
-   * Optional parent container.
-   * Enables hierarchical resolution and sharing of bindings.
+   * Parent container for inherited bindings.
    */
   readonly parent?: Container;
 
   /**
-   * Initial data for the root seed.
-   * Accessible via {@link WireScope.getSeed}() in services.
+   * Shared seed object. Read it with `scope.getSeed()` or inject `SEED`.
    */
   readonly seed?: AnyObject;
 
   /**
-   * Targeted seeds bound to specific injectables or tokens.
+   * Seed values keyed by service class, string, or symbol.
    */
   readonly seeds?: SeedEntries;
 
   /**
-   * Injectables to be bound to the container.
-   *
-   * @remarks
-   * Supports class constructors and {@link InjectableDescriptor} configurations.
+   * Services or binding descriptors to register.
    */
   readonly entries?: ReadonlyArray<Newable<object> | InjectableDescriptor>;
 
   /**
-   * Services to resolve immediately.
-   *
-   * @remarks
-   * Pass an array to activate specific services. Listed services must also be
-   * present in the `entries` array. Pass `true` to activate all provided entries.
+   * Entries to resolve immediately after binding.
    */
   readonly activate?: ContainerActivation;
 }
 
 /**
- * Represents configuration object accepted by {@link createContainer}.
+ * Represents reusable {@link createContainer} config.
  *
  * @remarks
- * Alias for {@link CreateContainerOptions}. Prefer this name when storing or
- * passing reusable container configuration values.
+ * Alias for {@link CreateContainerOptions}. Use it for provider configs stored
+ * outside JSX or element code.
  *
  * @group Container
  */
 export type ContainerConfig = CreateContainerOptions;
 
 /**
- * Creates an Inversify {@link Container} pre-configured with Wirestate essentials.
+ * Creates a Wirestate container.
  *
  * @remarks
- * The container is initialized with:
- * - State management tokens: `SEEDS_TOKEN` and `SEED_TOKEN`.
- * - Messaging buses: {@link EventBus}, {@link QueryBus}, {@link CommandBus}.
- * - Service bridge: {@link WireScope} (bound in transient scope).
- * - Default scope set to `Singleton`.
+ * This is an Inversify container with Wirestate pieces already installed:
+ *
+ * - Shared seed and targeted seed tokens.
+ * - Container-scoped `EventBus`, `CommandBus`, and `QueryBus`.
+ * - Transient `WireScope`, so each service gets its own scope handle.
+ * - Singleton default scope for normal services.
+ *
+ * Child containers inherit parent bindings, but get their own buses and seeds.
+ * Think of a child container like a nested workbench: it can borrow parent
+ * tools, but it keeps its own inbox.
  *
  * @group Container
  *
- * @param options - {@link CreateContainerOptions} configuration.
- * @returns A new Inversify {@link Container} instance.
+ * @param options - Container setup.
+ * @returns A new Wirestate-ready {@link Container}.
+ *
+ * @throws {@link WirestateError} If `activate` names a token missing from `entries`.
  *
  * @example
  * ```typescript
- * const container: Container = createContainer({
- *   seeds: [
- *     [CounterService, { count: 1000 }],
- *     ["SOME_KEY", "VALUE"],
- *   ],
- *   entries: [CounterService, LoggerService],
- *   activate: [LoggerService]
- * });
+ * import { Container, Injectable, createContainer } from "@wirestate/core";
  *
- * bindService(container, MyService);
- * ```
+ * @Injectable()
+ * class LoggerService {}
  *
- * @example
- * ```typescript
+ * @Injectable()
+ * class CounterService {}
+ *
  * const container: Container = createContainer({
  *   entries: [CounterService, LoggerService],
- *   activate: true
+ *   seeds: [[CounterService, { count: 10 }]],
+ *   activate: [LoggerService],
  * });
  *
- * bindService(container, MyService);
+ * const logger = container.get(LoggerService);
  * ```
  */
 export function createContainer(options: CreateContainerOptions = {}): Container {

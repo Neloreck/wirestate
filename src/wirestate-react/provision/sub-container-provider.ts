@@ -16,7 +16,7 @@ import { shallowEqualActivation, shallowEqualArrays, shallowEqualObjects } from 
 import { ProvisionLifecycle, retainContainer, scheduleContainerDestruction } from "./provision-lifecycle";
 
 /**
- * Child-container inputs controlled by {@link SubContainerProvider}.
+ * Represents child-container inputs controlled by {@link SubContainerProvider}.
  *
  * @internal
  */
@@ -28,7 +28,9 @@ interface SubContainerSource {
 }
 
 /**
- * Active child-container state stored in component state.
+ * Represents active child-container state stored in the component state.
+ *
+ * @internal
  */
 interface SubContainerState {
   readonly container: Container;
@@ -36,7 +38,7 @@ interface SubContainerState {
 }
 
 /**
- * Props accepted by {@link SubContainerProvider}.
+ * Represents props for {@link SubContainerProvider}.
  *
  * @group Provision
  */
@@ -75,16 +77,34 @@ export interface SubContainerProviderProps {
 }
 
 /**
- * Provides a child container derived from the nearest parent container.
+ * Provides a managed child container under the nearest parent container.
  *
  * @remarks
- * The provider owns the child container. It recreates when the normalized
- * source inputs change by shallow comparison.
+ * Use it for subtree-local services: a checkout flow, modal, wizard step, or
+ * tenant branch. The child inherits parent bindings but owns its buses, seeds,
+ * lifecycle, and disposal.
  *
  * @group Provision
  *
  * @param props - Provider props.
  * @returns A React context provider for the child container.
+ *
+ * @example
+ * ```tsx
+ * import { Injectable } from "@wirestate/core";
+ * import { SubContainerProvider } from "@wirestate/react";
+ *
+ * @Injectable()
+ * class CheckoutService {}
+ *
+ * export function CheckoutScope() {
+ *   return (
+ *     <SubContainerProvider entries={[CheckoutService]}>
+ *       <Checkout />
+ *     </SubContainerProvider>
+ *   );
+ * }
+ * ```
  */
 export function SubContainerProvider(props: SubContainerProviderProps) {
   const lifecycleRef = useRef<Optional<ProvisionLifecycle>>(null);

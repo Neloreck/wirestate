@@ -7,21 +7,28 @@ import { SeedEntries, SeedsMap } from "../types/initial-state";
 import { SEEDS_TOKEN } from "./tokens";
 
 /**
- * Removes specific targeted seeds from the container's internal seed map.
+ * Removes targeted seed values from a container.
  *
  * @remarks
- * This is typically called during provider unmounting to ensure that only
- * the seeds owned by that specific provider are removed, leaving other
- * providers' seeds intact.
+ * This removes by key. The seed values in `seeds` are ignored.
  *
  * @group Seeds
  *
- * @param container - The Inversify {@link Container} to clean up.
- * @param seeds - Targeted seed entries to remove.
+ * @param container - Container to update.
+ * @param seeds - Seed entries whose keys should be removed.
  *
  * @example
  * ```typescript
- * unapplySeeds(container, [[UserService, { initialUser: "admin" }]]);
+ * import { Injectable, createContainer, unapplySeeds } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class CounterService {}
+ *
+ * const container = createContainer({
+ *   seeds: [[CounterService, { count: 10 }]],
+ * });
+ *
+ * unapplySeeds(container, [[CounterService, { count: 10 }]]);
  * ```
  */
 export function unapplySeeds(container: Container, seeds: SeedEntries): void {

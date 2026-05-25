@@ -1,7 +1,7 @@
 import { MaybePromise } from "./general";
 
 /**
- * Represents identifier used to dispatch and handle commands.
+ * Represents token used to dispatch and handle commands.
  *
  * @remarks
  * Use strings for public commands and symbols for private/scoped commands to avoid name collisions.
@@ -23,7 +23,7 @@ import { MaybePromise } from "./general";
 export type CommandType = string | symbol;
 
 /**
- * Represents function signature for handling command execution.
+ * Represents the function that handles a command.
  *
  * @group Commands
  *
@@ -40,8 +40,9 @@ export type CommandType = string | symbol;
 export type CommandHandler<D = unknown, R = unknown> = (payload: D) => MaybePromise<R>;
 
 /**
- * Represents function returned when a command handler is registered.
- * Calling this function removes the handler from the command bus.
+ * Represents the function returned by command registration.
+ *
+ * Call it to remove that exact handler.
  *
  * @group Commands
  *
@@ -80,7 +81,7 @@ export enum CommandStatus {
 }
 
 /**
- * Represents a handle to an executing command.
+ * Represents the handle for a running command.
  *
  * @remarks
  * Returned by the command bus when a command is dispatched. It allows tracking

@@ -7,27 +7,29 @@ import { PROVISION_HANDLER_METADATA } from "../registry";
 import { Maybe } from "../types/general";
 
 /**
- * Decorator for service methods that should run when a framework provider exposes the service's container.
+ * Runs when a framework provider exposes the container.
  *
  * @remarks
- * Provider adapters call `@OnProvision` when a container is attached to a UI
- * subtree, for example by React or Lit `ContainerProvider` and
- * `SubContainerProvider` implementations. Use it for setup tied to provider
- * presence rather than container/service activation.
+ * React and Lit providers call this when a container enters a UI subtree.
+ * This is provider lifetime, not service lifetime.
  *
- * A service class may declare only one provision hook name. If a base class
- * declares one, subclasses may override and redecorate that same method name.
+ * Use it for UI-scoped subscriptions or resources that should follow a
+ * provider. A service hierarchy may have one provision hook name.
  *
  * @group Service
  *
- * @returns A method decorator function.
+ * @returns Method decorator.
  *
  * @example
  * ```typescript
- * class SomeService {
+ * import { Injectable, OnProvision } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class PanelService {
  *   @OnProvision()
  *   public onProvision(): void {
- *     // container is provided to a framework subtree
+ *     this.startPolling();
+ *     this.connect();
  *   }
  * }
  * ```

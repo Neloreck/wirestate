@@ -6,7 +6,7 @@ import { AnyObject, Interface, Optional } from "../types/general";
 import { OnEventController } from "./on-event-controller";
 
 /**
- * Represents type definition for the on-event decorator.
+ * Represents type returned by {@link onEvent}.
  *
  * @remarks
  * Supports both TC39 and legacy experimental decorators.

@@ -8,7 +8,7 @@ import { AnyObject, FieldMustMatchProvidedType, Interface, Optional } from "../t
 import type { OptionalInjectionFallback } from "./use-optional-injection";
 
 /**
- * Represents definition of the optional injection decorator.
+ * Represents type returned by {@link optionalInjection}.
  *
  * @remarks
  * Supports both TC39 and legacy experimental decorators.
@@ -29,7 +29,7 @@ export interface OptionalInjectionDecorator<T, F = null> {
 }
 
 /**
- * Represents options for the {@link optionalInjection} decorator.
+ * Represents options for {@link optionalInjection}.
  *
  * @group Consumption
  */
@@ -53,20 +53,19 @@ export interface OptionalInjectionOptions<T, F = null> {
 }
 
 /**
- * Decorator to optionally inject a service from the IoC container into a Lit element property.
+ * Injects a container value if it exists.
  *
  * @remarks
- * Unlike {@link injection}, this decorator assigns `null` when the dependency
- * is missing from the container and no fallback is provided.
+ * Missing token means fallback result, or `null` when no fallback exists.
  *
  * @group Consumption
  *
  * @template T - The type of the value being resolved.
  * @template F - The type returned by the fallback function.
  *
- * @param optionsOrInjectionId - Injection options or service identifier.
- * @param onFallback - Optional function called to provide a value if the token is not bound.
- * @returns An instance of {@link OptionalInjectionDecorator}.
+ * @param optionsOrInjectionId - Service token or options.
+ * @param onFallback - Fallback for missing bindings.
+ * @returns Lit property decorator.
  *
  * @example
  * ```typescript

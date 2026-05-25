@@ -5,7 +5,7 @@ import { FieldMustMatchProvidedType, Interface, Maybe } from "../types/general";
 import { SubContainerProvider, SubContainerProviderOptions } from "./sub-container-provider";
 
 /**
- * Represents type for the {@link subContainerProvide} decorator.
+ * Represents type returned by {@link subContainerProvide}.
  *
  * @remarks
  * Supports both TC39 and legacy experimental decorators.

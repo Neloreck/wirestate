@@ -7,7 +7,7 @@
 export type AnyObject = Record<string | symbol, any>;
 
 /**
- * Represents a value that can be null.
+ * Represents value that can be `T` or `null`.
  *
  * @template T - The base type.
  * @group general-types
@@ -15,7 +15,7 @@ export type AnyObject = Record<string | symbol, any>;
 export type Optional<T> = T | null;
 
 /**
- * Represents a value that can be a T or a Promise resolving to T.
+ * Represents value that can be `T` or a Promise of `T`.
  *
  * @template T - The base type.
  * @group general-types
@@ -23,7 +23,7 @@ export type Optional<T> = T | null;
 export type MaybePromise<T> = T | Promise<T>;
 
 /**
- * Represents a value that can be T, null, or undefined.
+ * Represents value that can be `T`, `null`, or `undefined`.
  *
  * @template T - The base type.
  * @group general-types

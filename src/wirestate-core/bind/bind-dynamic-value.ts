@@ -50,29 +50,38 @@ function validateDynamicValueDescriptor(entry: InjectableDescriptor): void {
 }
 
 /**
- * Binds a dynamic value (factory-based) to an identifier in the container.
+ * Binds a factory-backed value to a token.
  *
  * @remarks
- * Use this when the value depends on runtime state or requires logic during resolution.
- * The binding uses `entry.factory` if provided; otherwise, it falls back to `entry.value`.
- * Supports custom scoping via `entry.scopeBindingType`.
+ * Use this when the value depends on resolution time. A dynamic value is a
+ * vending machine: each resolution can ask the factory for a fresh item, unless
+ * you choose singleton scope.
  *
  * @group Bind
  *
- * @template T - Type of the value being bound.
+ * @template T - Value type.
  *
- * @param container - Target Inversify {@link Container}.
- * @param entry - Descriptor containing `id`, `factory` or `value`, and optional `scopeBindingType`.
+ * @param container - Container to bind into.
+ * @param entry - Descriptor with `id`, `factory` or `value`, and optional scope.
  * @returns Inversify fluent syntax for additional constraints.
+ *
+ * @throws {@link WirestateError} If the descriptor is invalid.
  *
  * @example
  * ```typescript
- * const DATE_NOW: unique symbol = Symbol("DATE_NOW");
+ * import { BindingType, ScopeBindingType, bindDynamicValue, createContainer } from "@wirestate/core";
+ *
+ * const DATE_NOW = Symbol("DATE_NOW");
+ * const container = createContainer();
  *
  * bindDynamicValue(container, {
  *   id: DATE_NOW,
- *   factory: () => new Date()
+ *   bindingType: BindingType.DynamicValue,
+ *   scopeBindingType: ScopeBindingType.Transient,
+ *   factory: () => new Date(),
  * });
+ *
+ * const now = container.get<Date>(DATE_NOW);
  * ```
  */
 export function bindDynamicValue<T>(container: Container, entry: InjectableDescriptor): BindWhenOnFluentSyntax<T> {

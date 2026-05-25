@@ -7,26 +7,27 @@ import { ACTIVATED_HANDLER_METADATA } from "../registry";
 import { Maybe } from "../types/general";
 
 /**
- * Decorator for service methods that should be executed after the service instance is activated.
+ * Runs a service method after container activation.
  *
  * @remarks
- * Methods decorated with `@OnActivated` are automatically invoked when the service
- * is resolved from the container and its activation lifecycle hook is triggered.
+ * Activation happens the first time the singleton service is resolved.
  *
- * It is commonly used for initial setup, subscribing to events, or starting background tasks.
- * A service class may declare only one `@OnActivated` method. If a base class already
- * declares an activation hook, override that method without redecorating it.
+ * Use it for seed reads, subscriptions, and startup work. A service hierarchy
+ * may have one activation hook name.
  *
  * @group Service
  *
- * @returns A method decorator function.
+ * @returns Method decorator.
  *
  * @example
  * ```typescript
- * class MyService {
+ * import { Injectable, OnActivated } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class FeedService {
  *   @OnActivated()
  *   public onActivated(): void {
- *     console.log("Service activated!");
+ *     this.initializeFromSeed();
  *   }
  * }
  * ```

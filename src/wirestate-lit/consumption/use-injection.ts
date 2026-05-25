@@ -9,7 +9,7 @@ import { ContainerContext } from "../context/container-context";
 import { Optional } from "../types/general";
 
 /**
- * Represents options for the {@link useInjection} hook.
+ * Represents options for {@link useInjection}.
  *
  * @group Consumption
  */
@@ -33,7 +33,7 @@ export interface UseInjectionOptions<T> {
 }
 
 /**
- * Represents result of the {@link useInjection} hook.
+ * Represents value returned by {@link useInjection}.
  *
  * @group Consumption
  */
@@ -49,13 +49,13 @@ export interface UseInjectionValue<T> {
 }
 
 /**
- * Hook (controller) to inject a service from the IoC container.
+ * Consumes a service from the nearest Lit container context.
  *
  * @group Consumption
  *
- * @param host - The host element.
- * @param optionsOrInjectionId - Injection options or service identifier.
- * @returns An instance of {@link UseInjectionValue}.
+ * @param host - Host element.
+ * @param optionsOrInjectionId - Service token or options.
+ * @returns Mutable injection holder.
  *
  * @example
  * ```typescript

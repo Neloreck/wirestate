@@ -10,22 +10,22 @@ import { ContainerContext } from "../context/container-context";
 import { UseInjectionValue } from "./use-injection";
 
 /**
- * Represents result of the {@link useScope} hook.
+ * Represents value returned by {@link useScope}.
  *
  * @group Consumption
  */
 export type UseScopeValue = UseInjectionValue<WireScope>;
 
 /**
- * Hook (consumer) to access the active {@link WireScope} from the nearest parent context.
+ * Consumes a {@link WireScope} from the nearest Lit container context.
  *
  * @remarks
  * The returned value updates when the nearest provided container changes.
  *
  * @group Consumption
  *
- * @param host - The host element.
- * @returns An instance of {@link UseScopeValue}.
+ * @param host - Host element.
+ * @returns Mutable scope holder.
  *
  * @example
  * ```typescript

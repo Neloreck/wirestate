@@ -12,26 +12,43 @@ import { getDeprovisionHandlerMetadata } from "./on-deprovision";
 import { getProvisionHandlerMetadata } from "./on-provision";
 
 /**
- * Tracks provider lifecycle services by container for framework adapters.
+ * Represents provider lifecycle state keyed by container.
+ *
+ * Framework adapters keep one map per provider tree.
  *
  * @group Service
  */
 export type ProvisionLifecycle = Map<Container, Array<object>>;
 
 /**
- * Resolves provider lifecycle services and calls their provision hooks once per provision cycle.
+ * Provisions a container for a framework provider.
  *
  * @remarks
- * Framework adapters call this when a container becomes available to a UI
- * subtree. Lifecycle services are resolved even if the container was not
- * otherwise eagerly activated, so `@OnActivated` still runs before
- * `@OnProvision`.
+ * Resolves lifecycle participants and calls `@OnProvision` once for this
+ * provision cycle. It also tracks injected `WireScope` instances so
+ * `scope.isDeprovisioned` matches provider ownership.
  *
  * @group Service
  *
- * @param container - Container that owns the entries.
+ * @param container - Container entering provider ownership.
  * @param lifecycle - Provider lifecycle state.
  * @param entries - Entries controlled by the provider.
+ *
+ * @example
+ * ```typescript
+ * import { Injectable, OnProvision, createContainer, provisionContainer } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class PanelService {
+ *   @OnProvision()
+ *   public connect(): void {}
+ * }
+ *
+ * const container = createContainer({ entries: [PanelService] });
+ * const lifecycle = new Map();
+ *
+ * provisionContainer(container, lifecycle, [PanelService]);
+ * ```
  */
 export function provisionContainer(
   container: Container,
@@ -53,12 +70,29 @@ export function provisionContainer(
 }
 
 /**
- * Calls deprovision hooks for services provisioned in the current provision cycle.
+ * Deprovisions a container for a framework provider.
  *
  * @group Service
  *
- * @param container - Container being removed from provider ownership.
+ * @param container - Container leaving provider ownership.
  * @param lifecycle - Provider lifecycle state.
+ *
+ * @example
+ * ```typescript
+ * import { Injectable, OnDeprovision, createContainer, deprovisionContainer, provisionContainer } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class PanelService {
+ *   @OnDeprovision()
+ *   public disconnect(): void {}
+ * }
+ *
+ * const container = createContainer({ entries: [PanelService] });
+ * const lifecycle = new Map();
+ *
+ * provisionContainer(container, lifecycle, [PanelService]);
+ * deprovisionContainer(container, lifecycle);
+ * ```
  */
 export function deprovisionContainer(container: Container, lifecycle: ProvisionLifecycle): void {
   const services: Maybe<Array<object>> = lifecycle.get(container);
@@ -75,20 +109,35 @@ export function deprovisionContainer(container: Container, lifecycle: ProvisionL
 }
 
 /**
- * Resolves services that declare provider lifecycle hooks or receive WireScope, then calls provision hooks.
+ * Resolves provider lifecycle participants and calls provision hooks.
  *
  * @remarks
- * Provisioning is intentionally split into two phases: all provider lifecycle
- * participants are first resolved so activation completes, then `@OnProvision`
- * hooks run in entry order for services that declare them. Services that inject
- * `WireScope` participate even without provider hooks so their scope
- * deprovision state can be tracked.
+ * Provisioning runs in two passes:
+ *
+ * - Resolve services first, so `@OnActivated` completes before provider hooks.
+ * - Call `@OnProvision` in entry order.
+ *
+ * Services that inject `WireScope` participate even without provider hooks.
  *
  * @group Service
  *
  * @param container - Container that owns the entries.
  * @param entries - Entries controlled by the provider.
  * @returns Services that were resolved for provider lifecycle management.
+ *
+ * @example
+ * ```typescript
+ * import { Injectable, OnProvision, createContainer, provisionServices } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class PanelService {
+ *   @OnProvision()
+ *   public connect(): void {}
+ * }
+ *
+ * const container = createContainer({ entries: [PanelService] });
+ * const services = provisionServices(container, [PanelService]);
+ * ```
  */
 export function provisionServices(container: Container, entries: InjectableEntries = []): Array<object> {
   const services: Array<object> = [];
@@ -122,11 +171,27 @@ export function provisionServices(container: Container, entries: InjectableEntri
 }
 
 /**
- * Calls deprovision hooks for services previously resolved by {@link provisionServices}.
+ * Calls deprovision hooks for provisioned services.
  *
  * @group Service
  *
  * @param services - Services resolved during provider provisioning.
+ *
+ * @example
+ * ```typescript
+ * import { Injectable, OnDeprovision, createContainer, deprovisionServices, provisionServices } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class PanelService {
+ *   @OnDeprovision()
+ *   public disconnect(): void {}
+ * }
+ *
+ * const container = createContainer({ entries: [PanelService] });
+ * const services = provisionServices(container, [PanelService]);
+ *
+ * deprovisionServices(services);
+ * ```
  */
 export function deprovisionServices(services: ReadonlyArray<object>): void {
   for (let index: number = services.length - 1; index >= 0; index -= 1) {

@@ -4,7 +4,7 @@ import { QueryHandler, QueryType } from "@wirestate/core";
 import { OnQueryController } from "./on-query-controller";
 
 /**
- * Represents options for the {@link useOnQuery} hook.
+ * Represents options for {@link useOnQuery}.
  *
  * @group Queries
  */
@@ -20,15 +20,15 @@ export interface UseOnQueryOptions<D = unknown, R = unknown> {
 }
 
 /**
- * Hook that registers a query handler for the host element's lifetime.
+ * Registers a query handler for the host element's lifetime.
  *
  * @group Queries
  *
- * @param host - The host element.
+ * @param host - Host element.
  * @param options - Query handling options.
  * @param options.type - The query type to handle.
  * @param options.handler - The query handler function.
- * @returns An instance of {@link OnQueryController}.
+ * @returns Query controller.
  *
  * @example
  * ```typescript

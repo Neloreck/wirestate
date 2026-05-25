@@ -4,32 +4,44 @@ import { prefix } from "@/macroses/prefix.macro";
 import { Event, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 
 /**
- * Orchestrates event broadcasting to multiple subscribers.
+ * Broadcasts events to every subscriber in one container.
  *
  * @remarks
- * The `EventBus` facilitates decoupled, many-to-many communication.
- * Unlike commands or queries, which are dispatched to a single handler,
- * events are broadcast to all registered subscribers.
+ * Events are fire-and-forget. No handler owns the result because there is no
+ * result. Use them for "this happened" notifications.
  *
  * @group Events
+ *
+ * @example
+ * ```typescript
+ * import { EventBus, createContainer } from "@wirestate/core";
+ *
+ * const container = createContainer();
+ * const bus = container.get(EventBus);
+ * const unsubscribe = bus.subscribe((event) => console.log(event.type));
+ *
+ * bus.emit("USER_LOGGED_IN", { userId: "u1" });
+ * unsubscribe();
+ * ```
  */
 export class EventBus {
   private readonly handlers: Set<EventHandler> = new Set();
 
   /**
-   * Broadcasts an event to all registered subscribers.
+   * Broadcasts an event to all subscribers.
    *
    * @remarks
-   * Handlers are executed in a try-catch block to ensure that a single
-   * failing subscriber does not prevent others from receiving the event.
+   * The bus snapshots subscribers before dispatch. A handler can unsubscribe
+   * while an event is being emitted. A thrown handler is logged and the next
+   * handler still runs.
    *
    * @template P - Type of the event payload.
    * @template T - Type of the event identifier.
    * @template F - Type of the event source.
    *
-   * @param type - Event identifier.
-   * @param payload - Optional data associated with the event.
-   * @param from - Optional source identifier.
+   * @param type - Event token.
+   * @param payload - Event payload.
+   * @param from - Event source.
    *
    * @example
    * ```typescript
@@ -63,10 +75,10 @@ export class EventBus {
   }
 
   /**
-   * Registers a handler to receive all broadcasted events.
+   * Subscribes to every event.
    *
-   * @param handler - Function invoked for every emitted event.
-   * @returns An {@link EventUnsubscriber} function to remove the subscription.
+   * @param handler - Event handler.
+   * @returns Function that removes this subscription.
    *
    * @example
    * ```typescript

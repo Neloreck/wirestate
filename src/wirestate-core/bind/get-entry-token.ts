@@ -2,27 +2,26 @@ import { Newable, ServiceIdentifier } from "../alias";
 import { InjectableDescriptor } from "../types/provision";
 
 /**
- * Resolves the identifier for a given entry.
+ * Returns the token for an entry.
  *
  * @remarks
- * Handles both plain service classes and injectable descriptors:
- * - If `entry` is a class constructor, it is returned as the identifier.
- * - If `entry` is an {@link InjectableDescriptor}, its `id` field is returned.
+ * Classes are their own tokens. Descriptors use `id`.
  *
  * @group Bind
  *
- * @template T - Type of the injectable object.
+ * @template T - Injectable type.
  *
- * @param entry - Class constructor or descriptor to get the identifier for.
- * @returns Identifier token for Inversify.
+ * @param entry - Service class or descriptor.
+ * @returns Token used for container resolution.
  *
  * @example
  * ```typescript
- * class MyService {}
+ * import { getEntryToken } from "@wirestate/core";
  *
- * getEntryToken(MyService); // returns MyService
+ * class UserService {}
  *
- * getEntryToken({ id: "my-service" }); // returns "my-service"
+ * const classToken = getEntryToken(UserService);
+ * const configToken = getEntryToken({ id: "CONFIG", value: { retries: 2 } });
  * ```
  */
 export function getEntryToken<T extends object = object>(entry: Newable<T> | InjectableDescriptor): ServiceIdentifier {

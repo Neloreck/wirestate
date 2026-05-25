@@ -34,8 +34,9 @@ import { registerContainerEntry } from "./bind-register";
  */
 export interface BindServiceOptions {
   /**
-   * If true, suppresses execution of `@OnActivated` and `@OnDeactivation` methods.
-   * Messaging registrations (commands, queries, events) are still processed.
+   * Skip `@OnActivated` and `@OnDeactivation`.
+   *
+   * Command, query, and event handlers are still wired.
    *
    * @default false
    */
@@ -43,55 +44,49 @@ export interface BindServiceOptions {
 }
 
 /**
- * Binds a service class in the {@link Container} with full lifecycle and messaging integration.
+ * Binds a service class as a Wirestate singleton.
  *
  * @remarks
- * Binds the class in singleton scope and configures Inversify activation/deactivation hooks to:
- * - Track activation state for injected {@link WireScope} instances.
- * - Trigger `@OnActivated` and `@OnDeactivation` decorated methods.
- * - Register/unregister `@OnCommand`, `@OnEvent` and `@OnQuery` handlers.
- * - Set up event dispatching and bus subscriptions.
- * - Track and dispose injected {@link WireScope} instances.
+ * Use this for classes that should participate in Wirestate lifecycle.
+ *
+ * The binding does four jobs:
+ *
+ * - Resolves one service instance per container.
+ * - Runs `@OnActivated` and `@OnDeactivation`.
+ * - Registers `@OnEvent`, `@OnCommand`, and `@OnQuery` handlers.
+ * - Tracks injected `WireScope` instances so stale async work can stop.
  *
  * @group Bind
  *
- * @template T - Type of the service instance.
+ * @template T - Service instance type.
  *
- * @param container - Target Inversify {@link Container}.
- * @param entry - Service class constructor.
- * @param options - Configuration options for the binding.
+ * @param container - Container to bind into.
+ * @param entry - Service class.
+ * @param options - Binding options.
  *
  * @example
  * ```typescript
+ * import { Injectable, OnCommand, bindService, createContainer } from "@wirestate/core";
+ *
  * @Injectable()
- * class UserService {
- *   @OnActivated()
- *   public onActivated(): void {
- *     console.log("UserService activated");
+ * class SessionService {
+ *   private active = false;
+ *
+ *   @OnCommand("LOGIN")
+ *   public login(): void {
+ *     this.active = true;
  *   }
  *
- *   @OnDeactivation()
- *   public onDeactivation(): void {
- *     console.log("UserService deactivating");
- *   }
- *
- *   @OnEvent("USER_LOGGED_IN")
- *   private onUserLoggedIn(event: UserLoggedInEvent) {
- *     console.log('User logged in:', event.payload);
- *   }
- *
- *   @OnCommand("LOG_DATE_NOW")
- *   private onLogDateNow(): void {
- *     console.log("Date now:", new Date());
- *   }
- *
- *   @OnQuery("DATE_NOW")
- *   private onQueryDateNow(): Date {
- *     return new Date();
+ *   public isActive(): boolean {
+ *     return this.active;
  *   }
  * }
  *
- * bindService(container, UserService);
+ * const container = createContainer();
+ *
+ * bindService(container, SessionService);
+ *
+ * const service = container.get(SessionService);
  * ```
  */
 export function bindService<T extends object>(

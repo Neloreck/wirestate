@@ -6,19 +6,23 @@ import { CommandHandlerMetadata, CommandType } from "../types/commands";
 import { Maybe } from "../types/general";
 
 /**
- * Decorator for service methods that handle a specific command.
+ * Marks a service method as a command handler.
  *
  * @remarks
- * Methods decorated with `@OnCommand` are registered as command handlers when
- * the service activates through {@link bindService}.
+ * The handler registers when the service activates and unregisters when the
+ * service deactivates. One command call goes to one handler: the newest
+ * registered handler for that token.
  *
  * @group Commands
  *
- * @param type - Unique identifier of the command to handle.
- * @returns A method decorator function.
+ * @param type - Command token.
+ * @returns Method decorator.
  *
  * @example
  * ```typescript
+ * import { Injectable, OnCommand } from "@wirestate/core";
+ *
+ * @Injectable()
  * class UserService {
  *   @OnCommand("USER_LOGIN")
  *   private onUserLogin(credentials: Credentials): Promise<Session> {

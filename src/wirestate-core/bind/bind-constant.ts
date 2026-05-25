@@ -40,30 +40,35 @@ function validateConstantDescriptor(entry: InjectableDescriptor): void {
 }
 
 /**
- * Binds a constant value to a service identifier in the container.
+ * Binds a fixed value to a token.
  *
  * @remarks
- * Use this to register configuration values, primitive constants, or pre-instantiated objects.
- * Constant values are bound with a singleton scope by default.
+ * Use constants for config, adapters, and test doubles. The same value comes
+ * back every time. No constructor runs.
  *
  * @group Bind
  *
- * @template T - Type of the service being bound.
+ * @template T - Value type.
  *
- * @param container - Target Inversify {@link Container}.
- * @param entry - Descriptor containing `id` (token) and `value` (constant).
+ * @param container - Container to bind into.
+ * @param entry - Descriptor with `id` and `value`.
  * @returns Inversify fluent syntax for additional constraints.
  *
  * @throws {@link WirestateError} If `entry.scopeBindingType` is not `Singleton`.
  *
  * @example
  * ```typescript
- * const API_URL: unique symbol = Symbol("API_URL");
+ * import { bindConstant, createContainer } from "@wirestate/core";
+ *
+ * const API_URL = Symbol("API_URL");
+ * const container = createContainer();
  *
  * bindConstant(container, {
  *   id: API_URL,
- *   value: "https://api.example.com"
+ *   value: "https://api.example.com",
  * });
+ *
+ * const apiUrl = container.get<string>(API_URL);
  * ```
  */
 export function bindConstant<T>(container: Container, entry: InjectableDescriptor): BindWhenOnFluentSyntax<T> {
