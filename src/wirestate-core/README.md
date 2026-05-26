@@ -230,7 +230,7 @@ Injected `WireScope` instances expose lifecycle state for async guards:
 | `resolve(token)`                          | Resolve a service or value by token                                                         |
 | `resolveOptional(token)`                  | Resolve a service or value, returns `null` if not bound                                     |
 | `getSeed(token?)`                         | Get the per-service or shared seed                                                          |
-| `emitEvent(type, payload?, from?)`        | Emit an event                                                                               |
+| `emitEvent(type, payload?, options?)`     | Emit an event; `options.from` defaults to the current scope                                 |
 | `subscribeToEvent(handler)`               | Subscribe a handler to all events; returns unsubscribe function                             |
 | `unsubscribeFromEvent(handler)`           | Remove a specific event subscription by handler reference                                   |
 | `queryData(type, data?)`                  | Dispatch a synchronous query and return the result                                          |

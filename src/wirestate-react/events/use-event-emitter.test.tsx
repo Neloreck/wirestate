@@ -27,9 +27,9 @@ describe("useEventEmitter", () => {
 
     render(withContainerProvider(<TestComponent />, container));
 
-    (emitter as EventEmitter)("TEST_EVENT", { foo: "bar" }, "source");
+    (emitter as EventEmitter)("TEST_EVENT", { foo: "bar" }, { from: "source" });
 
-    expect(bus.emit).toHaveBeenCalledWith("TEST_EVENT", { foo: "bar" }, "source");
+    expect(bus.emit).toHaveBeenCalledWith("TEST_EVENT", { foo: "bar" }, { from: "source" });
     expect(handler).toHaveBeenCalledWith({
       type: "TEST_EVENT",
       payload: { foo: "bar" },

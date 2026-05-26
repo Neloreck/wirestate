@@ -1,11 +1,10 @@
-import { EventType } from "@wirestate/core";
+import { EventEmitOptions, EventType } from "@wirestate/core";
 
 /**
  * Represents the function returned by {@link useEventEmitter}.
  *
  * @remarks
- * Typically returned by {@link useEventEmitter}. Supports optional payload
- * and source identifier.
+ * Typically returned by {@link useEventEmitter}. Supports optional payload and options.
  *
  * @group Events
  *
@@ -15,10 +14,10 @@ import { EventType } from "@wirestate/core";
  *
  * @param type - The event identifier.
  * @param payload - Optional data associated with the event.
- * @param from - Optional identifier of the event source.
+ * @param options - Optional emit options.
  */
 export type EventEmitter<P = unknown, T extends EventType = EventType, F = unknown> = (
   type: T,
   payload?: P,
-  from?: F
+  options?: EventEmitOptions<F>
 ) => void;

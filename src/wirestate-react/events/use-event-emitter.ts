@@ -1,4 +1,4 @@
-import { Container, EventBus, EventType } from "@wirestate/core";
+import { Container, EventBus, EventEmitOptions, EventType } from "@wirestate/core";
 import { useCallback } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -18,6 +18,7 @@ import { EventEmitter } from "../types/events";
  *
  * @template P - Default payload type for emitted events.
  * @template T - Default event identifier type.
+ * @template F - Default source identifier type.
  *
  * @returns An event emitter function.
  *
@@ -25,21 +26,21 @@ import { EventEmitter } from "../types/events";
  * ```tsx
  * const emit: EventEmitter = useEventEmitter();
  *
- * const onClick = () => emit("BUTTON_CLICKED", { id: "submit" });
+ * const onClick = () => emit("BUTTON_CLICKED", { id: "submit" }, { from: "submit-button" });
  * ```
  */
-export function useEventEmitter<P = unknown, T extends EventType = EventType>(): EventEmitter<P, T> {
+export function useEventEmitter<P = unknown, T extends EventType = EventType, F = unknown>(): EventEmitter<P, T, F> {
   const container: Container = useContainer();
 
   return useCallback(
-    <P, T extends EventType>(type: T, payload?: P, from?: unknown) => {
+    <P, T extends EventType>(type: T, payload?: P, options?: EventEmitOptions<F>) => {
       dbg.info(prefix(__filename), "Emit event:", {
         type,
         payload,
-        from,
+        options,
       });
 
-      container.get(EventBus).emit(type, payload, from);
+      container.get(EventBus).emit(type, payload, options);
     },
     [container]
   );

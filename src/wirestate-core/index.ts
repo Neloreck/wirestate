@@ -52,4 +52,4 @@ export { SeedsMap, SeedEntries, SeedEntry, SeedKey } from "./types/initial-state
 export { InjectableDescriptor, InjectableEntries } from "./types/provision";
 export { CommandStatus, CommandDescriptor, CommandHandler, CommandType, CommandUnregister } from "./types/commands";
 export { QueryHandler, QueryType, QueryUnregister } from "./types/queries";
-export { Event, EventHandler, EventType, EventUnsubscriber } from "./types/events";
+export { Event, EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "./types/events";

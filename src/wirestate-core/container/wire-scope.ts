@@ -9,7 +9,7 @@ import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 import { CommandDescriptor, CommandHandler, CommandUnregister, CommandType } from "../types/commands";
-import { EventHandler, EventType, EventUnsubscriber } from "../types/events";
+import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 import { Optional, AnyObject } from "../types/general";
 import { SeedKey, SeedsMap } from "../types/initial-state";
 import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
@@ -175,7 +175,7 @@ export class WireScope {
    *
    * @param type - Event identifier.
    * @param payload - Optional data associated with the event.
-   * @param from - Optional source identifier (defaults to current scope).
+   * @param options - Event emission options.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
    *
@@ -184,16 +184,18 @@ export class WireScope {
    * scope.emitEvent("VALUE_CHANGED", { value: "abcd" });
    * ```
    */
-  public emitEvent<P, T extends EventType = EventType>(type: T, payload?: P, from?: unknown): void {
+  public emitEvent<P, T extends EventType = EventType, F = unknown>(
+    type: T,
+    payload?: P,
+    options?: EventEmitOptions<F>
+  ): void {
     dbg.info(prefix(__filename), "Emit event:", {
       type,
       payload,
-      from: from === undefined ? this : from,
+      options,
     });
 
-    this.getContainer()
-      .get(EventBus)
-      .emit(type, payload, from === undefined ? this : from);
+    this.getContainer().get(EventBus).emit(type, payload, options);
   }
 
   /**

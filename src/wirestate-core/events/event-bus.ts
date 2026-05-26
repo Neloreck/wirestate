@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Event, EventHandler, EventType, EventUnsubscriber } from "../types/events";
+import { Event, EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 
 /**
  * Broadcasts events to every subscriber in one container.
@@ -41,14 +41,18 @@ export class EventBus {
    *
    * @param type - Event token.
    * @param payload - Event payload.
-   * @param from - Event source.
+   * @param options - Event emission options.
    *
    * @example
    * ```typescript
-   * eventBus.emit("USER_LOGGED_IN", { userId: "123" }, AuthService);
+   * eventBus.emit("USER_LOGGED_IN", { userId: "123" }, { from: authService });
    * ```
    */
-  public emit<P = unknown, T extends EventType = EventType, F = unknown>(type: T, payload?: P, from?: F): void {
+  public emit<P = unknown, T extends EventType = EventType, F = unknown>(
+    type: T,
+    payload?: P,
+    options?: EventEmitOptions<F>
+  ): void {
     // Snapshot prevents concurrent modification errors if handlers sub/unsub during emit.
     const snapshot: Array<EventHandler> = Array.from(this.handlers);
 
@@ -62,8 +66,8 @@ export class EventBus {
           (event as { payload: P }).payload = payload;
         }
 
-        if (from !== undefined) {
-          (event as { from: F }).from = from;
+        if (options?.from !== undefined) {
+          (event as { from: F }).from = options.from;
         }
 
         handler(event);

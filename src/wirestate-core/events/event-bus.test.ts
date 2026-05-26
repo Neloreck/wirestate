@@ -18,7 +18,7 @@ describe("EventBus", () => {
     const handler = jest.fn();
 
     bus.subscribe(handler);
-    bus.emit("TEST", undefined, undefined);
+    bus.emit("TEST", undefined, {});
 
     const event = handler.mock.calls[0][0];
 
@@ -32,8 +32,8 @@ describe("EventBus", () => {
     const handler = jest.fn();
 
     bus.subscribe(handler);
-    bus.emit("TEST_WITH_SOURCE", undefined, "source");
-    bus.emit("TEST_WITH_PAYLOAD", 42, undefined);
+    bus.emit("TEST_WITH_SOURCE", undefined, { from: "source" });
+    bus.emit("TEST_WITH_PAYLOAD", 42, {});
 
     const sourceEvent = handler.mock.calls[0][0];
     const payloadEvent = handler.mock.calls[1][0];
@@ -50,9 +50,9 @@ describe("EventBus", () => {
     const handler = jest.fn();
 
     bus.subscribe(handler);
-    bus.emit("NULL_VALUES", null, null);
-    bus.emit("ZERO_VALUES", 0, 0);
-    bus.emit("FALSE_VALUES", false, false);
+    bus.emit("NULL_VALUES", null, { from: null });
+    bus.emit("ZERO_VALUES", 0, { from: 0 });
+    bus.emit("FALSE_VALUES", false, { from: false });
 
     expect(handler).toHaveBeenNthCalledWith(1, { type: "NULL_VALUES", payload: null, from: null });
     expect(handler).toHaveBeenNthCalledWith(2, { type: "ZERO_VALUES", payload: 0, from: 0 });

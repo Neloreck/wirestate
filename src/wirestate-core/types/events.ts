@@ -19,6 +19,20 @@ export interface Event<P = unknown, T extends EventType = EventType, F = unknown
 }
 
 /**
+ * Options used when emitting an event.
+ *
+ * @group Events
+ *
+ * @template F - Type of the event source.
+ */
+export interface EventEmitOptions<F = unknown> {
+  /**
+   * Optional source identifier attached to the emitted event.
+   */
+  readonly from?: F;
+}
+
+/**
  * Represents the function that handles an event.
  *
  * @group Events

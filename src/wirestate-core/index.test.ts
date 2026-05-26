@@ -78,6 +78,7 @@ describe("Library exported API from wirestate-core", () => {
     "CreateContainerOptions",
     "Event",
     "EventBus",
+    "EventEmitOptions",
     "EventHandler",
     "EventType",
     "EventUnsubscriber",

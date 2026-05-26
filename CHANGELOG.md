@@ -35,7 +35,7 @@
 - Make `QueryBus.query` and `QueryBus.queryOptional` synchronous by default, with `queryAsync` and `queryOptionalAsync` for Promise-normalized consumers.
 - Rename React command/query executor APIs from the earlier `Caller` naming to `Executor`: `CommandExecutor`, `OptionalCommandExecutor`, `QueryExecutor`, `AsyncQueryExecutor`, `OptionalQueryExecutor`, `OptionalAsyncQueryExecutor`, `useCommandExecutor`, `useOptionalCommandExecutor`, `useQueryExecutor`, `useOptionalQueryExecutor`, `useAsyncQueryExecutor`, and `useOptionalAsyncQueryExecutor`.
 - Update React query hooks to match the sync/async split: `useQueryExecutor`, `useOptionalQueryExecutor`, `useAsyncQueryExecutor`, and `useOptionalAsyncQueryExecutor`.
-- Change `EventBus.emit` to accept `(type, payload?, from?)`, matching `WireScope.emitEvent` and React event emitters.
+- Change event emitters to accept `(type, payload?, options?)` with `options.from` instead of a positional `from` argument.
 - Simplify event payload typing and event dispatch construction.
 - Split React `ContainerProvider` props into external `container` mode and managed `config` mode.
 - Normalize managed React provider activation to `true`, recreate managed containers when shallow-compared config inputs change, and dispose only owned containers.

@@ -22,7 +22,7 @@ export class CartService {
   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
   public addItem(item: CartItem): void {
-    this.scope.emitEvent("CART_ITEM_ADDED", item, this);
+    this.scope.emitEvent("CART_ITEM_ADDED", item, { from: this });
   }
 }
 

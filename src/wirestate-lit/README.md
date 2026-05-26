@@ -241,7 +241,9 @@ class MyComponent extends LitElement {
 
 ### Events
 
-Subscribe to events from the event bus using `@onEvent` decorator or `useOnEvents` controller. Handlers follow the active container context when the nearest container changes.
+Subscribe to events from the event bus using `@onEvent` decorator or `useOnEvents` controller. Handlers follow the
+active container context when the nearest container changes. Emit with `WireScope.emitEvent(type, payload?, { from })`
+when an event should carry an explicit source.
 
 ```typescript
 import { LitElement } from "lit";

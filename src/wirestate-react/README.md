@@ -151,6 +151,7 @@ const emit = useEventEmitter();
 
 emit("RESET");
 emit("ADD", { amount: 5 });
+emit("OPENED", { panel: "cart" }, { from: "cart-button" });
 ```
 
 ### `useEvent(type, handler)`

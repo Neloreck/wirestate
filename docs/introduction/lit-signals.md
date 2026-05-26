@@ -165,7 +165,7 @@ export class CounterPanel extends LitElement {
   private label: string = "Unknown";
 
   private emitCounterEvent(): void {
-    this.scope.emitEvent("COUNTER_INCREMENTED", { count: 0 }, this);
+    this.scope.emitEvent("COUNTER_INCREMENTED", { count: 0 }, { from: this });
   }
 
   private incrementViaCommand(): void {
