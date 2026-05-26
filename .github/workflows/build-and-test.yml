@@ -51,6 +51,8 @@ jobs:
 
       - run: pnpm build:pkg
 
+      - run: pnpm test:package-consumption
+
       - name: Install zip
         uses: montudor/action-zip@v1
 
