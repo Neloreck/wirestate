@@ -15,6 +15,11 @@ export interface PackageRecord {
 
 const RELEASE_TYPES: Set<ReleaseType> = new Set(["major", "minor", "patch"]);
 const SEMVER_PATTERN: RegExp = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z-.]+)?$/;
+const INTERNAL_DEPENDENCY_FIELDS: Array<"dependencies" | "optionalDependencies" | "peerDependencies"> = [
+  "dependencies",
+  "optionalDependencies",
+  "peerDependencies",
+];
 
 export function printUsage(): void {
   console.log("Usage: pnpm version:packages <major|minor|patch|x.y.z[-tag]> [--dry-run]");
@@ -89,30 +94,32 @@ export function ensureLockstepVersions(packages: Array<PackageRecord>): string {
   return packages[0].version;
 }
 
-export function updateInternalPeerDependencies(
+export function updateInternalDependencyVersions(
   manifest: Record<string, unknown>,
   internalPackageNames: Set<string>,
   nextVersion: string
 ): void {
-  const peerDependencies = manifest.peerDependencies;
+  for (const field of INTERNAL_DEPENDENCY_FIELDS) {
+    const dependencies = manifest[field];
 
-  if (!peerDependencies || typeof peerDependencies !== "object" || Array.isArray(peerDependencies)) {
-    return;
-  }
-
-  const peerDependencyMap = peerDependencies as Record<string, unknown>;
-
-  for (const [dependencyName, dependencyVersion] of Object.entries(peerDependencyMap)) {
-    if (!internalPackageNames.has(dependencyName) || typeof dependencyVersion !== "string") {
+    if (!dependencies || typeof dependencies !== "object" || Array.isArray(dependencies)) {
       continue;
     }
 
-    peerDependencyMap[dependencyName] = nextVersion.includes("-") ? nextVersion : `^${nextVersion}`;
+    const dependencyMap = dependencies as Record<string, unknown>;
+
+    for (const [dependencyName, dependencyVersion] of Object.entries(dependencyMap)) {
+      if (!internalPackageNames.has(dependencyName) || typeof dependencyVersion !== "string") {
+        continue;
+      }
+
+      dependencyMap[dependencyName] = nextVersion.includes("-") ? nextVersion : `^${nextVersion}`;
+    }
   }
 }
 
 export function writeVersion(pkg: PackageRecord, nextVersion: string, internalPackageNames: Set<string>): void {
   pkg.manifest.version = nextVersion;
-  updateInternalPeerDependencies(pkg.manifest, internalPackageNames, nextVersion);
+  updateInternalDependencyVersions(pkg.manifest, internalPackageNames, nextVersion);
   fs.writeFileSync(pkg.manifestPath, `${JSON.stringify(pkg.manifest, null, 2)}\n`);
 }

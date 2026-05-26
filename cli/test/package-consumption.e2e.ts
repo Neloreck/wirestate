@@ -2,7 +2,7 @@ import * as fs from "node:fs";
 import path from "node:path";
 
 import {
-  PACKAGE_CHECKS,
+  STAGED_PACKAGES,
   packageBinPath,
   packageExportCheckScript,
   prepareConsumerFixture,
@@ -19,7 +19,7 @@ describe("built package consumption", () => {
   });
 
   it("marks ESM and CJS build trees with explicit package formats", () => {
-    for (const pkg of PACKAGE_CHECKS) {
+    for (const pkg of STAGED_PACKAGES) {
       expect(readConsumerText("node_modules", pkg.name, "esm", "package.json")).toBe('{\n  "type": "module"\n}\n');
       expect(readConsumerText("node_modules", pkg.name, "cjs", "package.json")).toBe('{\n  "type": "commonjs"\n}\n');
     }

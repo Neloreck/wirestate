@@ -10,8 +10,12 @@ export const CONSUMER_ROOT: string = path.resolve(PROJECT_ROOT, "target/pkg-cons
 type PackageExportCheckMode = "import" | "require";
 
 export interface PackageCheckDescriptor {
-  readonly directory: string;
   readonly exportName: string;
+  readonly name: string;
+}
+
+export interface StagedPackageDescriptor {
+  readonly directory: string;
   readonly name: string;
 }
 
@@ -20,13 +24,27 @@ interface CommandResultDescriptor {
   readonly stdout: string;
 }
 
+export const STAGED_PACKAGES: Array<StagedPackageDescriptor> = [
+  { directory: "wirestate-core", name: "@wirestate/core" },
+  { directory: "wirestate-react", name: "@wirestate/react" },
+  { directory: "wirestate-react-mobx", name: "@wirestate/react-mobx" },
+  { directory: "wirestate-react-signals", name: "@wirestate/react-signals" },
+  { directory: "wirestate-lit", name: "@wirestate/lit" },
+  { directory: "wirestate-lit-signals", name: "@wirestate/lit-signals" },
+  { directory: "wirestate", name: "wirestate" },
+];
+
 export const PACKAGE_CHECKS: Array<PackageCheckDescriptor> = [
-  { directory: "wirestate-core", exportName: "createContainer", name: "@wirestate/core" },
-  { directory: "wirestate-react", exportName: "ContainerProvider", name: "@wirestate/react" },
-  { directory: "wirestate-react-mobx", exportName: "Action", name: "@wirestate/react-mobx" },
-  { directory: "wirestate-react-signals", exportName: "signal", name: "@wirestate/react-signals" },
-  { directory: "wirestate-lit", exportName: "ContainerProvider", name: "@wirestate/lit" },
-  { directory: "wirestate-lit-signals", exportName: "signal", name: "@wirestate/lit-signals" },
+  { exportName: "createContainer", name: "@wirestate/core" },
+  { exportName: "ContainerProvider", name: "@wirestate/react" },
+  { exportName: "Action", name: "@wirestate/react-mobx" },
+  { exportName: "signal", name: "@wirestate/react-signals" },
+  { exportName: "ContainerProvider", name: "@wirestate/lit" },
+  { exportName: "signal", name: "@wirestate/lit-signals" },
+  { exportName: "createContainer", name: "wirestate" },
+  { exportName: "Action", name: "wirestate/mobx" },
+  { exportName: "signal", name: "wirestate/signals" },
+  { exportName: "mockContainer", name: "wirestate/test-utils" },
 ];
 
 function writeJson(filePath: string, value: Record<string, unknown>): void {
@@ -82,7 +100,7 @@ export function prepareConsumerFixture(): void {
     type: "module",
   });
 
-  for (const pkg of PACKAGE_CHECKS) {
+  for (const pkg of STAGED_PACKAGES) {
     copyStagedPackage(pkg);
   }
 
@@ -116,19 +134,43 @@ function typecheckSource(): string {
     'import { createContainer, type ContainerConfig } from "@wirestate/core";',
     'import { ContainerProvider as LitContainerProvider } from "@wirestate/lit";',
     'import { signal as litSignal } from "@wirestate/lit-signals";',
+    'import type { WatchDirectiveFunction } from "@wirestate/lit-signals";',
     'import { ContainerProvider as ReactContainerProvider } from "@wirestate/react";',
     'import { Action } from "@wirestate/react-mobx";',
+    'import type { AnnotationMapEntry, IActionFactory } from "@wirestate/react-mobx";',
     'import { signal as reactSignal } from "@wirestate/react-signals";',
+    'import type { Model, ReadonlySignal } from "@wirestate/react-signals";',
+    'import { createContainer as createWirestateContainer, ContainerProvider as WirestateContainerProvider } from "wirestate";',
+    'import { Action as WirestateAction } from "wirestate/mobx";',
+    'import type { AnnotationMapEntry as WirestateAnnotationMapEntry, IActionFactory as WirestateActionFactory } from "wirestate/mobx";',
+    'import { signal as wirestateSignal } from "wirestate/signals";',
+    'import type { Model as WirestateModel, ReadonlySignal as WirestateReadonlySignal } from "wirestate/signals";',
+    'import { mockContainer as wirestateMockContainer } from "wirestate/test-utils";',
+    "",
+    "type MobxTypeExportSmoke = AnnotationMapEntry | IActionFactory | WirestateAnnotationMapEntry | WirestateActionFactory;",
+    "type ReactSignalsTypeExportSmoke = Model | ReadonlySignal<unknown> | WirestateModel | WirestateReadonlySignal<unknown>;",
+    "type LitSignalsTypeExportSmoke = WatchDirectiveFunction;",
     "",
     "const config: ContainerConfig = {};",
     "const container = createContainer(config);",
+    "const mobxTypeExportSmoke: MobxTypeExportSmoke | null = null;",
+    "const reactSignalsTypeExportSmoke: ReactSignalsTypeExportSmoke | null = null;",
+    "const litSignalsTypeExportSmoke: LitSignalsTypeExportSmoke | null = null;",
     "",
     "void container;",
+    "void mobxTypeExportSmoke;",
+    "void reactSignalsTypeExportSmoke;",
+    "void litSignalsTypeExportSmoke;",
     "void LitContainerProvider;",
     "void litSignal;",
     "void ReactContainerProvider;",
     "void Action;",
     "void reactSignal;",
+    "void createWirestateContainer;",
+    "void WirestateContainerProvider;",
+    "void WirestateAction;",
+    "void wirestateSignal;",
+    "void wirestateMockContainer;",
     "",
   ].join("\n");
 }
@@ -160,6 +202,9 @@ function viteEntrySource(): string {
     'import { ContainerProvider as ReactContainerProvider } from "@wirestate/react";',
     'import { Action } from "@wirestate/react-mobx";',
     'import { signal as reactSignal } from "@wirestate/react-signals";',
+    'import { createContainer as createWirestateContainer, ContainerProvider as WirestateContainerProvider } from "wirestate";',
+    'import { Action as WirestateAction } from "wirestate/mobx";',
+    'import { signal as wirestateSignal } from "wirestate/signals";',
     "",
     "export const consumed = [",
     "  createContainer,",
@@ -168,14 +213,28 @@ function viteEntrySource(): string {
     "  ReactContainerProvider,",
     "  Action,",
     "  reactSignal,",
+    "  createWirestateContainer,",
+    "  WirestateContainerProvider,",
+    "  WirestateAction,",
+    "  wirestateSignal,",
     "];",
     "",
   ].join("\n");
 }
 
-function copyStagedPackage(pkg: PackageCheckDescriptor): void {
+function packageDestination(packageName: string): string {
+  if (!packageName.startsWith("@")) {
+    return path.resolve(CONSUMER_ROOT, "node_modules", packageName);
+  }
+
+  const [scope, name] = packageName.split("/");
+
+  return path.resolve(CONSUMER_ROOT, "node_modules", scope, name);
+}
+
+function copyStagedPackage(pkg: StagedPackageDescriptor): void {
   const source = path.resolve(STAGED_PACKAGES_ROOT, pkg.directory);
-  const destination = path.resolve(CONSUMER_ROOT, "node_modules", "@wirestate", pkg.name.replace("@wirestate/", ""));
+  const destination = packageDestination(pkg.name);
 
   if (!fs.existsSync(source)) {
     throw new Error(`Missing staged package ${source}. Run pnpm build before package consumption tests.`);
