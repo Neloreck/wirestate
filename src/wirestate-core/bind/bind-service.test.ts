@@ -2,14 +2,17 @@ import { GenericService } from "@/fixtures/services/generic-service";
 
 import { Container, Inject, Injectable } from "../alias";
 import { CommandBus } from "../commands/command-bus";
+import { OnCommand } from "../commands/on-command";
 import { WireScope } from "../container/wire-scope";
 import { EventBus } from "../events/event-bus";
+import { OnEvent } from "../events/on-event";
 import { OnQuery } from "../queries/on-query";
 import { QueryBus } from "../queries/query-bus";
 import { OnActivated } from "../service/on-activated";
 import { OnDeactivation } from "../service/on-deactivation";
 import { mockContainer } from "../test-utils";
 import { CommandStatus } from "../types/commands";
+import { Optional } from "../types/general";
 
 import { bindService } from "./bind-service";
 
@@ -152,6 +155,72 @@ describe("bindService", () => {
     expect(() => container.get(SyncFailActivationService)).toThrow("sync-activation-fail");
 
     consoleSpy.mockRestore();
+  });
+
+  it("should clean up handlers and scope when @OnActivated throws synchronously", () => {
+    const ACTIVATION_FAILURE_EVENT: string = "ACTIVATION_FAILURE_EVENT";
+    const ACTIVATION_FAILURE_COMMAND: string = "ACTIVATION_FAILURE_COMMAND";
+    const ACTIVATION_FAILURE_QUERY: string = "ACTIVATION_FAILURE_QUERY";
+
+    let eventCalls: number = 0;
+
+    const scopeRef: { current: Optional<WireScope> } = { current: null };
+
+    @Injectable()
+    class SyncFailActivationWithHandlersService {
+      public constructor(
+        @Inject(WireScope)
+        public readonly injectedScope: WireScope
+      ) {
+        scopeRef.current = injectedScope;
+      }
+
+      @OnActivated()
+      public onActivated(): void {
+        throw new Error("sync-activation-handlers-fail");
+      }
+
+      @OnCommand(ACTIVATION_FAILURE_COMMAND)
+      public onCommand(): string {
+        return "command-response";
+      }
+
+      @OnEvent(ACTIVATION_FAILURE_EVENT)
+      public onEvent(): void {
+        eventCalls += 1;
+      }
+
+      @OnQuery(ACTIVATION_FAILURE_QUERY)
+      public onQuery(): string {
+        return "query-response";
+      }
+    }
+
+    const container: Container = mockContainer();
+
+    bindService(container, SyncFailActivationWithHandlersService);
+
+    expect(() => container.get(SyncFailActivationWithHandlersService)).toThrow("sync-activation-handlers-fail");
+    expect(container.get(CommandBus).has(ACTIVATION_FAILURE_COMMAND)).toBe(false);
+    expect(container.get(QueryBus).has(ACTIVATION_FAILURE_QUERY)).toBe(false);
+    expect(container.get(EventBus).has()).toBe(false);
+    expect(scopeRef.current).not.toBeNull();
+
+    const activatedScope: WireScope = scopeRef.current as WireScope;
+
+    expect(activatedScope.isDisposed).toBe(true);
+    expect(activatedScope.isDeprovisioned).toBe(true);
+    expect(activatedScope.isInactive).toBe(true);
+    expect(() => container.get(QueryBus).query(ACTIVATION_FAILURE_QUERY)).toThrow(
+      "No query handler registered in container for type: 'ACTIVATION_FAILURE_QUERY'."
+    );
+    expect(() => container.get(CommandBus).command(ACTIVATION_FAILURE_COMMAND)).toThrow(
+      "No command handler registered in container for type: 'ACTIVATION_FAILURE_COMMAND'."
+    );
+
+    container.get(EventBus).emit(ACTIVATION_FAILURE_EVENT);
+
+    expect(eventCalls).toBe(0);
   });
 
   it("should catch and log failing @OnDeactivation methods while preserving cleanup", () => {

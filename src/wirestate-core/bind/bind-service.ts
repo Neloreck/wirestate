@@ -142,84 +142,90 @@ export function bindServiceWithToken<T extends object>(
       options,
     });
 
-    // Ensure flag is initialized on activation.
-    (instance as { IS_DISPOSED: boolean }).IS_DISPOSED = false;
+    try {
+      // Ensure flag is initialized on activation.
+      (instance as { IS_DISPOSED: boolean }).IS_DISPOSED = false;
 
-    CONTAINER_REFS_BY_SERVICE.set(instance, container);
-    attachWireScopes(instance, entry);
+      CONTAINER_REFS_BY_SERVICE.set(instance, container);
+      attachWireScopes(instance, entry);
 
-    // Compose all events listeners into a single bus subscription so we only
-    // pay one Set lookup per emitted event.
-    const dispatcher: Optional<EventHandler> = buildEventDispatcher(instance);
+      // Compose all events listeners into a single bus subscription so we only
+      // pay one Set lookup per emitted event.
+      const dispatcher: Optional<EventHandler> = buildEventDispatcher(instance);
 
-    if (dispatcher) {
-      attachEventsSubscription(instance, dispatcher);
-    }
-
-    // Register every `@OnQuery` handler on the container's QueryBus, and
-    // remember the unregister functions so we can roll them back when the
-    // service is deactivated.
-    const queryBus: QueryBus = container.get(QueryBus);
-
-    for (const meta of getQueryHandlerMetadata(instance)) {
-      const method = (instance as unknown as Record<string | symbol, unknown>)[meta.methodName];
-
-      if (typeof method !== "function") {
-        continue;
+      if (dispatcher) {
+        attachEventsSubscription(instance, dispatcher);
       }
 
-      const unregister: QueryUnregister = queryBus.register(meta.type, (method as QueryHandler).bind(instance));
+      // Register every `@OnQuery` handler on the container's QueryBus, and
+      // remember the unregister functions so we can roll them back when the
+      // service is deactivated.
+      const queryBus: QueryBus = container.get(QueryBus);
 
-      attachQueryUnregister(instance, unregister);
-    }
+      for (const meta of getQueryHandlerMetadata(instance)) {
+        const method = (instance as unknown as Record<string | symbol, unknown>)[meta.methodName];
 
-    // Register every `@OnCommand` handler on the container's CommandBus, and
-    // remember the unregister functions so we can roll them back when the
-    // service is deactivated.
-    const commandBus: CommandBus = container.get(CommandBus);
+        if (typeof method !== "function") {
+          continue;
+        }
 
-    for (const meta of getCommandHandlerMetadata(instance)) {
-      const method: unknown = (instance as unknown as Record<string | symbol, unknown>)[meta.methodName];
+        const unregister: QueryUnregister = queryBus.register(meta.type, (method as QueryHandler).bind(instance));
 
-      if (typeof method !== "function") {
-        continue;
+        attachQueryUnregister(instance, unregister);
       }
 
-      const unregister: CommandUnregister = commandBus.register(meta.type, (method as CommandHandler).bind(instance));
+      // Register every `@OnCommand` handler on the container's CommandBus, and
+      // remember the unregister functions so we can roll them back when the
+      // service is deactivated.
+      const commandBus: CommandBus = container.get(CommandBus);
 
-      attachCommandUnregister(instance, unregister);
-    }
+      for (const meta of getCommandHandlerMetadata(instance)) {
+        const method: unknown = (instance as unknown as Record<string | symbol, unknown>)[meta.methodName];
 
-    if (options?.isWithIgnoreLifecycle) {
-      dbg.info(prefix(__filename), "Skip lifecycle @onActivated method:", {
-        name: entry.name,
-        context,
-        container,
-        entry,
-        instance,
-        options,
-      });
-    } else {
-      // Fire-and-forget any async init so we stay synchronous from the
-      // container's point of view.
-      const methodName: Maybe<string | symbol> = getActivatedHandlerMetadata(instance);
+        if (typeof method !== "function") {
+          continue;
+        }
 
-      if (methodName) {
-        const method = (instance as unknown as Record<string | symbol, unknown>)[methodName];
+        const unregister: CommandUnregister = commandBus.register(meta.type, (method as CommandHandler).bind(instance));
 
-        if (typeof method === "function") {
-          const result: MaybePromise<void> = (method as () => MaybePromise<void>).call(instance);
+        attachCommandUnregister(instance, unregister);
+      }
 
-          if (result && typeof (result as Promise<void>).then === "function") {
-            (result as Promise<void>).catch((error) => {
-              console.error("[wirestate] @OnActivated rejected for:", entry.name, String(methodName), error);
-            });
+      if (options?.isWithIgnoreLifecycle) {
+        dbg.info(prefix(__filename), "Skip lifecycle @onActivated method:", {
+          name: entry.name,
+          context,
+          container,
+          entry,
+          instance,
+          options,
+        });
+      } else {
+        // Fire-and-forget any async init so we stay synchronous from the
+        // container's point of view.
+        const methodName: Maybe<string | symbol> = getActivatedHandlerMetadata(instance);
+
+        if (methodName) {
+          const method = (instance as unknown as Record<string | symbol, unknown>)[methodName];
+
+          if (typeof method === "function") {
+            const result: MaybePromise<void> = (method as () => MaybePromise<void>).call(instance);
+
+            if (result && typeof (result as Promise<void>).then === "function") {
+              (result as Promise<void>).catch((error) => {
+                console.error("[wirestate] @OnActivated rejected for:", entry.name, String(methodName), error);
+              });
+            }
           }
         }
       }
-    }
 
-    return instance;
+      return instance;
+    } catch (error) {
+      cleanupFailedActivation(instance);
+
+      throw error;
+    }
   });
 
   whenBind.onDeactivation((instance) => {
@@ -315,6 +321,24 @@ function detachEventSubscription<T extends object>(service: T): void {
     unsubscribe();
     EVENT_UNSUBSCRIBERS_BY_SERVICE.delete(service);
   }
+}
+
+/**
+ * Rolls back registrations made before a service finishes activation.
+ *
+ * @internal
+ *
+ * @param service - Service instance.
+ */
+function cleanupFailedActivation<T extends object>(service: T): void {
+  (service as { IS_DISPOSED: boolean }).IS_DISPOSED = true;
+
+  detachWireScopes(service);
+  detachCommandUnregister(service);
+  detachQueryUnregister(service);
+  detachEventSubscription(service);
+
+  CONTAINER_REFS_BY_SERVICE.delete(service);
 }
 
 /**
