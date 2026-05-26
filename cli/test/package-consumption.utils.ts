@@ -148,7 +148,7 @@ function typecheckSource(): string {
     'import { mockContainer as wirestateMockContainer } from "wirestate/test-utils";',
     "",
     "type MobxTypeExportSmoke = AnnotationMapEntry | IActionFactory | WirestateAnnotationMapEntry | WirestateActionFactory;",
-    "type ReactSignalsTypeExportSmoke = Model | ReadonlySignal<unknown> | WirestateModel | WirestateReadonlySignal<unknown>;",
+    "type ReactSignalsTypeExportSmoke = Model<unknown> | ReadonlySignal<unknown> | WirestateModel<unknown> | WirestateReadonlySignal<unknown>;",
     "type LitSignalsTypeExportSmoke = WatchDirectiveFunction;",
     "",
     "const config: ContainerConfig = {};",
