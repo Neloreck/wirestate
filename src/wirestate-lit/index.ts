@@ -1,7 +1,3 @@
-/*
- * 'https://github.com/Neloreck/wirestate'
- */
-
 export { injection, InjectionDecorator, InjectionOptions } from "./consumption/injection";
 export {
   optionalInjection,

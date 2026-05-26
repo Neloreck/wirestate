@@ -1,7 +1,3 @@
-/*
- * 'https://github.com/Neloreck/wirestate'
- */
-
 export * from "./alias";
 
 export { bindConstant } from "./bind/bind-constant";
