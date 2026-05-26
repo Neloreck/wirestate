@@ -4,7 +4,11 @@ import { prefix } from "@/macroses/prefix.macro";
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { Maybe, Optional } from "../types/general";
-import { QueryHandler, QueryType, QueryUnregister } from "../types/queries";
+import { type QueryHandler, type QueryType, type QueryUnregister } from "../types/queries";
+
+interface QueryHandlerDescriptor {
+  handler: QueryHandler;
+}
 
 /**
  * Dispatches named queries to one active handler.
@@ -33,7 +37,7 @@ export class QueryBus {
    * Internal handler storage.
    * Uses a stack for each query type to support shadowing (e.g., component-level vs service-level).
    */
-  private readonly handlers: Map<QueryType, Array<QueryHandler>> = new Map();
+  private readonly handlers: Map<QueryType, Array<QueryHandlerDescriptor>> = new Map();
 
   /**
    * Registers a query handler.
@@ -60,16 +64,50 @@ export class QueryBus {
       bus: this,
     });
 
-    let stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
+    let stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
 
     if (!stack) {
       stack = [];
       this.handlers.set(type, stack);
     }
 
-    stack.push(handler as QueryHandler);
+    const registration: QueryHandlerDescriptor = {
+      handler: handler as QueryHandler,
+    };
 
-    return () => this.unregister(type, handler as QueryHandler);
+    stack.push(registration);
+
+    return () => {
+      dbg.info(prefix(__filename), "Unregistering query handler with callback:", {
+        type,
+        handler: registration.handler,
+        bus: this,
+      });
+
+      const current: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
+
+      if (!current) {
+        return;
+      }
+
+      let index: number = -1;
+
+      for (let i: number = 0; i < current.length; i += 1) {
+        if (current[i] === registration) {
+          index = i;
+          break;
+        }
+      }
+
+      if (index >= 0) {
+        current.splice(index, 1);
+      }
+
+      // Clean empty stacks.
+      if (current.length === 0) {
+        this.handlers.delete(type);
+      }
+    };
   }
 
   /**
@@ -91,13 +129,20 @@ export class QueryBus {
       bus: this,
     });
 
-    const current: Maybe<Array<QueryHandler>> = this.handlers.get(type);
+    const current: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
 
     if (!current) {
       return;
     }
 
-    const index: number = current.indexOf(handler as QueryHandler);
+    let index: number = -1;
+
+    for (let it: number = current.length - 1; it >= 0; it -= 1) {
+      if (current[it].handler === (handler as QueryHandler)) {
+        index = it;
+        break;
+      }
+    }
 
     if (index >= 0) {
       current.splice(index, 1);
@@ -132,11 +177,11 @@ export class QueryBus {
    * ```
    */
   public query<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): R {
-    const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
+    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
 
     // Always use the top of the stack (most recent registration) if handlers are available.
     if (stack?.length) {
-      return (stack[stack.length - 1] as QueryHandler<D, R>)(data as D) as R;
+      return (stack[stack.length - 1].handler as QueryHandler<D, R>)(data as D) as R;
     }
 
     throw new WirestateError(
@@ -162,10 +207,10 @@ export class QueryBus {
    * @throws {@link WirestateError} If no handler is registered for the given type.
    */
   public async queryAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Promise<R> {
-    const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
+    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
-      return (stack[stack.length - 1] as QueryHandler<D, R>)(data as D);
+      return (stack[stack.length - 1].handler as QueryHandler<D, R>)(data as D);
     }
 
     throw new WirestateError(
@@ -190,10 +235,10 @@ export class QueryBus {
    * @returns The synchronous query result, or `null` if no handler is found.
    */
   public queryOptional<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Optional<R> {
-    const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
+    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
-      return (stack[stack.length - 1] as QueryHandler<D, R>)(data as D) as R;
+      return (stack[stack.length - 1].handler as QueryHandler<D, R>)(data as D) as R;
     }
 
     return null;
@@ -214,10 +259,10 @@ export class QueryBus {
     type: T,
     data?: D
   ): Promise<Optional<R>> {
-    const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
+    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
-      return (stack[stack.length - 1] as QueryHandler<D, R>)(data as D);
+      return (stack[stack.length - 1].handler as QueryHandler<D, R>)(data as D);
     }
 
     return null;
@@ -230,7 +275,7 @@ export class QueryBus {
    * @returns `true` if a handler is available, `false` otherwise.
    */
   public has(type: QueryType): boolean {
-    const stack: Maybe<Array<QueryHandler>> = this.handlers.get(type);
+    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
 
     return Boolean(stack && stack.length);
   }

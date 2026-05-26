@@ -12,6 +12,10 @@ import {
 } from "../types/commands";
 import { Maybe, Optional } from "../types/general";
 
+interface CommandHandlerDescriptor {
+  handler: CommandHandler;
+}
+
 /**
  * Dispatches named commands to one active handler.
  *
@@ -40,7 +44,7 @@ export class CommandBus {
    * Internal handler storage.
    * Uses a stack for each command type to support shadowing.
    */
-  private readonly handlers: Map<CommandType, Array<CommandHandler>> = new Map();
+  private readonly handlers: Map<CommandType, Array<CommandHandlerDescriptor>> = new Map();
 
   /**
    * Removes all registered command handlers from the bus.
@@ -72,7 +76,7 @@ export class CommandBus {
    * ```
    */
   public command<R = unknown, D = unknown>(type: CommandType, data?: D): CommandDescriptor<R> {
-    const stack: Maybe<Array<CommandHandler>> = this.handlers.get(type);
+    const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (!stack?.length) {
       throw new WirestateError(
@@ -81,7 +85,7 @@ export class CommandBus {
       );
     }
 
-    const handler = stack[stack.length - 1] as CommandHandler<D, R>;
+    const handler = stack[stack.length - 1].handler as CommandHandler<D, R>;
 
     const descriptor: CommandDescriptor<R> = {
       task: null as unknown as Promise<R>,
@@ -115,9 +119,7 @@ export class CommandBus {
    * @returns Command descriptor, or `null` when no handler exists.
    */
   public commandOptional<R = unknown, D = unknown>(type: CommandType, data?: D): Optional<CommandDescriptor<R>> {
-    const stack: Maybe<Array<CommandHandler>> = this.handlers.get(type);
-
-    return stack?.length ? this.command<R, D>(type, data) : null;
+    return this.handlers.get(type)?.length ? this.command<R, D>(type, data) : null;
   }
 
   /**
@@ -157,16 +159,50 @@ export class CommandBus {
       bus: this,
     });
 
-    let stack: Maybe<Array<CommandHandler>> = this.handlers.get(type);
+    let stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (!stack) {
       stack = [];
       this.handlers.set(type, stack);
     }
 
-    stack.push(handler as CommandHandler);
+    const registration: CommandHandlerDescriptor = {
+      handler: handler as CommandHandler,
+    };
 
-    return () => this.unregister(type, handler as CommandHandler);
+    stack.push(registration);
+
+    return () => {
+      dbg.info(prefix(__filename), "Unregistering command handler with callback:", {
+        type,
+        handler: registration.handler,
+        bus: this,
+      });
+
+      const current: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
+
+      if (!current) {
+        return;
+      }
+
+      let index: number = -1;
+
+      for (let it: number = 0; it < current.length; it += 1) {
+        if (current[it] === registration) {
+          index = it;
+          break;
+        }
+      }
+
+      if (index >= 0) {
+        current.splice(index, 1);
+      }
+
+      // Clean empty stacks.
+      if (current.length === 0) {
+        this.handlers.delete(type);
+      }
+    };
   }
 
   /**
@@ -188,13 +224,20 @@ export class CommandBus {
       bus: this,
     });
 
-    const current: Maybe<Array<CommandHandler>> = this.handlers.get(type);
+    const current: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (!current) {
       return;
     }
 
-    const index: number = current.indexOf(handler as CommandHandler);
+    let index: number = -1;
+
+    for (let it: number = current.length - 1; it >= 0; it -= 1) {
+      if (current[it].handler === (handler as CommandHandler)) {
+        index = it;
+        break;
+      }
+    }
 
     if (index >= 0) {
       current.splice(index, 1);

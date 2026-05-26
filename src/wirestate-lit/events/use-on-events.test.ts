@@ -62,6 +62,24 @@ describe("useOnEvents", () => {
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
+  it("should filter empty string event type via hook", () => {
+    const { provider, container } = fixture;
+
+    const bus: EventBus = container.get(EventBus);
+    const element: TestConsumerElement = new TestConsumerElement();
+    const handler = jest.fn();
+
+    useOnEvents(element, { handler, types: "" });
+
+    provider.appendChild(element);
+
+    bus.emit("OTHER");
+    expect(handler).not.toHaveBeenCalled();
+
+    bus.emit("");
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
   it("should handle multiple event types via hook", () => {
     const { provider, container } = fixture;
 

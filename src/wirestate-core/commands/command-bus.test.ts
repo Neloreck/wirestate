@@ -64,6 +64,23 @@ describe("CommandBus", () => {
     expect(() => bus.command("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
   });
 
+  it("should unregister only one duplicate handler registration per returned callback", async () => {
+    const bus: CommandBus = new CommandBus();
+    const handler = jest.fn(() => "value");
+
+    const unregisterFirst: CommandUnregister = bus.register("TYPE", handler);
+    const unregisterSecond: CommandUnregister = bus.register("TYPE", handler);
+
+    unregisterSecond();
+    unregisterSecond();
+
+    expect(await bus.command("TYPE").task).toBe("value");
+
+    unregisterFirst();
+
+    expect(() => bus.command("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
+  });
+
   it("should handle async handlers", async () => {
     const bus: CommandBus = new CommandBus();
 
@@ -235,6 +252,42 @@ describe("CommandBus", () => {
 
       expect(() => bus.unregister("TYPE", unregistered)).not.toThrow();
       expect(await bus.command("TYPE").task).toBe("value");
+    });
+
+    it("should unregister only one duplicate handler registration by type and reference per call", async () => {
+      const bus: CommandBus = new CommandBus();
+      const handler = jest.fn(() => "value");
+
+      bus.register("TYPE", handler);
+      bus.register("TYPE", handler);
+
+      bus.unregister("TYPE", handler);
+
+      expect(await bus.command("TYPE").task).toBe("value");
+
+      bus.unregister("TYPE", handler);
+
+      expect(() => bus.command("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
+    });
+
+    it("should unregister the newest duplicate handler registration by type and reference", () => {
+      const bus: CommandBus = new CommandBus();
+      const handler = jest.fn(() => "value");
+
+      const unregisterFirst: CommandUnregister = bus.register("TYPE", handler);
+      const unregisterSecond: CommandUnregister = bus.register("TYPE", handler);
+
+      bus.unregister("TYPE", handler);
+
+      expect(bus.has("TYPE")).toBe(true);
+
+      unregisterSecond();
+
+      expect(bus.has("TYPE")).toBe(true);
+
+      unregisterFirst();
+
+      expect(bus.has("TYPE")).toBe(false);
     });
   });
 });

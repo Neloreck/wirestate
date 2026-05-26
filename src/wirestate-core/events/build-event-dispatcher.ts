@@ -59,7 +59,11 @@ export function buildEventDispatcher<T extends object>(instance: T): Optional<Ev
       // Fan out events to all matching handlers.
       for (const entry of entries) {
         if (entry.types === null || entry.types.includes(event.type)) {
-          entry.handler(event);
+          try {
+            entry.handler(event);
+          } catch (error) {
+            console.error("[wirestate] Event handler threw:", error);
+          }
         }
       }
     };

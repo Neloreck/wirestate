@@ -56,6 +56,23 @@ describe("QueryBus", () => {
     expect(() => bus.query("TYPE")).toThrow("No query handler registered in container for type: 'TYPE'.");
   });
 
+  it("should unregister only one duplicate handler registration per returned callback", () => {
+    const bus: QueryBus = new QueryBus();
+    const handler = jest.fn(() => "value");
+
+    const unregisterFirst: QueryUnregister = bus.register("TYPE", handler);
+    const unregisterSecond: QueryUnregister = bus.register("TYPE", handler);
+
+    unregisterSecond();
+    unregisterSecond();
+
+    expect(bus.query("TYPE")).toBe("value");
+
+    unregisterFirst();
+
+    expect(() => bus.query("TYPE")).toThrow("No query handler registered in container for type: 'TYPE'.");
+  });
+
   it("should return promise values from query when the handler returns a Promise", async () => {
     const bus: QueryBus = new QueryBus();
 
@@ -273,6 +290,43 @@ describe("QueryBus", () => {
 
       expect(() => bus.unregister("TYPE", unregistered)).not.toThrow();
       expect(bus.query("TYPE")).toBe("value");
+    });
+
+    it("should unregister only one duplicate handler registration by type and reference per call", () => {
+      const bus: QueryBus = new QueryBus();
+      const handler = jest.fn(() => "value");
+
+      bus.register("TYPE", handler);
+      bus.register("TYPE", handler);
+
+      bus.unregister("TYPE", handler);
+
+      expect(bus.query("TYPE")).toBe("value");
+
+      bus.unregister("TYPE", handler);
+
+      expect(() => bus.query("TYPE")).toThrow("No query handler registered in container for type: 'TYPE'.");
+    });
+
+    it("should unregister the newest duplicate handler registration by type and reference", () => {
+      const bus: QueryBus = new QueryBus();
+      const handler = jest.fn(() => "value");
+
+      const unregisterFirst: QueryUnregister = bus.register("TYPE", handler);
+
+      const unregisterSecond: QueryUnregister = bus.register("TYPE", handler);
+
+      bus.unregister("TYPE", handler);
+
+      expect(bus.has("TYPE")).toBe(true);
+
+      unregisterSecond();
+
+      expect(bus.has("TYPE")).toBe(true);
+
+      unregisterFirst();
+
+      expect(bus.has("TYPE")).toBe(false);
     });
   });
 });
