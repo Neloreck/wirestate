@@ -1,11 +1,11 @@
 import "./GeneralControls.css";
 
 import {
-  type CommandCaller,
   type EventEmitter,
-  useCommandCaller,
   useInjection,
   useEventEmitter,
+  useCommandExecutor,
+  type CommandExecutor,
 } from "@wirestate/react";
 import { useCallback } from "react";
 
@@ -18,7 +18,7 @@ export function GeneralControls() {
   const counterService: CounterService = useInjection(CounterService);
   const themeService: ThemeService = useInjection(ThemeService);
 
-  const executeCommand: CommandCaller = useCommandCaller();
+  const executeCommand: CommandExecutor = useCommandExecutor();
   const emitEvent: EventEmitter = useEventEmitter();
 
   const onDumpData = useCallback(() => {

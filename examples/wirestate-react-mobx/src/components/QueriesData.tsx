@@ -1,12 +1,12 @@
 import "./QueriesData.css";
 
 import {
-  type AsyncQueryCaller,
-  type QueryCaller,
-  useAsyncQueryCaller,
+  type AsyncQueryExecutor,
+  type QueryExecutor,
+  useAsyncQueryExecutor,
   useInjection,
   useOptionalInjection,
-  useQueryCaller,
+  useQueryExecutor,
   useQueryHandler,
 } from "@wirestate/react";
 import { observer } from "@wirestate/react-mobx";
@@ -30,8 +30,8 @@ export const QueriesData = observer(() => {
   const loggerService: Optional<LoggerService> =
     useOptionalInjection(LoggerService);
 
-  const queryData: QueryCaller = useQueryCaller();
-  const queryAsyncData: AsyncQueryCaller = useAsyncQueryCaller();
+  const queryData: QueryExecutor = useQueryExecutor();
+  const queryAsyncData: AsyncQueryExecutor = useAsyncQueryExecutor();
 
   const onPullSummary = useCallback(() => {
     const value: ICounterSummary = queryData<ICounterSummary>(

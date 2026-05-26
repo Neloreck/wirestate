@@ -1,11 +1,11 @@
 import "./GeneralControls.css";
 
 import {
-  type CommandCaller,
   type EventEmitter,
-  useCommandCaller,
   useInjection,
   useEventEmitter,
+  type CommandExecutor,
+  useCommandExecutor,
 } from "@wirestate/react";
 import { observer } from "@wirestate/react-mobx";
 import { useCallback } from "react";
@@ -19,7 +19,7 @@ export const GeneralControls = observer(() => {
   const counterService: CounterService = useInjection(CounterService);
   const themeService: ThemeService = useInjection(ThemeService);
 
-  const executeCommand: CommandCaller = useCommandCaller();
+  const executeCommand: CommandExecutor = useCommandExecutor();
   const emitEvent: EventEmitter = useEventEmitter();
 
   const onDumpData = useCallback(() => {

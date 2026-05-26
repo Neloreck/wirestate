@@ -1,11 +1,12 @@
 import "./QueriesData.css";
 
 import {
-  type AsyncQueryCaller,
-  type QueryCaller,
+  type AsyncQueryExecutor,
+  type QueryExecutor,
+  useAsyncQueryExecutor,
   useInjection,
   useOptionalInjection,
-  useQueryCaller,
+  useQueryExecutor,
   useQueryHandler,
 } from "@wirestate/react";
 import { useCallback, useState } from "react";
@@ -28,8 +29,8 @@ export function QueriesData() {
   const loggerService: Optional<LoggerService> =
     useOptionalInjection(LoggerService);
 
-  const queryAsyncData: AsyncQueryCaller = useQueryCaller();
-  const queryData: QueryCaller = useQueryCaller();
+  const queryAsyncData: AsyncQueryExecutor = useAsyncQueryExecutor();
+  const queryData: QueryExecutor = useQueryExecutor();
 
   const onPullSummary = useCallback(() => {
     const value: ICounterSummary = queryData<ICounterSummary>(
