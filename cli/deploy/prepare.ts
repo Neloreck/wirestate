@@ -24,6 +24,10 @@ function ensureDir(dir: string): void {
   }
 }
 
+function writeJsonFile(filePath: string, value: Record<string, unknown>): void {
+  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
+}
+
 function getCommitHash(): string {
   return execSync("git rev-parse HEAD", { cwd: PROJECT_ROOT, encoding: "utf8" }).trim();
 }
@@ -33,7 +37,12 @@ function applyBuildMetadata(manifestPath: string, commit: string): void {
 
   manifest.wirestateCommit = commit;
 
-  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  writeJsonFile(manifestPath, manifest);
+}
+
+function writePackageFormatMarkers(pkgOutDir: string): void {
+  writeJsonFile(path.resolve(pkgOutDir, "esm", "package.json"), { type: "module" });
+  writeJsonFile(path.resolve(pkgOutDir, "cjs", "package.json"), { type: "commonjs" });
 }
 
 async function stagePackage(pkgName: string, commit: string): Promise<void> {
@@ -71,11 +80,11 @@ async function stagePackage(pkgName: string, commit: string): Promise<void> {
 
   copyFile(path.resolve(PROJECT_ROOT, "LICENSE"), path.resolve(pkgOutDir, "LICENSE"));
   copyFile(fs.existsSync(pkgReadme) ? pkgReadme : rootReadme, path.resolve(pkgOutDir, "README.md"));
-  copyFile(path.resolve(PROJECT_ROOT, "CHANGELOG.md"), path.resolve(pkgOutDir, "CHANGELOG.md"));
 
   const pkgManifest = path.resolve(pkgOutDir, "package.json");
 
   copyFile(path.resolve(pkgSrcDir, "package.json"), pkgManifest);
+  writePackageFormatMarkers(pkgOutDir);
   applyBuildMetadata(pkgManifest, commit);
 }
 

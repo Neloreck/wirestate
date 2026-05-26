@@ -58,7 +58,7 @@ export type AsyncQueryExecutor = <R = unknown, D = unknown, T extends QueryType 
 ) => Promise<R>;
 
 /**
- * Represents the unction returned by {@link useOptionalQueryExecutor}.
+ * Represents the function returned by {@link useOptionalQueryExecutor}.
  *
  * @remarks
  * Typically returned by {@link useOptionalQueryExecutor}. Returns `null` when
