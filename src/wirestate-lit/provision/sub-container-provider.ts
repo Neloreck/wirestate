@@ -158,6 +158,7 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
 
     this.destroyContainer();
 
+    this.clearCallbacks();
     super.setValue(undefined as unknown as Container);
   }
 

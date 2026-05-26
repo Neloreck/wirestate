@@ -6,6 +6,7 @@ import { customElement } from "lit/decorators.js";
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { ContainerContext } from "../context/container-context";
+import { OnEventController } from "../events/on-event-controller";
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
 import { Maybe } from "../types/general";
 
@@ -124,6 +125,41 @@ describe("SubContainerProvider", () => {
 
     expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
     expect(provider.value).toBeUndefined();
+  });
+
+  it("should not publish undefined to subscribed event controllers on disconnect", () => {
+    fixture = createLitProvision();
+
+    const element: TestProviderElement = new TestProviderElement();
+    const child: TestChildElement = new TestChildElement();
+    const provider: SubContainerProvider = new SubContainerProvider(element, {
+      config: { entries: [] },
+    });
+
+    new OnEventController(child, null, jest.fn());
+
+    fixture.provider.appendChild(element);
+
+    const receivedContexts: Array<Container> = [];
+
+    new ContextConsumer(child, {
+      context: ContainerContext,
+      subscribe: true,
+      callback: (context) => {
+        receivedContexts.push(context);
+      },
+    });
+
+    element.appendChild(child);
+
+    expect(provider.value).toBeInstanceOf(Container);
+    expect(receivedContexts).toEqual([provider.value]);
+
+    const providedContainer: Container = provider.value;
+
+    expect(() => element.remove()).not.toThrow();
+    expect(provider.value).toBeUndefined();
+    expect(receivedContexts).toEqual([providedContainer]);
   });
 
   it("should reject direct child container replacement values", () => {

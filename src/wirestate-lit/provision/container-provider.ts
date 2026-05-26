@@ -148,6 +148,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
       deprovisionContainer(container, this.lifecycle);
     }
 
+    this.clearCallbacks();
     super.setValue(undefined as unknown as Container);
   }
 

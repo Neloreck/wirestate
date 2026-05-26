@@ -7,6 +7,7 @@ import { customElement } from "lit/decorators.js";
 import { GenericService } from "@/fixtures/services/generic-service";
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
+import { useInjection } from "../consumption/use-injection";
 import { ContainerContext } from "../context/container-context";
 import { Maybe } from "../types/general";
 
@@ -259,6 +260,37 @@ describe("ContainerProvider", () => {
     element.remove();
 
     expect(controller.value).toBeUndefined();
+  });
+
+  it("should not publish undefined to subscribed injection consumers on disconnect", () => {
+    const element: TestProviderElement = new TestProviderElement();
+    const child: TestChildElement = new TestChildElement();
+    const controller: ContainerProvider = new ContainerProvider(element, {
+      config: { entries: [GenericService] },
+    });
+
+    const injection = useInjection(child, GenericService);
+    const receivedContexts: Array<Container> = [];
+
+    new ContextConsumer(child, {
+      context: ContainerContext,
+      subscribe: true,
+      callback: (context) => {
+        receivedContexts.push(context);
+      },
+    });
+
+    document.body.appendChild(element);
+    element.appendChild(child);
+
+    expect(injection.value).toBeInstanceOf(GenericService);
+    expect(receivedContexts).toEqual([controller.value]);
+
+    const providedContainer: Container = controller.value;
+
+    expect(() => element.remove()).not.toThrow();
+    expect(controller.value).toBeUndefined();
+    expect(receivedContexts).toEqual([providedContainer]);
   });
 
   it("should provision managed containers and deprovision before disposal", () => {
