@@ -1,4 +1,3 @@
-import { execSync } from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -28,24 +27,12 @@ function writeJsonFile(filePath: string, value: Record<string, unknown>): void {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
-function getCommitHash(): string {
-  return execSync("git rev-parse HEAD", { cwd: PROJECT_ROOT, encoding: "utf8" }).trim();
-}
-
-function applyBuildMetadata(manifestPath: string, commit: string): void {
-  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8")) as Record<string, unknown>;
-
-  manifest.wirestateCommit = commit;
-
-  writeJsonFile(manifestPath, manifest);
-}
-
 function writePackageFormatMarkers(pkgOutDir: string): void {
   writeJsonFile(path.resolve(pkgOutDir, "esm", "package.json"), { type: "module" });
   writeJsonFile(path.resolve(pkgOutDir, "cjs", "package.json"), { type: "commonjs" });
 }
 
-async function stagePackage(pkgName: string, commit: string): Promise<void> {
+async function stagePackage(pkgName: string): Promise<void> {
   const pkgSrcDir = path.resolve(PROJECT_ROOT, "src", pkgName);
   const pkgDistDir = path.resolve(DIST_ROOT, pkgName);
   const pkgOutDir = path.resolve(PKG_ROOT, pkgName);
@@ -85,16 +72,13 @@ async function stagePackage(pkgName: string, commit: string): Promise<void> {
 
   copyFile(path.resolve(pkgSrcDir, "package.json"), pkgManifest);
   writePackageFormatMarkers(pkgOutDir);
-  applyBuildMetadata(pkgManifest, commit);
 }
 
 async function main(): Promise<void> {
-  const commit: string = getCommitHash();
-
   for (const pkg of PACKAGES) {
     console.log(`Staging package: ${pkg.name}`);
 
-    await stagePackage(pkg.name, commit);
+    await stagePackage(pkg.name);
 
     console.log(`  -> target/pkg/${pkg.name}`);
   }
