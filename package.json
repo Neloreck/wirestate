@@ -20,7 +20,7 @@
     "format": "prettier --write \"**/*.(js|ts|tsx)\" && eslint . --fix",
     "format:check": "prettier --check \"**/*.(js|ts|tsx)\"",
     "lint": "eslint .",
-    "pre-deploy": "pnpm clean && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm test:package-consumption",
+    "pre-deploy": "pnpm clean && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm build:ptb && pnpm test:package-consumption",
     "purge": "npx rimraf ./node_modules */node_modules */**/node_modules",
     "refresh:browserslist": "pnpm dlx update-browserslist-db@latest && pnpm dedupe browserslist caniuse-lite update-browserslist-db electron-to-chromium node-releases baseline-browser-mapping",
     "test": "jest --config cli/test/jest.config.js --detectOpenHandles --maxWorkers=100%",
