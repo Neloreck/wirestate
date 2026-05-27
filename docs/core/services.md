@@ -1,0 +1,184 @@
+# Core Services
+
+A service is an `@Injectable` class bound to a container. Put state ownership, workflows, IO coordination, and business
+logic there.
+
+## Declare A Service
+
+```ts
+import { Injectable } from "@wirestate/core";
+
+@Injectable()
+export class UserService {
+  public currentUser: User | null = null;
+
+  public setUser(user: User): void {
+    this.currentUser = user;
+  }
+}
+```
+
+## Bind Services
+
+`createContainer({ entries })` binds entries during container creation.
+
+```ts
+import { Container, createContainer } from "@wirestate/core";
+import { UserService } from "./UserService";
+
+const container: Container = createContainer({
+  entries: [UserService],
+});
+
+const users = container.get(UserService);
+```
+
+Use `bindService` when you need to add a service to an existing container.
+
+```ts
+import { bindService, createContainer } from "@wirestate/core";
+
+const container = createContainer();
+
+bindService(container, UserService);
+```
+
+## Constructor Injection
+
+Use `@Inject(Token)` for constructor dependencies. A token can be a class, string, or symbol.
+
+```ts
+import { Inject, Injectable } from "@wirestate/core";
+
+@Injectable()
+export class OrderService {
+  public constructor(
+    @Inject(UserService)
+    private readonly users: UserService,
+    @Inject(LoggerService)
+    private readonly logger: LoggerService
+  ) {}
+}
+```
+
+## WireScope
+
+Inject [`WireScope`](/api/wirestate/classes/WireScope) when a service needs the container edge: lazy resolution, events,
+commands, queries, or seeds.
+
+```ts
+import { Inject, Injectable, WireScope } from "@wirestate/core";
+
+@Injectable()
+export class CartService {
+  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+
+  public checkout(): void {
+    this.scope.emitEvent("CHECKOUT_STARTED");
+  }
+}
+```
+
+`WireScope` is transient. Each service gets its own handle.
+
+- `scope.isDisposed` becomes `true` after service deactivation.
+- `scope.isDeprovisioned` tracks provider ownership: `null`, then `false`, then `true`.
+- `scope.isInactive` is the normal guard for async work that may finish late.
+
+## Lifecycle
+
+Wirestate has two lifecycle layers.
+
+- `@OnActivated` runs when the service is first resolved.
+- `@OnDeactivation` runs when the service is unbound or the container is disposed.
+- `@OnProvision` runs when a provider takes ownership of the container.
+- `@OnDeprovision` runs before that provider releases or replaces the container.
+
+Use provider lifecycle for work that needs cleanup: timers, subscriptions, sockets, observers, provider-scoped fetch
+loops, and external resource handles. Activation is resolution-time work. It can happen before a provider boundary is
+committed, so it should stay cheap and not open resources that depend on provider ownership.
+
+```ts
+import { Injectable, OnDeprovision, OnProvision } from "@wirestate/core";
+
+@Injectable()
+export class PollingService {
+  private timerId: ReturnType<typeof setInterval> | null = null;
+
+  @OnProvision()
+  public onProvision(): void {
+    this.timerId = setInterval(() => this.poll(), 5_000);
+  }
+
+  @OnDeprovision()
+  public onDeprovision(): void {
+    if (this.timerId) {
+      clearInterval(this.timerId);
+      this.timerId = null;
+    }
+  }
+
+  private poll(): void {
+    // fetch current data
+  }
+}
+```
+
+When you use core directly, call `provisionContainer` and `deprovisionContainer` at the boundary that owns the service
+work.
+
+```ts
+import { deprovisionContainer, provisionContainer } from "@wirestate/core";
+
+const lifecycle = new Map();
+
+provisionContainer(container, lifecycle, [PollingService]);
+deprovisionContainer(container, lifecycle);
+```
+
+## Lazy Resolution
+
+Use `scope.resolve(Token)` when the dependency is only needed later. `scope.resolveOptional(Token)` returns `null` when
+the token is not bound.
+
+```ts
+import { Inject, Injectable, WireScope } from "@wirestate/core";
+
+@Injectable()
+export class NotificationService {
+  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+
+  public notify(message: string): void {
+    const logger = this.scope.resolve(LoggerService);
+
+    logger.log(message);
+  }
+}
+```
+
+## Constants And Factories
+
+Use descriptors when the binding needs an explicit token or strategy. That includes constants, factories, and service
+classes registered behind a token that is different from the class itself.
+
+```ts
+import { BindingType, bindConstant, bindDynamicValue, createContainer } from "@wirestate/core";
+
+const API_URL = Symbol("API_URL");
+const DATE_NOW = Symbol("DATE_NOW");
+const container = createContainer();
+
+bindConstant(container, { id: API_URL, value: "https://api.example.com" });
+bindDynamicValue(container, {
+  id: DATE_NOW,
+  bindingType: BindingType.DynamicValue,
+  factory: () => new Date(),
+});
+```
+
+
+---
+
+API reference: [`Injectable`](/api/wirestate/functions/Injectable), [`Inject`](/api/wirestate/functions/Inject),
+[`WireScope`](/api/wirestate/classes/WireScope), [`OnProvision`](/api/wirestate/functions/OnProvision),
+[`OnDeprovision`](/api/wirestate/functions/OnDeprovision), [`InjectableDescriptor`](/api/wirestate/interfaces/InjectableDescriptor).

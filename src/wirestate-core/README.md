@@ -25,10 +25,12 @@ import "reflect-metadata";
 Services are plain classes decorated with `@Injectable`. Each service may inject a `WireScope` which provides access to the event, command, and query buses and to other services in the container.
 
 `@OnActivated` and `@OnDeactivation` methods are invoked during the synchronous Inversify lifecycle. If they return a
-promise, Wirestate does not block container resolution or disposal.
-`@OnProvision` and `@OnDeprovision` methods are invoked by framework providers such as React and Lit when a container
-is attached to or detached from a UI subtree. Services that inject `WireScope` also participate in provider
-deprovision state tracking, even when they do not declare provider lifecycle hooks.
+promise, Wirestate does not block container resolution or disposal. Keep activation cheap and avoid opening resources
+there.
+`@OnProvision` and `@OnDeprovision` methods are invoked by providers when a container is attached to or detached from an
+owned boundary. Use them for timers, subscriptions, sockets, and async work that needs cleanup. Services that inject
+`WireScope` also participate in provider deprovision state tracking, even when they do not declare provider lifecycle
+hooks.
 
 ```ts
 import { Injectable, Inject, WireScope } from "@wirestate/core";
@@ -148,7 +150,7 @@ export class AnotherService {
 
 ## Seeds
 
-Seeds pass initial data to services when they are activated.
+Seeds pass initial data to services when they are resolved or provisioned.
 
 ```ts
 import { SEED, Injectable, Inject } from "@wirestate/core";
@@ -169,47 +171,42 @@ export class OtherService {
 ```
 
 Seeds are applied via `applySeeds` / `applySharedSeed` and removed via `unapplySeeds`.
-For managed React containers, pass `seed` or `seeds` inside `ContainerProvider` `config`. For external containers, pass
-seeds to `createContainer` or apply them before services are activated.
+For managed containers, pass `seed` or `seeds` inside provider config. For external containers, pass seeds to
+`createContainer` or apply them before services are resolved or provisioned.
 
 ## Lifecycle
 
 ```ts
-import { OnActivated, OnDeactivation, OnDeprovision, OnProvision } from "@wirestate/core";
+import { OnDeprovision, OnProvision } from "@wirestate/core";
 
 @Injectable()
 export class PollingService {
   private timer?: ReturnType<typeof setInterval>;
-  private ubsubscribe?: () => void;
-
-  @OnActivated()
-  public onActivated(): void {
-    this.timer = setInterval(() => console.info("interval execution"), 5000);
-  }
-
-  @OnDeactivation()
-  public onDeactivation(): void {
-    clearInterval(this.timer);
-  }
+  private unsubscribe?: () => void;
 
   @OnProvision()
   public onProvision(): void {
-    this.ubsubscribe = connectToProviderScopedResource();
+    this.timer = setInterval(() => console.info("interval execution"), 5000);
+    this.unsubscribe = connectToProviderScopedResource();
   }
 
   @OnDeprovision()
   public onDeprovision(): void {
-    this.ubsubscribe?.();
-    this.ubsubscribe = undefined;
+    clearInterval(this.timer);
+    this.timer = undefined;
+    this.unsubscribe?.();
+    this.unsubscribe = undefined;
   }
 }
 ```
 
 `@OnActivated` runs after the service is bound and all dependencies are resolved.
 `@OnDeactivation` runs when the container scope is disposed.
-`@OnProvision` runs when a React or Lit provider exposes the container to a subtree.
+`@OnProvision` runs when a provider exposes the container to an owned boundary.
 `@OnDeprovision` runs before that provider removes or replaces the container; external containers are not disposed by
 the provider.
+
+Do not start cleanup-requiring work in `@OnActivated`. Provider lifecycles are the ownership boundary for that work.
 
 Injected `WireScope` instances expose lifecycle state for async guards:
 

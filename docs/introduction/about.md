@@ -5,8 +5,8 @@ Wirestate is a foundation for DI-backed TypeScript application architecture.
 It gives a UI framework layer the pieces it needs but should not invent every time: scoped ownership, injectable
 services, lifecycle, local messaging, and hydration data.
 
-Application logic lives in services. React and Lit adapters provide those services to component trees. Services talk
-through container-local events, commands, and queries instead of reaching across UI boundaries.
+Application logic lives in services. UI adapters provide those services to component trees. Services talk through
+container-local events, commands, and queries instead of reaching across UI boundaries.
 
 Reactivity stays outside the core. Use MobX, Preact Signals, Lit Signals, or plain TypeScript.
 
@@ -18,6 +18,12 @@ Reactivity stays outside the core. Use MobX, Preact Signals, Lit Signals, or pla
 - Container-local `EventBus`, `CommandBus`, and `QueryBus`.
 - Seeds for SSR hydration, deterministic tests, and per-subtree startup data.
 - React and Lit adapters that keep framework glue thin.
+
+## Docs Layout
+
+- [Core](/core/overview) covers framework-agnostic services, containers, lifecycle, messaging, seeds, and tests.
+- [React](/react/overview) covers React providers, hooks, signals, MobX, messaging, seeds, and tests.
+- [Lit](/lit/overview) covers Lit providers, decorators, controllers, signals, messaging, seeds, and tests.
 
 ## When It Fits
 

@@ -1,0 +1,73 @@
+# Core Overview
+
+`@wirestate/core` contains the framework-agnostic part of Wirestate.
+
+Use it to define services, [create scoped containers](/api/wirestate/functions/createContainer), run lifecycle hooks,
+pass seed data, and communicate through container-local events, commands, and queries.
+
+The core package does not choose a reactivity system. A service can hold plain values, immutable data, external stores,
+or reactive objects created by another package.
+
+## Install
+
+```bash
+npm install @wirestate/core reflect-metadata
+```
+
+Import `reflect-metadata` once before decorated services are loaded.
+
+```ts
+import "reflect-metadata";
+```
+
+Enable decorator metadata in TypeScript.
+
+```json
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
+}
+```
+
+## Basic Shape
+
+```ts
+import { Container, Injectable, createContainer } from "@wirestate/core";
+
+@Injectable()
+class CounterService {
+  public count: number = 0;
+
+  public increment(): void {
+    this.count += 1;
+  }
+}
+
+const container: Container = createContainer({
+  entries: [CounterService],
+});
+
+const counter = container.get(CounterService);
+
+counter.increment();
+```
+
+## What Belongs In Core
+
+- Service classes and dependency injection.
+- Root and child containers.
+- Service activation, deactivation, provision, and deprovision hooks.
+- Events for broadcast notifications.
+- Commands for one-handler write operations.
+- Queries for one-handler read operations.
+- Shared and targeted seed data.
+- Test helpers for service and container tests.
+
+
+---
+
+API reference: [`createContainer`](/api/wirestate/functions/createContainer), [`WireScope`](/api/wirestate/classes/WireScope),
+[`EventBus`](/api/wirestate/classes/EventBus), [`CommandBus`](/api/wirestate/classes/CommandBus),
+[`QueryBus`](/api/wirestate/classes/QueryBus).

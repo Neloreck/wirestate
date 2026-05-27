@@ -48,3 +48,9 @@ Enable decorator metadata.
   }
 }
 ```
+
+## Next Steps
+
+- Start with [Core overview](/core/overview) for services and containers.
+- Use [React overview](/react/overview) for React applications.
+- Use [Lit overview](/lit/overview) for Lit applications.

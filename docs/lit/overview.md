@@ -1,0 +1,76 @@
+# Lit Overview
+
+`@wirestate/lit` connects Wirestate containers to Lit elements.
+
+Use it for [container providers](/api/wirestate-lit/functions/containerProvide), service injection, and element-lifetime
+event, command, and query handlers. Use
+`@wirestate/lit-signals` when Lit services should expose signal state to templates.
+
+## Install
+
+```bash
+npm install @wirestate/core @wirestate/lit @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/signals signal-polyfill reflect-metadata
+```
+
+## Root Element
+
+```ts
+import { Injectable } from "@wirestate/core";
+import { ContainerProvider, containerProvide, injection } from "@wirestate/lit";
+import { State, signal, watch } from "@wirestate/lit-signals";
+import { LitElement, html } from "lit";
+import { customElement } from "lit/decorators.js";
+
+@Injectable()
+class CounterService {
+  public readonly count: State<number> = signal(0);
+
+  public increment(): void {
+    this.count.set(this.count.get() + 1);
+  }
+}
+
+@customElement("counter-application")
+class CounterApplication extends LitElement {
+  @containerProvide({ config: { entries: [CounterService] } })
+  private provider!: ContainerProvider;
+
+  protected render() {
+    return html`<counter-button></counter-button>`;
+  }
+}
+
+@customElement("counter-button")
+class CounterButton extends LitElement {
+  @injection(CounterService)
+  private counter!: CounterService;
+
+  protected render() {
+    return html`
+      <button @click=${() => this.counter.increment()}>
+        Count: ${watch(this.counter.count)}
+      </button>
+    `;
+  }
+}
+```
+
+## Provider Lifecycle
+
+Lit providers provision containers while the host is connected. Put connected-provider work in `@OnProvision`, and clean
+it up in `@OnDeprovision`. Use activation only for cheap resolution-time initialization that does not need cleanup.
+
+## Lit Package Surface
+
+- `containerProvide`, `subContainerProvide`, `useContainerProvision`, and `useSubContainerProvider` publish containers.
+- `injection`, `optionalInjection`, `useInjection`, `useOptionalInjection`, `useContainer`, and `useScope` consume values.
+- `onEvent`, `useOnEvents`, and `OnEventController` work with the event bus.
+- `onCommand`, `useOnCommand`, and `OnCommandController` work with the command bus.
+- `onQuery`, `useOnQuery`, and `OnQueryController` work with the query bus.
+
+
+---
+
+API reference: [`containerProvide`](/api/wirestate-lit/functions/containerProvide),
+[`ContainerProvider`](/api/wirestate-lit/classes/ContainerProvider), [`injection`](/api/wirestate-lit/functions/injection),
+[`onEvent`](/api/wirestate-lit/functions/onEvent), [`useOnQuery`](/api/wirestate-lit/functions/useOnQuery).

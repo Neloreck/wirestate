@@ -12,8 +12,10 @@ import { Maybe } from "../types/general";
  * @remarks
  * Activation happens the first time the singleton service is resolved.
  *
- * Use it for seed reads, subscriptions, and startup work. A service hierarchy
- * may have one activation hook name.
+ * Use it for cheap resolution-time initialization that does not open resources.
+ * Prefer `@OnProvision` for subscriptions, timers, sockets, observers, and
+ * async work that needs cleanup. A service hierarchy may have one activation
+ * hook name.
  *
  * @group Service
  *

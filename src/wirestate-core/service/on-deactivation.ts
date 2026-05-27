@@ -12,8 +12,9 @@ import { Maybe } from "../types/general";
  * @remarks
  * Deactivation happens when the container unbinds or disposes the service.
  *
- * Use it to cancel timers, close sockets, and flush work. A service hierarchy
- * may have one deactivation hook name.
+ * Use it for container-disposal cleanup. Prefer `@OnDeprovision` for work
+ * started by provider ownership, such as subscriptions, timers, sockets, and
+ * observers. A service hierarchy may have one deactivation hook name.
  *
  * @group Service
  *

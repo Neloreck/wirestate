@@ -13,8 +13,9 @@ import { Maybe } from "../types/general";
  * React and Lit providers call this when a container enters a UI subtree.
  * This is provider lifetime, not service lifetime.
  *
- * Use it for UI-scoped subscriptions or resources that should follow a
- * provider. A service hierarchy may have one provision hook name.
+ * Use it for subscriptions, timers, sockets, observers, provider-scoped async
+ * work, or any resource that should be cleaned up when the provider releases
+ * the container. A service hierarchy may have one provision hook name.
  *
  * @group Service
  *

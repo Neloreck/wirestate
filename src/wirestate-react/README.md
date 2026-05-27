@@ -95,8 +95,13 @@ export function CounterPage() {
 ## Provider lifecycle
 
 `@OnProvision` and `@OnDeprovision` run when a React provider commits, unmounts, or replaces its container.
-They are useful for services that need UI-scoped setup separate from core `@OnActivated` / `@OnDeactivation`.
+Use them for services that need UI-scoped setup or cleanup.
 Import them from `@wirestate/core` for services shared across React and Lit.
+
+Managed React providers create containers before the effect that provisions them. In Strict Mode, React can create an
+extra managed container, discard it, and commit another one. Do not start timers, subscriptions, sockets, or other
+cleanup-requiring work in `@OnActivated`; start it in `@OnProvision` and stop it in `@OnDeprovision`.
+Write provision hooks so setup can be fully undone and run again.
 
 ```ts
 import { Injectable, OnDeprovision, OnProvision } from "@wirestate/core";

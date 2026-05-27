@@ -143,7 +143,8 @@ class MyApp extends LitElement {
 ## Provider lifecycle
 
 `@OnProvision` and `@OnDeprovision` run when Lit root or child providers connect, disconnect, or replace a managed child
-container. Import them from `@wirestate/core` so the same service can be used by React and Lit providers.
+container. Import them from `@wirestate/core` so the same service can be used by different providers.
+Use provider lifecycle for timers, subscriptions, sockets, observers, and async work that needs cleanup.
 Injected `WireScope` instances expose `isDeprovisioned` for provider ownership state and `isInactive` as the usual guard
 for async work that should stop after provider deprovision or service disposal.
 
