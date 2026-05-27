@@ -20,6 +20,14 @@ export default defineConfig({
       { text: "Core", link: "/core/overview" },
       { text: "React", link: "/react/overview" },
       { text: "Lit", link: "/lit/overview" },
+      {
+        text: "Reactivity",
+        items: [
+          { text: "React Signals", link: "/react-signals/overview" },
+          { text: "React MobX", link: "/react-mobx/overview" },
+          { text: "Lit Signals", link: "/lit-signals/overview" },
+        ],
+      },
       { text: "API", link: "/api/" },
     ],
     sidebar: [
@@ -52,8 +60,6 @@ export default defineConfig({
           { text: "Overview", link: "/react/overview" },
           { text: "Containers", link: "/react/containers" },
           { text: "Injection", link: "/react/injection" },
-          { text: "Signals", link: "/react/signals" },
-          { text: "MobX", link: "/react/mobx" },
           { text: "Events", link: "/react/events" },
           { text: "Commands", link: "/react/commands" },
           { text: "Queries", link: "/react/queries" },
@@ -62,18 +68,29 @@ export default defineConfig({
         ],
       },
       {
+        text: "React Signals",
+        items: [{ text: "Overview", link: "/react-signals/overview" }],
+      },
+      {
+        text: "React MobX",
+        items: [{ text: "Overview", link: "/react-mobx/overview" }],
+      },
+      {
         text: "Lit",
         items: [
           { text: "Overview", link: "/lit/overview" },
           { text: "Containers", link: "/lit/containers" },
           { text: "Injection", link: "/lit/injection" },
-          { text: "Signals", link: "/lit/signals" },
           { text: "Events", link: "/lit/events" },
           { text: "Commands", link: "/lit/commands" },
           { text: "Queries", link: "/lit/queries" },
           { text: "Seeds", link: "/lit/seeds" },
           { text: "Testing", link: "/lit/testing" },
         ],
+      },
+      {
+        text: "Lit Signals",
+        items: [{ text: "Overview", link: "/lit-signals/overview" }],
       },
       {
         text: "API Reference",

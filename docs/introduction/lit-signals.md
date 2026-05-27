@@ -42,11 +42,7 @@ class CounterButton extends LitElement {
   private counter!: CounterService;
 
   protected render() {
-    return html`
-      <button @click=${() => this.counter.increment()}>
-        Count: ${watch(this.counter.count)}
-      </button>
-    `;
+    return html` <button @click=${() => this.counter.increment()}>Count: ${watch(this.counter.count)}</button> `;
   }
 }
 ```
@@ -56,10 +52,9 @@ class CounterButton extends LitElement {
 - [Lit overview](/lit/overview)
 - [Lit containers](/lit/containers)
 - [Lit injection](/lit/injection)
-- [Lit signals](/lit/signals)
+- [Lit Signals overview](/lit-signals/overview)
 - [Lit events](/lit/events)
 - [Lit commands](/lit/commands)
 - [Lit queries](/lit/queries)
 - [Lit seeds](/lit/seeds)
 - [Lit testing](/lit/testing)
-

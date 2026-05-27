@@ -3,14 +3,17 @@
 `@wirestate/lit` connects Wirestate containers to Lit elements.
 
 Use it for [container providers](/api/wirestate-lit/functions/containerProvide), service injection, and element-lifetime
-event, command, and query handlers. Use
-`@wirestate/lit-signals` when Lit services should expose signal state to templates.
+event, command, and query handlers. Use [Lit Signals](/lit-signals/overview) when Lit services should expose signal
+state to templates.
 
 ## Install
 
 ```bash
-npm install @wirestate/core @wirestate/lit @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/signals signal-polyfill reflect-metadata
+npm install @wirestate/core @wirestate/lit lit @lit/context @lit/reactive-element reflect-metadata
 ```
+
+The example below uses Lit Signals for service state. Install [Lit Signals](/lit-signals/overview) when using that
+pattern.
 
 ## Root Element
 
@@ -46,11 +49,7 @@ class CounterButton extends LitElement {
   private counter!: CounterService;
 
   protected render() {
-    return html`
-      <button @click=${() => this.counter.increment()}>
-        Count: ${watch(this.counter.count)}
-      </button>
-    `;
+    return html` <button @click=${() => this.counter.increment()}>Count: ${watch(this.counter.count)}</button> `;
   }
 }
 ```
@@ -68,9 +67,8 @@ it up in `@OnDeprovision`. Use activation only for cheap resolution-time initial
 - `onCommand`, `useOnCommand`, and `OnCommandController` work with the command bus.
 - `onQuery`, `useOnQuery`, and `OnQueryController` work with the query bus.
 
+## API Reference
 
----
-
-API reference: [`containerProvide`](/api/wirestate-lit/functions/containerProvide),
+[`containerProvide`](/api/wirestate-lit/functions/containerProvide),
 [`ContainerProvider`](/api/wirestate-lit/classes/ContainerProvider), [`injection`](/api/wirestate-lit/functions/injection),
 [`onEvent`](/api/wirestate-lit/functions/onEvent), [`useOnQuery`](/api/wirestate-lit/functions/useOnQuery).

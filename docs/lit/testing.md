@@ -45,9 +45,8 @@ describe("CounterView", () => {
 
 Append elements under `fixture.provider` so they can consume the provided context.
 
+## API Reference
 
----
-
-API reference: [`createLitProvision`](/api/wirestate-lit/test-utils/functions/createLitProvision),
+[`createLitProvision`](/api/wirestate-lit/test-utils/functions/createLitProvision),
 [`LitProvisionFixture`](/api/wirestate-lit/test-utils/interfaces/LitProvisionFixture),
 [`mockContainer`](/api/wirestate/test-utils/functions/mockContainer).

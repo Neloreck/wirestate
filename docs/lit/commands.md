@@ -60,8 +60,7 @@ class SearchButton extends LitElement {
 
 Newer handlers shadow older handlers for the same command type.
 
+## API Reference
 
----
-
-API reference: [`onCommand`](/api/wirestate-lit/functions/onCommand),
+[`onCommand`](/api/wirestate-lit/functions/onCommand),
 [`useOnCommand`](/api/wirestate-lit/functions/useOnCommand), [`OnCommandController`](/api/wirestate-lit/classes/OnCommandController).

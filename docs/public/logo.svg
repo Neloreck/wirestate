@@ -1,12 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">Wirestate logo</title>
+  <desc id="desc">A blue and purple four-part service gear mark for Wirestate.</desc>
   <defs>
-    <clipPath id="g">
-      <path clip-rule="evenodd" d="M67.4 29.5L70.3 10.7L89.7 10.7L92.6 29.5A52 52 0 0 1 106.8 35.4L122.1 24.1L135.9 37.9L124.6 53.2A52 52 0 0 1 130.5 67.4L149.3 70.3L149.3 89.7L130.5 92.6A52 52 0 0 1 124.6 106.8L135.9 122.1L122.1 135.9L106.8 124.6A52 52 0 0 1 92.6 130.5L89.7 149.3L70.3 149.3L67.4 130.5A52 52 0 0 1 53.2 124.6L37.9 135.9L24.1 122.1L35.4 106.8A52 52 0 0 1 29.5 92.6L10.7 89.7L10.7 70.3L29.5 67.4A52 52 0 0 1 35.4 53.2L24.1 37.9L37.9 24.1L53.2 35.4A52 52 0 0 1 67.4 29.5ZM80 58A22 22 0 0 0 80 102A22 22 0 0 0 80 58Z"/>
+    <path
+      id="gear"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M67.4 29.5 70.3 10.7h19.4l2.9 18.8a52 52 0 0 1 14.2 5.9l15.3-11.3 13.8 13.8-11.3 15.3a52 52 0 0 1 5.9 14.2l18.8 2.9v19.4l-18.8 2.9a52 52 0 0 1-5.9 14.2l11.3 15.3-13.8 13.8-15.3-11.3a52 52 0 0 1-14.2 5.9l-2.9 18.8H70.3l-2.9-18.8a52 52 0 0 1-14.2-5.9l-15.3 11.3-13.8-13.8 11.3-15.3a52 52 0 0 1-5.9-14.2l-18.8-2.9V70.3l18.8-2.9a52 52 0 0 1 5.9-14.2L24.1 37.9l13.8-13.8 15.3 11.3a52 52 0 0 1 14.2-5.9ZM80 58a22 22 0 1 0 0 44 22 22 0 0 0 0-44"
+    />
+    <clipPath id="gearClip">
+      <use href="#gear" />
     </clipPath>
+    <linearGradient id="sky" x1="16" y1="10" x2="84" y2="82" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#BAE6FD" />
+      <stop offset="1" stop-color="#60A5FA" />
+    </linearGradient>
+    <linearGradient id="blue" x1="82" y1="10" x2="150" y2="82" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#93C5FD" />
+      <stop offset="1" stop-color="#818CF8" />
+    </linearGradient>
+    <linearGradient id="lavender" x1="12" y1="80" x2="82" y2="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#C4B5FD" />
+      <stop offset="1" stop-color="#A78BFA" />
+    </linearGradient>
+    <linearGradient id="violet" x1="80" y1="80" x2="150" y2="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#DDD6FE" />
+      <stop offset="1" stop-color="#8B5CF6" />
+    </linearGradient>
   </defs>
 
-  <rect x="0" y="0" width="80" height="80" fill="#333333" clip-path="url(#g)"/>
-  <rect x="80" y="0" width="80" height="80" fill="#666666" clip-path="url(#g)"/>
-  <rect x="0" y="80" width="80" height="80" fill="#CCCCCC" clip-path="url(#g)"/>
-  <rect x="80" y="80" width="80" height="80" fill="#999999" clip-path="url(#g)"/>
+  <g clip-path="url(#gearClip)">
+    <rect width="80" height="80" fill="url(#sky)" />
+    <rect x="80" width="80" height="80" fill="url(#blue)" />
+    <rect y="80" width="80" height="80" fill="url(#lavender)" />
+    <rect x="80" y="80" width="80" height="80" fill="url(#violet)" />
+    <path fill="none" stroke="#4338CA" stroke-opacity=".18" stroke-width="4" d="M80 10v140M10 80h140" />
+    <circle cx="80" cy="80" r="35" fill="none" stroke="#4338CA" stroke-opacity=".2" stroke-width="6" />
+  </g>
+
+  <use href="#gear" fill="none" stroke="#6366F1" stroke-linejoin="round" stroke-opacity=".48" stroke-width="5" />
+  <use href="#gear" fill="none" stroke="#EFF6FF" stroke-linejoin="round" stroke-opacity=".66" stroke-width="2" />
+
+  <circle cx="80" cy="80" r="25" fill="#312E81" fill-opacity=".92" />
+  <circle cx="80" cy="80" r="15" fill="none" stroke="#BAE6FD" stroke-width="5" />
+  <circle cx="80" cy="80" r="5" fill="#C4B5FD" />
+  <circle cx="111" cy="48" r="7" fill="#67E8F9" stroke="#EEF2FF" stroke-opacity=".8" stroke-width="3" />
 </svg>

@@ -66,9 +66,8 @@ export class CounterService {
 
 Managed Lit containers are recreated when their provider config is replaced and when disconnected elements reconnect.
 
+## API Reference
 
----
-
-API reference: [`containerProvide`](/api/wirestate-lit/functions/containerProvide),
+[`containerProvide`](/api/wirestate-lit/functions/containerProvide),
 [`subContainerProvide`](/api/wirestate-lit/functions/subContainerProvide), [`WireScope`](/api/wirestate/classes/WireScope),
 [`SeedEntries`](/api/wirestate/type-aliases/SeedEntries).

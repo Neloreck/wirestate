@@ -11,7 +11,7 @@ This package builds the current core and React adapter into one distributable pa
 
 New focused work lives in the scoped packages, but this package keeps the unscoped name.
 
-### Monorepo 
+### Monorepo
 
 https://github.com/Neloreck/wirestate
 

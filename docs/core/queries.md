@@ -86,9 +86,8 @@ export class ThemeQueryService {
 
 Use this pattern when the query handler depends on runtime state or cannot be expressed with `@OnQuery`.
 
+## API Reference
 
----
-
-API reference: [`QueryBus`](/api/wirestate/classes/QueryBus), [`WireScope`](/api/wirestate/classes/WireScope),
+[`QueryBus`](/api/wirestate/classes/QueryBus), [`WireScope`](/api/wirestate/classes/WireScope),
 [`OnQuery`](/api/wirestate/functions/OnQuery), [`QueryHandler`](/api/wirestate/type-aliases/QueryHandler),
 [`QueryUnregister`](/api/wirestate/type-aliases/QueryUnregister).

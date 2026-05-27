@@ -176,9 +176,8 @@ bindDynamicValue(container, {
 });
 ```
 
+## API Reference
 
----
-
-API reference: [`Injectable`](/api/wirestate/functions/Injectable), [`Inject`](/api/wirestate/functions/Inject),
+[`Injectable`](/api/wirestate/functions/Injectable), [`Inject`](/api/wirestate/functions/Inject),
 [`WireScope`](/api/wirestate/classes/WireScope), [`OnProvision`](/api/wirestate/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate/functions/OnDeprovision), [`InjectableDescriptor`](/api/wirestate/interfaces/InjectableDescriptor).

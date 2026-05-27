@@ -89,10 +89,9 @@ class CheckoutScope extends LitElement {
 
 The child container is recreated when the parent context changes and destroyed when the host disconnects.
 
+## API Reference
 
----
-
-API reference: [`containerProvide`](/api/wirestate-lit/functions/containerProvide),
+[`containerProvide`](/api/wirestate-lit/functions/containerProvide),
 [`ContainerProvider`](/api/wirestate-lit/classes/ContainerProvider),
 [`useContainerProvision`](/api/wirestate-lit/functions/useContainerProvision),
 [`subContainerProvide`](/api/wirestate-lit/functions/subContainerProvide),

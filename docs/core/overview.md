@@ -65,9 +65,8 @@ counter.increment();
 - Shared and targeted seed data.
 - Test helpers for service and container tests.
 
+## API Reference
 
----
-
-API reference: [`createContainer`](/api/wirestate/functions/createContainer), [`WireScope`](/api/wirestate/classes/WireScope),
+[`createContainer`](/api/wirestate/functions/createContainer), [`WireScope`](/api/wirestate/classes/WireScope),
 [`EventBus`](/api/wirestate/classes/EventBus), [`CommandBus`](/api/wirestate/classes/CommandBus),
 [`QueryBus`](/api/wirestate/classes/QueryBus).

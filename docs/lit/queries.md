@@ -60,8 +60,7 @@ export class ThemeButton extends LitElement {
 
 Newer handlers shadow older handlers for the same query type.
 
+## API Reference
 
----
-
-API reference: [`onQuery`](/api/wirestate-lit/functions/onQuery), [`useOnQuery`](/api/wirestate-lit/functions/useOnQuery),
+[`onQuery`](/api/wirestate-lit/functions/onQuery), [`useOnQuery`](/api/wirestate-lit/functions/useOnQuery),
 [`OnQueryController`](/api/wirestate-lit/classes/OnQueryController).

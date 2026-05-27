@@ -55,11 +55,12 @@ export function useOnEvents<E extends Event = Event>(
   host: ReactiveElement,
   { types, handler }: UseOnEventsOptions
 ): OnEventController<E> {
-  const normalized: Optional<ReadonlyArray<EventType>> = types === null || types === undefined
-    ? null
-    : Array.isArray(types)
-      ? [...(types as ReadonlyArray<EventType>)]
-      : [types as EventType];
+  const normalized: Optional<ReadonlyArray<EventType>> =
+    types === null || types === undefined
+      ? null
+      : Array.isArray(types)
+        ? [...(types as ReadonlyArray<EventType>)]
+        : [types as EventType];
 
   return new OnEventController<E>(host, normalized, handler);
 }

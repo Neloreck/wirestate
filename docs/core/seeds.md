@@ -118,9 +118,8 @@ unapplySeeds(container, [[CounterService, null]]);
 Seed updates do not rewind already provisioned services. Apply seeds before the provider provisions the container, or
 explicitly re-apply the value in your own service method.
 
+## API Reference
 
----
-
-API reference: [`SEED`](/api/wirestate/variables/SEED), [`SEEDS`](/api/wirestate/variables/SEEDS),
+[`SEED`](/api/wirestate/variables/SEED), [`SEEDS`](/api/wirestate/variables/SEEDS),
 [`applySharedSeed`](/api/wirestate/functions/applySharedSeed), [`applySeeds`](/api/wirestate/functions/applySeeds),
 [`unapplySeeds`](/api/wirestate/functions/unapplySeeds), [`SeedEntries`](/api/wirestate/type-aliases/SeedEntries).

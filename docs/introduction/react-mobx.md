@@ -53,10 +53,9 @@ const Counter = observer(function Counter() {
 - [React overview](/react/overview)
 - [React containers](/react/containers)
 - [React injection](/react/injection)
-- [React MobX](/react/mobx)
+- [React MobX overview](/react-mobx/overview)
 - [React events](/react/events)
 - [React commands](/react/commands)
 - [React queries](/react/queries)
 - [React seeds](/react/seeds)
 - [React testing](/react/testing)
-

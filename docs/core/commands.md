@@ -70,14 +70,7 @@ When a service owns a dynamic command handler, register it during provider lifec
 deprovision.
 
 ```ts
-import {
-  CommandUnregister,
-  Inject,
-  Injectable,
-  OnDeprovision,
-  OnProvision,
-  WireScope,
-} from "@wirestate/core";
+import { CommandUnregister, Inject, Injectable, OnDeprovision, OnProvision, WireScope } from "@wirestate/core";
 
 @Injectable()
 export class CartCommandService {
@@ -106,9 +99,8 @@ export class CartCommandService {
 
 Use this pattern when the command handler depends on runtime state or cannot be expressed with `@OnCommand`.
 
+## API Reference
 
----
-
-API reference: [`CommandBus`](/api/wirestate/classes/CommandBus), [`WireScope`](/api/wirestate/classes/WireScope),
+[`CommandBus`](/api/wirestate/classes/CommandBus), [`WireScope`](/api/wirestate/classes/WireScope),
 [`OnCommand`](/api/wirestate/functions/OnCommand), [`CommandDescriptor`](/api/wirestate/interfaces/CommandDescriptor),
 [`CommandUnregister`](/api/wirestate/type-aliases/CommandUnregister).

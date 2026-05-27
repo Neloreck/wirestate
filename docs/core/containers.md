@@ -63,9 +63,8 @@ if (container.isBound(UserService)) {
 
 Prefer entries and bind helpers for Wirestate services so lifecycle and messaging metadata are registered consistently.
 
+## API Reference
 
----
-
-API reference: [`createContainer`](/api/wirestate/functions/createContainer), [`ContainerConfig`](/api/wirestate/type-aliases/ContainerConfig),
+[`createContainer`](/api/wirestate/functions/createContainer), [`ContainerConfig`](/api/wirestate/type-aliases/ContainerConfig),
 [`Container`](/api/wirestate/classes/Container), [`provisionContainer`](/api/wirestate/functions/provisionContainer),
 [`deprovisionContainer`](/api/wirestate/functions/deprovisionContainer).

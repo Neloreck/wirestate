@@ -87,11 +87,7 @@ export function Application() {
 function Counter() {
   const counterService = useInjection(CounterService);
 
-  return (
-    <button onClick={() => counterService.increment()}>
-      Count: {counterService.count.value}
-    </button>
-  );
+  return <button onClick={() => counterService.increment()}>Count: {counterService.count.value}</button>;
 }
 ```
 
@@ -100,12 +96,7 @@ function Counter() {
 ```tsx
 import { Injectable } from "@wirestate/core";
 import { ContainerProvider, useInjection } from "@wirestate/react";
-import {
-  Action,
-  Observable,
-  makeObservable,
-  observer,
-} from "@wirestate/react-mobx";
+import { Action, Observable, makeObservable, observer } from "@wirestate/react-mobx";
 
 @Injectable()
 class CounterService {
@@ -135,11 +126,7 @@ export function Application() {
 const Counter = observer(function Counter() {
   const counterService = useInjection(CounterService);
 
-  return (
-    <button onClick={() => counterService.increment()}>
-      Count: {counterService.count}
-    </button>
-  );
+  return <button onClick={() => counterService.increment()}>Count: {counterService.count}</button>;
 });
 ```
 
@@ -178,9 +165,7 @@ class CounterButton extends LitElement {
 
   protected render() {
     return html`
-      <button @click=${() => this.counterService.increment()}>
-        Count: ${watch(this.counterService.count)}
-      </button>
+      <button @click=${() => this.counterService.increment()}>Count: ${watch(this.counterService.count)}</button>
     `;
   }
 }

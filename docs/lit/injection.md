@@ -72,10 +72,9 @@ class DebugButton extends LitElement {
 }
 ```
 
+## API Reference
 
----
-
-API reference: [`injection`](/api/wirestate-lit/functions/injection),
+[`injection`](/api/wirestate-lit/functions/injection),
 [`optionalInjection`](/api/wirestate-lit/functions/optionalInjection), [`useInjection`](/api/wirestate-lit/functions/useInjection),
 [`useOptionalInjection`](/api/wirestate-lit/functions/useOptionalInjection), [`useContainer`](/api/wirestate-lit/functions/useContainer),
 [`useScope`](/api/wirestate-lit/functions/useScope).

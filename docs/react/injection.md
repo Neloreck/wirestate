@@ -66,9 +66,8 @@ function DebugButton() {
 }
 ```
 
+## API Reference
 
----
-
-API reference: [`useInjection`](/api/wirestate/functions/useInjection),
+[`useInjection`](/api/wirestate/functions/useInjection),
 [`useOptionalInjection`](/api/wirestate/functions/useOptionalInjection), [`useContainer`](/api/wirestate/functions/useContainer),
 [`useScope`](/api/wirestate/functions/useScope).

@@ -8,17 +8,14 @@ Choose a separate reactivity package for service state.
 
 ## Install
 
-For React with Preact Signals:
+Install the React bridge with core:
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-signals @preact/signals-react reflect-metadata
+npm install @wirestate/core @wirestate/react reflect-metadata
 ```
 
-For React with MobX:
-
-```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-mobx mobx mobx-react-lite reflect-metadata
-```
+For reactive service state, use a separate package such as [React Signals](/react-signals/overview) or
+[React MobX](/react-mobx/overview).
 
 ## Root Provider
 
@@ -71,9 +68,8 @@ activated, then discarded before the committed provider lifecycle continues. Put
 - `useQueryExecutor`, `useAsyncQueryExecutor`, `useOptionalQueryExecutor`, `useOptionalAsyncQueryExecutor`, and
   `useQueryHandler` work with the query bus.
 
+## API Reference
 
----
-
-API reference: [`ContainerProvider`](/api/wirestate/functions/ContainerProvider),
+[`ContainerProvider`](/api/wirestate/functions/ContainerProvider),
 [`SubContainerProvider`](/api/wirestate/functions/SubContainerProvider), [`useInjection`](/api/wirestate/functions/useInjection),
 [`useCommandExecutor`](/api/wirestate/functions/useCommandExecutor), [`useQueryExecutor`](/api/wirestate/functions/useQueryExecutor).

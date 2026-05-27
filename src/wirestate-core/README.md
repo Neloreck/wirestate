@@ -219,7 +219,7 @@ Injected `WireScope` instances expose lifecycle state for async guards:
 `WireScope` is injected per-service and exposes:
 
 | Member                                    | Description                                                                                 |
-| ----------------------------------------- |---------------------------------------------------------------------------------------------|
+| ----------------------------------------- | ------------------------------------------------------------------------------------------- |
 | `isDisposed`                              | `true` after service deactivation                                                           |
 | `isDeprovisioned`                         | `null` before provider provisioning, `false` while owned, `true` after provider deprovision |
 | `isInactive`                              | `true` when `isDisposed` or `isDeprovisioned === true`                                      |

@@ -22,15 +22,16 @@ Reactivity stays outside the core. Use MobX, Preact Signals, Lit Signals, or pla
 ## Docs Layout
 
 - [Core](/core/overview) covers framework-agnostic services, containers, lifecycle, messaging, seeds, and tests.
-- [React](/react/overview) covers React providers, hooks, signals, MobX, messaging, seeds, and tests.
-- [Lit](/lit/overview) covers Lit providers, decorators, controllers, signals, messaging, seeds, and tests.
+- [React](/react/overview) covers React providers, hooks, messaging, seeds, and tests.
+- [Lit](/lit/overview) covers Lit providers, decorators, controllers, messaging, seeds, and tests.
+- [React Signals](/react-signals/overview), [React MobX](/react-mobx/overview), and
+  [Lit Signals](/lit-signals/overview) cover framework-specific reactivity packages.
 
 ## When It Fits
 
-- You want application logic outside React or Lit components.
+- You want application logic outside UI components.
 - You want service lifetime scoped to a container or subtree.
 - You want testable services without rendering UI.
-- You want DI without making the core pick a reactivity library.
 
 Wirestate fits complex applications where a page grows into a long-lived feature with its own state, workflows,
 and service boundaries.
@@ -66,11 +67,7 @@ export function Application() {
 function Counter() {
   const counterService = useInjection(CounterService);
 
-  return (
-    <button onClick={() => counterService.increment()}>
-      Count: {counterService.count.value}
-    </button>
-  );
+  return <button onClick={() => counterService.increment()}>Count: {counterService.count.value}</button>;
 }
 ```
 
@@ -79,12 +76,7 @@ function Counter() {
 ```tsx
 import { Injectable } from "@wirestate/core";
 import { ContainerProvider, useInjection } from "@wirestate/react";
-import {
-  Action,
-  Observable,
-  makeObservable,
-  observer,
-} from "@wirestate/react-mobx";
+import { Action, Observable, makeObservable, observer } from "@wirestate/react-mobx";
 
 @Injectable()
 class CounterService {
@@ -114,11 +106,7 @@ export function Application() {
 const Counter = observer(function Counter() {
   const counterService = useInjection(CounterService);
 
-  return (
-    <button onClick={() => counterService.increment()}>
-      Count: {counterService.count}
-    </button>
-  );
+  return <button onClick={() => counterService.increment()}>Count: {counterService.count}</button>;
 });
 ```
 
@@ -157,9 +145,7 @@ class CounterButton extends LitElement {
 
   protected render() {
     return html`
-      <button @click=${() => this.counterService.increment()}>
-        Count: ${watch(this.counterService.count)}
-      </button>
+      <button @click=${() => this.counterService.increment()}>Count: ${watch(this.counterService.count)}</button>
     `;
   }
 }

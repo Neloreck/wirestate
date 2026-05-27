@@ -59,8 +59,7 @@ function EventLog() {
 
 Subscriptions unregister when the component unmounts or the active container changes.
 
+## API Reference
 
----
-
-API reference: [`useEventEmitter`](/api/wirestate/functions/useEventEmitter), [`useEvent`](/api/wirestate/functions/useEvent),
+[`useEventEmitter`](/api/wirestate/functions/useEventEmitter), [`useEvent`](/api/wirestate/functions/useEvent),
 [`useEvents`](/api/wirestate/functions/useEvents), [`useEventsHandler`](/api/wirestate/functions/useEventsHandler).

@@ -65,9 +65,8 @@ export class CounterService {
 
 Changing provider seeds recreates managed provider containers when the shallow provider inputs change.
 
+## API Reference
 
----
-
-API reference: [`ContainerProvider`](/api/wirestate/functions/ContainerProvider),
+[`ContainerProvider`](/api/wirestate/functions/ContainerProvider),
 [`SubContainerProvider`](/api/wirestate/functions/SubContainerProvider), [`SeedEntries`](/api/wirestate/type-aliases/SeedEntries),
 [`WireScope`](/api/wirestate/classes/WireScope).

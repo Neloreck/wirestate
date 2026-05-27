@@ -60,8 +60,7 @@ class CartButton extends LitElement {
 
 Handlers unregister when the element disconnects or its active container changes.
 
+## API Reference
 
----
-
-API reference: [`onEvent`](/api/wirestate-lit/functions/onEvent), [`useOnEvents`](/api/wirestate-lit/functions/useOnEvents),
+[`onEvent`](/api/wirestate-lit/functions/onEvent), [`useOnEvents`](/api/wirestate-lit/functions/useOnEvents),
 [`OnEventController`](/api/wirestate-lit/classes/OnEventController).

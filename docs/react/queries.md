@@ -49,10 +49,9 @@ function ThemeProvider() {
 Handlers unregister when the component unmounts or the active container changes. Newer handlers shadow older handlers
 for the same query type.
 
+## API Reference
 
----
-
-API reference: [`useQueryExecutor`](/api/wirestate/functions/useQueryExecutor),
+[`useQueryExecutor`](/api/wirestate/functions/useQueryExecutor),
 [`useAsyncQueryExecutor`](/api/wirestate/functions/useAsyncQueryExecutor),
 [`useOptionalQueryExecutor`](/api/wirestate/functions/useOptionalQueryExecutor),
 [`useOptionalAsyncQueryExecutor`](/api/wirestate/functions/useOptionalAsyncQueryExecutor),

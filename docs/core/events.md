@@ -99,9 +99,8 @@ Use this pattern when the subscription depends on runtime state or cannot be exp
 
 A throwing event handler is logged. The next handler still runs.
 
+## API Reference
 
----
-
-API reference: [`EventBus`](/api/wirestate/classes/EventBus), [`WireScope`](/api/wirestate/classes/WireScope),
+[`EventBus`](/api/wirestate/classes/EventBus), [`WireScope`](/api/wirestate/classes/WireScope),
 [`OnEvent`](/api/wirestate/functions/OnEvent), [`Event`](/api/wirestate/interfaces/Event),
 [`EventUnsubscriber`](/api/wirestate/type-aliases/EventUnsubscriber).

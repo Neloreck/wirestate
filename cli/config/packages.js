@@ -49,8 +49,6 @@ export const PACKAGES = [
       path.resolve(SRC_PATH, "wirestate/mobx.ts"),
       path.resolve(SRC_PATH, "wirestate/signals.ts"),
     ],
-    external: [
-      ...EXTERNAL_DEPENDENCIES,
-    ],
+    external: [...EXTERNAL_DEPENDENCIES],
   },
 ];

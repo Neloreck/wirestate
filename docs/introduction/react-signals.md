@@ -47,10 +47,9 @@ function Counter() {
 - [React overview](/react/overview)
 - [React containers](/react/containers)
 - [React injection](/react/injection)
-- [React signals](/react/signals)
+- [React Signals overview](/react-signals/overview)
 - [React events](/react/events)
 - [React commands](/react/commands)
 - [React queries](/react/queries)
 - [React seeds](/react/seeds)
 - [React testing](/react/testing)
-

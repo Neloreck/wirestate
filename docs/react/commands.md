@@ -54,9 +54,8 @@ function SearchPanel() {
 Handlers unregister when the component unmounts or the active container changes. Newer handlers shadow older handlers
 for the same command type.
 
+## API Reference
 
----
-
-API reference: [`useCommandExecutor`](/api/wirestate/functions/useCommandExecutor),
+[`useCommandExecutor`](/api/wirestate/functions/useCommandExecutor),
 [`useOptionalCommandExecutor`](/api/wirestate/functions/useOptionalCommandExecutor),
 [`useCommandHandler`](/api/wirestate/functions/useCommandHandler).

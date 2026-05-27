@@ -10,7 +10,11 @@ describe("package version bump", () => {
       },
     };
 
-    updateInternalDependencyVersions(manifest, new Set(["@wirestate/core", "@wirestate/react"]), "0.7.0-experimental.8");
+    updateInternalDependencyVersions(
+      manifest,
+      new Set(["@wirestate/core", "@wirestate/react"]),
+      "0.7.0-experimental.8"
+    );
 
     expect(manifest.peerDependencies).toEqual({
       "@wirestate/core": "0.7.0-experimental.8",

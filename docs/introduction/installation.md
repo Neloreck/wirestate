@@ -5,7 +5,7 @@ Install the core package, one UI adapter, and the reactivity package you actuall
 ## Packages
 
 | Stack           | Packages                                                                                                                                                          |
-| --------------- |-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | React + Signals | `@wirestate/core` `@wirestate/react` `@wirestate/react-signals` `@preact/signals-react` `reflect-metadata`                                                        |
 | React + MobX    | `@wirestate/core` `@wirestate/react` `@wirestate/react-mobx` `mobx` `mobx-react-lite` `reflect-metadata`                                                          |
 | Lit + Signals   | `@wirestate/core` `@wirestate/lit` `@wirestate/lit-signals` `lit` `@lit/context` `@lit/reactive-element` `@lit-labs/signals` `signal-polyfill` `reflect-metadata` |
@@ -54,3 +54,5 @@ Enable decorator metadata.
 - Start with [Core overview](/core/overview) for services and containers.
 - Use [React overview](/react/overview) for React applications.
 - Use [Lit overview](/lit/overview) for Lit applications.
+- Use [React Signals](/react-signals/overview), [React MobX](/react-mobx/overview), or
+  [Lit Signals](/lit-signals/overview) for framework-specific reactivity packages.

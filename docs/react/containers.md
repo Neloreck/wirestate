@@ -88,10 +88,9 @@ function DevTools() {
 }
 ```
 
+## API Reference
 
----
-
-API reference: [`ContainerProvider`](/api/wirestate/functions/ContainerProvider),
+[`ContainerProvider`](/api/wirestate/functions/ContainerProvider),
 [`ContainerProviderProps`](/api/wirestate/interfaces/ContainerProviderProps),
 [`SubContainerProvider`](/api/wirestate/functions/SubContainerProvider),
 [`SubContainerProviderProps`](/api/wirestate/interfaces/SubContainerProviderProps), [`useContainer`](/api/wirestate/functions/useContainer),

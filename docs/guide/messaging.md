@@ -19,4 +19,3 @@ Lit:
 - [Lit events](/lit/events)
 - [Lit commands](/lit/commands)
 - [Lit queries](/lit/queries)
-

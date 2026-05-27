@@ -68,11 +68,7 @@ import { SubContainerProvider } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 function CounterServicesProvider(props: { children?: ReactNode }) {
-  return (
-    <SubContainerProvider entries={[CounterService, LoggerService]}>
-      {props.children}
-    </SubContainerProvider>
-  );
+  return <SubContainerProvider entries={[CounterService, LoggerService]}>{props.children}</SubContainerProvider>;
 }
 
 export function CounterPage() {
@@ -86,10 +82,10 @@ export function CounterPage() {
 
 **Props:**
 
-| Prop       | Type                                  | Description                                                                    |
-| ---------- | ------------------------------------- | ------------------------------------------------------------------------------ |
-| `entries`  | `InjectableEntries`                   | Services or binding descriptors to add to the child container.                 |
-| `seeds`    | `SeedEntries`                         | Per-service seeds, e.g. `[[CounterService, { count: 10 }]]`. Applied on mount. |
+| Prop       | Type                                  | Description                                                                     |
+| ---------- | ------------------------------------- | ------------------------------------------------------------------------------- |
+| `entries`  | `InjectableEntries`                   | Services or binding descriptors to add to the child container.                  |
+| `seeds`    | `SeedEntries`                         | Per-service seeds, e.g. `[[CounterService, { count: 10 }]]`. Applied on mount.  |
 | `activate` | `boolean \| Array<ServiceIdentifier>` | `true` by default. Pass `false` or specific entry tokens to control activation. |
 
 ## Provider lifecycle
