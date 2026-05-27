@@ -10,6 +10,8 @@ npm install @wirestate/core @wirestate/lit @wirestate/lit-signals lit @lit/conte
 
 ## Minimal Example
 
+Create signals in services or stable element state. Use `watch()` in templates to subscribe rendering to signal updates.
+
 ```ts
 import { Injectable } from "@wirestate/core";
 import { ContainerProvider, containerProvide, injection } from "@wirestate/lit";

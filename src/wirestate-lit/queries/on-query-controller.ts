@@ -22,8 +22,11 @@ import { Optional } from "../types/general";
  * import { LitElement } from "lit";
  * import { OnQueryController } from "@wirestate/lit";
  *
- * class ThemeHost extends LitElement {
- *   private readonly queryTheme = new OnQueryController(this, "CURRENT_THEME", () => "dark");
+ * class CheckoutHost extends LitElement {
+ *   private readonly querySummary = new OnQueryController(this, "CHECKOUT_SUMMARY", () => ({
+ *     itemCount: 2,
+ *     total: 48,
+ *   }));
  * }
  * ```
  */

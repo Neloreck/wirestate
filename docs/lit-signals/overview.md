@@ -28,7 +28,8 @@ export class CounterService {
 
 ## Template
 
-Use `watch` in templates to subscribe the element to the signal.
+Create signals in services or stable element state. Use `watch()` in templates to subscribe the element to signal
+updates.
 
 ```ts
 import { injection } from "@wirestate/lit";

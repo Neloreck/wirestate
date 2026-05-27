@@ -23,7 +23,11 @@ import { OptionalQueryExecutor } from "../types/queries";
  * @example
  * ```tsx
  * const queryOptional: OptionalQueryExecutor = useOptionalQueryExecutor();
- * const settings: UserSettings | null = queryOptional(GET_USER_SETTINGS, { id: 1 });
+ * const [settings, setSettings] = useState<UserSettings | null>(null);
+ *
+ * const refreshSettings = useCallback(() => {
+ *   setSettings(queryOptional(GET_USER_SETTINGS, { id: 1 }));
+ * }, [queryOptional]);
  * ```
  */
 export function useOptionalQueryExecutor(): OptionalQueryExecutor {

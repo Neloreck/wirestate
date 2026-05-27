@@ -21,7 +21,11 @@ import { AsyncQueryExecutor } from "../types/queries";
  * @example
  * ```tsx
  * const queryAsync: AsyncQueryExecutor = useAsyncQueryExecutor();
- * const result: UserProfile = await queryAsync(GET_USER_PROFILE, { id: 123 });
+ * const [profile, setProfile] = useState<UserProfile | null>(null);
+ *
+ * const refreshProfile = useCallback(async () => {
+ *   setProfile(await queryAsync(GET_USER_PROFILE, { id: 123 }));
+ * }, [queryAsync]);
  * ```
  */
 export function useAsyncQueryExecutor(): AsyncQueryExecutor {

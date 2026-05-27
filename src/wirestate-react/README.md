@@ -215,13 +215,20 @@ useCommandHandler("SCROLL_TOP", () => {
 
 ## Query hooks
 
+Query execution can resolve services and run user handlers. Avoid calling query executors directly during render; call
+them from an effect, event handler, or memoized callback and render cached component state.
+
 ### `useQueryExecutor()`
 
 Returns a function that calls a synchronous query handler and returns its value directly.
 
 ```tsx
 const query = useQueryExecutor();
-const items = query("GET_ITEMS");
+const [items, setItems] = useState<Array<Item>>([]);
+
+useEffect(() => {
+  setItems(query("GET_ITEMS"));
+}, [query]);
 ```
 
 ### `useAsyncQueryExecutor()`
@@ -231,7 +238,11 @@ and asynchronous handlers.
 
 ```tsx
 const queryAsync = useAsyncQueryExecutor();
-const items = await queryAsync("GET_ITEMS");
+const [items, setItems] = useState<Array<Item>>([]);
+
+const refreshItems = useCallback(async () => {
+  setItems(await queryAsync("GET_ITEMS"));
+}, [queryAsync]);
 ```
 
 ### `useOptionalQueryExecutor()` / `useOptionalAsyncQueryExecutor()`

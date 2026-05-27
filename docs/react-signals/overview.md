@@ -28,7 +28,8 @@ export class CounterService {
 
 ## Component
 
-Signals re-render React consumers when read during render.
+Signals re-render React consumers when read during render. Keep signal creation in services or stable component state;
+reading `.value` in render is the subscription point.
 
 ```tsx
 import { useInjection } from "@wirestate/react";

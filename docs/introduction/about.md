@@ -40,6 +40,8 @@ and service boundaries.
 
 ### React + Signals
 
+Signal reads in render are the React subscription point. Create signals in services or stable component state.
+
 ```tsx
 import { Injectable } from "@wirestate/core";
 import { ContainerProvider, useInjection } from "@wirestate/react";
@@ -111,6 +113,8 @@ const Counter = observer(function Counter() {
 ```
 
 ### Lit + Signals
+
+Use `watch()` in templates to subscribe rendering to signal updates. Create signals in services or stable element state.
 
 ```ts
 import { Injectable } from "@wirestate/core";

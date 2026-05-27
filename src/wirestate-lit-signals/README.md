@@ -5,6 +5,8 @@
 
 Re-exports `@lit-labs/signals` for use with Wirestate services in Lit elements.
 
+Create signals in services or stable element state. Use `watch()` in templates to subscribe rendering to signal updates.
+
 ## Installation
 
 ```bash

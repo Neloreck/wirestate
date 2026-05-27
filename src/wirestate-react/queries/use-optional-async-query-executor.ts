@@ -22,7 +22,11 @@ import { OptionalAsyncQueryExecutor } from "../types/queries";
  * @example
  * ```tsx
  * const queryOptionalAsync: OptionalAsyncQueryExecutor = useOptionalAsyncQueryExecutor();
- * const settings: UserSettings | null = await queryOptionalAsync(GET_USER_SETTINGS, { id: 1 });
+ * const [settings, setSettings] = useState<UserSettings | null>(null);
+ *
+ * const refreshSettings = useCallback(async () => {
+ *   setSettings(await queryOptionalAsync(GET_USER_SETTINGS, { id: 1 }));
+ * }, [queryOptionalAsync]);
  * ```
  */
 export function useOptionalAsyncQueryExecutor(): OptionalAsyncQueryExecutor {

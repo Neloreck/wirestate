@@ -9,11 +9,11 @@ import { onQuery } from "@wirestate/lit";
 import { LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 
-@customElement("theme-answer")
-export class ThemeAnswer extends LitElement {
-  @onQuery("CURRENT_THEME")
-  private currentTheme(): string {
-    return "dark";
+@customElement("checkout-answer")
+export class CheckoutAnswer extends LitElement {
+  @onQuery("CHECKOUT_SUMMARY")
+  private checkoutSummary(): { itemCount: number; total: number } {
+    return { itemCount: 2, total: 48 };
   }
 }
 ```
@@ -24,10 +24,10 @@ export class ThemeAnswer extends LitElement {
 import { useOnQuery } from "@wirestate/lit";
 import { LitElement } from "lit";
 
-class ThemeAnswer extends LitElement {
-  private readonly query = useOnQuery(this, {
-    type: "CURRENT_THEME",
-    handler: () => "dark",
+class CheckoutAnswer extends LitElement {
+  private readonly summaryQuery = useOnQuery(this, {
+    type: "CHECKOUT_SUMMARY",
+    handler: () => ({ itemCount: 2, total: 48 }),
   });
 }
 ```
@@ -40,20 +40,22 @@ import { injection } from "@wirestate/lit";
 import { LitElement, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
 
-@customElement("theme-button")
-export class ThemeButton extends LitElement {
+@customElement("checkout-summary-button")
+export class CheckoutSummaryButton extends LitElement {
   @injection(WireScope)
   private scope!: WireScope;
 
   @state()
-  private theme: string = "unknown";
+  private itemCount: number = 0;
 
-  private readTheme(): void {
-    this.theme = this.scope.queryData<string>("CURRENT_THEME");
+  private readSummary(): void {
+    const summary = this.scope.queryData<{ itemCount: number; total: number }>("CHECKOUT_SUMMARY");
+
+    this.itemCount = summary.itemCount;
   }
 
   protected render() {
-    return html`<button @click=${() => this.readTheme()}>Theme: ${this.theme}</button>`;
+    return html`<button @click=${() => this.readSummary()}>Items: ${this.itemCount}</button>`;
   }
 }
 ```

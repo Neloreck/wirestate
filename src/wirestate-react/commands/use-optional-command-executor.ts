@@ -22,11 +22,14 @@ import { OptionalCommandExecutor } from "../types/commands";
  * @example
  * ```tsx
  * const executeOptionalCommand: OptionalCommandExecutor = useOptionalCommandExecutor();
- * const descriptor: CommandDescriptor<string> | null = executeOptionalCommand("OPTIONAL_COMMAND", data);
  *
- * if (descriptor) {
- *   const result: string = await descriptor.task;
- * }
+ * const onClick = useCallback(async () => {
+ *   const descriptor: CommandDescriptor<string> | null = executeOptionalCommand("OPTIONAL_COMMAND", data);
+ *
+ *   if (descriptor) {
+ *     const result: string = await descriptor.task;
+ *   }
+ * }, [data, executeOptionalCommand]);
  * ```
  */
 export function useOptionalCommandExecutor(): OptionalCommandExecutor {

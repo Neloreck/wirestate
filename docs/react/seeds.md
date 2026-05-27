@@ -40,11 +40,12 @@ import { SubContainerProvider } from "@wirestate/react";
 
 ## Read Seeds In Services
 
-Read targeted seeds in `@OnProvision`. This applies provider-owned startup data after the React provider commits and
-avoids doing provider work during activation.
+Read static targeted seeds in `@OnActivated`. Seed values are already bound before service activation, and activation is
+the right lifecycle for cheap resolution-time initialization that does not need cleanup. Keep `@OnProvision` for
+provider-owned work such as subscriptions, timers, sockets, or async resources.
 
 ```ts
-import { Inject, Injectable, OnProvision, WireScope } from "@wirestate/core";
+import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
 
 @Injectable()
 export class CounterService {
@@ -52,8 +53,8 @@ export class CounterService {
 
   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
-  @OnProvision()
-  public onProvision(): void {
+  @OnActivated()
+  public onActivated(): void {
     const seed = this.scope.getSeed<{ initialCount?: number }>(CounterService);
 
     if (typeof seed?.initialCount === "number") {

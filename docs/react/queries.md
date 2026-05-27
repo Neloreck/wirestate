@@ -2,15 +2,29 @@
 
 React query hooks dispatch queries and register component-lifetime query handlers on the active container.
 
+Query execution can resolve services and run user handlers. Avoid calling query executors directly during render; call
+them from an effect, event handler, or memoized callback and render cached component state.
+
 ## Execute A Query
 
 ```tsx
 import { useQueryExecutor } from "@wirestate/react";
+import { useEffect, useState } from "react";
 
-function ThemeButton() {
+interface CheckoutSummary {
+  itemCount: number;
+  total: number;
+}
+
+function CheckoutSummaryBadge() {
   const query = useQueryExecutor();
+  const [summary, setSummary] = useState<CheckoutSummary>({ itemCount: 0, total: 0 });
 
-  return <button>Theme: {query<string>("CURRENT_THEME")}</button>;
+  useEffect(() => {
+    setSummary(query<CheckoutSummary>("CHECKOUT_SUMMARY"));
+  }, [query]);
+
+  return <span>{summary.itemCount} items</span>;
 }
 ```
 
@@ -25,12 +39,22 @@ Choose the hook by return shape:
 
 ```tsx
 import { useOptionalQueryExecutor } from "@wirestate/react";
+import { useCallback, useState } from "react";
 
-function OptionalTheme() {
+interface ShippingQuote {
+  etaDays: number;
+  price: number;
+}
+
+function ShippingQuoteButton() {
   const query = useOptionalQueryExecutor();
-  const theme = query<string>("CURRENT_THEME");
+  const [quote, setQuote] = useState<ShippingQuote | null>(null);
 
-  return <span>{theme ?? "default"}</span>;
+  const refreshQuote = useCallback(() => {
+    setQuote(query<ShippingQuote>("SHIPPING_QUOTE"));
+  }, [query]);
+
+  return <button onClick={refreshQuote}>{quote ? `$${quote.price}` : "Check shipping"}</button>;
 }
 ```
 
@@ -39,8 +63,11 @@ function OptionalTheme() {
 ```tsx
 import { useQueryHandler } from "@wirestate/react";
 
-function ThemeProvider() {
-  useQueryHandler("CURRENT_THEME", () => "dark");
+function CheckoutQueries(props: { cart: Array<{ price: number }> }) {
+  useQueryHandler("CHECKOUT_SUMMARY", () => ({
+    itemCount: props.cart.length,
+    total: props.cart.reduce((sum, item) => sum + item.price, 0),
+  }));
 
   return null;
 }

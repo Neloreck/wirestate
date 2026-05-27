@@ -10,6 +10,8 @@ npm install @wirestate/core @wirestate/react @wirestate/react-signals @preact/si
 
 ## Minimal Example
 
+Create signals in services or stable component state. Reading `.value` in render subscribes the component to updates.
+
 ```tsx
 import { Injectable } from "@wirestate/core";
 import { ContainerProvider, useInjection } from "@wirestate/react";

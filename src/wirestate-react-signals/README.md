@@ -5,6 +5,8 @@
 
 Re-exports `@preact/signals-react` for use with Wirestate services.
 
+Create signals in services or stable component state. Reading `.value` in render subscribes React consumers to updates.
+
 ## Installation
 
 ```bash

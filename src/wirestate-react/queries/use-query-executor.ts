@@ -22,7 +22,11 @@ import { QueryExecutor } from "../types/queries";
  * @example
  * ```tsx
  * const query: QueryExecutor = useQueryExecutor();
- * const result: UserProfile = query(GET_USER_PROFILE, { id: 123 });
+ * const [profile, setProfile] = useState<UserProfile | null>(null);
+ *
+ * useEffect(() => {
+ *   setProfile(query(GET_USER_PROFILE, { id: 123 }));
+ * }, [query]);
  * ```
  */
 export function useQueryExecutor(): QueryExecutor {

@@ -11,12 +11,15 @@ active again.
 import { Injectable, OnQuery } from "@wirestate/core";
 
 @Injectable()
-export class ThemeService {
-  private theme: string = "dark";
+export class CartSummaryService {
+  private items: Array<{ price: number }> = [];
 
-  @OnQuery("CURRENT_THEME")
-  public currentTheme(): string {
-    return this.theme;
+  @OnQuery("CHECKOUT_SUMMARY")
+  public checkoutSummary(): { itemCount: number; total: number } {
+    return {
+      itemCount: this.items.length,
+      total: this.items.reduce((sum, item) => sum + item.price, 0),
+    };
   }
 }
 ```
@@ -27,11 +30,11 @@ export class ThemeService {
 import { Inject, Injectable, WireScope } from "@wirestate/core";
 
 @Injectable()
-export class ToolbarService {
+export class HeaderCartService {
   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
-  public getTheme(): string {
-    return this.scope.queryData<string>("CURRENT_THEME");
+  public getCheckoutSummary(): { itemCount: number; total: number } {
+    return this.scope.queryData("CHECKOUT_SUMMARY");
   }
 }
 ```
@@ -65,21 +68,21 @@ When a service owns a dynamic query handler, register it during provider lifecyc
 import { Inject, Injectable, OnDeprovision, OnProvision, QueryUnregister, WireScope } from "@wirestate/core";
 
 @Injectable()
-export class ThemeQueryService {
-  private unregisterCurrentTheme: QueryUnregister | null = null;
-  private theme: string = "dark";
+export class ShippingQuoteQueryService {
+  private unregisterShippingQuote: QueryUnregister | null = null;
+  private quote = { etaDays: 3, price: 12 };
 
   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
   @OnProvision()
   public onProvision(): void {
-    this.unregisterCurrentTheme = this.scope.registerQueryHandler("CURRENT_THEME", () => this.theme);
+    this.unregisterShippingQuote = this.scope.registerQueryHandler("SHIPPING_QUOTE", () => this.quote);
   }
 
   @OnDeprovision()
   public onDeprovision(): void {
-    this.unregisterCurrentTheme?.();
-    this.unregisterCurrentTheme = null;
+    this.unregisterShippingQuote?.();
+    this.unregisterShippingQuote = null;
   }
 }
 ```

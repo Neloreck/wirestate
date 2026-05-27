@@ -22,7 +22,9 @@ import { CommandExecutor } from "../types/commands";
  * ```tsx
  * const executeCommand: CommandExecutor = useCommandExecutor();
  *
- * const onClick = () => executeCommand("SAVE_USER_COMMAND", { id: 1 });
+ * const onClick = useCallback(() => {
+ *   return executeCommand("SAVE_USER_COMMAND", { id: 1 });
+ * }, [executeCommand]);
  * ```
  */
 export function useCommandExecutor(): CommandExecutor {
