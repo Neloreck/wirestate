@@ -1,9 +1,10 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Container, Inject, Injectable } from "../alias";
+import { BindingType, Container, Inject, Injectable } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { OnCommand } from "../commands/on-command";
 import { WireScope } from "../container/wire-scope";
+import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { EventBus } from "../events/event-bus";
 import { OnEvent } from "../events/on-event";
 import { OnQuery } from "../queries/on-query";
@@ -13,8 +14,9 @@ import { OnDeactivation } from "../service/on-deactivation";
 import { mockContainer } from "../test-utils";
 import { CommandStatus } from "../types/commands";
 import { Optional } from "../types/general";
+import { BindingDescriptor } from "../types/provision";
 
-import { bindService } from "./bind-service";
+import { bindService, bindServiceWithToken } from "./bind-service";
 
 interface ReflectMetadata {
   getMetadata?: (metadataKey: string, target: object) => unknown;
@@ -121,6 +123,22 @@ describe("bindService", () => {
     expect(instance.isActivated).toBe(false);
     expect(instance.scope.isDisposed).toBe(false);
     expect(instance.scope.isInactive).toBe(false);
+  });
+
+  it("should throw for instance descriptor without constructor value", () => {
+    const container: Container = mockContainer();
+    const binding = {
+      bindingType: BindingType.Instance,
+      id: GenericService,
+      value: "not-a-constructor",
+    } as BindingDescriptor;
+
+    expect(() =>
+      bindServiceWithToken(container, GenericService, binding.value as never, binding, {})
+    ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
+    expect(() => bindServiceWithToken(container, GenericService, binding.value as never, binding, {})).toThrow(
+      "Instance descriptor 'value' must be a service constructor."
+    );
   });
 
   it("should handle async @OnActivated and catch errors", async () => {

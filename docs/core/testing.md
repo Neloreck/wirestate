@@ -23,14 +23,14 @@ test("logs a message", () => {
 
 ## One Service
 
-`mockService` creates a mock container, binds the service, and returns the instance.
+Use `mockBind` with a fresh `mockContainer` when one service needs Wirestate wiring.
 
 ```ts
-import { mockService } from "@wirestate/core/test-utils";
+import { mockBind, mockContainer } from "@wirestate/core/test-utils";
 import { CounterService } from "./CounterService";
 
 test("increments count", () => {
-  const service = mockService(CounterService);
+  const service = mockBind(mockContainer(), CounterService).get(CounterService);
 
   service.increment();
 
@@ -41,9 +41,9 @@ test("increments count", () => {
 Skip lifecycle when hook setup is noise for the test.
 
 ```ts
-import { mockContainer, mockService } from "@wirestate/core/test-utils";
+import { mockBind, mockContainer } from "@wirestate/core/test-utils";
 
-const service = mockService(CounterService, mockContainer(), { skipLifecycle: true });
+const service = mockBind(mockContainer(), CounterService, { skipLifecycle: true }).get(CounterService);
 ```
 
 ## Several Services
@@ -73,19 +73,38 @@ test("counter emits event on increment", () => {
 });
 ```
 
+## Add Bindings
+
+Use `mockBind` when a test starts from an existing container and needs one more service or descriptor. It accepts the
+same binding shapes as `mockContainer({ bindings })`.
+
+```ts
+import { mockBind, mockContainer } from "@wirestate/core/test-utils";
+import { CartService, PricingService } from "./services";
+
+test("cart uses pricing service", () => {
+  const container = mockContainer({ bindings: [CartService] });
+
+  mockBind(container, PricingService);
+
+  const cart = container.get(CartService);
+
+  expect(cart.total()).toBe(25);
+});
+```
+
 ## Replace Dependencies
 
 Bind a constant under the dependency token before resolving the service under test.
 
 ```ts
-import { bindConstant } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { mockBind, mockContainer } from "@wirestate/core/test-utils";
 
 test("cart uses mocked api client", async () => {
   const container = mockContainer({ bindings: [CartService] });
   const api = { post: jest.fn().mockResolvedValue({ ok: true }) };
 
-  bindConstant(container, { id: ApiClient, value: api as unknown as ApiClient });
+  mockBind(container, { id: ApiClient, value: api as unknown as ApiClient });
 
   const cart = container.get(CartService);
   await cart.checkout();
@@ -96,6 +115,6 @@ test("cart uses mocked api client", async () => {
 
 ## API Reference
 
-[`mockService`](/api/wirestate-core/test-utils/functions/mockService),
-[`mockContainer`](/api/wirestate-core/test-utils/functions/mockContainer), [`mockBind`](/api/wirestate-core/test-utils/functions/mockBind),
-[`mockBindService`](/api/wirestate-core/test-utils/functions/mockBindService), [`mockUnbindService`](/api/wirestate-core/test-utils/functions/mockUnbindService).
+[`mockContainer`](/api/wirestate-core/test-utils/functions/mockContainer),
+[`mockBind`](/api/wirestate-core/test-utils/functions/mockBind),
+[`mockUnbind`](/api/wirestate-core/test-utils/functions/mockUnbind).

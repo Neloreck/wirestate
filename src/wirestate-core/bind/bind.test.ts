@@ -1,6 +1,6 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Container, ScopeBindingType, BindingType } from "../alias";
+import { BindingType, Container, ScopeBindingType } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { mockContainer } from "../test-utils/mock-container";
 import { BindingDescriptor } from "../types/provision";
@@ -101,7 +101,7 @@ describe("bind", () => {
       value: GenericService,
     };
 
-    bind(container, binding);
+    bind(container, binding as unknown as BindingDescriptor);
 
     expect(container.isBound(TOKEN)).toBe(true);
     expect(container.get(TOKEN)).toBeInstanceOf(GenericService);
@@ -113,31 +113,11 @@ describe("bind", () => {
 
     expect(() =>
       bind(container, {
-        // @ts-ignore
-        bindingType: "UNKNOWN",
+        bindingType: "UNKNOWN" as BindingDescriptor["bindingType"],
         id: GenericService,
         value: GenericService,
       })
     ).toThrow("Binding descriptor has unknown binding type 'UNKNOWN'.");
-  });
-
-  it("should throw for unsupported bindingType", () => {
-    const container: Container = mockContainer();
-
-    expect(() =>
-      bind(container, {
-        bindingType: BindingType.Factory,
-        id: "factory-binding",
-        value: () => "factory-value",
-      })
-    ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
-    expect(() =>
-      bind(container, {
-        bindingType: BindingType.Factory,
-        id: "factory-binding",
-        value: () => "factory-value",
-      })
-    ).toThrow("Unsupported binding type 'Factory'. Supported binding types: ConstantValue, DynamicValue, Instance.");
   });
 
   it("should throw for missing descriptor id", () => {
@@ -154,16 +134,14 @@ describe("bind", () => {
     expect(() =>
       bind(container, {
         id: "bad-scope",
-        // @ts-ignore
-        scopeBindingType: "UNKNOWN",
+        scopeBindingType: "UNKNOWN" as BindingDescriptor["scopeBindingType"],
         value: "my-value",
       })
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_BINDING_SCOPE }));
     expect(() =>
       bind(container, {
         id: "bad-scope",
-        // @ts-ignore
-        scopeBindingType: "UNKNOWN",
+        scopeBindingType: "UNKNOWN" as BindingDescriptor["scopeBindingType"],
         value: "my-value",
       })
     ).toThrow("Binding descriptor has unknown scope binding type 'UNKNOWN'.");
@@ -174,9 +152,8 @@ describe("bind", () => {
 
     expect(() =>
       bind(container, {
-        // @ts-ignore
         id: "missing-value",
-      })
+      } as BindingDescriptor)
     ).toThrow("Constant value descriptor must provide a 'value' property.");
 
     expect(() =>
@@ -193,37 +170,17 @@ describe("bind", () => {
     expect(() =>
       bind(container, {
         bindingType: BindingType.DynamicValue,
-        // @ts-ignore
-        factory: "not-a-function",
+        factory: "not-a-function" as unknown as BindingDescriptor["factory"],
         id: "bad-factory",
       })
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bind(container, {
         bindingType: BindingType.DynamicValue,
-        // @ts-ignore
-        factory: "not-a-function",
+        factory: "not-a-function" as unknown as BindingDescriptor["factory"],
         id: "bad-factory",
       })
     ).toThrow("Dynamic value descriptor 'factory' must be a function.");
   });
 
-  it("should throw for instance descriptor without constructor value", () => {
-    const container: Container = mockContainer();
-
-    expect(() =>
-      bind(container, {
-        bindingType: BindingType.Instance,
-        id: GenericService,
-        value: "not-a-constructor",
-      })
-    ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
-    expect(() =>
-      bind(container, {
-        bindingType: BindingType.Instance,
-        id: GenericService,
-        value: "not-a-constructor",
-      })
-    ).toThrow("Instance descriptor 'value' must be a service constructor.");
-  });
 });

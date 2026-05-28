@@ -1,7 +1,9 @@
+import type { BindInWhenOnFluentSyntax, BindWhenOnFluentSyntax } from "inversify";
+
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindInWhenOnFluentSyntax, BindWhenOnFluentSyntax, Container, ScopeBindingType, BindingType } from "../alias";
+import { BindingType, Container, ScopeBindingType } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { BindingDescriptor } from "../types/provision";
@@ -94,7 +96,7 @@ export function bindDynamicValue<T>(container: Container, descriptor: BindingDes
 
   const binding: BindInWhenOnFluentSyntax<T> = container.bind(descriptor.id).toDynamicValue(() => {
     if (Object.prototype.hasOwnProperty.call(descriptor, "factory") && descriptor.factory) {
-      return descriptor.factory();
+      return (descriptor.factory as () => T)();
     }
 
     return descriptor.value;

@@ -4,8 +4,6 @@
  * @packageDocumentation
  */
 
-export { mockBindService } from "./test-utils/mock-bind-service";
 export { mockBind } from "./test-utils/mock-bind";
-export { mockUnbindService } from "./test-utils/mock-unbind-service";
+export { mockUnbind } from "./test-utils/mock-unbind";
 export { mockContainer } from "./test-utils/mock-container";
-export { mockService } from "./test-utils/mock-service";

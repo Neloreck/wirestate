@@ -1,52 +1,13 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { BindingType, Container, Newable, ServiceIdentifier } from "../alias";
-import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
-import { WirestateError } from "../error/wirestate-error";
-import { BindingDescriptor } from "../types/provision";
+import { Binding } from "../types/provision";
 
 import { bindConstant } from "./bind-constant";
 import { bindDynamicValue } from "./bind-dynamic-value";
+import { bindFactory } from "./bind-factory";
+import { bindResolvedValue } from "./bind-resolved-value";
 import { bindService, bindServiceWithToken, type BindServiceOptions } from "./bind-service";
+import { bindServiceRedirection } from "./bind-service-redirection";
 import { validateBindingDescriptor } from "./validate-binding-descriptor";
-
-const SUPPORTED_BINDING_TYPES: ReadonlyArray<string> = [
-  BindingType.ConstantValue,
-  BindingType.DynamicValue,
-  BindingType.Instance,
-  // ? -> "Factory" | "ResolvedValue" | "ServiceRedirection";
-];
-
-/**
- * Validates descriptor fields needed before {@link bind} dispatches to a concrete binding helper.
- *
- * @group Bind
- * @internal
- *
- * @param binding - Descriptor to validate.
- *
- * @throws {@link WirestateError} If the descriptor uses an unsupported binding type or an invalid instance value.
- */
-function validateBindDescriptor(binding: BindingDescriptor): void {
-  validateBindingDescriptor(binding);
-
-  const bindingType: string = binding.bindingType ?? BindingType.ConstantValue;
-
-  if (!SUPPORTED_BINDING_TYPES.includes(bindingType)) {
-    throw new WirestateError(
-      ERROR_CODE_INVALID_ARGUMENTS,
-      `Unsupported binding type '${bindingType}'. Supported binding types: ${SUPPORTED_BINDING_TYPES.join(", ")}.`
-    );
-  }
-
-  if (bindingType === BindingType.Instance && typeof binding.value !== "function") {
-    throw new WirestateError(
-      ERROR_CODE_INVALID_ARGUMENTS,
-      "Instance descriptor 'value' must be a service constructor."
-    );
-  }
-}
 
 /**
  * Represents options for {@link bind}.
@@ -63,27 +24,36 @@ export interface BindOptions extends BindServiceOptions {
 }
 
 /**
- * Binds a class or descriptor into a container.
+ * Binds a {@link Binding} into a container.
  *
  * @remarks
- * `bind` is the router behind `createContainer({ bindings })`.
+ * `bind` is the router behind `createContainer({ bindings })`. Pass a service
+ * class constructor directly, or pass a descriptor when the binding needs a
+ * custom token, fixed value, factory, resolved value, or token redirection.
  *
- * It chooses the right binding helper:
+ * Descriptors without `bindingType` are treated as `ConstantValue` bindings.
+ * Descriptors with `Factory`, `ResolvedValue`, and `ServiceRedirection` are
+ * delegated to their dedicated Inversify binding helpers.
  *
  * - Class constructor: singleton service via {@link bindService}.
  * - `ConstantValue`: fixed value via {@link bindConstant}.
  * - `DynamicValue`: factory value via {@link bindDynamicValue}.
  * - `Instance`: service class behind a custom token.
+ * - `Factory`: factory creator via {@link bindFactory}.
+ * - `ResolvedValue`: injected factory via {@link bindResolvedValue}.
+ * - `ServiceRedirection`: token redirection via {@link bindServiceRedirection}.
  *
  * @group Bind
  *
  * @template T - Bound object type.
  *
  * @param container - Container to bind into.
- * @param binding - Service class or descriptor.
+ * @param binding - Service class or binding descriptor.
  * @param options - Binding options for class bindings.
  *
- * @throws {@link WirestateError} If the descriptor is invalid.
+ * @throws {@link WirestateError} If the descriptor has no `id`, has an unknown
+ * `bindingType` or `scopeBindingType`, or is missing fields required by the
+ * selected binding strategy.
  *
  * @example
  * ```typescript
@@ -102,11 +72,16 @@ export interface BindOptions extends BindServiceOptions {
  *   bindingType: BindingType.ConstantValue,
  *   value: "https://api.example.com",
  * });
+ * bind(container, {
+ *   id: "USER_SERVICE_FACTORY",
+ *   bindingType: BindingType.Factory,
+ *   factory: () => () => container.get(UserService),
+ * });
  * ```
  */
 export function bind<T extends object = object>(
   container: Container,
-  binding: Newable<T> | BindingDescriptor,
+  binding: Binding,
   options: BindOptions = {}
 ): void {
   if (typeof binding === "function") {
@@ -115,35 +90,43 @@ export function bind<T extends object = object>(
     return;
   }
 
-  validateBindDescriptor(binding);
+  validateBindingDescriptor(binding);
 
-  if (!binding.bindingType || binding.bindingType === BindingType.ConstantValue) {
-    bindConstant(container, binding);
+  switch (binding.bindingType ?? BindingType.ConstantValue) {
+    case BindingType.ConstantValue:
+      bindConstant(container, binding);
 
-    return;
+      return;
+
+    case BindingType.DynamicValue:
+      bindDynamicValue(container, binding);
+
+      return;
+
+    case BindingType.Factory:
+      bindFactory(container, binding);
+
+      return;
+
+    case BindingType.ResolvedValue:
+      bindResolvedValue(container, binding);
+
+      return;
+
+    case BindingType.ServiceRedirection:
+      bindServiceRedirection(container, binding);
+
+      return;
+
+    case BindingType.Instance:
+      bindServiceWithToken(
+        container,
+        binding.id as ServiceIdentifier<T>,
+        binding.value as unknown as Newable<T>,
+        binding,
+        options
+      );
+
+      return;
   }
-
-  if (binding.bindingType === BindingType.DynamicValue) {
-    dbg.info(prefix(__filename), "Binding dynamic value descriptor:", {
-      binding,
-      container,
-    });
-
-    bindDynamicValue(container, binding);
-
-    return;
-  }
-
-  dbg.info(prefix(__filename), "Binding instance descriptor:", {
-    binding,
-    container,
-  });
-
-  bindServiceWithToken(
-    container,
-    binding.id as ServiceIdentifier<T>,
-    binding.value as unknown as Newable<T>,
-    binding,
-    options
-  );
 }

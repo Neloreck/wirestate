@@ -246,7 +246,7 @@ Injected `WireScope` instances expose lifecycle state for async guards:
 Available via `@wirestate/core/test-utils`:
 
 ```ts
-import { mockContainer, mockService, mockBindService, mockBind, mockUnbindService } from "@wirestate/core/test-utils";
+import { mockContainer, mockBind, mockUnbind } from "@wirestate/core/test-utils";
 ```
 
 ### `mockContainer(options?)`
@@ -273,30 +273,23 @@ const container = mockContainer({
 });
 ```
 
-### `mockService(ServiceClass, container?, options?)`
+### `mockBind(container, binding, options?)`
 
-Binds a service class to a container and returns its instance. Creates a new `mockContainer` if none is provided.
+Binds a service class or `BindingDescriptor` to an existing container and returns that container. Accepts
+`{ skipLifecycle?: boolean }`.
 
 ```ts
-const counter = mockService(CounterService);
+const counter = mockBind(mockContainer(), CounterService).get(CounterService);
 counter.increment();
 expect(counter.count).toBe(1);
 ```
 
-### `mockBindService(container, ServiceClass, options?)`
+### `mockUnbind(container, identifier)`
 
-Binds a service class to an existing container. Accepts `{ skipLifecycle?: boolean }`.
-
-### `mockBind(container, binding, options?)`
-
-Binds a service class or `BindingDescriptor` to an existing container. Accepts `{ skipLifecycle?: boolean }`.
-
-### `mockUnbindService(container, ServiceClass)`
-
-Removes a service binding from the container. Useful for overriding registrations between tests.
+Removes a binding from the container. Useful for overriding registrations between tests.
 
 ```ts
-mockUnbindService(container, CounterService);
+mockUnbind(container, CounterService);
 mockBind(container, { id: CounterService, value: fakeCounter });
 ```
 

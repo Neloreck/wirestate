@@ -1,11 +1,15 @@
+import type { BindWhenOnFluentSyntax } from "inversify";
+
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindWhenOnFluentSyntax, Container, ServiceIdentifier, type Newable } from "../alias";
+import { BindingType, Container, Newable, ServiceIdentifier } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { getCommandHandlerMetadata } from "../commands/get-command-handler-metadata";
 import { hasWireScopeInjection } from "../container/has-wire-scope-injection";
 import { WireScope } from "../container/wire-scope";
+import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
 import { buildEventDispatcher } from "../events/build-event-dispatcher";
 import { EventBus } from "../events/event-bus";
 import { getQueryHandlerMetadata } from "../queries/get-query-handler-metadata";
@@ -22,10 +26,29 @@ import { getDeactivationHandlerMetadata } from "../service/on-deactivation";
 import { CommandHandler, CommandUnregister } from "../types/commands";
 import { EventHandler, EventUnsubscriber } from "../types/events";
 import { Maybe, MaybePromise, Optional } from "../types/general";
-import { Bindings } from "../types/provision";
+import { BindingDescriptor, Bindings } from "../types/provision";
 import { QueryHandler, QueryUnregister } from "../types/queries";
 
 import { registerContainerBinding } from "./bind-register";
+
+/**
+ * Validates that an instance descriptor can be bound by {@link bindServiceWithToken}.
+ *
+ * @group Bind
+ * @internal
+ *
+ * @param descriptor - Descriptor to validate.
+ *
+ * @throws {@link WirestateError} If the descriptor value is not a service constructor.
+ */
+function validateInstanceDescriptor(descriptor: BindingDescriptor): void {
+  if (descriptor.bindingType === BindingType.Instance && typeof descriptor.value !== "function") {
+    throw new WirestateError(
+      ERROR_CODE_INVALID_ARGUMENTS,
+      "Instance descriptor 'value' must be a service constructor."
+    );
+  }
+}
 
 /**
  * Represents options for {@link bindService}.
@@ -118,6 +141,10 @@ export function bindServiceWithToken<T extends object>(
   registeredBinding: Bindings[number],
   options?: BindServiceOptions
 ): void {
+  if (typeof registeredBinding !== "function") {
+    validateInstanceDescriptor(registeredBinding);
+  }
+
   dbg.info(prefix(__filename), "Binding service:", {
     name: binding.name,
     token,

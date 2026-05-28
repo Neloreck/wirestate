@@ -9,8 +9,8 @@ import { QueryBus } from "../queries/query-bus";
 import { setSeeds } from "../seeds/set-seeds";
 import { OnActivated } from "../service/on-activated";
 import { OnDeactivation } from "../service/on-deactivation";
+import { mockBind } from "../test-utils/mock-bind";
 import { mockContainer } from "../test-utils/mock-container";
-import { mockService } from "../test-utils/mock-service";
 import { CommandStatus, Command } from "../types/commands";
 import { Optional } from "../types/general";
 
@@ -350,7 +350,7 @@ describe("WireScope", () => {
     expect(commandBus.has("TEST_COMMAND")).toBe(false);
     expect(queryBus.has("TEST_QUERY")).toBe(false);
 
-    const service: ServiceWithManualSubs = mockService(ServiceWithManualSubs, container);
+    const service: ServiceWithManualSubs = mockBind(container, ServiceWithManualSubs).get(ServiceWithManualSubs);
 
     expect(eventBus.has()).toBe(true);
     expect(commandBus.has("TEST_COMMAND")).toBe(true);
