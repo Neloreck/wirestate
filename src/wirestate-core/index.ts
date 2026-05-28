@@ -42,13 +42,7 @@ export { OnActivated } from "./service/on-activated";
 export { OnDeactivation } from "./service/on-deactivation";
 export { OnDeprovision } from "./service/on-deprovision";
 export { OnProvision } from "./service/on-provision";
-export {
-  ProvisionLifecycle,
-  deprovisionContainer,
-  deprovisionServices,
-  provisionContainer,
-  provisionServices,
-} from "./service/provision-lifecycle";
+export { ProvisionLifecycle, deprovisionContainer, provisionContainer } from "./service/provision-lifecycle";
 
 export { SeedsMap, SeedEntries, SeedEntry, SeedKey } from "./types/initial-state";
 export { InjectableDescriptor, InjectableEntries } from "./types/provision";

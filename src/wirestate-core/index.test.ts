@@ -113,11 +113,9 @@ describe("Library exported API from wirestate-core", () => {
     "createContainer",
     "decorate",
     "deprovisionContainer",
-    "deprovisionServices",
     "getContainerEntries",
     "getEntryToken",
     "provisionContainer",
-    "provisionServices",
     "unapplySeeds",
     "validateContainerConfig",
   ];
