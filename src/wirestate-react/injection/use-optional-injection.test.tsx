@@ -34,7 +34,7 @@ describe("useOptionalInjection", () => {
 
   it("should resolve bound service", () => {
     const container: Container = mockContainer({
-      entries: [GenericService],
+      bindings: [GenericService],
     });
 
     const { getByTestId } = render(withContainerProvider(<TestComponent token={GenericService} />, container));

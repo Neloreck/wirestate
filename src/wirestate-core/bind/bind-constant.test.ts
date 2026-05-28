@@ -1,16 +1,16 @@
 import { Container } from "../alias";
 import { BindingType, ScopeBindingType } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
-import { InjectableDescriptor } from "../types/provision";
+import { BindingDescriptor } from "../types/provision";
 
 import { bindConstant } from "./bind-constant";
 
 describe("bindConstant", () => {
   it("should bind a constant value to the container", () => {
     const container: Container = new Container();
-    const entry: InjectableDescriptor = { id: "my-token", value: "my-value" };
+    const binding: BindingDescriptor = { id: "my-token", value: "my-value" };
 
-    bindConstant(container, entry);
+    bindConstant(container, binding);
 
     expect(container.get("my-token")).toBe("my-value");
   });
@@ -43,12 +43,12 @@ describe("bindConstant", () => {
 
   it("should throw if id is missing", () => {
     const container: Container = new Container();
-    const entry = { value: "my-value" } as unknown as InjectableDescriptor;
+    const binding = { value: "my-value" } as unknown as BindingDescriptor;
 
-    expect(() => bindConstant(container, entry)).toThrow(
+    expect(() => bindConstant(container, binding)).toThrow(
       expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
     );
-    expect(() => bindConstant(container, entry)).toThrow("Injectable descriptor must provide an 'id' token.");
+    expect(() => bindConstant(container, binding)).toThrow("Binding descriptor must provide an 'id' token.");
   });
 
   it("should throw if value is missing", () => {

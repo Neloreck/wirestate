@@ -2,14 +2,14 @@ import { Container } from "../alias";
 import { mockContainer } from "../test-utils/mock-container";
 import { SeedsMap } from "../types/initial-state";
 
-import { applySharedSeed } from "./apply-shared-seed";
+import { setSharedSeed } from "./set-shared-seed";
 import { SEED_TOKEN } from "./tokens";
 
-describe("applySharedSeed", () => {
+describe("setSharedSeed", () => {
   it("should bind initial state to container when not yet bound", () => {
     const container: Container = mockContainer();
 
-    applySharedSeed(container, { key: "value" });
+    setSharedSeed(container, { key: "value" });
 
     expect(container.get(SEED_TOKEN)).toEqual({ key: "value" });
   });
@@ -17,8 +17,8 @@ describe("applySharedSeed", () => {
   it("should overwrite shared state", () => {
     const container: Container = mockContainer();
 
-    applySharedSeed(container, { x: 1 });
-    applySharedSeed(container, { y: 2 });
+    setSharedSeed(container, { x: 1 });
+    setSharedSeed(container, { y: 2 });
 
     const state: SeedsMap = container.get(SEED_TOKEN);
 
@@ -31,14 +31,14 @@ describe("applySharedSeed", () => {
     const bindSpy = jest.spyOn(container, "bind");
     const rebindSpy = jest.spyOn(container, "rebind");
 
-    applySharedSeed(container, { initial: true });
+    setSharedSeed(container, { initial: true });
 
     expect(rebindSpy).toHaveBeenCalledTimes(1);
     expect(rebindSpy).toHaveBeenCalledWith(SEED_TOKEN);
     expect(container.get(SEED_TOKEN)).toEqual({ initial: true });
     expect(bindSpy).not.toHaveBeenCalled();
 
-    applySharedSeed(container, { another: true });
+    setSharedSeed(container, { another: true });
 
     expect(rebindSpy).toHaveBeenCalledTimes(2);
     expect(rebindSpy).toHaveBeenCalledWith(SEED_TOKEN);

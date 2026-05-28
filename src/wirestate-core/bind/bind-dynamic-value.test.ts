@@ -1,7 +1,7 @@
 import { Container, BindingType, ScopeBindingType } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { AnyObject } from "../types/general";
-import { InjectableDescriptor } from "../types/provision";
+import { BindingDescriptor } from "../types/provision";
 
 import { bindDynamicValue } from "./bind-dynamic-value";
 
@@ -76,12 +76,12 @@ describe("bindDynamicValue", () => {
 
   it("should throw if id is missing", () => {
     const container: Container = new Container();
-    const entry = { value: "my-value" } as unknown as InjectableDescriptor;
+    const binding = { value: "my-value" } as unknown as BindingDescriptor;
 
-    expect(() => bindDynamicValue(container, entry)).toThrow(
+    expect(() => bindDynamicValue(container, binding)).toThrow(
       expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
     );
-    expect(() => bindDynamicValue(container, entry)).toThrow("Injectable descriptor must provide an 'id' token.");
+    expect(() => bindDynamicValue(container, binding)).toThrow("Binding descriptor must provide an 'id' token.");
   });
 
   it("should throw if neither factory nor value is provided", () => {
@@ -155,6 +155,6 @@ describe("bindDynamicValue", () => {
         // @ts-ignore
         scopeBindingType: "UNKNOWN",
       })
-    ).toThrow("Injectable descriptor has unknown scope binding type 'UNKNOWN'.");
+    ).toThrow("Binding descriptor has unknown scope binding type 'UNKNOWN'.");
   });
 });

@@ -4,10 +4,10 @@ import { prefix } from "@/macroses/prefix.macro";
 import { BindInWhenOnFluentSyntax, BindWhenOnFluentSyntax, Container, ScopeBindingType, BindingType } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { InjectableDescriptor } from "../types/provision";
+import { BindingDescriptor } from "../types/provision";
 
-import { registerContainerEntry } from "./bind-register";
-import { validateInjectableDescriptor } from "./validate-injectable-descriptor";
+import { registerContainerBinding } from "./bind-register";
+import { validateBindingDescriptor } from "./validate-binding-descriptor";
 
 /**
  * Validates that a descriptor can be bound by {@link bindDynamicValue}.
@@ -15,15 +15,15 @@ import { validateInjectableDescriptor } from "./validate-injectable-descriptor";
  * @group Bind
  * @internal
  *
- * @param entry - Descriptor to validate.
+ * @param descriptor - Descriptor to validate.
  *
  * @throws {@link WirestateError} If the descriptor is missing a token, uses a non-dynamic binding type,
  * omits both `factory` and `value`, or provides a non-function `factory`.
  */
-function validateDynamicValueDescriptor(entry: InjectableDescriptor): void {
-  validateInjectableDescriptor(entry);
+function validateDynamicValueDescriptor(descriptor: BindingDescriptor): void {
+  validateBindingDescriptor(descriptor);
 
-  if (entry.bindingType !== undefined && entry.bindingType !== BindingType.DynamicValue) {
+  if (descriptor.bindingType !== undefined && descriptor.bindingType !== BindingType.DynamicValue) {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
       `bindDynamicValue expected binding type '${BindingType.DynamicValue}'.`
@@ -31,8 +31,8 @@ function validateDynamicValueDescriptor(entry: InjectableDescriptor): void {
   }
 
   if (
-    !Object.prototype.hasOwnProperty.call(entry, "factory") &&
-    !Object.prototype.hasOwnProperty.call(entry, "value")
+    !Object.prototype.hasOwnProperty.call(descriptor, "factory") &&
+    !Object.prototype.hasOwnProperty.call(descriptor, "value")
   ) {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
@@ -41,9 +41,9 @@ function validateDynamicValueDescriptor(entry: InjectableDescriptor): void {
   }
 
   if (
-    Object.prototype.hasOwnProperty.call(entry, "factory") &&
-    entry.factory !== undefined &&
-    typeof entry.factory !== "function"
+    Object.prototype.hasOwnProperty.call(descriptor, "factory") &&
+    descriptor.factory !== undefined &&
+    typeof descriptor.factory !== "function"
   ) {
     throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, "Dynamic value descriptor 'factory' must be a function.");
   }
@@ -62,7 +62,7 @@ function validateDynamicValueDescriptor(entry: InjectableDescriptor): void {
  * @template T - Value type.
  *
  * @param container - Container to bind into.
- * @param entry - Descriptor with `id`, `factory` or `value`, and optional scope.
+ * @param descriptor - Descriptor with `id`, `factory` or `value`, and optional scope.
  * @returns Inversify fluent syntax for additional constraints.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
@@ -84,29 +84,29 @@ function validateDynamicValueDescriptor(entry: InjectableDescriptor): void {
  * const now = container.get<Date>(DATE_NOW);
  * ```
  */
-export function bindDynamicValue<T>(container: Container, entry: InjectableDescriptor): BindWhenOnFluentSyntax<T> {
-  validateDynamicValueDescriptor(entry);
+export function bindDynamicValue<T>(container: Container, descriptor: BindingDescriptor): BindWhenOnFluentSyntax<T> {
+  validateDynamicValueDescriptor(descriptor);
 
-  dbg.info(prefix(__filename), "Binding constant:", {
-    entry,
+  dbg.info(prefix(__filename), "Binding dynamic value:", {
+    descriptor,
     container,
   });
 
-  const binding: BindInWhenOnFluentSyntax<T> = container.bind(entry.id).toDynamicValue(() => {
-    if (Object.prototype.hasOwnProperty.call(entry, "factory") && entry.factory) {
-      return entry.factory();
+  const binding: BindInWhenOnFluentSyntax<T> = container.bind(descriptor.id).toDynamicValue(() => {
+    if (Object.prototype.hasOwnProperty.call(descriptor, "factory") && descriptor.factory) {
+      return descriptor.factory();
     }
 
-    return entry.value;
+    return descriptor.value;
   }) as BindInWhenOnFluentSyntax<T>;
 
-  registerContainerEntry(container, entry);
+  registerContainerBinding(container, descriptor);
 
-  if (!entry.scopeBindingType) {
+  if (!descriptor.scopeBindingType) {
     return binding;
-  } else if (entry.scopeBindingType === ScopeBindingType.Transient) {
+  } else if (descriptor.scopeBindingType === ScopeBindingType.Transient) {
     return binding.inTransientScope();
-  } else if (entry.scopeBindingType === ScopeBindingType.Request) {
+  } else if (descriptor.scopeBindingType === ScopeBindingType.Request) {
     return binding.inRequestScope();
   } else {
     return binding.inSingletonScope();

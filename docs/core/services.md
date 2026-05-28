@@ -20,14 +20,14 @@ export class UserService {
 
 ## Bind Services
 
-`createContainer({ entries })` binds entries during container creation.
+`createContainer({ bindings })` registers services and descriptors during container creation.
 
 ```ts
 import { Container, createContainer } from "@wirestate/core";
 import { UserService } from "./UserService";
 
 const container: Container = createContainer({
-  entries: [UserService],
+  bindings: [UserService],
 });
 
 const users = container.get(UserService);
@@ -180,4 +180,4 @@ bindDynamicValue(container, {
 
 [`Injectable`](/api/wirestate-core/functions/Injectable), [`Inject`](/api/wirestate-core/functions/Inject),
 [`WireScope`](/api/wirestate-core/classes/WireScope), [`OnProvision`](/api/wirestate-core/functions/OnProvision),
-[`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision), [`InjectableDescriptor`](/api/wirestate-core/interfaces/InjectableDescriptor).
+[`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision), [`BindingDescriptor`](/api/wirestate-core/interfaces/BindingDescriptor).

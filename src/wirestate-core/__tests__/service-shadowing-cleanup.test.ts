@@ -91,8 +91,8 @@ describe("core service shadowing and cleanup integration", () => {
 
   it("restores previous command and query handlers after the shadowing service is removed", async () => {
     const container: Container = createContainer({
-      entries: [PrimaryHandlerService, SecondaryHandlerService],
       activate: [PrimaryHandlerService, SecondaryHandlerService],
+      bindings: [PrimaryHandlerService, SecondaryHandlerService],
     });
 
     expect(container.get(CommandBus).has(FORMAT_COMMAND)).toBe(true);
@@ -123,8 +123,8 @@ describe("core service shadowing and cleanup integration", () => {
 
   it("broadcasts events to all active services and removes only disconnected listeners", () => {
     const container: Container = createContainer({
-      entries: [PrimaryHandlerService, SecondaryHandlerService],
       activate: [PrimaryHandlerService, SecondaryHandlerService],
+      bindings: [PrimaryHandlerService, SecondaryHandlerService],
     });
 
     const bus: EventBus = container.get(EventBus);

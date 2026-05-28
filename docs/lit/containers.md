@@ -16,7 +16,7 @@ import { CounterService } from "./CounterService";
 export class ApplicationRoot extends LitElement {
   @containerProvide({
     config: {
-      entries: [CounterService],
+      bindings: [CounterService],
     },
   })
   private provider!: ContainerProvider;
@@ -27,7 +27,7 @@ export class ApplicationRoot extends LitElement {
 }
 ```
 
-Managed containers are created when the host connects and disposed when it disconnects. They activate all entries by
+Managed containers are created when the host connects and disposed when it disconnects. They activate all bindings by
 default unless `activate` is provided.
 
 Use `@OnProvision` for resource work that belongs to the connected provider lifetime. Use `@OnDeprovision` to clean it
@@ -44,7 +44,7 @@ import { LitElement } from "lit";
 
 export class ApplicationRoot extends LitElement {
   private readonly provider: ContainerProvider = useContainerProvision(this, {
-    config: { entries: [CounterService] },
+    config: { bindings: [CounterService] },
   });
 }
 ```
@@ -58,7 +58,7 @@ does not dispose it.
 import { createContainer } from "@wirestate/core";
 import { ContainerProvider, containerProvide } from "@wirestate/lit";
 
-const container = createContainer({ entries: [CounterService] });
+const container = createContainer({ bindings: [CounterService] });
 
 class ApplicationRoot extends LitElement {
   @containerProvide({ container })
@@ -80,7 +80,7 @@ import { CartService } from "./CartService";
 class CheckoutScope extends LitElement {
   @subContainerProvide({
     config: {
-      entries: [CartService],
+      bindings: [CartService],
     },
   })
   private provider!: SubContainerProvider;

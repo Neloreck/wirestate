@@ -37,7 +37,7 @@ describe("useOptionalInjection", () => {
 
   it("should resolve bound service", () => {
     const container: Container = mockContainer({
-      entries: [GenericService],
+      bindings: [GenericService],
     });
 
     fixture = createLitProvision(container);

@@ -10,7 +10,7 @@
 - Add portable bundle entry points for core, React MobX, React Signals, and Lit Signals targets.
 - Add `createContainer`, `CreateContainerOptions`, `ContainerConfig`, and `ContainerActivation` as the current core container creation API.
 - Add immediate seed application, service provisioning, and activation options to `createContainer`.
-- Add `getContainerEntries` and `getEntryToken` for inspecting entries registered through Wirestate binding helpers.
+- Add `getContainerBindings` and `getBindingToken` for inspecting bindings registered through Wirestate binding helpers.
 - Add core `OnProvision` and `OnDeprovision` decorators plus `provisionContainer`, `deprovisionContainer`, `provisionServices`, and `deprovisionServices`.
 - Add explicit handler cleanup APIs: `EventBus.unsubscribe`, `CommandBus.unregister`, and `QueryBus.unregister`.
 - Add `WireScope` event, command, and query registration helpers, including unsubscribe/unregister methods and async query helpers.
@@ -47,8 +47,8 @@
 - Normalize Lit managed provider activation to `true`, validate Lit provider lifecycle config, and keep context publication tied to host connection state.
 - Preserve named Inversify instances when framework providers resolve lifecycle services.
 - Share WireScope constructor-injection metadata detection between service binding and provider lifecycle resolution.
-- Validate injectable descriptors in `bindConstant`, `bindDynamicValue`, `bindEntry`, and `bindService`, throwing `WirestateError` for invalid binding config.
-- Support class bindings behind custom `id` tokens in `bindEntry` while preserving Wirestate lifecycle registration.
+- Validate binding descriptors in `bindConstant`, `bindDynamicValue`, `bind`, and `bindService`, throwing `WirestateError` for invalid binding config.
+- Support class bindings behind custom `id` tokens in `bind` while preserving Wirestate lifecycle registration.
 - Move container config validation into core with `validateContainerConfig` so React and Lit providers share the same rules.
 - Rework seed storage around shared root seeds and targeted per-token seeds, including public `SEED` and `SEEDS` aliases.
 - Update React, Lit, and example apps to use public aliases from `@wirestate/core` instead of direct Inversify imports.
@@ -58,7 +58,7 @@
 
 - Preserve falsy targeted seed values in `WireScope.getSeed` and return `null` only when targeted seed data is missing.
 - Report missing `reflect-metadata` for service binding with a dedicated `WirestateError`, and declare `reflect-metadata` as a peer dependency where needed.
-- Recreate managed React containers when normalized `seed`, `seeds`, `entries`, or `activate` values change.
+- Recreate managed React containers when normalized `seed`, `seeds`, `bindings`, or `activate` values change.
 - Recreate containers synchronously with rendering where required so consumers do not see stale container state.
 - Recreate child containers when the parent config or parent container changes.
 - Correct React `useContainer` subscription behavior.

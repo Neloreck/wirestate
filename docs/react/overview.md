@@ -37,7 +37,7 @@ class CounterService {
 }
 
 export function Application() {
-  const config = useMemo(() => ({ entries: [CounterService] }), []);
+  const config = useMemo(() => ({ bindings: [CounterService] }), []);
 
   return (
     <ContainerProvider config={config}>

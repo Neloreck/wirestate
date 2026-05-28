@@ -6,7 +6,7 @@ import { ERROR_CODE_ACCESS_AFTER_DISPOSAL, ERROR_CODE_ACCESS_BEFORE_ACTIVATION }
 import { WirestateError } from "../error/wirestate-error";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
-import { applySeeds } from "../seeds/apply-seeds";
+import { setSeeds } from "../seeds/set-seeds";
 import { OnActivated } from "../service/on-activated";
 import { OnDeactivation } from "../service/on-deactivation";
 import { mockContainer } from "../test-utils/mock-container";
@@ -290,7 +290,7 @@ describe("WireScope", () => {
     const container: Container = mockContainer();
     const scope: WireScope = new WireScope(container);
 
-    applySeeds(container, [[GenericService, { a: 1, b: 2 }]]);
+    setSeeds(container, [[GenericService, { a: 1, b: 2 }]]);
 
     expect(scope.getSeed(GenericService)).toEqual({ a: 1, b: 2 });
     expect(scope.getSeed("NOT_EXISTING")).toBeNull();
@@ -300,7 +300,7 @@ describe("WireScope", () => {
     const container: Container = mockContainer();
     const scope: WireScope = new WireScope(container);
 
-    applySeeds(container, [
+    setSeeds(container, [
       ["FALSE_SEED", false],
       ["ZERO_SEED", 0],
       ["EMPTY_STRING_SEED", ""],

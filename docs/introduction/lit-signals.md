@@ -33,7 +33,7 @@ class CounterService {
 
 @customElement("counter-application")
 class CounterApplication extends LitElement {
-  @containerProvide({ config: { entries: [CounterService] } })
+  @containerProvide({ config: { bindings: [CounterService] } })
   private provider!: ContainerProvider;
 
   protected render() {

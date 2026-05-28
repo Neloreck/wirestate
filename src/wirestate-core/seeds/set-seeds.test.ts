@@ -4,14 +4,14 @@ import { Container } from "../alias";
 import { mockContainer } from "../test-utils/mock-container";
 import { SeedsMap } from "../types/initial-state";
 
-import { applySeeds } from "./apply-seeds";
+import { setSeeds } from "./set-seeds";
 import { SEEDS_TOKEN } from "./tokens";
 
-describe("applySeeds", () => {
+describe("setSeeds", () => {
   it("should bind seeds to container when not yet bound", () => {
     const container: Container = mockContainer();
 
-    applySeeds(container, [["ServiceA", { a: 1 }]]);
+    setSeeds(container, [["ServiceA", { a: 1 }]]);
 
     const seeds: SeedsMap = container.get(SEEDS_TOKEN);
 
@@ -21,12 +21,12 @@ describe("applySeeds", () => {
     expect(seeds.get("ServiceA")).toEqual({ a: 1 });
   });
 
-  it("should merge targeted entries when initial state already exists", () => {
+  it("should merge targeted bindings when initial state already exists", () => {
     const container: Container = mockContainer();
 
-    applySeeds(container, [["ServiceA", { a: 1 }]]);
-    applySeeds(container, [["ServiceB", { b: 2 }]]);
-    applySeeds(container, [[GenericService, { c: 3 }]]);
+    setSeeds(container, [["ServiceA", { a: 1 }]]);
+    setSeeds(container, [["ServiceB", { b: 2 }]]);
+    setSeeds(container, [[GenericService, { c: 3 }]]);
 
     const state: SeedsMap = container.get(SEEDS_TOKEN);
 
@@ -41,12 +41,12 @@ describe("applySeeds", () => {
     const bindSpy = jest.spyOn(container, "bind");
     const rebindSpy = jest.spyOn(container, "rebind");
 
-    applySeeds(container, [[GenericService, { a: 1 }]]);
+    setSeeds(container, [[GenericService, { a: 1 }]]);
 
     expect(rebindSpy).not.toHaveBeenCalled();
     expect(bindSpy).not.toHaveBeenCalled();
 
-    applySeeds(container, [["ServiceA", { a: 1 }]]);
+    setSeeds(container, [["ServiceA", { a: 1 }]]);
 
     expect(rebindSpy).not.toHaveBeenCalled();
     expect(bindSpy).not.toHaveBeenCalled();

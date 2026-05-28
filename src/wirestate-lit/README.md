@@ -33,8 +33,8 @@ Lit component behavior is covered by the official [Lit docs](https://lit.dev/doc
 Provides a container to the component tree. It uses Lit Context to propagate the container to child elements.
 
 Pass `container` to expose an existing container, or pass `config` to create and manage one for the host lifecycle.
-Managed Lit containers activate all provided entries by default; pass `activate: false` to skip eager activation, or pass
-an array to activate only specific entries. Both modes run core provider lifecycle hooks while the host is connected.
+Managed Lit containers activate all provided bindings by default; pass `activate: false` to skip eager activation, or pass
+an array to activate only specific bindings. Both modes run core provider lifecycle hooks while the host is connected.
 Services that inject `WireScope` also receive provider deprovision state updates, even when they do not declare provider
 lifecycle hooks.
 External containers are deprovisioned on disconnect, but they are never disposed by Lit. The provider value is only
@@ -52,7 +52,7 @@ import { AuthService, UserService } from "./services";
 class MyApp extends LitElement {
   @containerProvide({
     config: {
-      entries: [AuthService, UserService],
+      bindings: [AuthService, UserService],
       seed: { someData: "value" },
     },
   })
@@ -68,8 +68,8 @@ class MyApp extends LitElement {
 
 Creates a managed child container derived from the nearest parent container for the host element's lifetime. The child
 container is created when the host connects, recreated when the parent container changes, and destroyed when the host
-disconnects. Child containers activate all provided entries by default; pass `activate: false` or an array to activate
-only specific entries. Before first connect and after disconnect, `SubContainerProvider.value` is `undefined`.
+disconnects. Child containers activate all provided bindings by default; pass `activate: false` or an array to activate
+only specific bindings. Before first connect and after disconnect, `SubContainerProvider.value` is `undefined`.
 
 Using the decorator (accessor):
 
@@ -84,7 +84,7 @@ import { AuthService, UserService } from "./services";
 class MyApp extends LitElement {
   @subContainerProvide({
     config: {
-      entries: [AuthService, UserService],
+      bindings: [AuthService, UserService],
     },
   })
   public containerProvider!: SubContainerProvider;
@@ -102,7 +102,7 @@ import { AuthService, UserService } from "./services";
 class MyApp extends LitElement {
   private container = useSubContainerProvider(this, {
     config: {
-      entries: [AuthService, UserService],
+      bindings: [AuthService, UserService],
     },
   });
 }
@@ -119,7 +119,7 @@ import { AuthService, UserService } from "./services";
 class MyApp extends LitElement {
   private containerProvider: SubContainerProvider = new SubContainerProvider(this, {
     config: {
-      entries: [AuthService, UserService],
+      bindings: [AuthService, UserService],
     },
   });
 }
@@ -136,7 +136,7 @@ import { AuthService, UserService } from "./services";
 class MyApp extends LitElement {
   private provider: SubContainerProvider = useSubContainerProvider(this, {
     config: {
-      entries: [AuthService, UserService],
+      bindings: [AuthService, UserService],
       seeds: [[AuthService, { role: "admin" }]],
     },
   });

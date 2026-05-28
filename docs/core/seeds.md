@@ -33,21 +33,21 @@ class ApiClient {
 }
 
 const container: Container = createContainer({
+  bindings: [ApiClient],
   seed: {
     apiUrl: "https://api.example.com",
     locale: "en-US",
     featureFlags: new Set(["cart-redesign"]),
   } satisfies ApplicationSeed,
-  entries: [ApiClient],
 });
 ```
 
-Replace the shared seed with `applySharedSeed`.
+Replace the shared seed with `setSharedSeed`.
 
 ```ts
-import { applySharedSeed } from "@wirestate/core";
+import { setSharedSeed } from "@wirestate/core";
 
-applySharedSeed(container, { apiUrl: "https://api.next.example.com", locale: "uk-UA" });
+setSharedSeed(container, { apiUrl: "https://api.next.example.com", locale: "uk-UA" });
 ```
 
 ## Targeted Seeds
@@ -59,12 +59,12 @@ or static config that should stay tied to one token.
 import { Container, createContainer } from "@wirestate/core";
 
 const container: Container = createContainer({
+  bindings: [CounterService],
   seeds: [
     [CounterService, { count: 10 }],
     [ApiClient, { timeoutMs: 5_000 }],
     ["TENANT_ID", "tenant-a"],
   ],
-  entries: [CounterService],
 });
 ```
 
@@ -106,13 +106,13 @@ provisionContainer(container, lifecycle, [CounterService]);
 
 ## Updating Seeds
 
-`applySeeds` updates targeted seeds in place. `unapplySeeds` removes targeted seeds by key.
+`setSeeds` updates targeted seeds in place. `unsetSeeds` removes targeted seeds by key.
 
 ```ts
-import { applySeeds, unapplySeeds } from "@wirestate/core";
+import { setSeeds, unsetSeeds } from "@wirestate/core";
 
-applySeeds(container, [[CounterService, { count: 50 }]]);
-unapplySeeds(container, [[CounterService, null]]);
+setSeeds(container, [[CounterService, { count: 50 }]]);
+unsetSeeds(container, [[CounterService, null]]);
 ```
 
 Seed updates do not rewind already provisioned services. Apply seeds before the provider provisions the container, or
@@ -121,5 +121,5 @@ explicitly re-apply the value in your own service method.
 ## API Reference
 
 [`SEED`](/api/wirestate-core/variables/SEED), [`SEEDS`](/api/wirestate-core/variables/SEEDS),
-[`applySharedSeed`](/api/wirestate-core/functions/applySharedSeed), [`applySeeds`](/api/wirestate-core/functions/applySeeds),
-[`unapplySeeds`](/api/wirestate-core/functions/unapplySeeds), [`SeedEntries`](/api/wirestate-core/type-aliases/SeedEntries).
+[`setSharedSeed`](/api/wirestate-core/functions/setSharedSeed), [`setSeeds`](/api/wirestate-core/functions/setSeeds),
+[`unsetSeeds`](/api/wirestate-core/functions/unsetSeeds), [`SeedBindings`](/api/wirestate-core/type-aliases/SeedBindings).

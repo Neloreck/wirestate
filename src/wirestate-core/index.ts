@@ -6,12 +6,12 @@
 
 export * from "./alias";
 
+export { bind, BindOptions } from "./bind/bind";
 export { bindConstant } from "./bind/bind-constant";
 export { bindDynamicValue } from "./bind/bind-dynamic-value";
-export { bindEntry, BindEntryOptions } from "./bind/bind-entry";
-export { getContainerEntries } from "./bind/bind-register";
 export { bindService, BindServiceOptions } from "./bind/bind-service";
-export { getEntryToken } from "./bind/get-entry-token";
+export { getBindingToken } from "./bind/get-binding-token";
+export { getContainerBindings } from "./bind/bind-register";
 
 export { OnCommand } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";
@@ -32,11 +32,11 @@ export { EventBus } from "./events/event-bus";
 export { QueryBus } from "./queries/query-bus";
 export { OnQuery } from "./queries/on-query";
 
-export { SEEDS_TOKEN as SEEDS } from "@wirestate/core/seeds/tokens";
-export { SEED_TOKEN as SEED } from "@wirestate/core/seeds/tokens";
-export { applySeeds } from "./seeds/apply-seeds";
-export { applySharedSeed } from "./seeds/apply-shared-seed";
-export { unapplySeeds } from "./seeds/unapply-seeds";
+export { SEEDS_TOKEN as SEEDS } from "./seeds/tokens";
+export { SEED_TOKEN as SEED } from "./seeds/tokens";
+export { setSeeds } from "./seeds/set-seeds";
+export { setSharedSeed } from "./seeds/set-shared-seed";
+export { unsetSeeds } from "./seeds/unset-seeds";
 
 export { OnActivated } from "./service/on-activated";
 export { OnDeactivation } from "./service/on-deactivation";
@@ -44,8 +44,8 @@ export { OnDeprovision } from "./service/on-deprovision";
 export { OnProvision } from "./service/on-provision";
 export { ProvisionLifecycle, deprovisionContainer, provisionContainer } from "./service/provision-lifecycle";
 
-export { SeedsMap, SeedEntries, SeedEntry, SeedKey } from "./types/initial-state";
-export { InjectableDescriptor, InjectableEntries } from "./types/provision";
+export { SeedsMap, SeedBindings, SeedBinding, SeedKey } from "./types/initial-state";
+export { BindingDescriptor, BindingEntries } from "./types/provision";
 export { CommandStatus, CommandDescriptor, CommandHandler, CommandType, CommandUnregister } from "./types/commands";
 export { QueryHandler, QueryType, QueryUnregister } from "./types/queries";
 export { Event, EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "./types/events";

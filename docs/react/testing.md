@@ -14,7 +14,7 @@ import { Counter } from "./Counter";
 import { CounterService } from "./CounterService";
 
 test("renders count", () => {
-  const container = mockContainer({ entries: [CounterService], activate: true });
+  const container = mockContainer({ bindings: [CounterService], activate: true });
 
   const { getByText } = render(withContainerProvider(<Counter />, container));
 

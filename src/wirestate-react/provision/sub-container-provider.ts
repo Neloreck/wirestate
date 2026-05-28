@@ -2,9 +2,9 @@ import {
   Container,
   ContainerActivation,
   createContainer,
-  InjectableEntries,
+  BindingEntries,
   provisionContainer,
-  SeedEntries,
+  SeedBindings,
 } from "@wirestate/core";
 import { createElement, type ReactNode, useEffect, useRef, useState } from "react";
 
@@ -22,9 +22,9 @@ import { ProvisionLifecycle, retainContainer, scheduleContainerDestruction } fro
  */
 interface SubContainerSource {
   readonly parent: Container;
-  readonly seeds?: SeedEntries;
+  readonly seeds?: SeedBindings;
   readonly activate: ContainerActivation;
-  readonly entries: InjectableEntries;
+  readonly bindings: BindingEntries;
 }
 
 /**
@@ -44,13 +44,13 @@ interface SubContainerState {
  */
 export interface SubContainerProviderProps {
   /**
-   * Targeted seeds applied before entries are bound.
+   * Targeted seeds applied before bindings are bound.
    *
    * @remarks
-   * Seed changes recreate the child container when the seed entries change by
+   * Seed changes recreate the child container when the seed bindings change by
    * shallow comparison.
    */
-  readonly seeds?: SeedEntries;
+  readonly seeds?: SeedBindings;
 
   /**
    * Services or descriptors bound inside the child container.
@@ -59,14 +59,14 @@ export interface SubContainerProviderProps {
    * The child container is recreated when provider inputs change by shallow
    * comparison.
    */
-  readonly entries: InjectableEntries;
+  readonly bindings: BindingEntries;
 
   /**
    * Services to resolve immediately.
    *
    * @remarks
    * Pass an array to activate specific services. Listed services must also be
-   * present in the `entries` array. Pass `true` to activate all provided entries.
+   * present in the `bindings` array. Pass `true` to activate all provided bindings.
    */
   readonly activate?: ContainerActivation;
 
@@ -99,7 +99,7 @@ export interface SubContainerProviderProps {
  *
  * export function CheckoutScope() {
  *   return (
- *     <SubContainerProvider entries={[CheckoutService]}>
+ *     <SubContainerProvider bindings={[CheckoutService]}>
  *       <Checkout />
  *     </SubContainerProvider>
  *   );
@@ -114,7 +114,7 @@ export function SubContainerProvider(props: SubContainerProviderProps) {
   const source: SubContainerSource = {
     parent: parent,
     activate: props.activate ?? true,
-    entries: props.entries,
+    bindings: props.bindings,
     seeds: props.seeds,
   };
 
@@ -126,7 +126,7 @@ export function SubContainerProvider(props: SubContainerProviderProps) {
   const needsReplacement: boolean =
     state.source.parent !== source.parent ||
     !shallowEqualObjects(state.source.seeds as Maybe<AnyObject>, source.seeds as Maybe<AnyObject>) ||
-    !shallowEqualArrays(state.source.entries, source.entries) ||
+    !shallowEqualArrays(state.source.bindings, source.bindings) ||
     !shallowEqualActivation(state.source.activate, source.activate);
 
   let activeState: SubContainerState = state;
@@ -147,7 +147,7 @@ export function SubContainerProvider(props: SubContainerProviderProps) {
     });
 
     retainContainer(activeState.container, lifecycle);
-    provisionContainer(activeState.container, lifecycle.provisionedServices, activeState.source.entries);
+    provisionContainer(activeState.container, lifecycle.provisionedServices, activeState.source.bindings);
 
     return () => scheduleContainerDestruction(activeState.container, lifecycle);
   }, [activeState]);

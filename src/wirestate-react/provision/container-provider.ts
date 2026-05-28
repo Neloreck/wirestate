@@ -3,7 +3,7 @@ import {
   ContainerConfig,
   createContainer,
   deprovisionContainer,
-  getContainerEntries,
+  getContainerBindings,
   provisionContainer,
   WirestateError,
 } from "@wirestate/core";
@@ -39,7 +39,7 @@ export interface ContainerProviderProps {
    *
    * @remarks
    * Managed containers created from config are disposed on unmount and activate
-   * all entries by default unless `activate` is provided explicitly. Managed
+   * all bindings by default unless `activate` is provided explicitly. Managed
    * containers are recreated when the normalized config changes by shallow
    * comparison.
    */
@@ -68,7 +68,7 @@ interface ContainerProviderState {
  * - External `container`: passed through, provisioned, never disposed.
  * - Managed `config`: created by the provider, provisioned, disposed on unmount.
  *
- * Managed containers activate all entries by default. Pass `activate: false`
+ * Managed containers activate all bindings by default. Pass `activate: false`
  * to keep them lazy.
  *
  * @group Provision
@@ -87,7 +87,7 @@ interface ContainerProviderState {
  * class CounterService {}
  *
  * export function Application() {
- *   const config = useMemo(() => ({ entries: [CounterService] }), []);
+ *   const config = useMemo(() => ({ bindings: [CounterService] }), []);
  *
  *   return (
  *     <ContainerProvider config={config}>
@@ -155,7 +155,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
     (state.source.parent !== normalizedSource.parent ||
       !shallowEqualObjects(state.source.seed, normalizedSource.seed) ||
       !shallowEqualObjects(state.source.seeds as Maybe<AnyObject>, normalizedSource.seeds as Maybe<AnyObject>) ||
-      !shallowEqualArrays(state.source.entries, normalizedSource.entries) ||
+      !shallowEqualArrays(state.source.bindings, normalizedSource.bindings) ||
       !shallowEqualActivation(state.source.activate, normalizedSource.activate))
   );
 
@@ -171,7 +171,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
   }
 
   const activeContainer: Container = activeState ? activeState.container : (externalContainer as Container);
-  const activeEntries = activeState ? activeState.source.entries : getContainerEntries(activeContainer);
+  const activeBindings = activeState ? activeState.source.bindings : getContainerBindings(activeContainer);
 
   useEffect(() => {
     const lifecycle: ProvisionLifecycle = (lifecycleRef.current ??= {
@@ -180,7 +180,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
     } as ProvisionLifecycle);
 
     retainContainer(activeContainer, lifecycle);
-    provisionContainer(activeContainer, lifecycle.provisionedServices, activeEntries);
+    provisionContainer(activeContainer, lifecycle.provisionedServices, activeBindings);
 
     return () => {
       if (owned) {
@@ -189,7 +189,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
         deprovisionContainer(activeContainer, lifecycle.provisionedServices);
       }
     };
-  }, [activeContainer, activeEntries, owned]);
+  }, [activeContainer, activeBindings, owned]);
 
   return createElement(ContainerReactContext.Provider, { value: activeContainer }, props.children ?? null);
 }

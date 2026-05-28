@@ -49,8 +49,8 @@ export interface SubContainerProviderDecorator<T extends ReactiveElement = React
  * class MyComponent extends LitElement {
  *   @subContainerProvide({
  *     config: {
- *       entries: [AuthService, UserService],
  *       activate: [AuthService],
+ *       bindings: [AuthService, UserService],
  *     },
  *   })
  *   public containerProvider!: SubContainerProvider<MyComponent>;

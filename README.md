@@ -81,7 +81,7 @@ class CounterService {
 }
 
 export function Application() {
-  const config = useMemo(() => ({ entries: [CounterService] }), []);
+  const config = useMemo(() => ({ bindings: [CounterService] }), []);
 
   return (
     <ContainerProvider config={config}>
@@ -120,7 +120,7 @@ class CounterService {
 }
 
 export function Application() {
-  const config = useMemo(() => ({ entries: [CounterService] }), []);
+  const config = useMemo(() => ({ bindings: [CounterService] }), []);
 
   return (
     <ContainerProvider config={config}>
@@ -158,7 +158,7 @@ class CounterService {
 
 @customElement("counter-application")
 class CounterApplication extends LitElement {
-  @containerProvide({ config: { entries: [CounterService] } })
+  @containerProvide({ config: { bindings: [CounterService] } })
   private containerProvider!: ContainerProvider;
 
   protected render() {

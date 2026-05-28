@@ -24,7 +24,7 @@ export type SeedKey = Newable | string | symbol;
 export type SeedsMap<T = unknown> = Map<SeedKey, T>;
 
 /**
- * Represents a single targeted seed entry.
+ * Represents a single targeted seed binding.
  *
  * @remarks
  * Represented as a readonly tuple of `[SeedKey, T]`.
@@ -33,14 +33,14 @@ export type SeedsMap<T = unknown> = Map<SeedKey, T>;
  *
  * @template T - The type of the seed value.
  */
-export type SeedEntry<T = unknown> = readonly [SeedKey, T];
+export type SeedBinding<T = unknown> = readonly [SeedKey, T];
 
 /**
- * Represents a collection of targeted seed entries.
+ * Represents a collection of targeted seed bindings.
  *
  * @remarks
  * Used during container initialization to populate the {@link SeedsMap}.
  *
  * @group Seeds
  */
-export type SeedEntries = ReadonlyArray<SeedEntry>;
+export type SeedBindings = ReadonlyArray<SeedBinding>;

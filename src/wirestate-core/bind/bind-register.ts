@@ -1,29 +1,29 @@
 import { Container } from "../alias";
-import { CONTAINER_ENTRIES } from "../registry";
+import { CONTAINER_BINDINGS } from "../registry";
 import { Maybe } from "../types/general";
-import { InjectableEntries } from "../types/provision";
+import { BindingEntries } from "../types/provision";
 
 /**
- * Records an entry as owned by a container.
+ * Records a binding as owned by a container.
  *
  * @group Container
  * @internal
  *
- * @param container - Container receiving the entry.
- * @param entry - Entry bound to the container.
+ * @param container - Container receiving the binding.
+ * @param binding - Binding bound to the container.
  */
-export function registerContainerEntry(container: Container, entry: InjectableEntries[number]): void {
-  const entries: Maybe<Array<InjectableEntries[number]>> = CONTAINER_ENTRIES.get(container);
+export function registerContainerBinding(container: Container, binding: BindingEntries[number]): void {
+  const bindings: Maybe<Array<BindingEntries[number]>> = CONTAINER_BINDINGS.get(container);
 
-  if (entries) {
-    entries.push(entry);
+  if (bindings) {
+    bindings.push(binding);
   } else {
-    CONTAINER_ENTRIES.set(container, [entry]);
+    CONTAINER_BINDINGS.set(container, [binding]);
   }
 }
 
 /**
- * Returns entries Wirestate bound into a container.
+ * Returns bindings Wirestate bound into a container.
  *
  * Framework providers use this list to run provider lifecycle hooks for
  * external containers. Raw Inversify bindings are invisible here.
@@ -31,19 +31,19 @@ export function registerContainerEntry(container: Container, entry: InjectableEn
  * @group Container
  *
  * @param container - Container to inspect.
- * @returns Entries registered through Wirestate binding helpers.
+ * @returns Bindings registered through Wirestate binding helpers.
  *
  * @example
  * ```typescript
- * import { Injectable, createContainer, getContainerEntries } from "@wirestate/core";
+ * import { Injectable, createContainer, getContainerBindings } from "@wirestate/core";
  *
  * @Injectable()
  * class UserService {}
  *
- * const container = createContainer({ entries: [UserService] });
- * const entries = getContainerEntries(container);
+ * const container = createContainer({ bindings: [UserService] });
+ * const bindings = getContainerBindings(container);
  * ```
  */
-export function getContainerEntries(container: Container): InjectableEntries {
-  return CONTAINER_ENTRIES.get(container) ?? [];
+export function getContainerBindings(container: Container): BindingEntries {
+  return CONTAINER_BINDINGS.get(container) ?? [];
 }

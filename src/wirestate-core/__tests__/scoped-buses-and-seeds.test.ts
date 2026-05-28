@@ -92,15 +92,15 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
   it("keeps parent and child messaging in separate scope", async () => {
     const parent: Container = createContainer({
-      entries: [ParentCounterService, { id: PARENT_TOKEN, value: "root-value" }],
-      seeds: [[SETTINGS_TOKEN, { label: "root-label", offset: 1 }]],
       activate: [ParentCounterService],
+      bindings: [ParentCounterService, { id: PARENT_TOKEN, value: "root-value" }],
+      seeds: [[SETTINGS_TOKEN, { label: "root-label", offset: 1 }]],
     });
     const child: Container = createContainer({
-      parent,
-      entries: [ChildCounterService],
-      seeds: [[SETTINGS_TOKEN, { label: "child-label", offset: 10 }]],
       activate: [ChildCounterService],
+      bindings: [ChildCounterService],
+      parent: parent,
+      seeds: [[SETTINGS_TOKEN, { label: "child-label", offset: 10 }]],
     });
 
     expect(child.get(PARENT_TOKEN)).toBe("root-value");
@@ -189,9 +189,9 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     }
 
     const container: Container = createContainer({
-      entries: [CleanupService],
-      seeds: [[SETTINGS_TOKEN, { label: "cleanup-label", offset: 0 }]],
       activate: [CleanupService],
+      bindings: [CleanupService],
+      seeds: [[SETTINGS_TOKEN, { label: "cleanup-label", offset: 0 }]],
     });
 
     container.unbindAll();
@@ -282,8 +282,8 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     }
 
     const container: Container = createContainer({
-      entries: [DeactivationCoordinatorService, DeactivationPeerService],
       activate: [DeactivationCoordinatorService, DeactivationPeerService],
+      bindings: [DeactivationCoordinatorService, DeactivationPeerService],
     });
 
     container.unbindAll();

@@ -3,16 +3,16 @@ import { GenericService } from "@/fixtures/services/generic-service";
 import { Container, ScopeBindingType, BindingType } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { mockContainer } from "../test-utils/mock-container";
-import { InjectableDescriptor } from "../types/provision";
+import { BindingDescriptor } from "../types/provision";
 
-import { bindEntry } from "./bind-entry";
-import { getContainerEntries } from "./bind-register";
+import { bind } from "./bind";
+import { getContainerBindings } from "./bind-register";
 
-describe("bindEntry", () => {
+describe("bind", () => {
   it("should bind a service class directly", () => {
     const container: Container = mockContainer();
 
-    bindEntry(container, GenericService);
+    bind(container, GenericService);
 
     expect(container.isBound(GenericService)).toBe(true);
   });
@@ -21,7 +21,7 @@ describe("bindEntry", () => {
     const container: Container = mockContainer();
     const TOKEN: unique symbol = Symbol("config");
 
-    bindEntry(container, {
+    bind(container, {
       id: TOKEN,
       value: { key: "value" },
       bindingType: BindingType.ConstantValue,
@@ -34,7 +34,7 @@ describe("bindEntry", () => {
     const container: Container = mockContainer();
     const TOKEN: unique symbol = Symbol("config");
 
-    bindEntry(container, { id: TOKEN, value: 42 });
+    bind(container, { id: TOKEN, value: 42 });
 
     expect(container.get(TOKEN)).toBe(42);
   });
@@ -45,7 +45,7 @@ describe("bindEntry", () => {
 
     let callCount: number = 0;
 
-    bindEntry(container, {
+    bind(container, {
       id: TOKEN,
       value: null,
       bindingType: BindingType.DynamicValue,
@@ -66,7 +66,7 @@ describe("bindEntry", () => {
     const container: Container = mockContainer();
     const TOKEN: unique symbol = Symbol("dynamic-fallback");
 
-    bindEntry(container, {
+    bind(container, {
       id: TOKEN,
       value: Math.random(),
       bindingType: BindingType.DynamicValue,
@@ -83,7 +83,7 @@ describe("bindEntry", () => {
   it("should bind an instance descriptor", () => {
     const container: Container = mockContainer();
 
-    bindEntry(container, {
+    bind(container, {
       bindingType: BindingType.Instance,
       id: GenericService,
       value: GenericService,
@@ -95,46 +95,46 @@ describe("bindEntry", () => {
   it("should bind an instance descriptor to its descriptor id", () => {
     const container: Container = mockContainer();
     const TOKEN: unique symbol = Symbol("generic-service");
-    const entry: InjectableDescriptor = {
+    const binding: BindingDescriptor = {
       bindingType: BindingType.Instance,
       id: TOKEN,
       value: GenericService,
     };
 
-    bindEntry(container, entry);
+    bind(container, binding);
 
     expect(container.isBound(TOKEN)).toBe(true);
     expect(container.get(TOKEN)).toBeInstanceOf(GenericService);
-    expect(getContainerEntries(container)).toEqual([entry]);
+    expect(getContainerBindings(container)).toEqual([binding]);
   });
 
   it("should throw for unknown bindingType", () => {
     const container: Container = mockContainer();
 
     expect(() =>
-      bindEntry(container, {
+      bind(container, {
         // @ts-ignore
         bindingType: "UNKNOWN",
         id: GenericService,
         value: GenericService,
       })
-    ).toThrow("Injectable descriptor has unknown binding type 'UNKNOWN'.");
+    ).toThrow("Binding descriptor has unknown binding type 'UNKNOWN'.");
   });
 
   it("should throw for unsupported bindingType", () => {
     const container: Container = mockContainer();
 
     expect(() =>
-      bindEntry(container, {
+      bind(container, {
         bindingType: BindingType.Factory,
-        id: "factory-entry",
+        id: "factory-binding",
         value: () => "factory-value",
       })
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
-      bindEntry(container, {
+      bind(container, {
         bindingType: BindingType.Factory,
-        id: "factory-entry",
+        id: "factory-binding",
         value: () => "factory-value",
       })
     ).toThrow("Unsupported binding type 'Factory'. Supported binding types: ConstantValue, DynamicValue, Instance.");
@@ -142,17 +142,17 @@ describe("bindEntry", () => {
 
   it("should throw for missing descriptor id", () => {
     const container: Container = mockContainer();
-    const entry = { value: "my-value" } as unknown as InjectableDescriptor;
+    const binding = { value: "my-value" } as unknown as BindingDescriptor;
 
-    expect(() => bindEntry(container, entry)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
-    expect(() => bindEntry(container, entry)).toThrow("Injectable descriptor must provide an 'id' token.");
+    expect(() => bind(container, binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
+    expect(() => bind(container, binding)).toThrow("Binding descriptor must provide an 'id' token.");
   });
 
   it("should throw for unknown scopeBindingType", () => {
     const container: Container = mockContainer();
 
     expect(() =>
-      bindEntry(container, {
+      bind(container, {
         id: "bad-scope",
         // @ts-ignore
         scopeBindingType: "UNKNOWN",
@@ -160,27 +160,27 @@ describe("bindEntry", () => {
       })
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_BINDING_SCOPE }));
     expect(() =>
-      bindEntry(container, {
+      bind(container, {
         id: "bad-scope",
         // @ts-ignore
         scopeBindingType: "UNKNOWN",
         value: "my-value",
       })
-    ).toThrow("Injectable descriptor has unknown scope binding type 'UNKNOWN'.");
+    ).toThrow("Binding descriptor has unknown scope binding type 'UNKNOWN'.");
   });
 
   it("should throw for descriptors without value or factory", () => {
     const container: Container = mockContainer();
 
     expect(() =>
-      bindEntry(container, {
+      bind(container, {
         // @ts-ignore
         id: "missing-value",
       })
     ).toThrow("Constant value descriptor must provide a 'value' property.");
 
     expect(() =>
-      bindEntry(container, {
+      bind(container, {
         bindingType: BindingType.DynamicValue,
         id: "missing-dynamic",
       })
@@ -191,7 +191,7 @@ describe("bindEntry", () => {
     const container: Container = mockContainer();
 
     expect(() =>
-      bindEntry(container, {
+      bind(container, {
         bindingType: BindingType.DynamicValue,
         // @ts-ignore
         factory: "not-a-function",
@@ -199,7 +199,7 @@ describe("bindEntry", () => {
       })
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
-      bindEntry(container, {
+      bind(container, {
         bindingType: BindingType.DynamicValue,
         // @ts-ignore
         factory: "not-a-function",
@@ -212,14 +212,14 @@ describe("bindEntry", () => {
     const container: Container = mockContainer();
 
     expect(() =>
-      bindEntry(container, {
+      bind(container, {
         bindingType: BindingType.Instance,
         id: GenericService,
         value: "not-a-constructor",
       })
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
-      bindEntry(container, {
+      bind(container, {
         bindingType: BindingType.Instance,
         id: GenericService,
         value: "not-a-constructor",

@@ -40,7 +40,7 @@ describe("react event container boundaries integration (SubContainer essentials 
         <EventPanel name={"root"} />
 
         {showChild ? (
-          <SubContainerProvider entries={[]}>
+          <SubContainerProvider bindings={[]}>
             <EventPanel name={"child"} />
           </SubContainerProvider>
         ) : null}

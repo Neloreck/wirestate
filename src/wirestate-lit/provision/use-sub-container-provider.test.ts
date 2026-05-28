@@ -22,7 +22,7 @@ describe("useSubContainerProvider", () => {
 
   it("should create and provide a child container derived from the current parent context", () => {
     const parent: Container = createContainer({
-      entries: [
+      bindings: [
         { id: PARENT_TOKEN, value: "parent-value" },
         { id: CONFIG_TOKEN, value: "parent-value" },
       ],
@@ -33,7 +33,7 @@ describe("useSubContainerProvider", () => {
     const element: TestConsumerElement = new TestConsumerElement();
     const provider: SubContainerProvider = useSubContainerProvider(element, {
       config: {
-        entries: [{ id: CONFIG_TOKEN, value: "child-value" }],
+        bindings: [{ id: CONFIG_TOKEN, value: "child-value" }],
       },
     });
 

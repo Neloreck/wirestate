@@ -4,12 +4,12 @@ import { prefix } from "@/macroses/prefix.macro";
 import { BindingType, Container, Newable, ServiceIdentifier } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { InjectableDescriptor } from "../types/provision";
+import { BindingDescriptor } from "../types/provision";
 
 import { bindConstant } from "./bind-constant";
 import { bindDynamicValue } from "./bind-dynamic-value";
 import { bindService, bindServiceWithToken, type BindServiceOptions } from "./bind-service";
-import { validateInjectableDescriptor } from "./validate-injectable-descriptor";
+import { validateBindingDescriptor } from "./validate-binding-descriptor";
 
 const SUPPORTED_BINDING_TYPES: ReadonlyArray<string> = [
   BindingType.ConstantValue,
@@ -19,19 +19,19 @@ const SUPPORTED_BINDING_TYPES: ReadonlyArray<string> = [
 ];
 
 /**
- * Validates descriptor fields needed before {@link bindEntry} dispatches to a concrete binding helper.
+ * Validates descriptor fields needed before {@link bind} dispatches to a concrete binding helper.
  *
  * @group Bind
  * @internal
  *
- * @param entry - Descriptor to validate.
+ * @param binding - Descriptor to validate.
  *
  * @throws {@link WirestateError} If the descriptor uses an unsupported binding type or an invalid instance value.
  */
-function validateEntryDescriptor(entry: InjectableDescriptor): void {
-  validateInjectableDescriptor(entry);
+function validateBindDescriptor(binding: BindingDescriptor): void {
+  validateBindingDescriptor(binding);
 
-  const bindingType: string = entry.bindingType ?? BindingType.ConstantValue;
+  const bindingType: string = binding.bindingType ?? BindingType.ConstantValue;
 
   if (!SUPPORTED_BINDING_TYPES.includes(bindingType)) {
     throw new WirestateError(
@@ -40,7 +40,7 @@ function validateEntryDescriptor(entry: InjectableDescriptor): void {
     );
   }
 
-  if (bindingType === BindingType.Instance && typeof entry.value !== "function") {
+  if (bindingType === BindingType.Instance && typeof binding.value !== "function") {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
       "Instance descriptor 'value' must be a service constructor."
@@ -49,13 +49,13 @@ function validateEntryDescriptor(entry: InjectableDescriptor): void {
 }
 
 /**
- * Represents options for {@link bindEntry}.
+ * Represents options for {@link bind}.
  *
  * @group Bind
  */
-export interface BindEntryOptions extends BindServiceOptions {
+export interface BindOptions extends BindServiceOptions {
   /**
-   * Skip service lifecycle hooks for class entries.
+   * Skip service lifecycle hooks for class bindings.
    *
    * @default `false`
    */
@@ -66,7 +66,7 @@ export interface BindEntryOptions extends BindServiceOptions {
  * Binds a class or descriptor into a container.
  *
  * @remarks
- * `bindEntry` is the router behind `createContainer({ entries })`.
+ * `bind` is the router behind `createContainer({ bindings })`.
  *
  * It chooses the right binding helper:
  *
@@ -80,14 +80,14 @@ export interface BindEntryOptions extends BindServiceOptions {
  * @template T - Bound object type.
  *
  * @param container - Container to bind into.
- * @param entry - Service class or descriptor.
- * @param options - Binding options for class entries.
+ * @param binding - Service class or descriptor.
+ * @param options - Binding options for class bindings.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
  *
  * @example
  * ```typescript
- * import { BindingType, Injectable, bindEntry, createContainer } from "@wirestate/core";
+ * import { BindingType, Injectable, bind, createContainer } from "@wirestate/core";
  *
  * const API_URL = Symbol("API_URL");
  *
@@ -96,54 +96,54 @@ export interface BindEntryOptions extends BindServiceOptions {
  *
  * const container = createContainer();
  *
- * bindEntry(container, UserService);
- * bindEntry(container, {
+ * bind(container, UserService);
+ * bind(container, {
  *   id: API_URL,
  *   bindingType: BindingType.ConstantValue,
  *   value: "https://api.example.com",
  * });
  * ```
  */
-export function bindEntry<T extends object = object>(
+export function bind<T extends object = object>(
   container: Container,
-  entry: Newable<T> | InjectableDescriptor,
-  options: BindEntryOptions = {}
+  binding: Newable<T> | BindingDescriptor,
+  options: BindOptions = {}
 ): void {
-  if (typeof entry === "function") {
-    bindService(container, entry, options);
+  if (typeof binding === "function") {
+    bindService(container, binding, options);
 
     return;
   }
 
-  validateEntryDescriptor(entry);
+  validateBindDescriptor(binding);
 
-  if (!entry.bindingType || entry.bindingType === BindingType.ConstantValue) {
-    bindConstant(container, entry);
+  if (!binding.bindingType || binding.bindingType === BindingType.ConstantValue) {
+    bindConstant(container, binding);
 
     return;
   }
 
-  if (entry.bindingType === BindingType.DynamicValue) {
-    dbg.info(prefix(__filename), "Binding dynamic value entry:", {
-      entry,
+  if (binding.bindingType === BindingType.DynamicValue) {
+    dbg.info(prefix(__filename), "Binding dynamic value descriptor:", {
+      binding,
       container,
     });
 
-    bindDynamicValue(container, entry);
+    bindDynamicValue(container, binding);
 
     return;
   }
 
-  dbg.info(prefix(__filename), "Binding instance entry:", {
-    entry,
+  dbg.info(prefix(__filename), "Binding instance descriptor:", {
+    binding,
     container,
   });
 
   bindServiceWithToken(
     container,
-    entry.id as ServiceIdentifier<T>,
-    entry.value as unknown as Newable<T>,
-    entry,
+    binding.id as ServiceIdentifier<T>,
+    binding.value as unknown as Newable<T>,
+    binding,
     options
   );
 }

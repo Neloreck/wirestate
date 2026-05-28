@@ -15,7 +15,7 @@ describe("subContainerProvide", () => {
   class DecoratedElement extends ReactiveElement {
     @subContainerProvide({
       config: {
-        entries: [{ id: CONFIG_TOKEN, value: "child-value" }],
+        bindings: [{ id: CONFIG_TOKEN, value: "child-value" }],
       },
     })
     public containerProvider!: SubContainerProvider;
@@ -29,7 +29,7 @@ describe("subContainerProvide", () => {
 
   it("should expose a child-container provider controller and derive its container from parent context", () => {
     const parent: Container = createContainer({
-      entries: [{ id: PARENT_TOKEN, value: "parent-value" }],
+      bindings: [{ id: PARENT_TOKEN, value: "parent-value" }],
     });
 
     fixture = createLitProvision(parent);

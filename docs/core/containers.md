@@ -17,15 +17,15 @@ class UserService {}
 class AuthService {}
 
 const container: Container = createContainer({
-  seed: { apiUrl: "https://api.example.com" },
-  entries: [UserService, AuthService],
   activate: [AuthService],
+  bindings: [UserService, AuthService],
+  seed: { apiUrl: "https://api.example.com" },
 });
 ```
 
 `activate` controls eager resolution.
 
-- `true` resolves every entry.
+- `true` resolves every binding.
 - `false` or omitted keeps services lazy.
 - An array resolves only the listed tokens.
 
@@ -42,7 +42,7 @@ import { Container, createContainer } from "@wirestate/core";
 
 const child: Container = createContainer({
   parent: container,
-  entries: [CartService],
+  bindings: [CartService],
 });
 ```
 
@@ -61,7 +61,7 @@ if (container.isBound(UserService)) {
 }
 ```
 
-Prefer entries and bind helpers for Wirestate services so lifecycle and messaging metadata are registered consistently.
+Prefer bindings and bind helpers for Wirestate services so lifecycle and messaging metadata are registered consistently.
 
 ## API Reference
 

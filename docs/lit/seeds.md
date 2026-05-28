@@ -13,8 +13,8 @@ import { customElement } from "lit/decorators.js";
 export class CounterRoot extends LitElement {
   @containerProvide({
     config: {
+      bindings: [CounterService],
       seed: { locale: "en-US" },
-      entries: [CounterService],
       seeds: [[CounterService, { count: 100 }]],
     },
   })
@@ -30,7 +30,7 @@ import { SubContainerProvider, subContainerProvide } from "@wirestate/lit";
 class CheckoutScope extends LitElement {
   @subContainerProvide({
     config: {
-      entries: [CartService],
+      bindings: [CartService],
       seeds: [[CartService, { items: hydratedItems }]],
     },
   })
@@ -70,4 +70,4 @@ Managed Lit containers are recreated when their provider config is replaced and 
 
 [`containerProvide`](/api/wirestate-lit/functions/containerProvide),
 [`subContainerProvide`](/api/wirestate-lit/functions/subContainerProvide), [`WireScope`](/api/wirestate-core/classes/WireScope),
-[`SeedEntries`](/api/wirestate-core/type-aliases/SeedEntries).
+[`SeedBindings`](/api/wirestate-core/type-aliases/SeedBindings).

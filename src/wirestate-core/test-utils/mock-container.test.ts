@@ -5,19 +5,19 @@ import { BindingType, Container, Injectable } from "../alias";
 import { mockContainer } from "./mock-container";
 
 describe("mockContainer", () => {
-  it("should validate activation entries before binding test services", () => {
+  it("should validate activation bindings before binding test services", () => {
     @Injectable()
     class TestService {}
 
     expect(() =>
       mockContainer({
         activate: ["MissingService"],
-        entries: [TestService],
+        bindings: [TestService],
       })
-    ).toThrow("is listed in 'activate' but was not provided in 'entries'.");
+    ).toThrow("is listed in 'activate' but was not provided in 'bindings'.");
   });
 
-  it("should validate activate true against descriptor entries", () => {
+  it("should validate activate true against descriptor bindings", () => {
     const TOKEN: unique symbol = Symbol("test-service");
 
     @Injectable()
@@ -26,7 +26,7 @@ describe("mockContainer", () => {
     expect(() =>
       mockContainer({
         activate: true,
-        entries: [
+        bindings: [
           {
             bindingType: BindingType.Instance,
             id: TOKEN,
@@ -37,7 +37,7 @@ describe("mockContainer", () => {
     ).not.toThrow();
   });
 
-  it("should activate requested mock entries after validation", () => {
+  it("should activate requested mock bindings after validation", () => {
     let activated: boolean = false;
 
     @Injectable()
@@ -49,7 +49,7 @@ describe("mockContainer", () => {
 
     const container: Container = mockContainer({
       activate: [TestService],
-      entries: [TestService],
+      bindings: [TestService],
     });
 
     expect(container.get(TestService)).toBeInstanceOf(TestService);
@@ -61,7 +61,7 @@ describe("mockContainer", () => {
 
     const container: Container = mockContainer({
       activate: [LifecycleService],
-      entries: [LifecycleService],
+      bindings: [LifecycleService],
     });
 
     expect(container.get(LifecycleService)).toBeInstanceOf(LifecycleService);
@@ -77,7 +77,7 @@ describe("mockContainer", () => {
 
     const container: Container = mockContainer({
       activate: [LifecycleService],
-      entries: [LifecycleService],
+      bindings: [LifecycleService],
       skipLifecycle: true,
     });
 

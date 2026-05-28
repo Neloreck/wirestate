@@ -22,7 +22,7 @@ Root provider. Exposes the top-level container to the React tree. Pass either an
 managed `createContainer(...)` `config`.
 
 When `container` is a prebuilt container instance, the provider uses it as-is and never disposes it. React provider
-lifecycle hooks still run for entries registered through Wirestate binding helpers.
+lifecycle hooks still run for bindings registered through Wirestate binding helpers.
 
 ```tsx
 import { createContainer, Container } from "@wirestate/core";
@@ -30,8 +30,8 @@ import { ContainerProvider } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 const container: Container = createContainer({
-  entries: [CounterService, LoggerService],
   activate: [LoggerService],
+  bindings: [CounterService, LoggerService],
 });
 
 export function Application() {
@@ -44,7 +44,7 @@ export function Application() {
 ```
 
 When `config` is provided, `ContainerProvider` creates and owns the container. Managed containers activate all provided
-entries by default; pass `activate: false` to skip core eager activation, or pass an array to activate only specific entries.
+bindings by default; pass `activate: false` to skip core eager activation, or pass an array to activate only specific bindings.
 
 ```tsx
 import { ContainerProvider } from "@wirestate/react";
@@ -52,7 +52,7 @@ import { CounterService, LoggerService } from "./services";
 
 export function Application() {
   return (
-    <ContainerProvider config={{ entries: [CounterService, LoggerService] }}>
+    <ContainerProvider config={{ bindings: [CounterService, LoggerService] }}>
       <SomeComponent />
     </ContainerProvider>
   );
@@ -63,7 +63,7 @@ export function Application() {
 
 Creates a child container scoped to a subtree.
 Use it under `ContainerProvider` when a branch needs its own service bindings or per-service seeds.
-Child containers activate all provided entries by default; pass `activate: false` or a token array to override that.
+Child containers activate all provided bindings by default; pass `activate: false` or a token array to override that.
 
 ```tsx
 import { ReactNode } from "react";
@@ -71,7 +71,7 @@ import { SubContainerProvider } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 function CounterServicesProvider(props: { children?: ReactNode }) {
-  return <SubContainerProvider entries={[CounterService, LoggerService]}>{props.children}</SubContainerProvider>;
+  return <SubContainerProvider bindings={[CounterService, LoggerService]}>{props.children}</SubContainerProvider>;
 }
 
 export function CounterPage() {
@@ -85,11 +85,11 @@ export function CounterPage() {
 
 **Props:**
 
-| Prop       | Type                                  | Description                                                                     |
-| ---------- | ------------------------------------- | ------------------------------------------------------------------------------- |
-| `entries`  | `InjectableEntries`                   | Services or binding descriptors to add to the child container.                  |
-| `seeds`    | `SeedEntries`                         | Per-service seeds, e.g. `[[CounterService, { count: 10 }]]`. Applied on mount.  |
-| `activate` | `boolean \| Array<ServiceIdentifier>` | `true` by default. Pass `false` or specific entry tokens to control activation. |
+| Prop       | Type                                  | Description                                                                       |
+| ---------- | ------------------------------------- | --------------------------------------------------------------------------------- |
+| `bindings` | `BindingEntries`                      | Services or binding descriptors to add to the child container.                    |
+| `seeds`    | `SeedBindings`                        | Per-service seeds, e.g. `[[CounterService, { count: 10 }]]`. Applied on mount.    |
+| `activate` | `boolean \| Array<ServiceIdentifier>` | `true` by default. Pass `false` or specific binding tokens to control activation. |
 
 ## Provider lifecycle
 

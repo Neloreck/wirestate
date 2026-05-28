@@ -10,7 +10,7 @@ import {
   QueryBus,
   WireScope,
 } from "@wirestate/core";
-import { mockBindEntry, mockContainer } from "@wirestate/core/test-utils";
+import { mockBind, mockContainer } from "@wirestate/core/test-utils";
 import { StrictMode } from "react";
 
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
@@ -39,7 +39,7 @@ describe("SubContainerProvider", () => {
     const { getByTestId } = render(
       <ContainerProvider container={parentContainer}>
         <SubContainerProvider
-          entries={[
+          bindings={[
             {
               id: CONFIG_TOKEN,
               value: "child-value",
@@ -62,7 +62,7 @@ describe("SubContainerProvider", () => {
     expect(childContainer?.isBound(CommandBus)).toBe(true);
   });
 
-  it("should provide child container with bound entries", () => {
+  it("should provide child container with bound bindings", () => {
     function Consumer() {
       const container: Container = useContainer();
 
@@ -71,7 +71,7 @@ describe("SubContainerProvider", () => {
 
     const parentContainer: Container = mockContainer();
 
-    mockBindEntry(parentContainer, {
+    mockBind(parentContainer, {
       id: CONFIG_TOKEN,
       value: "parent-value",
     });
@@ -79,7 +79,7 @@ describe("SubContainerProvider", () => {
     const { getByTestId, rerender } = render(
       <ContainerProvider container={parentContainer}>
         <SubContainerProvider
-          entries={[
+          bindings={[
             {
               id: CONFIG_TOKEN,
               value: "child-value",
@@ -102,7 +102,7 @@ describe("SubContainerProvider", () => {
     expect(getByTestId("value").textContent).toBe("parent-value");
   });
 
-  it("should recreate child container when entries change", () => {
+  it("should recreate child container when bindings change", () => {
     const parentContainer: Container = mockContainer();
     const containers: Array<Container> = [];
 
@@ -116,7 +116,7 @@ describe("SubContainerProvider", () => {
 
     const { rerender, getByTestId } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider entries={[{ id: CONFIG_TOKEN, value: "first" }]}>
+        <SubContainerProvider bindings={[{ id: CONFIG_TOKEN, value: "first" }]}>
           <TrackingConsumer />
         </SubContainerProvider>
       </ContainerProvider>
@@ -126,7 +126,7 @@ describe("SubContainerProvider", () => {
 
     rerender(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider entries={[{ id: CONFIG_TOKEN, value: "second" }]}>
+        <SubContainerProvider bindings={[{ id: CONFIG_TOKEN, value: "second" }]}>
           <TrackingConsumer />
         </SubContainerProvider>
       </ContainerProvider>
@@ -137,15 +137,15 @@ describe("SubContainerProvider", () => {
     expect(containers[0]).not.toBe(containers[1]);
   });
 
-  it("should recreate child container when parent container changes with same entries", async () => {
+  it("should recreate child container when parent container changes with same bindings", async () => {
     const PARENT_TOKEN: string = "PARENT_TOKEN";
     const firstParent: Container = mockContainer();
     const secondParent: Container = mockContainer();
     const containers: Array<Container> = [];
     const lifecycleEvents: Array<string> = [];
 
-    mockBindEntry(firstParent, { id: PARENT_TOKEN, value: "first-parent" });
-    mockBindEntry(secondParent, { id: PARENT_TOKEN, value: "second-parent" });
+    mockBind(firstParent, { id: PARENT_TOKEN, value: "first-parent" });
+    mockBind(secondParent, { id: PARENT_TOKEN, value: "second-parent" });
 
     @Injectable()
     class LifecycleService {
@@ -175,7 +175,7 @@ describe("SubContainerProvider", () => {
 
     const { rerender, getByTestId } = render(
       <ContainerProvider container={firstParent}>
-        <SubContainerProvider entries={[LifecycleService, { id: CONFIG_TOKEN, value: "stable" }]}>
+        <SubContainerProvider bindings={[LifecycleService, { id: CONFIG_TOKEN, value: "stable" }]}>
           <TrackingConsumer />
         </SubContainerProvider>
       </ContainerProvider>
@@ -185,7 +185,7 @@ describe("SubContainerProvider", () => {
 
     rerender(
       <ContainerProvider container={secondParent}>
-        <SubContainerProvider entries={[LifecycleService, { id: CONFIG_TOKEN, value: "stable" }]}>
+        <SubContainerProvider bindings={[LifecycleService, { id: CONFIG_TOKEN, value: "stable" }]}>
           <TrackingConsumer />
         </SubContainerProvider>
       </ContainerProvider>
@@ -203,9 +203,9 @@ describe("SubContainerProvider", () => {
     expect(lifecycleEvents).toEqual(["activate", "activate", "deactivate"]);
   });
 
-  it("should keep child container when entries are shallow-equal", () => {
+  it("should keep child container when bindings are shallow-equal", () => {
     const parentContainer: Container = mockContainer();
-    const entry = { id: CONFIG_TOKEN, value: "stable" };
+    const binding = { id: CONFIG_TOKEN, value: "stable" };
     const containers: Array<Container> = [];
 
     function TrackingConsumer() {
@@ -218,7 +218,7 @@ describe("SubContainerProvider", () => {
 
     const { rerender, getByTestId } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider entries={[entry]}>
+        <SubContainerProvider bindings={[binding]}>
           <TrackingConsumer />
         </SubContainerProvider>
       </ContainerProvider>
@@ -226,7 +226,7 @@ describe("SubContainerProvider", () => {
 
     rerender(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider entries={[entry]}>
+        <SubContainerProvider bindings={[binding]}>
           <TrackingConsumer />
         </SubContainerProvider>
       </ContainerProvider>
@@ -243,7 +243,7 @@ describe("SubContainerProvider", () => {
 
     const { rerender } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider entries={[LifecycleService]} activate={false} />
+        <SubContainerProvider bindings={[LifecycleService]} activate={false} />
       </ContainerProvider>
     );
 
@@ -251,7 +251,7 @@ describe("SubContainerProvider", () => {
 
     rerender(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider entries={[LifecycleService]} activate={true} />
+        <SubContainerProvider bindings={[LifecycleService]} activate={true} />
       </ContainerProvider>
     );
 
@@ -268,7 +268,7 @@ describe("SubContainerProvider lifecycle", () => {
     const { unmount } = render(
       <ContainerProvider container={parentContainer}>
         <SubContainerProvider
-          entries={[
+          bindings={[
             {
               bindingType: BindingType.Instance,
               id: TOKEN,
@@ -291,7 +291,7 @@ describe("SubContainerProvider lifecycle", () => {
 
     render(
       <ContainerProvider container={mockContainer()}>
-        <SubContainerProvider entries={[LifecycleService]} />
+        <SubContainerProvider bindings={[LifecycleService]} />
       </ContainerProvider>
     );
 
@@ -302,12 +302,12 @@ describe("SubContainerProvider lifecycle", () => {
     const events: Array<string> = [];
     const { LifecycleService: ParentLifecycleService } = createLifecycleService({ events, suffix: "parent" });
     const { LifecycleService: ChildLifecycleService } = createLifecycleService({ events, suffix: "child" });
-    const parentContainer: Container = mockContainer({ entries: [ParentLifecycleService], activate: true });
+    const parentContainer: Container = mockContainer({ bindings: [ParentLifecycleService], activate: true });
     const unbindAllSpy = jest.spyOn(parentContainer, "unbindAll");
 
     const { unmount } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider entries={[ChildLifecycleService]} />
+        <SubContainerProvider bindings={[ChildLifecycleService]} />
       </ContainerProvider>
     );
 
@@ -345,14 +345,14 @@ describe("SubContainerProvider lifecycle", () => {
 
     const { rerender } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider entries={[LifecycleService]} />
+        <SubContainerProvider bindings={[LifecycleService]} />
       </ContainerProvider>
     );
 
     for (let it = 0; it < 10; it++) {
       rerender(
         <ContainerProvider container={parentContainer}>
-          <SubContainerProvider entries={[LifecycleService]} />
+          <SubContainerProvider bindings={[LifecycleService]} />
         </ContainerProvider>
       );
     }
@@ -368,7 +368,7 @@ describe("SubContainerProvider lifecycle", () => {
 
     const { rerender } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider entries={[FirstLifecycleService]} />
+        <SubContainerProvider bindings={[FirstLifecycleService]} />
       </ContainerProvider>
     );
 
@@ -376,7 +376,7 @@ describe("SubContainerProvider lifecycle", () => {
 
     rerender(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider entries={[SecondLifecycleService]} />
+        <SubContainerProvider bindings={[SecondLifecycleService]} />
       </ContainerProvider>
     );
 
@@ -409,7 +409,7 @@ describe("SubContainerProvider lifecycle", () => {
     const { rerender } = render(
       <StrictMode>
         <ContainerProvider container={parentContainer}>
-          <SubContainerProvider entries={[FirstLifecycleService]} />
+          <SubContainerProvider bindings={[FirstLifecycleService]} />
         </ContainerProvider>
       </StrictMode>
     );
@@ -425,7 +425,7 @@ describe("SubContainerProvider lifecycle", () => {
     rerender(
       <StrictMode>
         <ContainerProvider container={parentContainer}>
-          <SubContainerProvider entries={[SecondLifecycleService]} />
+          <SubContainerProvider bindings={[SecondLifecycleService]} />
         </ContainerProvider>
       </StrictMode>
     );

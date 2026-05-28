@@ -58,8 +58,8 @@ import { CounterService, LoggerService } from "./services";
 
 test("counter emits event on increment", () => {
   const container = mockContainer({
-    entries: [LoggerService, CounterService],
     activate: [CounterService],
+    bindings: [LoggerService, CounterService],
   });
 
   const counter = container.get(CounterService);
@@ -82,7 +82,7 @@ import { bindConstant } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 
 test("cart uses mocked api client", async () => {
-  const container = mockContainer({ entries: [CartService] });
+  const container = mockContainer({ bindings: [CartService] });
   const api = { post: jest.fn().mockResolvedValue({ ok: true }) };
 
   bindConstant(container, { id: ApiClient, value: api as unknown as ApiClient });
@@ -97,5 +97,5 @@ test("cart uses mocked api client", async () => {
 ## API Reference
 
 [`mockService`](/api/wirestate-core/test-utils/functions/mockService),
-[`mockContainer`](/api/wirestate-core/test-utils/functions/mockContainer), [`mockBindEntry`](/api/wirestate-core/test-utils/functions/mockBindEntry),
+[`mockContainer`](/api/wirestate-core/test-utils/functions/mockContainer), [`mockBind`](/api/wirestate-core/test-utils/functions/mockBind),
 [`mockBindService`](/api/wirestate-core/test-utils/functions/mockBindService), [`mockUnbindService`](/api/wirestate-core/test-utils/functions/mockUnbindService).

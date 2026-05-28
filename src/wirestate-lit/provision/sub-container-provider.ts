@@ -1,18 +1,17 @@
 import { ContextConsumer, ContextProvider } from "@lit/context";
 import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-element";
 import {
+  BindingEntries,
   Container,
   ContainerActivation,
+  SeedBindings,
+  WirestateError,
   createContainer,
   deprovisionContainer,
-  getContainerEntries,
-  InjectableDescriptor,
-  Newable,
+  getContainerBindings,
   provisionContainer,
-  SeedEntries,
   type ProvisionLifecycle,
   validateContainerConfig,
-  WirestateError,
 } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -39,24 +38,24 @@ export interface SubContainerProviderOptions {
    */
   readonly config: {
     /**
-     * List of service entries to bind to the container.
+     * Services or descriptors bound inside the child container.
      */
-    readonly entries: ReadonlyArray<Newable<object> | InjectableDescriptor>;
+    readonly bindings: BindingEntries;
 
     /**
      * Services to activate (get from container) immediately after binding.
      *
      * @remarks
-     * Defaults to `true`, activating all provided entries. Pass `false` to skip
-     * eager activation, or pass an array to activate specific entries.
+     * Defaults to `true`, activating all provided bindings. Pass `false` to skip
+     * eager activation, or pass an array to activate specific bindings.
      */
     readonly activate?: ContainerActivation;
 
     /**
      * Seed data to apply to the container before binding.
-     * Applied before entries are bound so that `@Inject(SEEDS_TOKEN)` works during activation.
+     * Applied before bindings are bound so that `@Inject(SEEDS_TOKEN)` works during activation.
      */
-    readonly seeds?: SeedEntries;
+    readonly seeds?: SeedBindings;
   };
 }
 
@@ -67,7 +66,7 @@ export interface SubContainerProviderOptions {
  * The child container inherits parent bindings but owns its own buses, seeds,
  * and lifecycle. It is recreated when the parent container changes.
  *
- * Child containers activate all entries by default unless `activate` is set.
+ * Child containers activate all bindings by default unless `activate` is set.
  * Before connect and after disconnect, the context value is `undefined`.
  *
  * @group Provision
@@ -77,7 +76,7 @@ export interface SubContainerProviderOptions {
  * class MyComponent extends LitElement {
  *   private container = new SubContainerProvider(this, {
  *     config: {
- *       entries: [AuthService, UserService],
+ *       bindings: [AuthService, UserService],
  *       seeds: [[AuthService, { role: "admin" }]],
  *     },
  *   });
@@ -98,7 +97,7 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
 
   /**
    * @param host - The host element.
-   * @param options - Provisioning options, including child entries, eager activations, and seeds.
+   * @param options - Provisioning options, including child bindings, eager activations, and seeds.
    */
   public constructor(host: E, options: SubContainerProviderOptions) {
     super(host, {
@@ -212,7 +211,7 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
     this.destroyed = false;
     super.setValue(container);
 
-    provisionContainer(container, this.lifecycle, getContainerEntries(container));
+    provisionContainer(container, this.lifecycle, getContainerBindings(container));
   }
 
   /**

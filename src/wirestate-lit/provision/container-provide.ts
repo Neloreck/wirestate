@@ -53,8 +53,8 @@ export interface ContainerProviderDecorator<E extends ReactiveElement = Reactive
  * class MyRootElement extends LitElement {
  *   @containerProvide({
  *     config: {
+ *       bindings: [LoggerService],
  *       seed: { someData: "value" },
- *       entries: [LoggerService],
  *     },
  *   })
  *   private containerProvider!: ContainerProvider;

@@ -24,7 +24,7 @@ describe("CounterView", () => {
   let fixture: LitProvisionFixture;
 
   beforeEach(() => {
-    const container = mockContainer({ entries: [CounterService], activate: [CounterService] });
+    const container = mockContainer({ bindings: [CounterService], activate: [CounterService] });
 
     fixture = createLitProvision(container);
   });

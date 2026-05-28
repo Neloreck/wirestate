@@ -1,14 +1,14 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Container, Newable, ServiceIdentifier } from "../alias";
-import { bindEntry } from "../bind/bind-entry";
-import { getEntryToken } from "../bind/get-entry-token";
-import { applySeeds } from "../seeds/apply-seeds";
+import { Container, ServiceIdentifier } from "../alias";
+import { bind } from "../bind/bind";
+import { getBindingToken } from "../bind/get-binding-token";
+import { setSeeds } from "../seeds/set-seeds";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 import { AnyObject } from "../types/general";
-import { SeedEntries, SeedsMap } from "../types/initial-state";
-import { InjectableDescriptor } from "../types/provision";
+import { SeedBindings, SeedsMap } from "../types/initial-state";
+import { BindingEntries } from "../types/provision";
 
 import { createBaseContainer } from "./create-base-container";
 import { validateContainerConfig } from "./validate-container-config";
@@ -17,7 +17,7 @@ import { WireScope } from "./wire-scope";
 /**
  * Services to resolve right after binding.
  *
- * `true` resolves every entry. An array resolves only those tokens. `false` or
+ * `true` resolves every binding. An array resolves only those tokens. `false` or
  * `undefined` leaves services lazy.
  */
 export type ContainerActivation = boolean | ReadonlyArray<ServiceIdentifier>;
@@ -28,6 +28,16 @@ export type ContainerActivation = boolean | ReadonlyArray<ServiceIdentifier>;
  * @group Container
  */
 export interface CreateContainerOptions {
+  /**
+   * Bindings to resolve immediately after binding.
+   */
+  readonly activate?: ContainerActivation;
+
+  /**
+   * Services or binding descriptors to register.
+   */
+  readonly bindings?: BindingEntries;
+
   /**
    * Parent container for inherited bindings.
    */
@@ -41,17 +51,7 @@ export interface CreateContainerOptions {
   /**
    * Seed values keyed by service class, string, or symbol.
    */
-  readonly seeds?: SeedEntries;
-
-  /**
-   * Services or binding descriptors to register.
-   */
-  readonly entries?: ReadonlyArray<Newable<object> | InjectableDescriptor>;
-
-  /**
-   * Entries to resolve immediately after binding.
-   */
-  readonly activate?: ContainerActivation;
+  readonly seeds?: SeedBindings;
 }
 
 /**
@@ -85,7 +85,7 @@ export type ContainerConfig = CreateContainerOptions;
  * @param options - Container setup.
  * @returns A new Wirestate-ready {@link Container}.
  *
- * @throws {@link WirestateError} If `activate` names a token missing from `entries`.
+ * @throws {@link WirestateError} If `activate` names a token missing from `bindings`.
  *
  * @example
  * ```typescript
@@ -98,9 +98,9 @@ export type ContainerConfig = CreateContainerOptions;
  * class CounterService {}
  *
  * const container: Container = createContainer({
- *   entries: [CounterService, LoggerService],
- *   seeds: [[CounterService, { count: 10 }]],
  *   activate: [LoggerService],
+ *   bindings: [CounterService, LoggerService],
+ *   seeds: [[CounterService, { count: 10 }]],
  * });
  *
  * const logger = container.get(LoggerService);
@@ -112,7 +112,7 @@ export function createContainer(options: CreateContainerOptions = {}): Container
   validateContainerConfig(options);
 
   const activate: ReadonlyArray<ServiceIdentifier> =
-    (options.activate === true ? options.entries?.map(getEntryToken) : options.activate) || [];
+    (options.activate === true ? options.bindings?.map(getBindingToken) : options.activate) || [];
 
   const container: Container = new Container({
     defaultScope: "Singleton",
@@ -124,7 +124,7 @@ export function createContainer(options: CreateContainerOptions = {}): Container
   container.bind(SEED_TOKEN).toConstantValue(options.seed ?? {});
 
   if (options.seeds) {
-    applySeeds(container, options.seeds);
+    setSeeds(container, options.seeds);
   }
 
   container
@@ -132,16 +132,16 @@ export function createContainer(options: CreateContainerOptions = {}): Container
     .toResolvedValue((): WireScope => new WireScope(container))
     .inTransientScope();
 
-  dbg.info(prefix(__filename), "Injecting entries on creation:", { container, options });
+  dbg.info(prefix(__filename), "Injecting bindings on creation:", { container, options });
 
-  if (options.entries) {
-    for (const entry of options.entries) {
-      bindEntry(container, entry);
+  if (options.bindings) {
+    for (const binding of options.bindings) {
+      bind(container, binding);
     }
   }
 
-  for (const entry of activate) {
-    container.get(entry);
+  for (const binding of activate) {
+    container.get(binding);
   }
 
   return container;

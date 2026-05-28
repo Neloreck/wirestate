@@ -11,8 +11,8 @@ import { useMemo } from "react";
 function ApplicationRoot() {
   const config = useMemo(
     () => ({
+      bindings: [CounterService],
       seed: { locale: "en-US" },
-      entries: [CounterService],
       seeds: [[CounterService, { initialCount: 10 }]],
     }),
     []
@@ -33,7 +33,7 @@ function ApplicationRoot() {
 ```tsx
 import { SubContainerProvider } from "@wirestate/react";
 
-<SubContainerProvider entries={[CartService]} seeds={[[CartService, { items: hydratedItems }]]}>
+<SubContainerProvider bindings={[CartService]} seeds={[[CartService, { items: hydratedItems }]]}>
   <Cart />
 </SubContainerProvider>;
 ```
@@ -70,4 +70,4 @@ Changing provider seeds recreates managed provider containers when the shallow p
 
 [`ContainerProvider`](/api/wirestate-react/functions/ContainerProvider),
 [`SubContainerProvider`](/api/wirestate-react/functions/SubContainerProvider),
-[`SeedEntries`](/api/wirestate-core/type-aliases/SeedEntries), [`WireScope`](/api/wirestate-core/classes/WireScope).
+[`SeedBindings`](/api/wirestate-core/type-aliases/SeedBindings), [`WireScope`](/api/wirestate-core/classes/WireScope).

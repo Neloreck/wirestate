@@ -277,7 +277,7 @@ describe("optionalInjection (new standard decorator)", () => {
 
   it("should inject bound service for standard accessors", () => {
     const container: Container = mockContainer({
-      entries: [GenericService],
+      bindings: [GenericService],
     });
 
     fixture = createLitProvision(container);

@@ -5,10 +5,10 @@ import { BindWhenOnFluentSyntax, Container, type ServiceIdentifier } from "../al
 import { BindingType, ScopeBindingType } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { InjectableDescriptor } from "../types/provision";
+import { BindingDescriptor } from "../types/provision";
 
-import { registerContainerEntry } from "./bind-register";
-import { validateInjectableDescriptor } from "./validate-injectable-descriptor";
+import { registerContainerBinding } from "./bind-register";
+import { validateBindingDescriptor } from "./validate-binding-descriptor";
 
 /**
  * Validates that a descriptor can be bound by {@link bindConstant}.
@@ -16,22 +16,22 @@ import { validateInjectableDescriptor } from "./validate-injectable-descriptor";
  * @group Bind
  * @internal
  *
- * @param entry - Descriptor to validate.
+ * @param descriptor - Descriptor to validate.
  *
  * @throws {@link WirestateError} If the descriptor is missing a token, uses a non-constant binding type,
  * or omits the `value` field.
  */
-function validateConstantDescriptor(entry: InjectableDescriptor): void {
-  validateInjectableDescriptor(entry);
+function validateConstantDescriptor(descriptor: BindingDescriptor): void {
+  validateBindingDescriptor(descriptor);
 
-  if (entry.bindingType !== undefined && entry.bindingType !== BindingType.ConstantValue) {
+  if (descriptor.bindingType !== undefined && descriptor.bindingType !== BindingType.ConstantValue) {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
       `bindConstant expected binding type '${BindingType.ConstantValue}'.`
     );
   }
 
-  if (!Object.prototype.hasOwnProperty.call(entry, "value")) {
+  if (!Object.prototype.hasOwnProperty.call(descriptor, "value")) {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
       "Constant value descriptor must provide a 'value' property."
@@ -51,10 +51,10 @@ function validateConstantDescriptor(entry: InjectableDescriptor): void {
  * @template T - Value type.
  *
  * @param container - Container to bind into.
- * @param entry - Descriptor with `id` and `value`.
+ * @param descriptor - Descriptor with `id` and `value`.
  * @returns Inversify fluent syntax for additional constraints.
  *
- * @throws {@link WirestateError} If `entry.scopeBindingType` is not `Singleton`.
+ * @throws {@link WirestateError} If `descriptor.scopeBindingType` is not `Singleton`.
  *
  * @example
  * ```typescript
@@ -71,25 +71,25 @@ function validateConstantDescriptor(entry: InjectableDescriptor): void {
  * const apiUrl = container.get<string>(API_URL);
  * ```
  */
-export function bindConstant<T>(container: Container, entry: InjectableDescriptor): BindWhenOnFluentSyntax<T> {
-  validateConstantDescriptor(entry);
+export function bindConstant<T>(container: Container, descriptor: BindingDescriptor): BindWhenOnFluentSyntax<T> {
+  validateConstantDescriptor(descriptor);
 
   dbg.info(prefix(__filename), "Binding constant:", {
-    id: entry.id,
-    value: entry.value,
-    entry,
+    id: descriptor.id,
+    value: descriptor.value,
+    descriptor,
     container,
   });
 
-  if (entry.scopeBindingType && entry.scopeBindingType !== ScopeBindingType.Singleton) {
+  if (descriptor.scopeBindingType && descriptor.scopeBindingType !== ScopeBindingType.Singleton) {
     throw new WirestateError(ERROR_CODE_BINDING_SCOPE, "Provided unexpected binding scope for constant value.");
   }
 
   const binding: BindWhenOnFluentSyntax<T> = container
-    .bind<T>(entry.id as ServiceIdentifier<T>)
-    .toConstantValue(entry.value as T);
+    .bind<T>(descriptor.id as ServiceIdentifier<T>)
+    .toConstantValue(descriptor.value as T);
 
-  registerContainerEntry(container, entry);
+  registerContainerBinding(container, descriptor);
 
   return binding;
 }

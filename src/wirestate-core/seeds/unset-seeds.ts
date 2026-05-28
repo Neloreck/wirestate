@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { Container } from "../alias";
-import { SeedEntries, SeedsMap } from "../types/initial-state";
+import { SeedBindings, SeedsMap } from "../types/initial-state";
 
 import { SEEDS_TOKEN } from "./tokens";
 
@@ -15,11 +15,11 @@ import { SEEDS_TOKEN } from "./tokens";
  * @group Seeds
  *
  * @param container - Container to update.
- * @param seeds - Seed entries whose keys should be removed.
+ * @param seeds - Seed bindings whose keys should be removed.
  *
  * @example
  * ```typescript
- * import { Injectable, createContainer, unapplySeeds } from "@wirestate/core";
+ * import { Injectable, createContainer, unsetSeeds } from "@wirestate/core";
  *
  * @Injectable()
  * class CounterService {}
@@ -28,10 +28,10 @@ import { SEEDS_TOKEN } from "./tokens";
  *   seeds: [[CounterService, { count: 10 }]],
  * });
  *
- * unapplySeeds(container, [[CounterService, { count: 10 }]]);
+ * unsetSeeds(container, [[CounterService, { count: 10 }]]);
  * ```
  */
-export function unapplySeeds(container: Container, seeds: SeedEntries): void {
+export function unsetSeeds(container: Container, seeds: SeedBindings): void {
   const existing: SeedsMap = container.get(SEEDS_TOKEN);
 
   dbg.info(prefix(__filename), "Unapply seeds for container:", { existing, seeds, container });

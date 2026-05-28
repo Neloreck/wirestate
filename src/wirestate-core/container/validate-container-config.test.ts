@@ -9,13 +9,13 @@ describe("validateContainerConfig", () => {
 
     expect(() =>
       validateContainerConfig({
-        entries: [TestService],
         activate: [TestService],
+        bindings: [TestService],
       })
     ).not.toThrow();
   });
 
-  it("should validate activate true against descriptor entries", () => {
+  it("should validate activate true against descriptor bindings", () => {
     const TOKEN: unique symbol = Symbol("test-service");
 
     @Injectable()
@@ -23,35 +23,35 @@ describe("validateContainerConfig", () => {
 
     expect(() =>
       validateContainerConfig({
-        entries: [
+        activate: true,
+        bindings: [
           {
             bindingType: BindingType.Instance,
             id: TOKEN,
             value: TestService,
           },
         ],
-        activate: true,
       })
     ).not.toThrow();
   });
 
-  it("should throw if activate is provided without entries", () => {
+  it("should throw if activate is provided without bindings", () => {
     expect(() =>
       validateContainerConfig({
         activate: ["SomeService"],
       })
-    ).toThrow("Supplied activation list while entries for binding are not provided.");
+    ).toThrow("Supplied activation list while container bindings are not provided.");
   });
 
-  it("should throw if activated service is not in entries", () => {
+  it("should throw if activated service is not in bindings", () => {
     @Injectable()
     class TestService {}
 
     expect(() =>
       validateContainerConfig({
-        entries: [TestService],
         activate: ["OtherService"],
+        bindings: [TestService],
       })
-    ).toThrow("is listed in 'activate' but was not provided in 'entries'.");
+    ).toThrow("is listed in 'activate' but was not provided in 'bindings'.");
   });
 });

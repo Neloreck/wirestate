@@ -2,11 +2,11 @@ import { Container } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
-import { applySeeds } from "../seeds/apply-seeds";
+import { setSeeds } from "../seeds/set-seeds";
 import { SEED_TOKEN } from "../seeds/tokens";
 import { SEEDS_TOKEN } from "../seeds/tokens";
 import { AnyObject, Maybe } from "../types/general";
-import { SeedEntries, SeedsMap } from "../types/initial-state";
+import { SeedBindings, SeedsMap } from "../types/initial-state";
 
 import { CONTAINER_PARENT_TOKEN } from "./tokens";
 
@@ -31,7 +31,7 @@ export interface CreateBaseContainerOptions {
   /**
    * Targeted seeds bound to specific injectables or tokens.
    */
-  readonly seeds?: Maybe<SeedEntries>;
+  readonly seeds?: Maybe<SeedBindings>;
 }
 
 /**
@@ -43,7 +43,7 @@ export interface CreateBaseContainerOptions {
  * - sets the default scope to `Singleton`
  * - binds the core buses: {@link EventBus}, {@link QueryBus}, and {@link CommandBus}
  * - registers the seed map tokens: `SEEDS_TOKEN` and `SEED_TOKEN`
- * - applies any targeted seed entries passed in `options.seeds`
+ * - applies any targeted seed bindings passed in `options.seeds`
  *
  * @group Container
  * @internal
@@ -81,7 +81,7 @@ export function createBaseContainer(options: CreateBaseContainerOptions): Contai
   container.bind(SEED_TOKEN).toConstantValue(options.seed ?? {});
 
   if (options.seeds) {
-    applySeeds(container, options.seeds);
+    setSeeds(container, options.seeds);
   }
 
   return container;

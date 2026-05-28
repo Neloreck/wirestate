@@ -12,7 +12,7 @@ import { useMemo } from "react";
 import { CounterService, LoggerService } from "./services";
 
 export function Application() {
-  const config = useMemo(() => ({ entries: [CounterService, LoggerService] }), []);
+  const config = useMemo(() => ({ bindings: [CounterService, LoggerService] }), []);
 
   return (
     <ContainerProvider config={config}>
@@ -22,7 +22,7 @@ export function Application() {
 }
 ```
 
-Managed containers activate all entries by default. Pass `activate: false` to keep entries lazy.
+Managed containers activate all bindings by default. Pass `activate: false` to keep bindings lazy.
 
 Activation is not the right place for resource work. React providers create managed containers before their effect
 commits. In Strict Mode, React can create an extra container, discard it, then commit another one. Start timers,
@@ -38,7 +38,7 @@ import { Container, createContainer } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
 
 const container: Container = createContainer({
-  entries: [CounterService, LoggerService],
+  bindings: [CounterService, LoggerService],
 });
 
 export function Application() {
@@ -65,7 +65,7 @@ import { SubContainerProvider } from "@wirestate/react";
 import { CartService, CheckoutService } from "./services";
 
 export function CheckoutScope(props: { children?: ReactNode }) {
-  return <SubContainerProvider entries={[CartService, CheckoutService]}>{props.children}</SubContainerProvider>;
+  return <SubContainerProvider bindings={[CartService, CheckoutService]}>{props.children}</SubContainerProvider>;
 }
 ```
 

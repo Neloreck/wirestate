@@ -53,8 +53,8 @@ export class CounterService {
 import { createContainer, bindService } from "@wirestate/core";
 
 const container = createContainer({
+  bindings: [CounterService],
   seed: { baseUrl: "https://example.com" },
-  entries: [CounterService],
 });
 
 bindService(container, AnotherService);
@@ -64,7 +64,7 @@ const anotherService = container.get(AnotherService);
 ```
 
 `bindService` binds a class in singleton scope by default.
-Use `bindConstant` to bind a value, `bindEntry` to bind under a custom token.
+Use `bindConstant` to bind a value, `bind` to bind under a custom token.
 
 ## Events
 
@@ -170,7 +170,7 @@ export class OtherService {
 }
 ```
 
-Seeds are applied via `applySeeds` / `applySharedSeed` and removed via `unapplySeeds`.
+Seeds are applied via `setSeeds` / `setSharedSeed` and removed via `unsetSeeds`.
 For managed containers, pass `seed` or `seeds` inside provider config. For external containers, pass seeds to
 `createContainer` or apply them before services are resolved or provisioned.
 
@@ -246,36 +246,30 @@ Injected `WireScope` instances expose lifecycle state for async guards:
 Available via `@wirestate/core/test-utils`:
 
 ```ts
-import {
-  mockContainer,
-  mockService,
-  mockBindService,
-  mockBindEntry,
-  mockUnbindService,
-} from "@wirestate/core/test-utils";
+import { mockContainer, mockService, mockBindService, mockBind, mockUnbindService } from "@wirestate/core/test-utils";
 ```
 
 ### `mockContainer(options?)`
 
 Creates a configured IoC container for testing. Accepts an optional object:
 
-| Option          | Type                                     | Description                                                                            |
-| --------------- | ---------------------------------------- | -------------------------------------------------------------------------------------- |
-| `entries`       | `Array<Newable \| InjectableDescriptor>` | Services or descriptors to bind                                                        |
-| `activate`      | `boolean \| Array<ServiceIdentifier>`    | `true` to resolve all entries, or specific tokens to resolve immediately after binding |
-| `skipLifecycle` | `boolean`                                | Skip `@OnActivated` / `@OnDeactivation` hooks                                          |
+| Option          | Type                                  | Description                                                                             |
+| --------------- | ------------------------------------- | --------------------------------------------------------------------------------------- |
+| `activate`      | `boolean \| Array<ServiceIdentifier>` | `true` to resolve all bindings, or specific tokens to resolve immediately after binding |
+| `bindings`      | `Array<Newable \| BindingDescriptor>` | Services or descriptors to bind                                                         |
+| `skipLifecycle` | `boolean`                             | Skip `@OnActivated` / `@OnDeactivation` hooks                                           |
 
 ```ts
 const container = mockContainer({
-  entries: [CounterService, LoggerService],
   activate: [CounterService],
+  bindings: [CounterService, LoggerService],
 });
 ```
 
 ```ts
 const container = mockContainer({
-  entries: [CounterService, LoggerService],
   activate: true,
+  bindings: [CounterService, LoggerService],
 });
 ```
 
@@ -293,9 +287,9 @@ expect(counter.count).toBe(1);
 
 Binds a service class to an existing container. Accepts `{ skipLifecycle?: boolean }`.
 
-### `mockBindEntry(container, entry, options?)`
+### `mockBind(container, binding, options?)`
 
-Binds a service class or `InjectableDescriptor` to an existing container. Accepts `{ skipLifecycle?: boolean }`.
+Binds a service class or `BindingDescriptor` to an existing container. Accepts `{ skipLifecycle?: boolean }`.
 
 ### `mockUnbindService(container, ServiceClass)`
 
@@ -303,7 +297,7 @@ Removes a service binding from the container. Useful for overriding registration
 
 ```ts
 mockUnbindService(container, CounterService);
-mockBindEntry(container, { id: CounterService, value: fakeCounter });
+mockBind(container, { id: CounterService, value: fakeCounter });
 ```
 
 ## License

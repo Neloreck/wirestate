@@ -36,7 +36,7 @@ export class Application extends LitElement {
         [LoggerService, { enabled: true }],
         [CounterService, { count: 25 }],
       ],
-      entries: [
+      bindings: [
         LoggerService,
         CounterService,
         ThemeService,

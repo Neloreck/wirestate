@@ -20,16 +20,16 @@ import { SEED_TOKEN } from "./tokens";
  *
  * @example
  * ```typescript
- * import { SEED, applySharedSeed, createContainer } from "@wirestate/core";
+ * import { SEED, setSharedSeed, createContainer } from "@wirestate/core";
  *
  * const container = createContainer({ seed: { locale: "en-US" } });
  *
- * applySharedSeed(container, { locale: "uk-UA" });
+ * setSharedSeed(container, { locale: "uk-UA" });
  *
  * const seed = container.get<{ locale: string }>(SEED);
  * ```
  */
-export function applySharedSeed(container: Container, seed: AnyObject): void {
+export function setSharedSeed(container: Container, seed: AnyObject): void {
   dbg.info(prefix(__filename), "Apply shared seed:", { shared: seed, container });
 
   container.rebind<AnyObject>(SEED_TOKEN).toConstantValue(seed);

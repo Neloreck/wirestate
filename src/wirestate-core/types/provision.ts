@@ -15,7 +15,7 @@ export type BindingType = (typeof bindingTypeValues)[keyof typeof bindingTypeVal
 export type ScopeBindingType = (typeof bindingScopeValues)[keyof typeof bindingScopeValues];
 
 /**
- * Represents one container entry.
+ * Represents one container binding.
  *
  * @remarks
  * Use descriptors when a class token is not enough: constants, factories, or a
@@ -28,18 +28,18 @@ export type ScopeBindingType = (typeof bindingScopeValues)[keyof typeof bindingS
  *
  * @example
  * ```typescript
- * import { BindingType, InjectableDescriptor } from "@wirestate/core";
+ * import { BindingType, BindingDescriptor } from "@wirestate/core";
  *
  * const API_URL = Symbol("API_URL");
  *
- * const descriptor: InjectableDescriptor<string> = {
+ * const descriptor: BindingDescriptor<string> = {
  *   id: API_URL,
  *   bindingType: BindingType.ConstantValue,
  *   value: "https://api.example.com",
  * };
  * ```
  */
-export interface InjectableDescriptor<T = unknown, V = unknown> {
+export interface BindingDescriptor<T = unknown, V = unknown> {
   /**
    * Binding strategy.
    */
@@ -51,7 +51,7 @@ export interface InjectableDescriptor<T = unknown, V = unknown> {
   readonly factory?: () => T;
 
   /**
-   * Token used to resolve the entry.
+   * Token used to resolve the binding.
    */
   readonly id: ServiceIdentifier<T>;
 
@@ -67,11 +67,11 @@ export interface InjectableDescriptor<T = unknown, V = unknown> {
 }
 
 /**
- * Represents entries accepted by Wirestate registration APIs.
+ * Represents bindings accepted by Wirestate registration APIs.
  *
  * @remarks
- * Each item is either a service class or an {@link InjectableDescriptor}.
+ * Each item is either a service class or an {@link BindingDescriptor}.
  *
  * @group Bind
  */
-export type InjectableEntries = ReadonlyArray<Newable<object> | InjectableDescriptor>;
+export type BindingEntries = ReadonlyArray<Newable<object> | BindingDescriptor>;

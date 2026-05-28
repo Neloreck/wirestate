@@ -3,13 +3,13 @@ import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-elemen
 import {
   Container,
   ContainerConfig,
+  WirestateError,
   createContainer,
   deprovisionContainer,
-  getContainerEntries,
+  getContainerBindings,
   provisionContainer,
   type ProvisionLifecycle,
   validateContainerConfig,
-  WirestateError,
 } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -44,7 +44,7 @@ export interface ContainerProviderOptions {
    * @remarks
    * The managed container is created when the host connects, disposed when it
    * disconnects, and recreated on the next reconnect. Managed containers
-   * activate all entries by default unless `activate` is provided explicitly.
+   * activate all bindings by default unless `activate` is provided explicitly.
    * The provider value is `undefined` while the host is disconnected.
    */
   readonly config?: ContainerConfig;
@@ -59,7 +59,7 @@ export interface ContainerProviderOptions {
  * - External `container`: published while connected, provisioned, never disposed.
  * - Managed `config`: created on connect, provisioned, disposed on disconnect.
  *
- * Managed containers activate all entries by default. Before connect and after
+ * Managed containers activate all bindings by default. Before connect and after
  * disconnect, the context value is `undefined`.
  *
  * @group Provision
@@ -75,7 +75,7 @@ export interface ContainerProviderOptions {
  *
  * class AppRoot extends LitElement {
  *   private readonly provider = new ContainerProvider(this, {
- *     config: { entries: [CounterService] },
+ *     config: { bindings: [CounterService] },
  *   });
  * }
  * ```
@@ -134,7 +134,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
 
     super.setValue(container);
 
-    provisionContainer(container, this.lifecycle, getContainerEntries(container));
+    provisionContainer(container, this.lifecycle, getContainerBindings(container));
 
     super.hostConnected();
   }
@@ -174,7 +174,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
 
         super.setValue(container, force);
 
-        provisionContainer(container, this.lifecycle, getContainerEntries(container));
+        provisionContainer(container, this.lifecycle, getContainerBindings(container));
       }
     }
   }
@@ -211,7 +211,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
       this.container = container;
       super.setValue(container);
 
-      provisionContainer(container, this.lifecycle, getContainerEntries(container));
+      provisionContainer(container, this.lifecycle, getContainerBindings(container));
     }
   }
 

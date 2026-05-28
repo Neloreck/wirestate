@@ -1,9 +1,9 @@
 import { Container, ServiceIdentifier } from "../alias";
-import { getEntryToken } from "../bind/get-entry-token";
+import { getBindingToken } from "../bind/get-binding-token";
 import { createContainer, CreateContainerOptions } from "../container/create-container";
 import { validateContainerConfig } from "../container/validate-container-config";
 
-import { mockBindEntry } from "./mock-bind-entry";
+import { mockBind } from "./mock-bind";
 
 /**
  * Represents options for {@link mockContainer}.
@@ -27,7 +27,7 @@ export interface MockContainerOptions extends CreateContainerOptions {
  *
  * @remarks
  * This utility initializes a new container via {@link createContainer} and
- * binds the provided `entries` using {@link mockBindEntry}. It can also
+ * binds the provided `bindings` using {@link mockBind}. It can also
  * automatically resolve (activate) all or a subset of services.
  *
  * @group Test-utils
@@ -35,28 +35,28 @@ export interface MockContainerOptions extends CreateContainerOptions {
  * @param options - Configuration options for the mock container.
  * @returns A configured Inversify {@link Container}.
  *
- * @throws {WirestateError} If an identifier in `activate` is not found in `entries`.
+ * @throws {WirestateError} If an identifier in `activate` is not found in `bindings`.
  *
  * @example
  * ```typescript
  * const container: Container = mockContainer({
- *   entries: [UserService, AuthService],
  *   activate: true
+ *   bindings: [UserService, AuthService],
  * });
  * ```
  */
 export function mockContainer(options: MockContainerOptions = {}): Container {
-  const { entries = [], skipLifecycle } = options;
+  const { bindings = [], skipLifecycle } = options;
 
   validateContainerConfig(options);
 
   const activate: ReadonlyArray<ServiceIdentifier> =
-    (options.activate === true ? entries.map(getEntryToken) : options.activate) || [];
+    (options.activate === true ? bindings.map(getBindingToken) : options.activate) || [];
 
   const container: Container = createContainer({ parent: options.parent, seeds: options.seeds, seed: options.seed });
 
-  for (const it of entries) {
-    mockBindEntry(container, it, { skipLifecycle: skipLifecycle });
+  for (const it of bindings) {
+    mockBind(container, it, { skipLifecycle: skipLifecycle });
   }
 
   for (const it of activate) {

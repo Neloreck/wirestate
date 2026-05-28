@@ -22,10 +22,10 @@ import { getDeactivationHandlerMetadata } from "../service/on-deactivation";
 import { CommandHandler, CommandUnregister } from "../types/commands";
 import { EventHandler, EventUnsubscriber } from "../types/events";
 import { Maybe, MaybePromise, Optional } from "../types/general";
-import { InjectableEntries } from "../types/provision";
+import { BindingEntries } from "../types/provision";
 import { QueryHandler, QueryUnregister } from "../types/queries";
 
-import { registerContainerEntry } from "./bind-register";
+import { registerContainerBinding } from "./bind-register";
 
 /**
  * Represents options for {@link bindService}.
@@ -61,7 +61,7 @@ export interface BindServiceOptions {
  * @template T - Service instance type.
  *
  * @param container - Container to bind into.
- * @param entry - Service class.
+ * @param binding - Service class.
  * @param options - Binding options.
  *
  * @example
@@ -91,10 +91,10 @@ export interface BindServiceOptions {
  */
 export function bindService<T extends object>(
   container: Container,
-  entry: Newable<T>,
+  binding: Newable<T>,
   options?: BindServiceOptions
 ): void {
-  bindServiceWithToken(container, entry, entry, entry, options);
+  bindServiceWithToken(container, binding, binding, binding, options);
 }
 
 /**
@@ -107,21 +107,21 @@ export function bindService<T extends object>(
  *
  * @param container - Target Inversify {@link Container}.
  * @param token - Service identifier used to resolve the binding.
- * @param entry - Service class constructor.
- * @param registeredEntry - Entry recorded as container-owned.
+ * @param binding - Service class constructor.
+ * @param registeredBinding - Binding recorded as container-owned.
  * @param options - Configuration options for the binding.
  */
 export function bindServiceWithToken<T extends object>(
   container: Container,
   token: ServiceIdentifier<T>,
-  entry: Newable<T>,
-  registeredEntry: InjectableEntries[number],
+  binding: Newable<T>,
+  registeredBinding: BindingEntries[number],
   options?: BindServiceOptions
 ): void {
   dbg.info(prefix(__filename), "Binding service:", {
-    name: entry.name,
+    name: binding.name,
     token,
-    entry,
+    binding,
     options,
     container,
   });
@@ -130,14 +130,14 @@ export function bindServiceWithToken<T extends object>(
   // `.onDeactivation` call per chain, so we register them on the container
   // itself instead - this also works correctly if a later call rebinds the
   // same token.
-  const whenBind: BindWhenOnFluentSyntax<T> = container.bind<T>(token).to(entry).inSingletonScope();
+  const whenBind: BindWhenOnFluentSyntax<T> = container.bind<T>(token).to(binding).inSingletonScope();
 
   whenBind.onActivation((context, instance) => {
     dbg.info(prefix(__filename), "Activating service:", {
-      name: entry.name,
+      name: binding.name,
       context,
       container,
-      entry,
+      binding,
       instance,
       options,
     });
@@ -147,7 +147,7 @@ export function bindServiceWithToken<T extends object>(
       (instance as { IS_DISPOSED: boolean }).IS_DISPOSED = false;
 
       CONTAINER_REFS_BY_SERVICE.set(instance, container);
-      attachWireScopes(instance, entry);
+      attachWireScopes(instance, binding);
 
       // Compose all events listeners into a single bus subscription so we only
       // pay one Set lookup per emitted event.
@@ -193,10 +193,10 @@ export function bindServiceWithToken<T extends object>(
 
       if (options?.isWithIgnoreLifecycle) {
         dbg.info(prefix(__filename), "Skip lifecycle @onActivated method:", {
-          name: entry.name,
+          name: binding.name,
           context,
           container,
-          entry,
+          binding,
           instance,
           options,
         });
@@ -213,7 +213,7 @@ export function bindServiceWithToken<T extends object>(
 
             if (result && typeof (result as Promise<void>).then === "function") {
               (result as Promise<void>).catch((error) => {
-                console.error("[wirestate] @OnActivated rejected for:", entry.name, String(methodName), error);
+                console.error("[wirestate] @OnActivated rejected for:", binding.name, String(methodName), error);
               });
             }
           }
@@ -230,7 +230,7 @@ export function bindServiceWithToken<T extends object>(
 
   whenBind.onDeactivation((instance) => {
     dbg.info(prefix(__filename), "Deactivating service:", {
-      name: entry.name,
+      name: binding.name,
       container,
       instance,
     });
@@ -239,9 +239,9 @@ export function bindServiceWithToken<T extends object>(
 
     if (options?.isWithIgnoreLifecycle) {
       dbg.info(prefix(__filename), "Skip lifecycle @OnDeactivation method:", {
-        name: entry.name,
+        name: binding.name,
         container,
-        entry,
+        binding,
         instance,
         options,
       });
@@ -259,14 +259,14 @@ export function bindServiceWithToken<T extends object>(
 
             if (result && typeof (result as Promise<void>).then === "function") {
               (result as Promise<void>).catch((error) => {
-                console.error("[wirestate] @OnDeactivation rejected for:", entry.name, String(methodName), error);
+                console.error("[wirestate] @OnDeactivation rejected for:", binding.name, String(methodName), error);
               });
             }
           }
         } catch (error) {
           console.error(
             "[wirestate] @OnDeactivation failed for:",
-            entry.name,
+            binding.name,
             String(deactivationMethodName ?? "unknown"),
             error
           );
@@ -288,7 +288,7 @@ export function bindServiceWithToken<T extends object>(
     CONTAINER_REFS_BY_SERVICE.delete(instance);
   });
 
-  registerContainerEntry(container, registeredEntry);
+  registerContainerBinding(container, registeredBinding);
 }
 
 /**

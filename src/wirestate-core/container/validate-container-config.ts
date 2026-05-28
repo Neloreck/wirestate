@@ -1,5 +1,5 @@
 import { ServiceIdentifier } from "../alias";
-import { getEntryToken } from "../bind/get-entry-token";
+import { getBindingToken } from "../bind/get-binding-token";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 
@@ -14,7 +14,7 @@ import type { ContainerConfig } from "./create-container";
  * @group Container
  *
  * @param config - Container configuration to validate.
- * @throws {@link WirestateError} If `activate` references a token missing from `entries`.
+ * @throws {@link WirestateError} If `activate` references a token missing from `bindings`.
  *
  * @example
  * ```typescript
@@ -24,33 +24,33 @@ import type { ContainerConfig } from "./create-container";
  * class LoggerService {}
  *
  * validateContainerConfig({
- *   entries: [LoggerService],
  *   activate: [LoggerService],
+ *   bindings: [LoggerService],
  * });
  * ```
  */
 export function validateContainerConfig(config: ContainerConfig): void {
   const activate: ReadonlyArray<ServiceIdentifier> =
-    (config.activate === true ? config.entries?.map(getEntryToken) : config.activate) || [];
+    (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
 
   if (!activate.length) {
     return;
   }
 
-  if (!config.entries?.length) {
+  if (!config.bindings?.length) {
     throw new WirestateError(
       ERROR_CODE_VALIDATION_ERROR,
-      "Supplied activation list while entries for binding are not provided."
+      "Supplied activation list while container bindings are not provided."
     );
   }
 
-  const entryTokens: ReadonlyArray<ServiceIdentifier> = config.entries.map(getEntryToken);
+  const bindingTokens: ReadonlyArray<ServiceIdentifier> = config.bindings.map(getBindingToken);
 
   for (const eager of activate) {
-    if (!entryTokens.includes(eager)) {
+    if (!bindingTokens.includes(eager)) {
       throw new WirestateError(
         ERROR_CODE_VALIDATION_ERROR,
-        `createContainer: '${String(eager)}' is listed in 'activate' but was not provided in 'entries'.`
+        `createContainer: '${String(eager)}' is listed in 'activate' but was not provided in 'bindings'.`
       );
     }
   }

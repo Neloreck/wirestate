@@ -23,7 +23,7 @@ export function Provider({ children }: PropsWithChildren) {
         [CounterService, { count: 10 } as ICounterSeed],
         [LoggerService, { logs: [] }],
       ],
-      entries: [
+      bindings: [
         LoggerService,
         CounterService,
         ThemeService,

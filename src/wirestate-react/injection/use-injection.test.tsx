@@ -35,7 +35,7 @@ describe("useInjection", () => {
   });
 
   it("should resolve bound service from container", () => {
-    const container: Container = mockContainer({ entries: [SimpleService] });
+    const container: Container = mockContainer({ bindings: [SimpleService] });
 
     const { getByTestId } = render(withContainerProvider(<TestComponent />, container));
 
@@ -59,7 +59,7 @@ describe("useInjection", () => {
   });
 
   it("should memoize service instance", () => {
-    const container: Container = mockContainer({ entries: [SimpleService] });
+    const container: Container = mockContainer({ bindings: [SimpleService] });
 
     const originalGet = container.get.bind(container);
     let resolveCount = 0;
@@ -88,7 +88,7 @@ describe("useInjection", () => {
     class AnotherService {}
 
     const container: Container = mockContainer({
-      entries: [SimpleService, AnotherService],
+      bindings: [SimpleService, AnotherService],
     });
 
     const { rerender, getByTestId } = render(withContainerProvider(<TestComponent token={SimpleService} />, container));

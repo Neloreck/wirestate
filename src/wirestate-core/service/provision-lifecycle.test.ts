@@ -18,7 +18,7 @@ describe("provision lifecycle", () => {
     const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
     const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
 
-    const container: Container = createContainer({ activate: false, entries: [FirstService, SecondService] });
+    const container: Container = createContainer({ activate: false, bindings: [FirstService, SecondService] });
     const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle, [FirstService, SecondService]);
@@ -55,7 +55,7 @@ describe("provision lifecycle", () => {
     const { LifecycleService, events } = createLifecycleService({ methods: ["provision"] });
 
     const container: Container = createContainer({
-      entries: [
+      bindings: [
         {
           bindingType: BindingType.Instance,
           id: TOKEN,
@@ -76,7 +76,7 @@ describe("provision lifecycle", () => {
     expect(events).toEqual(["provision"]);
   });
 
-  it("should skip entries without provider lifecycle metadata", () => {
+  it("should skip bindings without provider lifecycle metadata", () => {
     const events: Array<string> = [];
 
     @Injectable()
@@ -88,7 +88,7 @@ describe("provision lifecycle", () => {
     }
 
     const container: Container = createContainer({
-      entries: [PlainService],
+      bindings: [PlainService],
     });
     const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
 
@@ -114,7 +114,7 @@ describe("provision lifecycle", () => {
     }
 
     const container: Container = createContainer({
-      entries: [ScopedPlainService],
+      bindings: [ScopedPlainService],
     });
     const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
 
@@ -139,7 +139,7 @@ describe("provision lifecycle", () => {
     });
 
     const container: Container = createContainer({
-      entries: [LifecycleService],
+      bindings: [LifecycleService],
     });
     const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
 
@@ -183,7 +183,7 @@ describe("provision lifecycle", () => {
       suffix: () => "second-" + getScopeStates(),
     });
 
-    const container: Container = createContainer({ entries: [FirstService, SecondService] });
+    const container: Container = createContainer({ bindings: [FirstService, SecondService] });
     const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
 
     state.first = container.get(FirstService);

@@ -2,7 +2,7 @@ import { Container } from "./alias";
 import { WireScope } from "./container/wire-scope";
 import { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
 import { EventHandlerMetadata, EventUnsubscriber } from "./types/events";
-import { InjectableEntries } from "./types/provision";
+import { BindingEntries } from "./types/provision";
 import { QueryHandlerMetadata, QueryUnregister } from "./types/queries";
 
 /**
@@ -150,9 +150,9 @@ export const QUERY_UNREGISTERS_BY_SERVICE: WeakMap<object, Array<QueryUnregister
 export const COMMAND_UNREGISTERS_BY_SERVICE: WeakMap<object, Array<CommandUnregister>> = new WeakMap();
 
 /**
- * Internal storage for entries registered on a container through Wirestate helpers.
+ * Internal storage for bindings registered on a container through Wirestate helpers.
  *
  * @group Container
  * @internal
  */
-export const CONTAINER_ENTRIES: WeakMap<Container, Array<InjectableEntries[number]>> = new WeakMap();
+export const CONTAINER_BINDINGS: WeakMap<Container, Array<BindingEntries[number]>> = new WeakMap();

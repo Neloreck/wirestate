@@ -155,7 +155,7 @@ describe("ContainerProvider", () => {
     const { LifecycleService, events } = createLifecycleService();
     const container: Container = createContainer({
       activate: [LifecycleService],
-      entries: [LifecycleService],
+      bindings: [LifecycleService],
     });
     const unbindAllSpy = jest.spyOn(container, "unbindAll");
 
@@ -181,8 +181,8 @@ describe("ContainerProvider", () => {
     const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
     const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
 
-    const firstContainer: Container = createContainer({ entries: [FirstService] });
-    const secondContainer: Container = createContainer({ entries: [SecondService] });
+    const firstContainer: Container = createContainer({ bindings: [FirstService] });
+    const secondContainer: Container = createContainer({ bindings: [SecondService] });
 
     const firstUnbindAllSpy = jest.spyOn(firstContainer, "unbindAll");
     const secondUnbindAllSpy = jest.spyOn(secondContainer, "unbindAll");
@@ -223,7 +223,7 @@ describe("ContainerProvider", () => {
     const element: TestProviderElement = new TestProviderElement();
     const controller: ContainerProvider = new ContainerProvider(element, { container: mockContainer() });
 
-    expect(() => controller.setConfig({ entries: [] })).toThrow(
+    expect(() => controller.setConfig({ bindings: [] })).toThrow(
       "ContainerProvider uses an external container. Use `setValue(container)` to replace it."
     );
   });
@@ -233,7 +233,7 @@ describe("ContainerProvider", () => {
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
-      config: { entries: [{ id: CONFIG_TOKEN, value: "managed" }] },
+      config: { bindings: [{ id: CONFIG_TOKEN, value: "managed" }] },
     });
 
     expect(controller.value).toBeUndefined();
@@ -266,7 +266,7 @@ describe("ContainerProvider", () => {
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
-      config: { entries: [GenericService] },
+      config: { bindings: [GenericService] },
     });
 
     const injection = useInjection(child, GenericService);
@@ -298,7 +298,7 @@ describe("ContainerProvider", () => {
     const { LifecycleService, events } = createLifecycleService();
     const controller: ContainerProvider = new ContainerProvider(element, {
       config: {
-        entries: [LifecycleService],
+        bindings: [LifecycleService],
       },
     });
 
@@ -325,7 +325,7 @@ describe("ContainerProvider", () => {
 
   it("should reject direct container replacement for managed providers", () => {
     const element: TestProviderElement = new TestProviderElement();
-    const controller: ContainerProvider = new ContainerProvider(element, { config: { entries: [GenericService] } });
+    const controller: ContainerProvider = new ContainerProvider(element, { config: { bindings: [GenericService] } });
 
     expect(() => controller.setValue(mockContainer())).toThrow(
       "ContainerProvider owns managed containers. Use `setConfig(config)` to replace the managed container."
@@ -338,7 +338,7 @@ describe("ContainerProvider", () => {
     const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
 
     const element: TestProviderElement = new TestProviderElement();
-    const controller: ContainerProvider = new ContainerProvider(element, { config: { entries: [FirstService] } });
+    const controller: ContainerProvider = new ContainerProvider(element, { config: { bindings: [FirstService] } });
 
     document.body.appendChild(element);
 
@@ -346,7 +346,7 @@ describe("ContainerProvider", () => {
 
     expect(events).toEqual(["activated-first", "provision-first"]);
 
-    controller.setConfig({ entries: [SecondService] });
+    controller.setConfig({ bindings: [SecondService] });
 
     expect(controller.value).not.toBe(firstContainer);
     expect(events).toEqual([
@@ -378,9 +378,9 @@ describe("ContainerProvider", () => {
     const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
 
     const element: TestProviderElement = new TestProviderElement();
-    const controller: ContainerProvider = new ContainerProvider(element, { config: { entries: [FirstService] } });
+    const controller: ContainerProvider = new ContainerProvider(element, { config: { bindings: [FirstService] } });
 
-    controller.setConfig({ entries: [SecondService] });
+    controller.setConfig({ bindings: [SecondService] });
 
     expect(events).toEqual([]);
     expect(controller.value).toBeUndefined();
@@ -399,7 +399,7 @@ describe("ContainerProvider", () => {
     const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
 
     const element: TestProviderElement = new TestProviderElement();
-    const controller: ContainerProvider = new ContainerProvider(element, { config: { entries: [FirstService] } });
+    const controller: ContainerProvider = new ContainerProvider(element, { config: { bindings: [FirstService] } });
 
     document.body.appendChild(element);
 
@@ -412,7 +412,7 @@ describe("ContainerProvider", () => {
     expect(events).toEqual(["activated-first", "provision-first", "deprovision-first", "deactivation-first"]);
     expect(controller.value).toBeUndefined();
 
-    controller.setConfig({ entries: [SecondService] });
+    controller.setConfig({ bindings: [SecondService] });
 
     expect(events).toEqual(["activated-first", "provision-first", "deprovision-first", "deactivation-first"]);
     expect(controller.value).toBeUndefined();
@@ -443,7 +443,7 @@ describe("ContainerProvider", () => {
     ]);
   });
 
-  it("should validate managed activation entries before first connect", () => {
+  it("should validate managed activation bindings before first connect", () => {
     @Injectable()
     class LifecycleService {}
 
@@ -454,13 +454,13 @@ describe("ContainerProvider", () => {
         new ContainerProvider(element, {
           config: {
             activate: ["MissingService"],
-            entries: [LifecycleService],
+            bindings: [LifecycleService],
           },
         })
-    ).toThrow("is listed in 'activate' but was not provided in 'entries'.");
+    ).toThrow("is listed in 'activate' but was not provided in 'bindings'.");
   });
 
-  it("should activate true descriptor entries before first connect", () => {
+  it("should activate true descriptor bindings before first connect", () => {
     const events: Array<string> = [];
     const { LifecycleService: DirectService } = createLifecycleService({
       events,
@@ -477,7 +477,7 @@ describe("ContainerProvider", () => {
     const controller: ContainerProvider = new ContainerProvider(element, {
       config: {
         activate: true,
-        entries: [
+        bindings: [
           DirectService,
           {
             bindingType: BindingType.Instance,
@@ -519,7 +519,7 @@ describe("ContainerProvider", () => {
     const controller: ContainerProvider = new ContainerProvider(element, {
       config: {
         activate: [LifecycleService],
-        entries: [LifecycleService],
+        bindings: [LifecycleService],
       },
     });
 
@@ -549,7 +549,7 @@ describe("ContainerProvider", () => {
     expect(lifecycleEvents).toEqual(["activate", "deactivate", "activate", "deactivate"]);
   });
 
-  it("should activate all managed entries when activate is true", () => {
+  it("should activate all managed bindings when activate is true", () => {
     const lifecycleEvents: Array<string> = [];
 
     @Injectable()
@@ -573,7 +573,7 @@ describe("ContainerProvider", () => {
     new ContainerProvider(element, {
       config: {
         activate: true,
-        entries: [FirstService, SecondService],
+        bindings: [FirstService, SecondService],
       },
     });
 
@@ -586,14 +586,14 @@ describe("ContainerProvider", () => {
     element.remove();
   });
 
-  it("should activate all managed entries by default", () => {
+  it("should activate all managed bindings by default", () => {
     const events: Array<string> = [];
     const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
     const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
 
     const element: TestProviderElement = new TestProviderElement();
 
-    new ContainerProvider(element, { config: { entries: [FirstService, SecondService] } });
+    new ContainerProvider(element, { config: { bindings: [FirstService, SecondService] } });
 
     expect(events).toEqual([]);
 
@@ -604,7 +604,7 @@ describe("ContainerProvider", () => {
     element.remove();
   });
 
-  it("should not activate managed entries when activate is false", () => {
+  it("should not activate managed bindings when activate is false", () => {
     const events: Array<string> = [];
 
     @Injectable()
@@ -619,7 +619,7 @@ describe("ContainerProvider", () => {
     new ContainerProvider(element, {
       config: {
         activate: false,
-        entries: [PlainService],
+        bindings: [PlainService],
       },
     });
 

@@ -2,11 +2,11 @@ describe("Library test utils exports from wirestate-core/test-utils", () => {
   const testUtilsRoot = require("./test-utils");
 
   const expectedTestUtilsExports: Array<string> = [
-    "mockContainer",
+    "mockBind",
     "mockBindService",
-    "mockBindEntry",
-    "mockUnbindService",
+    "mockContainer",
     "mockService",
+    "mockUnbindService",
   ];
 
   const assertListIntersection = (first: Array<string>, second: Array<string>) => {

@@ -144,10 +144,10 @@ describe("createContainer", () => {
     expect(seedsMap.get(TEST_TOKEN)).toEqual({ data: 123 });
   });
 
-  it("should bind provided entries", () => {
+  it("should bind provided bindings", () => {
     class TestService {}
     const container: Container = createContainer({
-      entries: [TestService],
+      bindings: [TestService],
     });
 
     expect(container.get(TestService)).toBeInstanceOf(TestService);
@@ -164,8 +164,8 @@ describe("createContainer", () => {
     }
 
     createContainer({
-      entries: [TestService],
       activate: [TestService],
+      bindings: [TestService],
     });
 
     expect(activated).toBe(true);
@@ -183,21 +183,21 @@ describe("createContainer", () => {
     }
 
     const container: Container = createContainer({
-      entries: [
+      activate: [TOKEN],
+      bindings: [
         {
           bindingType: BindingType.Instance,
           id: TOKEN,
           value: TestService,
         },
       ],
-      activate: [TOKEN],
     });
 
     expect(activated).toBe(true);
     expect(container.get(TOKEN)).toBeInstanceOf(TestService);
   });
 
-  it("should activate all provided entries when activate is true", () => {
+  it("should activate all provided bindings when activate is true", () => {
     const lifecycleEvents: Array<string> = [];
 
     @Injectable()
@@ -215,14 +215,14 @@ describe("createContainer", () => {
     }
 
     createContainer({
-      entries: [FirstService, SecondService],
       activate: true,
+      bindings: [FirstService, SecondService],
     });
 
     expect(lifecycleEvents).toEqual(["first", "second"]);
   });
 
-  it("should not activate provided entries when activate is false", () => {
+  it("should not activate provided bindings when activate is false", () => {
     let activated: boolean = false;
 
     @Injectable()
@@ -233,30 +233,30 @@ describe("createContainer", () => {
     }
 
     createContainer({
-      entries: [TestService],
       activate: false,
+      bindings: [TestService],
     });
 
     expect(activated).toBe(false);
   });
 
-  it("should throw error if activate is provided without entries", () => {
+  it("should throw error if activate is provided without bindings", () => {
     expect(() =>
       createContainer({
         activate: ["SomeService"],
       })
-    ).toThrow("Supplied activation list while entries for binding are not provided.");
+    ).toThrow("Supplied activation list while container bindings are not provided.");
   });
 
-  it("should throw error if activated service is not in entries", () => {
+  it("should throw error if activated service is not in bindings", () => {
     @Injectable()
     class TestService {}
 
     expect(() =>
       createContainer({
-        entries: [TestService],
         activate: ["OtherService"],
+        bindings: [TestService],
       })
-    ).toThrow("is listed in 'activate' but was not provided in 'entries'.");
+    ).toThrow("is listed in 'activate' but was not provided in 'bindings'.");
   });
 });

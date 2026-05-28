@@ -63,7 +63,7 @@ describe("ContainerProvider", () => {
     }
   });
 
-  it("should recreate managed container when entries change", () => {
+  it("should recreate managed container when bindings change", () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
     const containers: Array<Container> = [];
 
@@ -77,7 +77,7 @@ describe("ContainerProvider", () => {
     }
 
     const { getByTestId, rerender } = render(
-      <ContainerProvider config={{ entries: [{ id: CONFIG_TOKEN, value: "first" }] }}>
+      <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "first" }] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
@@ -85,7 +85,7 @@ describe("ContainerProvider", () => {
     expect(getByTestId("value").textContent).toBe("first");
 
     rerender(
-      <ContainerProvider config={{ entries: [{ id: CONFIG_TOKEN, value: "second" }] }}>
+      <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "second" }] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
@@ -95,9 +95,9 @@ describe("ContainerProvider", () => {
     expect(getByTestId("value").textContent).toBe("second");
   });
 
-  it("should keep managed container when entries are shallow-equal", () => {
+  it("should keep managed container when bindings are shallow-equal", () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
-    const entry = { id: CONFIG_TOKEN, value: "stable" };
+    const binding = { id: CONFIG_TOKEN, value: "stable" };
     const containers: Array<Container> = [];
 
     function TrackingConsumer() {
@@ -110,13 +110,13 @@ describe("ContainerProvider", () => {
     }
 
     const { getByTestId, rerender } = render(
-      <ContainerProvider config={{ entries: [entry] }}>
+      <ContainerProvider config={{ bindings: [binding] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
 
     rerender(
-      <ContainerProvider config={{ entries: [entry] }}>
+      <ContainerProvider config={{ bindings: [binding] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
@@ -166,11 +166,11 @@ describe("ContainerProvider", () => {
   it("should recreate managed container when activate changes", () => {
     const { LifecycleService, events } = createLifecycleService({ methods: ["activated"] });
 
-    const { rerender } = render(<ContainerProvider config={{ entries: [LifecycleService], activate: false }} />);
+    const { rerender } = render(<ContainerProvider config={{ bindings: [LifecycleService], activate: false }} />);
 
     expect(events).toEqual(["activated"]);
 
-    rerender(<ContainerProvider config={{ entries: [LifecycleService], activate: true }} />);
+    rerender(<ContainerProvider config={{ bindings: [LifecycleService], activate: true }} />);
 
     expect(events).toEqual(["activated", "activated"]);
   });
@@ -211,7 +211,7 @@ describe("ContainerProvider", () => {
     }
 
     const { rerender } = render(
-      <ContainerProvider config={{ entries: [{ id: CONFIG_TOKEN, value: "first" }] }}>
+      <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "first" }] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
@@ -219,7 +219,7 @@ describe("ContainerProvider", () => {
     const unbindAllSpy = jest.spyOn(containers[0], "unbindAll");
 
     rerender(
-      <ContainerProvider config={{ entries: [{ id: CONFIG_TOKEN, value: "second" }] }}>
+      <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "second" }] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
@@ -242,7 +242,7 @@ describe("ContainerProvider", () => {
 
     const { rerender } = render(
       <StrictMode>
-        <ContainerProvider config={{ entries: [{ id: CONFIG_TOKEN, value: "first" }] }}>
+        <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "first" }] }}>
           <TrackingConsumer />
         </ContainerProvider>
       </StrictMode>
@@ -250,7 +250,7 @@ describe("ContainerProvider", () => {
 
     rerender(
       <StrictMode>
-        <ContainerProvider config={{ entries: [{ id: CONFIG_TOKEN, value: "second" }] }}>
+        <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "second" }] }}>
           <TrackingConsumer />
         </ContainerProvider>
       </StrictMode>
@@ -274,7 +274,7 @@ describe("ContainerProvider", () => {
 
     const { getByTestId } = render(
       <StrictMode>
-        <ContainerProvider config={{ entries: [{ id: CONFIG_TOKEN, value: "strict" }] }}>
+        <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "strict" }] }}>
           <TrackingConsumer />
         </ContainerProvider>
       </StrictMode>
@@ -292,7 +292,7 @@ describe("ContainerProvider lifecycle", () => {
     const { unmount } = render(
       <ContainerProvider
         config={{
-          entries: [
+          bindings: [
             {
               bindingType: BindingType.Instance,
               id: TOKEN,
@@ -312,7 +312,7 @@ describe("ContainerProvider lifecycle", () => {
 
   it("should call provision lifecycle for external container without disposing it", async () => {
     const { LifecycleService, events } = createLifecycleService();
-    const container: Container = createContainer({ entries: [LifecycleService] });
+    const container: Container = createContainer({ bindings: [LifecycleService] });
     const unbindAllSpy = jest.spyOn(container, "unbindAll");
 
     const { unmount } = render(<ContainerProvider container={container} />);
@@ -332,7 +332,7 @@ describe("ContainerProvider lifecycle", () => {
 
   it("should not provision the same external container twice on stable rerender", () => {
     const { LifecycleService, events } = createLifecycleService({ methods: ["provision", "deprovision"] });
-    const container: Container = createContainer({ entries: [LifecycleService] });
+    const container: Container = createContainer({ bindings: [LifecycleService] });
 
     const { rerender, unmount } = render(<ContainerProvider container={container} />);
 
@@ -353,12 +353,12 @@ describe("ContainerProvider lifecycle", () => {
     const { LifecycleService: SecondLifecycleService } = createLifecycleService({ events, suffix: "second" });
 
     const { rerender } = render(
-      <ContainerProvider container={createContainer({ entries: [FirstLifecycleService] })} />
+      <ContainerProvider container={createContainer({ bindings: [FirstLifecycleService] })} />
     );
 
     expect(events).toEqual(["activated-first", "provision-first"]);
 
-    rerender(<ContainerProvider container={createContainer({ entries: [SecondLifecycleService] })} />);
+    rerender(<ContainerProvider container={createContainer({ bindings: [SecondLifecycleService] })} />);
 
     expect(events).toEqual([
       "activated-first",
@@ -375,7 +375,7 @@ describe("ContainerProvider lifecycle", () => {
     render(
       <ContainerProvider
         config={{
-          entries: [LifecycleService],
+          bindings: [LifecycleService],
         }}
       />
     );
@@ -389,7 +389,7 @@ describe("ContainerProvider lifecycle", () => {
     const { rerender } = render(
       <ContainerProvider
         config={{
-          entries: [LifecycleService],
+          bindings: [LifecycleService],
         }}
       />
     );
@@ -398,7 +398,7 @@ describe("ContainerProvider lifecycle", () => {
       rerender(
         <ContainerProvider
           config={{
-            entries: [LifecycleService],
+            bindings: [LifecycleService],
           }}
         />
       );
@@ -417,7 +417,7 @@ describe("ContainerProvider lifecycle", () => {
     const { rerender } = render(
       <ContainerProvider
         config={{
-          entries: [FirstLifecycleService],
+          bindings: [FirstLifecycleService],
         }}
       />
     );
@@ -427,7 +427,7 @@ describe("ContainerProvider lifecycle", () => {
     rerender(
       <ContainerProvider
         config={{
-          entries: [SecondLifecycleService],
+          bindings: [SecondLifecycleService],
         }}
       />
     );
@@ -461,7 +461,7 @@ describe("ContainerProvider lifecycle", () => {
       <StrictMode>
         <ContainerProvider
           config={{
-            entries: [FirstLifecycleService],
+            bindings: [FirstLifecycleService],
           }}
         />
       </StrictMode>
@@ -479,7 +479,7 @@ describe("ContainerProvider lifecycle", () => {
       <StrictMode>
         <ContainerProvider
           config={{
-            entries: [SecondLifecycleService],
+            bindings: [SecondLifecycleService],
           }}
         />
       </StrictMode>

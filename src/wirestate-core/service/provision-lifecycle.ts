@@ -2,11 +2,11 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { BindingType, Container, ServiceIdentifier } from "../alias";
-import { getEntryToken } from "../bind/get-entry-token";
+import { getBindingToken } from "../bind/get-binding-token";
 import { hasWireScopeInjection } from "../container/has-wire-scope-injection";
 import { WIRE_SCOPES_BY_SERVICE } from "../registry";
 import { Maybe, MaybePromise, Optional } from "../types/general";
-import { InjectableEntries } from "../types/provision";
+import { BindingEntries } from "../types/provision";
 
 import { getDeprovisionHandlerMetadata } from "./on-deprovision";
 import { getProvisionHandlerMetadata } from "./on-provision";
@@ -32,7 +32,7 @@ export type ProvisionLifecycle = Map<Container, Array<object>>;
  *
  * @param container - Container entering provider ownership.
  * @param lifecycle - Provider lifecycle state.
- * @param entries - Entries controlled by the provider.
+ * @param bindings - Bindings controlled by the provider.
  *
  * @example
  * ```typescript
@@ -44,7 +44,7 @@ export type ProvisionLifecycle = Map<Container, Array<object>>;
  *   public connect(): void {}
  * }
  *
- * const container = createContainer({ entries: [PanelService] });
+ * const container = createContainer({ bindings: [PanelService] });
  * const lifecycle = new Map();
  *
  * provisionContainer(container, lifecycle, [PanelService]);
@@ -53,13 +53,13 @@ export type ProvisionLifecycle = Map<Container, Array<object>>;
 export function provisionContainer(
   container: Container,
   lifecycle: ProvisionLifecycle,
-  entries: InjectableEntries = []
+  bindings: BindingEntries = []
 ): void {
   if (lifecycle.has(container)) {
     return;
   }
 
-  const services: Array<object> = provisionServices(container, entries);
+  const services: Array<object> = provisionServices(container, bindings);
 
   dbg.info(prefix(__filename), "Provisioning container:", {
     container,
@@ -87,7 +87,7 @@ export function provisionContainer(
  *   public disconnect(): void {}
  * }
  *
- * const container = createContainer({ entries: [PanelService] });
+ * const container = createContainer({ bindings: [PanelService] });
  * const lifecycle = new Map();
  *
  * provisionContainer(container, lifecycle, [PanelService]);
@@ -115,14 +115,14 @@ export function deprovisionContainer(container: Container, lifecycle: ProvisionL
  * Provisioning runs in two passes:
  *
  * - Resolve services first, so `@OnActivated` completes before provider hooks.
- * - Call `@OnProvision` in entry order.
+ * - Call `@OnProvision` in binding order.
  *
  * Services that inject `WireScope` participate even without provider hooks.
  *
  * @group Service
  *
- * @param container - Container that owns the entries.
- * @param entries - Entries controlled by the provider.
+ * @param container - Container that owns the bindings.
+ * @param bindings - Bindings controlled by the provider.
  * @returns Services that were resolved for provider lifecycle management.
  *
  * @example
@@ -135,17 +135,17 @@ export function deprovisionContainer(container: Container, lifecycle: ProvisionL
  *   public connect(): void {}
  * }
  *
- * const container = createContainer({ entries: [PanelService] });
+ * const container = createContainer({ bindings: [PanelService] });
  * const services = provisionServices(container, [PanelService]);
  * ```
  */
-export function provisionServices(container: Container, entries: InjectableEntries = []): Array<object> {
+export function provisionServices(container: Container, bindings: BindingEntries = []): Array<object> {
   const services: Array<object> = [];
   const visited: Set<ServiceIdentifier> = new Set();
 
-  for (const entry of entries) {
-    const token: ServiceIdentifier = getEntryToken(entry);
-    const metadataToken: ServiceIdentifier = getProviderLifecycleMetadataToken(entry);
+  for (const binding of bindings) {
+    const token: ServiceIdentifier = getBindingToken(binding);
+    const metadataToken: ServiceIdentifier = getProviderLifecycleMetadataToken(binding);
 
     if (!visited.has(token) && isProviderLifecycleParticipant(metadataToken)) {
       visited.add(token);
@@ -187,7 +187,7 @@ export function provisionServices(container: Container, entries: InjectableEntri
  *   public disconnect(): void {}
  * }
  *
- * const container = createContainer({ entries: [PanelService] });
+ * const container = createContainer({ bindings: [PanelService] });
  * const services = provisionServices(container, [PanelService]);
  *
  * deprovisionServices(services);
@@ -231,15 +231,19 @@ function markServiceDeprovisionStatus(service: object, isDeprovisioned: Optional
  *
  * @internal
  *
- * @param entry - Entry registered on the provider container.
- * @returns Service constructor for instance descriptors, otherwise the entry token.
+ * @param binding - Binding registered on the provider container.
+ * @returns Service constructor for instance descriptors, otherwise the binding token.
  */
-function getProviderLifecycleMetadataToken(entry: InjectableEntries[number]): ServiceIdentifier {
-  if (typeof entry !== "function" && entry.bindingType === BindingType.Instance && typeof entry.value === "function") {
-    return entry.value as ServiceIdentifier;
+function getProviderLifecycleMetadataToken(binding: BindingEntries[number]): ServiceIdentifier {
+  if (
+    typeof binding !== "function" &&
+    binding.bindingType === BindingType.Instance &&
+    typeof binding.value === "function"
+  ) {
+    return binding.value as ServiceIdentifier;
   }
 
-  return getEntryToken(entry);
+  return getBindingToken(binding);
 }
 
 /**
@@ -247,7 +251,7 @@ function getProviderLifecycleMetadataToken(entry: InjectableEntries[number]): Se
  *
  * @internal
  *
- * @param token - Entry token to inspect.
+ * @param token - Binding token to inspect.
  * @returns True when the token is a service constructor with provider lifecycle metadata or WireScope injection.
  */
 function isProviderLifecycleParticipant(token: ServiceIdentifier): boolean {

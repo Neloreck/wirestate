@@ -4,16 +4,16 @@ import { Container } from "../alias";
 import { mockContainer } from "../test-utils/mock-container";
 import { SeedsMap } from "../types/initial-state";
 
-import { applySeeds } from "./apply-seeds";
+import { setSeeds } from "./set-seeds";
 import { SEEDS_TOKEN } from "./tokens";
-import { unapplySeeds } from "./unapply-seeds";
+import { unsetSeeds } from "./unset-seeds";
 
-describe("unapplySeeds", () => {
-  it("should remove specific entries from initial state", () => {
+describe("unsetSeeds", () => {
+  it("should remove specific bindings from initial state", () => {
     const container: Container = mockContainer();
     const state: SeedsMap = container.get(SEEDS_TOKEN);
 
-    applySeeds(container, [
+    setSeeds(container, [
       ["ServiceA", { a: 1 }],
       ["ServiceB", { b: 2 }],
       [GenericService, { c: 3 }],
@@ -23,7 +23,7 @@ describe("unapplySeeds", () => {
     expect(state.has("ServiceB")).toBe(true);
     expect(state.has(GenericService)).toBe(true);
 
-    unapplySeeds(container, [
+    unsetSeeds(container, [
       ["ServiceA", null],
       [GenericService, {}],
     ]);
@@ -39,7 +39,7 @@ describe("unapplySeeds", () => {
 
     expect(seeds.size).toBe(0);
 
-    unapplySeeds(container, [["ServiceA", null]]);
+    unsetSeeds(container, [["ServiceA", null]]);
     expect(seeds.size).toBe(0);
   });
 });

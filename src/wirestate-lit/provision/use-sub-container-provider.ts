@@ -27,7 +27,7 @@ import { SubContainerProvider, SubContainerProviderOptions } from "./sub-contain
  * class MyComponent extends LitElement {
  *   private containerProvider: SubContainerProvider = useSubContainerProvider(this, {
  *     config: {
- *       entries: [AuthService, UserService],
+ *       bindings: [AuthService, UserService],
  *     },
  *   });
  * }

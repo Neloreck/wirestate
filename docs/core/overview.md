@@ -46,7 +46,7 @@ class CounterService {
 }
 
 const container: Container = createContainer({
-  entries: [CounterService],
+  bindings: [CounterService],
 });
 
 const counter = container.get(CounterService);
