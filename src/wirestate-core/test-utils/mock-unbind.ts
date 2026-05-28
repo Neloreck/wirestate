@@ -1,4 +1,5 @@
 import { Container, type ServiceIdentifier } from "../alias";
+import { unbind } from "../bind/unbind";
 
 /**
  * Unbinds a token from the IoC container.
@@ -21,5 +22,5 @@ import { Container, type ServiceIdentifier } from "../alias";
  * ```
  */
 export function mockUnbind<T = unknown>(container: Container, identifier: ServiceIdentifier<T>): void {
-  container.unbind(identifier);
+  unbind(container, identifier);
 }

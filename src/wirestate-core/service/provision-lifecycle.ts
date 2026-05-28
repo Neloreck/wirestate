@@ -4,7 +4,12 @@ import { prefix } from "@/macroses/prefix.macro";
 import { BindingType, Container, ServiceIdentifier } from "../alias";
 import { getBindingToken } from "../bind/get-binding-token";
 import { hasWireScopeInjection } from "../container/has-wire-scope-injection";
-import { WIRE_SCOPES_BY_SERVICE } from "../registry";
+import {
+  CONTAINER_REFS_BY_SERVICE,
+  PROVISION_LIFECYCLES_BY_CONTAINER,
+  PROVISION_TOKENS_BY_SERVICE,
+  WIRE_SCOPES_BY_SERVICE,
+} from "../registry";
 import { Maybe, MaybePromise, Optional } from "../types/general";
 import { Bindings } from "../types/provision";
 
@@ -63,6 +68,7 @@ export function provisionContainer(container: Container, lifecycle: ProvisionLif
   });
 
   lifecycle.set(container, services);
+  trackProvisionLifecycle(container, lifecycle);
 }
 
 /**
@@ -99,8 +105,85 @@ export function deprovisionContainer(container: Container, lifecycle: ProvisionL
       services,
     });
 
-    deprovisionServices(services);
+    deprovisionServices(services.filter((service) => CONTAINER_REFS_BY_SERVICE.get(service) === container));
+
+    for (const service of services) {
+      PROVISION_TOKENS_BY_SERVICE.delete(service);
+    }
+
     lifecycle.delete(container);
+
+    untrackProvisionLifecycle(container, lifecycle);
+  }
+}
+
+/**
+ * Deprovisions any provider lifecycle service represented by a binding token.
+ *
+ * @group Service
+ * @internal
+ *
+ * @param container - Container losing the binding.
+ * @param token - Binding token removed from the container.
+ */
+export function deprovisionContainerBinding(container: Container, token: ServiceIdentifier): void {
+  const lifecycles: Maybe<Set<ProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
+
+  if (!lifecycles) {
+    return;
+  }
+
+  for (const lifecycle of Array.from(lifecycles)) {
+    const services: Maybe<Array<object>> = lifecycle.get(container);
+
+    if (!services) {
+      continue;
+    }
+
+    const removed: Array<object> = [];
+    const remaining: Array<object> = [];
+
+    for (const service of services) {
+      if (isServiceProvisionedForToken(service, token)) {
+        removed.push(service);
+      } else {
+        remaining.push(service);
+      }
+    }
+
+    if (removed.length === 0) {
+      continue;
+    }
+
+    deprovisionServices(removed.filter((service) => CONTAINER_REFS_BY_SERVICE.get(service) === container));
+    untrackProvisionToken(removed, token);
+
+    if (remaining.length > 0) {
+      lifecycle.set(container, remaining);
+    } else {
+      lifecycle.delete(container);
+      untrackProvisionLifecycle(container, lifecycle);
+    }
+  }
+}
+
+/**
+ * Deprovisions all provider lifecycle services owned by a container.
+ *
+ * @group Service
+ * @internal
+ *
+ * @param container - Container leaving provider ownership.
+ */
+export function deprovisionContainerBindings(container: Container): void {
+  const lifecycles: Maybe<Set<ProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
+
+  if (!lifecycles) {
+    return;
+  }
+
+  for (const lifecycle of Array.from(lifecycles)) {
+    deprovisionContainer(container, lifecycle);
   }
 }
 
@@ -145,7 +228,11 @@ export function provisionServices(container: Container, bindings: Bindings = [])
 
     if (!visited.has(token) && isProviderLifecycleParticipant(metadataToken)) {
       visited.add(token);
-      services.push(container.get(token) as object);
+
+      const service: object = container.get(token) as object;
+
+      trackProvisionToken(service, token);
+      services.push(service);
     }
   }
 
@@ -210,7 +297,7 @@ export function deprovisionServices(services: ReadonlyArray<object>): void {
  * @param isDeprovisioned - Whether the service has left provider ownership, or null before provision reaches it.
  */
 function markServiceDeprovisionStatus(service: object, isDeprovisioned: Optional<boolean>): void {
-  const scopes: Maybe<ReadonlyArray<{ readonly isDeprovisioned: boolean | null }>> =
+  const scopes: Maybe<ReadonlyArray<{ readonly isDeprovisioned: Optional<boolean> }>> =
     WIRE_SCOPES_BY_SERVICE.get(service);
 
   if (!scopes) {
@@ -220,6 +307,103 @@ function markServiceDeprovisionStatus(service: object, isDeprovisioned: Optional
   for (const scope of scopes) {
     (scope as { isDeprovisioned: Optional<boolean> }).isDeprovisioned = isDeprovisioned;
   }
+}
+
+/**
+ * Tracks a provider lifecycle map that currently owns a container.
+ *
+ * @internal
+ *
+ * @param container - Provisioned container.
+ * @param lifecycle - Provider lifecycle state.
+ */
+function trackProvisionLifecycle(container: Container, lifecycle: ProvisionLifecycle): void {
+  let lifecycles: Maybe<Set<ProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
+
+  if (!lifecycles) {
+    lifecycles = new Set();
+    PROVISION_LIFECYCLES_BY_CONTAINER.set(container, lifecycles);
+  }
+
+  lifecycles.add(lifecycle);
+}
+
+/**
+ * Removes a provider lifecycle map from a container.
+ *
+ * @internal
+ *
+ * @param container - Deprovisioned container.
+ * @param lifecycle - Provider lifecycle state.
+ */
+function untrackProvisionLifecycle(container: Container, lifecycle: ProvisionLifecycle): void {
+  const lifecycles: Maybe<Set<ProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
+
+  if (!lifecycles) {
+    return;
+  }
+
+  lifecycles.delete(lifecycle);
+
+  if (lifecycles.size === 0) {
+    PROVISION_LIFECYCLES_BY_CONTAINER.delete(container);
+  }
+}
+
+/**
+ * Tracks which binding token caused a service to enter provider lifecycle state.
+ *
+ * @internal
+ *
+ * @param service - Provisioned service.
+ * @param token - Binding token used to resolve the service.
+ */
+function trackProvisionToken(service: object, token: ServiceIdentifier): void {
+  let tokens: Maybe<Set<ServiceIdentifier>> = PROVISION_TOKENS_BY_SERVICE.get(service);
+
+  if (!tokens) {
+    tokens = new Set();
+    PROVISION_TOKENS_BY_SERVICE.set(service, tokens);
+  }
+
+  tokens.add(token);
+}
+
+/**
+ * Removes one provider lifecycle token from services.
+ *
+ * @internal
+ *
+ * @param services - Services losing a lifecycle token.
+ * @param token - Binding token to remove.
+ */
+function untrackProvisionToken(services: ReadonlyArray<object>, token: ServiceIdentifier): void {
+  for (const service of services) {
+    const tokens: Maybe<Set<ServiceIdentifier>> = PROVISION_TOKENS_BY_SERVICE.get(service);
+
+    if (!tokens) {
+      continue;
+    }
+
+    tokens.delete(token);
+
+    if (tokens.size === 0) {
+      PROVISION_TOKENS_BY_SERVICE.delete(service);
+    }
+  }
+}
+
+/**
+ * Checks whether a service lifecycle entry belongs to a binding token.
+ *
+ * @internal
+ *
+ * @param service - Provisioned service.
+ * @param token - Binding token to inspect.
+ * @returns True when the service was provisioned for the token.
+ */
+function isServiceProvisionedForToken(service: object, token: ServiceIdentifier): boolean {
+  return PROVISION_TOKENS_BY_SERVICE.get(service)?.has(token) ?? false;
 }
 
 /**

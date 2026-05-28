@@ -3,7 +3,7 @@ import { GenericService } from "@/fixtures/services/generic-service";
 import { Container } from "../alias";
 import { BindingDescriptor } from "../types/provision";
 
-import { getContainerBindings, registerBinding } from "./register-binding";
+import { getContainerBindings, registerBinding, unregisterAllBindings, unregisterBinding } from "./register-binding";
 
 describe("register-binding", () => {
   it("should return empty bindings for a container without registrations", () => {
@@ -44,5 +44,38 @@ describe("register-binding", () => {
 
     expect(getContainerBindings(firstContainer)).toEqual([firstDescriptor]);
     expect(getContainerBindings(secondContainer)).toEqual([GenericService, secondDescriptor]);
+  });
+
+  it("should unregister all bindings for a token", () => {
+    const container: Container = new Container();
+    const descriptor: BindingDescriptor = {
+      id: GenericService,
+      value: "shadow",
+    };
+    const remaining: BindingDescriptor = {
+      id: "CONFIG_TOKEN",
+      value: "config-value",
+    };
+
+    registerBinding(container, GenericService);
+    registerBinding(container, descriptor);
+    registerBinding(container, remaining);
+    unregisterBinding(container, GenericService);
+
+    expect(getContainerBindings(container)).toEqual([remaining]);
+  });
+
+  it("should unregister all container bindings", () => {
+    const container: Container = new Container();
+    const descriptor: BindingDescriptor = {
+      id: "CONFIG_TOKEN",
+      value: "config-value",
+    };
+
+    registerBinding(container, GenericService);
+    registerBinding(container, descriptor);
+    unregisterAllBindings(container);
+
+    expect(getContainerBindings(container)).toEqual([]);
   });
 });

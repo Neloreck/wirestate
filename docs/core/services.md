@@ -33,14 +33,14 @@ const container: Container = createContainer({
 const users = container.get(UserService);
 ```
 
-Use `bindService` when you need to add a service to an existing container.
+Use `bind` when you need to add a service to an existing container.
 
 ```ts
-import { bindService, createContainer } from "@wirestate/core";
+import { bind, createContainer } from "@wirestate/core";
 
 const container = createContainer();
 
-bindService(container, UserService);
+bind(container, UserService);
 ```
 
 ## Constructor Injection
@@ -162,22 +162,37 @@ Use descriptors when the binding needs an explicit token or strategy. That inclu
 classes registered behind a token that is different from the class itself.
 
 ```ts
-import { BindingType, bindConstant, bindDynamicValue, createContainer } from "@wirestate/core";
+import { BindingType, bind, createContainer } from "@wirestate/core";
 
 const API_URL = Symbol("API_URL");
 const DATE_NOW = Symbol("DATE_NOW");
 const container = createContainer();
 
-bindConstant(container, { id: API_URL, value: "https://api.example.com" });
-bindDynamicValue(container, {
+bind(container, { id: API_URL, value: "https://api.example.com" });
+bind(container, {
   id: DATE_NOW,
   bindingType: BindingType.DynamicValue,
   factory: () => new Date(),
 });
 ```
 
+## Remove Services
+
+Use `unbind` or `unbindAll` when removing Wirestate bindings.
+
+```ts
+import { unbind, unbindAll } from "@wirestate/core";
+
+unbind(container, UserService);
+unbindAll(container);
+```
+
+The wrappers keep Wirestate's registered binding list and provider lifecycle state in sync with Inversify. If a provider
+owns a service when it is removed, `@OnDeprovision` runs before `@OnDeactivation`.
+
 ## API Reference
 
 [`Injectable`](/api/wirestate-core/functions/Injectable), [`Inject`](/api/wirestate-core/functions/Inject),
 [`WireScope`](/api/wirestate-core/classes/WireScope), [`OnProvision`](/api/wirestate-core/functions/OnProvision),
-[`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision), [`BindingDescriptor`](/api/wirestate-core/interfaces/BindingDescriptor).
+[`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision), [`BindingDescriptor`](/api/wirestate-core/interfaces/BindingDescriptor),
+[`unbind`](/api/wirestate-core/functions/unbind), [`unbindAll`](/api/wirestate-core/functions/unbindAll).

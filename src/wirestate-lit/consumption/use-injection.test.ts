@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { bindConstant, Container } from "@wirestate/core";
+import { bind, Container } from "@wirestate/core";
 import { mockBind, mockContainer } from "@wirestate/core/test-utils";
 import { customElement } from "lit/decorators.js";
 
@@ -55,7 +55,7 @@ describe("useInjection", () => {
   it("should inject string constants from symbol tokens", () => {
     const API_URL: unique symbol = Symbol("api-url");
 
-    bindConstant<string>(fixture.container, {
+    bind(fixture.container, {
       id: API_URL,
       value: "https://api.example.com",
     });
@@ -76,7 +76,7 @@ describe("useInjection", () => {
     const STATUS_TOKEN: string = "status-token";
     const READY_STATUS: unique symbol = Symbol("ready-status");
 
-    bindConstant<symbol>(fixture.container, {
+    bind(fixture.container, {
       id: STATUS_TOKEN,
       value: READY_STATUS,
     });

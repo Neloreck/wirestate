@@ -10,6 +10,7 @@ import {
   deprovisionContainer,
   getContainerBindings,
   provisionContainer,
+  unbindAll,
   type ProvisionLifecycle,
   validateContainerConfig,
 } from "@wirestate/core";
@@ -225,8 +226,8 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
       });
 
       deprovisionContainer(this.value, this.lifecycle);
+      unbindAll(this.value);
 
-      this.value.unbindAll();
       this.destroyed = true;
     }
   }

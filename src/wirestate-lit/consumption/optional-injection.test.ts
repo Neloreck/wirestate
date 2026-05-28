@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { bindConstant, Container, ServiceIdentifier } from "@wirestate/core";
+import { bind, Container, ServiceIdentifier } from "@wirestate/core";
 import { mockBind, mockContainer } from "@wirestate/core/test-utils";
 import { customElement } from "lit/decorators.js";
 
@@ -99,7 +99,7 @@ describe("optionalInjection", () => {
     const unboundToken: ServiceIdentifier<string> = Symbol("unbound-token");
     const boundToken: ServiceIdentifier<string> = Symbol("bound-token");
 
-    bindConstant<string>(container, {
+    bind(container, {
       id: boundToken,
       value: "bound-value",
     });

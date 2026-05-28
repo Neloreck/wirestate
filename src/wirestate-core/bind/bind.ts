@@ -36,13 +36,13 @@ export interface BindOptions extends BindServiceOptions {
  * Descriptors with `Factory`, `ResolvedValue`, and `ServiceRedirection` are
  * delegated to their dedicated Inversify binding helpers.
  *
- * - Class constructor: singleton service via {@link bindService}.
- * - `ConstantValue`: fixed value via {@link bindConstant}.
- * - `DynamicValue`: factory value via {@link bindDynamicValue}.
+ * - Class constructor: singleton service binding.
+ * - `ConstantValue`: fixed value binding.
+ * - `DynamicValue`: factory value binding.
  * - `Instance`: service class behind a custom token.
- * - `Factory`: factory creator via {@link bindFactory}.
- * - `ResolvedValue`: injected factory via {@link bindResolvedValue}.
- * - `ServiceRedirection`: token redirection via {@link bindServiceRedirection}.
+ * - `Factory`: factory creator binding.
+ * - `ResolvedValue`: injected factory binding.
+ * - `ServiceRedirection`: token redirection binding.
  *
  * @group Bind
  *

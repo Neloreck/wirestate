@@ -1,4 +1,4 @@
-import { Container } from "./alias";
+import { Container, ServiceIdentifier } from "./alias";
 import { WireScope } from "./container/wire-scope";
 import { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
 import { EventHandlerMetadata, EventUnsubscriber } from "./types/events";
@@ -156,3 +156,19 @@ export const COMMAND_UNREGISTERS_BY_SERVICE: WeakMap<object, Array<CommandUnregi
  * @internal
  */
 export const CONTAINER_BINDINGS: WeakMap<Container, Array<Bindings[number]>> = new WeakMap();
+
+/**
+ * Internal storage for provider lifecycle maps that currently own a container.
+ *
+ * @group Container
+ * @internal
+ */
+export const PROVISION_LIFECYCLES_BY_CONTAINER: WeakMap<Container, Set<Map<Container, Array<object>>>> = new WeakMap();
+
+/**
+ * Internal storage for provider lifecycle tokens represented by a service instance.
+ *
+ * @group Container
+ * @internal
+ */
+export const PROVISION_TOKENS_BY_SERVICE: WeakMap<object, Set<ServiceIdentifier>> = new WeakMap();

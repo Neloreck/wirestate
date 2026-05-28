@@ -1,4 +1,9 @@
-import { Container, deprovisionContainer, type ProvisionLifecycle as CoreProvisionLifecycle } from "@wirestate/core";
+import {
+  Container,
+  deprovisionContainer,
+  unbindAll,
+  type ProvisionLifecycle as CoreProvisionLifecycle,
+} from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -67,7 +72,7 @@ export function scheduleContainerDestruction(container: Container, lifecycle: Pr
       dbg.info(prefix(__filename), "Destroying container:", { container });
 
       lifecycle.pendingDestruction.delete(container);
-      container.unbindAll();
+      unbindAll(container);
     }, 0)
   );
 }

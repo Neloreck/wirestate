@@ -1,7 +1,9 @@
-import { Container } from "../alias";
+import { Container, ServiceIdentifier } from "../alias";
 import { CONTAINER_BINDINGS } from "../registry";
 import { Maybe } from "../types/general";
 import { Bindings } from "../types/provision";
+
+import { getBindingToken } from "./get-binding-token";
 
 /**
  * Records a binding as owned by a container.
@@ -46,4 +48,43 @@ export function registerBinding(container: Container, binding: Bindings[number])
  */
 export function getContainerBindings(container: Container): Bindings {
   return CONTAINER_BINDINGS.get(container) ?? [];
+}
+
+/**
+ * Removes all Wirestate-owned binding entries for a token.
+ *
+ * @group Container
+ * @internal
+ *
+ * @param container - Container losing the binding.
+ * @param identifier - Binding token removed from the container.
+ */
+export function unregisterBinding(container: Container, identifier: ServiceIdentifier): void {
+  const bindings: Maybe<Array<Bindings[number]>> = CONTAINER_BINDINGS.get(container);
+
+  if (!bindings) {
+    return;
+  }
+
+  const remaining: Array<Bindings[number]> = bindings.filter(
+    (binding) => !Object.is(getBindingToken(binding), identifier)
+  );
+
+  if (remaining.length) {
+    CONTAINER_BINDINGS.set(container, remaining);
+  } else {
+    CONTAINER_BINDINGS.delete(container);
+  }
+}
+
+/**
+ * Removes all Wirestate-owned binding entries for a container.
+ *
+ * @group Container
+ * @internal
+ *
+ * @param container - Container losing all bindings.
+ */
+export function unregisterAllBindings(container: Container): void {
+  CONTAINER_BINDINGS.delete(container);
 }

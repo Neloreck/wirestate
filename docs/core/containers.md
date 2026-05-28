@@ -61,10 +61,30 @@ if (container.isBound(UserService)) {
 }
 ```
 
-Prefer bindings and bind helpers for Wirestate services so lifecycle and messaging metadata are registered consistently.
+Prefer bindings and Wirestate's bind/unbind helpers for Wirestate services so lifecycle, provider ownership, and messaging
+metadata stay registered consistently.
+
+## Removing Bindings
+
+Use [`unbind`](/api/wirestate-core/functions/unbind) or [`unbindAll`](/api/wirestate-core/functions/unbindAll) when
+removing bindings that were added through Wirestate.
+
+```ts
+import { unbind, unbindAll } from "@wirestate/core";
+
+unbind(container, UserService);
+unbindAll(child);
+```
+
+These wrappers call the underlying Inversify unbind operation and also clean Wirestate-owned bookkeeping. If a provider
+currently owns the service, `@OnDeprovision` runs before service deactivation.
+
+Raw `container.unbind(...)` and `container.unbindAll()` remain available as Inversify escape hatches, but they do not clean
+Wirestate's registered binding list.
 
 ## API Reference
 
 [`createContainer`](/api/wirestate-core/functions/createContainer), [`ContainerConfig`](/api/wirestate-core/type-aliases/ContainerConfig),
 [`Container`](/api/wirestate-core/classes/Container), [`provisionContainer`](/api/wirestate-core/functions/provisionContainer),
-[`deprovisionContainer`](/api/wirestate-core/functions/deprovisionContainer).
+[`deprovisionContainer`](/api/wirestate-core/functions/deprovisionContainer),
+[`unbind`](/api/wirestate-core/functions/unbind), [`unbindAll`](/api/wirestate-core/functions/unbindAll).

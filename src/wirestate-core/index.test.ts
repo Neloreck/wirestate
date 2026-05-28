@@ -18,7 +18,6 @@ describe("Library exported API from wirestate-core", () => {
     "forwardRef",
     // Core.
     "BindOptions",
-    "BindServiceOptions",
     "BindingDescriptor",
     "Binding",
     "Bindings",
@@ -64,9 +63,6 @@ describe("Library exported API from wirestate-core", () => {
     "WireScope",
     "WirestateError",
     "bind",
-    "bindConstant",
-    "bindDynamicValue",
-    "bindService",
     "createContainer",
     "deprovisionContainer",
     "getBindingToken",
@@ -74,6 +70,8 @@ describe("Library exported API from wirestate-core", () => {
     "provisionContainer",
     "setSeeds",
     "setSharedSeed",
+    "unbind",
+    "unbindAll",
     "unsetSeeds",
     "validateContainerConfig",
   ];

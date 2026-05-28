@@ -93,6 +93,17 @@ test("cart uses pricing service", () => {
 });
 ```
 
+Use `mockUnbind` to remove a binding through the same cleanup path as core `unbind`.
+
+```ts
+import { mockBind, mockContainer, mockUnbind } from "@wirestate/core/test-utils";
+
+const container = mockContainer({ bindings: [CartService] });
+
+mockBind(container, PricingService);
+mockUnbind(container, PricingService);
+```
+
 ## Replace Dependencies
 
 Bind a constant under the dependency token before resolving the service under test.

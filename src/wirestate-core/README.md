@@ -50,21 +50,24 @@ export class CounterService {
 ## Container
 
 ```ts
-import { createContainer, bindService } from "@wirestate/core";
+import { bind, createContainer, unbind, unbindAll } from "@wirestate/core";
 
 const container = createContainer({
   bindings: [CounterService],
   seed: { baseUrl: "https://example.com" },
 });
 
-bindService(container, AnotherService);
+bind(container, AnotherService);
 
 const counterService = container.get(CounterService);
 const anotherService = container.get(AnotherService);
+
+unbind(container, AnotherService);
+unbindAll(container);
 ```
 
-`bindService` binds a class in singleton scope by default.
-Use `bindConstant` to bind a value, `bind` to bind under a custom token.
+`bind` accepts service classes and binding descriptors. Use `unbind` and `unbindAll` to remove Wirestate bindings; they
+clean registered binding entries and deprovision provider-owned services before Inversify deactivation.
 
 ## Events
 
@@ -201,12 +204,14 @@ export class PollingService {
 ```
 
 `@OnActivated` runs after the service is bound and all dependencies are resolved.
-`@OnDeactivation` runs when the container scope is disposed.
+`@OnDeactivation` runs when a service is unbound or the container scope is disposed.
 `@OnProvision` runs when a provider exposes the container to an owned boundary.
 `@OnDeprovision` runs before that provider removes or replaces the container; external containers are not disposed by
 the provider.
 
 Do not start cleanup-requiring work in `@OnActivated`. Provider lifecycles are the ownership boundary for that work.
+When removing bindings manually, prefer Wirestate's `unbind` and `unbindAll` helpers over raw `container.unbind(...)` so
+the registered binding list and provider lifecycle state stay in sync.
 
 Injected `WireScope` instances expose lifecycle state for async guards:
 
@@ -286,7 +291,8 @@ expect(counter.count).toBe(1);
 
 ### `mockUnbind(container, identifier)`
 
-Removes a binding from the container. Useful for overriding registrations between tests.
+Removes a binding from the container through the same cleanup path as core `unbind`. Useful for overriding registrations
+between tests.
 
 ```ts
 mockUnbind(container, CounterService);
