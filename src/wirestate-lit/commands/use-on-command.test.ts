@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { CommandBus, CommandDescriptor } from "@wirestate/core";
+import { CommandBus, Command } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
@@ -50,8 +50,8 @@ describe("useOnCommand hook", () => {
 
     provider.appendChild(element);
 
-    const descriptor: CommandDescriptor<number> = bus.command<number, number>("HOOK_COMMAND", 5);
-    const result: number = await descriptor.task;
+    const command: Command<number> = bus.command<number, number>("HOOK_COMMAND", 5);
+    const result: number = await command.task;
 
     expect(result).toBe(105);
     expect(handler).toHaveBeenCalledWith(5);

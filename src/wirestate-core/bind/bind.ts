@@ -59,7 +59,7 @@ export interface BindOptions extends BindServiceOptions {
    *
    * @default `false`
    */
-  readonly isWithIgnoreLifecycle?: boolean;
+  readonly skipLifecycle?: boolean;
 }
 
 /**

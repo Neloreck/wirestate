@@ -1,5 +1,5 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, CommandBus, CommandStatus, CommandDescriptor } from "@wirestate/core";
+import { Container, CommandBus, CommandStatus, Command } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
@@ -29,11 +29,11 @@ describe("useCommandExecutor", () => {
 
     render(withContainerProvider(<TestComponent />, container));
 
-    const descriptor: CommandDescriptor = (executor as unknown as CommandExecutor)("TEST_COMMAND", "some-data");
+    const command: Command = (executor as unknown as CommandExecutor)("TEST_COMMAND", "some-data");
 
-    expect(descriptor.status).toBe(CommandStatus.PENDING);
+    expect(command.status).toBe(CommandStatus.PENDING);
 
-    const result: unknown = await descriptor.task;
+    const result: unknown = await command.task;
 
     expect(result).toBe("some-data-result");
     expect(handler).toHaveBeenCalledWith("some-data");

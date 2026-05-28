@@ -46,6 +46,6 @@ export function mockBindService<T extends object>(
   const { skipLifecycle } = options;
 
   bindService(container, ServiceClass, {
-    isWithIgnoreLifecycle: skipLifecycle,
+    skipLifecycle: skipLifecycle,
   });
 }

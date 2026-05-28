@@ -1,4 +1,4 @@
-import { CommandDescriptor, CommandType } from "@wirestate/core";
+import { Command, CommandType } from "@wirestate/core";
 
 import { Optional } from "./general";
 
@@ -7,23 +7,23 @@ import { Optional } from "./general";
  *
  * @remarks
  * Typically returned by {@link useCommandExecutor}. Dispatched commands are
- * automatically wrapped in a {@link CommandDescriptor}.
+ * automatically wrapped in a {@link Command}.
  *
  * @group Commands
  *
- * @template R - The expected result type of the command task.
+ * @template R - The expected result type of the command.
  * @template D - The type of the data payload.
  * @template T - The command identifier type.
  *
  * @param type - The command identifier.
  * @param data - Optional payload for the command.
  *
- * @returns A descriptor containing the execution task and status.
+ * @returns A command containing the execution promise and status.
  */
 export type CommandExecutor = <R = unknown, D = unknown, T extends CommandType = CommandType>(
   type: T,
   data?: D
-) => CommandDescriptor<R>;
+) => Command<R>;
 
 /**
  * Represents the function returned by {@link useOptionalCommandExecutor}.
@@ -34,16 +34,16 @@ export type CommandExecutor = <R = unknown, D = unknown, T extends CommandType =
  *
  * @group Commands
  *
- * @template R - The expected result type of the command task.
+ * @template R - The expected result type of the command.
  * @template D - The type of the data payload.
  * @template T - The command identifier type.
  *
  * @param type - The command identifier.
  * @param data - Optional payload for the command.
  *
- * @returns A descriptor if a handler was found, or `null` otherwise.
+ * @returns A command if a handler was found, or `null` otherwise.
  */
 export type OptionalCommandExecutor = <R = unknown, D = unknown, T extends CommandType = CommandType>(
   type: T,
   data?: D
-) => Optional<CommandDescriptor<R>>;
+) => Optional<Command<R>>;

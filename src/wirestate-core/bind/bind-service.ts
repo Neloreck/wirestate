@@ -40,7 +40,7 @@ export interface BindServiceOptions {
    *
    * @default false
    */
-  readonly isWithIgnoreLifecycle?: boolean;
+  readonly skipLifecycle?: boolean;
 }
 
 /**
@@ -191,7 +191,7 @@ export function bindServiceWithToken<T extends object>(
         attachCommandUnregister(instance, unregister);
       }
 
-      if (options?.isWithIgnoreLifecycle) {
+      if (options?.skipLifecycle) {
         dbg.info(prefix(__filename), "Skip lifecycle @onActivated method:", {
           name: binding.name,
           context,
@@ -237,7 +237,7 @@ export function bindServiceWithToken<T extends object>(
 
     let deactivationMethodName: Maybe<string | symbol> = null;
 
-    if (options?.isWithIgnoreLifecycle) {
+    if (options?.skipLifecycle) {
       dbg.info(prefix(__filename), "Skip lifecycle @OnDeactivation method:", {
         name: binding.name,
         container,

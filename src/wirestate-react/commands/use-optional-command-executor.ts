@@ -1,4 +1,4 @@
-import { Container, CommandBus, CommandDescriptor, CommandType } from "@wirestate/core";
+import { Container, CommandBus, Command, CommandType } from "@wirestate/core";
 import { useCallback } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -24,10 +24,10 @@ import { OptionalCommandExecutor } from "../types/commands";
  * const executeOptionalCommand: OptionalCommandExecutor = useOptionalCommandExecutor();
  *
  * const onClick = useCallback(async () => {
- *   const descriptor: CommandDescriptor<string> | null = executeOptionalCommand("OPTIONAL_COMMAND", data);
+ *   const command: Command<string> | null = executeOptionalCommand("OPTIONAL_COMMAND", data);
  *
- *   if (descriptor) {
- *     const result: string = await descriptor.task;
+ *   if (command) {
+ *     const result: string = await command.task;
  *   }
  * }, [data, executeOptionalCommand]);
  * ```
@@ -36,7 +36,7 @@ export function useOptionalCommandExecutor(): OptionalCommandExecutor {
   const container: Container = useContainer();
 
   return useCallback(
-    <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): CommandDescriptor<R> | null => {
+    <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): Command<R> | null => {
       dbg.info(prefix(__filename), "Optional command:", {
         type,
         data,

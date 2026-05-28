@@ -1,5 +1,5 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, CommandBus, CommandDescriptor, CommandHandler } from "@wirestate/core";
+import { Container, CommandBus, Command, CommandHandler } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 import { useLayoutEffect } from "react";
 
@@ -30,16 +30,16 @@ describe("useCommandHandler", () => {
 
     expect(commandBus.has("HOOK_COMMAND")).toBe(true);
 
-    const descriptor: CommandDescriptor = commandBus.command("HOOK_COMMAND", "data");
+    const command: Command = commandBus.command("HOOK_COMMAND", "data");
 
-    await descriptor.task;
+    await command.task;
 
     expect(handler).toHaveBeenCalledWith("data");
 
     unmount();
 
     expect(commandBus.has("HOOK_COMMAND")).toBe(false);
-    expect(await descriptor.task).toBe("async-data");
+    expect(await command.task).toBe("async-data");
   });
 
   it("should update handler ref when handler changes", async () => {

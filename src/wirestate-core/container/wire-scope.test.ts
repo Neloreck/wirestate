@@ -11,7 +11,7 @@ import { OnActivated } from "../service/on-activated";
 import { OnDeactivation } from "../service/on-deactivation";
 import { mockContainer } from "../test-utils/mock-container";
 import { mockService } from "../test-utils/mock-service";
-import { CommandStatus, CommandDescriptor } from "../types/commands";
+import { CommandStatus, Command } from "../types/commands";
 import { Optional } from "../types/general";
 
 import { WireScope } from "./wire-scope";
@@ -179,11 +179,11 @@ describe("WireScope", () => {
 
     jest.spyOn(bus, "command");
 
-    const result: CommandDescriptor<string> = scope.executeCommand("TEST_COMMAND", "first-attempt");
+    const result: Command<string> = scope.executeCommand("TEST_COMMAND", "first-attempt");
 
     expect(result.status).toBe(CommandStatus.PENDING);
     expect(await result.task).toBe("result-from-command-bus");
-    expect(result.status).toBe(CommandStatus.SETTLED);
+    expect(result.status).toBe(CommandStatus.SUCCESS);
     expect(bus.command).toHaveBeenCalledWith("TEST_COMMAND", "first-attempt");
 
     expect(() => scope.executeCommand("NOT_EXISTING", "second-attempt")).toThrow(
@@ -202,17 +202,17 @@ describe("WireScope", () => {
 
     jest.spyOn(bus, "commandOptional");
 
-    const missing: Optional<CommandDescriptor> = scope.executeOptionalCommand("TEST_COMMAND", "first-attempt");
+    const missing: Optional<Command> = scope.executeOptionalCommand("TEST_COMMAND", "first-attempt");
 
     expect(missing).toBeNull();
 
     bus.register("TEST_COMMAND", () => "result-from-command-bus");
 
-    const result: Optional<CommandDescriptor<string>> = scope.executeOptionalCommand("TEST_COMMAND", "second-attempt");
+    const result: Optional<Command<string>> = scope.executeOptionalCommand("TEST_COMMAND", "second-attempt");
 
     expect(result?.status).toBe(CommandStatus.PENDING);
     expect(await result?.task).toBe("result-from-command-bus");
-    expect(result?.status).toBe(CommandStatus.SETTLED);
+    expect(result?.status).toBe(CommandStatus.SUCCESS);
 
     expect(bus.commandOptional).toHaveBeenCalledTimes(2);
     expect(bus.commandOptional).toHaveBeenCalledWith("TEST_COMMAND", "first-attempt");

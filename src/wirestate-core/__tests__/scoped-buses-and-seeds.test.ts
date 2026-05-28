@@ -148,7 +148,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     const logs: Array<string> = [];
 
-    let commandTask: Optional<Promise<string>> = null as Optional<Promise<string>>;
+    let task: Optional<Promise<string>> = null as Optional<Promise<string>>;
 
     @Injectable()
     class CleanupService {
@@ -165,7 +165,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
         this.scope.emitEvent(DEACTIVATE_EVENT, "cleanup");
         logs.push(`query-result:${this.scope.queryData(DEACTIVATE_QUERY)}`);
 
-        commandTask = this.scope.executeCommand<string>(DEACTIVATE_COMMAND).task;
+        task = this.scope.executeCommand<string>(DEACTIVATE_COMMAND).task;
       }
 
       @OnCommand(DEACTIVATE_COMMAND)
@@ -197,11 +197,11 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     container.unbindAll();
 
     expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result"]);
-    expect(commandTask).not.toBeNull();
+    expect(task).not.toBeNull();
 
-    const commandResult: Optional<string> = await commandTask;
+    const result: Optional<string> = await task;
 
-    expect(commandResult).toBe("command-result");
+    expect(result).toBe("command-result");
     expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
 
     expect(container.get(EventBus).has()).toBe(false);
@@ -215,7 +215,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     const PEER_DEACTIVATE_QUERY: string = "PEER_DEACTIVATE_QUERY";
 
     const logs: Array<string> = [];
-    let commandTask: Optional<Promise<string>> = null as Optional<Promise<string>>;
+    let task: Optional<Promise<string>> = null as Optional<Promise<string>>;
 
     const fromDeactivationPeerService: Array<unknown> = [];
     const fromDeactivationCoordinatorService: Array<unknown> = [];
@@ -271,7 +271,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
         this.scope.emitEvent(PEER_DEACTIVATE_EVENT, "from-coordinator");
         logs.push(`coordinator-query:${this.scope.queryData(PEER_DEACTIVATE_QUERY, "from-coordinator")}`);
 
-        commandTask = this.scope.executeCommand<string, string>(PEER_DEACTIVATE_COMMAND, "from-coordinator").task;
+        task = this.scope.executeCommand<string, string>(PEER_DEACTIVATE_COMMAND, "from-coordinator").task;
 
         fromDeactivationCoordinatorService.push(
           this.scope.resolve(WireScope),
@@ -295,9 +295,9 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
       "coordinator-query:peer-query-result",
       "peer-deactivation",
     ]);
-    expect(commandTask).not.toBeNull();
+    expect(task).not.toBeNull();
 
-    expect(await commandTask).toBe("peer-command-result");
+    expect(await task).toBe("peer-command-result");
     expect(logs).toEqual([
       "coordinator-deactivation",
       "peer-event:from-coordinator",

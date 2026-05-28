@@ -48,6 +48,6 @@ export function mockBind<T extends object>(
   const { skipLifecycle } = options;
 
   bind(container, binding, {
-    isWithIgnoreLifecycle: skipLifecycle,
+    skipLifecycle: skipLifecycle,
   });
 }

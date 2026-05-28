@@ -1,5 +1,5 @@
 import { watch } from "@lit-labs/signals";
-import { CommandDescriptor, WireScope, Event } from "@wirestate/core";
+import { Command, WireScope, Event } from "@wirestate/core";
 import { injection, onEvent } from "@wirestate/lit";
 import { Computed, computed } from "@wirestate/lit-signals";
 import { css, CSSResult, html, LitElement } from "lit";
@@ -100,7 +100,7 @@ export class GeneralControls extends LitElement {
   }
 
   public onDumpData(): void {
-    const command: CommandDescriptor = this.scope.executeCommand(EGlobalCommand.DUMP_DATA, {
+    const command: Command = this.scope.executeCommand(EGlobalCommand.DUMP_DATA, {
       at: Date.now(),
     });
 

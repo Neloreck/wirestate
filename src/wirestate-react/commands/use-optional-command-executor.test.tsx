@@ -29,7 +29,7 @@ describe("useOptionalCommandExecutor", () => {
     expect((executor as unknown as OptionalCommandExecutor)("MISSING_CMD")).toBeNull();
   });
 
-  it("should return descriptor if handler exists", async () => {
+  it("should return a command if handler exists", async () => {
     const container: Container = mockContainer();
 
     container.get(CommandBus).register("EXISTING_COMMAND", () => "ok");
@@ -44,9 +44,9 @@ describe("useOptionalCommandExecutor", () => {
 
     render(withContainerProvider(<TestComponent />, container));
 
-    const descriptor = (executor as unknown as OptionalCommandExecutor)("EXISTING_COMMAND");
+    const command = (executor as unknown as OptionalCommandExecutor)("EXISTING_COMMAND");
 
-    expect(descriptor).not.toBeNull();
-    expect(await descriptor!.task).toBe("ok");
+    expect(command).not.toBeNull();
+    expect(await command!.task).toBe("ok");
   });
 });

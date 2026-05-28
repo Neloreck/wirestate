@@ -72,11 +72,11 @@ export interface CommandHandlerMetadata {
  * @group Commands
  */
 export enum CommandStatus {
-  /** The command task has started but not yet completed. */
+  /** The command has started but not yet completed. */
   PENDING = "pending",
-  /** The command task has successfully completed. */
-  SETTLED = "settled",
-  /** The command task failed with an error. */
+  /** The command has successfully completed. */
+  SUCCESS = "success",
+  /** The command failed with an error. */
   ERROR = "error",
 }
 
@@ -91,7 +91,7 @@ export enum CommandStatus {
  *
  * @template R - Type of the result produced by the command.
  */
-export interface CommandDescriptor<R = unknown> {
+export interface Command<R = unknown> {
   /**
    * A promise that resolves with the command result or rejects with an error.
    */

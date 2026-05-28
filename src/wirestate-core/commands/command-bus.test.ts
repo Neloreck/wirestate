@@ -1,4 +1,4 @@
-import { CommandStatus, CommandDescriptor, CommandUnregister } from "../types/commands";
+import { CommandStatus, Command, CommandUnregister } from "../types/commands";
 
 import { CommandBus } from "./command-bus";
 
@@ -9,15 +9,15 @@ describe("CommandBus", () => {
 
     bus.register("TEST", handler);
 
-    const descriptor: CommandDescriptor<string> = bus.command("TEST", "data");
+    const command: Command<string> = bus.command("TEST", "data");
 
-    expect(descriptor.status).toBe(CommandStatus.PENDING);
+    expect(command.status).toBe(CommandStatus.PENDING);
 
-    const result: string = await descriptor.task;
+    const result: string = await command.task;
 
     expect(result).toBe("result");
     expect(handler).toHaveBeenCalledWith("data");
-    expect(descriptor.status).toBe(CommandStatus.SETTLED);
+    expect(command.status).toBe(CommandStatus.SUCCESS);
   });
 
   it("should throw when no handler is registered", () => {
@@ -32,9 +32,9 @@ describe("CommandBus", () => {
     bus.register("TYPE", () => "first");
     bus.register("TYPE", () => "second");
 
-    const descriptor: CommandDescriptor<string> = bus.command("TYPE");
+    const command: Command<string> = bus.command("TYPE");
 
-    expect(await descriptor.task).toBe("second");
+    expect(await command.task).toBe("second");
   });
 
   it("should unregister a handler", () => {
@@ -86,14 +86,14 @@ describe("CommandBus", () => {
 
     bus.register("ASYNC", async (data: number) => data * 2);
 
-    const descriptor: CommandDescriptor<number> = bus.command<number>("ASYNC", 5);
+    const command: Command<number> = bus.command<number>("ASYNC", 5);
 
-    expect(descriptor.status).toBe(CommandStatus.PENDING);
+    expect(command.status).toBe(CommandStatus.PENDING);
 
-    const result: number = await descriptor.task;
+    const result: number = await command.task;
 
     expect(result).toBe(10);
-    expect(descriptor.status).toBe(CommandStatus.SETTLED);
+    expect(command.status).toBe(CommandStatus.SUCCESS);
   });
 
   it("should set error status on handler rejection", async () => {
@@ -104,13 +104,13 @@ describe("CommandBus", () => {
       throw error;
     });
 
-    const descriptor: CommandDescriptor = bus.command("FAIL");
+    const command: Command = bus.command("FAIL");
 
-    expect(descriptor.status).toBe(CommandStatus.PENDING);
+    expect(command.status).toBe(CommandStatus.PENDING);
 
-    await expect(descriptor.task).rejects.toThrow("command failed");
+    await expect(command.task).rejects.toThrow("command failed");
 
-    expect(descriptor.status).toBe(CommandStatus.ERROR);
+    expect(command.status).toBe(CommandStatus.ERROR);
   });
 
   it("should set error status on async handler rejection", async () => {
@@ -121,11 +121,11 @@ describe("CommandBus", () => {
       throw error;
     });
 
-    const descriptor: CommandDescriptor = bus.command("FAIL_ASYNC");
+    const command: Command = bus.command("FAIL_ASYNC");
 
-    await expect(descriptor.task).rejects.toThrow("async failed");
+    await expect(command.task).rejects.toThrow("async failed");
 
-    expect(descriptor.status).toBe(CommandStatus.ERROR);
+    expect(command.status).toBe(CommandStatus.ERROR);
   });
 
   it("should check if handler exists", () => {
@@ -164,21 +164,21 @@ describe("CommandBus", () => {
 
     bus.register(type, () => "symbol-result");
 
-    const descriptor: CommandDescriptor<string> = bus.command(type);
+    const command: Command<string> = bus.command(type);
 
-    expect(await descriptor.task).toBe("symbol-result");
+    expect(await command.task).toBe("symbol-result");
   });
 
   describe("commandOptional", () => {
-    it("should return descriptor when handler exists", async () => {
+    it("should return a command when handler exists", async () => {
       const bus: CommandBus = new CommandBus();
 
       bus.register("TYPE", () => "value");
 
-      const descriptor = bus.commandOptional("TYPE");
+      const command = bus.commandOptional("TYPE");
 
-      expect(descriptor).not.toBeNull();
-      expect(await descriptor!.task).toBe("value");
+      expect(command).not.toBeNull();
+      expect(await command!.task).toBe("value");
     });
 
     it("should return null when no handler is registered", () => {
@@ -192,10 +192,10 @@ describe("CommandBus", () => {
 
       bus.register("ASYNC", async () => "async-value");
 
-      const descriptor = bus.commandOptional("ASYNC");
+      const command = bus.commandOptional("ASYNC");
 
-      expect(descriptor).not.toBeNull();
-      expect(await descriptor!.task).toBe("async-value");
+      expect(command).not.toBeNull();
+      expect(await command!.task).toBe("async-value");
     });
   });
 

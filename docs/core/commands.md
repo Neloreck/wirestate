@@ -1,6 +1,6 @@
 # Core Commands
 
-Commands trigger write work. A command has one active handler and returns a descriptor with `status` and `task`.
+Commands trigger write work. A command has one active handler and returns a `Command` handle with `status` and `task`.
 
 Each command type uses a stack of handlers. The newest registration wins. When it unregisters, the previous handler is
 active again.
@@ -102,5 +102,5 @@ Use this pattern when the command handler depends on runtime state or cannot be 
 ## API Reference
 
 [`CommandBus`](/api/wirestate-core/classes/CommandBus), [`WireScope`](/api/wirestate-core/classes/WireScope),
-[`OnCommand`](/api/wirestate-core/functions/OnCommand), [`CommandDescriptor`](/api/wirestate-core/interfaces/CommandDescriptor),
+[`OnCommand`](/api/wirestate-core/functions/OnCommand), [`Command`](/api/wirestate-core/interfaces/Command),
 [`CommandUnregister`](/api/wirestate-core/type-aliases/CommandUnregister).

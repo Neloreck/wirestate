@@ -111,10 +111,10 @@ describe("bindService", () => {
     expect(() => container.get(QueryBus).query("TEST_QUERY")).toThrow();
   });
 
-  it("should skip lifecycle if isWithIgnoreLifecycle is true", () => {
+  it("should skip lifecycle if skipLifecycle is true", () => {
     const container: Container = mockContainer();
 
-    bindService(container, GenericService, { isWithIgnoreLifecycle: true });
+    bindService(container, GenericService, { skipLifecycle: true });
 
     const instance: GenericService = container.get(GenericService);
 

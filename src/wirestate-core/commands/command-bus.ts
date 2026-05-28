@@ -5,7 +5,7 @@ import { ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER } from "../error/error-cod
 import { WirestateError } from "../error/wirestate-error";
 import {
   CommandStatus,
-  type CommandDescriptor,
+  type Command,
   type CommandHandler,
   type CommandType,
   type CommandUnregister,
@@ -21,7 +21,7 @@ interface CommandHandlerDescriptor {
  *
  * @remarks
  * Commands are writes: save, login, reset, send. The caller gets a
- * {@link CommandDescriptor} immediately and can await `descriptor.task`.
+ * {@link Command} immediately and can await `command.task`.
  *
  * Handlers are stacked by type. The newest handler wins. Unregister it and the
  * previous handler takes over again.
@@ -57,25 +57,25 @@ export class CommandBus {
    * Dispatches a command to the newest handler.
    *
    * @remarks
-   * The handler result is always wrapped in a Promise. The descriptor starts
-   * as `PENDING`, then becomes `SETTLED` or `ERROR`.
+   * The handler result is always wrapped in a Promise. The command starts
+   * as `PENDING`, then becomes `SUCCESS` or `ERROR`.
    *
    * @template R - Type of the command result.
    * @template D - Type of the command payload data.
    *
    * @param type - Command token.
    * @param data - Command payload.
-   * @returns Descriptor for the running command.
+   * @returns The running command handle.
    *
    * @throws {@link WirestateError} If no handler is registered.
    *
    * @example
    * ```typescript
-   * const descriptor: CommandDescriptor<User> = commandBus.command<User, string>("GET_USER", "id-123");
-   * const user: User = await descriptor.task;
+   * const command: Command<User> = commandBus.command<User, string>("GET_USER", "id-123");
+   * const user: User = await command.task;
    * ```
    */
-  public command<R = unknown, D = unknown>(type: CommandType, data?: D): CommandDescriptor<R> {
+  public command<R = unknown, D = unknown>(type: CommandType, data?: D): Command<R> {
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (!stack?.length) {
@@ -87,25 +87,25 @@ export class CommandBus {
 
     const handler = stack[stack.length - 1].handler as CommandHandler<D, R>;
 
-    const descriptor: CommandDescriptor<R> = {
+    const command: Command<R> = {
       task: null as unknown as Promise<R>,
       status: CommandStatus.PENDING,
     };
 
-    (descriptor as { task: Promise<R> }).task = Promise.resolve()
+    (command as { task: Promise<R> }).task = Promise.resolve()
       .then(() => handler(data as D))
       .then((result: R) => {
-        (descriptor as { status: CommandStatus }).status = CommandStatus.SETTLED;
+        (command as { status: CommandStatus }).status = CommandStatus.SUCCESS;
 
         return result;
       })
       .catch((error: unknown) => {
-        (descriptor as { status: CommandStatus }).status = CommandStatus.ERROR;
+        (command as { status: CommandStatus }).status = CommandStatus.ERROR;
 
         throw error;
       });
 
-    return descriptor as CommandDescriptor<R>;
+    return command as Command<R>;
   }
 
   /**
@@ -116,9 +116,9 @@ export class CommandBus {
    *
    * @param type - Command identifier.
    * @param data - Optional payload for the handler.
-   * @returns Command descriptor, or `null` when no handler exists.
+   * @returns The running command handle, or `null` when no handler exists.
    */
-  public commandOptional<R = unknown, D = unknown>(type: CommandType, data?: D): Optional<CommandDescriptor<R>> {
+  public commandOptional<R = unknown, D = unknown>(type: CommandType, data?: D): Optional<Command<R>> {
     return this.handlers.get(type)?.length ? this.command<R, D>(type, data) : null;
   }
 
