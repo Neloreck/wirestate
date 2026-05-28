@@ -5,6 +5,7 @@ import {
   PackageRecord,
   printUsage,
   readPackages,
+  readRootPackage,
   resolveNextVersion,
   writeVersion,
 } from "./bump-version.utils";
@@ -21,18 +22,20 @@ if (require.main === module) {
     }
 
     const packages: Array<PackageRecord> = readPackages();
+    const rootPackage: PackageRecord = readRootPackage();
     const currentVersion: string = ensureLockstepVersions(packages);
     const nextVersion: string = resolveNextVersion(currentVersion, target);
     const wirestatePackagesNames: Set<string> = new Set(packages.map((pkg) => pkg.displayName));
+    const manifests: Array<PackageRecord> = [rootPackage, ...packages];
 
-    if (currentVersion === nextVersion) {
-      console.log(`Packages already use version ${nextVersion}.`);
+    if (currentVersion === nextVersion && rootPackage.version === nextVersion) {
+      console.log(`Package manifests already use version ${nextVersion}.`);
       process.exit(0);
     }
 
-    console.log(`Bumping wirestate packages from ${currentVersion} to ${nextVersion}${dryRun ? " (dry run)" : ""}`);
+    console.log(`Bumping wirestate manifests to ${nextVersion}${dryRun ? " (dry run)" : ""}`);
 
-    for (const pkg of packages) {
+    for (const pkg of manifests) {
       if (!dryRun) {
         writeVersion(pkg, nextVersion, wirestatePackagesNames);
       }

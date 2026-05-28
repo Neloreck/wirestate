@@ -22,6 +22,7 @@ jobs:
     name: Bump package versions
     runs-on: ubuntu-latest
     env:
+      ROOT_MANIFEST_PATHSPEC: "package.json"
       PACKAGE_MANIFEST_PATHSPEC: ":(glob)src/**/package.json"
 
     steps:
@@ -68,7 +69,7 @@ jobs:
       - name: Detect manifest changes
         id: manifest-changes
         run: |
-          if git diff --quiet -- "${PACKAGE_MANIFEST_PATHSPEC}"; then
+          if git diff --quiet -- "${ROOT_MANIFEST_PATHSPEC}" "${PACKAGE_MANIFEST_PATHSPEC}"; then
             echo "changed=false" >> "${GITHUB_OUTPUT}"
           else
             echo "changed=true" >> "${GITHUB_OUTPUT}"
@@ -82,10 +83,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "${PACKAGE_MANIFEST_PATHSPEC}"
+          git add -- "${ROOT_MANIFEST_PATHSPEC}" "${PACKAGE_MANIFEST_PATHSPEC}"
           git commit -m "chore: bump wirestate packages to ${TARGET_VERSION}"
           git push origin "HEAD:${TARGET_BRANCH}"
 
       - name: Report unchanged version
         if: steps.manifest-changes.outputs.changed == 'false'
-        run: echo "Package manifests already match the requested version target."
+        run: echo "Versioned manifests already match the requested version target."

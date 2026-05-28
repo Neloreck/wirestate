@@ -143,9 +143,6 @@ export function bindServiceWithToken<T extends object>(
     });
 
     try {
-      // Ensure flag is initialized on activation.
-      (instance as { IS_DISPOSED: boolean }).IS_DISPOSED = false;
-
       CONTAINER_REFS_BY_SERVICE.set(instance, container);
       attachWireScopes(instance, binding);
 
@@ -274,12 +271,6 @@ export function bindServiceWithToken<T extends object>(
       }
     }
 
-    // Flip the public disposal flag first so any async work already in
-    // flight (fetches awaiting in @Action methods, scheduled reactions,
-    // etc.) can short-circuit before it mutates the about-to-die instance.
-    // The cast is the only write-site for this `readonly` field.
-    (instance as { IS_DISPOSED: boolean }).IS_DISPOSED = true;
-
     detachWireScopes(instance);
     detachCommandUnregister(instance);
     detachQueryUnregister(instance);
@@ -331,8 +322,6 @@ function detachEventSubscription<T extends object>(service: T): void {
  * @param service - Service instance.
  */
 function cleanupFailedActivation<T extends object>(service: T): void {
-  (service as { IS_DISPOSED: boolean }).IS_DISPOSED = true;
-
   detachWireScopes(service);
   detachCommandUnregister(service);
   detachQueryUnregister(service);

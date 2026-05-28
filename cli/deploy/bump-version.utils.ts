@@ -82,6 +82,24 @@ export function readPackages(): Array<PackageRecord> {
   });
 }
 
+export function readRootPackage(): PackageRecord {
+  const manifestPath = path.resolve(PROJECT_ROOT, "package.json");
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8")) as Record<string, unknown>;
+  const version = manifest.version;
+  const displayName = typeof manifest.name === "string" ? manifest.name : "root package";
+
+  if (typeof version !== "string") {
+    throw new Error(`Package ${displayName} is missing a string version field.`);
+  }
+
+  return {
+    displayName,
+    manifestPath,
+    manifest,
+    version,
+  };
+}
+
 export function ensureLockstepVersions(packages: Array<PackageRecord>): string {
   const versions = new Set(packages.map((pkg) => pkg.version));
 
