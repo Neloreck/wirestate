@@ -69,5 +69,5 @@ Managed Lit containers are recreated when their provider config is replaced and 
 ## API Reference
 
 [`containerProvide`](/api/wirestate-lit/functions/containerProvide),
-[`subContainerProvide`](/api/wirestate-lit/functions/subContainerProvide), [`WireScope`](/api/wirestate/classes/WireScope),
-[`SeedEntries`](/api/wirestate/type-aliases/SeedEntries).
+[`subContainerProvide`](/api/wirestate-lit/functions/subContainerProvide), [`WireScope`](/api/wirestate-core/classes/WireScope),
+[`SeedEntries`](/api/wirestate-core/type-aliases/SeedEntries).

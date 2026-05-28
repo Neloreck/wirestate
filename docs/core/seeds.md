@@ -120,6 +120,6 @@ explicitly re-apply the value in your own service method.
 
 ## API Reference
 
-[`SEED`](/api/wirestate/variables/SEED), [`SEEDS`](/api/wirestate/variables/SEEDS),
-[`applySharedSeed`](/api/wirestate/functions/applySharedSeed), [`applySeeds`](/api/wirestate/functions/applySeeds),
-[`unapplySeeds`](/api/wirestate/functions/unapplySeeds), [`SeedEntries`](/api/wirestate/type-aliases/SeedEntries).
+[`SEED`](/api/wirestate-core/variables/SEED), [`SEEDS`](/api/wirestate-core/variables/SEEDS),
+[`applySharedSeed`](/api/wirestate-core/functions/applySharedSeed), [`applySeeds`](/api/wirestate-core/functions/applySeeds),
+[`unapplySeeds`](/api/wirestate-core/functions/unapplySeeds), [`SeedEntries`](/api/wirestate-core/type-aliases/SeedEntries).

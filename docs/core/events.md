@@ -101,6 +101,6 @@ A throwing event handler is logged. The next handler still runs.
 
 ## API Reference
 
-[`EventBus`](/api/wirestate/classes/EventBus), [`WireScope`](/api/wirestate/classes/WireScope),
-[`OnEvent`](/api/wirestate/functions/OnEvent), [`Event`](/api/wirestate/interfaces/Event),
-[`EventUnsubscriber`](/api/wirestate/type-aliases/EventUnsubscriber).
+[`EventBus`](/api/wirestate-core/classes/EventBus), [`WireScope`](/api/wirestate-core/classes/WireScope),
+[`OnEvent`](/api/wirestate-core/functions/OnEvent), [`Event`](/api/wirestate-core/interfaces/Event),
+[`EventUnsubscriber`](/api/wirestate-core/type-aliases/EventUnsubscriber).

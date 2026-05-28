@@ -1,6 +1,6 @@
 # React Containers
 
-React [providers](/api/wirestate/functions/ContainerProvider) publish Wirestate containers through context.
+React [providers](/api/wirestate-react/functions/ContainerProvider) publish Wirestate containers through context.
 
 ## Managed Root Container
 
@@ -90,8 +90,8 @@ function DevTools() {
 
 ## API Reference
 
-[`ContainerProvider`](/api/wirestate/functions/ContainerProvider),
-[`ContainerProviderProps`](/api/wirestate/interfaces/ContainerProviderProps),
-[`SubContainerProvider`](/api/wirestate/functions/SubContainerProvider),
-[`SubContainerProviderProps`](/api/wirestate/interfaces/SubContainerProviderProps), [`useContainer`](/api/wirestate/functions/useContainer),
-[`useScope`](/api/wirestate/functions/useScope).
+[`ContainerProvider`](/api/wirestate-react/functions/ContainerProvider),
+[`ContainerProviderProps`](/api/wirestate-react/interfaces/ContainerProviderProps),
+[`SubContainerProvider`](/api/wirestate-react/functions/SubContainerProvider),
+[`SubContainerProviderProps`](/api/wirestate-react/interfaces/SubContainerProviderProps), [`useContainer`](/api/wirestate-react/functions/useContainer),
+[`useScope`](/api/wirestate-react/functions/useScope).

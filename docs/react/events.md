@@ -61,5 +61,5 @@ Subscriptions unregister when the component unmounts or the active container cha
 
 ## API Reference
 
-[`useEventEmitter`](/api/wirestate/functions/useEventEmitter), [`useEvent`](/api/wirestate/functions/useEvent),
-[`useEvents`](/api/wirestate/functions/useEvents), [`useEventsHandler`](/api/wirestate/functions/useEventsHandler).
+[`useEventEmitter`](/api/wirestate-react/functions/useEventEmitter), [`useEvent`](/api/wirestate-react/functions/useEvent),
+[`useEvents`](/api/wirestate-react/functions/useEvents), [`useEventsHandler`](/api/wirestate-react/functions/useEventsHandler).

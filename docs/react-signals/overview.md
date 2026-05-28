@@ -1,14 +1,28 @@
 # React Signals
 
-Use `@wirestate/react-signals` when React services should store Preact Signals.
+Use `@wirestate/react-signals` when React services should store signal state.
 
-The package re-exports `@preact/signals-react`. Wirestate does not wrap or change signal behavior.
+The package exposes the React Signals APIs through the Wirestate adapter. Wirestate does not wrap or change signal
+behavior.
 
 ## Install
 
 ```bash
 npm install @wirestate/core @wirestate/react @wirestate/react-signals @preact/signals-react reflect-metadata
+npm install --save-dev @preact/signals-react-transform
 ```
+
+Add the Preact Signals React transform to your Babel config so components that read signal values during render are
+subscribed automatically.
+
+```json
+{
+  "plugins": [["module:@preact/signals-react-transform"]]
+}
+```
+
+If your build cannot use the transform, call `useSignals()` from `@wirestate/react-signals` in components that read
+signal `.value` during render.
 
 ## Service
 
@@ -28,8 +42,8 @@ export class CounterService {
 
 ## Component
 
-Signals re-render React consumers when read during render. Keep signal creation in services or stable component state;
-reading `.value` in render is the subscription point.
+With the transform configured, React consumers re-render when they read signal `.value` during render. Keep signal
+creation in services or stable component state.
 
 ```tsx
 import { useInjection } from "@wirestate/react";

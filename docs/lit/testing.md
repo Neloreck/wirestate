@@ -49,4 +49,4 @@ Append elements under `fixture.provider` so they can consume the provided contex
 
 [`createLitProvision`](/api/wirestate-lit/test-utils/functions/createLitProvision),
 [`LitProvisionFixture`](/api/wirestate-lit/test-utils/interfaces/LitProvisionFixture),
-[`mockContainer`](/api/wirestate/test-utils/functions/mockContainer).
+[`mockContainer`](/api/wirestate-core/test-utils/functions/mockContainer).

@@ -78,8 +78,8 @@ for the same query type.
 
 ## API Reference
 
-[`useQueryExecutor`](/api/wirestate/functions/useQueryExecutor),
-[`useAsyncQueryExecutor`](/api/wirestate/functions/useAsyncQueryExecutor),
-[`useOptionalQueryExecutor`](/api/wirestate/functions/useOptionalQueryExecutor),
-[`useOptionalAsyncQueryExecutor`](/api/wirestate/functions/useOptionalAsyncQueryExecutor),
-[`useQueryHandler`](/api/wirestate/functions/useQueryHandler).
+[`useQueryExecutor`](/api/wirestate-react/functions/useQueryExecutor),
+[`useAsyncQueryExecutor`](/api/wirestate-react/functions/useAsyncQueryExecutor),
+[`useOptionalQueryExecutor`](/api/wirestate-react/functions/useOptionalQueryExecutor),
+[`useOptionalAsyncQueryExecutor`](/api/wirestate-react/functions/useOptionalAsyncQueryExecutor),
+[`useQueryHandler`](/api/wirestate-react/functions/useQueryHandler).

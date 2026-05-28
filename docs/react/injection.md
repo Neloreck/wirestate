@@ -1,6 +1,6 @@
 # React Injection
 
-Use [`useInjection`](/api/wirestate/functions/useInjection) to resolve a service or value from the active container.
+Use [`useInjection`](/api/wirestate-react/functions/useInjection) to resolve a service or value from the active container.
 
 ## Required Injection
 
@@ -68,6 +68,6 @@ function DebugButton() {
 
 ## API Reference
 
-[`useInjection`](/api/wirestate/functions/useInjection),
-[`useOptionalInjection`](/api/wirestate/functions/useOptionalInjection), [`useContainer`](/api/wirestate/functions/useContainer),
-[`useScope`](/api/wirestate/functions/useScope).
+[`useInjection`](/api/wirestate-react/functions/useInjection),
+[`useOptionalInjection`](/api/wirestate-react/functions/useOptionalInjection), [`useContainer`](/api/wirestate-react/functions/useContainer),
+[`useScope`](/api/wirestate-react/functions/useScope).

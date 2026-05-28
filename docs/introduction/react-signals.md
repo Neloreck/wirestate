@@ -1,16 +1,30 @@
 # React Signals
 
-Use this stack when React components should render service state stored in Preact Signals.
+Use this stack when React components should render signal state stored in services.
 
 Install:
 
 ```bash
 npm install @wirestate/core @wirestate/react @wirestate/react-signals @preact/signals-react reflect-metadata
+npm install --save-dev @preact/signals-react-transform
 ```
+
+Configure the Preact Signals React transform so React components that read signal values during render subscribe to
+updates automatically.
+
+```json
+{
+  "plugins": [["module:@preact/signals-react-transform"]]
+}
+```
+
+If your build cannot use the transform, call `useSignals()` from `@wirestate/react-signals` in components that read
+signal `.value` during render.
 
 ## Minimal Example
 
-Create signals in services or stable component state. Reading `.value` in render subscribes the component to updates.
+Create signals in services or stable component state. With the transform configured, reading `.value` in render
+subscribes the component to updates.
 
 ```tsx
 import { Injectable } from "@wirestate/core";

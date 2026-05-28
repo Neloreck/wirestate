@@ -101,6 +101,6 @@ Use this pattern when the command handler depends on runtime state or cannot be 
 
 ## API Reference
 
-[`CommandBus`](/api/wirestate/classes/CommandBus), [`WireScope`](/api/wirestate/classes/WireScope),
-[`OnCommand`](/api/wirestate/functions/OnCommand), [`CommandDescriptor`](/api/wirestate/interfaces/CommandDescriptor),
-[`CommandUnregister`](/api/wirestate/type-aliases/CommandUnregister).
+[`CommandBus`](/api/wirestate-core/classes/CommandBus), [`WireScope`](/api/wirestate-core/classes/WireScope),
+[`OnCommand`](/api/wirestate-core/functions/OnCommand), [`CommandDescriptor`](/api/wirestate-core/interfaces/CommandDescriptor),
+[`CommandUnregister`](/api/wirestate-core/type-aliases/CommandUnregister).

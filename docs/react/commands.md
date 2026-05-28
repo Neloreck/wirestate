@@ -56,6 +56,6 @@ for the same command type.
 
 ## API Reference
 
-[`useCommandExecutor`](/api/wirestate/functions/useCommandExecutor),
-[`useOptionalCommandExecutor`](/api/wirestate/functions/useOptionalCommandExecutor),
-[`useCommandHandler`](/api/wirestate/functions/useCommandHandler).
+[`useCommandExecutor`](/api/wirestate-react/functions/useCommandExecutor),
+[`useOptionalCommandExecutor`](/api/wirestate-react/functions/useOptionalCommandExecutor),
+[`useCommandHandler`](/api/wirestate-react/functions/useCommandHandler).

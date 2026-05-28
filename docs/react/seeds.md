@@ -68,6 +68,6 @@ Changing provider seeds recreates managed provider containers when the shallow p
 
 ## API Reference
 
-[`ContainerProvider`](/api/wirestate/functions/ContainerProvider),
-[`SubContainerProvider`](/api/wirestate/functions/SubContainerProvider), [`SeedEntries`](/api/wirestate/type-aliases/SeedEntries),
-[`WireScope`](/api/wirestate/classes/WireScope).
+[`ContainerProvider`](/api/wirestate-react/functions/ContainerProvider),
+[`SubContainerProvider`](/api/wirestate-react/functions/SubContainerProvider),
+[`SeedEntries`](/api/wirestate-core/type-aliases/SeedEntries), [`WireScope`](/api/wirestate-core/classes/WireScope).

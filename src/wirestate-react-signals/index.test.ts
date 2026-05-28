@@ -2,6 +2,7 @@ describe("Library exported API from wirestate/react-signals", () => {
   const libRoot = require("./index");
 
   const expectedLibExports: Array<string> = [
+    "EffectStore",
     "Model",
     "ModelConstructor",
     "ReadonlySignal",
@@ -11,12 +12,15 @@ describe("Library exported API from wirestate/react-signals", () => {
     "computed",
     "createModel",
     "effect",
+    "ensureFinalCleanup",
     "signal",
     "untracked",
     "useComputed",
     "useModel",
     "useSignal",
     "useSignalEffect",
+    "useSignals",
+    "wrapJsx",
   ];
 
   const assertListIntersection = (first: Array<string>, second: Array<string>) => {

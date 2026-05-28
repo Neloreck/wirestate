@@ -46,5 +46,5 @@ test("opens search from command", async () => {
 
 ## API Reference
 
-[`withContainerProvider`](/api/wirestate/test-utils/functions/withContainerProvider),
-[`mockContainer`](/api/wirestate/test-utils/functions/mockContainer).
+[`withContainerProvider`](/api/wirestate-react/test-utils/functions/withContainerProvider),
+[`mockContainer`](/api/wirestate-core/test-utils/functions/mockContainer).

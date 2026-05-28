@@ -96,6 +96,6 @@ test("cart uses mocked api client", async () => {
 
 ## API Reference
 
-[`mockService`](/api/wirestate/test-utils/functions/mockService),
-[`mockContainer`](/api/wirestate/test-utils/functions/mockContainer), [`mockBindEntry`](/api/wirestate/test-utils/functions/mockBindEntry),
-[`mockBindService`](/api/wirestate/test-utils/functions/mockBindService), [`mockUnbindService`](/api/wirestate/test-utils/functions/mockUnbindService).
+[`mockService`](/api/wirestate-core/test-utils/functions/mockService),
+[`mockContainer`](/api/wirestate-core/test-utils/functions/mockContainer), [`mockBindEntry`](/api/wirestate-core/test-utils/functions/mockBindEntry),
+[`mockBindService`](/api/wirestate-core/test-utils/functions/mockBindService), [`mockUnbindService`](/api/wirestate-core/test-utils/functions/mockUnbindService).

@@ -2,7 +2,7 @@
 
 `@wirestate/react` connects Wirestate containers to a React tree.
 
-Use it for [providers](/api/wirestate/functions/ContainerProvider), scoped containers, service injection, and
+Use it for [providers](/api/wirestate-react/functions/ContainerProvider), scoped containers, service injection, and
 component-lifetime event, command, and query handlers.
 Choose a separate reactivity package for service state.
 
@@ -70,6 +70,6 @@ activated, then discarded before the committed provider lifecycle continues. Put
 
 ## API Reference
 
-[`ContainerProvider`](/api/wirestate/functions/ContainerProvider),
-[`SubContainerProvider`](/api/wirestate/functions/SubContainerProvider), [`useInjection`](/api/wirestate/functions/useInjection),
-[`useCommandExecutor`](/api/wirestate/functions/useCommandExecutor), [`useQueryExecutor`](/api/wirestate/functions/useQueryExecutor).
+[`ContainerProvider`](/api/wirestate-react/functions/ContainerProvider),
+[`SubContainerProvider`](/api/wirestate-react/functions/SubContainerProvider), [`useInjection`](/api/wirestate-react/functions/useInjection),
+[`useCommandExecutor`](/api/wirestate-react/functions/useCommandExecutor), [`useQueryExecutor`](/api/wirestate-react/functions/useQueryExecutor).

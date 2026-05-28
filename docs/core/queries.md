@@ -91,6 +91,6 @@ Use this pattern when the query handler depends on runtime state or cannot be ex
 
 ## API Reference
 
-[`QueryBus`](/api/wirestate/classes/QueryBus), [`WireScope`](/api/wirestate/classes/WireScope),
-[`OnQuery`](/api/wirestate/functions/OnQuery), [`QueryHandler`](/api/wirestate/type-aliases/QueryHandler),
-[`QueryUnregister`](/api/wirestate/type-aliases/QueryUnregister).
+[`QueryBus`](/api/wirestate-core/classes/QueryBus), [`WireScope`](/api/wirestate-core/classes/WireScope),
+[`OnQuery`](/api/wirestate-core/functions/OnQuery), [`QueryHandler`](/api/wirestate-core/type-aliases/QueryHandler),
+[`QueryUnregister`](/api/wirestate-core/type-aliases/QueryUnregister).

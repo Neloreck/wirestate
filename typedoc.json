@@ -1,8 +1,17 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "name": "Wirestate API",
-  "entryPoints": ["src/*/index.ts", "src/*/test-utils.ts"],
-  "exclude": ["src/wirestate-portable/index.ts"],
+  "entryPoints": [
+    "src/wirestate-core/index.ts",
+    "src/wirestate-core/test-utils.ts",
+    "src/wirestate-lit/index.ts",
+    "src/wirestate-lit/test-utils.ts",
+    "src/wirestate-lit-signals/index.ts",
+    "src/wirestate-react/index.ts",
+    "src/wirestate-react/test-utils.ts",
+    "src/wirestate-react-mobx/index.ts",
+    "src/wirestate-react-signals/index.ts"
+  ],
   "out": "docs/api",
   "plugin": ["typedoc-plugin-markdown", "./docs/plugins/typedoc-npm-sources.mjs"],
   "groupOrder": ["*", "External-inversify", "External-inversify-binding"],

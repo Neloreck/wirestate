@@ -19,3 +19,9 @@ export {
   useSignal,
   useSignalEffect,
 } from "@preact/signals-react";
+
+/**
+ * @group Signals
+ * @see {@link https://www.npmjs.com/package/@preact/signals-react}
+ */
+export { EffectStore, wrapJsx, useSignals, ensureFinalCleanup } from "@preact/signals-react/runtime";

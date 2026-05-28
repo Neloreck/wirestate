@@ -1,6 +1,6 @@
 # Core Containers
 
-A [container](/api/wirestate/classes/Container) owns service instances, seed data, and one set of message buses.
+A [container](/api/wirestate-core/classes/Container) owns service instances, seed data, and one set of message buses.
 
 Same container means same `EventBus`, `CommandBus`, and `QueryBus`. Child container means inherited bindings with
 separate buses and local seed data.
@@ -65,6 +65,6 @@ Prefer entries and bind helpers for Wirestate services so lifecycle and messagin
 
 ## API Reference
 
-[`createContainer`](/api/wirestate/functions/createContainer), [`ContainerConfig`](/api/wirestate/type-aliases/ContainerConfig),
-[`Container`](/api/wirestate/classes/Container), [`provisionContainer`](/api/wirestate/functions/provisionContainer),
-[`deprovisionContainer`](/api/wirestate/functions/deprovisionContainer).
+[`createContainer`](/api/wirestate-core/functions/createContainer), [`ContainerConfig`](/api/wirestate-core/type-aliases/ContainerConfig),
+[`Container`](/api/wirestate-core/classes/Container), [`provisionContainer`](/api/wirestate-core/functions/provisionContainer),
+[`deprovisionContainer`](/api/wirestate-core/functions/deprovisionContainer).

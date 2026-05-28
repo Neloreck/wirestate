@@ -63,7 +63,7 @@ export class OrderService {
 
 ## WireScope
 
-Inject [`WireScope`](/api/wirestate/classes/WireScope) when a service needs the container edge: lazy resolution, events,
+Inject [`WireScope`](/api/wirestate-core/classes/WireScope) when a service needs the container edge: lazy resolution, events,
 commands, queries, or seeds.
 
 ```ts
@@ -178,6 +178,6 @@ bindDynamicValue(container, {
 
 ## API Reference
 
-[`Injectable`](/api/wirestate/functions/Injectable), [`Inject`](/api/wirestate/functions/Inject),
-[`WireScope`](/api/wirestate/classes/WireScope), [`OnProvision`](/api/wirestate/functions/OnProvision),
-[`OnDeprovision`](/api/wirestate/functions/OnDeprovision), [`InjectableDescriptor`](/api/wirestate/interfaces/InjectableDescriptor).
+[`Injectable`](/api/wirestate-core/functions/Injectable), [`Inject`](/api/wirestate-core/functions/Inject),
+[`WireScope`](/api/wirestate-core/classes/WireScope), [`OnProvision`](/api/wirestate-core/functions/OnProvision),
+[`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision), [`InjectableDescriptor`](/api/wirestate-core/interfaces/InjectableDescriptor).
