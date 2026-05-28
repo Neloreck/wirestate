@@ -5,14 +5,14 @@ import { FieldMustMatchProvidedType, Interface, Maybe } from "../types/general";
 import { ContainerProvider, ContainerProviderOptions } from "./container-provider";
 
 /**
- * Represents the type returned by {@link containerProvide}.
+ * Represents the type returned by {@link provideContainer}.
  *
  * @remarks
  * Supports both TC39 and legacy experimental decorators.
  *
  * @group Provision
  */
-export interface ContainerProviderDecorator<E extends ReactiveElement = ReactiveElement> {
+export interface ProvideContainerDecorator<E extends ReactiveElement = ReactiveElement> {
   // Standard:
   <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V extends ContainerProvider<E>>(
     value: ClassAccessorDecoratorTarget<C, V>,
@@ -46,12 +46,12 @@ export interface ContainerProviderDecorator<E extends ReactiveElement = Reactive
  * @param options - Provisioning options.
  * @param options.container - External container instance to provide.
  * @param options.config - Managed container creation config.
- * @returns An instance of {@link ContainerProviderDecorator}.
+ * @returns An instance of {@link ProvideContainerDecorator}.
  *
  * @example
  * ```typescript
  * class MyRootElement extends LitElement {
- *   @containerProvide({
+ *   @provideContainer({
  *     config: {
  *       bindings: [LoggerService],
  *       seed: { someData: "value" },
@@ -64,14 +64,14 @@ export interface ContainerProviderDecorator<E extends ReactiveElement = Reactive
  * @example
  * ```typescript
  * class MyRootElement extends LitElement {
- *   @containerProvide({ container: container })
+ *   @provideContainer({ container: container })
  *   private containerProvider!: ContainerProvider;
  * }
  * ```
  */
-export function containerProvide<E extends ReactiveElement>(
+export function provideContainer<E extends ReactiveElement>(
   options: ContainerProviderOptions
-): ContainerProviderDecorator<E> {
+): ProvideContainerDecorator<E> {
   return ((
     protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, ContainerProvider<E>>,
     nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, ContainerProvider<E>>
@@ -97,5 +97,5 @@ export function containerProvide<E extends ReactiveElement>(
         enumerable: true,
       };
     }
-  }) as ContainerProviderDecorator<E>;
+  }) as ProvideContainerDecorator<E>;
 }

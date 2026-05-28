@@ -142,7 +142,7 @@ This example provides the same service from a Lit root element. `watch()` subscr
 
 ```ts
 import { Injectable } from "@wirestate/core";
-import { ContainerProvider, containerProvide, injection } from "@wirestate/lit";
+import { ContainerProvider, provideContainer, injection } from "@wirestate/lit";
 import { signal, State, watch } from "@wirestate/lit-signals";
 import { html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
@@ -158,7 +158,7 @@ class CounterService {
 
 @customElement("counter-application")
 class CounterApplication extends LitElement {
-  @containerProvide({ config: { bindings: [CounterService] } })
+  @provideContainer({ config: { bindings: [CounterService] } })
   private containerProvider!: ContainerProvider;
 
   protected render() {

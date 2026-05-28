@@ -5,13 +5,13 @@ Lit managed providers accept shared and targeted seed data inside provider confi
 ## Root Provider Seeds
 
 ```ts
-import { ContainerProvider, containerProvide } from "@wirestate/lit";
+import { ContainerProvider, provideContainer } from "@wirestate/lit";
 import { LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 
 @customElement("counter-root")
 export class CounterRoot extends LitElement {
-  @containerProvide({
+  @provideContainer({
     config: {
       bindings: [CounterService],
       seed: { locale: "en-US" },
@@ -22,13 +22,13 @@ export class CounterRoot extends LitElement {
 }
 ```
 
-## Child Provider Seeds
+## Sub-Container Provider Seeds
 
 ```ts
-import { SubContainerProvider, subContainerProvide } from "@wirestate/lit";
+import { SubContainerProvider, provideSubContainer } from "@wirestate/lit";
 
 class CheckoutScope extends LitElement {
-  @subContainerProvide({
+  @provideSubContainer({
     config: {
       bindings: [CartService],
       seeds: [[CartService, { items: hydratedItems }]],
@@ -68,6 +68,6 @@ Managed Lit containers are recreated when their provider config is replaced and 
 
 ## API Reference
 
-[`containerProvide`](/api/wirestate-lit/functions/containerProvide),
-[`subContainerProvide`](/api/wirestate-lit/functions/subContainerProvide), [`WireScope`](/api/wirestate-core/classes/WireScope),
+[`provideContainer`](/api/wirestate-lit/functions/provideContainer),
+[`provideSubContainer`](/api/wirestate-lit/functions/provideSubContainer), [`WireScope`](/api/wirestate-core/classes/WireScope),
 [`SeedBindings`](/api/wirestate-core/type-aliases/SeedBindings).

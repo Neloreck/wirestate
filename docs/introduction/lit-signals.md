@@ -17,7 +17,7 @@ Create signals in services or stable element state. Use `watch()` in templates t
 
 ```ts
 import { Injectable } from "@wirestate/core";
-import { ContainerProvider, containerProvide, injection } from "@wirestate/lit";
+import { ContainerProvider, provideContainer, injection } from "@wirestate/lit";
 import { State, signal, watch } from "@wirestate/lit-signals";
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
@@ -33,7 +33,7 @@ class CounterService {
 
 @customElement("counter-application")
 class CounterApplication extends LitElement {
-  @containerProvide({ config: { bindings: [CounterService] } })
+  @provideContainer({ config: { bindings: [CounterService] } })
   private provider!: ContainerProvider;
 
   protected render() {

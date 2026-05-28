@@ -28,17 +28,17 @@ import { Maybe } from "../types/general";
  */
 export interface SubContainerProviderOptions {
   /**
-   * Managed child-container creation options.
+   * Managed sub-container creation options.
    *
    * @remarks
-   * The child container is created from the current parent context when the
+   * The sub-container is created from the current parent context when the
    * host connects, destroyed when the host disconnects, and recreated when the
    * parent context changes or the host reconnects. The provider value is
    * `undefined` while the host is disconnected.
    */
   readonly config: {
     /**
-     * Services or descriptors bound inside the child container.
+     * Services or descriptors bound inside the sub-container.
      */
     readonly bindings: Bindings;
 
@@ -60,13 +60,13 @@ export interface SubContainerProviderOptions {
 }
 
 /**
- * Reactive controller that provides a managed child container.
+ * Reactive controller that provides a managed sub-container.
  *
  * @remarks
- * The child container inherits parent bindings but owns its own buses, seeds,
+ * The sub-container inherits parent bindings but owns its own buses, seeds,
  * and lifecycle. It is recreated when the parent container changes.
  *
- * Child containers activate all bindings by default unless `activate` is set.
+ * Sub-containers activate all bindings by default unless `activate` is set.
  * Before connect and after disconnect, the context value is `undefined`.
  *
  * @group Provision
@@ -97,7 +97,7 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
 
   /**
    * @param host - The host element.
-   * @param options - Provisioning options, including child bindings, eager activations, and seeds.
+   * @param options - Provisioning options, including sub-container bindings, eager activations, and seeds.
    */
   public constructor(host: E, options: SubContainerProviderOptions) {
     super(host, {
@@ -167,19 +167,19 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
 
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
-      "SubContainerProvider owns its child container. Use `setConfig(config)` to replace the managed child container."
+      "SubContainerProvider owns its sub-container. Use `setConfig(config)` to replace the managed sub-container."
     );
   }
 
   /**
-   * Replaces the managed child-container config.
+   * Replaces the managed sub-container config.
    *
    * @remarks
-   * When the provider is not currently provisioning a child container, the
-   * config is stored for the next connect. When it is active, the current child
-   * container is deprovisioned, destroyed, and recreated from the new config.
+   * When the provider is not currently provisioning a sub-container, the
+   * config is stored for the next connect. When it is active, the current
+   * sub-container is deprovisioned, destroyed, and recreated from the new config.
    *
-   * @param config - Child-container creation options to use from now on.
+   * @param config - Sub-container creation options to use from now on.
    */
   public setConfig(config: SubContainerProviderOptions["config"]): void {
     validateContainerConfig(config);
@@ -193,7 +193,7 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
   }
 
   /**
-   * Replaces the currently provided child container with a new one derived
+   * Replaces the currently provided sub-container with a new one derived
    * from the latest parent context.
    */
   protected createContainer(): void {
@@ -215,7 +215,7 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
   }
 
   /**
-   * Destroys the currently provided child container.
+   * Destroys the currently provided sub-container.
    */
   protected destroyContainer(): void {
     if (this.value && !this.destroyed) {

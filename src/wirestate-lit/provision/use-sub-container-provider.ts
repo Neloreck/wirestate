@@ -3,15 +3,15 @@ import { ReactiveControllerHost } from "@lit/reactive-element";
 import { SubContainerProvider, SubContainerProviderOptions } from "./sub-container-provider";
 
 /**
- * Hook that provides a managed child container for the host element's lifetime.
+ * Hook that provides a managed sub-container for the host element's lifetime.
  *
  * @remarks
- * The child container is derived from the current parent
+ * The sub-container is derived from the current parent
  * {@link ContainerContext}, recreated when that parent context changes, and
  * destroyed when the host disconnects. Provider lifecycle hooks run while the
- * child container is connected.
+ * sub-container is connected.
  *
- * The child container value is published through Lit context only while the
+ * The sub-container value is published through Lit context only while the
  * host is connected. Before the first connection and after disconnection, the
  * provider value is `undefined`.
  *
@@ -19,7 +19,7 @@ import { SubContainerProvider, SubContainerProviderOptions } from "./sub-contain
  *
  * @param host - The host element.
  * @param options - Provisioning options.
- * @param options.config - Child-container creation options.
+ * @param options.config - Sub-container creation options.
  * @returns An instance of {@link SubContainerProvider}.
  *
  * @example

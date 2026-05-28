@@ -7,19 +7,17 @@ import { customElement } from "lit/decorators.js";
 import { ContainerContext } from "../context/container-context";
 import { Maybe } from "../types/general";
 
-import { containerProvide } from "./container-provide";
 import { ContainerProvider } from "./container-provider";
+import { provideContainer } from "./provide-container";
 
-describe("containerProvide", () => {
-  @customElement("ws-container-provide-decorated")
+describe("provideContainer", () => {
+  @customElement("ws-provide-container-decorated")
   class DecoratedElement extends ReactiveElement {
-    @containerProvide({
-      container: mockContainer(),
-    })
+    @provideContainer({ container: mockContainer() })
     public containerProvider!: ContainerProvider;
   }
 
-  @customElement("ws-container-provide-child")
+  @customElement("ws-provide-container-child")
   class ChildElement extends ReactiveElement {}
 
   afterEach(() => {

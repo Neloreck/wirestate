@@ -2,7 +2,7 @@
 
 `@wirestate/lit` connects Wirestate containers to Lit elements.
 
-Use it for [container providers](/api/wirestate-lit/functions/containerProvide), service injection, and element-lifetime
+Use it for [container providers](/api/wirestate-lit/functions/provideContainer), service injection, and element-lifetime
 event, command, and query handlers. Use [Lit Signals](/lit-signals/overview) when Lit services should expose signal
 state to templates.
 
@@ -22,7 +22,7 @@ pattern.
 
 ```ts
 import { Injectable } from "@wirestate/core";
-import { ContainerProvider, containerProvide, injection } from "@wirestate/lit";
+import { ContainerProvider, provideContainer, injection } from "@wirestate/lit";
 import { State, signal, watch } from "@wirestate/lit-signals";
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
@@ -38,7 +38,7 @@ class CounterService {
 
 @customElement("counter-application")
 class CounterApplication extends LitElement {
-  @containerProvide({ config: { bindings: [CounterService] } })
+  @provideContainer({ config: { bindings: [CounterService] } })
   private provider!: ContainerProvider;
 
   protected render() {
@@ -64,7 +64,7 @@ it up in `@OnDeprovision`. Use activation only for cheap resolution-time initial
 
 ## Lit Package Surface
 
-- `containerProvide`, `subContainerProvide`, `useContainerProvision`, and `useSubContainerProvider` publish containers.
+- `provideContainer`, `provideSubContainer`, `useContainerProvision`, and `useSubContainerProvider` publish containers.
 - `injection`, `optionalInjection`, `useInjection`, `useOptionalInjection`, `useContainer`, and `useScope` consume values.
 - `onEvent`, `useOnEvents`, and `OnEventController` work with the event bus.
 - `onCommand`, `useOnCommand`, and `OnCommandController` work with the command bus.
@@ -72,6 +72,6 @@ it up in `@OnDeprovision`. Use activation only for cheap resolution-time initial
 
 ## API Reference
 
-[`containerProvide`](/api/wirestate-lit/functions/containerProvide),
+[`provideContainer`](/api/wirestate-lit/functions/provideContainer),
 [`ContainerProvider`](/api/wirestate-lit/classes/ContainerProvider), [`injection`](/api/wirestate-lit/functions/injection),
 [`onEvent`](/api/wirestate-lit/functions/onEvent), [`useOnQuery`](/api/wirestate-lit/functions/useOnQuery).

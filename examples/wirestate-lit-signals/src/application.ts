@@ -7,7 +7,7 @@ import "@/components/events-log";
 import "@/components/queries-data";
 
 import { BindingType, ScopeBindingType } from "@wirestate/core";
-import { ContainerProvider, containerProvide } from "@wirestate/lit";
+import { ContainerProvider, provideContainer } from "@wirestate/lit";
 import { LitElement, html, CSSResult, TemplateResult, css } from "lit";
 import { customElement } from "lit/decorators.js";
 
@@ -30,7 +30,7 @@ export class Application extends LitElement {
     `,
   ];
 
-  @containerProvide({
+  @provideContainer({
     config: {
       seeds: [
         [LoggerService, { enabled: true }],

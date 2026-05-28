@@ -4,16 +4,16 @@ import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
 
-import { subContainerProvide } from "./sub-container-provide";
+import { provideSubContainer } from "./provide-sub-container";
 import { SubContainerProvider } from "./sub-container-provider";
 
-describe("subContainerProvide", () => {
+describe("provideSubContainer", () => {
   const CONFIG_TOKEN: string = "CONFIG_TOKEN";
   const PARENT_TOKEN: string = "PARENT_TOKEN";
 
-  @customElement("ws-sub-container-provide-decorated")
+  @customElement("ws-provide-sub-container-decorated")
   class DecoratedElement extends ReactiveElement {
-    @subContainerProvide({
+    @provideSubContainer({
       config: {
         bindings: [{ id: CONFIG_TOKEN, value: "child-value" }],
       },
@@ -27,7 +27,7 @@ describe("subContainerProvide", () => {
     fixture?.cleanup();
   });
 
-  it("should expose a child-container provider controller and derive its container from parent context", () => {
+  it("should expose a sub-container provider controller and derive its container from parent context", () => {
     const parent: Container = createContainer({
       bindings: [{ id: PARENT_TOKEN, value: "parent-value" }],
     });

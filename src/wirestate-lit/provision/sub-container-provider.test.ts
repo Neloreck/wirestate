@@ -28,7 +28,7 @@ describe("SubContainerProvider", () => {
     fixture?.cleanup();
   });
 
-  it("should create child container with current context as parent and provide it to descendants", () => {
+  it("should create sub-container with current context as parent and provide it to descendants", () => {
     const parent: Container = createContainer({
       bindings: [{ id: PARENT_TOKEN, value: "parent-value" }],
     });
@@ -71,7 +71,7 @@ describe("SubContainerProvider", () => {
     expect(provider.value).toBeUndefined();
   });
 
-  it("should activate configured bindings when the child container is created", () => {
+  it("should activate configured bindings when the sub-container is created", () => {
     fixture = createLitProvision();
 
     const { LifecycleService, events } = createLifecycleService({ methods: ["activated"] });
@@ -104,7 +104,7 @@ describe("SubContainerProvider", () => {
     ).toThrow("is listed in 'activate' but was not provided in 'bindings'.");
   });
 
-  it("should provision child containers and deprovision before disposal", () => {
+  it("should provision sub-containers and deprovision before disposal", () => {
     fixture = createLitProvision();
 
     const { LifecycleService, events } = createLifecycleService();
@@ -163,18 +163,18 @@ describe("SubContainerProvider", () => {
     expect(receivedContexts).toEqual([providedContainer]);
   });
 
-  it("should reject direct child container replacement values", () => {
+  it("should reject direct sub-container replacement values", () => {
     const element: TestProviderElement = new TestProviderElement();
     const provider: SubContainerProvider = new SubContainerProvider(element, {
       config: { bindings: [{ id: CONFIG_TOKEN, value: "child-value" }] },
     });
 
     expect(() => provider.setValue(createContainer({ bindings: [{ id: CONFIG_TOKEN, value: "next-value" }] }))).toThrow(
-      "SubContainerProvider owns its child container. Use `setConfig(config)` to replace the managed child container."
+      "SubContainerProvider owns its sub-container. Use `setConfig(config)` to replace the managed sub-container."
     );
   });
 
-  it("should deprovision previous child containers and provision updated config", () => {
+  it("should deprovision previous sub-containers and provision updated config", () => {
     const events: Array<string> = [];
     const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
     const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
@@ -214,7 +214,7 @@ describe("SubContainerProvider", () => {
     expect(provider.value).toBeUndefined();
   });
 
-  it("should validate replacement config before replacing the active child container", () => {
+  it("should validate replacement config before replacing the active sub-container", () => {
     fixture = createLitProvision();
 
     const { LifecycleService, events } = createLifecycleService({
@@ -391,7 +391,7 @@ describe("SubContainerProvider", () => {
     expect(events).toEqual([]);
   });
 
-  it("should destroy child container on disconnect and recreate it on reconnect", () => {
+  it("should destroy sub-container on disconnect and recreate it on reconnect", () => {
     fixture = createLitProvision();
 
     const { LifecycleService, events } = createLifecycleService({ methods: ["activated", "deactivation"] });
@@ -425,7 +425,7 @@ describe("SubContainerProvider", () => {
     expect(events).toEqual(["activated", "deactivation", "activated"]);
   });
 
-  it("should recreate child container when parent context changes", () => {
+  it("should recreate sub-container when parent context changes", () => {
     const firstParent: Container = createContainer({
       bindings: [{ id: PARENT_TOKEN, value: "first-parent" }],
     });

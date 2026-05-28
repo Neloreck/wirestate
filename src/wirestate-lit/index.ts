@@ -36,7 +36,7 @@ export { ContainerContext } from "./context/container-context";
 
 export { ContainerProvider, ContainerProviderOptions } from "./provision/container-provider";
 export { SubContainerProvider, SubContainerProviderOptions } from "./provision/sub-container-provider";
-export { containerProvide, ContainerProviderDecorator } from "./provision/container-provide";
-export { subContainerProvide, SubContainerProviderDecorator } from "./provision/sub-container-provide";
+export { provideContainer, ProvideContainerDecorator } from "./provision/provide-container";
+export { provideSubContainer, ProvideSubContainerDecorator } from "./provision/provide-sub-container";
 export { useContainerProvision, UseContainerProvisionOptions } from "./provision/use-container-provision";
 export { useSubContainerProvider } from "./provision/use-sub-container-provider";

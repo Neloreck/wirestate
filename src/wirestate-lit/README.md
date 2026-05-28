@@ -22,13 +22,13 @@ Lit component behavior is covered by the official [Lit docs](https://lit.dev/doc
   - **Events**: Subscribe to events from the active container's event bus using `@onEvent` or `useOnEvents`.
   - **Commands**: Register command handlers using `@onCommand` or `useOnCommand`.
   - **Queries**: Register query handlers using `@onQuery` or `useOnQuery`.
-- **Container Provisioning**: Provide and manage containers within the Lit component tree using `@containerProvide` or `useContainerProvision`.
-- **Sub-containers**: Create managed child containers derived from the parent context using `@subContainerProvide`, `useSubContainerProvider`, or `SubContainerProvider`.
+- **Container Provisioning**: Provide and manage containers within the Lit component tree using `@provideContainer` or `useContainerProvision`.
+- **Sub-containers**: Create managed sub-containers derived from the parent context using `@provideSubContainer`, `useSubContainerProvider`, or `SubContainerProvider`.
 - **Test Utilities**: Simplified setup for unit testing components with IoC dependencies.
 
 ## Provisioning
 
-### `@containerProvide(options)` / `useContainerProvision(host, options)`
+### `@provideContainer(options)` / `useContainerProvision(host, options)`
 
 Provides a container to the component tree. It uses Lit Context to propagate the container to child elements.
 
@@ -44,13 +44,13 @@ published while the host is connected; before first connect and after disconnect
 ```typescript
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
-import { containerProvide, ContainerProvider } from "@wirestate/lit";
+import { provideContainer, ContainerProvider } from "@wirestate/lit";
 
 import { AuthService, UserService } from "./services";
 
 @customElement("my-app")
 class MyApp extends LitElement {
-  @containerProvide({
+  @provideContainer({
     config: {
       bindings: [AuthService, UserService],
       seed: { someData: "value" },
@@ -64,11 +64,11 @@ class MyApp extends LitElement {
 }
 ```
 
-### `@subContainerProvide(options)` / `useSubContainerProvider(host, options)`
+### `@provideSubContainer(options)` / `useSubContainerProvider(host, options)`
 
-Creates a managed child container derived from the nearest parent container for the host element's lifetime. The child
-container is created when the host connects, recreated when the parent container changes, and destroyed when the host
-disconnects. Child containers activate all provided bindings by default; pass `activate: false` or an array to activate
+Creates a managed sub-container derived from the nearest parent container for the host element's lifetime. The
+sub-container is created when the host connects, recreated when the parent container changes, and destroyed when the host
+disconnects. Sub-containers activate all provided bindings by default; pass `activate: false` or an array to activate
 only specific bindings. Before first connect and after disconnect, `SubContainerProvider.value` is `undefined`.
 
 Using the decorator (accessor):
@@ -76,17 +76,13 @@ Using the decorator (accessor):
 ```typescript
 import { LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
-import { subContainerProvide, SubContainerProvider } from "@wirestate/lit";
+import { provideSubContainer, SubContainerProvider } from "@wirestate/lit";
 
 import { AuthService, UserService } from "./services";
 
 @customElement("my-app")
 class MyApp extends LitElement {
-  @subContainerProvide({
-    config: {
-      bindings: [AuthService, UserService],
-    },
-  })
+  @provideSubContainer({ config: { bindings: [AuthService, UserService] } })
   public containerProvider!: SubContainerProvider;
 }
 ```
@@ -125,7 +121,7 @@ class MyApp extends LitElement {
 }
 ```
 
-To seed the child container during creation, pass `seeds` inside `config`:
+To seed the sub-container during creation, pass `seeds` inside `config`:
 
 ```typescript
 import { LitElement } from "lit";
@@ -145,8 +141,8 @@ class MyApp extends LitElement {
 
 ## Provider lifecycle
 
-`@OnProvision` and `@OnDeprovision` run when Lit root or child providers connect, disconnect, or replace a managed child
-container. Import them from `@wirestate/core` so the same service can be used by different providers.
+`@OnProvision` and `@OnDeprovision` run when Lit root or sub-container providers connect, disconnect, or replace a
+managed sub-container. Import them from `@wirestate/core` so the same service can be used by different providers.
 Use provider lifecycle for timers, subscriptions, sockets, observers, and async work that needs cleanup.
 Injected `WireScope` instances expose `isDeprovisioned` for provider ownership state and `isInactive` as the usual guard
 for async work that should stop after provider deprovision or service disposal.

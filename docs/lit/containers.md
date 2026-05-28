@@ -4,21 +4,17 @@ Lit [providers](/api/wirestate-lit/classes/ContainerProvider) publish Wirestate 
 
 ## Decorator Root Provider
 
-Use `containerProvide` when a host element should create or publish a root container.
+Use `provideContainer` when a host element should create or publish a root container.
 
 ```ts
-import { ContainerProvider, containerProvide } from "@wirestate/lit";
+import { ContainerProvider, provideContainer } from "@wirestate/lit";
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { CounterService } from "./CounterService";
 
 @customElement("application-root")
 export class ApplicationRoot extends LitElement {
-  @containerProvide({
-    config: {
-      bindings: [CounterService],
-    },
-  })
+  @provideContainer({ config: { bindings: [CounterService] } })
   private provider!: ContainerProvider;
 
   protected render() {
@@ -56,43 +52,39 @@ does not dispose it.
 
 ```ts
 import { createContainer } from "@wirestate/core";
-import { ContainerProvider, containerProvide } from "@wirestate/lit";
+import { ContainerProvider, provideContainer } from "@wirestate/lit";
 
 const container = createContainer({ bindings: [CounterService] });
 
 class ApplicationRoot extends LitElement {
-  @containerProvide({ container })
+  @provideContainer({ container })
   private provider!: ContainerProvider;
 }
 ```
 
-## Child Container
+## Sub-Container
 
-`subContainerProvide` creates a managed child container from the nearest parent context.
+`provideSubContainer` creates a managed sub-container from the nearest parent context.
 
 ```ts
-import { SubContainerProvider, subContainerProvide } from "@wirestate/lit";
+import { SubContainerProvider, provideSubContainer } from "@wirestate/lit";
 import { LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 import { CartService } from "./CartService";
 
 @customElement("checkout-scope")
 class CheckoutScope extends LitElement {
-  @subContainerProvide({
-    config: {
-      bindings: [CartService],
-    },
-  })
+  @provideSubContainer({ config: { bindings: [CartService] } })
   private provider!: SubContainerProvider;
 }
 ```
 
-The child container is recreated when the parent context changes and destroyed when the host disconnects.
+The sub-container is recreated when the parent context changes and destroyed when the host disconnects.
 
 ## API Reference
 
-[`containerProvide`](/api/wirestate-lit/functions/containerProvide),
+[`provideContainer`](/api/wirestate-lit/functions/provideContainer),
 [`ContainerProvider`](/api/wirestate-lit/classes/ContainerProvider),
 [`useContainerProvision`](/api/wirestate-lit/functions/useContainerProvision),
-[`subContainerProvide`](/api/wirestate-lit/functions/subContainerProvide),
+[`provideSubContainer`](/api/wirestate-lit/functions/provideSubContainer),
 [`SubContainerProvider`](/api/wirestate-lit/classes/SubContainerProvider).

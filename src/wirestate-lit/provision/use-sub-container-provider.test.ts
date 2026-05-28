@@ -20,7 +20,7 @@ describe("useSubContainerProvider", () => {
     fixture?.cleanup();
   });
 
-  it("should create and provide a child container derived from the current parent context", () => {
+  it("should create and provide a sub-container derived from the current parent context", () => {
     const parent: Container = createContainer({
       bindings: [
         { id: PARENT_TOKEN, value: "parent-value" },
