@@ -1,3 +1,9 @@
+/**
+ * React integration APIs for providers, injection hooks, and component-scoped message handlers.
+ *
+ * @packageDocumentation
+ */
+
 export { useCommandExecutor } from "./commands/use-command-executor";
 export { useOptionalCommandExecutor } from "./commands/use-optional-command-executor";
 export { useCommandHandler } from "./commands/use-command-handler";

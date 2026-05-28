@@ -4,6 +4,9 @@ Use `@wirestate/lit-signals` when Lit services should expose Lit Signals.
 
 The package re-exports `@lit-labs/signals` and the `State<T>` and `Computed<T>` types from `signal-polyfill`.
 
+For Lit Signals behavior, use the official [Lit Signals docs](https://lit.dev/docs/data/signals/) and
+[`@lit-labs/signals` package](https://www.npmjs.com/package/@lit-labs/signals).
+
 ## Install
 
 ```bash

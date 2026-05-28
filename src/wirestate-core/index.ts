@@ -1,3 +1,9 @@
+/**
+ * Framework-agnostic Wirestate APIs for containers, services, lifecycle, messaging, seeds, and dependency injection.
+ *
+ * @packageDocumentation
+ */
+
 export * from "./alias";
 
 export { bindConstant } from "./bind/bind-constant";

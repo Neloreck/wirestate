@@ -10,6 +10,9 @@ render subscribes React consumers to updates.
 
 Re-exports `@preact/signals-react` for use with Wirestate services.
 
+For signal API details, use the official [Preact Signals guide](https://preactjs.com/guide/v10/signals) and
+[`@preact/signals-react` package](https://www.npmjs.com/package/@preact/signals-react).
+
 ## Installation
 
 ```bash
@@ -27,6 +30,9 @@ For automatic component subscription without manual `useSignal` calls, add the B
 ```bash
 npm install --save-dev @preact/signals-react-transform
 ```
+
+See the [`@preact/signals-react-transform` package](https://www.npmjs.com/package/@preact/signals-react-transform) for
+transform setup details.
 
 If your build cannot use the transform, import `useSignals()` from `@wirestate/react-signals` in components that read
 signal `.value` during render.

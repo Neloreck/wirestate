@@ -5,6 +5,11 @@
 
 Re-exports MobX and `mobx-react-lite`, plus class decorator wrappers compatible with TypeScript's legacy decorators.
 
+For MobX behavior and React integration details, use the official [MobX docs](https://mobx.js.org/README.html),
+[React integration docs](https://mobx.js.org/react-integration.html), and
+[`mobx`](https://www.npmjs.com/package/mobx) and
+[`mobx-react-lite`](https://www.npmjs.com/package/mobx-react-lite) packages.
+
 ## Installation
 
 ```bash

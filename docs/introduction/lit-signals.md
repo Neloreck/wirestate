@@ -2,6 +2,9 @@
 
 Use this stack when Lit elements should render service state stored in Lit Signals.
 
+Use the official [Lit docs](https://lit.dev/docs/), [Lit Signals docs](https://lit.dev/docs/data/signals/), and
+[`@lit-labs/signals` package](https://www.npmjs.com/package/@lit-labs/signals) for external Lit and signal API details.
+
 Install:
 
 ```bash

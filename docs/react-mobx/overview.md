@@ -5,6 +5,11 @@ Use `@wirestate/react-mobx` when React services should store MobX state.
 The package re-exports MobX and `mobx-react-lite`, plus decorator aliases such as `Observable`, `Action`, and
 `Computed`.
 
+For MobX behavior and React integration details, use the official [MobX docs](https://mobx.js.org/README.html),
+[React integration docs](https://mobx.js.org/react-integration.html), and
+[`mobx`](https://www.npmjs.com/package/mobx) and
+[`mobx-react-lite`](https://www.npmjs.com/package/mobx-react-lite) packages.
+
 ## Install
 
 ```bash

@@ -10,6 +10,10 @@ Install the core package, one UI adapter, and the reactivity package you actuall
 | React + MobX    | `@wirestate/core` `@wirestate/react` `@wirestate/react-mobx` `mobx` `mobx-react-lite` `reflect-metadata`                                                          |
 | Lit + Signals   | `@wirestate/core` `@wirestate/lit` `@wirestate/lit-signals` `lit` `@lit/context` `@lit/reactive-element` `@lit-labs/signals` `signal-polyfill` `reflect-metadata` |
 
+External framework and reactivity details live in the official docs for [React](https://react.dev/reference/react),
+[Lit](https://lit.dev/docs/), [Preact Signals](https://preactjs.com/guide/v10/signals),
+[MobX](https://mobx.js.org/README.html), and [Lit Signals](https://lit.dev/docs/data/signals/).
+
 ### React + Signals
 
 ```bash

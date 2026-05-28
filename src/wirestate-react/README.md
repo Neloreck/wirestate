@@ -11,6 +11,9 @@ React integration for Wirestate. Providers and hooks for injecting services and 
 npm install @wirestate/core @wirestate/react reflect-metadata
 ```
 
+React runtime behavior is covered by the official [React docs](https://react.dev/reference/react) and
+[`react` package](https://www.npmjs.com/package/react).
+
 ## Providers
 
 ### `ContainerProvider`

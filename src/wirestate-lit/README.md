@@ -12,6 +12,9 @@ npm install @wirestate/core @wirestate/lit reflect-metadata
 npm install lit @lit/context @lit/reactive-element
 ```
 
+Lit component behavior is covered by the official [Lit docs](https://lit.dev/docs/) and
+[`lit` package](https://www.npmjs.com/package/lit).
+
 ## Features
 
 - **Dependency Injection**: Inject services from the IoC container using `@injection` decorator or `useInjection` controller.

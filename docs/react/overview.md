@@ -14,6 +14,9 @@ Install the React bridge with core:
 npm install @wirestate/core @wirestate/react reflect-metadata
 ```
 
+For React APIs and runtime behavior, use the official [React reference](https://react.dev/reference/react) and
+[`react` package](https://www.npmjs.com/package/react).
+
 For reactive service state, use a separate package such as [React Signals](/react-signals/overview) or
 [React MobX](/react-mobx/overview).
 

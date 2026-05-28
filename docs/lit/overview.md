@@ -12,6 +12,9 @@ state to templates.
 npm install @wirestate/core @wirestate/lit lit @lit/context @lit/reactive-element reflect-metadata
 ```
 
+For Lit APIs and component behavior, use the official [Lit docs](https://lit.dev/docs/) and
+[`lit` package](https://www.npmjs.com/package/lit).
+
 The example below uses Lit Signals for service state. Install [Lit Signals](/lit-signals/overview) when using that
 pattern.
 

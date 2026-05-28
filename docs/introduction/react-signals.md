@@ -2,6 +2,11 @@
 
 Use this stack when React components should render signal state stored in services.
 
+Use the official [Preact Signals guide](https://preactjs.com/guide/v10/signals),
+[`@preact/signals-react` package](https://www.npmjs.com/package/@preact/signals-react), and
+[`@preact/signals-react-transform` package](https://www.npmjs.com/package/@preact/signals-react-transform) for the
+signal APIs and transform setup.
+
 Install:
 
 ```bash

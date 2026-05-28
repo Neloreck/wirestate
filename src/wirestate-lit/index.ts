@@ -1,3 +1,9 @@
+/**
+ * Lit integration APIs for container providers, injection decorators, and element-scoped message handlers.
+ *
+ * @packageDocumentation
+ */
+
 export { injection, InjectionDecorator, InjectionOptions } from "./consumption/injection";
 export {
   optionalInjection,

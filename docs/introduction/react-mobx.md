@@ -2,6 +2,11 @@
 
 Use this stack when React components should render service state stored in MobX observables.
 
+Use the official [MobX docs](https://mobx.js.org/README.html),
+[React integration docs](https://mobx.js.org/react-integration.html), and
+[`mobx`](https://www.npmjs.com/package/mobx) and
+[`mobx-react-lite`](https://www.npmjs.com/package/mobx-react-lite) packages for MobX API details.
+
 Install:
 
 ```bash

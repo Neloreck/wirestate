@@ -5,12 +5,18 @@ Use `@wirestate/react-signals` when React services should store signal state.
 The package exposes the React Signals APIs through the Wirestate adapter. Wirestate does not wrap or change signal
 behavior.
 
+For signal API details, use the official [Preact Signals guide](https://preactjs.com/guide/v10/signals) and
+[`@preact/signals-react` package](https://www.npmjs.com/package/@preact/signals-react).
+
 ## Install
 
 ```bash
 npm install @wirestate/core @wirestate/react @wirestate/react-signals @preact/signals-react reflect-metadata
 npm install --save-dev @preact/signals-react-transform
 ```
+
+See the [`@preact/signals-react-transform` package](https://www.npmjs.com/package/@preact/signals-react-transform) for
+transform setup details.
 
 Add the Preact Signals React transform to your Babel config so components that read signal values during render are
 subscribed automatically.
