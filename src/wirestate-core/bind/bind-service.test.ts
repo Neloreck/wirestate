@@ -4,7 +4,7 @@ import { BindingType, Container, Inject, Injectable } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { OnCommand } from "../commands/on-command";
 import { WireScope } from "../container/wire-scope";
-import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
+import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { EventBus } from "../events/event-bus";
 import { OnEvent } from "../events/on-event";
 import { OnQuery } from "../queries/on-query";
@@ -134,11 +134,43 @@ describe("bindService", () => {
       value: "not-a-constructor",
     } as BindingDescriptor;
 
-    expect(() =>
-      bindServiceWithToken(container, GenericService, binding.value as never, binding, {})
-    ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
+    expect(() => bindServiceWithToken(container, GenericService, binding.value as never, binding, {})).toThrow(
+      expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
+    );
     expect(() => bindServiceWithToken(container, GenericService, binding.value as never, binding, {})).toThrow(
       "Instance descriptor 'value' must be a service constructor."
+    );
+  });
+
+  it("should throw for instance descriptor without id", () => {
+    const container: Container = mockContainer();
+    const binding = {
+      bindingType: BindingType.Instance,
+      value: GenericService,
+    } as unknown as BindingDescriptor;
+
+    expect(() => bindServiceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
+      expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
+    );
+    expect(() => bindServiceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
+      "Binding descriptor must provide an 'id' token."
+    );
+  });
+
+  it("should throw for instance descriptor with unknown scopeBindingType", () => {
+    const container: Container = mockContainer();
+    const binding = {
+      bindingType: BindingType.Instance,
+      id: GenericService,
+      scopeBindingType: "UNKNOWN" as BindingDescriptor["scopeBindingType"],
+      value: GenericService,
+    } as BindingDescriptor;
+
+    expect(() => bindServiceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
+      expect.objectContaining({ code: ERROR_CODE_BINDING_SCOPE })
+    );
+    expect(() => bindServiceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
+      "Binding descriptor has unknown scope binding type 'UNKNOWN'."
     );
   });
 

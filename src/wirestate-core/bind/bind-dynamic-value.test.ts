@@ -1,3 +1,5 @@
+import type { ResolutionContext } from "inversify";
+
 import { Container, BindingType, ScopeBindingType } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { AnyObject } from "../types/general";
@@ -6,28 +8,36 @@ import { BindingDescriptor } from "../types/provision";
 import { bindDynamicValue } from "./bind-dynamic-value";
 
 describe("bindDynamicValue", () => {
-  it("should bind a value using toDynamicValue", () => {
-    const container: Container = new Container();
-    const value: AnyObject = { a: 1, b: 2 };
-
-    const result: Container = bindDynamicValue(container, { id: "static-value-ref", value: value });
-
-    expect(result).toBe(container);
-    expect(container.get("static-value-ref")).toEqual({ a: 1, b: 2 });
-    expect(container.get("static-value-ref")).toBe(value);
-  });
-
   it("should bind a factory function using toDynamicValue", () => {
     const container: Container = new Container();
     const value: AnyObject = { c: 3, d: 4 };
     const factory = jest.fn(() => value);
 
-    bindDynamicValue(container, { id: "factory-value", factory });
+    const result: Container = bindDynamicValue(container, { id: "factory-value", factory });
 
+    expect(result).toBe(container);
     expect(container.get("factory-value")).toEqual({ c: 3, d: 4 });
     expect(container.get("factory-value")).toBe(value);
 
     expect(factory).toHaveBeenCalledTimes(2);
+  });
+
+  it("should pass resolution context to factory", () => {
+    const container: Container = new Container();
+    const NAME_TOKEN: unique symbol = Symbol("name");
+    const GREETING_TOKEN: unique symbol = Symbol("greeting");
+    const factory = jest.fn((context: ResolutionContext) => `Hello, ${context.get(NAME_TOKEN)}`);
+
+    container.bind(NAME_TOKEN).toConstantValue("Ada");
+
+    bindDynamicValue(container, {
+      bindingType: BindingType.DynamicValue,
+      factory,
+      id: GREETING_TOKEN,
+    });
+
+    expect(container.get(GREETING_TOKEN)).toBe("Hello, Ada");
+    expect(factory).toHaveBeenCalledTimes(1);
   });
 
   it("should respect Singleton scope", () => {
@@ -85,7 +95,7 @@ describe("bindDynamicValue", () => {
     expect(() => bindDynamicValue(container, binding)).toThrow("Binding descriptor must provide an 'id' token.");
   });
 
-  it("should throw if neither factory nor value is provided", () => {
+  it("should throw if factory is missing", () => {
     const container: Container = new Container();
 
     expect(() =>
@@ -97,7 +107,45 @@ describe("bindDynamicValue", () => {
       bindDynamicValue(container, {
         id: "missing-dynamic-source",
       })
-    ).toThrow("Dynamic value descriptor must provide either a 'factory' or 'value' property.");
+    ).toThrow("Dynamic value descriptor 'factory' must be a function.");
+  });
+
+  it("should throw if value is provided instead of factory", () => {
+    const container: Container = new Container();
+
+    expect(() =>
+      bindDynamicValue(container, {
+        bindingType: BindingType.DynamicValue,
+        id: "static-value-ref",
+        value: { a: 1, b: 2 },
+      })
+    ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
+    expect(() =>
+      bindDynamicValue(container, {
+        bindingType: BindingType.DynamicValue,
+        id: "static-value-ref",
+        value: { a: 1, b: 2 },
+      })
+    ).toThrow("Dynamic value descriptor 'factory' must be a function.");
+  });
+
+  it("should throw if factory is undefined", () => {
+    const container: Container = new Container();
+
+    expect(() =>
+      bindDynamicValue(container, {
+        bindingType: BindingType.DynamicValue,
+        factory: undefined,
+        id: "undefined-factory",
+      })
+    ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
+    expect(() =>
+      bindDynamicValue(container, {
+        bindingType: BindingType.DynamicValue,
+        factory: undefined,
+        id: "undefined-factory",
+      })
+    ).toThrow("Dynamic value descriptor 'factory' must be a function.");
   });
 
   it("should throw if descriptor uses another binding type", () => {

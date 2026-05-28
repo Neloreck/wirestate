@@ -30,6 +30,7 @@ import { BindingDescriptor, Bindings } from "../types/provision";
 import { QueryHandler, QueryUnregister } from "../types/queries";
 
 import { registerBinding } from "./register-binding";
+import { validateBindingDescriptor } from "./validate-binding-descriptor";
 
 /**
  * Validates that an instance descriptor can be bound by {@link bindServiceWithToken}.
@@ -39,9 +40,12 @@ import { registerBinding } from "./register-binding";
  *
  * @param descriptor - Descriptor to validate.
  *
- * @throws {@link WirestateError} If the descriptor value is not a service constructor.
+ * @throws {@link WirestateError} If shared descriptor fields are invalid or
+ * the descriptor value is not a service constructor.
  */
 function validateInstanceDescriptor(descriptor: BindingDescriptor): void {
+  validateBindingDescriptor(descriptor);
+
   if (descriptor.bindingType === BindingType.Instance && typeof descriptor.value !== "function") {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,

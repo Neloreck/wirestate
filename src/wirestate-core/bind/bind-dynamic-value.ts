@@ -1,4 +1,4 @@
-import type { BindInWhenOnFluentSyntax } from "inversify";
+import type { BindInWhenOnFluentSyntax, DynamicValueBuilder } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -21,7 +21,7 @@ import { validateBindingDescriptor } from "./validate-binding-descriptor";
  * @param descriptor - Descriptor to validate.
  *
  * @throws {@link WirestateError} If the descriptor is missing a token, uses a non-dynamic binding type,
- * omits both `factory` and `value`, or provides a non-function `factory`.
+ * omits `factory`, or provides a non-function `factory`.
  */
 function validateDynamicValueDescriptor(descriptor: BindingDescriptor): void {
   validateBindingDescriptor(descriptor);
@@ -33,21 +33,7 @@ function validateDynamicValueDescriptor(descriptor: BindingDescriptor): void {
     );
   }
 
-  if (
-    !Object.prototype.hasOwnProperty.call(descriptor, "factory") &&
-    !Object.prototype.hasOwnProperty.call(descriptor, "value")
-  ) {
-    throw new WirestateError(
-      ERROR_CODE_INVALID_ARGUMENTS,
-      "Dynamic value descriptor must provide either a 'factory' or 'value' property."
-    );
-  }
-
-  if (
-    Object.prototype.hasOwnProperty.call(descriptor, "factory") &&
-    descriptor.factory !== undefined &&
-    typeof descriptor.factory !== "function"
-  ) {
+  if (typeof descriptor.factory !== "function") {
     throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, "Dynamic value descriptor 'factory' must be a function.");
   }
 }
@@ -65,7 +51,7 @@ function validateDynamicValueDescriptor(descriptor: BindingDescriptor): void {
  * @template T - Value type.
  *
  * @param container - Container to bind into.
- * @param descriptor - Descriptor with `id`, `factory` or `value`, and optional scope.
+ * @param descriptor - Descriptor with `id`, `factory`, and optional scope.
  * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
@@ -87,7 +73,7 @@ function validateDynamicValueDescriptor(descriptor: BindingDescriptor): void {
  * const now = container.get<Date>(DATE_NOW);
  * ```
  */
-export function bindDynamicValue<T>(container: Container, descriptor: BindingDescriptor): Container {
+export function bindDynamicValue<T>(container: Container, descriptor: BindingDescriptor<T, T>): Container {
   validateDynamicValueDescriptor(descriptor);
 
   dbg.info(prefix(__filename), "Binding dynamic value:", {
@@ -95,16 +81,15 @@ export function bindDynamicValue<T>(container: Container, descriptor: BindingDes
     container,
   });
 
-  const binding: BindInWhenOnFluentSyntax<T> = container.bind(descriptor.id).toDynamicValue(() => {
-    if (Object.prototype.hasOwnProperty.call(descriptor, "factory") && descriptor.factory) {
-      return (descriptor.factory as () => T)();
-    }
+  const binding: BindInWhenOnFluentSyntax<T> = container
+    .bind(descriptor.id)
+    .toDynamicValue((context) =>
+      (descriptor.factory as DynamicValueBuilder<T>)(context)
+    ) as BindInWhenOnFluentSyntax<T>;
 
-    return descriptor.value;
-  }) as BindInWhenOnFluentSyntax<T>;
+  applyBindingScope(binding, descriptor.scopeBindingType);
 
   registerBinding(container, descriptor);
-  applyBindingScope(binding, descriptor.scopeBindingType);
 
   return container;
 }

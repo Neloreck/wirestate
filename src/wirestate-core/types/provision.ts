@@ -59,7 +59,7 @@ export interface DynamicValueBindingDescriptor<T = unknown> {
   /**
    * Factory used to produce the value at resolution time.
    */
-  readonly factory?: DynamicValueBuilder<T>;
+  readonly factory: DynamicValueBuilder<T>;
 
   /**
    * Token used to resolve the binding.
@@ -71,10 +71,6 @@ export interface DynamicValueBindingDescriptor<T = unknown> {
    */
   readonly scopeBindingType?: ScopeBindingType;
 
-  /**
-   * Fallback value returned by the dynamic binding when `factory` is omitted.
-   */
-  readonly value?: T;
 }
 
 /**
