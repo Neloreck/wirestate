@@ -2,7 +2,7 @@ import {
   Container,
   ContainerActivation,
   createContainer,
-  BindingEntries,
+  Bindings,
   provisionContainer,
   SeedBindings,
 } from "@wirestate/core";
@@ -24,7 +24,7 @@ interface SubContainerSource {
   readonly parent: Container;
   readonly seeds?: SeedBindings;
   readonly activate: ContainerActivation;
-  readonly bindings: BindingEntries;
+  readonly bindings: Bindings;
 }
 
 /**
@@ -59,7 +59,7 @@ export interface SubContainerProviderProps {
    * The child container is recreated when provider inputs change by shallow
    * comparison.
    */
-  readonly bindings: BindingEntries;
+  readonly bindings: Bindings;
 
   /**
    * Services to resolve immediately.

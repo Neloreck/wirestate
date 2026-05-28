@@ -87,7 +87,7 @@ export function CounterPage() {
 
 | Prop       | Type                                  | Description                                                                       |
 | ---------- | ------------------------------------- | --------------------------------------------------------------------------------- |
-| `bindings` | `BindingEntries`                      | Services or binding descriptors to add to the child container.                    |
+| `bindings` | `Bindings`                            | Services or binding descriptors to add to the child container.                    |
 | `seeds`    | `SeedBindings`                        | Per-service seeds, e.g. `[[CounterService, { count: 10 }]]`. Applied on mount.    |
 | `activate` | `boolean \| Array<ServiceIdentifier>` | `true` by default. Pass `false` or specific binding tokens to control activation. |
 

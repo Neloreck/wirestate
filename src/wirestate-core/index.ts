@@ -45,7 +45,7 @@ export { OnProvision } from "./service/on-provision";
 export { ProvisionLifecycle, deprovisionContainer, provisionContainer } from "./service/provision-lifecycle";
 
 export { SeedsMap, SeedBindings, SeedBinding, SeedKey } from "./types/initial-state";
-export { BindingDescriptor, BindingEntries } from "./types/provision";
+export { BindingDescriptor, Bindings } from "./types/provision";
 export { CommandStatus, CommandDescriptor, CommandHandler, CommandType, CommandUnregister } from "./types/commands";
 export { QueryHandler, QueryType, QueryUnregister } from "./types/queries";
 export { Event, EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "./types/events";

@@ -74,4 +74,4 @@ export interface BindingDescriptor<T = unknown, V = unknown> {
  *
  * @group Bind
  */
-export type BindingEntries = ReadonlyArray<Newable<object> | BindingDescriptor>;
+export type Bindings = ReadonlyArray<Newable<object> | BindingDescriptor>;

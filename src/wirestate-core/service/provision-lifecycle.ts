@@ -6,7 +6,7 @@ import { getBindingToken } from "../bind/get-binding-token";
 import { hasWireScopeInjection } from "../container/has-wire-scope-injection";
 import { WIRE_SCOPES_BY_SERVICE } from "../registry";
 import { Maybe, MaybePromise, Optional } from "../types/general";
-import { BindingEntries } from "../types/provision";
+import { Bindings } from "../types/provision";
 
 import { getDeprovisionHandlerMetadata } from "./on-deprovision";
 import { getProvisionHandlerMetadata } from "./on-provision";
@@ -50,11 +50,7 @@ export type ProvisionLifecycle = Map<Container, Array<object>>;
  * provisionContainer(container, lifecycle, [PanelService]);
  * ```
  */
-export function provisionContainer(
-  container: Container,
-  lifecycle: ProvisionLifecycle,
-  bindings: BindingEntries = []
-): void {
+export function provisionContainer(container: Container, lifecycle: ProvisionLifecycle, bindings: Bindings = []): void {
   if (lifecycle.has(container)) {
     return;
   }
@@ -139,7 +135,7 @@ export function deprovisionContainer(container: Container, lifecycle: ProvisionL
  * const services = provisionServices(container, [PanelService]);
  * ```
  */
-export function provisionServices(container: Container, bindings: BindingEntries = []): Array<object> {
+export function provisionServices(container: Container, bindings: Bindings = []): Array<object> {
   const services: Array<object> = [];
   const visited: Set<ServiceIdentifier> = new Set();
 
@@ -234,7 +230,7 @@ function markServiceDeprovisionStatus(service: object, isDeprovisioned: Optional
  * @param binding - Binding registered on the provider container.
  * @returns Service constructor for instance descriptors, otherwise the binding token.
  */
-function getProviderLifecycleMetadataToken(binding: BindingEntries[number]): ServiceIdentifier {
+function getProviderLifecycleMetadataToken(binding: Bindings[number]): ServiceIdentifier {
   if (
     typeof binding !== "function" &&
     binding.bindingType === BindingType.Instance &&

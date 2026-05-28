@@ -8,7 +8,7 @@ import { setSeeds } from "../seeds/set-seeds";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 import { AnyObject } from "../types/general";
 import { SeedBindings, SeedsMap } from "../types/initial-state";
-import { BindingEntries } from "../types/provision";
+import { Bindings } from "../types/provision";
 
 import { createBaseContainer } from "./create-base-container";
 import { validateContainerConfig } from "./validate-container-config";
@@ -36,7 +36,7 @@ export interface CreateContainerOptions {
   /**
    * Services or binding descriptors to register.
    */
-  readonly bindings?: BindingEntries;
+  readonly bindings?: Bindings;
 
   /**
    * Parent container for inherited bindings.

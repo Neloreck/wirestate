@@ -1,7 +1,7 @@
 import { ContextConsumer, ContextProvider } from "@lit/context";
 import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-element";
 import {
-  BindingEntries,
+  Bindings,
   Container,
   ContainerActivation,
   SeedBindings,
@@ -40,7 +40,7 @@ export interface SubContainerProviderOptions {
     /**
      * Services or descriptors bound inside the child container.
      */
-    readonly bindings: BindingEntries;
+    readonly bindings: Bindings;
 
     /**
      * Services to activate (get from container) immediately after binding.

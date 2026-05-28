@@ -22,7 +22,7 @@ import { getDeactivationHandlerMetadata } from "../service/on-deactivation";
 import { CommandHandler, CommandUnregister } from "../types/commands";
 import { EventHandler, EventUnsubscriber } from "../types/events";
 import { Maybe, MaybePromise, Optional } from "../types/general";
-import { BindingEntries } from "../types/provision";
+import { Bindings } from "../types/provision";
 import { QueryHandler, QueryUnregister } from "../types/queries";
 
 import { registerContainerBinding } from "./bind-register";
@@ -115,7 +115,7 @@ export function bindServiceWithToken<T extends object>(
   container: Container,
   token: ServiceIdentifier<T>,
   binding: Newable<T>,
-  registeredBinding: BindingEntries[number],
+  registeredBinding: Bindings[number],
   options?: BindServiceOptions
 ): void {
   dbg.info(prefix(__filename), "Binding service:", {

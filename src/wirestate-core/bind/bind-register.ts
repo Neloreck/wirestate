@@ -1,7 +1,7 @@
 import { Container } from "../alias";
 import { CONTAINER_BINDINGS } from "../registry";
 import { Maybe } from "../types/general";
-import { BindingEntries } from "../types/provision";
+import { Bindings } from "../types/provision";
 
 /**
  * Records a binding as owned by a container.
@@ -12,8 +12,8 @@ import { BindingEntries } from "../types/provision";
  * @param container - Container receiving the binding.
  * @param binding - Binding bound to the container.
  */
-export function registerContainerBinding(container: Container, binding: BindingEntries[number]): void {
-  const bindings: Maybe<Array<BindingEntries[number]>> = CONTAINER_BINDINGS.get(container);
+export function registerContainerBinding(container: Container, binding: Bindings[number]): void {
+  const bindings: Maybe<Array<Bindings[number]>> = CONTAINER_BINDINGS.get(container);
 
   if (bindings) {
     bindings.push(binding);
@@ -44,6 +44,6 @@ export function registerContainerBinding(container: Container, binding: BindingE
  * const bindings = getContainerBindings(container);
  * ```
  */
-export function getContainerBindings(container: Container): BindingEntries {
+export function getContainerBindings(container: Container): Bindings {
   return CONTAINER_BINDINGS.get(container) ?? [];
 }

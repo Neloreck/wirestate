@@ -68,7 +68,7 @@ describe("Library exported API from wirestate-core", () => {
     "BindOptions",
     "BindServiceOptions",
     "BindingDescriptor",
-    "BindingEntries",
+    "Bindings",
     "CommandBus",
     "CommandDescriptor",
     "CommandHandler",
