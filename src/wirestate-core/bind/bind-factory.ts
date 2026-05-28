@@ -8,7 +8,7 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { BindingDescriptor } from "../types/provision";
 
-import { registerContainerBinding } from "./bind-register";
+import { registerBinding } from "./register-binding";
 import { validateBindingDescriptor } from "./validate-binding-descriptor";
 
 /**
@@ -25,7 +25,10 @@ function validateFactoryDescriptor(descriptor: BindingDescriptor): void {
   validateBindingDescriptor(descriptor);
 
   if (descriptor.bindingType !== BindingType.Factory) {
-    throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, `bindFactory expected binding type '${BindingType.Factory}'.`);
+    throw new WirestateError(
+      ERROR_CODE_INVALID_ARGUMENTS,
+      `bindFactory expected binding type '${BindingType.Factory}'.`
+    );
   }
 
   if (typeof descriptor.factory !== "function") {
@@ -58,7 +61,7 @@ export function bindFactory(container: Container, descriptor: BindingDescriptor)
     .bind(descriptor.id as ServiceIdentifier<Factory<unknown>>)
     .toFactory(descriptor.factory as (context: ResolutionContext) => Factory<unknown> | Promise<Factory<unknown>>);
 
-  registerContainerBinding(container, descriptor);
+  registerBinding(container, descriptor);
 
   return container;
 }

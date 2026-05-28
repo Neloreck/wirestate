@@ -6,7 +6,7 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { BindingDescriptor } from "../types/provision";
 
-import { registerContainerBinding } from "./bind-register";
+import { registerBinding } from "./register-binding";
 import { validateBindingDescriptor } from "./validate-binding-descriptor";
 
 /**
@@ -64,7 +64,7 @@ export function bindServiceRedirection<T>(container: Container, descriptor: Bind
 
   container.bind<T>(descriptor.id as ServiceIdentifier<T>).toService(descriptor.service as ServiceIdentifier<T>);
 
-  registerContainerBinding(container, descriptor);
+  registerBinding(container, descriptor);
 
   return container;
 }

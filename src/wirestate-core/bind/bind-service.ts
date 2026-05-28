@@ -29,7 +29,7 @@ import { Maybe, MaybePromise, Optional } from "../types/general";
 import { BindingDescriptor, Bindings } from "../types/provision";
 import { QueryHandler, QueryUnregister } from "../types/queries";
 
-import { registerContainerBinding } from "./bind-register";
+import { registerBinding } from "./register-binding";
 
 /**
  * Validates that an instance descriptor can be bound by {@link bindServiceWithToken}.
@@ -308,7 +308,7 @@ export function bindServiceWithToken<T extends object>(
     CONTAINER_REFS_BY_SERVICE.delete(instance);
   });
 
-  registerContainerBinding(container, registeredBinding);
+  registerBinding(container, registeredBinding);
 
   return container;
 }

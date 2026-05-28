@@ -6,7 +6,7 @@ import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error
 import { WirestateError } from "../error/wirestate-error";
 import { BindingDescriptor } from "../types/provision";
 
-import { registerContainerBinding } from "./bind-register";
+import { registerBinding } from "./register-binding";
 import { validateBindingDescriptor } from "./validate-binding-descriptor";
 
 /**
@@ -86,7 +86,7 @@ export function bindConstant<T>(container: Container, descriptor: BindingDescrip
 
   container.bind<T>(descriptor.id as ServiceIdentifier<T>).toConstantValue(descriptor.value as T);
 
-  registerContainerBinding(container, descriptor);
+  registerBinding(container, descriptor);
 
   return container;
 }

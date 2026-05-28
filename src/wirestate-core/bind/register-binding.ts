@@ -12,7 +12,7 @@ import { Bindings } from "../types/provision";
  * @param container - Container receiving the binding.
  * @param binding - Binding bound to the container.
  */
-export function registerContainerBinding(container: Container, binding: Bindings[number]): void {
+export function registerBinding(container: Container, binding: Bindings[number]): void {
   const bindings: Maybe<Array<Bindings[number]>> = CONTAINER_BINDINGS.get(container);
 
   if (bindings) {

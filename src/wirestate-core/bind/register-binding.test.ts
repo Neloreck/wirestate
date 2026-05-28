@@ -3,9 +3,9 @@ import { GenericService } from "@/fixtures/services/generic-service";
 import { Container } from "../alias";
 import { BindingDescriptor } from "../types/provision";
 
-import { getContainerBindings, registerContainerBinding } from "./bind-register";
+import { getContainerBindings, registerBinding } from "./register-binding";
 
-describe("bind-register", () => {
+describe("register-binding", () => {
   it("should return empty bindings for a container without registrations", () => {
     const container: Container = new Container();
 
@@ -19,8 +19,8 @@ describe("bind-register", () => {
       value: "config-value",
     };
 
-    registerContainerBinding(container, GenericService);
-    registerContainerBinding(container, descriptor);
+    registerBinding(container, GenericService);
+    registerBinding(container, descriptor);
 
     expect(getContainerBindings(container)).toEqual([GenericService, descriptor]);
   });
@@ -38,9 +38,9 @@ describe("bind-register", () => {
       value: "second-value",
     };
 
-    registerContainerBinding(firstContainer, firstDescriptor);
-    registerContainerBinding(secondContainer, GenericService);
-    registerContainerBinding(secondContainer, secondDescriptor);
+    registerBinding(firstContainer, firstDescriptor);
+    registerBinding(secondContainer, GenericService);
+    registerBinding(secondContainer, secondDescriptor);
 
     expect(getContainerBindings(firstContainer)).toEqual([firstDescriptor]);
     expect(getContainerBindings(secondContainer)).toEqual([GenericService, secondDescriptor]);

@@ -6,7 +6,7 @@ import { mockContainer } from "../test-utils/mock-container";
 import { BindingDescriptor } from "../types/provision";
 
 import { bind } from "./bind";
-import { getContainerBindings } from "./bind-register";
+import { getContainerBindings } from "./register-binding";
 
 describe("bind", () => {
   it("should bind a service class directly", () => {

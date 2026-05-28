@@ -9,7 +9,7 @@ import { WirestateError } from "../error/wirestate-error";
 import { BindingDescriptor } from "../types/provision";
 
 import { applyBindingScope } from "./apply-binding-scope";
-import { registerContainerBinding } from "./bind-register";
+import { registerBinding } from "./register-binding";
 import { validateBindingDescriptor } from "./validate-binding-descriptor";
 
 /**
@@ -103,7 +103,7 @@ export function bindDynamicValue<T>(container: Container, descriptor: BindingDes
     return descriptor.value;
   }) as BindInWhenOnFluentSyntax<T>;
 
-  registerContainerBinding(container, descriptor);
+  registerBinding(container, descriptor);
   applyBindingScope(binding, descriptor.scopeBindingType);
 
   return container;

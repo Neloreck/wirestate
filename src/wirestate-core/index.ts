@@ -11,7 +11,7 @@ export { bindConstant } from "./bind/bind-constant";
 export { bindDynamicValue } from "./bind/bind-dynamic-value";
 export { bindService, BindServiceOptions } from "./bind/bind-service";
 export { getBindingToken } from "./bind/get-binding-token";
-export { getContainerBindings } from "./bind/bind-register";
+export { getContainerBindings } from "./bind/register-binding";
 
 export { OnCommand } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";

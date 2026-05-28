@@ -5,9 +5,9 @@ import { createContainer } from "../container/create-container";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { BindingDescriptor } from "../types/provision";
 
-import { getContainerBindings } from "./bind-register";
 import { bindService } from "./bind-service";
 import { bindServiceRedirection } from "./bind-service-redirection";
+import { getContainerBindings } from "./register-binding";
 
 describe("bindServiceRedirection", () => {
   it("should bind a service redirection descriptor", () => {

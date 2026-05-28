@@ -3,8 +3,8 @@ import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error
 import { BindingDescriptor } from "../types/provision";
 
 import { bindConstant } from "./bind-constant";
-import { getContainerBindings } from "./bind-register";
 import { bindResolvedValue } from "./bind-resolved-value";
+import { getContainerBindings } from "./register-binding";
 
 describe("bindResolvedValue", () => {
   it("should bind a resolved value without injected arguments", () => {
