@@ -37,6 +37,9 @@ Choose the hook by return shape:
 - `useOptionalQueryExecutor` returns `null` when no handler exists.
 - `useOptionalAsyncQueryExecutor` combines optional lookup and Promise wrapping.
 
+Use an async variant when the handler may return a Promise, so callers can always `await` the result without checking
+whether the handler is sync or async.
+
 ```tsx
 import { useOptionalQueryExecutor } from "@wirestate/react";
 import { useCallback, useState } from "react";

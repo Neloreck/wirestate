@@ -1,6 +1,11 @@
 # Lit Seeds
 
-Lit managed providers accept shared and targeted seed data inside provider config.
+Lit managed providers accept seed data inside provider config. There are two keys:
+
+- `seed`: one shared object for the whole container, read with `scope.getSeed()`.
+- `seeds`: values keyed by token, read with `scope.getSeed(Token)`.
+
+See [Core seeds](/core/seeds) for the full model.
 
 ## Root Provider Seeds
 
@@ -40,11 +45,12 @@ class CheckoutScope extends LitElement {
 
 ## Read Seeds In Services
 
-Read targeted seeds in `@OnProvision`. This applies provider-owned startup data while the Lit provider owns the
-container.
+Read static targeted seeds in `@OnActivated`. Seeds exist from container creation, so applying them is cheap
+resolution-time work with no cleanup. Keep `@OnProvision` for provider-owned resources such as timers, subscriptions,
+or sockets.
 
 ```ts
-import { Inject, Injectable, OnProvision, WireScope } from "@wirestate/core";
+import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
 import { State, signal } from "@wirestate/lit-signals";
 
 @Injectable()
@@ -53,8 +59,8 @@ export class CounterService {
 
   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
-  @OnProvision()
-  public onProvision(): void {
+  @OnActivated()
+  public onActivated(): void {
     const seed = this.scope.getSeed<{ count?: number }>(CounterService);
 
     if (typeof seed?.count === "number") {

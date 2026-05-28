@@ -30,8 +30,12 @@ export class SearchPanel extends LitElement {
 ```ts
 import { useOnCommand } from "@wirestate/lit";
 import { LitElement } from "lit";
+import { state } from "lit/decorators.js";
 
 class SearchPanel extends LitElement {
+  @state()
+  private open: boolean = false;
+
   private readonly openSearch = useOnCommand(this, {
     type: "OPEN_SEARCH",
     handler: () => {

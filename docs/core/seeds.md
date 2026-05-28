@@ -68,11 +68,12 @@ const container: Container = createContainer({
 });
 ```
 
-Read targeted seeds through `WireScope`. When seed application is part of provider-owned startup, apply it in
-`@OnProvision`.
+Read targeted seeds through `WireScope`. Seeds exist from container creation, so apply static seed values in
+`@OnActivated`. That is cheap resolution-time work with no cleanup. Keep `@OnProvision` for provider-owned resources
+such as timers, subscriptions, or sockets.
 
 ```ts
-import { Inject, Injectable, OnProvision, WireScope } from "@wirestate/core";
+import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
 
 @Injectable()
 export class CounterService {
@@ -80,8 +81,8 @@ export class CounterService {
 
   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
-  @OnProvision()
-  public onProvision(): void {
+  @OnActivated()
+  public onActivated(): void {
     const seed = this.scope.getSeed<{ count?: number }>(CounterService);
 
     if (typeof seed?.count === "number") {
@@ -93,15 +94,10 @@ export class CounterService {
 
 `scope.getSeed(Token)` returns `null` when no targeted seed exists. Falsy values are preserved.
 
-If you use core without a framework adapter, call `provisionContainer` after creating the container so provider lifecycle
-hooks run.
+`@OnActivated` runs the first time the service is resolved. Resolve or activate the service so the hook runs.
 
 ```ts
-import { provisionContainer } from "@wirestate/core";
-
-const lifecycle = new Map();
-
-provisionContainer(container, lifecycle, [CounterService]);
+const counter = container.get(CounterService);
 ```
 
 ## Updating Seeds

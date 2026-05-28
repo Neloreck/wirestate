@@ -1,6 +1,11 @@
 # React Seeds
 
-React providers pass seed data through container config.
+React providers pass seed data through container config. There are two keys:
+
+- `seed`: one shared object for the whole container, read with `scope.getSeed()`.
+- `seeds`: values keyed by token, read with `scope.getSeed(Token)`.
+
+See [Core seeds](/core/seeds) for the full model.
 
 ## Root Provider Seeds
 
