@@ -3,33 +3,36 @@
 [![docs](https://img.shields.io/badge/docs-github_pages-blue)](https://neloreck.github.io/wirestate)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/master/LICENSE)
 
-Wirestate is a foundation for DI-backed TypeScript application architecture.
+Wirestate is a set of TypeScript packages for building application state around dependency-injected services.
 
-It gives you the pieces a UI framework layer needs but should not invent every time:
+The core package provides the container model. React and Lit packages connect that model to component trees.
+Reactivity is optional and lives in adapter packages or in your own service code.
 
-- Scoped containers for ownership boundaries.
-- Injectable services for workflows and state owners.
-- Lifecycle hooks for setup, cleanup, provider attach, and provider detach.
-- Container-local events, commands, and queries for service communication.
-- Seeds for hydration, tests, and per-subtree startup data.
+Use Wirestate when application logic should live outside UI components and service lifetime should follow an app,
+subtree, test, tenant, or feature scope.
 
-React and Lit packages adapt that core to component trees. Reactivity stays outside the core: use MobX, Preact Signals,
-Lit Signals, or plain TypeScript.
+What the core gives you:
+
+- Scoped containers for root apps and child branches.
+- `@Injectable` services that own state, workflows, and coordination logic.
+- Activation, deactivation, provision, and deprovision hooks.
+- Container-local events, commands, and queries.
+- Shared and targeted seeds for hydration, tests, and startup data.
 
 ## Packages
 
-| NPM                                                                                                                                                   | Package                                                               | Description                                              |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------- |
-| [![npm version](https://img.shields.io/npm/v/@wirestate/core.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/core)                   | [`@wirestate/core`](./src/wirestate-core/README.md)                   | DI container, services, events, commands, queries, seeds |
-| [![npm version](https://img.shields.io/npm/v/@wirestate/react.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react)                 | [`@wirestate/react`](./src/wirestate-react/README.md)                 | React integration (hooks, providers)                     |
-| [![npm version](https://img.shields.io/npm/v/@wirestate/react-mobx.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react-mobx)       | [`@wirestate/react-mobx`](./src/wirestate-react-mobx/README.md)       | React MobX re-exports and decorator wrappers             |
-| [![npm version](https://img.shields.io/npm/v/@wirestate/react-signals.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react-signals) | [`@wirestate/react-signals`](./src/wirestate-react-signals/README.md) | React Signals (Preact) re-exports                        |
-| [![npm version](https://img.shields.io/npm/v/@wirestate/lit.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/lit)                     | [`@wirestate/lit`](./src/wirestate-lit/README.md)                     | Lit integration (hooks, controllers, providers)          |
-| [![npm version](https://img.shields.io/npm/v/@wirestate/lit-signals.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/lit-signals)     | [`@wirestate/lit-signals`](./src/wirestate-lit-signals/README.md)     | Lit signals re-exports                                   |
+| NPM                                                                                                                                                   | Package                                                               | Description                                            |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------ |
+| [![npm version](https://img.shields.io/npm/v/@wirestate/core.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/core)                   | [`@wirestate/core`](./src/wirestate-core/README.md)                   | Containers, services, lifecycle, messaging, seeds      |
+| [![npm version](https://img.shields.io/npm/v/@wirestate/react.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react)                 | [`@wirestate/react`](./src/wirestate-react/README.md)                 | React providers, hooks, messaging, test utilities      |
+| [![npm version](https://img.shields.io/npm/v/@wirestate/react-mobx.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react-mobx)       | [`@wirestate/react-mobx`](./src/wirestate-react-mobx/README.md)       | MobX and MobX React re-exports                         |
+| [![npm version](https://img.shields.io/npm/v/@wirestate/react-signals.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react-signals) | [`@wirestate/react-signals`](./src/wirestate-react-signals/README.md) | Preact Signals for React re-exports                    |
+| [![npm version](https://img.shields.io/npm/v/@wirestate/lit.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/lit)                     | [`@wirestate/lit`](./src/wirestate-lit/README.md)                     | Lit decorators, controllers, providers, test utilities |
+| [![npm version](https://img.shields.io/npm/v/@wirestate/lit-signals.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/lit-signals)     | [`@wirestate/lit-signals`](./src/wirestate-lit-signals/README.md)     | Lit Signals re-exports                                 |
 
 ## Install
 
-Import `reflect-metadata` once at the application entry point before decorated services are loaded.
+Import `reflect-metadata` once before decorated services are loaded.
 
 ### For React
 
@@ -60,7 +63,8 @@ npm install @wirestate/lit-signals @lit-labs/signals signal-polyfill
 
 ### React + Signals
 
-Signal reads in render are the React subscription point. Create signals in services or stable component state.
+This example stores state in a service and renders it from React with Preact Signals. Reading `.value` during render is
+the React subscription point.
 
 ```tsx
 import { Injectable } from "@wirestate/core";
@@ -134,7 +138,7 @@ const Counter = observer(function Counter() {
 
 ### Lit + Signals
 
-Use `watch()` in templates to subscribe rendering to signal updates. Create signals in services or stable element state.
+This example provides the same service from a Lit root element. `watch()` subscribes the template to signal updates.
 
 ```ts
 import { Injectable } from "@wirestate/core";
