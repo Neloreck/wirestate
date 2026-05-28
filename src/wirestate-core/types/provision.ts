@@ -67,6 +67,17 @@ export interface BindingDescriptor<T = unknown, V = unknown> {
 }
 
 /**
+ * Represents a single binding accepted by Wirestate registration APIs.
+ *
+ * @remarks
+ * A binding is either a service class constructor or a descriptor for constants,
+ * factories, or custom-token class bindings.
+ *
+ * @group Bind
+ */
+export type Binding = Newable<object> | BindingDescriptor;
+
+/**
  * Represents bindings accepted by Wirestate registration APIs.
  *
  * @remarks
@@ -74,4 +85,4 @@ export interface BindingDescriptor<T = unknown, V = unknown> {
  *
  * @group Bind
  */
-export type Bindings = ReadonlyArray<Newable<object> | BindingDescriptor>;
+export type Bindings = ReadonlyArray<Binding>;
