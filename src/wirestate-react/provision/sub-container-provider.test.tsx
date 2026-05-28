@@ -9,8 +9,9 @@ import {
   OnDeactivation,
   QueryBus,
   WireScope,
+  bind,
 } from "@wirestate/core";
-import { mockBind, mockContainer } from "@wirestate/core/test-utils";
+import { mockContainer } from "@wirestate/core/test-utils";
 import { StrictMode } from "react";
 
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
@@ -71,7 +72,7 @@ describe("SubContainerProvider", () => {
 
     const parentContainer: Container = mockContainer();
 
-    mockBind(parentContainer, {
+    bind(parentContainer, {
       id: CONFIG_TOKEN,
       value: "parent-value",
     });
@@ -144,8 +145,8 @@ describe("SubContainerProvider", () => {
     const containers: Array<Container> = [];
     const lifecycleEvents: Array<string> = [];
 
-    mockBind(firstParent, { id: PARENT_TOKEN, value: "first-parent" });
-    mockBind(secondParent, { id: PARENT_TOKEN, value: "second-parent" });
+    bind(firstParent, { id: PARENT_TOKEN, value: "first-parent" });
+    bind(secondParent, { id: PARENT_TOKEN, value: "second-parent" });
 
     @Injectable()
     class LifecycleService {

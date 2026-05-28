@@ -1,6 +1,6 @@
 import { ReactiveElement } from "@lit/reactive-element";
 import { bind, Container } from "@wirestate/core";
-import { mockBind, mockContainer } from "@wirestate/core/test-utils";
+import { mockContainer } from "@wirestate/core/test-utils";
 import { customElement } from "lit/decorators.js";
 
 import { GenericService } from "@/fixtures/services/generic-service";
@@ -15,7 +15,7 @@ describe("injection", () => {
   beforeEach(() => {
     const container: Container = mockContainer();
 
-    mockBind(container, GenericService);
+    bind(container, GenericService);
 
     fixture = createLitProvision(container);
   });

@@ -1,9 +1,8 @@
 import { Container, ServiceIdentifier } from "../alias";
+import { bind } from "../bind/bind";
 import { getBindingToken } from "../bind/get-binding-token";
 import { createContainer, CreateContainerOptions } from "../container/create-container";
 import { validateContainerConfig } from "../container/validate-container-config";
-
-import { mockBind } from "./mock-bind";
 
 /**
  * Represents options for {@link mockContainer}.
@@ -27,7 +26,7 @@ export interface MockContainerOptions extends CreateContainerOptions {
  *
  * @remarks
  * This utility initializes a new container via {@link createContainer} and
- * binds the provided `bindings` using {@link mockBind}. It can also
+ * binds the provided `bindings` using {@link bind}. It can also
  * automatically resolve (activate) all or a subset of services.
  *
  * @group Test-utils
@@ -56,7 +55,7 @@ export function mockContainer(options: MockContainerOptions = {}): Container {
   const container: Container = createContainer({ parent: options.parent, seeds: options.seeds, seed: options.seed });
 
   for (const it of bindings) {
-    mockBind(container, it, { skipLifecycle: skipLifecycle });
+    bind(container, it, { skipLifecycle: skipLifecycle });
   }
 
   for (const it of activate) {

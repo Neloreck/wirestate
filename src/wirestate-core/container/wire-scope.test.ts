@@ -1,6 +1,7 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
 import { Container, Inject, Injectable } from "../alias";
+import { bind } from "../bind/bind";
 import { CommandBus } from "../commands/command-bus";
 import { ERROR_CODE_ACCESS_AFTER_DISPOSAL, ERROR_CODE_ACCESS_BEFORE_ACTIVATION } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
@@ -9,7 +10,6 @@ import { QueryBus } from "../queries/query-bus";
 import { setSeeds } from "../seeds/set-seeds";
 import { OnActivated } from "../service/on-activated";
 import { OnDeactivation } from "../service/on-deactivation";
-import { mockBind } from "../test-utils/mock-bind";
 import { mockContainer } from "../test-utils/mock-container";
 import { CommandStatus, Command } from "../types/commands";
 import { Optional } from "../types/general";
@@ -350,7 +350,7 @@ describe("WireScope", () => {
     expect(commandBus.has("TEST_COMMAND")).toBe(false);
     expect(queryBus.has("TEST_QUERY")).toBe(false);
 
-    const service: ServiceWithManualSubs = mockBind(container, ServiceWithManualSubs).get(ServiceWithManualSubs);
+    const service: ServiceWithManualSubs = bind(container, ServiceWithManualSubs).get(ServiceWithManualSubs);
 
     expect(eventBus.has()).toBe(true);
     expect(commandBus.has("TEST_COMMAND")).toBe(true);

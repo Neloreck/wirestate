@@ -251,7 +251,7 @@ Injected `WireScope` instances expose lifecycle state for async guards:
 Available via `@wirestate/core/test-utils`:
 
 ```ts
-import { mockContainer, mockBind, mockUnbind } from "@wirestate/core/test-utils";
+import { mockContainer } from "@wirestate/core/test-utils";
 ```
 
 ### `mockContainer(options?)`
@@ -278,25 +278,19 @@ const container = mockContainer({
 });
 ```
 
-### `mockBind(container, binding, options?)`
-
-Binds a service class or `BindingDescriptor` to an existing container and returns that container. Accepts
-`{ skipLifecycle?: boolean }`.
+Use core `bind` and `unbind` with a mock container when a test needs to add or remove one binding.
 
 ```ts
-const counter = mockBind(mockContainer(), CounterService).get(CounterService);
+import { bind, unbind } from "@wirestate/core";
+
+const container = mockContainer();
+const counter = bind(container, CounterService).get(CounterService);
+
 counter.increment();
 expect(counter.count).toBe(1);
-```
 
-### `mockUnbind(container, identifier)`
-
-Removes a binding from the container through the same cleanup path as core `unbind`. Useful for overriding registrations
-between tests.
-
-```ts
-mockUnbind(container, CounterService);
-mockBind(container, { id: CounterService, value: fakeCounter });
+unbind(container, CounterService);
+bind(container, { id: CounterService, value: fakeCounter });
 ```
 
 ## License
