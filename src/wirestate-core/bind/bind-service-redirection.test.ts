@@ -20,8 +20,10 @@ describe("bindServiceRedirection", () => {
     };
 
     bindService(container, GenericService);
-    bindServiceRedirection(container, binding);
 
+    const result: Container = bindServiceRedirection(container, binding);
+
+    expect(result).toBe(container);
     expect(container.get(TOKEN)).toBe(container.get(GenericService));
     expect(getContainerBindings(container)).toEqual([GenericService, binding]);
   });

@@ -1,4 +1,6 @@
 import { BindingType, Container, Newable, ServiceIdentifier } from "../alias";
+import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
 import { Binding } from "../types/provision";
 
 import { bindConstant } from "./bind-constant";
@@ -7,7 +9,6 @@ import { bindFactory } from "./bind-factory";
 import { bindResolvedValue } from "./bind-resolved-value";
 import { bindService, bindServiceWithToken, type BindServiceOptions } from "./bind-service";
 import { bindServiceRedirection } from "./bind-service-redirection";
-import { validateBindingDescriptor } from "./validate-binding-descriptor";
 
 /**
  * Represents options for {@link bind}.
@@ -50,6 +51,7 @@ export interface BindOptions extends BindServiceOptions {
  * @param container - Container to bind into.
  * @param binding - Service class or binding descriptor.
  * @param options - Binding options for class bindings.
+ * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor has no `id`, has an unknown
  * `bindingType` or `scopeBindingType`, or is missing fields required by the
@@ -83,43 +85,29 @@ export function bind<T extends object = object>(
   container: Container,
   binding: Binding,
   options: BindOptions = {}
-): void {
+): Container {
   if (typeof binding === "function") {
-    bindService(container, binding, options);
-
-    return;
+    return bindService(container, binding, options);
   }
-
-  validateBindingDescriptor(binding);
 
   switch (binding.bindingType ?? BindingType.ConstantValue) {
     case BindingType.ConstantValue:
-      bindConstant(container, binding);
-
-      return;
+      return bindConstant(container, binding);
 
     case BindingType.DynamicValue:
-      bindDynamicValue(container, binding);
-
-      return;
+      return bindDynamicValue(container, binding);
 
     case BindingType.Factory:
-      bindFactory(container, binding);
-
-      return;
+      return bindFactory(container, binding);
 
     case BindingType.ResolvedValue:
-      bindResolvedValue(container, binding);
-
-      return;
+      return bindResolvedValue(container, binding);
 
     case BindingType.ServiceRedirection:
-      bindServiceRedirection(container, binding);
-
-      return;
+      return bindServiceRedirection(container, binding);
 
     case BindingType.Instance:
-      bindServiceWithToken(
+      return bindServiceWithToken(
         container,
         binding.id as ServiceIdentifier<T>,
         binding.value as unknown as Newable<T>,
@@ -127,6 +115,10 @@ export function bind<T extends object = object>(
         options
       );
 
-      return;
+    default:
+      throw new WirestateError(
+        ERROR_CODE_INVALID_ARGUMENTS,
+        `Binding descriptor has unknown binding type '${String(binding.bindingType)}'.`
+      );
   }
 }

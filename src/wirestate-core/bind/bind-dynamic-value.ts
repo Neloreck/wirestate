@@ -1,13 +1,14 @@
-import type { BindInWhenOnFluentSyntax, BindWhenOnFluentSyntax } from "inversify";
+import type { BindInWhenOnFluentSyntax } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType, Container, ScopeBindingType } from "../alias";
+import { BindingType, Container } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { BindingDescriptor } from "../types/provision";
 
+import { applyBindingScope } from "./apply-binding-scope";
 import { registerContainerBinding } from "./bind-register";
 import { validateBindingDescriptor } from "./validate-binding-descriptor";
 
@@ -65,7 +66,7 @@ function validateDynamicValueDescriptor(descriptor: BindingDescriptor): void {
  *
  * @param container - Container to bind into.
  * @param descriptor - Descriptor with `id`, `factory` or `value`, and optional scope.
- * @returns Inversify fluent syntax for additional constraints.
+ * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
  *
@@ -86,7 +87,7 @@ function validateDynamicValueDescriptor(descriptor: BindingDescriptor): void {
  * const now = container.get<Date>(DATE_NOW);
  * ```
  */
-export function bindDynamicValue<T>(container: Container, descriptor: BindingDescriptor): BindWhenOnFluentSyntax<T> {
+export function bindDynamicValue<T>(container: Container, descriptor: BindingDescriptor): Container {
   validateDynamicValueDescriptor(descriptor);
 
   dbg.info(prefix(__filename), "Binding dynamic value:", {
@@ -103,14 +104,7 @@ export function bindDynamicValue<T>(container: Container, descriptor: BindingDes
   }) as BindInWhenOnFluentSyntax<T>;
 
   registerContainerBinding(container, descriptor);
+  applyBindingScope(binding, descriptor.scopeBindingType);
 
-  if (!descriptor.scopeBindingType) {
-    return binding;
-  } else if (descriptor.scopeBindingType === ScopeBindingType.Transient) {
-    return binding.inTransientScope();
-  } else if (descriptor.scopeBindingType === ScopeBindingType.Request) {
-    return binding.inRequestScope();
-  } else {
-    return binding.inSingletonScope();
-  }
+  return container;
 }

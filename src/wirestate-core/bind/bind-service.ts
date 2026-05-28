@@ -86,6 +86,7 @@ export interface BindServiceOptions {
  * @param container - Container to bind into.
  * @param binding - Service class.
  * @param options - Binding options.
+ * @returns The same container for chaining or immediate resolution.
  *
  * @example
  * ```typescript
@@ -116,8 +117,8 @@ export function bindService<T extends object>(
   container: Container,
   binding: Newable<T>,
   options?: BindServiceOptions
-): void {
-  bindServiceWithToken(container, binding, binding, binding, options);
+): Container {
+  return bindServiceWithToken(container, binding, binding, binding, options);
 }
 
 /**
@@ -133,6 +134,7 @@ export function bindService<T extends object>(
  * @param binding - Service class constructor.
  * @param registeredBinding - Binding recorded as container-owned.
  * @param options - Configuration options for the binding.
+ * @returns The same container for chaining or immediate resolution.
  */
 export function bindServiceWithToken<T extends object>(
   container: Container,
@@ -140,7 +142,7 @@ export function bindServiceWithToken<T extends object>(
   binding: Newable<T>,
   registeredBinding: Bindings[number],
   options?: BindServiceOptions
-): void {
+): Container {
   if (typeof registeredBinding !== "function") {
     validateInstanceDescriptor(registeredBinding);
   }
@@ -307,6 +309,8 @@ export function bindServiceWithToken<T extends object>(
   });
 
   registerContainerBinding(container, registeredBinding);
+
+  return container;
 }
 
 /**

@@ -42,10 +42,11 @@ function validateFactoryDescriptor(descriptor: BindingDescriptor): void {
  *
  * @param container - Container to bind into.
  * @param descriptor - Descriptor with `id`, `bindingType`, and `factory`.
+ * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
  */
-export function bindFactory(container: Container, descriptor: BindingDescriptor): void {
+export function bindFactory(container: Container, descriptor: BindingDescriptor): Container {
   validateFactoryDescriptor(descriptor);
 
   dbg.info(prefix(__filename), "Binding factory descriptor:", {
@@ -58,4 +59,6 @@ export function bindFactory(container: Container, descriptor: BindingDescriptor)
     .toFactory(descriptor.factory as (context: ResolutionContext) => Factory<unknown> | Promise<Factory<unknown>>);
 
   registerContainerBinding(container, descriptor);
+
+  return container;
 }

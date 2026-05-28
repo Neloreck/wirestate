@@ -50,10 +50,11 @@ function validateServiceRedirectionDescriptor(descriptor: BindingDescriptor): vo
  *
  * @param container - Container to bind into.
  * @param descriptor - Descriptor with `id`, `bindingType`, and `service`.
+ * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
  */
-export function bindServiceRedirection<T>(container: Container, descriptor: BindingDescriptor<T>): void {
+export function bindServiceRedirection<T>(container: Container, descriptor: BindingDescriptor<T>): Container {
   validateServiceRedirectionDescriptor(descriptor);
 
   dbg.info(prefix(__filename), "Binding service redirection descriptor:", {
@@ -64,4 +65,6 @@ export function bindServiceRedirection<T>(container: Container, descriptor: Bind
   container.bind<T>(descriptor.id as ServiceIdentifier<T>).toService(descriptor.service as ServiceIdentifier<T>);
 
   registerContainerBinding(container, descriptor);
+
+  return container;
 }

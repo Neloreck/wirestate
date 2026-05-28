@@ -46,10 +46,11 @@ function validateResolvedValueDescriptor(descriptor: BindingDescriptor): void {
  *
  * @param container - Container to bind into.
  * @param descriptor - Descriptor with `id`, `bindingType`, `factory`, and optional `injectOptions`.
+ * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
  */
-export function bindResolvedValue<T>(container: Container, descriptor: BindingDescriptor<T>): void {
+export function bindResolvedValue<T>(container: Container, descriptor: BindingDescriptor<T>): Container {
   validateResolvedValueDescriptor(descriptor);
 
   dbg.info(prefix(__filename), "Binding resolved value descriptor:", {
@@ -68,4 +69,6 @@ export function bindResolvedValue<T>(container: Container, descriptor: BindingDe
 
   applyBindingScope(binding, descriptor.scopeBindingType);
   registerContainerBinding(container, descriptor);
+
+  return container;
 }

@@ -10,8 +10,9 @@ describe("bindDynamicValue", () => {
     const container: Container = new Container();
     const value: AnyObject = { a: 1, b: 2 };
 
-    bindDynamicValue(container, { id: "static-value-ref", value: value });
+    const result: Container = bindDynamicValue(container, { id: "static-value-ref", value: value });
 
+    expect(result).toBe(container);
     expect(container.get("static-value-ref")).toEqual({ a: 1, b: 2 });
     expect(container.get("static-value-ref")).toBe(value);
   });

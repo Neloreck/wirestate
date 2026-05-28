@@ -1,5 +1,3 @@
-import type { BindWhenOnFluentSyntax } from "inversify";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
@@ -20,7 +18,7 @@ import { validateBindingDescriptor } from "./validate-binding-descriptor";
  * @param descriptor - Descriptor to validate.
  *
  * @throws {@link WirestateError} If the descriptor is missing a token, uses a non-constant binding type,
- * or omits the `value` field.
+ * uses a non-singleton scope, or omits the `value` field.
  */
 function validateConstantDescriptor(descriptor: BindingDescriptor): void {
   validateBindingDescriptor(descriptor);
@@ -30,6 +28,10 @@ function validateConstantDescriptor(descriptor: BindingDescriptor): void {
       ERROR_CODE_INVALID_ARGUMENTS,
       `bindConstant expected binding type '${BindingType.ConstantValue}'.`
     );
+  }
+
+  if (descriptor.scopeBindingType && descriptor.scopeBindingType !== ScopeBindingType.Singleton) {
+    throw new WirestateError(ERROR_CODE_BINDING_SCOPE, "Provided unexpected binding scope for constant value.");
   }
 
   if (!Object.prototype.hasOwnProperty.call(descriptor, "value")) {
@@ -53,7 +55,7 @@ function validateConstantDescriptor(descriptor: BindingDescriptor): void {
  *
  * @param container - Container to bind into.
  * @param descriptor - Descriptor with `id` and `value`.
- * @returns Inversify fluent syntax for additional constraints.
+ * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If `descriptor.scopeBindingType` is not `Singleton`.
  *
@@ -72,7 +74,7 @@ function validateConstantDescriptor(descriptor: BindingDescriptor): void {
  * const apiUrl = container.get<string>(API_URL);
  * ```
  */
-export function bindConstant<T>(container: Container, descriptor: BindingDescriptor): BindWhenOnFluentSyntax<T> {
+export function bindConstant<T>(container: Container, descriptor: BindingDescriptor): Container {
   validateConstantDescriptor(descriptor);
 
   dbg.info(prefix(__filename), "Binding constant:", {
@@ -82,15 +84,9 @@ export function bindConstant<T>(container: Container, descriptor: BindingDescrip
     container,
   });
 
-  if (descriptor.scopeBindingType && descriptor.scopeBindingType !== ScopeBindingType.Singleton) {
-    throw new WirestateError(ERROR_CODE_BINDING_SCOPE, "Provided unexpected binding scope for constant value.");
-  }
-
-  const binding: BindWhenOnFluentSyntax<T> = container
-    .bind<T>(descriptor.id as ServiceIdentifier<T>)
-    .toConstantValue(descriptor.value as T);
+  container.bind<T>(descriptor.id as ServiceIdentifier<T>).toConstantValue(descriptor.value as T);
 
   registerContainerBinding(container, descriptor);
 
-  return binding;
+  return container;
 }

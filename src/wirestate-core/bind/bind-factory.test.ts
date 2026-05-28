@@ -15,10 +15,11 @@ describe("bindFactory", () => {
       id: TOKEN,
     };
 
-    bindFactory(container, binding);
+    const result: Container = bindFactory(container, binding);
 
     const factory: () => string = container.get(TOKEN);
 
+    expect(result).toBe(container);
     expect(factory()).toBe("hello");
     expect(getContainerBindings(container)).toEqual([binding]);
   });

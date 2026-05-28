@@ -10,8 +10,9 @@ describe("bindConstant", () => {
     const container: Container = new Container();
     const binding: BindingDescriptor = { id: "my-token", value: "my-value" };
 
-    bindConstant(container, binding);
+    const result: Container = bindConstant(container, binding);
 
+    expect(result).toBe(container);
     expect(container.get("my-token")).toBe("my-value");
   });
 

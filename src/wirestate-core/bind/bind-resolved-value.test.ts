@@ -15,8 +15,9 @@ describe("bindResolvedValue", () => {
       id: "resolved-value",
     };
 
-    bindResolvedValue(container, binding);
+    const result: Container = bindResolvedValue(container, binding);
 
+    expect(result).toBe(container);
     expect(container.get("resolved-value")).toBe("resolved");
     expect(getContainerBindings(container)).toEqual([binding]);
   });

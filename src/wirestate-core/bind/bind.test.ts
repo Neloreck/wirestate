@@ -11,22 +11,23 @@ import { getContainerBindings } from "./bind-register";
 describe("bind", () => {
   it("should bind a service class directly", () => {
     const container: Container = mockContainer();
+    const result: Container = bind(container, GenericService);
 
-    bind(container, GenericService);
-
+    expect(result).toBe(container);
     expect(container.isBound(GenericService)).toBe(true);
   });
 
   it("should bind a constant value descriptor", () => {
-    const container: Container = mockContainer();
     const TOKEN: unique symbol = Symbol("config");
 
-    bind(container, {
+    const container: Container = mockContainer();
+    const result: Container = bind(container, {
       id: TOKEN,
       value: { key: "value" },
       bindingType: BindingType.ConstantValue,
     });
 
+    expect(result).toBe(container);
     expect(container.get(TOKEN)).toEqual({ key: "value" });
   });
 
@@ -110,14 +111,14 @@ describe("bind", () => {
 
   it("should throw for unknown bindingType", () => {
     const container: Container = mockContainer();
+    const binding: BindingDescriptor = {
+      bindingType: "UNKNOWN" as BindingDescriptor["bindingType"],
+      id: GenericService,
+      value: GenericService,
+    };
 
-    expect(() =>
-      bind(container, {
-        bindingType: "UNKNOWN" as BindingDescriptor["bindingType"],
-        id: GenericService,
-        value: GenericService,
-      })
-    ).toThrow("Binding descriptor has unknown binding type 'UNKNOWN'.");
+    expect(() => bind(container, binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
+    expect(() => bind(container, binding)).toThrow("Binding descriptor has unknown binding type 'UNKNOWN'.");
   });
 
   it("should throw for missing descriptor id", () => {
@@ -182,5 +183,4 @@ describe("bind", () => {
       })
     ).toThrow("Dynamic value descriptor 'factory' must be a function.");
   });
-
 });

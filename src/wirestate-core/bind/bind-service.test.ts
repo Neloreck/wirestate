@@ -75,8 +75,9 @@ describe("bindService", () => {
   it("should bind service and handle lifecycle", async () => {
     const container: Container = mockContainer();
 
-    bindService(container, GenericService);
+    const result: Container = bindService(container, GenericService);
 
+    expect(result).toBe(container);
     expect(container.isBound(GenericService)).toBe(true);
 
     const instance: GenericService = container.get(GenericService);
