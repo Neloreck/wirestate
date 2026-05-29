@@ -40,6 +40,14 @@ export interface ConstantValueBindingDescriptor<T = unknown> {
   readonly id: ServiceIdentifier<T>;
 
   /**
+   * Lifetime scope for the fixed value.
+   *
+   * @remarks
+   * Constant values can only be singleton-scoped.
+   */
+  readonly scopeBindingType?: typeof ScopeBindingTypeValues.Singleton;
+
+  /**
    * Fixed value to bind.
    */
   readonly value: T;
@@ -70,7 +78,6 @@ export interface DynamicValueBindingDescriptor<T = unknown> {
    * Lifetime scope for created values.
    */
   readonly scopeBindingType?: ScopeBindingType;
-
 }
 
 /**
@@ -172,17 +179,18 @@ export interface ServiceRedirectionBindingDescriptor<T = unknown> {
 }
 
 /**
- * Represents one container binding.
+ * Describes one binding descriptor.
  *
  * @remarks
- * Use descriptors when a class token is not enough: constants, factories,
- * resolved values, service redirection, or a class behind a custom token.
+ * `BindingDescriptor` is a union of the specific descriptor shapes accepted by
+ * {@link bind}. Use descriptors when a class token is not enough: constants,
+ * factories, resolved values, service redirection, or a class behind a custom
+ * token.
  *
  * @group Bind
  *
  * @template T - Resolved value type.
- * @template V - Descriptor value type.
- * @template TArgs - Resolved value factory argument tuple.
+ * @template FA - Resolved value factory argument tuple.
  *
  * @example
  * ```typescript
@@ -197,45 +205,13 @@ export interface ServiceRedirectionBindingDescriptor<T = unknown> {
  * };
  * ```
  */
-export interface BindingDescriptor<T = unknown, V = unknown, TArgs extends Array<unknown> = Array<unknown>> {
-  /**
-   * Binding strategy.
-   */
-  readonly bindingType?: BindingType;
-
-  /**
-   * Factory used by dynamic, factory, and resolved value bindings.
-   */
-  readonly factory?:
-    | DynamicValueBuilder<T>
-    | ((context: ResolutionContext) => T | Promise<T>)
-    | ((...args: TArgs) => T | Promise<T>);
-
-  /**
-   * Token used to resolve the binding.
-   */
-  readonly id: ServiceIdentifier<T>;
-
-  /**
-   * Injection options for resolved value factory arguments.
-   */
-  readonly injectOptions?: MapToResolvedValueInjectOptions<TArgs>;
-
-  /**
-   * Existing service token for service redirection bindings.
-   */
-  readonly service?: ServiceIdentifier<T>;
-
-  /**
-   * Lifetime scope for binding types that support scopes.
-   */
-  readonly scopeBindingType?: ScopeBindingType;
-
-  /**
-   * Fixed value or class constructor, depending on binding type.
-   */
-  readonly value?: V;
-}
+export type BindingDescriptor<T = unknown, FA extends Array<unknown> = Array<unknown>> =
+  | ConstantValueBindingDescriptor<T>
+  | DynamicValueBindingDescriptor<T>
+  | FactoryBindingDescriptor<T>
+  | (T extends object ? InstanceBindingDescriptor<T> : InstanceBindingDescriptor)
+  | ResolvedValueBindingDescriptor<T, FA>
+  | ServiceRedirectionBindingDescriptor<T>;
 
 /**
  * Represents a single binding accepted by Wirestate registration APIs.

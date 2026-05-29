@@ -6,7 +6,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { BindingType, Container } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { BindingDescriptor } from "../types/provision";
+import { DynamicValueBindingDescriptor } from "../types/provision";
 
 import { applyBindingScope } from "./apply-binding-scope";
 import { registerBinding } from "./register-binding";
@@ -23,7 +23,7 @@ import { validateBindingDescriptor } from "./validate-binding-descriptor";
  * @throws {@link WirestateError} If the descriptor is missing a token, uses a non-dynamic binding type,
  * omits `factory`, or provides a non-function `factory`.
  */
-function validateDynamicValueDescriptor(descriptor: BindingDescriptor): void {
+function validateDynamicValueDescriptor(descriptor: DynamicValueBindingDescriptor): void {
   validateBindingDescriptor(descriptor);
 
   if (descriptor.bindingType !== undefined && descriptor.bindingType !== BindingType.DynamicValue) {
@@ -73,7 +73,7 @@ function validateDynamicValueDescriptor(descriptor: BindingDescriptor): void {
  * const now = container.get<Date>(DATE_NOW);
  * ```
  */
-export function bindDynamicValue<T>(container: Container, descriptor: BindingDescriptor<T, T>): Container {
+export function bindDynamicValue<T>(container: Container, descriptor: DynamicValueBindingDescriptor<T>): Container {
   validateDynamicValueDescriptor(descriptor);
 
   dbg.info(prefix(__filename), "Binding dynamic value:", {

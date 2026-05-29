@@ -6,7 +6,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { BindingType, Container, type ServiceIdentifier } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { BindingDescriptor } from "../types/provision";
+import { FactoryBindingDescriptor } from "../types/provision";
 
 import { registerBinding } from "./register-binding";
 import { validateBindingDescriptor } from "./validate-binding-descriptor";
@@ -21,7 +21,7 @@ import { validateBindingDescriptor } from "./validate-binding-descriptor";
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
  */
-function validateFactoryDescriptor(descriptor: BindingDescriptor): void {
+function validateFactoryDescriptor(descriptor: FactoryBindingDescriptor): void {
   validateBindingDescriptor(descriptor);
 
   if (descriptor.bindingType !== BindingType.Factory) {
@@ -49,7 +49,7 @@ function validateFactoryDescriptor(descriptor: BindingDescriptor): void {
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
  */
-export function bindFactory(container: Container, descriptor: BindingDescriptor): Container {
+export function bindFactory(container: Container, descriptor: FactoryBindingDescriptor): Container {
   validateFactoryDescriptor(descriptor);
 
   dbg.info(prefix(__filename), "Binding factory descriptor:", {

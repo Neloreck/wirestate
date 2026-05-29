@@ -11,7 +11,7 @@ import {
   WIRE_SCOPES_BY_SERVICE,
 } from "../registry";
 import { Maybe, MaybePromise, Optional } from "../types/general";
-import { Bindings } from "../types/provision";
+import { Binding, Bindings } from "../types/provision";
 
 import { getDeprovisionHandlerMetadata } from "./on-deprovision";
 import { getProvisionHandlerMetadata } from "./on-provision";
@@ -414,7 +414,7 @@ function isServiceProvisionedForToken(service: object, token: ServiceIdentifier)
  * @param binding - Binding registered on the provider container.
  * @returns Service constructor for instance descriptors, otherwise the binding token.
  */
-function getProviderLifecycleMetadataToken(binding: Bindings[number]): ServiceIdentifier {
+function getProviderLifecycleMetadataToken(binding: Binding): ServiceIdentifier {
   if (
     typeof binding !== "function" &&
     binding.bindingType === BindingType.Instance &&

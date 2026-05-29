@@ -1,7 +1,7 @@
 import { Container, ServiceIdentifier } from "../alias";
 import { CONTAINER_BINDINGS } from "../registry";
 import { Maybe } from "../types/general";
-import { Bindings } from "../types/provision";
+import { Binding, Bindings } from "../types/provision";
 
 import { getBindingToken } from "./get-binding-token";
 
@@ -14,8 +14,8 @@ import { getBindingToken } from "./get-binding-token";
  * @param container - Container receiving the binding.
  * @param binding - Binding bound to the container.
  */
-export function registerBinding(container: Container, binding: Bindings[number]): void {
-  const bindings: Maybe<Array<Bindings[number]>> = CONTAINER_BINDINGS.get(container);
+export function registerBinding(container: Container, binding: Binding): void {
+  const bindings: Maybe<Array<Binding>> = CONTAINER_BINDINGS.get(container);
 
   if (bindings) {
     bindings.push(binding);
@@ -60,15 +60,13 @@ export function getContainerBindings(container: Container): Bindings {
  * @param identifier - Binding token removed from the container.
  */
 export function unregisterBinding(container: Container, identifier: ServiceIdentifier): void {
-  const bindings: Maybe<Array<Bindings[number]>> = CONTAINER_BINDINGS.get(container);
+  const bindings: Maybe<Array<Binding>> = CONTAINER_BINDINGS.get(container);
 
   if (!bindings) {
     return;
   }
 
-  const remaining: Array<Bindings[number]> = bindings.filter(
-    (binding) => !Object.is(getBindingToken(binding), identifier)
-  );
+  const remaining: Array<Binding> = bindings.filter((binding) => !Object.is(getBindingToken(binding), identifier));
 
   if (remaining.length) {
     CONTAINER_BINDINGS.set(container, remaining);

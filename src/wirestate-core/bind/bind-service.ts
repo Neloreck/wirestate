@@ -26,7 +26,7 @@ import { getDeactivationHandlerMetadata } from "../service/on-deactivation";
 import { CommandHandler, CommandUnregister } from "../types/commands";
 import { EventHandler, EventUnsubscriber } from "../types/events";
 import { Maybe, MaybePromise, Optional } from "../types/general";
-import { BindingDescriptor, Bindings } from "../types/provision";
+import { InstanceBindingDescriptor } from "../types/provision";
 import { QueryHandler, QueryUnregister } from "../types/queries";
 
 import { registerBinding } from "./register-binding";
@@ -43,7 +43,7 @@ import { validateBindingDescriptor } from "./validate-binding-descriptor";
  * @throws {@link WirestateError} If shared descriptor fields are invalid or
  * the descriptor value is not a service constructor.
  */
-function validateInstanceDescriptor(descriptor: BindingDescriptor): void {
+function validateInstanceDescriptor(descriptor: InstanceBindingDescriptor): void {
   validateBindingDescriptor(descriptor);
 
   if (descriptor.bindingType === BindingType.Instance && typeof descriptor.value !== "function") {
@@ -144,7 +144,7 @@ export function bindServiceWithToken<T extends object>(
   container: Container,
   token: ServiceIdentifier<T>,
   binding: Newable<T>,
-  registeredBinding: Bindings[number],
+  registeredBinding: Newable<T> | InstanceBindingDescriptor<T>,
   options?: BindServiceOptions
 ): Container {
   if (typeof registeredBinding !== "function") {

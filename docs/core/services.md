@@ -194,5 +194,5 @@ owns a service when it is removed, `@OnDeprovision` runs before `@OnDeactivation
 
 [`Injectable`](/api/wirestate-core/functions/Injectable), [`Inject`](/api/wirestate-core/functions/Inject),
 [`WireScope`](/api/wirestate-core/classes/WireScope), [`OnProvision`](/api/wirestate-core/functions/OnProvision),
-[`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision), [`BindingDescriptor`](/api/wirestate-core/interfaces/BindingDescriptor),
+[`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision), [`BindingDescriptor`](/api/wirestate-core/type-aliases/BindingDescriptor),
 [`unbind`](/api/wirestate-core/functions/unbind), [`unbindAll`](/api/wirestate-core/functions/unbindAll).

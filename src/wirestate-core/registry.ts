@@ -2,7 +2,7 @@ import { Container, ServiceIdentifier } from "./alias";
 import { WireScope } from "./container/wire-scope";
 import { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
 import { EventHandlerMetadata, EventUnsubscriber } from "./types/events";
-import { Bindings } from "./types/provision";
+import { Binding } from "./types/provision";
 import { QueryHandlerMetadata, QueryUnregister } from "./types/queries";
 
 /**
@@ -155,7 +155,7 @@ export const COMMAND_UNREGISTERS_BY_SERVICE: WeakMap<object, Array<CommandUnregi
  * @group Container
  * @internal
  */
-export const CONTAINER_BINDINGS: WeakMap<Container, Array<Bindings[number]>> = new WeakMap();
+export const CONTAINER_BINDINGS: WeakMap<Container, Array<Binding>> = new WeakMap();
 
 /**
  * Internal storage for provider lifecycle maps that currently own a container.

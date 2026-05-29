@@ -14,7 +14,7 @@ import { OnDeactivation } from "../service/on-deactivation";
 import { mockContainer } from "../test-utils";
 import { CommandStatus } from "../types/commands";
 import { Optional } from "../types/general";
-import { BindingDescriptor } from "../types/provision";
+import { InstanceBindingDescriptor } from "../types/provision";
 
 import { bindService, bindServiceWithToken } from "./bind-service";
 
@@ -132,7 +132,7 @@ describe("bindService", () => {
       bindingType: BindingType.Instance,
       id: GenericService,
       value: "not-a-constructor",
-    } as BindingDescriptor;
+    } as unknown as InstanceBindingDescriptor;
 
     expect(() => bindServiceWithToken(container, GenericService, binding.value as never, binding, {})).toThrow(
       expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
@@ -147,7 +147,7 @@ describe("bindService", () => {
     const binding = {
       bindingType: BindingType.Instance,
       value: GenericService,
-    } as unknown as BindingDescriptor;
+    } as unknown as InstanceBindingDescriptor;
 
     expect(() => bindServiceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
       expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
@@ -162,9 +162,9 @@ describe("bindService", () => {
     const binding = {
       bindingType: BindingType.Instance,
       id: GenericService,
-      scopeBindingType: "UNKNOWN" as BindingDescriptor["scopeBindingType"],
+      scopeBindingType: "UNKNOWN",
       value: GenericService,
-    } as BindingDescriptor;
+    } as unknown as InstanceBindingDescriptor;
 
     expect(() => bindServiceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
       expect.objectContaining({ code: ERROR_CODE_BINDING_SCOPE })

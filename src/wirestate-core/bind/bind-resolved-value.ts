@@ -6,7 +6,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { BindingType, Container, type ServiceIdentifier } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { BindingDescriptor } from "../types/provision";
+import { ResolvedValueBindingDescriptor } from "../types/provision";
 
 import { applyBindingScope } from "./apply-binding-scope";
 import { registerBinding } from "./register-binding";
@@ -22,7 +22,9 @@ import { validateBindingDescriptor } from "./validate-binding-descriptor";
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
  */
-function validateResolvedValueDescriptor(descriptor: BindingDescriptor): void {
+function validateResolvedValueDescriptor<T, TArgs extends Array<unknown>>(
+  descriptor: ResolvedValueBindingDescriptor<T, TArgs>
+): void {
   validateBindingDescriptor(descriptor);
 
   if (descriptor.bindingType !== BindingType.ResolvedValue) {
@@ -50,7 +52,10 @@ function validateResolvedValueDescriptor(descriptor: BindingDescriptor): void {
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
  */
-export function bindResolvedValue<T>(container: Container, descriptor: BindingDescriptor<T>): Container {
+export function bindResolvedValue<T, FA extends Array<unknown> = Array<unknown>>(
+  container: Container,
+  descriptor: ResolvedValueBindingDescriptor<T, FA>
+): Container {
   validateResolvedValueDescriptor(descriptor);
 
   dbg.info(prefix(__filename), "Binding resolved value descriptor:", {
@@ -70,7 +75,7 @@ export function bindResolvedValue<T>(container: Container, descriptor: BindingDe
         .toResolvedValue(descriptor.factory as () => T | Promise<T>);
 
   applyBindingScope(binding, descriptor.scopeBindingType);
-  registerBinding(container, descriptor);
+  registerBinding(container, descriptor as ResolvedValueBindingDescriptor);
 
   return container;
 }

@@ -4,7 +4,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { BindingType, Container, type ServiceIdentifier } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { BindingDescriptor } from "../types/provision";
+import { ServiceRedirectionBindingDescriptor } from "../types/provision";
 
 import { registerBinding } from "./register-binding";
 import { validateBindingDescriptor } from "./validate-binding-descriptor";
@@ -19,7 +19,7 @@ import { validateBindingDescriptor } from "./validate-binding-descriptor";
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
  */
-function validateServiceRedirectionDescriptor(descriptor: BindingDescriptor): void {
+function validateServiceRedirectionDescriptor(descriptor: ServiceRedirectionBindingDescriptor): void {
   validateBindingDescriptor(descriptor);
 
   if (descriptor.bindingType !== BindingType.ServiceRedirection) {
@@ -54,7 +54,10 @@ function validateServiceRedirectionDescriptor(descriptor: BindingDescriptor): vo
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
  */
-export function bindServiceRedirection<T>(container: Container, descriptor: BindingDescriptor<T>): Container {
+export function bindServiceRedirection<T>(
+  container: Container,
+  descriptor: ServiceRedirectionBindingDescriptor<T>
+): Container {
   validateServiceRedirectionDescriptor(descriptor);
 
   dbg.info(prefix(__filename), "Binding service redirection descriptor:", {

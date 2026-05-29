@@ -1,7 +1,15 @@
 import { BindingType, Container, Newable, ServiceIdentifier } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { Binding } from "../types/provision";
+import {
+  Binding,
+  ConstantValueBindingDescriptor,
+  DynamicValueBindingDescriptor,
+  FactoryBindingDescriptor,
+  InstanceBindingDescriptor,
+  ResolvedValueBindingDescriptor,
+  ServiceRedirectionBindingDescriptor,
+} from "../types/provision";
 
 import { bindConstant } from "./bind-constant";
 import { bindDynamicValue } from "./bind-dynamic-value";
@@ -92,26 +100,26 @@ export function bind<T extends object = object>(
 
   switch (binding.bindingType ?? BindingType.ConstantValue) {
     case BindingType.ConstantValue:
-      return bindConstant(container, binding);
+      return bindConstant(container, binding as ConstantValueBindingDescriptor);
 
     case BindingType.DynamicValue:
-      return bindDynamicValue(container, binding);
+      return bindDynamicValue(container, binding as DynamicValueBindingDescriptor);
 
     case BindingType.Factory:
-      return bindFactory(container, binding);
+      return bindFactory(container, binding as FactoryBindingDescriptor);
 
     case BindingType.ResolvedValue:
-      return bindResolvedValue(container, binding);
+      return bindResolvedValue(container, binding as ResolvedValueBindingDescriptor);
 
     case BindingType.ServiceRedirection:
-      return bindServiceRedirection(container, binding);
+      return bindServiceRedirection(container, binding as ServiceRedirectionBindingDescriptor);
 
     case BindingType.Instance:
       return bindServiceWithToken(
         container,
         binding.id as ServiceIdentifier<T>,
-        binding.value as unknown as Newable<T>,
-        binding,
+        (binding as InstanceBindingDescriptor<T>).value as unknown as Newable<T>,
+        binding as InstanceBindingDescriptor<T>,
         options
       );
 

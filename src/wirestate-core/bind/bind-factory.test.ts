@@ -1,6 +1,6 @@
 import { BindingType, Container } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
-import { BindingDescriptor } from "../types/provision";
+import { FactoryBindingDescriptor } from "../types/provision";
 
 import { bindFactory } from "./bind-factory";
 import { getContainerBindings } from "./register-binding";
@@ -9,7 +9,7 @@ describe("bindFactory", () => {
   it("should bind a factory creator", () => {
     const container: Container = new Container();
     const TOKEN: unique symbol = Symbol("greeting-factory");
-    const binding: BindingDescriptor<() => string> = {
+    const binding: FactoryBindingDescriptor<() => string> = {
       bindingType: BindingType.Factory,
       factory: () => () => "hello",
       id: TOKEN,
@@ -26,7 +26,10 @@ describe("bindFactory", () => {
 
   it("should throw if id is missing", () => {
     const container: Container = new Container();
-    const binding = { bindingType: BindingType.Factory, factory: () => () => "value" } as unknown as BindingDescriptor;
+    const binding = {
+      bindingType: BindingType.Factory,
+      factory: () => () => "value",
+    } as unknown as FactoryBindingDescriptor;
 
     expect(() => bindFactory(container, binding)).toThrow(
       expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
@@ -41,13 +44,13 @@ describe("bindFactory", () => {
       bindFactory(container, {
         bindingType: BindingType.Factory,
         id: "factory-binding",
-      } as BindingDescriptor)
+      } as FactoryBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindFactory(container, {
         bindingType: BindingType.Factory,
         id: "factory-binding",
-      } as BindingDescriptor)
+      } as FactoryBindingDescriptor)
     ).toThrow("Factory descriptor 'factory' must be a function.");
   });
 
@@ -59,14 +62,14 @@ describe("bindFactory", () => {
         bindingType: BindingType.DynamicValue,
         factory: () => () => "value",
         id: "factory-binding",
-      })
+      } as unknown as FactoryBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindFactory(container, {
         bindingType: BindingType.DynamicValue,
         factory: () => () => "value",
         id: "factory-binding",
-      })
+      } as unknown as FactoryBindingDescriptor)
     ).toThrow("bindFactory expected binding type 'Factory'.");
   });
 });

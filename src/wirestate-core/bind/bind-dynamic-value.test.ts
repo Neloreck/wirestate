@@ -3,7 +3,7 @@ import type { ResolutionContext } from "inversify";
 import { Container, BindingType, ScopeBindingType } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { AnyObject } from "../types/general";
-import { BindingDescriptor } from "../types/provision";
+import { DynamicValueBindingDescriptor } from "../types/provision";
 
 import { bindDynamicValue } from "./bind-dynamic-value";
 
@@ -13,7 +13,11 @@ describe("bindDynamicValue", () => {
     const value: AnyObject = { c: 3, d: 4 };
     const factory = jest.fn(() => value);
 
-    const result: Container = bindDynamicValue(container, { id: "factory-value", factory });
+    const result: Container = bindDynamicValue(container, {
+      bindingType: BindingType.DynamicValue,
+      id: "factory-value",
+      factory,
+    });
 
     expect(result).toBe(container);
     expect(container.get("factory-value")).toEqual({ c: 3, d: 4 });
@@ -45,7 +49,12 @@ describe("bindDynamicValue", () => {
     const value: AnyObject = { c: 3, d: 4 };
     const factory = jest.fn(() => value);
 
-    bindDynamicValue(container, { id: "factory-singleton", factory, scopeBindingType: ScopeBindingType.Singleton });
+    bindDynamicValue(container, {
+      bindingType: BindingType.DynamicValue,
+      id: "factory-singleton",
+      factory,
+      scopeBindingType: ScopeBindingType.Singleton,
+    });
 
     expect(container.get("factory-singleton")).toBe(value);
     expect(container.get("factory-singleton")).toBe(value);
@@ -59,6 +68,7 @@ describe("bindDynamicValue", () => {
     let count: number = 0;
 
     bindDynamicValue(container, {
+      bindingType: BindingType.DynamicValue,
       id: "factory-transient",
       factory: () => count++,
       scopeBindingType: ScopeBindingType.Transient,
@@ -74,6 +84,7 @@ describe("bindDynamicValue", () => {
     let count: number = 0;
 
     bindDynamicValue(container, {
+      bindingType: BindingType.DynamicValue,
       id: "factory-request",
       factory: () => count++,
       scopeBindingType: ScopeBindingType.Request,
@@ -87,7 +98,7 @@ describe("bindDynamicValue", () => {
 
   it("should throw if id is missing", () => {
     const container: Container = new Container();
-    const binding = { value: "my-value" } as unknown as BindingDescriptor;
+    const binding = { value: "my-value" } as unknown as DynamicValueBindingDescriptor;
 
     expect(() => bindDynamicValue(container, binding)).toThrow(
       expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
@@ -101,12 +112,12 @@ describe("bindDynamicValue", () => {
     expect(() =>
       bindDynamicValue(container, {
         id: "missing-dynamic-source",
-      })
+      } as DynamicValueBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindDynamicValue(container, {
         id: "missing-dynamic-source",
-      })
+      } as DynamicValueBindingDescriptor)
     ).toThrow("Dynamic value descriptor 'factory' must be a function.");
   });
 
@@ -118,14 +129,14 @@ describe("bindDynamicValue", () => {
         bindingType: BindingType.DynamicValue,
         id: "static-value-ref",
         value: { a: 1, b: 2 },
-      })
+      } as unknown as DynamicValueBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindDynamicValue(container, {
         bindingType: BindingType.DynamicValue,
         id: "static-value-ref",
         value: { a: 1, b: 2 },
-      })
+      } as unknown as DynamicValueBindingDescriptor)
     ).toThrow("Dynamic value descriptor 'factory' must be a function.");
   });
 
@@ -137,14 +148,14 @@ describe("bindDynamicValue", () => {
         bindingType: BindingType.DynamicValue,
         factory: undefined,
         id: "undefined-factory",
-      })
+      } as unknown as DynamicValueBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindDynamicValue(container, {
         bindingType: BindingType.DynamicValue,
         factory: undefined,
         id: "undefined-factory",
-      })
+      } as unknown as DynamicValueBindingDescriptor)
     ).toThrow("Dynamic value descriptor 'factory' must be a function.");
   });
 
@@ -156,14 +167,14 @@ describe("bindDynamicValue", () => {
         bindingType: BindingType.ConstantValue,
         id: "constant-value",
         value: "my-value",
-      })
+      } as unknown as DynamicValueBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindDynamicValue(container, {
         bindingType: BindingType.ConstantValue,
         id: "constant-value",
         value: "my-value",
-      })
+      } as unknown as DynamicValueBindingDescriptor)
     ).toThrow("bindDynamicValue expected binding type 'DynamicValue'.");
   });
 
@@ -172,17 +183,15 @@ describe("bindDynamicValue", () => {
 
     expect(() =>
       bindDynamicValue(container, {
-        // @ts-ignore
         factory: "not-a-function",
         id: "bad-factory",
-      })
+      } as unknown as DynamicValueBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindDynamicValue(container, {
-        // @ts-ignore
         factory: "not-a-function",
         id: "bad-factory",
-      })
+      } as unknown as DynamicValueBindingDescriptor)
     ).toThrow("Dynamic value descriptor 'factory' must be a function.");
   });
 
@@ -193,17 +202,15 @@ describe("bindDynamicValue", () => {
       bindDynamicValue(container, {
         factory: () => "my-value",
         id: "bad-scope",
-        // @ts-ignore
         scopeBindingType: "UNKNOWN",
-      })
+      } as unknown as DynamicValueBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_BINDING_SCOPE }));
     expect(() =>
       bindDynamicValue(container, {
         factory: () => "my-value",
         id: "bad-scope",
-        // @ts-ignore
         scopeBindingType: "UNKNOWN",
-      })
+      } as unknown as DynamicValueBindingDescriptor)
     ).toThrow("Binding descriptor has unknown scope binding type 'UNKNOWN'.");
   });
 });

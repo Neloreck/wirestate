@@ -3,7 +3,7 @@ import { GenericService } from "@/fixtures/services/generic-service";
 import { BindingType, Container } from "../alias";
 import { createContainer } from "../container/create-container";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
-import { BindingDescriptor } from "../types/provision";
+import { ServiceRedirectionBindingDescriptor } from "../types/provision";
 
 import { bindService } from "./bind-service";
 import { bindServiceRedirection } from "./bind-service-redirection";
@@ -13,7 +13,7 @@ describe("bindServiceRedirection", () => {
   it("should bind a service redirection descriptor", () => {
     const container: Container = createContainer();
     const TOKEN: unique symbol = Symbol("generic-service-alias");
-    const binding: BindingDescriptor<GenericService> = {
+    const binding: ServiceRedirectionBindingDescriptor<GenericService> = {
       bindingType: BindingType.ServiceRedirection,
       id: TOKEN,
       service: GenericService,
@@ -33,7 +33,7 @@ describe("bindServiceRedirection", () => {
     const binding = {
       bindingType: BindingType.ServiceRedirection,
       service: GenericService,
-    } as unknown as BindingDescriptor;
+    } as unknown as ServiceRedirectionBindingDescriptor;
 
     expect(() => bindServiceRedirection(container, binding)).toThrow(
       expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
@@ -48,13 +48,13 @@ describe("bindServiceRedirection", () => {
       bindServiceRedirection(container, {
         bindingType: BindingType.ServiceRedirection,
         id: "redirected-binding",
-      } as BindingDescriptor)
+      } as ServiceRedirectionBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindServiceRedirection(container, {
         bindingType: BindingType.ServiceRedirection,
         id: "redirected-binding",
-      } as BindingDescriptor)
+      } as ServiceRedirectionBindingDescriptor)
     ).toThrow("Service redirection descriptor must provide a 'service' token.");
   });
 
@@ -66,14 +66,14 @@ describe("bindServiceRedirection", () => {
         bindingType: BindingType.Instance,
         id: "redirected-binding",
         service: GenericService,
-      })
+      } as unknown as ServiceRedirectionBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindServiceRedirection(container, {
         bindingType: BindingType.Instance,
         id: "redirected-binding",
         service: GenericService,
-      })
+      } as unknown as ServiceRedirectionBindingDescriptor)
     ).toThrow("bindServiceRedirection expected binding type 'ServiceRedirection'.");
   });
 });

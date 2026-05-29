@@ -4,7 +4,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { BindingType, Container, ScopeBindingType, type ServiceIdentifier } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { BindingDescriptor } from "../types/provision";
+import { ConstantValueBindingDescriptor } from "../types/provision";
 
 import { registerBinding } from "./register-binding";
 import { validateBindingDescriptor } from "./validate-binding-descriptor";
@@ -20,7 +20,7 @@ import { validateBindingDescriptor } from "./validate-binding-descriptor";
  * @throws {@link WirestateError} If the descriptor is missing a token, uses a non-constant binding type,
  * uses a non-singleton scope, or omits the `value` field.
  */
-function validateConstantDescriptor(descriptor: BindingDescriptor): void {
+function validateConstantDescriptor(descriptor: ConstantValueBindingDescriptor): void {
   validateBindingDescriptor(descriptor);
 
   if (descriptor.bindingType !== undefined && descriptor.bindingType !== BindingType.ConstantValue) {
@@ -74,7 +74,7 @@ function validateConstantDescriptor(descriptor: BindingDescriptor): void {
  * const apiUrl = container.get<string>(API_URL);
  * ```
  */
-export function bindConstant<T>(container: Container, descriptor: BindingDescriptor): Container {
+export function bindConstant<T>(container: Container, descriptor: ConstantValueBindingDescriptor<T>): Container {
   validateConstantDescriptor(descriptor);
 
   dbg.info(prefix(__filename), "Binding constant:", {
