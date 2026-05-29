@@ -14,8 +14,8 @@ import {
 import { bindConstant } from "./bind-constant";
 import { bindDynamicValue } from "./bind-dynamic-value";
 import { bindFactory } from "./bind-factory";
+import { bindInstance, bindInstanceWithToken, type BindInstanceOptions } from "./bind-instance";
 import { bindResolvedValue } from "./bind-resolved-value";
-import { bindService, bindServiceWithToken, type BindServiceOptions } from "./bind-service";
 import { bindServiceRedirection } from "./bind-service-redirection";
 
 /**
@@ -23,7 +23,7 @@ import { bindServiceRedirection } from "./bind-service-redirection";
  *
  * @group Bind
  */
-export interface BindOptions extends BindServiceOptions {
+export interface BindOptions extends BindInstanceOptions {
   /**
    * Skip service lifecycle hooks for class bindings.
    *
@@ -95,7 +95,7 @@ export function bind<T extends object = object>(
   options: BindOptions = {}
 ): Container {
   if (typeof binding === "function") {
-    return bindService(container, binding, options);
+    return bindInstance(container, binding, options);
   }
 
   switch (binding.bindingType ?? BindingType.ConstantValue) {
@@ -115,7 +115,7 @@ export function bind<T extends object = object>(
       return bindServiceRedirection(container, binding as ServiceRedirectionBindingDescriptor);
 
     case BindingType.Instance:
-      return bindServiceWithToken(
+      return bindInstanceWithToken(
         container,
         binding.id as ServiceIdentifier<T>,
         (binding as InstanceBindingDescriptor<T>).value as unknown as Newable<T>,

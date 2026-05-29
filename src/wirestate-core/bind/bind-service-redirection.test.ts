@@ -5,7 +5,7 @@ import { createContainer } from "../container/create-container";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { ServiceRedirectionBindingDescriptor } from "../types/provision";
 
-import { bindService } from "./bind-service";
+import { bind } from "./bind";
 import { bindServiceRedirection } from "./bind-service-redirection";
 import { getContainerBindings } from "./register-binding";
 
@@ -19,7 +19,7 @@ describe("bindServiceRedirection", () => {
       service: GenericService,
     };
 
-    bindService(container, GenericService);
+    bind(container, GenericService);
 
     const result: Container = bindServiceRedirection(container, binding);
 

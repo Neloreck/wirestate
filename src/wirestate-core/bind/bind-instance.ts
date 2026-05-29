@@ -33,7 +33,7 @@ import { registerBinding } from "./register-binding";
 import { validateBindingDescriptor } from "./validate-binding-descriptor";
 
 /**
- * Validates that an instance descriptor can be bound by {@link bindServiceWithToken}.
+ * Validates that an instance descriptor can be bound by {@link bindInstanceWithToken}.
  *
  * @group Bind
  * @internal
@@ -55,11 +55,11 @@ function validateInstanceDescriptor(descriptor: InstanceBindingDescriptor): void
 }
 
 /**
- * Represents options for {@link bindService}.
+ * Represents options for {@link bindInstance}.
  *
  * @group Bind
  */
-export interface BindServiceOptions {
+export interface BindInstanceOptions {
   /**
    * Skip `@OnActivated` and `@OnDeactivation`.
    *
@@ -94,7 +94,7 @@ export interface BindServiceOptions {
  *
  * @example
  * ```typescript
- * import { Injectable, OnCommand, bindService, createContainer } from "@wirestate/core";
+ * import { Injectable, OnCommand, bind, createContainer } from "@wirestate/core";
  *
  * @Injectable()
  * class SessionService {
@@ -112,17 +112,17 @@ export interface BindServiceOptions {
  *
  * const container = createContainer();
  *
- * bindService(container, SessionService);
+ * bind(container, SessionService);
  *
  * const service = container.get(SessionService);
  * ```
  */
-export function bindService<T extends object>(
+export function bindInstance<T extends object>(
   container: Container,
   binding: Newable<T>,
-  options?: BindServiceOptions
+  options?: BindInstanceOptions
 ): Container {
-  return bindServiceWithToken(container, binding, binding, binding, options);
+  return bindInstanceWithToken(container, binding, binding, binding, options);
 }
 
 /**
@@ -140,12 +140,12 @@ export function bindService<T extends object>(
  * @param options - Configuration options for the binding.
  * @returns The same container for chaining or immediate resolution.
  */
-export function bindServiceWithToken<T extends object>(
+export function bindInstanceWithToken<T extends object>(
   container: Container,
   token: ServiceIdentifier<T>,
   binding: Newable<T>,
   registeredBinding: Newable<T> | InstanceBindingDescriptor<T>,
-  options?: BindServiceOptions
+  options?: BindInstanceOptions
 ): Container {
   if (typeof registeredBinding !== "function") {
     validateInstanceDescriptor(registeredBinding);

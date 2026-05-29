@@ -16,13 +16,13 @@ import { CommandStatus } from "../types/commands";
 import { Optional } from "../types/general";
 import { InstanceBindingDescriptor } from "../types/provision";
 
-import { bindService, bindServiceWithToken } from "./bind-service";
+import { bindInstance, bindInstanceWithToken } from "./bind-instance";
 
 interface ReflectMetadata {
   getMetadata?: (metadataKey: string, target: object) => unknown;
 }
 
-describe("bindService", () => {
+describe("bindInstance", () => {
   @Injectable()
   class AsyncFailService {
     @OnActivated()
@@ -75,7 +75,7 @@ describe("bindService", () => {
   it("should bind service and handle lifecycle", async () => {
     const container: Container = mockContainer();
 
-    const result: Container = bindService(container, GenericService);
+    const result: Container = bindInstance(container, GenericService);
 
     expect(result).toBe(container);
     expect(container.isBound(GenericService)).toBe(true);
@@ -117,7 +117,7 @@ describe("bindService", () => {
   it("should skip lifecycle if skipLifecycle is true", () => {
     const container: Container = mockContainer();
 
-    bindService(container, GenericService, { skipLifecycle: true });
+    bindInstance(container, GenericService, { skipLifecycle: true });
 
     const instance: GenericService = container.get(GenericService);
 
@@ -134,10 +134,10 @@ describe("bindService", () => {
       value: "not-a-constructor",
     } as unknown as InstanceBindingDescriptor;
 
-    expect(() => bindServiceWithToken(container, GenericService, binding.value as never, binding, {})).toThrow(
+    expect(() => bindInstanceWithToken(container, GenericService, binding.value as never, binding, {})).toThrow(
       expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
     );
-    expect(() => bindServiceWithToken(container, GenericService, binding.value as never, binding, {})).toThrow(
+    expect(() => bindInstanceWithToken(container, GenericService, binding.value as never, binding, {})).toThrow(
       "Instance descriptor 'value' must be a service constructor."
     );
   });
@@ -149,10 +149,10 @@ describe("bindService", () => {
       value: GenericService,
     } as unknown as InstanceBindingDescriptor;
 
-    expect(() => bindServiceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
+    expect(() => bindInstanceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
       expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
     );
-    expect(() => bindServiceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
+    expect(() => bindInstanceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
       "Binding descriptor must provide an 'id' token."
     );
   });
@@ -166,10 +166,10 @@ describe("bindService", () => {
       value: GenericService,
     } as unknown as InstanceBindingDescriptor;
 
-    expect(() => bindServiceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
+    expect(() => bindInstanceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
       expect.objectContaining({ code: ERROR_CODE_BINDING_SCOPE })
     );
-    expect(() => bindServiceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
+    expect(() => bindInstanceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
       "Binding descriptor has unknown scope binding type 'UNKNOWN'."
     );
   });
@@ -179,7 +179,7 @@ describe("bindService", () => {
 
     const container: Container = mockContainer();
 
-    bindService(container, AsyncFailService);
+    bindInstance(container, AsyncFailService);
 
     container.get(AsyncFailService);
 
@@ -201,7 +201,7 @@ describe("bindService", () => {
 
     const container: Container = mockContainer();
 
-    bindService(container, SyncFailActivationService);
+    bindInstance(container, SyncFailActivationService);
 
     expect(() => container.get(SyncFailActivationService)).toThrow("sync-activation-fail");
 
@@ -249,7 +249,7 @@ describe("bindService", () => {
 
     const container: Container = mockContainer();
 
-    bindService(container, SyncFailActivationWithHandlersService);
+    bindInstance(container, SyncFailActivationWithHandlersService);
 
     expect(() => container.get(SyncFailActivationWithHandlersService)).toThrow("sync-activation-handlers-fail");
     expect(container.get(CommandBus).has(ACTIVATION_FAILURE_COMMAND)).toBe(false);
@@ -279,7 +279,7 @@ describe("bindService", () => {
 
     const container: Container = mockContainer();
 
-    bindService(container, SyncFailDeactivationService);
+    bindInstance(container, SyncFailDeactivationService);
 
     const instance: SyncFailDeactivationService = container.get(SyncFailDeactivationService);
 
@@ -301,7 +301,7 @@ describe("bindService", () => {
   it("should handle non-function @OnQuery or @OnActivated properties during activation", () => {
     const container: Container = mockContainer();
 
-    bindService(container, CorruptedService);
+    bindInstance(container, CorruptedService);
 
     // This should not throw exceptions with corrupted 'activation' handlers.
     const instance: CorruptedService = container.get(CorruptedService);
@@ -323,7 +323,7 @@ describe("bindService", () => {
     try {
       delete reflectMetadata.getMetadata;
 
-      bindService(container, ServiceWithoutMetadataPolyfill);
+      bindInstance(container, ServiceWithoutMetadataPolyfill);
 
       expect(() => container.get(ServiceWithoutMetadataPolyfill)).toThrow(
         'reflect-metadata is required for Wirestate service activation. Import "reflect-metadata" once at your application entry point before creating Wirestate containers.'

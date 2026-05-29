@@ -1,5 +1,5 @@
 import { BindingType, Container, Injectable } from "../alias";
-import { bindService } from "../bind/bind-service";
+import { bind } from "../bind/bind";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
@@ -103,7 +103,7 @@ describe("createContainer", () => {
 
     class TestService {}
 
-    bindService(container, TestService);
+    bind(container, TestService);
 
     expect(container.get(TestService)).toBe(container.get(TestService));
   });
