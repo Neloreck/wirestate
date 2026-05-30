@@ -42,7 +42,7 @@ export class GenericService {
   }
 
   public testGetContainer(): Container {
-    return this.scope.getContainer();
+    return this.scope.resolve(Container);
   }
 
   public testGetSeed(): Container {

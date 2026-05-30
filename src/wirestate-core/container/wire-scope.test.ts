@@ -3,7 +3,7 @@ import { GenericService } from "@/fixtures/services/generic-service";
 import { Container, Inject, Injectable } from "../alias";
 import { bind } from "../bind/bind";
 import { CommandBus } from "../commands/command-bus";
-import { ERROR_CODE_ACCESS_AFTER_DISPOSAL, ERROR_CODE_ACCESS_BEFORE_ACTIVATION } from "../error/error-code";
+import { ERROR_CODE_ACCESS_AFTER_DISPOSAL } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
@@ -17,27 +17,21 @@ import { Optional } from "../types/general";
 import { WireScope } from "./wire-scope";
 
 describe("WireScope", () => {
-  it("should throw error if accessed before activation", () => {
-    const scope: WireScope = new WireScope(null);
-
-    expect(() => scope.getContainer()).toThrow(WirestateError);
-    expect(() => scope.getContainer()).toThrow(expect.objectContaining({ code: ERROR_CODE_ACCESS_BEFORE_ACTIVATION }));
-  });
-
   it("should throw error if accessed after disposal", () => {
-    const scope: WireScope = new WireScope(null);
+    const scope: WireScope = new WireScope(mockContainer());
 
     (scope as { isDisposed: boolean }).isDisposed = true;
+    (scope as unknown as { container: Optional<Container> }).container = null;
 
-    expect(() => scope.getContainer()).toThrow(WirestateError);
-    expect(() => scope.getContainer()).toThrow(expect.objectContaining({ code: ERROR_CODE_ACCESS_AFTER_DISPOSAL }));
+    expect(() => scope.resolve(Container)).toThrow(WirestateError);
+    expect(() => scope.resolve(Container)).toThrow(expect.objectContaining({ code: ERROR_CODE_ACCESS_AFTER_DISPOSAL }));
   });
 
-  it("should return container if activated", () => {
+  it("should resolve container if activated", () => {
     const container: Container = mockContainer();
     const scope: WireScope = new WireScope(container);
 
-    expect(scope.getContainer()).toBe(container);
+    expect(scope.resolve(Container)).toBe(container);
   });
 
   it("should report inactive state after disposal or deprovision", () => {
@@ -217,6 +211,33 @@ describe("WireScope", () => {
     expect(bus.executeOptional).toHaveBeenCalledTimes(2);
     expect(bus.executeOptional).toHaveBeenCalledWith("TEST_COMMAND", "first-attempt");
     expect(bus.executeOptional).toHaveBeenCalledWith("TEST_COMMAND", "second-attempt");
+  });
+
+  it("should inject core buses during construction", async () => {
+    const container: Container = mockContainer();
+    const eventBus: EventBus = container.get(EventBus);
+    const queryBus: QueryBus = container.get(QueryBus);
+    const commandBus: CommandBus = container.get(CommandBus);
+
+    eventBus.subscribe(() => void 0);
+    queryBus.register("TEST_QUERY", (value: number) => value + 1);
+    commandBus.register("TEST_COMMAND", (value: number) => value + 1);
+
+    const getSpy = jest.spyOn(container, "get");
+    const scope: WireScope = new WireScope(container);
+
+    scope.emitEvent("TEST_EVENT", 1);
+    scope.emitEvent("TEST_EVENT", 2);
+
+    expect(scope.query("TEST_QUERY", 1)).toBe(2);
+    expect(scope.query("TEST_QUERY", 2)).toBe(3);
+
+    await expect(scope.executeCommand("TEST_COMMAND", 1).result).resolves.toBe(2);
+    await expect(scope.executeCommand("TEST_COMMAND", 2).result).resolves.toBe(3);
+
+    expect(getSpy.mock.calls.filter(([token]) => token === EventBus)).toHaveLength(1);
+    expect(getSpy.mock.calls.filter(([token]) => token === QueryBus)).toHaveLength(1);
+    expect(getSpy.mock.calls.filter(([token]) => token === CommandBus)).toHaveLength(1);
   });
 
   it("should register query handler via scope", () => {

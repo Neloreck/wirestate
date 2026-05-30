@@ -23,6 +23,6 @@ describe("useScope", () => {
     expect(scope).not.toBeNull();
     expect(scope).toBeInstanceOf(WireScope);
     expect(scope).not.toBe(container.get(WireScope));
-    expect(scope?.getContainer()).toBe(container);
+    expect(scope?.resolve(Container)).toBe(container);
   });
 });

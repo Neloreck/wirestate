@@ -15,7 +15,7 @@ import { ERROR_CODE_GENERIC } from "./error-code";
  * import { WirestateError } from "@wirestate/core";
  *
  * try {
- *   scope.getContainer();
+ *   scope.resolve(SomeService);
  * } catch (error) {
  *   if (error instanceof WirestateError) {
  *     console.error(error.code, error.message);

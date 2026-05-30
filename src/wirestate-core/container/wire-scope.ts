@@ -61,7 +61,26 @@ export class WireScope {
    */
   public readonly isDeprovisioned: Optional<boolean> = null;
 
-  public constructor(private readonly container: Optional<Container>) {}
+  /**
+   * Container-scoped command bus used by command helper methods.
+   */
+  private readonly commandBus: CommandBus;
+
+  /**
+   * Container-scoped event bus used by event helper methods.
+   */
+  private readonly eventBus: EventBus;
+
+  /**
+   * Container-scoped query bus used by query helper methods.
+   */
+  private readonly queryBus: QueryBus;
+
+  public constructor(private readonly container: Container) {
+    this.commandBus = container.get(CommandBus);
+    this.eventBus = container.get(EventBus);
+    this.queryBus = container.get(QueryBus);
+  }
 
   /**
    * Whether this scope should stop user work because its service or provider lifecycle ended.
@@ -74,39 +93,6 @@ export class WireScope {
    */
   public get isInactive(): boolean {
     return this.isDisposed || this.isDeprovisioned === true;
-  }
-
-  /**
-   * Provides direct access to the underlying Inversify {@link Container}.
-   *
-   * @returns The active {@link Container}.
-   *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
-   * @example
-   * ```typescript
-   * const container: Container = scope.getContainer();
-   *
-   * container.bind("TOKEN").toConstantValue(42);
-   * ```
-   */
-  public getContainer(): Container {
-    if (this.container) {
-      return this.container;
-    }
-
-    if (this.isDisposed) {
-      throw new WirestateError(
-        ERROR_CODE_ACCESS_AFTER_DISPOSAL,
-        "WireScope::container accessed after deactivation. Ensure service is properly disposed."
-      );
-    } else {
-      throw new WirestateError(
-        ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
-        "WireScope::container accessed before activation. " +
-          "Ensure service is bound to container and is properly resolved."
-      );
-    }
   }
 
   /**
@@ -136,7 +122,9 @@ export class WireScope {
       key: injectionId,
     });
 
-    return this.getContainer().get<T>(injectionId);
+    this.assertActive();
+
+    return this.container.get<T>(injectionId);
   }
 
   /**
@@ -162,9 +150,9 @@ export class WireScope {
       key: injectionId,
     });
 
-    const container: Container = this.getContainer();
+    this.assertActive();
 
-    return container.isBound(injectionId) ? container.get<T>(injectionId) : null;
+    return this.container.isBound(injectionId) ? this.container.get<T>(injectionId) : null;
   }
 
   /**
@@ -195,7 +183,9 @@ export class WireScope {
       options,
     });
 
-    this.getContainer().get(EventBus).emit(type, payload, options);
+    this.assertActive();
+
+    this.eventBus.emit(type, payload, options);
   }
 
   /**
@@ -216,7 +206,9 @@ export class WireScope {
   public subscribeToEvent(handler: EventHandler): EventUnsubscriber {
     dbg.info(prefix(__filename), "Subscribe event:", { handler });
 
-    return this.getContainer().get(EventBus).subscribe(handler);
+    this.assertActive();
+
+    return this.eventBus.subscribe(handler);
   }
 
   /**
@@ -234,7 +226,9 @@ export class WireScope {
   public unsubscribeFromEvent(handler: EventHandler): void {
     dbg.info(prefix(__filename), "Unsubscribe event:", { handler });
 
-    this.getContainer().get(EventBus).unsubscribe(handler);
+    this.assertActive();
+
+    this.eventBus.unsubscribe(handler);
   }
 
   /**
@@ -259,7 +253,9 @@ export class WireScope {
   public query<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): R {
     dbg.info(prefix(__filename), "Query:", { type, data });
 
-    return this.getContainer().get(QueryBus).query<R, D>(type, data);
+    this.assertActive();
+
+    return this.queryBus.query<R, D>(type, data);
   }
 
   /**
@@ -284,7 +280,9 @@ export class WireScope {
   public queryAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Promise<R> {
     dbg.info(prefix(__filename), "Async query:", { type, data });
 
-    return this.getContainer().get(QueryBus).queryAsync<R, D>(type, data);
+    this.assertActive();
+
+    return this.queryBus.queryAsync<R, D>(type, data);
   }
 
   /**
@@ -308,7 +306,9 @@ export class WireScope {
   public queryOptional<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Optional<R> {
     dbg.info(prefix(__filename), "Query optional:", { type, data });
 
-    return this.getContainer().get(QueryBus).queryOptional<R, D>(type, data);
+    this.assertActive();
+
+    return this.queryBus.queryOptional<R, D>(type, data);
   }
 
   /**
@@ -335,7 +335,9 @@ export class WireScope {
   ): Promise<Optional<R>> {
     dbg.info(prefix(__filename), "Optional async query:", { type, data });
 
-    return this.getContainer().get(QueryBus).queryOptionalAsync<R, D>(type, data);
+    this.assertActive();
+
+    return this.queryBus.queryOptionalAsync<R, D>(type, data);
   }
 
   /**
@@ -358,7 +360,9 @@ export class WireScope {
   public registerQueryHandler<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): QueryUnregister {
     dbg.info(prefix(__filename), "Register query handler:", { type });
 
-    return this.getContainer().get(QueryBus).register(type, handler);
+    this.assertActive();
+
+    return this.queryBus.register(type, handler);
   }
 
   /**
@@ -380,7 +384,9 @@ export class WireScope {
   public unregisterQueryHandler<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): void {
     dbg.info(prefix(__filename), "Unregister query:", { type });
 
-    this.getContainer().get(QueryBus).unregister(type, handler);
+    this.assertActive();
+
+    this.queryBus.unregister(type, handler);
   }
 
   /**
@@ -410,7 +416,9 @@ export class WireScope {
   ): CommandExecution<R> {
     dbg.info(prefix(__filename), "Execute command:", { type, data });
 
-    return this.getContainer().get(CommandBus).execute<R, D>(type, data);
+    this.assertActive();
+
+    return this.commandBus.execute<R, D>(type, data);
   }
 
   /**
@@ -441,7 +449,9 @@ export class WireScope {
   ): Optional<CommandExecution<R>> {
     dbg.info(prefix(__filename), "Execute command:", { type, data });
 
-    return this.getContainer().get(CommandBus).executeOptional<R, D>(type, data);
+    this.assertActive();
+
+    return this.commandBus.executeOptional<R, D>(type, data);
   }
 
   /**
@@ -469,7 +479,9 @@ export class WireScope {
   ): CommandUnregister {
     dbg.info(prefix(__filename), "Register command handler:", { type });
 
-    return this.getContainer().get(CommandBus).register(type, handler);
+    this.assertActive();
+
+    return this.commandBus.register(type, handler);
   }
 
   /**
@@ -491,7 +503,9 @@ export class WireScope {
   public unregisterCommandHandler<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): void {
     dbg.info(prefix(__filename), "Unregister command:", { type });
 
-    this.getContainer().get(CommandBus).unregister(type, handler);
+    this.assertActive();
+
+    this.commandBus.unregister(type, handler);
   }
 
   /**
@@ -541,11 +555,40 @@ export class WireScope {
     });
 
     if (seed === undefined) {
-      return this.getContainer().get<T>(SEED_TOKEN);
+      this.assertActive();
+
+      return this.container.get<T>(SEED_TOKEN);
     } else {
-      const seeds: SeedsMap = this.getContainer().get<SeedsMap>(SEEDS_TOKEN);
+      this.assertActive();
+
+      const seeds: SeedsMap = this.container.get<SeedsMap>(SEEDS_TOKEN);
 
       return seeds.has(seed) ? (seeds.get(seed) as T) : null;
+    }
+  }
+
+  /**
+   * Verifies that this scope still belongs to an active service instance.
+   *
+   * @throws {@link WirestateError} If the scope is accessed before activation
+   * or after disposal.
+   */
+  private assertActive(): void {
+    if (this.container) {
+      return;
+    }
+
+    if (this.isDisposed) {
+      throw new WirestateError(
+        ERROR_CODE_ACCESS_AFTER_DISPOSAL,
+        "WireScope::container accessed after deactivation. Ensure service is properly disposed."
+      );
+    } else {
+      throw new WirestateError(
+        ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
+        "WireScope::container accessed before activation. " +
+          "Ensure service is bound to container and is properly resolved."
+      );
     }
   }
 }

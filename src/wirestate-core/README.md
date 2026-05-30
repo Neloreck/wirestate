@@ -228,7 +228,6 @@ Injected `WireScope` instances expose lifecycle state for async guards:
 | `isDisposed`                              | `true` after service deactivation                                                           |
 | `isDeprovisioned`                         | `null` before provider provisioning, `false` while owned, `true` after provider deprovision |
 | `isInactive`                              | `true` when `isDisposed` or `isDeprovisioned === true`                                      |
-| `getContainer()`                          | Access the raw IoC container                                                                |
 | `resolve(token)`                          | Resolve a service or value by token                                                         |
 | `resolveOptional(token)`                  | Resolve a service or value, returns `null` if not bound                                     |
 | `getSeed(token?)`                         | Get the per-service or shared seed                                                          |
