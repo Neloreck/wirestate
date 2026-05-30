@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Event, EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../types/events";
+import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "../types/events";
 
 /**
  * Broadcasts events to every subscriber in one container.
@@ -58,7 +58,7 @@ export class EventBus {
 
     for (const handler of snapshot) {
       try {
-        const event: Event<P, T, F> = {
+        const event: WireEvent<P, T, F> = {
           type,
         };
 

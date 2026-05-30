@@ -17,11 +17,11 @@ function CartButton() {
 ## Listen To One Event
 
 ```tsx
-import { Event } from "@wirestate/core";
+import { WireEvent } from "@wirestate/core";
 import { useEvent } from "@wirestate/react";
 
 function CartLogger() {
-  useEvent("CART_ITEM_ADDED", (event: Event<CartItem>) => {
+  useEvent("CART_ITEM_ADDED", (event: WireEvent<CartItem>) => {
     console.log(event.payload);
   });
 

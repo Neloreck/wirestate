@@ -12,7 +12,7 @@ export type EventType = string | symbol;
  *
  * @group Events
  */
-export interface Event<P = unknown, T extends EventType = EventType, F = unknown> {
+export interface WireEvent<P = unknown, T extends EventType = EventType, F = unknown> {
   readonly type: T;
   readonly payload?: P;
   readonly from?: F;
@@ -37,7 +37,7 @@ export interface EventEmitOptions<F = unknown> {
  *
  * @group Events
  */
-export type EventHandler<E extends Event = Event> = (event: E) => void;
+export type EventHandler<E extends WireEvent = WireEvent> = (event: E) => void;
 
 /**
  * Represents the function that removes an event subscription.
@@ -53,7 +53,7 @@ export type EventUnsubscriber = () => void;
  * @internal
  */
 export interface EventDispatchEntry {
-  readonly types: Optional<ReadonlyArray<Event["type"]>>;
+  readonly types: Optional<ReadonlyArray<WireEvent["type"]>>;
   readonly handler: EventHandler;
 }
 

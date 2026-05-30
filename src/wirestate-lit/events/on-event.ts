@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { Event, EventType } from "@wirestate/core";
+import { EventType, WireEvent } from "@wirestate/core";
 
 import { AnyObject, Interface, Optional } from "../types/general";
 
@@ -13,7 +13,7 @@ import { OnEventController } from "./on-event-controller";
  *
  * @group Events
  */
-export interface OnEventDecorator<E extends Event = Event> {
+export interface OnEventDecorator<E extends WireEvent = WireEvent> {
   // Standard (TC39):
   <This extends Interface<Omit<ReactiveElement, "renderRoot">>>(
     value: (this: This, event: E) => void,
@@ -38,7 +38,7 @@ export interface OnEventDecorator<E extends Event = Event> {
  * ```typescript
  * class MyElement extends LitElement {
  *   @onEvent()
- *   private onMyEvent(event: Event) {
+ *   private onMyEvent(event: WireEvent) {
  *     console.log("Event received:", event);
  *   }
  * }
@@ -58,13 +58,13 @@ export interface OnEventDecorator<E extends Event = Event> {
  * ```typescript
  * class MyElement extends LitElement {
  *   @onEvent(["MY_EVENT_TYPE_1", "MY_EVENT_TYPE_2"])
- *   private onMyEvent(event: Event) {
+ *   private onMyEvent(event: WireEvent) {
  *     console.log("Event received:", event);
  *   }
  * }
  * ```
  */
-export function onEvent<E extends Event = Event>(types?: EventType | ReadonlyArray<EventType>): OnEventDecorator<E> {
+export function onEvent<E extends WireEvent = WireEvent>(types?: EventType | ReadonlyArray<EventType>): OnEventDecorator<E> {
   const normalized: Optional<ReadonlyArray<EventType>> =
     types === undefined ? null : Array.isArray(types) ? [...(types as ReadonlyArray<EventType>)] : [types as EventType];
 

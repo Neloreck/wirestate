@@ -21,12 +21,12 @@ import { Maybe, Optional } from "../types/general";
  *
  * @example
  * ```typescript
- * import { Event, Injectable, OnEvent } from "@wirestate/core";
+ * import { Injectable, OnEvent, WireEvent } from "@wirestate/core";
  *
  * @Injectable()
  * class MyService {
  *   @OnEvent("USER_LOGGED_IN")
- *   private onLogin(event: Event<User>): void {
+ *   private onLogin(event: WireEvent<User>): void {
  *     console.log(event.payload.id);
  *   }
  * }

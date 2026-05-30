@@ -22,12 +22,12 @@ export class CartService {
 ## Handle With A Decorator
 
 ```ts
-import { Event, Injectable, OnEvent } from "@wirestate/core";
+import { Injectable, OnEvent, WireEvent } from "@wirestate/core";
 
 @Injectable()
 export class AnalyticsService {
   @OnEvent("CART_ITEM_ADDED")
-  public trackAdd(event: Event<CartItem>): void {
+  public trackAdd(event: WireEvent<CartItem>): void {
     this.track("add_to_cart", event.payload);
   }
 
@@ -66,7 +66,7 @@ unsubscribe();
 When a service owns a dynamic subscription, attach it during provider lifecycle and remove it during deprovision.
 
 ```ts
-import { Event, EventUnsubscriber, Inject, Injectable, OnDeprovision, OnProvision, WireScope } from "@wirestate/core";
+import { EventUnsubscriber, Inject, Injectable, OnDeprovision, OnProvision, WireEvent, WireScope } from "@wirestate/core";
 
 @Injectable()
 export class CartActivityService {
@@ -76,7 +76,7 @@ export class CartActivityService {
 
   @OnProvision()
   public onProvision(): void {
-    this.unsubscribe = this.scope.subscribeToEvent((event: Event) => {
+    this.unsubscribe = this.scope.subscribeToEvent((event: WireEvent) => {
       if (event.type === "CART_VIEWED") {
         this.recordView();
       }
@@ -102,5 +102,5 @@ A throwing event handler is logged. The next handler still runs.
 ## API Reference
 
 [`EventBus`](/api/wirestate-core/classes/EventBus), [`WireScope`](/api/wirestate-core/classes/WireScope),
-[`OnEvent`](/api/wirestate-core/functions/OnEvent), [`Event`](/api/wirestate-core/interfaces/Event),
+[`OnEvent`](/api/wirestate-core/functions/OnEvent), [`WireEvent`](/api/wirestate-core/interfaces/WireEvent),
 [`EventUnsubscriber`](/api/wirestate-core/type-aliases/EventUnsubscriber).

@@ -56,4 +56,4 @@ export {
 } from "./types/provision";
 export { CommandStatus, CommandExecution, CommandHandler, CommandType, CommandUnregister } from "./types/commands";
 export { QueryHandler, QueryType, QueryUnregister } from "./types/queries";
-export { Event, EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "./types/events";
+export { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "./types/events";

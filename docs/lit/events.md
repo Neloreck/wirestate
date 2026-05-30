@@ -5,7 +5,7 @@ Lit event helpers register handlers against the active container while the eleme
 ## Decorator Handler
 
 ```ts
-import { Event } from "@wirestate/core";
+import { WireEvent } from "@wirestate/core";
 import { onEvent } from "@wirestate/lit";
 import { LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
@@ -13,7 +13,7 @@ import { customElement } from "lit/decorators.js";
 @customElement("cart-logger")
 export class CartLogger extends LitElement {
   @onEvent("CART_ITEM_ADDED")
-  private log(event: Event<CartItem>): void {
+  private log(event: WireEvent<CartItem>): void {
     console.log(event.payload);
   }
 }

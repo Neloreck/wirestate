@@ -1,6 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveController, ReactiveElement } from "@lit/reactive-element";
-import { Event, EventBus, EventHandler, EventType, EventUnsubscriber } from "@wirestate/core";
+import { EventBus, EventHandler, EventType, EventUnsubscriber, WireEvent } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -29,7 +29,7 @@ import { Optional } from "../types/general";
  * }
  * ```
  */
-export class OnEventController<E extends Event = Event> implements ReactiveController {
+export class OnEventController<E extends WireEvent = WireEvent> implements ReactiveController {
   private bus: Optional<EventBus> = null;
   private unsubscriber: Optional<EventUnsubscriber> = null;
 

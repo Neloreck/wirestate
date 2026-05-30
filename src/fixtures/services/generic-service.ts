@@ -5,7 +5,7 @@ import { OnEvent } from "../../wirestate-core/events/on-event";
 import { OnQuery } from "../../wirestate-core/queries/on-query";
 import { OnActivated } from "../../wirestate-core/service/on-activated";
 import { OnDeactivation } from "../../wirestate-core/service/on-deactivation";
-import { Event } from "../../wirestate-core/types/events";
+import { WireEvent } from "../../wirestate-core/types/events";
 import { Maybe } from "../../wirestate-core/types/general";
 
 @Injectable()
@@ -71,7 +71,7 @@ export class GenericService {
   }
 
   @OnEvent("TEST_STRING_EVENT")
-  public onTestStringEvent(event: Event<string>): void {
+  public onTestStringEvent(event: WireEvent<string>): void {
     this.isTestStringEventReceived = true;
     this.testStingEventPayload = event.payload;
   }
