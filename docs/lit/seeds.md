@@ -27,19 +27,19 @@ export class CounterRoot extends LitElement {
 }
 ```
 
-## Sub-Container Provider Seeds
+## Child Container Provider Seeds
 
 ```ts
-import { SubContainerProvider, provideSubContainer } from "@wirestate/lit";
+import { ChildContainerProvider, provideChildContainer } from "@wirestate/lit";
 
 class CheckoutScope extends LitElement {
-  @provideSubContainer({
+  @provideChildContainer({
     config: {
       bindings: [CartService],
       seeds: [[CartService, { items: hydratedItems }]],
     },
   })
-  private provider!: SubContainerProvider;
+  private provider!: ChildContainerProvider;
 }
 ```
 
@@ -75,5 +75,5 @@ Managed Lit containers are recreated when their provider config is replaced and 
 ## API Reference
 
 [`provideContainer`](/api/wirestate-lit/functions/provideContainer),
-[`provideSubContainer`](/api/wirestate-lit/functions/provideSubContainer), [`WireScope`](/api/wirestate-core/classes/WireScope),
+[`provideChildContainer`](/api/wirestate-lit/functions/provideChildContainer), [`WireScope`](/api/wirestate-core/classes/WireScope),
 [`SeedBindings`](/api/wirestate-core/type-aliases/SeedBindings).

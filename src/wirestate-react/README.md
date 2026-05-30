@@ -59,7 +59,7 @@ export function Application() {
 }
 ```
 
-### `SubContainerProvider`
+### `ChildContainerProvider`
 
 Creates a child container scoped to a subtree.
 Use it under `ContainerProvider` when a branch needs its own service bindings or per-service seeds.
@@ -67,11 +67,11 @@ Child containers activate all provided bindings by default; pass `activate: fals
 
 ```tsx
 import { ReactNode } from "react";
-import { SubContainerProvider } from "@wirestate/react";
+import { ChildContainerProvider } from "@wirestate/react";
 import { CounterService, LoggerService } from "./services";
 
 function CounterServicesProvider(props: { children?: ReactNode }) {
-  return <SubContainerProvider bindings={[CounterService, LoggerService]}>{props.children}</SubContainerProvider>;
+  return <ChildContainerProvider bindings={[CounterService, LoggerService]}>{props.children}</ChildContainerProvider>;
 }
 
 export function CounterPage() {

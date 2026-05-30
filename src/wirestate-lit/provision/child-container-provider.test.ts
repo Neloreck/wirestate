@@ -10,16 +10,16 @@ import { OnEventController } from "../events/on-event-controller";
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
 import { Maybe } from "../types/general";
 
-import { SubContainerProvider } from "./sub-container-provider";
+import { ChildContainerProvider } from "./child-container-provider";
 
-describe("SubContainerProvider", () => {
+describe("ChildContainerProvider", () => {
   const CONFIG_TOKEN: string = "CONFIG_TOKEN";
   const PARENT_TOKEN: string = "PARENT_TOKEN";
 
-  @customElement("ws-sub-container-provider-host")
+  @customElement("ws-child-container-provider-host")
   class TestProviderElement extends ReactiveElement {}
 
-  @customElement("ws-sub-container-provider-child")
+  @customElement("ws-child-container-provider-child")
   class TestChildElement extends ReactiveElement {}
 
   let fixture: LitProvisionFixture;
@@ -28,7 +28,7 @@ describe("SubContainerProvider", () => {
     fixture?.cleanup();
   });
 
-  it("should create sub-container with current context as parent and provide it to descendants", () => {
+  it("should create child container with current context as parent and provide it to descendants", () => {
     const parent: Container = createContainer({
       bindings: [{ id: PARENT_TOKEN, value: "parent-value" }],
     });
@@ -37,7 +37,7 @@ describe("SubContainerProvider", () => {
 
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
-    const provider: SubContainerProvider = new SubContainerProvider(element, {
+    const provider: ChildContainerProvider = new ChildContainerProvider(element, {
       config: {
         bindings: [{ id: CONFIG_TOKEN, value: "child-value" }],
       },
@@ -71,13 +71,13 @@ describe("SubContainerProvider", () => {
     expect(provider.value).toBeUndefined();
   });
 
-  it("should activate configured bindings when the sub-container is created", () => {
+  it("should activate configured bindings when the child container is created", () => {
     fixture = createLitProvision();
 
     const { LifecycleService, events } = createLifecycleService({ methods: ["activated"] });
 
     const element: TestProviderElement = new TestProviderElement();
-    const provider: SubContainerProvider = new SubContainerProvider(element, {
+    const provider: ChildContainerProvider = new ChildContainerProvider(element, {
       config: {
         activate: [LifecycleService],
         bindings: [LifecycleService],
@@ -100,17 +100,17 @@ describe("SubContainerProvider", () => {
 
     expect(
       () =>
-        new SubContainerProvider(element, { config: { activate: ["MissingService"], bindings: [LifecycleService] } })
+        new ChildContainerProvider(element, { config: { activate: ["MissingService"], bindings: [LifecycleService] } })
     ).toThrow("is listed in 'activate' but was not provided in 'bindings'.");
   });
 
-  it("should provision sub-containers and deprovision before disposal", () => {
+  it("should provision child containers and deprovision before disposal", () => {
     fixture = createLitProvision();
 
     const { LifecycleService, events } = createLifecycleService();
     const element: TestProviderElement = new TestProviderElement();
 
-    const provider: SubContainerProvider = new SubContainerProvider(element, {
+    const provider: ChildContainerProvider = new ChildContainerProvider(element, {
       config: {
         bindings: [LifecycleService],
       },
@@ -133,7 +133,7 @@ describe("SubContainerProvider", () => {
 
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
-    const provider: SubContainerProvider = new SubContainerProvider(element, {
+    const provider: ChildContainerProvider = new ChildContainerProvider(element, {
       config: { bindings: [] },
     });
 
@@ -163,24 +163,24 @@ describe("SubContainerProvider", () => {
     expect(receivedContexts).toEqual([providedContainer]);
   });
 
-  it("should reject direct sub-container replacement values", () => {
+  it("should reject direct child container replacement values", () => {
     const element: TestProviderElement = new TestProviderElement();
-    const provider: SubContainerProvider = new SubContainerProvider(element, {
+    const provider: ChildContainerProvider = new ChildContainerProvider(element, {
       config: { bindings: [{ id: CONFIG_TOKEN, value: "child-value" }] },
     });
 
     expect(() => provider.setValue(createContainer({ bindings: [{ id: CONFIG_TOKEN, value: "next-value" }] }))).toThrow(
-      "SubContainerProvider owns its sub-container. Use `setConfig(config)` to replace the managed sub-container."
+      "ChildContainerProvider owns its child container. Use `setConfig(config)` to replace the managed child container."
     );
   });
 
-  it("should deprovision previous sub-containers and provision updated config", () => {
+  it("should deprovision previous child containers and provision updated config", () => {
     const events: Array<string> = [];
     const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
     const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
 
     const element: TestProviderElement = new TestProviderElement();
-    const provider: SubContainerProvider = new SubContainerProvider(element, { config: { bindings: [FirstService] } });
+    const provider: ChildContainerProvider = new ChildContainerProvider(element, { config: { bindings: [FirstService] } });
 
     fixture = createLitProvision();
 
@@ -214,7 +214,7 @@ describe("SubContainerProvider", () => {
     expect(provider.value).toBeUndefined();
   });
 
-  it("should validate replacement config before replacing the active sub-container", () => {
+  it("should validate replacement config before replacing the active child container", () => {
     fixture = createLitProvision();
 
     const { LifecycleService, events } = createLifecycleService({
@@ -222,7 +222,7 @@ describe("SubContainerProvider", () => {
     });
 
     const element: TestProviderElement = new TestProviderElement();
-    const provider: SubContainerProvider = new SubContainerProvider(element, {
+    const provider: ChildContainerProvider = new ChildContainerProvider(element, {
       config: { bindings: [LifecycleService] },
     });
 
@@ -249,7 +249,7 @@ describe("SubContainerProvider", () => {
     const { LifecycleService: ReplacementService } = createLifecycleService({ events, suffix: "replacement" });
 
     const element: TestProviderElement = new TestProviderElement();
-    const provider: SubContainerProvider = new SubContainerProvider(element, {
+    const provider: ChildContainerProvider = new ChildContainerProvider(element, {
       config: { bindings: [ManagedService] },
     });
 
@@ -286,7 +286,7 @@ describe("SubContainerProvider", () => {
     const { LifecycleService: ReplacementService } = createLifecycleService({ events, suffix: "replacement" });
 
     const element: TestProviderElement = new TestProviderElement();
-    const provider: SubContainerProvider = new SubContainerProvider(element, {
+    const provider: ChildContainerProvider = new ChildContainerProvider(element, {
       config: { bindings: [ManagedService] },
     });
 
@@ -334,7 +334,7 @@ describe("SubContainerProvider", () => {
 
     const element: TestProviderElement = new TestProviderElement();
 
-    new SubContainerProvider(element, {
+    new ChildContainerProvider(element, {
       config: {
         activate: true,
         bindings: [FirstService, SecondService],
@@ -357,7 +357,7 @@ describe("SubContainerProvider", () => {
 
     const element: TestProviderElement = new TestProviderElement();
 
-    new SubContainerProvider(element, {
+    new ChildContainerProvider(element, {
       config: {
         bindings: [FirstService, SecondService],
       },
@@ -384,20 +384,20 @@ describe("SubContainerProvider", () => {
 
     const element: TestProviderElement = new TestProviderElement();
 
-    new SubContainerProvider(element, { config: { activate: false, bindings: [PlainService] } });
+    new ChildContainerProvider(element, { config: { activate: false, bindings: [PlainService] } });
 
     fixture.provider.appendChild(element);
 
     expect(events).toEqual([]);
   });
 
-  it("should destroy sub-container on disconnect and recreate it on reconnect", () => {
+  it("should destroy child container on disconnect and recreate it on reconnect", () => {
     fixture = createLitProvision();
 
     const { LifecycleService, events } = createLifecycleService({ methods: ["activated", "deactivation"] });
 
     const element: TestProviderElement = new TestProviderElement();
-    const provider: SubContainerProvider = new SubContainerProvider(element, {
+    const provider: ChildContainerProvider = new ChildContainerProvider(element, {
       config: {
         activate: [LifecycleService],
         bindings: [LifecycleService, { id: CONFIG_TOKEN, value: "stable" }],
@@ -425,7 +425,7 @@ describe("SubContainerProvider", () => {
     expect(events).toEqual(["activated", "deactivation", "activated"]);
   });
 
-  it("should recreate sub-container when parent context changes", () => {
+  it("should recreate child container when parent context changes", () => {
     const firstParent: Container = createContainer({
       bindings: [{ id: PARENT_TOKEN, value: "first-parent" }],
     });
@@ -438,7 +438,7 @@ describe("SubContainerProvider", () => {
     const { LifecycleService, events } = createLifecycleService({ methods: ["activated", "deactivation"] });
 
     const element: TestProviderElement = new TestProviderElement();
-    const provider: SubContainerProvider = new SubContainerProvider(element, {
+    const provider: ChildContainerProvider = new ChildContainerProvider(element, {
       config: {
         activate: [LifecycleService],
         bindings: [LifecycleService, { id: CONFIG_TOKEN, value: "child-value" }],
@@ -467,7 +467,7 @@ describe("SubContainerProvider", () => {
 
     const element: TestProviderElement = new TestProviderElement();
 
-    new SubContainerProvider(element, {
+    new ChildContainerProvider(element, {
       config: {
         bindings: [{ id: CONFIG_TOKEN, value: "child-value" }],
       },

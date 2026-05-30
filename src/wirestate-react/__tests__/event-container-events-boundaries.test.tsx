@@ -2,9 +2,9 @@ import { cleanup, fireEvent, render } from "@testing-library/react";
 import { ContainerConfig } from "@wirestate/core";
 import { useMemo, useState } from "react";
 
-import { ContainerProvider, SubContainerProvider, useEventEmitter, useEventsHandler } from "../index";
+import { ContainerProvider, ChildContainerProvider, useEventEmitter, useEventsHandler } from "../index";
 
-describe("react event container boundaries integration (SubContainer essentials isolation)", () => {
+describe("react event container boundaries integration (child container essentials isolation)", () => {
   const COUNTER_EVENT: string = "COUNTER_EVENT";
 
   afterEach(() => {
@@ -40,15 +40,15 @@ describe("react event container boundaries integration (SubContainer essentials 
         <EventPanel name={"root"} />
 
         {showChild ? (
-          <SubContainerProvider bindings={[]}>
+          <ChildContainerProvider bindings={[]}>
             <EventPanel name={"child"} />
-          </SubContainerProvider>
+          </ChildContainerProvider>
         ) : null}
       </ContainerProvider>
     );
   }
 
-  it("keeps events isolated between parent and sub-containers", () => {
+  it("keeps events isolated between parent and child containers", () => {
     const { getByTestId, queryByTestId, rerender } = render(<Application showChild={true} />);
 
     fireEvent.click(getByTestId("root-emit"));

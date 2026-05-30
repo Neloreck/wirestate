@@ -19,10 +19,10 @@ import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 import { useContainer } from "../context/use-container";
 import { Optional } from "../types/general";
 
+import { ChildContainerProvider } from "./child-container-provider";
 import { ContainerProvider } from "./container-provider";
-import { SubContainerProvider } from "./sub-container-provider";
 
-describe("SubContainerProvider", () => {
+describe("ChildContainerProvider", () => {
   const CONFIG_TOKEN: string = "CONFIG_TOKEN";
 
   it("should create child container with correct parent context", () => {
@@ -39,7 +39,7 @@ describe("SubContainerProvider", () => {
 
     const { getByTestId } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider
+        <ChildContainerProvider
           bindings={[
             {
               id: CONFIG_TOKEN,
@@ -48,7 +48,7 @@ describe("SubContainerProvider", () => {
           ]}
         >
           <Consumer />
-        </SubContainerProvider>
+        </ChildContainerProvider>
       </ContainerProvider>
     );
 
@@ -79,7 +79,7 @@ describe("SubContainerProvider", () => {
 
     const { getByTestId, rerender } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider
+        <ChildContainerProvider
           bindings={[
             {
               id: CONFIG_TOKEN,
@@ -88,7 +88,7 @@ describe("SubContainerProvider", () => {
           ]}
         >
           <Consumer />
-        </SubContainerProvider>
+        </ChildContainerProvider>
       </ContainerProvider>
     );
 
@@ -117,9 +117,9 @@ describe("SubContainerProvider", () => {
 
     const { rerender, getByTestId } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider bindings={[{ id: CONFIG_TOKEN, value: "first" }]}>
+        <ChildContainerProvider bindings={[{ id: CONFIG_TOKEN, value: "first" }]}>
           <TrackingConsumer />
-        </SubContainerProvider>
+        </ChildContainerProvider>
       </ContainerProvider>
     );
 
@@ -127,9 +127,9 @@ describe("SubContainerProvider", () => {
 
     rerender(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider bindings={[{ id: CONFIG_TOKEN, value: "second" }]}>
+        <ChildContainerProvider bindings={[{ id: CONFIG_TOKEN, value: "second" }]}>
           <TrackingConsumer />
-        </SubContainerProvider>
+        </ChildContainerProvider>
       </ContainerProvider>
     );
 
@@ -176,9 +176,9 @@ describe("SubContainerProvider", () => {
 
     const { rerender, getByTestId } = render(
       <ContainerProvider container={firstParent}>
-        <SubContainerProvider bindings={[LifecycleService, { id: CONFIG_TOKEN, value: "stable" }]}>
+        <ChildContainerProvider bindings={[LifecycleService, { id: CONFIG_TOKEN, value: "stable" }]}>
           <TrackingConsumer />
-        </SubContainerProvider>
+        </ChildContainerProvider>
       </ContainerProvider>
     );
 
@@ -186,9 +186,9 @@ describe("SubContainerProvider", () => {
 
     rerender(
       <ContainerProvider container={secondParent}>
-        <SubContainerProvider bindings={[LifecycleService, { id: CONFIG_TOKEN, value: "stable" }]}>
+        <ChildContainerProvider bindings={[LifecycleService, { id: CONFIG_TOKEN, value: "stable" }]}>
           <TrackingConsumer />
-        </SubContainerProvider>
+        </ChildContainerProvider>
       </ContainerProvider>
     );
 
@@ -219,17 +219,17 @@ describe("SubContainerProvider", () => {
 
     const { rerender, getByTestId } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider bindings={[binding]}>
+        <ChildContainerProvider bindings={[binding]}>
           <TrackingConsumer />
-        </SubContainerProvider>
+        </ChildContainerProvider>
       </ContainerProvider>
     );
 
     rerender(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider bindings={[binding]}>
+        <ChildContainerProvider bindings={[binding]}>
           <TrackingConsumer />
-        </SubContainerProvider>
+        </ChildContainerProvider>
       </ContainerProvider>
     );
 
@@ -244,7 +244,7 @@ describe("SubContainerProvider", () => {
 
     const { rerender } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider bindings={[LifecycleService]} activate={false} />
+        <ChildContainerProvider bindings={[LifecycleService]} activate={false} />
       </ContainerProvider>
     );
 
@@ -252,7 +252,7 @@ describe("SubContainerProvider", () => {
 
     rerender(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider bindings={[LifecycleService]} activate={true} />
+        <ChildContainerProvider bindings={[LifecycleService]} activate={true} />
       </ContainerProvider>
     );
 
@@ -260,7 +260,7 @@ describe("SubContainerProvider", () => {
   });
 });
 
-describe("SubContainerProvider lifecycle", () => {
+describe("ChildContainerProvider lifecycle", () => {
   it("should call provider lifecycle for instance descriptors bound behind custom tokens", () => {
     const parentContainer: Container = mockContainer();
     const TOKEN: unique symbol = Symbol("lifecycle-service");
@@ -268,7 +268,7 @@ describe("SubContainerProvider lifecycle", () => {
 
     const { unmount } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider
+        <ChildContainerProvider
           bindings={[
             {
               bindingType: BindingType.Instance,
@@ -292,7 +292,7 @@ describe("SubContainerProvider lifecycle", () => {
 
     render(
       <ContainerProvider container={mockContainer()}>
-        <SubContainerProvider bindings={[LifecycleService]} />
+        <ChildContainerProvider bindings={[LifecycleService]} />
       </ContainerProvider>
     );
 
@@ -308,7 +308,7 @@ describe("SubContainerProvider lifecycle", () => {
 
     const { unmount } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider bindings={[ChildLifecycleService]} />
+        <ChildContainerProvider bindings={[ChildLifecycleService]} />
       </ContainerProvider>
     );
 
@@ -346,14 +346,14 @@ describe("SubContainerProvider lifecycle", () => {
 
     const { rerender } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider bindings={[LifecycleService]} />
+        <ChildContainerProvider bindings={[LifecycleService]} />
       </ContainerProvider>
     );
 
     for (let it = 0; it < 10; it++) {
       rerender(
         <ContainerProvider container={parentContainer}>
-          <SubContainerProvider bindings={[LifecycleService]} />
+          <ChildContainerProvider bindings={[LifecycleService]} />
         </ContainerProvider>
       );
     }
@@ -369,7 +369,7 @@ describe("SubContainerProvider lifecycle", () => {
 
     const { rerender } = render(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider bindings={[FirstLifecycleService]} />
+        <ChildContainerProvider bindings={[FirstLifecycleService]} />
       </ContainerProvider>
     );
 
@@ -377,7 +377,7 @@ describe("SubContainerProvider lifecycle", () => {
 
     rerender(
       <ContainerProvider container={parentContainer}>
-        <SubContainerProvider bindings={[SecondLifecycleService]} />
+        <ChildContainerProvider bindings={[SecondLifecycleService]} />
       </ContainerProvider>
     );
 
@@ -410,7 +410,7 @@ describe("SubContainerProvider lifecycle", () => {
     const { rerender } = render(
       <StrictMode>
         <ContainerProvider container={parentContainer}>
-          <SubContainerProvider bindings={[FirstLifecycleService]} />
+          <ChildContainerProvider bindings={[FirstLifecycleService]} />
         </ContainerProvider>
       </StrictMode>
     );
@@ -426,7 +426,7 @@ describe("SubContainerProvider lifecycle", () => {
     rerender(
       <StrictMode>
         <ContainerProvider container={parentContainer}>
-          <SubContainerProvider bindings={[SecondLifecycleService]} />
+          <ChildContainerProvider bindings={[SecondLifecycleService]} />
         </ContainerProvider>
       </StrictMode>
     );

@@ -57,15 +57,15 @@ responsibility.
 
 ## Child Containers
 
-`SubContainerProvider` creates a managed child container under the nearest parent provider.
+`ChildContainerProvider` creates a managed child container under the nearest parent provider.
 
 ```tsx
 import { ReactNode } from "react";
-import { SubContainerProvider } from "@wirestate/react";
+import { ChildContainerProvider } from "@wirestate/react";
 import { CartService, CheckoutService } from "./services";
 
 export function CheckoutScope(props: { children?: ReactNode }) {
-  return <SubContainerProvider bindings={[CartService, CheckoutService]}>{props.children}</SubContainerProvider>;
+  return <ChildContainerProvider bindings={[CartService, CheckoutService]}>{props.children}</ChildContainerProvider>;
 }
 ```
 
@@ -92,6 +92,6 @@ function DevTools() {
 
 [`ContainerProvider`](/api/wirestate-react/functions/ContainerProvider),
 [`ContainerProviderProps`](/api/wirestate-react/interfaces/ContainerProviderProps),
-[`SubContainerProvider`](/api/wirestate-react/functions/SubContainerProvider),
-[`SubContainerProviderProps`](/api/wirestate-react/interfaces/SubContainerProviderProps), [`useContainer`](/api/wirestate-react/functions/useContainer),
+[`ChildContainerProvider`](/api/wirestate-react/functions/ChildContainerProvider),
+[`ChildContainerProviderProps`](/api/wirestate-react/interfaces/ChildContainerProviderProps), [`useContainer`](/api/wirestate-react/functions/useContainer),
 [`useScope`](/api/wirestate-react/functions/useScope).

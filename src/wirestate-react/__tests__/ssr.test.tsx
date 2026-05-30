@@ -3,7 +3,7 @@ import { renderToString } from "react-dom/server";
 
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { ContainerProvider, SubContainerProvider, useInjection } from "../index";
+import { ContainerProvider, ChildContainerProvider, useInjection } from "../index";
 
 describe("React SSR", () => {
   interface RootSeed {
@@ -136,9 +136,9 @@ describe("React SSR", () => {
 
     const html: string = renderToString(
       <ContainerProvider config={{ bindings: [{ id: STRING_VALUE_TOKEN, value: "string-value" }] }}>
-        <SubContainerProvider bindings={[ChildSeededService]} seeds={[[ChildSeededService, { tenantId: "tenant-a" }]]}>
+        <ChildContainerProvider bindings={[ChildSeededService]} seeds={[[ChildSeededService, { tenantId: "tenant-a" }]]}>
           <Consumer />
-        </SubContainerProvider>
+        </ChildContainerProvider>
       </ContainerProvider>
     );
 

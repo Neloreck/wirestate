@@ -23,23 +23,23 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { Maybe } from "../types/general";
 
 /**
- * Represents options for {@link SubContainerProvider}.
+ * Represents options for {@link ChildContainerProvider}.
  *
  * @group Provision
  */
-export interface SubContainerProviderOptions {
+export interface ChildContainerProviderOptions {
   /**
-   * Managed sub-container creation options.
+   * Managed child container creation options.
    *
    * @remarks
-   * The sub-container is created from the current parent context when the
+   * The child container is created from the current parent context when the
    * host connects, destroyed when the host disconnects, and recreated when the
    * parent context changes or the host reconnects. The provider value is
    * `undefined` while the host is disconnected.
    */
   readonly config: {
     /**
-     * Services or descriptors bound inside the sub-container.
+     * Services or descriptors bound inside the child container.
      */
     readonly bindings: Bindings;
 
@@ -61,13 +61,13 @@ export interface SubContainerProviderOptions {
 }
 
 /**
- * Reactive controller that provides a managed sub-container.
+ * Reactive controller that provides a managed child container.
  *
  * @remarks
- * The sub-container inherits parent bindings but owns its own buses, seeds,
+ * The child container inherits parent bindings but owns its own buses, seeds,
  * and lifecycle. It is recreated when the parent container changes.
  *
- * Sub-containers activate all bindings by default unless `activate` is set.
+ * Child containers activate all bindings by default unless `activate` is set.
  * Before connect and after disconnect, the context value is `undefined`.
  *
  * @group Provision
@@ -75,7 +75,7 @@ export interface SubContainerProviderOptions {
  * @example
  * ```typescript
  * class MyComponent extends LitElement {
- *   private container = new SubContainerProvider(this, {
+ *   private container = new ChildContainerProvider(this, {
  *     config: {
  *       bindings: [AuthService, UserService],
  *       seeds: [[AuthService, { role: "admin" }]],
@@ -84,23 +84,23 @@ export interface SubContainerProviderOptions {
  * }
  * ```
  */
-export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement = ReactiveControllerHost & HTMLElement>
+export class ChildContainerProvider<E extends ReactiveControllerHost & HTMLElement = ReactiveControllerHost & HTMLElement>
   extends ContextProvider<typeof ContainerContext, E>
   implements ReactiveController
 {
   protected readonly lifecycle: ProvisionLifecycle = new Map();
 
   protected readonly consumer: ContextConsumer<typeof ContainerContext, E>;
-  protected config: SubContainerProviderOptions["config"];
+  protected config: ChildContainerProviderOptions["config"];
 
   protected parent: Maybe<Container> = null;
   protected destroyed: boolean = true;
 
   /**
    * @param host - The host element.
-   * @param options - Provisioning options, including sub-container bindings, eager activations, and seeds.
+   * @param options - Provisioning options, including child container bindings, eager activations, and seeds.
    */
-  public constructor(host: E, options: SubContainerProviderOptions) {
+  public constructor(host: E, options: ChildContainerProviderOptions) {
     super(host, {
       context: ContainerContext,
     });
@@ -168,21 +168,21 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
 
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
-      "SubContainerProvider owns its sub-container. Use `setConfig(config)` to replace the managed sub-container."
+      "ChildContainerProvider owns its child container. Use `setConfig(config)` to replace the managed child container."
     );
   }
 
   /**
-   * Replaces the managed sub-container config.
+   * Replaces the managed child container config.
    *
    * @remarks
-   * When the provider is not currently provisioning a sub-container, the
+   * When the provider is not currently provisioning a child container, the
    * config is stored for the next connect. When it is active, the current
-   * sub-container is deprovisioned, destroyed, and recreated from the new config.
+   * child container is deprovisioned, destroyed, and recreated from the new config.
    *
-   * @param config - Sub-container creation options to use from now on.
+   * @param config - Child container creation options to use from now on.
    */
-  public setConfig(config: SubContainerProviderOptions["config"]): void {
+  public setConfig(config: ChildContainerProviderOptions["config"]): void {
     validateContainerConfig(config);
 
     this.config = { ...config, activate: config.activate ?? true };
@@ -194,7 +194,7 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
   }
 
   /**
-   * Replaces the currently provided sub-container with a new one derived
+   * Replaces the currently provided child container with a new one derived
    * from the latest parent context.
    */
   protected createContainer(): void {
@@ -216,7 +216,7 @@ export class SubContainerProvider<E extends ReactiveControllerHost & HTMLElement
   }
 
   /**
-   * Destroys the currently provided sub-container.
+   * Destroys the currently provided child container.
    */
   protected destroyContainer(): void {
     if (this.value && !this.destroyed) {

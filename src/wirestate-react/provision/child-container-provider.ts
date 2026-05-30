@@ -1,8 +1,8 @@
 import {
+  Bindings,
   Container,
   ContainerActivation,
   createContainer,
-  Bindings,
   provisionContainer,
   SeedBindings,
 } from "@wirestate/core";
@@ -16,11 +16,11 @@ import { shallowEqualActivation, shallowEqualArrays, shallowEqualObjects } from 
 import { ProvisionLifecycle, retainContainer, scheduleContainerDestruction } from "./provision-lifecycle";
 
 /**
- * Represents child-container inputs controlled by {@link SubContainerProvider}.
+ * Represents child-container inputs controlled by {@link ChildContainerProvider}.
  *
  * @internal
  */
-interface SubContainerSource {
+interface ChildContainerSource {
   readonly parent: Container;
   readonly seeds?: SeedBindings;
   readonly activate: ContainerActivation;
@@ -32,17 +32,17 @@ interface SubContainerSource {
  *
  * @internal
  */
-interface SubContainerState {
+interface ChildContainerState {
   readonly container: Container;
-  readonly source: SubContainerSource;
+  readonly source: ChildContainerSource;
 }
 
 /**
- * Represents props for {@link SubContainerProvider}.
+ * Represents props for {@link ChildContainerProvider}.
  *
  * @group Provision
  */
-export interface SubContainerProviderProps {
+export interface ChildContainerProviderProps {
   /**
    * Targeted seeds applied before bindings are bound.
    *
@@ -92,33 +92,33 @@ export interface SubContainerProviderProps {
  * @example
  * ```tsx
  * import { Injectable } from "@wirestate/core";
- * import { SubContainerProvider } from "@wirestate/react";
+ * import { ChildContainerProvider } from "@wirestate/react";
  *
  * @Injectable()
  * class CheckoutService {}
  *
  * export function CheckoutScope() {
  *   return (
- *     <SubContainerProvider bindings={[CheckoutService]}>
+ *     <ChildContainerProvider bindings={[CheckoutService]}>
  *       <Checkout />
- *     </SubContainerProvider>
+ *     </ChildContainerProvider>
  *   );
  * }
  * ```
  */
-export function SubContainerProvider(props: SubContainerProviderProps) {
+export function ChildContainerProvider(props: ChildContainerProviderProps) {
   const lifecycleRef = useRef<Optional<ProvisionLifecycle>>(null);
 
   const parent: Container = useContainer();
 
-  const source: SubContainerSource = {
+  const source: ChildContainerSource = {
     parent: parent,
     activate: props.activate ?? true,
     bindings: props.bindings,
     seeds: props.seeds,
   };
 
-  const [state, setState] = useState<SubContainerState>(() => ({
+  const [state, setState] = useState<ChildContainerState>(() => ({
     container: createContainer(source),
     source,
   }));
@@ -129,7 +129,7 @@ export function SubContainerProvider(props: SubContainerProviderProps) {
     !shallowEqualArrays(state.source.bindings, source.bindings) ||
     !shallowEqualActivation(state.source.activate, source.activate);
 
-  let activeState: SubContainerState = state;
+  let activeState: ChildContainerState = state;
 
   if (needsReplacement) {
     activeState = {

@@ -35,8 +35,8 @@ export { useOnQuery, UseOnQueryOptions } from "./queries/use-on-query";
 export { ContainerContext } from "./context/container-context";
 
 export { ContainerProvider, ContainerProviderOptions } from "./provision/container-provider";
-export { SubContainerProvider, SubContainerProviderOptions } from "./provision/sub-container-provider";
+export { ChildContainerProvider, ChildContainerProviderOptions } from "./provision/child-container-provider";
 export { provideContainer, ProvideContainerDecorator } from "./provision/provide-container";
-export { provideSubContainer, ProvideSubContainerDecorator } from "./provision/provide-sub-container";
+export { provideChildContainer, ProvideChildContainerDecorator } from "./provision/provide-child-container";
 export { useContainerProvision, UseContainerProvisionOptions } from "./provision/use-container-provision";
-export { useSubContainerProvider } from "./provision/use-sub-container-provider";
+export { useChildContainerProvider } from "./provision/use-child-container-provider";

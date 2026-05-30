@@ -17,9 +17,9 @@ describe("Library exported API from wirestate/lit", () => {
     "OptionalInjectionFallback",
     "OptionalInjectionOptions",
     "ProvideContainerDecorator",
-    "ProvideSubContainerDecorator",
-    "SubContainerProvider",
-    "SubContainerProviderOptions",
+    "ProvideChildContainerDecorator",
+    "ChildContainerProvider",
+    "ChildContainerProviderOptions",
     "UseContainerProvisionOptions",
     "UseContainerValue",
     "UseInjectionOptions",
@@ -36,7 +36,7 @@ describe("Library exported API from wirestate/lit", () => {
     "onQuery",
     "optionalInjection",
     "provideContainer",
-    "provideSubContainer",
+    "provideChildContainer",
     "useContainer",
     "useContainerProvision",
     "useInjection",
@@ -45,7 +45,7 @@ describe("Library exported API from wirestate/lit", () => {
     "useOnQuery",
     "useOptionalInjection",
     "useScope",
-    "useSubContainerProvider",
+    "useChildContainerProvider",
   ];
 
   const assertListIntersection = (first: Array<string>, second: Array<string>) => {

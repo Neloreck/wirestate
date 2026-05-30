@@ -4,14 +4,14 @@ import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
 
-import { SubContainerProvider } from "./sub-container-provider";
-import { useSubContainerProvider } from "./use-sub-container-provider";
+import { ChildContainerProvider } from "./child-container-provider";
+import { useChildContainerProvider } from "./use-child-container-provider";
 
-describe("useSubContainerProvider", () => {
+describe("useChildContainerProvider", () => {
   const CONFIG_TOKEN: string = "CONFIG_TOKEN";
   const PARENT_TOKEN: string = "PARENT_TOKEN";
 
-  @customElement("ws-use-sub-container-provider-host")
+  @customElement("ws-use-child-container-provider-host")
   class TestConsumerElement extends ReactiveElement {}
 
   let fixture: LitProvisionFixture;
@@ -20,7 +20,7 @@ describe("useSubContainerProvider", () => {
     fixture?.cleanup();
   });
 
-  it("should create and provide a sub-container derived from the current parent context", () => {
+  it("should create and provide a child container derived from the current parent context", () => {
     const parent: Container = createContainer({
       bindings: [
         { id: PARENT_TOKEN, value: "parent-value" },
@@ -31,13 +31,13 @@ describe("useSubContainerProvider", () => {
     fixture = createLitProvision(parent);
 
     const element: TestConsumerElement = new TestConsumerElement();
-    const provider: SubContainerProvider = useSubContainerProvider(element, {
+    const provider: ChildContainerProvider = useChildContainerProvider(element, {
       config: {
         bindings: [{ id: CONFIG_TOKEN, value: "child-value" }],
       },
     });
 
-    expect(provider).toBeInstanceOf(SubContainerProvider);
+    expect(provider).toBeInstanceOf(ChildContainerProvider);
     expect(provider.value).toBeUndefined();
 
     fixture.provider.appendChild(element);

@@ -64,7 +64,7 @@ activated, then discarded before the committed provider lifecycle continues. Put
 
 ## React Package Surface
 
-- `ContainerProvider` and `SubContainerProvider` publish containers through React context.
+- `ContainerProvider` and `ChildContainerProvider` publish containers through React context.
 - `useInjection`, `useOptionalInjection`, `useContainer`, and `useScope` read from the active container.
 - `useEvent`, `useEvents`, `useEventsHandler`, and `useEventEmitter` work with the event bus.
 - `useCommandExecutor`, `useOptionalCommandExecutor`, and `useCommandHandler` work with the command bus.
@@ -74,5 +74,5 @@ activated, then discarded before the committed provider lifecycle continues. Put
 ## API Reference
 
 [`ContainerProvider`](/api/wirestate-react/functions/ContainerProvider),
-[`SubContainerProvider`](/api/wirestate-react/functions/SubContainerProvider), [`useInjection`](/api/wirestate-react/functions/useInjection),
+[`ChildContainerProvider`](/api/wirestate-react/functions/ChildContainerProvider), [`useInjection`](/api/wirestate-react/functions/useInjection),
 [`useCommandExecutor`](/api/wirestate-react/functions/useCommandExecutor), [`useQueryExecutor`](/api/wirestate-react/functions/useQueryExecutor).

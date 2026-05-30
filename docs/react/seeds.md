@@ -33,14 +33,14 @@ function ApplicationRoot() {
 
 ## Child Provider Seeds
 
-`SubContainerProvider` accepts targeted seeds for its child container.
+`ChildContainerProvider` accepts targeted seeds for its child container.
 
 ```tsx
-import { SubContainerProvider } from "@wirestate/react";
+import { ChildContainerProvider } from "@wirestate/react";
 
-<SubContainerProvider bindings={[CartService]} seeds={[[CartService, { items: hydratedItems }]]}>
+<ChildContainerProvider bindings={[CartService]} seeds={[[CartService, { items: hydratedItems }]]}>
   <Cart />
-</SubContainerProvider>;
+</ChildContainerProvider>;
 ```
 
 ## Read Seeds In Services
@@ -74,5 +74,5 @@ Changing provider seeds recreates managed provider containers when the shallow p
 ## API Reference
 
 [`ContainerProvider`](/api/wirestate-react/functions/ContainerProvider),
-[`SubContainerProvider`](/api/wirestate-react/functions/SubContainerProvider),
+[`ChildContainerProvider`](/api/wirestate-react/functions/ChildContainerProvider),
 [`SeedBindings`](/api/wirestate-core/type-aliases/SeedBindings), [`WireScope`](/api/wirestate-core/classes/WireScope).
