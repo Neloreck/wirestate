@@ -1,4 +1,4 @@
-import { Command, CommandType } from "@wirestate/core";
+import { CommandExecution, CommandType } from "@wirestate/core";
 
 import { Optional } from "./general";
 
@@ -7,7 +7,7 @@ import { Optional } from "./general";
  *
  * @remarks
  * Typically returned by {@link useCommandExecutor}. Dispatched commands are
- * automatically wrapped in a {@link Command}.
+ * automatically wrapped in a {@link CommandExecution}.
  *
  * @group Commands
  *
@@ -23,7 +23,7 @@ import { Optional } from "./general";
 export type CommandExecutor = <R = unknown, D = unknown, T extends CommandType = CommandType>(
   type: T,
   data?: D
-) => Command<R>;
+) => CommandExecution<R>;
 
 /**
  * Represents the function returned by {@link useOptionalCommandExecutor}.
@@ -46,4 +46,4 @@ export type CommandExecutor = <R = unknown, D = unknown, T extends CommandType =
 export type OptionalCommandExecutor = <R = unknown, D = unknown, T extends CommandType = CommandType>(
   type: T,
   data?: D
-) => Optional<Command<R>>;
+) => Optional<CommandExecution<R>>;

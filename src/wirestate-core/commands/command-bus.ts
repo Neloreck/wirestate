@@ -4,8 +4,8 @@ import { prefix } from "@/macroses/prefix.macro";
 import { ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import {
+  type CommandExecution,
   CommandStatus,
-  type Command,
   type CommandHandler,
   type CommandType,
   type CommandUnregister,
@@ -21,7 +21,7 @@ interface CommandHandlerDescriptor {
  *
  * @remarks
  * Commands are writes: save, login, reset, send. The caller gets a
- * {@link Command} immediately and can await `command.task`.
+ * {@link CommandExecution} immediately and can await `execution.result`.
  *
  * Handlers are stacked by type. The newest handler wins. Unregister it and the
  * previous handler takes over again.
@@ -35,8 +35,8 @@ interface CommandHandlerDescriptor {
  * const bus = new CommandBus();
  * bus.register("SAVE_USER", async (user: User) => saveUser(user));
  *
- * const command = bus.execute<void, User>("SAVE_USER", user);
- * await command.task;
+ * const execution = bus.execute<void, User>("SAVE_USER", user);
+ * await execution.result;
  * ```
  */
 export class CommandBus {
@@ -71,11 +71,11 @@ export class CommandBus {
    *
    * @example
    * ```typescript
-   * const command: Command<User> = commandBus.execute<User, string>("GET_USER", "id-123");
-   * const user: User = await command.task;
+   * const execution: CommandExecution<User> = commandBus.execute<User, string>("GET_USER", "id-123");
+   * const user: User = await execution.result;
    * ```
    */
-  public execute<R = unknown, D = unknown>(type: CommandType, data?: D): Command<R> {
+  public execute<R = unknown, D = unknown>(type: CommandType, data?: D): CommandExecution<R> {
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (!stack?.length) {
@@ -87,25 +87,25 @@ export class CommandBus {
 
     const handler = stack[stack.length - 1].handler as CommandHandler<D, R>;
 
-    const command: Command<R> = {
-      task: null as unknown as Promise<R>,
+    const execution: CommandExecution<R> = {
+      result: null as unknown as Promise<R>,
       status: CommandStatus.PENDING,
     };
 
-    (command as { task: Promise<R> }).task = Promise.resolve()
+    (execution as { result: Promise<R> }).result = Promise.resolve()
       .then(() => handler(data as D))
       .then((result: R) => {
-        (command as { status: CommandStatus }).status = CommandStatus.SUCCESS;
+        (execution as { status: CommandStatus }).status = CommandStatus.SUCCESS;
 
         return result;
       })
       .catch((error: unknown) => {
-        (command as { status: CommandStatus }).status = CommandStatus.ERROR;
+        (execution as { status: CommandStatus }).status = CommandStatus.ERROR;
 
         throw error;
       });
 
-    return command as Command<R>;
+    return execution as CommandExecution<R>;
   }
 
   /**
@@ -116,9 +116,9 @@ export class CommandBus {
    *
    * @param type - Command identifier.
    * @param data - Optional payload for the handler.
-   * @returns The running command handle, or `null` when no handler exists.
+   * @returns The running command execution, or `null` when no handler exists.
    */
-  public executeOptional<R = unknown, D = unknown>(type: CommandType, data?: D): Optional<Command<R>> {
+  public executeOptional<R = unknown, D = unknown>(type: CommandType, data?: D): Optional<CommandExecution<R>> {
     return this.handlers.get(type)?.length ? this.execute<R, D>(type, data) : null;
   }
 

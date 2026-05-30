@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { CommandBus, Command, CommandStatus, Container } from "@wirestate/core";
+import { CommandBus, CommandExecution, CommandStatus, Container } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 import { customElement } from "lit/decorators.js";
 
@@ -49,11 +49,11 @@ describe("OnCommandController", () => {
 
     provider.appendChild(element);
 
-    const command: Command<string> = bus.execute("SOME_COMMAND", "payload");
-    const result: string = await command.task;
+    const execution: CommandExecution<string> = bus.execute("SOME_COMMAND", "payload");
+    const result: string = await execution.result;
 
     expect(handler).toHaveBeenCalledWith("payload");
-    expect(command.status).toBe(CommandStatus.SUCCESS);
+    expect(execution.status).toBe(CommandStatus.SUCCESS);
     expect(result).toBe("payload-result");
 
     element.remove();
@@ -73,9 +73,9 @@ describe("OnCommandController", () => {
 
     provider.appendChild(element);
 
-    const command: Command<number> = bus.execute("ASYNC_COMMAND", 21);
+    const execution: CommandExecution<number> = bus.execute("ASYNC_COMMAND", 21);
 
-    expect(await command.task).toBe(42);
+    expect(await execution.result).toBe(42);
   });
 
   it("should re-register when container context is updated", () => {

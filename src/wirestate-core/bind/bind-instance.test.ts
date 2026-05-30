@@ -98,9 +98,9 @@ describe("bindInstance", () => {
     // Test command from external source.
     expect(container.get(CommandBus).execute("TEST_SYNC_COMMAND", 800)).toEqual({
       status: CommandStatus.PENDING,
-      task: expect.any(Promise),
+      result: expect.any(Promise),
     });
-    expect(await container.get(CommandBus).execute("TEST_SYNC_COMMAND", 800).task).toBe(1800);
+    expect(await container.get(CommandBus).execute("TEST_SYNC_COMMAND", 800).result).toBe(1800);
 
     // Test deactivation.
     (instance.scope as { isDeprovisioned: boolean }).isDeprovisioned = false;

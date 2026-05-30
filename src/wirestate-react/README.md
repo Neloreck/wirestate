@@ -192,13 +192,13 @@ useEventsHandler((event) => {
 
 ### `useCommandExecutor()`
 
-Returns a function that dispatches a command and returns a descriptor for its task.
+Returns a function that dispatches a command and returns a `CommandExecution`.
 
 ```tsx
 const executeCommand = useCommandExecutor();
 
 async function handleClick() {
-  await executeCommand("LOGIN", { username: "alice" }).task;
+  await executeCommand("LOGIN", { username: "alice" }).result;
 }
 ```
 

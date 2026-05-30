@@ -108,8 +108,8 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     expect(child.get(CommandBus)).not.toBe(parent.get(CommandBus));
     expect(child.get(QueryBus)).not.toBe(parent.get(QueryBus));
 
-    expect(await parent.get(CommandBus).execute(ADD_COMMAND, 2).task).toBe(3);
-    expect(await child.get(CommandBus).execute(ADD_COMMAND, 2).task).toBe(112);
+    expect(await parent.get(CommandBus).execute(ADD_COMMAND, 2).result).toBe(3);
+    expect(await child.get(CommandBus).execute(ADD_COMMAND, 2).result).toBe(112);
     expect(parent.get(QueryBus).query(COUNT_QUERY)).toBe("root-label:3");
     expect(child.get(QueryBus).query(COUNT_QUERY)).toBe("child-label:112");
 
@@ -121,7 +121,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     child.unbindAll();
 
-    expect(await parent.get(CommandBus).execute(ADD_COMMAND, 2).task).toBe(6);
+    expect(await parent.get(CommandBus).execute(ADD_COMMAND, 2).result).toBe(6);
     expect(parent.get(QueryBus).query(COUNT_QUERY)).toBe("root-label:6");
 
     parent.get(EventBus).emit(LOG_EVENT, "from-parent");
@@ -148,7 +148,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     const logs: Array<string> = [];
 
-    let task: Optional<Promise<string>> = null as Optional<Promise<string>>;
+    let commandResult: Optional<Promise<string>> = null as Optional<Promise<string>>;
 
     @Injectable()
     class CleanupService {
@@ -165,7 +165,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
         this.scope.emitEvent(DEACTIVATE_EVENT, "cleanup");
         logs.push(`query-result:${this.scope.query(DEACTIVATE_QUERY)}`);
 
-        task = this.scope.executeCommand<string>(DEACTIVATE_COMMAND).task;
+        commandResult = this.scope.executeCommand<string>(DEACTIVATE_COMMAND).result;
       }
 
       @OnCommand(DEACTIVATE_COMMAND)
@@ -197,9 +197,9 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     container.unbindAll();
 
     expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result"]);
-    expect(task).not.toBeNull();
+    expect(commandResult).not.toBeNull();
 
-    const result: Optional<string> = await task;
+    const result: Optional<string> = await commandResult;
 
     expect(result).toBe("command-result");
     expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
@@ -215,7 +215,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     const PEER_DEACTIVATE_QUERY: string = "PEER_DEACTIVATE_QUERY";
 
     const logs: Array<string> = [];
-    let task: Optional<Promise<string>> = null as Optional<Promise<string>>;
+    let commandResult: Optional<Promise<string>> = null as Optional<Promise<string>>;
 
     const fromDeactivationPeerService: Array<unknown> = [];
     const fromDeactivationCoordinatorService: Array<unknown> = [];
@@ -271,7 +271,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
         this.scope.emitEvent(PEER_DEACTIVATE_EVENT, "from-coordinator");
         logs.push(`coordinator-query:${this.scope.query(PEER_DEACTIVATE_QUERY, "from-coordinator")}`);
 
-        task = this.scope.executeCommand<string, string>(PEER_DEACTIVATE_COMMAND, "from-coordinator").task;
+        commandResult = this.scope.executeCommand<string, string>(PEER_DEACTIVATE_COMMAND, "from-coordinator").result;
 
         fromDeactivationCoordinatorService.push(
           this.scope.resolve(WireScope),
@@ -295,9 +295,9 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
       "coordinator-query:peer-query-result",
       "peer-deactivation",
     ]);
-    expect(task).not.toBeNull();
+    expect(commandResult).not.toBeNull();
 
-    expect(await task).toBe("peer-command-result");
+    expect(await commandResult).toBe("peer-command-result");
     expect(logs).toEqual([
       "coordinator-deactivation",
       "peer-event:from-coordinator",

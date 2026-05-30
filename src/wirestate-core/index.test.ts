@@ -22,7 +22,7 @@ describe("Library exported API from wirestate-core", () => {
     "Binding",
     "Bindings",
     "CommandBus",
-    "Command",
+    "CommandExecution",
     "CommandHandler",
     "CommandStatus",
     "CommandType",

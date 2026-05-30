@@ -99,13 +99,13 @@ describe("core service shadowing and cleanup integration", () => {
     expect(container.get(QueryBus).has(CURRENT_QUERY)).toBe(true);
     expect(lifecycle).toEqual(["primary:activated", "secondary:activated"]);
 
-    expect(await container.get(CommandBus).execute(FORMAT_COMMAND, "first").task).toBe("secondary:first");
+    expect(await container.get(CommandBus).execute(FORMAT_COMMAND, "first").result).toBe("secondary:first");
     expect(container.get(QueryBus).query(CURRENT_QUERY)).toBe("secondary:first");
 
     container.unbind(SecondaryHandlerService);
 
     expect(lifecycle).toEqual(["primary:activated", "secondary:activated", "secondary:deactivated"]);
-    expect(await container.get(CommandBus).execute(FORMAT_COMMAND, "second").task).toBe("primary:second");
+    expect(await container.get(CommandBus).execute(FORMAT_COMMAND, "second").result).toBe("primary:second");
     expect(container.get(QueryBus).query(CURRENT_QUERY)).toBe("primary:second");
 
     container.unbind(PrimaryHandlerService);

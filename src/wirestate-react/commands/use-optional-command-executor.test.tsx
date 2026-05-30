@@ -47,6 +47,6 @@ describe("useOptionalCommandExecutor", () => {
     const command = (executor as unknown as OptionalCommandExecutor)("EXISTING_COMMAND");
 
     expect(command).not.toBeNull();
-    expect(await command!.task).toBe("ok");
+    expect(await command!.result).toBe("ok");
   });
 });

@@ -57,7 +57,7 @@ class SearchButton extends LitElement {
   private scope!: WireScope;
 
   protected render() {
-    return html`<button @click=${() => void this.scope.executeCommand("OPEN_SEARCH").task}>Search</button>`;
+    return html`<button @click=${() => void this.scope.executeCommand("OPEN_SEARCH").result}>Search</button>`;
   }
 }
 ```

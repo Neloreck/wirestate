@@ -116,7 +116,7 @@ export class AnotherService {
   public constructor(@Inject(WireScope) private scope: WireScope) {}
 
   public async login(): Promise<void> {
-    await this.scope.executeCommand("LOGIN").task;
+    await this.scope.executeCommand("LOGIN").result;
   }
 }
 ```
@@ -241,7 +241,7 @@ Injected `WireScope` instances expose lifecycle state for async guards:
 | `queryOptionalAsync(type, data?)`         | Dispatch a query as a promise; returns `null` if no handler is registered                   |
 | `registerQueryHandler(type, handler)`     | Register a query handler; returns unregister function                                       |
 | `unregisterQueryHandler(type, handler)`   | Remove a specific query handler by type and reference                                       |
-| `executeCommand(type, data?)`             | Dispatch a command and return a descriptor                                                  |
+| `executeCommand(type, data?)`             | Dispatch a command and return a command execution                                           |
 | `executeOptionalCommand(type, data?)`     | Dispatch a command; returns `null` if no handler is registered                              |
 | `registerCommandHandler(type, handler)`   | Register a command handler; returns unregister function                                     |
 | `unregisterCommandHandler(type, handler)` | Remove a specific command handler by type and reference                                     |

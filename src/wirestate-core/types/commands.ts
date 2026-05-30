@@ -81,21 +81,21 @@ export enum CommandStatus {
 }
 
 /**
- * Represents the handle for a running command.
+ * Represents a running command execution.
  *
  * @remarks
  * Returned by the command bus when a command is dispatched. It allows tracking
- * the progress and outcome of the command execution.
+ * the progress and result of the command execution.
  *
  * @group Commands
  *
  * @template R - Type of the result produced by the command.
  */
-export interface Command<R = unknown> {
+export interface CommandExecution<R = unknown> {
   /**
    * A promise that resolves with the command result or rejects with an error.
    */
-  readonly task: Promise<R>;
+  readonly result: Promise<R>;
   /**
    * The current execution status of the command.
    */

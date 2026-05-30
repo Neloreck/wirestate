@@ -8,7 +8,7 @@ import { WirestateError } from "../error/wirestate-error";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
-import { Command, CommandHandler, CommandUnregister, CommandType } from "../types/commands";
+import { CommandExecution, CommandHandler, CommandUnregister, CommandType } from "../types/commands";
 import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 import { Optional, AnyObject } from "../types/general";
 import { SeedKey, SeedsMap } from "../types/initial-state";
@@ -392,19 +392,22 @@ export class WireScope {
    *
    * @param type - Command identifier.
    * @param data - Payload for the command.
-   * @returns A command with `status` and `task`.
+   * @returns A command execution with `status` and `result`.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
    * @throws {@link WirestateError} If no command handler is registered.
    *
    * @example
    * ```typescript
-   * const command: Command = scope.executeCommand("LOGOUT");
+   * const execution: CommandExecution = scope.executeCommand("LOGOUT");
    *
-   * await command.task;
+   * await execution.result;
    * ```
    */
-  public executeCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): Command<R> {
+  public executeCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(
+    type: T,
+    data?: D
+  ): CommandExecution<R> {
     dbg.info(prefix(__filename), "Execute command:", { type, data });
 
     return this.getContainer().get(CommandBus).execute<R, D>(type, data);
@@ -419,23 +422,23 @@ export class WireScope {
    *
    * @param type - Command identifier.
    * @param data - Payload for the command.
-   * @returns A {@link Command} or `null`.
+   * @returns A {@link CommandExecution} or `null`.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
    *
    * @example
    * ```typescript
-   * const command: Command | null = scope.executeOptionalCommand("CLEANUP_CACHE");
+   * const execution: CommandExecution | null = scope.executeOptionalCommand("CLEANUP_CACHE");
    *
-   * if (command) {
-   *   await command.task;
+   * if (execution) {
+   *   await execution.result;
    * }
    * ```
    */
   public executeOptionalCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(
     type: T,
     data?: D
-  ): Optional<Command<R>> {
+  ): Optional<CommandExecution<R>> {
     dbg.info(prefix(__filename), "Execute command:", { type, data });
 
     return this.getContainer().get(CommandBus).executeOptional<R, D>(type, data);

@@ -38,7 +38,7 @@ test("opens search from command", async () => {
 
   const { findByText } = render(withContainerProvider(<SearchPanel />, container));
 
-  await container.get(CommandBus).execute("OPEN_SEARCH").task;
+  await container.get(CommandBus).execute("OPEN_SEARCH").result;
 
   expect(await findByText("Search")).toBeInTheDocument();
 });

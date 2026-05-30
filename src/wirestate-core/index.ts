@@ -54,6 +54,6 @@ export {
   ResolvedValueBindingDescriptor,
   ServiceRedirectionBindingDescriptor,
 } from "./types/provision";
-export { CommandStatus, Command, CommandHandler, CommandType, CommandUnregister } from "./types/commands";
+export { CommandStatus, CommandExecution, CommandHandler, CommandType, CommandUnregister } from "./types/commands";
 export { QueryHandler, QueryType, QueryUnregister } from "./types/queries";
 export { Event, EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "./types/events";

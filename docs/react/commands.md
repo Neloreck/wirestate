@@ -10,7 +10,7 @@ import { useCommandExecutor } from "@wirestate/react";
 function LogoutButton() {
   const executeCommand = useCommandExecutor();
 
-  return <button onClick={() => void executeCommand("LOGOUT").task}>Log out</button>;
+  return <button onClick={() => void executeCommand("LOGOUT").result}>Log out</button>;
 }
 ```
 
@@ -27,7 +27,7 @@ function RefreshButton() {
   return (
     <button
       onClick={() => {
-        void executeOptionalCommand("REFRESH_DEVTOOLS")?.task;
+        void executeOptionalCommand("REFRESH_DEVTOOLS")?.result;
       }}
     >
       Refresh
