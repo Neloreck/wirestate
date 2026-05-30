@@ -13,6 +13,7 @@ export const EXTERNAL_DEPENDENCIES = [
   "mobx",
   "mobx-react-lite",
   "@preact/signals-react",
+  "@preact/signals-react/runtime",
   "tslib",
   "@lit/reactive-element",
   "@lit/context",

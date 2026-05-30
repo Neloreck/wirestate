@@ -4,5 +4,7 @@
     "target": "es2022",
     "importHelpers": true,
     "ignoreDeprecations": "6.0",
+    "removeComments": true,
+    "sourceMap": false,
   }
 }

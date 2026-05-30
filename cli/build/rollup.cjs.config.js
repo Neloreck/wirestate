@@ -22,7 +22,7 @@ const createPackageCjsConfig = (pkg, env) => ({
     chunkFileNames: "lib.js",
     compact: env === EEnvironment.PRODUCTION,
     dir: path.resolve(DIST_ROOT, pkg.name, "cjs", env),
-    sourcemap: true,
+    sourcemap: false,
     format: "cjs",
   },
   plugins: [
@@ -33,6 +33,7 @@ const createPackageCjsConfig = (pkg, env) => ({
       preventAssignment: true,
     }),
     typescript({
+      sourceMap: false,
       tsconfig: TS_BUILD_CONFIG,
       declaration: false,
       declarationMap: false,

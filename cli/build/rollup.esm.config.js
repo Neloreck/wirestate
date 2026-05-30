@@ -22,7 +22,7 @@ const createPackageEsmConfig = (pkg, env) => ({
     compact: env === EEnvironment.PRODUCTION,
     dir: path.resolve(DIST_ROOT, pkg.name, "esm", env),
     preserveModules: true,
-    sourcemap: true,
+    sourcemap: false,
     format: "es",
   },
   plugins: [
@@ -33,7 +33,7 @@ const createPackageEsmConfig = (pkg, env) => ({
       preventAssignment: true,
     }),
     typescript({
-      sourceMap: true,
+      sourceMap: false,
       tsconfig: TS_BUILD_CONFIG,
       pretty: env !== EEnvironment.PRODUCTION,
       declaration: false,

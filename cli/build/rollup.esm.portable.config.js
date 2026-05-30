@@ -33,7 +33,7 @@ const createPortableConfig = (entry, isDebug) => ({
     compact: false,
     dir: isDebug ? PORTABLE_DEBUG_ROOT : PORTABLE_ROOT,
     preserveModules: false,
-    sourcemap: true,
+    sourcemap: false,
     format: "es",
   },
   plugins: [
@@ -47,7 +47,7 @@ const createPortableConfig = (entry, isDebug) => ({
     commonjs(),
     replace({ preventAssignment: true }),
     typescript({
-      sourceMap: true,
+      sourceMap: false,
       tsconfig: TS_PORTABLE_CONFIG,
       declaration: false,
       declarationMap: false,
