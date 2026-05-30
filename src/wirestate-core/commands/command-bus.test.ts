@@ -9,7 +9,7 @@ describe("CommandBus", () => {
 
     bus.register("TEST", handler);
 
-    const command: Command<string> = bus.command("TEST", "data");
+    const command: Command<string> = bus.execute("TEST", "data");
 
     expect(command.status).toBe(CommandStatus.PENDING);
 
@@ -23,7 +23,7 @@ describe("CommandBus", () => {
   it("should throw when no handler is registered", () => {
     const bus: CommandBus = new CommandBus();
 
-    expect(() => bus.command("MISSING")).toThrow("No command handler registered in container for type: 'MISSING'.");
+    expect(() => bus.execute("MISSING")).toThrow("No command handler registered in container for type: 'MISSING'.");
   });
 
   it("should support handler shadowing (stack)", async () => {
@@ -32,7 +32,7 @@ describe("CommandBus", () => {
     bus.register("TYPE", () => "first");
     bus.register("TYPE", () => "second");
 
-    const command: Command<string> = bus.command("TYPE");
+    const command: Command<string> = bus.execute("TYPE");
 
     expect(await command.task).toBe("second");
   });
@@ -55,13 +55,13 @@ describe("CommandBus", () => {
     const unregisterFirst: CommandUnregister = bus.register("TYPE", () => "first");
     const unregisterSecond: CommandUnregister = bus.register("TYPE", () => "second");
 
-    expect(await bus.command("TYPE").task).toBe("second");
+    expect(await bus.execute("TYPE").task).toBe("second");
 
     unregisterSecond();
-    expect(await bus.command("TYPE").task).toBe("first");
+    expect(await bus.execute("TYPE").task).toBe("first");
 
     unregisterFirst();
-    expect(() => bus.command("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
+    expect(() => bus.execute("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
   });
 
   it("should unregister only one duplicate handler registration per returned callback", async () => {
@@ -74,11 +74,11 @@ describe("CommandBus", () => {
     unregisterSecond();
     unregisterSecond();
 
-    expect(await bus.command("TYPE").task).toBe("value");
+    expect(await bus.execute("TYPE").task).toBe("value");
 
     unregisterFirst();
 
-    expect(() => bus.command("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
+    expect(() => bus.execute("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
   });
 
   it("should handle async handlers", async () => {
@@ -86,7 +86,7 @@ describe("CommandBus", () => {
 
     bus.register("ASYNC", async (data: number) => data * 2);
 
-    const command: Command<number> = bus.command<number>("ASYNC", 5);
+    const command: Command<number> = bus.execute<number>("ASYNC", 5);
 
     expect(command.status).toBe(CommandStatus.PENDING);
 
@@ -104,7 +104,7 @@ describe("CommandBus", () => {
       throw error;
     });
 
-    const command: Command = bus.command("FAIL");
+    const command: Command = bus.execute("FAIL");
 
     expect(command.status).toBe(CommandStatus.PENDING);
 
@@ -121,7 +121,7 @@ describe("CommandBus", () => {
       throw error;
     });
 
-    const command: Command = bus.command("FAIL_ASYNC");
+    const command: Command = bus.execute("FAIL_ASYNC");
 
     await expect(command.task).rejects.toThrow("async failed");
 
@@ -164,18 +164,18 @@ describe("CommandBus", () => {
 
     bus.register(type, () => "symbol-result");
 
-    const command: Command<string> = bus.command(type);
+    const command: Command<string> = bus.execute(type);
 
     expect(await command.task).toBe("symbol-result");
   });
 
-  describe("commandOptional", () => {
+  describe("executeOptional", () => {
     it("should return a command when handler exists", async () => {
       const bus: CommandBus = new CommandBus();
 
       bus.register("TYPE", () => "value");
 
-      const command = bus.commandOptional("TYPE");
+      const command = bus.executeOptional("TYPE");
 
       expect(command).not.toBeNull();
       expect(await command!.task).toBe("value");
@@ -184,7 +184,7 @@ describe("CommandBus", () => {
     it("should return null when no handler is registered", () => {
       const bus: CommandBus = new CommandBus();
 
-      expect(bus.commandOptional("MISSING")).toBeNull();
+      expect(bus.executeOptional("MISSING")).toBeNull();
     });
 
     it("should support async handlers", async () => {
@@ -192,7 +192,7 @@ describe("CommandBus", () => {
 
       bus.register("ASYNC", async () => "async-value");
 
-      const command = bus.commandOptional("ASYNC");
+      const command = bus.executeOptional("ASYNC");
 
       expect(command).not.toBeNull();
       expect(await command!.task).toBe("async-value");
@@ -208,7 +208,7 @@ describe("CommandBus", () => {
       bus.unregister("TYPE", handler);
 
       expect(bus.has("TYPE")).toBe(false);
-      expect(() => bus.command("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
+      expect(() => bus.execute("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
     });
 
     it("should not throw when unregistering a handler not registered for the type", () => {
@@ -227,7 +227,7 @@ describe("CommandBus", () => {
       bus.register("TYPE", handlerB);
       bus.unregister("TYPE", handlerB);
 
-      expect(await bus.command("TYPE").task).toBe("a");
+      expect(await bus.execute("TYPE").task).toBe("a");
     });
 
     it("should not affect handlers for other types", async () => {
@@ -240,7 +240,7 @@ describe("CommandBus", () => {
       bus.unregister("TYPE_A", handlerA);
 
       expect(bus.has("TYPE_A")).toBe(false);
-      expect(await bus.command("TYPE_B").task).toBe("b");
+      expect(await bus.execute("TYPE_B").task).toBe("b");
     });
 
     it("should not throw when unregistering a handler not present in the stack", async () => {
@@ -251,7 +251,7 @@ describe("CommandBus", () => {
       bus.register("TYPE", registered);
 
       expect(() => bus.unregister("TYPE", unregistered)).not.toThrow();
-      expect(await bus.command("TYPE").task).toBe("value");
+      expect(await bus.execute("TYPE").task).toBe("value");
     });
 
     it("should unregister only one duplicate handler registration by type and reference per call", async () => {
@@ -263,11 +263,11 @@ describe("CommandBus", () => {
 
       bus.unregister("TYPE", handler);
 
-      expect(await bus.command("TYPE").task).toBe("value");
+      expect(await bus.execute("TYPE").task).toBe("value");
 
       bus.unregister("TYPE", handler);
 
-      expect(() => bus.command("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
+      expect(() => bus.execute("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
     });
 
     it("should unregister the newest duplicate handler registration by type and reference", () => {

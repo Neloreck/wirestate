@@ -407,7 +407,7 @@ export class WireScope {
   public executeCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): Command<R> {
     dbg.info(prefix(__filename), "Execute command:", { type, data });
 
-    return this.getContainer().get(CommandBus).command<R, D>(type, data);
+    return this.getContainer().get(CommandBus).execute<R, D>(type, data);
   }
 
   /**
@@ -438,7 +438,7 @@ export class WireScope {
   ): Optional<Command<R>> {
     dbg.info(prefix(__filename), "Execute command:", { type, data });
 
-    return this.getContainer().get(CommandBus).commandOptional<R, D>(type, data);
+    return this.getContainer().get(CommandBus).executeOptional<R, D>(type, data);
   }
 
   /**

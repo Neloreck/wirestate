@@ -48,7 +48,7 @@ describe("@onCommand", () => {
 
     provider.appendChild(element);
 
-    const command: Command<string> = bus.command("TEST_COMMAND", "input");
+    const command: Command<string> = bus.execute("TEST_COMMAND", "input");
     const result: string = await command.task;
 
     expect(result).toBe("input-handled");
@@ -56,7 +56,7 @@ describe("@onCommand", () => {
 
     element.remove();
 
-    expect(() => bus.command("TEST_COMMAND", "input")).toThrow(
+    expect(() => bus.execute("TEST_COMMAND", "input")).toThrow(
       "No command handler registered in container for type: 'TEST_COMMAND'."
     );
   });

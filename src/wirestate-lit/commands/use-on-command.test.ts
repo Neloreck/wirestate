@@ -50,7 +50,7 @@ describe("useOnCommand hook", () => {
 
     provider.appendChild(element);
 
-    const command: Command<number> = bus.command<number, number>("HOOK_COMMAND", 5);
+    const command: Command<number> = bus.execute<number, number>("HOOK_COMMAND", 5);
     const result: number = await command.task;
 
     expect(result).toBe(105);

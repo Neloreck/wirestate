@@ -12,7 +12,7 @@ import { CommandExecutor } from "../types/commands";
  *
  * @remarks
  * The returned executor is memoized using `useCallback` and stays stable
- * for the lifetime of the container. It uses {@link CommandBus.command} internally.
+ * for the lifetime of the container. It uses {@link CommandBus.execute} internally.
  *
  * @group Commands
  *
@@ -37,7 +37,7 @@ export function useCommandExecutor(): CommandExecutor {
         data,
       });
 
-      return container.get(CommandBus).command<R, D>(type, data);
+      return container.get(CommandBus).execute<R, D>(type, data);
     },
     [container]
   );

@@ -13,7 +13,7 @@ import { OptionalCommandExecutor } from "../types/commands";
  * @remarks
  * Similar to {@link useCommandExecutor}, but returns `null` instead of throwing
  * {WirestateError} if no handler is registered for the command type.
- * Uses {@link CommandBus.commandOptional} internally.
+ * Uses {@link CommandBus.executeOptional} internally.
  *
  * @group Commands
  *
@@ -42,7 +42,7 @@ export function useOptionalCommandExecutor(): OptionalCommandExecutor {
         data,
       });
 
-      return container.get(CommandBus).commandOptional<R, D>(type, data);
+      return container.get(CommandBus).executeOptional<R, D>(type, data);
     },
     [container]
   );

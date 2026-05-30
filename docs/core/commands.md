@@ -60,7 +60,7 @@ const unregister = bus.register("SAVE_CART", async (cart: Cart) => {
   await saveCart(cart);
 });
 
-await bus.command("SAVE_CART", cart).task;
+await bus.execute("SAVE_CART", cart).task;
 unregister();
 ```
 

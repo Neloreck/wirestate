@@ -30,7 +30,7 @@ describe("useCommandHandler", () => {
 
     expect(commandBus.has("HOOK_COMMAND")).toBe(true);
 
-    const command: Command = commandBus.command("HOOK_COMMAND", "data");
+    const command: Command = commandBus.execute("HOOK_COMMAND", "data");
 
     await command.task;
 
@@ -57,12 +57,12 @@ describe("useCommandHandler", () => {
 
     const { rerender } = render(withContainerProvider(<TestComponent handler={handler1} />, container));
 
-    await commandBus.command("UPDATE_COMMAND").task;
+    await commandBus.execute("UPDATE_COMMAND").task;
     expect(handler1).toHaveBeenCalled();
 
     rerender(withContainerProvider(<TestComponent handler={handler2} />, container));
 
-    await commandBus.command("UPDATE_COMMAND").task;
+    await commandBus.execute("UPDATE_COMMAND").task;
     expect(handler2).toHaveBeenCalled();
   });
 
@@ -79,7 +79,7 @@ describe("useCommandHandler", () => {
 
       useLayoutEffect(() => {
         if (fire) {
-          task = commandBus.command("IMMEDIATE_COMMAND").task;
+          task = commandBus.execute("IMMEDIATE_COMMAND").task;
         }
       }, [fire]);
 

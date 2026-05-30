@@ -49,7 +49,7 @@ describe("OnCommandController", () => {
 
     provider.appendChild(element);
 
-    const command: Command<string> = bus.command("SOME_COMMAND", "payload");
+    const command: Command<string> = bus.execute("SOME_COMMAND", "payload");
     const result: string = await command.task;
 
     expect(handler).toHaveBeenCalledWith("payload");
@@ -57,7 +57,7 @@ describe("OnCommandController", () => {
     expect(result).toBe("payload-result");
 
     element.remove();
-    expect(() => bus.command("SOME_COMMAND", "payload")).toThrow(
+    expect(() => bus.execute("SOME_COMMAND", "payload")).toThrow(
       "No command handler registered in container for type: 'SOME_COMMAND'."
     );
   });
@@ -73,7 +73,7 @@ describe("OnCommandController", () => {
 
     provider.appendChild(element);
 
-    const command: Command<number> = bus.command("ASYNC_COMMAND", 21);
+    const command: Command<number> = bus.execute("ASYNC_COMMAND", 21);
 
     expect(await command.task).toBe(42);
   });

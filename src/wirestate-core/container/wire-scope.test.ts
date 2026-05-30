@@ -177,22 +177,22 @@ describe("WireScope", () => {
 
     bus.register("TEST_COMMAND", () => "result-from-command-bus");
 
-    jest.spyOn(bus, "command");
+    jest.spyOn(bus, "execute");
 
     const result: Command<string> = scope.executeCommand("TEST_COMMAND", "first-attempt");
 
     expect(result.status).toBe(CommandStatus.PENDING);
     expect(await result.task).toBe("result-from-command-bus");
     expect(result.status).toBe(CommandStatus.SUCCESS);
-    expect(bus.command).toHaveBeenCalledWith("TEST_COMMAND", "first-attempt");
+    expect(bus.execute).toHaveBeenCalledWith("TEST_COMMAND", "first-attempt");
 
     expect(() => scope.executeCommand("NOT_EXISTING", "second-attempt")).toThrow(
       "No command handler registered in container for type: 'NOT_EXISTING'."
     );
 
-    expect(bus.command).toHaveBeenCalledTimes(2);
-    expect(bus.command).toHaveBeenCalledWith("TEST_COMMAND", "first-attempt");
-    expect(bus.command).toHaveBeenCalledWith("NOT_EXISTING", "second-attempt");
+    expect(bus.execute).toHaveBeenCalledTimes(2);
+    expect(bus.execute).toHaveBeenCalledWith("TEST_COMMAND", "first-attempt");
+    expect(bus.execute).toHaveBeenCalledWith("NOT_EXISTING", "second-attempt");
   });
 
   it("should execute optional commands via command bus", async () => {
@@ -200,7 +200,7 @@ describe("WireScope", () => {
     const bus: CommandBus = container.get(CommandBus);
     const scope: WireScope = new WireScope(container);
 
-    jest.spyOn(bus, "commandOptional");
+    jest.spyOn(bus, "executeOptional");
 
     const missing: Optional<Command> = scope.executeOptionalCommand("TEST_COMMAND", "first-attempt");
 
@@ -214,9 +214,9 @@ describe("WireScope", () => {
     expect(await result?.task).toBe("result-from-command-bus");
     expect(result?.status).toBe(CommandStatus.SUCCESS);
 
-    expect(bus.commandOptional).toHaveBeenCalledTimes(2);
-    expect(bus.commandOptional).toHaveBeenCalledWith("TEST_COMMAND", "first-attempt");
-    expect(bus.commandOptional).toHaveBeenCalledWith("TEST_COMMAND", "second-attempt");
+    expect(bus.executeOptional).toHaveBeenCalledTimes(2);
+    expect(bus.executeOptional).toHaveBeenCalledWith("TEST_COMMAND", "first-attempt");
+    expect(bus.executeOptional).toHaveBeenCalledWith("TEST_COMMAND", "second-attempt");
   });
 
   it("should register query handler via scope", () => {
@@ -246,7 +246,7 @@ describe("WireScope", () => {
 
     expect(bus.register).toHaveBeenCalledWith("TEST_COMMAND", handler);
     expect(typeof unregister).toBe("function");
-    expect(await bus.command("TEST_COMMAND").task).toBe("result");
+    expect(await bus.execute("TEST_COMMAND").task).toBe("result");
   });
 
   it("should unregister query handler via scope", () => {

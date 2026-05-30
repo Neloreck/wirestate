@@ -35,7 +35,7 @@ interface CommandHandlerDescriptor {
  * const bus = new CommandBus();
  * bus.register("SAVE_USER", async (user: User) => saveUser(user));
  *
- * const command = bus.command<void, User>("SAVE_USER", user);
+ * const command = bus.execute<void, User>("SAVE_USER", user);
  * await command.task;
  * ```
  */
@@ -71,11 +71,11 @@ export class CommandBus {
    *
    * @example
    * ```typescript
-   * const command: Command<User> = commandBus.command<User, string>("GET_USER", "id-123");
+   * const command: Command<User> = commandBus.execute<User, string>("GET_USER", "id-123");
    * const user: User = await command.task;
    * ```
    */
-  public command<R = unknown, D = unknown>(type: CommandType, data?: D): Command<R> {
+  public execute<R = unknown, D = unknown>(type: CommandType, data?: D): Command<R> {
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (!stack?.length) {
@@ -118,8 +118,8 @@ export class CommandBus {
    * @param data - Optional payload for the handler.
    * @returns The running command handle, or `null` when no handler exists.
    */
-  public commandOptional<R = unknown, D = unknown>(type: CommandType, data?: D): Optional<Command<R>> {
-    return this.handlers.get(type)?.length ? this.command<R, D>(type, data) : null;
+  public executeOptional<R = unknown, D = unknown>(type: CommandType, data?: D): Optional<Command<R>> {
+    return this.handlers.get(type)?.length ? this.execute<R, D>(type, data) : null;
   }
 
   /**

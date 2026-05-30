@@ -96,11 +96,11 @@ describe("bindInstance", () => {
     expect(container.get(QueryBus).query("TEST_STRING_QUERY")).toBe("string-query-response");
 
     // Test command from external source.
-    expect(container.get(CommandBus).command("TEST_SYNC_COMMAND", 800)).toEqual({
+    expect(container.get(CommandBus).execute("TEST_SYNC_COMMAND", 800)).toEqual({
       status: CommandStatus.PENDING,
       task: expect.any(Promise),
     });
-    expect(await container.get(CommandBus).command("TEST_SYNC_COMMAND", 800).task).toBe(1800);
+    expect(await container.get(CommandBus).execute("TEST_SYNC_COMMAND", 800).task).toBe(1800);
 
     // Test deactivation.
     (instance.scope as { isDeprovisioned: boolean }).isDeprovisioned = false;
@@ -265,7 +265,7 @@ describe("bindInstance", () => {
     expect(() => container.get(QueryBus).query(ACTIVATION_FAILURE_QUERY)).toThrow(
       "No query handler registered in container for type: 'ACTIVATION_FAILURE_QUERY'."
     );
-    expect(() => container.get(CommandBus).command(ACTIVATION_FAILURE_COMMAND)).toThrow(
+    expect(() => container.get(CommandBus).execute(ACTIVATION_FAILURE_COMMAND)).toThrow(
       "No command handler registered in container for type: 'ACTIVATION_FAILURE_COMMAND'."
     );
 

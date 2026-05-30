@@ -121,7 +121,7 @@ export class AnotherService {
 }
 ```
 
-Use `executeOptionalCommand` from `WireScope` or `CommandBus.commandOptional` when a handler may not be registered; both return `null` instead of throwing.
+Use `executeOptionalCommand` from `WireScope` or `CommandBus.executeOptional` when a handler may not be registered; both return `null` instead of throwing.
 
 ## Queries
 
