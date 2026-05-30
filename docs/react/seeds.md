@@ -31,18 +31,6 @@ function ApplicationRoot() {
 }
 ```
 
-## Child Provider Seeds
-
-`ChildContainerProvider` accepts targeted seeds for its child container.
-
-```tsx
-import { ChildContainerProvider } from "@wirestate/react";
-
-<ChildContainerProvider bindings={[CartService]} seeds={[[CartService, { items: hydratedItems }]]}>
-  <Cart />
-</ChildContainerProvider>;
-```
-
 ## Read Seeds In Services
 
 Read static targeted seeds in `@OnActivated`. Seed values are already bound before service activation, and activation is
@@ -74,5 +62,4 @@ Changing provider seeds recreates managed provider containers when the shallow p
 ## API Reference
 
 [`ContainerProvider`](/api/wirestate-react/functions/ContainerProvider),
-[`ChildContainerProvider`](/api/wirestate-react/functions/ChildContainerProvider),
 [`SeedBindings`](/api/wirestate-core/type-aliases/SeedBindings), [`WireScope`](/api/wirestate-core/classes/WireScope).

@@ -55,22 +55,6 @@ External containers are provisioned and deprovisioned by the provider, but they 
 For external containers, provider lifecycle still runs while the provider is mounted. Disposal remains the caller's
 responsibility.
 
-## Child Containers
-
-`ChildContainerProvider` creates a managed child container under the nearest parent provider.
-
-```tsx
-import { ReactNode } from "react";
-import { ChildContainerProvider } from "@wirestate/react";
-import { CartService, CheckoutService } from "./services";
-
-export function CheckoutScope(props: { children?: ReactNode }) {
-  return <ChildContainerProvider bindings={[CartService, CheckoutService]}>{props.children}</ChildContainerProvider>;
-}
-```
-
-Child containers inherit parent bindings and own their own buses, seeds, lifecycle, and disposal.
-
 ## Direct Access
 
 Prefer `useInjection` for normal service use. Reach for `useContainer` or `useScope` when a component needs the
@@ -92,6 +76,5 @@ function DevTools() {
 
 [`ContainerProvider`](/api/wirestate-react/functions/ContainerProvider),
 [`ContainerProviderProps`](/api/wirestate-react/interfaces/ContainerProviderProps),
-[`ChildContainerProvider`](/api/wirestate-react/functions/ChildContainerProvider),
-[`ChildContainerProviderProps`](/api/wirestate-react/interfaces/ChildContainerProviderProps), [`useContainer`](/api/wirestate-react/functions/useContainer),
+[`useContainer`](/api/wirestate-react/functions/useContainer),
 [`useScope`](/api/wirestate-react/functions/useScope).

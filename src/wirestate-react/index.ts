@@ -19,7 +19,6 @@ export { useEventEmitter } from "./events/use-event-emitter";
 export { useInjection } from "./injection/use-injection";
 export { useOptionalInjection } from "./injection/use-optional-injection";
 
-export { ChildContainerProvider, ChildContainerProviderProps } from "./provision/child-container-provider";
 export { ContainerProvider, ContainerProviderProps } from "./provision/container-provider";
 
 export { useQueryExecutor } from "./queries/use-query-executor";

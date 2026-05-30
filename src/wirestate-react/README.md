@@ -59,38 +59,6 @@ export function Application() {
 }
 ```
 
-### `ChildContainerProvider`
-
-Creates a child container scoped to a subtree.
-Use it under `ContainerProvider` when a branch needs its own service bindings or per-service seeds.
-Child containers activate all provided bindings by default; pass `activate: false` or a token array to override that.
-
-```tsx
-import { ReactNode } from "react";
-import { ChildContainerProvider } from "@wirestate/react";
-import { CounterService, LoggerService } from "./services";
-
-function CounterServicesProvider(props: { children?: ReactNode }) {
-  return <ChildContainerProvider bindings={[CounterService, LoggerService]}>{props.children}</ChildContainerProvider>;
-}
-
-export function CounterPage() {
-  return (
-    <CounterServicesProvider>
-      <CounterView />
-    </CounterServicesProvider>
-  );
-}
-```
-
-**Props:**
-
-| Prop       | Type                                  | Description                                                                       |
-| ---------- | ------------------------------------- | --------------------------------------------------------------------------------- |
-| `bindings` | `Bindings`                            | Services or binding descriptors to add to the child container.                    |
-| `seeds`    | `SeedBindings`                        | Per-service seeds, e.g. `[[CounterService, { count: 10 }]]`. Applied on mount.    |
-| `activate` | `boolean \| Array<ServiceIdentifier>` | `true` by default. Pass `false` or specific binding tokens to control activation. |
-
 ## Provider lifecycle
 
 `@OnProvision` and `@OnDeprovision` run when a React provider commits, unmounts, or replaces its container.

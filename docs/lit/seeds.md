@@ -27,22 +27,6 @@ export class CounterRoot extends LitElement {
 }
 ```
 
-## Child Container Provider Seeds
-
-```ts
-import { ChildContainerProvider, provideChildContainer } from "@wirestate/lit";
-
-class CheckoutScope extends LitElement {
-  @provideChildContainer({
-    config: {
-      bindings: [CartService],
-      seeds: [[CartService, { items: hydratedItems }]],
-    },
-  })
-  private provider!: ChildContainerProvider;
-}
-```
-
 ## Read Seeds In Services
 
 Read static targeted seeds in `@OnActivated`. Seeds exist from container creation, so applying them is cheap
@@ -75,5 +59,5 @@ Managed Lit containers are recreated when their provider config is replaced and 
 ## API Reference
 
 [`provideContainer`](/api/wirestate-lit/functions/provideContainer),
-[`provideChildContainer`](/api/wirestate-lit/functions/provideChildContainer), [`WireScope`](/api/wirestate-core/classes/WireScope),
+[`WireScope`](/api/wirestate-core/classes/WireScope),
 [`SeedBindings`](/api/wirestate-core/type-aliases/SeedBindings).

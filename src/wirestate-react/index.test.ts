@@ -12,8 +12,6 @@ describe("Library exported API from wirestate-react", () => {
     "OptionalQueryExecutor",
     "QueryExecutor",
     "QueryResponder",
-    "ChildContainerProvider",
-    "ChildContainerProviderProps",
     "useAsyncQueryExecutor",
     "useCommandExecutor",
     "useCommandHandler",

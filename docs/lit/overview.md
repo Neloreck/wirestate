@@ -65,7 +65,7 @@ resolution-time initialization that does not need cleanup.
 
 ## Lit Package Surface
 
-- `provideContainer`, `provideChildContainer`, `useContainerProvider`, and `useChildContainerProvider` publish containers.
+- `provideContainer` and `useContainerProvider` publish containers.
 - `injection`, `optionalInjection`, `useInjection`, `useOptionalInjection`, `useContainer`, and `useScope` consume values.
 - `onEvent`, `useOnEvents`, and `OnEventController` work with the event bus.
 - `onCommand`, `useOnCommand`, and `OnCommandController` work with the command bus.

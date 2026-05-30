@@ -62,29 +62,8 @@ class ApplicationRoot extends LitElement {
 }
 ```
 
-## Child Containers
-
-`provideChildContainer` creates a managed child container from the nearest parent context.
-
-```ts
-import { ChildContainerProvider, provideChildContainer } from "@wirestate/lit";
-import { LitElement } from "lit";
-import { customElement } from "lit/decorators.js";
-import { CartService } from "./CartService";
-
-@customElement("checkout-scope")
-class CheckoutScope extends LitElement {
-  @provideChildContainer({ config: { bindings: [CartService] } })
-  private provider!: ChildContainerProvider;
-}
-```
-
-The child container is recreated when the parent context changes and destroyed when the host disconnects.
-
 ## API Reference
 
 [`provideContainer`](/api/wirestate-lit/functions/provideContainer),
 [`ContainerProvider`](/api/wirestate-lit/classes/ContainerProvider),
-[`useContainerProvider`](/api/wirestate-lit/functions/useContainerProvider),
-[`provideChildContainer`](/api/wirestate-lit/functions/provideChildContainer),
-[`ChildContainerProvider`](/api/wirestate-lit/classes/ChildContainerProvider).
+[`useContainerProvider`](/api/wirestate-lit/functions/useContainerProvider).
