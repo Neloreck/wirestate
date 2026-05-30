@@ -7,11 +7,11 @@
 export * from "./alias";
 
 export { bind, BindOptions } from "./bind/bind";
-export { getBindingToken } from "./bind/get-binding-token";
 export { unbind, unbindAll } from "./bind/unbind";
 
 export { OnCommand } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";
+
 export {
   createContainer,
   ContainerActivation,
