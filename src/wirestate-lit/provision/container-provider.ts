@@ -6,7 +6,6 @@ import {
   WirestateError,
   createContainer,
   deprovisionContainer,
-  getContainerBindings,
   provisionContainer,
   unbindAll,
   type ProvisionLifecycle,
@@ -135,7 +134,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
 
     super.setValue(container);
 
-    provisionContainer(container, this.lifecycle, getContainerBindings(container));
+    provisionContainer(container, this.lifecycle);
 
     super.hostConnected();
   }
@@ -175,7 +174,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
 
         super.setValue(container, force);
 
-        provisionContainer(container, this.lifecycle, getContainerBindings(container));
+        provisionContainer(container, this.lifecycle);
       }
     }
   }
@@ -212,7 +211,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
       this.container = container;
       super.setValue(container);
 
-      provisionContainer(container, this.lifecycle, getContainerBindings(container));
+      provisionContainer(container, this.lifecycle);
     }
   }
 

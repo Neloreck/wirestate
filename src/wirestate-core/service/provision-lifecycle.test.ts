@@ -21,7 +21,7 @@ describe("provision lifecycle", () => {
     const container: Container = createContainer({ activate: false, bindings: [FirstService, SecondService] });
     const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
 
-    provisionContainer(container, lifecycle, [FirstService, SecondService]);
+    provisionContainer(container, lifecycle);
 
     expect(events).toEqual(["activated-first", "activated-second", "provision-first", "provision-second"]);
 

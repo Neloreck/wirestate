@@ -1,11 +1,10 @@
-import { getContainerBindings } from "@wirestate/core";
-
 import { Container } from "../alias";
 import { BindingType, BindingScope } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { ConstantValueBindingDescriptor } from "../types/provision";
 
 import { bindConstant } from "./bind-constant";
+import { getContainerBindings } from "./register-binding";
 
 describe("bindConstant", () => {
   it("should bind a constant value to the container", () => {

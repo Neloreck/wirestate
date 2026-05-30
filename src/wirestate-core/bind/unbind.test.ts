@@ -52,7 +52,7 @@ describe("unbind", () => {
     });
     const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
 
-    provisionContainer(container, lifecycle, getContainerBindings(container));
+    provisionContainer(container, lifecycle);
 
     expect(events).toEqual(["provision"]);
 
@@ -75,7 +75,7 @@ describe("unbind", () => {
     });
     const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
 
-    provisionContainer(container, lifecycle, getContainerBindings(container));
+    provisionContainer(container, lifecycle);
 
     expect(events).toEqual(["provision"]);
 

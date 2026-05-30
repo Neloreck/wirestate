@@ -8,7 +8,6 @@ export * from "./alias";
 
 export { bind, BindOptions } from "./bind/bind";
 export { getBindingToken } from "./bind/get-binding-token";
-export { getContainerBindings } from "./bind/register-binding";
 export { unbind, unbindAll } from "./bind/unbind";
 
 export { OnCommand } from "./commands/on-command";

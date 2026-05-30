@@ -3,7 +3,6 @@ import {
   ContainerConfig,
   createContainer,
   deprovisionContainer,
-  getContainerBindings,
   provisionContainer,
   WirestateError,
 } from "@wirestate/core";
@@ -171,7 +170,6 @@ export function ContainerProvider(props: ContainerProviderProps) {
   }
 
   const activeContainer: Container = activeState ? activeState.container : (externalContainer as Container);
-  const activeBindings = activeState ? activeState.source.bindings : getContainerBindings(activeContainer);
 
   useEffect(() => {
     const lifecycle: ProvisionLifecycle = (lifecycleRef.current ??= {
@@ -180,7 +178,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
     } as ProvisionLifecycle);
 
     retainContainer(activeContainer, lifecycle);
-    provisionContainer(activeContainer, lifecycle.provisionedServices, activeBindings);
+    provisionContainer(activeContainer, lifecycle.provisionedServices);
 
     return () => {
       if (owned) {
@@ -189,7 +187,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
         deprovisionContainer(activeContainer, lifecycle.provisionedServices);
       }
     };
-  }, [activeContainer, activeBindings, owned]);
+  }, [activeContainer, owned]);
 
   return createElement(ContainerReactContext.Provider, { value: activeContainer }, props.children ?? null);
 }

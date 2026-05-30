@@ -66,7 +66,6 @@ describe("Library exported API from wirestate-core", () => {
     "createContainer",
     "deprovisionContainer",
     "getBindingToken",
-    "getContainerBindings",
     "provisionContainer",
     "setSeeds",
     "setSharedSeed",

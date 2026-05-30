@@ -31,20 +31,10 @@ export function registerBinding(container: Container, binding: Binding): void {
  * external containers. Raw Inversify bindings are invisible here.
  *
  * @group Container
+ * @internal
  *
  * @param container - Container to inspect.
  * @returns Bindings registered through Wirestate binding helpers.
- *
- * @example
- * ```typescript
- * import { Injectable, createContainer, getContainerBindings } from "@wirestate/core";
- *
- * @Injectable()
- * class UserService {}
- *
- * const container = createContainer({ bindings: [UserService] });
- * const bindings = getContainerBindings(container);
- * ```
  */
 export function getContainerBindings(container: Container): Bindings {
   return CONTAINER_BINDINGS.get(container) ?? [];

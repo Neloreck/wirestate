@@ -3,6 +3,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { BindingType, Container, ServiceIdentifier } from "../alias";
 import { getBindingToken } from "../bind/get-binding-token";
+import { getContainerBindings } from "../bind/register-binding";
 import { hasWireScopeInjection } from "../container/has-wire-scope-injection";
 import {
   CONTAINER_REFS_BY_SERVICE,
@@ -52,10 +53,14 @@ export type ProvisionLifecycle = Map<Container, Array<object>>;
  * const container = createContainer({ bindings: [PanelService] });
  * const lifecycle = new Map();
  *
- * provisionContainer(container, lifecycle, [PanelService]);
+ * provisionContainer(container, lifecycle);
  * ```
  */
-export function provisionContainer(container: Container, lifecycle: ProvisionLifecycle, bindings: Bindings = []): void {
+export function provisionContainer(
+  container: Container,
+  lifecycle: ProvisionLifecycle,
+  bindings: Bindings = getContainerBindings(container)
+): void {
   if (lifecycle.has(container)) {
     return;
   }
