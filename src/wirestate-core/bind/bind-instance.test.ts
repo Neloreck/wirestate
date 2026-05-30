@@ -109,6 +109,10 @@ describe("bindInstance", () => {
     expect(instance.scope.isDisposed).toBe(true);
     expect(instance.scope.isDeprovisioned).toBe(true);
     expect(instance.scope.isInactive).toBe(true);
+    expect(instance.scope["commandBus"]).toBeNull();
+    expect(instance.scope["container"]).toBeNull();
+    expect(instance.scope["eventBus"]).toBeNull();
+    expect(instance.scope["queryBus"]).toBeNull();
 
     // Verify query handler is removed
     expect(() => container.get(QueryBus).query("TEST_QUERY")).toThrow();
@@ -262,6 +266,11 @@ describe("bindInstance", () => {
     expect(activatedScope.isDisposed).toBe(true);
     expect(activatedScope.isDeprovisioned).toBe(true);
     expect(activatedScope.isInactive).toBe(true);
+    expect(activatedScope["commandBus"]).toBeNull();
+    expect(activatedScope["container"]).toBeNull();
+    expect(activatedScope["eventBus"]).toBeNull();
+    expect(activatedScope["queryBus"]).toBeNull();
+
     expect(() => container.get(QueryBus).query(ACTIVATION_FAILURE_QUERY)).toThrow(
       "No query handler registered in container for type: 'ACTIVATION_FAILURE_QUERY'."
     );
@@ -285,8 +294,14 @@ describe("bindInstance", () => {
 
     expect(container.get(QueryBus).query("SYNC_FAIL_DEACTIVATION_QUERY")).toBe("query-response");
     expect(() => container.unbind(SyncFailDeactivationService)).not.toThrow();
+
     expect(instance.scope.isDisposed).toBe(true);
     expect(instance.scope.isInactive).toBe(true);
+    expect(instance.scope["commandBus"]).toBeNull();
+    expect(instance.scope["container"]).toBeNull();
+    expect(instance.scope["eventBus"]).toBeNull();
+    expect(instance.scope["queryBus"]).toBeNull();
+
     expect(container.get(QueryBus).has("SYNC_FAIL_DEACTIVATION_QUERY")).toBe(false);
     expect(consoleSpy).toHaveBeenCalledWith(
       "[wirestate] @OnDeactivation failed for:",

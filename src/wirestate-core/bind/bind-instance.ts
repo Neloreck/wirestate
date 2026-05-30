@@ -498,6 +498,9 @@ function detachWireScopes<T extends object>(service: T): void {
     (scope as { isDisposed: boolean }).isDisposed = true;
     (scope as { isDeprovisioned: boolean }).isDeprovisioned = true;
     (scope as unknown as { container: Optional<Container> }).container = null;
+    (scope as unknown as { commandBus: Optional<CommandBus> }).commandBus = null;
+    (scope as unknown as { eventBus: Optional<EventBus> }).eventBus = null;
+    (scope as unknown as { queryBus: Optional<QueryBus> }).queryBus = null;
   }
 
   WIRE_SCOPES_BY_SERVICE.delete(service);
