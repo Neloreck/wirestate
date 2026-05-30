@@ -100,7 +100,7 @@ describe("optionalInjection", () => {
     const boundToken: ServiceIdentifier<string> = Symbol("bound-token");
 
     bind(container, {
-      id: boundToken,
+      token: boundToken,
       value: "bound-value",
     });
 
@@ -128,7 +128,7 @@ describe("optionalInjection", () => {
     @customElement("test-optional-injection-options-element")
     class TestOptionsElement extends ReactiveElement {
       @optionalInjection({
-        injectionId: token,
+        token,
         onFallback: () => "options-fallback",
       })
       public value: Optional<string> = null;
@@ -149,7 +149,7 @@ describe("optionalInjection", () => {
 
     @customElement("test-optional-injection-options-parameter-fallback-element")
     class TestOptionsParameterFallbackElement extends ReactiveElement {
-      @optionalInjection({ injectionId: token }, () => 30)
+      @optionalInjection({ token }, () => 30)
       public value: string | number = 0;
     }
 
@@ -170,7 +170,7 @@ describe("optionalInjection", () => {
     class TestOptionsFallbackPriorityElement extends ReactiveElement {
       @optionalInjection(
         {
-          injectionId: token,
+          token,
           onFallback: () => "options-fallback",
         },
         () => "parameter-fallback"
@@ -194,7 +194,7 @@ describe("optionalInjection", () => {
     @customElement("test-optional-injection-typed-options-element")
     class TestTypedOptionsElement extends ReactiveElement {
       @optionalInjection({
-        injectionId: token,
+        token,
         onFallback: () => 20,
       })
       public value: string | number = 0;

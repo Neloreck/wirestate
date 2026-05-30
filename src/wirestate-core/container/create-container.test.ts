@@ -171,7 +171,7 @@ describe("createContainer", () => {
     expect(activated).toBe(true);
   });
 
-  it("should activate instance descriptors by descriptor id", () => {
+  it("should activate instance descriptors by descriptor token", () => {
     const TOKEN: unique symbol = Symbol("test-service");
     let activated: boolean = false;
 
@@ -187,7 +187,7 @@ describe("createContainer", () => {
       bindings: [
         {
           bindingType: BindingType.Instance,
-          id: TOKEN,
+          token: TOKEN,
           value: TestService,
         },
       ],

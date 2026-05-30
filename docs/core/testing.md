@@ -119,7 +119,7 @@ test("cart uses mocked api client", async () => {
   const container = mockContainer({ bindings: [CartService] });
   const api = { post: jest.fn().mockResolvedValue({ ok: true }) };
 
-  bind(container, { id: ApiClient, value: api as unknown as ApiClient });
+  bind(container, { token: ApiClient, value: api as unknown as ApiClient });
 
   const cart = container.get(CartService);
   await cart.checkout();

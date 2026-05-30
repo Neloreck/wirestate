@@ -5,8 +5,8 @@ import { BindingType, ScopeBindingType } from "../types/provision";
 
 interface UnsafeBindingDescriptor {
   readonly bindingType?: unknown;
-  readonly id?: unknown;
   readonly scopeBindingType?: unknown;
+  readonly token?: unknown;
 }
 
 /**
@@ -20,8 +20,12 @@ interface UnsafeBindingDescriptor {
  * @throws {@link WirestateError} If required shared descriptor fields are invalid.
  */
 export function validateBindingDescriptor(binding: UnsafeBindingDescriptor): void {
-  if (!Object.prototype.hasOwnProperty.call(binding, "id") || binding.id === undefined || binding.id === null) {
-    throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, "Binding descriptor must provide an 'id' token.");
+  if (
+    !Object.prototype.hasOwnProperty.call(binding, "token") ||
+    binding.token === undefined ||
+    binding.token === null
+  ) {
+    throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, "Binding descriptor must provide a 'token' property.");
   }
 
   if (binding.bindingType !== undefined && !Object.values(Binding).includes(binding.bindingType as BindingType)) {

@@ -90,9 +90,9 @@ export class PanelService {
 
 ## Injection
 
-### `@injection(optionsOrId)` / `useInjection(host, optionsOrId)`
+### `@injection(optionsOrToken)` / `useInjection(host, optionsOrToken)`
 
-Injects a service from the nearest parent container. Supports both options object and direct service identifier.
+Injects a service from the nearest parent container. Supports both options object and direct service token.
 
 ```typescript
 import { LitElement, html } from "lit";
@@ -103,12 +103,12 @@ import { MyService } from "./services";
 
 @customElement("my-component")
 class MyComponent extends LitElement {
-  // Using identifier:
+  // Using token:
   @injection(MyService)
   private myService!: MyService;
 
   // Using options object:
-  @injection({ injectionId: MyService, once: true })
+  @injection({ token: MyService, once: true })
   private onceService!: MyService;
 
   render() {
@@ -126,11 +126,11 @@ import { useInjection } from "@wirestate/lit";
 import { MyService } from "./services";
 
 class MyComponent extends LitElement {
-  // Using identifier:
+  // Using token:
   private myService = useInjection(this, MyService);
 
   // Using options object:
-  private onceService = useInjection(this, { injectionId: MyService, once: true });
+  private onceService = useInjection(this, { token: MyService, once: true });
 
   render() {
     return html`<div>${this.myService.value.getData()}</div>`;
@@ -138,7 +138,7 @@ class MyComponent extends LitElement {
 }
 ```
 
-### `@optionalInjection(optionsOrId, onFallback?)` / `useOptionalInjection(host, optionsOrId, onFallback?)`
+### `@optionalInjection(optionsOrToken, onFallback?)` / `useOptionalInjection(host, optionsOrToken, onFallback?)`
 
 Safely resolves a service from the nearest parent container. Returns `null` when the service is not bound, or calls the
 fallback function when one is provided.

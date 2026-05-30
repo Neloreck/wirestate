@@ -19,7 +19,7 @@ import { AnyObject } from "../types/general";
  * @template T - The type of the value being resolved.
  * @template F - The type returned by the fallback function.
  *
- * @param injectionId - The service identifier (string, symbol, or constructor).
+ * @param token - The service token (string, symbol, or constructor).
  * @param onFallback - Optional function called to provide a value if the token is not bound.
  *
  * @returns The resolved value, the result of the fallback function, or `null` when no fallback is provided.
@@ -30,26 +30,26 @@ import { AnyObject } from "../types/general";
  * ```
  */
 export function useOptionalInjection<T, F = null>(
-  injectionId: ServiceIdentifier<T>,
+  token: ServiceIdentifier<T>,
   onFallback?: (container: Container) => F
 ): T | F {
   const container: Container = useContainer();
 
   // Revision bump forces a container reset; force re-resolution to drop stale instances.
   return useMemo(() => {
-    if (container.isBound(injectionId)) {
+    if (container.isBound(token)) {
       dbg.info(prefix(__filename), "Resolving injection:", {
-        token: injectionId,
-        name: (injectionId as AnyObject)?.name ?? injectionId,
+        token,
+        name: (token as AnyObject)?.name ?? token,
         container,
         onFallback,
       });
 
-      return container.get<T>(injectionId);
+      return container.get<T>(token);
     } else if (onFallback) {
       dbg.info(prefix(__filename), "Injection not found, using fallback handler:", {
-        token: injectionId,
-        name: (injectionId as AnyObject)?.name ?? injectionId,
+        token,
+        name: (token as AnyObject)?.name ?? token,
         container,
         onFallback,
       });
@@ -57,13 +57,13 @@ export function useOptionalInjection<T, F = null>(
       return onFallback(container);
     } else {
       dbg.info(prefix(__filename), "Injection not found, returning null:", {
-        token: injectionId,
-        name: (injectionId as AnyObject)?.name ?? injectionId,
+        token,
+        name: (token as AnyObject)?.name ?? token,
         container,
         onFallback,
       });
 
       return null as F;
     }
-  }, [container, injectionId]);
+  }, [container, token]);
 }

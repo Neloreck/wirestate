@@ -31,10 +31,10 @@ describe("unbind", () => {
     const { LifecycleService } = createLifecycleService();
     const container: Container = createContainer({
       activate: false,
-      bindings: [LifecycleService, { id: "CONFIG", value: "config-value" }],
+      bindings: [LifecycleService, { token: "CONFIG", value: "config-value" }],
     });
 
-    expect(getContainerBindings(container)).toEqual([LifecycleService, { id: "CONFIG", value: "config-value" }]);
+    expect(getContainerBindings(container)).toEqual([LifecycleService, { token: "CONFIG", value: "config-value" }]);
 
     unbindAll(container);
 

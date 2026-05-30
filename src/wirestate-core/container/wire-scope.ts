@@ -105,7 +105,7 @@ export class WireScope {
    *
    * @template T - Type of the service or value to resolve.
    *
-   * @param injectionId - Service token (class constructor, symbol, or string).
+   * @param token - Service token (class constructor, symbol, or string).
    * @returns The resolved instance or value.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
@@ -116,15 +116,15 @@ export class WireScope {
    * const service: MyService = scope.resolve(MyService);
    * ```
    */
-  public resolve<T>(injectionId: ServiceIdentifier<T>): T {
+  public resolve<T>(token: ServiceIdentifier<T>): T {
     dbg.info(prefix(__filename), "Lazy resolve:", {
-      name: (injectionId as AnyObject)?.name ?? injectionId,
-      key: injectionId,
+      name: (token as AnyObject)?.name ?? token,
+      token,
     });
 
     this.assertActive();
 
-    return this.container.get<T>(injectionId);
+    return this.container.get<T>(token);
   }
 
   /**
@@ -132,7 +132,7 @@ export class WireScope {
    *
    * @template T - Type of the service or value to resolve.
    *
-   * @param injectionId - Service token (class constructor, symbol, or string).
+   * @param token - Service token (class constructor, symbol, or string).
    * @returns The resolved instance, value, or `null` if not bound.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
@@ -144,15 +144,15 @@ export class WireScope {
    * logger?.info("Resolved optionally");
    * ```
    */
-  public resolveOptional<T>(injectionId: ServiceIdentifier<T>): Optional<T> {
+  public resolveOptional<T>(token: ServiceIdentifier<T>): Optional<T> {
     dbg.info(prefix(__filename), "Lazy optional resolve:", {
-      name: (injectionId as AnyObject)?.name ?? injectionId,
-      key: injectionId,
+      name: (token as AnyObject)?.name ?? token,
+      token,
     });
 
     this.assertActive();
 
-    return this.container.isBound(injectionId) ? this.container.get<T>(injectionId) : null;
+    return this.container.isBound(token) ? this.container.get<T>(token) : null;
   }
 
   /**
@@ -537,7 +537,7 @@ export class WireScope {
    * Targeted seeds are keyed by service class, string, or symbol.
    *
    * @template T - Expected type of the seed value.
-   * @param seed - Lookup key (identifier or token) for the seed.
+   * @param seed - Lookup token for the seed.
    * @returns The seed value or `null` if not found.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.

@@ -57,10 +57,10 @@ describe("shallowEqualArrays", () => {
   });
 
   it("should compare array items by reference", () => {
-    const entry = { id: "TOKEN" };
+    const entry = { token: "TOKEN" };
 
     expect(shallowEqualArrays([entry], [entry])).toBe(true);
-    expect(shallowEqualArrays([entry], [{ id: "TOKEN" }])).toBe(false);
+    expect(shallowEqualArrays([entry], [{ token: "TOKEN" }])).toBe(false);
   });
 });
 

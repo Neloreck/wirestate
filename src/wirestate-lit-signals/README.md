@@ -53,7 +53,7 @@ import { CounterService } from "./services";
 
 @customElement("my-component")
 class MyComponent extends LitElement {
-  @injection({ injectionId: CounterService })
+  @injection({ token: CounterService })
   private readonly counterService!: CounterService;
 
   private isOddLabel = computed(() => (this.counterService.count.get() % 2 === 0 ? "even" : "odd"));

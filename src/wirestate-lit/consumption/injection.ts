@@ -33,9 +33,9 @@ export interface InjectionDecorator<T> {
  */
 export interface InjectionOptions<T> {
   /**
-   * The service identifier to inject.
+   * The service token to inject.
    */
-  injectionId: ServiceIdentifier<T>;
+  token: ServiceIdentifier<T>;
   /**
    * Resolve only the first context value.
    *
@@ -54,7 +54,7 @@ export interface InjectionOptions<T> {
  *
  * @group Consumption
  *
- * @param optionsOrInjectionId - Service token or options.
+ * @param optionsOrToken - Service token or options.
  * @returns Lit property decorator.
  *
  * @example
@@ -72,7 +72,7 @@ export interface InjectionOptions<T> {
  * @example
  * ```typescript
  * class MyElement extends LitElement {
- *   @injection({ injectionId: MyService, once: true })
+ *   @injection({ token: MyService, once: true })
  *   private myService!: MyService;
  *
  *   public render() {
@@ -81,17 +81,17 @@ export interface InjectionOptions<T> {
  * }
  * ```
  */
-export function injection<T>(optionsOrInjectionId: InjectionOptions<T> | ServiceIdentifier<T>): InjectionDecorator<T> {
+export function injection<T>(optionsOrToken: InjectionOptions<T> | ServiceIdentifier<T>): InjectionDecorator<T> {
   const options: InjectionOptions<T> =
-    typeof optionsOrInjectionId === "object" && optionsOrInjectionId !== null && "injectionId" in optionsOrInjectionId
-      ? optionsOrInjectionId
-      : { injectionId: optionsOrInjectionId as ServiceIdentifier<T> };
+    typeof optionsOrToken === "object" && optionsOrToken !== null && "token" in optionsOrToken
+      ? optionsOrToken
+      : { token: optionsOrToken as ServiceIdentifier<T> };
 
   return ((
     protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, T>,
     nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, T>
   ): void => {
-    const { injectionId, once } = options;
+    const { once, token } = options;
 
     // Standard decorators branch.
     if (typeof nameOrContext === "object") {
@@ -99,7 +99,7 @@ export function injection<T>(optionsOrInjectionId: InjectionOptions<T> | Service
         new ContextConsumer(this, {
           context: ContainerContext,
           callback: (container) => {
-            protoOrTarget.set.call(this, container.get(injectionId));
+            protoOrTarget.set.call(this, container.get(token));
           },
           subscribe: !once,
         });
@@ -110,7 +110,7 @@ export function injection<T>(optionsOrInjectionId: InjectionOptions<T> | Service
         new ContextConsumer(element, {
           context: ContainerContext,
           callback: (container) => {
-            (element as AnyObject)[nameOrContext] = container.get(injectionId);
+            (element as AnyObject)[nameOrContext] = container.get(token);
           },
           subscribe: !once,
         });

@@ -15,7 +15,7 @@ describe("register-binding", () => {
   it("should register container bindings in insertion order", () => {
     const container: Container = new Container();
     const descriptor: BindingDescriptor = {
-      id: "CONFIG_TOKEN",
+      token: "CONFIG_TOKEN",
       value: "config-value",
     };
 
@@ -30,11 +30,11 @@ describe("register-binding", () => {
     const secondContainer: Container = new Container();
 
     const firstDescriptor: BindingDescriptor = {
-      id: "FIRST_TOKEN",
+      token: "FIRST_TOKEN",
       value: "first-value",
     };
     const secondDescriptor: BindingDescriptor = {
-      id: "SECOND_TOKEN",
+      token: "SECOND_TOKEN",
       value: "second-value",
     };
 
@@ -49,11 +49,11 @@ describe("register-binding", () => {
   it("should unregister all bindings for a token", () => {
     const container: Container = new Container();
     const descriptor: BindingDescriptor = {
-      id: GenericService,
+      token: GenericService,
       value: "shadow",
     };
     const remaining: BindingDescriptor = {
-      id: "CONFIG_TOKEN",
+      token: "CONFIG_TOKEN",
       value: "config-value",
     };
 
@@ -68,7 +68,7 @@ describe("register-binding", () => {
   it("should unregister all container bindings", () => {
     const container: Container = new Container();
     const descriptor: BindingDescriptor = {
-      id: "CONFIG_TOKEN",
+      token: "CONFIG_TOKEN",
       value: "config-value",
     };
 

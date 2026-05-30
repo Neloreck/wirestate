@@ -44,7 +44,7 @@ function validateFactoryDescriptor(descriptor: FactoryBindingDescriptor): void {
  * @template T - Factory function type.
  *
  * @param container - Container to bind into.
- * @param descriptor - Descriptor with `id`, `bindingType`, and `factory`.
+ * @param descriptor - Descriptor with `token`, `bindingType`, and `factory`.
  * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
@@ -58,7 +58,7 @@ export function bindFactory(container: Container, descriptor: FactoryBindingDesc
   });
 
   container
-    .bind(descriptor.id as ServiceIdentifier<Factory<unknown>>)
+    .bind(descriptor.token as ServiceIdentifier<Factory<unknown>>)
     .toFactory(descriptor.factory as (context: ResolutionContext) => Factory<unknown> | Promise<Factory<unknown>>);
 
   registerBinding(container, descriptor);

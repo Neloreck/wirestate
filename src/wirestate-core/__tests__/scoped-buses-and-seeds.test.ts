@@ -93,7 +93,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
   it("keeps parent and child messaging in separate scope", async () => {
     const parent: Container = createContainer({
       activate: [ParentCounterService],
-      bindings: [ParentCounterService, { id: PARENT_TOKEN, value: "root-value" }],
+      bindings: [ParentCounterService, { token: PARENT_TOKEN, value: "root-value" }],
       seeds: [[SETTINGS_TOKEN, { label: "root-label", offset: 1 }]],
     });
     const child: Container = createContainer({

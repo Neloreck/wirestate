@@ -12,7 +12,7 @@ describe("bindResolvedValue", () => {
     const binding: ResolvedValueBindingDescriptor<string> = {
       bindingType: BindingType.ResolvedValue,
       factory: () => "resolved",
-      id: "resolved-value",
+      token: "resolved-value",
     };
 
     const result: Container = bindResolvedValue(container, binding);
@@ -29,11 +29,11 @@ describe("bindResolvedValue", () => {
     const binding: ResolvedValueBindingDescriptor<string, [string]> = {
       bindingType: BindingType.ResolvedValue,
       factory: (name: string) => `Hello, ${name}`,
-      id: GREETING_TOKEN,
+      token: GREETING_TOKEN,
       injectOptions: [NAME_TOKEN as ServiceIdentifier<string>],
     };
 
-    bindConstant(container, { id: NAME_TOKEN, value: "Ada" });
+    bindConstant(container, { token: NAME_TOKEN, value: "Ada" });
     bindResolvedValue(container, binding);
 
     expect(container.get(GREETING_TOKEN)).toBe("Hello, Ada");
@@ -46,7 +46,7 @@ describe("bindResolvedValue", () => {
     bindResolvedValue(container, {
       bindingType: BindingType.ResolvedValue,
       factory: () => count++,
-      id: "singleton-resolved-value",
+      token: "singleton-resolved-value",
       scopeBindingType: ScopeBindingType.Singleton,
     });
 
@@ -61,7 +61,7 @@ describe("bindResolvedValue", () => {
     bindResolvedValue(container, {
       bindingType: BindingType.ResolvedValue,
       factory: () => count++,
-      id: "transient-resolved-value",
+      token: "transient-resolved-value",
       scopeBindingType: ScopeBindingType.Transient,
     });
 
@@ -69,7 +69,7 @@ describe("bindResolvedValue", () => {
     expect(container.get("transient-resolved-value")).toBe(1);
   });
 
-  it("should throw if id is missing", () => {
+  it("should throw if token is missing", () => {
     const container: Container = new Container();
     const binding = {
       bindingType: BindingType.ResolvedValue,
@@ -79,7 +79,7 @@ describe("bindResolvedValue", () => {
     expect(() => bindResolvedValue(container, binding)).toThrow(
       expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
     );
-    expect(() => bindResolvedValue(container, binding)).toThrow("Binding descriptor must provide an 'id' token.");
+    expect(() => bindResolvedValue(container, binding)).toThrow("Binding descriptor must provide a 'token' property.");
   });
 
   it("should throw if factory is missing", () => {
@@ -88,13 +88,13 @@ describe("bindResolvedValue", () => {
     expect(() =>
       bindResolvedValue(container, {
         bindingType: BindingType.ResolvedValue,
-        id: "resolved-value-binding",
+        token: "resolved-value-binding",
       } as ResolvedValueBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindResolvedValue(container, {
         bindingType: BindingType.ResolvedValue,
-        id: "resolved-value-binding",
+        token: "resolved-value-binding",
       } as ResolvedValueBindingDescriptor)
     ).toThrow("Resolved value descriptor 'factory' must be a function.");
   });
@@ -106,14 +106,14 @@ describe("bindResolvedValue", () => {
       bindResolvedValue(container, {
         bindingType: BindingType.DynamicValue,
         factory: () => "value",
-        id: "resolved-value-binding",
+        token: "resolved-value-binding",
       } as unknown as ResolvedValueBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindResolvedValue(container, {
         bindingType: BindingType.DynamicValue,
         factory: () => "value",
-        id: "resolved-value-binding",
+        token: "resolved-value-binding",
       } as unknown as ResolvedValueBindingDescriptor)
     ).toThrow("bindResolvedValue expected binding type 'ResolvedValue'.");
   });
@@ -125,7 +125,7 @@ describe("bindResolvedValue", () => {
       bindResolvedValue(container, {
         bindingType: BindingType.ResolvedValue,
         factory: () => "value",
-        id: "bad-scope",
+        token: "bad-scope",
         scopeBindingType: "UNKNOWN",
       } as unknown as ResolvedValueBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_BINDING_SCOPE }));
@@ -133,7 +133,7 @@ describe("bindResolvedValue", () => {
       bindResolvedValue(container, {
         bindingType: BindingType.ResolvedValue,
         factory: () => "value",
-        id: "bad-scope",
+        token: "bad-scope",
         scopeBindingType: "UNKNOWN",
       } as unknown as ResolvedValueBindingDescriptor)
     ).toThrow("Binding descriptor has unknown scope binding type 'UNKNOWN'.");

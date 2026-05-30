@@ -5,7 +5,7 @@ import { BindingDescriptor } from "../types/provision";
  * Returns the token for a binding.
  *
  * @remarks
- * Classes are their own tokens. Descriptors use `id`.
+ * Classes are their own tokens. Descriptors use `token`.
  *
  * @group Bind
  *
@@ -21,9 +21,9 @@ import { BindingDescriptor } from "../types/provision";
  * class UserService {}
  *
  * const classToken = getBindingToken(UserService);
- * const configToken = getBindingToken({ id: "CONFIG", value: { retries: 2 } });
+ * const configToken = getBindingToken({ token: "CONFIG", value: { retries: 2 } });
  * ```
  */
 export function getBindingToken<T extends object = object>(binding: Newable<T> | BindingDescriptor): ServiceIdentifier {
-  return typeof binding === "function" ? binding : binding.id;
+  return typeof binding === "function" ? binding : binding.token;
 }

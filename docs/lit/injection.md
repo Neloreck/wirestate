@@ -25,7 +25,7 @@ By default, the property follows the nearest container context. Pass `once: true
 stay fixed.
 
 ```ts
-@injection({ injectionId: CartService, once: true })
+@injection({ token: CartService, once: true })
 private cart!: CartService;
 ```
 

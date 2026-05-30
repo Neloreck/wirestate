@@ -168,9 +168,9 @@ const API_URL = Symbol("API_URL");
 const DATE_NOW = Symbol("DATE_NOW");
 const container = createContainer();
 
-bind(container, { id: API_URL, value: "https://api.example.com" });
+bind(container, { token: API_URL, value: "https://api.example.com" });
 bind(container, {
-  id: DATE_NOW,
+  token: DATE_NOW,
   bindingType: BindingType.DynamicValue,
   factory: () => new Date(),
 });

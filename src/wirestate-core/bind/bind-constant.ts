@@ -54,7 +54,7 @@ function validateConstantDescriptor(descriptor: ConstantValueBindingDescriptor):
  * @template T - Value type.
  *
  * @param container - Container to bind into.
- * @param descriptor - Descriptor with `id` and `value`.
+ * @param descriptor - Descriptor with `token` and `value`.
  * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If `descriptor.scopeBindingType` is not `Singleton`.
@@ -65,13 +65,13 @@ export function bindConstant<T>(container: Container, descriptor: ConstantValueB
   validateConstantDescriptor(descriptor);
 
   dbg.info(prefix(__filename), "Binding constant:", {
-    id: descriptor.id,
+    token: descriptor.token,
     value: descriptor.value,
     descriptor,
     container,
   });
 
-  container.bind<T>(descriptor.id as ServiceIdentifier<T>).toConstantValue(descriptor.value as T);
+  container.bind<T>(descriptor.token as ServiceIdentifier<T>).toConstantValue(descriptor.value as T);
 
   registerBinding(container, descriptor);
 

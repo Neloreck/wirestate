@@ -124,7 +124,7 @@ describe("useOptionalInjection", () => {
     @customElement("test-use-optional-injection-options-element")
     class TestOptionsElement extends ReactiveElement {
       public data = useOptionalInjection(this, {
-        injectionId: token,
+        token,
         onFallback: () => "options-fallback",
       });
     }
@@ -144,7 +144,7 @@ describe("useOptionalInjection", () => {
 
     @customElement("test-use-optional-injection-options-parameter-fallback-element")
     class TestOptionsParameterFallbackElement extends ReactiveElement {
-      public data = useOptionalInjection(this, { injectionId: token }, () => 30);
+      public data = useOptionalInjection(this, { token }, () => 30);
     }
 
     const element = new TestOptionsParameterFallbackElement();
@@ -168,7 +168,7 @@ describe("useOptionalInjection", () => {
       public data = useOptionalInjection(
         this,
         {
-          injectionId: token,
+          token,
           onFallback: () => "options-fallback",
         },
         () => "parameter-fallback"
@@ -191,7 +191,7 @@ describe("useOptionalInjection", () => {
     @customElement("test-use-optional-injection-typed-options-element")
     class TestTypedOptionsElement extends ReactiveElement {
       public data = useOptionalInjection(this, {
-        injectionId: token,
+        token,
         onFallback: () => 20,
       });
     }
@@ -215,7 +215,7 @@ describe("useOptionalInjection", () => {
     @customElement("test-use-optional-injection-initial-element")
     class TestInitialElement extends ReactiveElement {
       public data = useOptionalInjection(this, {
-        injectionId: token,
+        token,
         value: "initial-value",
       });
     }

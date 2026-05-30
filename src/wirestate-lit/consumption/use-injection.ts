@@ -27,9 +27,9 @@ export interface UseInjectionOptions<T> {
    */
   value?: Optional<T>;
   /**
-   * The service identifier to inject.
+   * The service token to inject.
    */
-  injectionId: ServiceIdentifier<T>;
+  token: ServiceIdentifier<T>;
 }
 
 /**
@@ -39,9 +39,9 @@ export interface UseInjectionOptions<T> {
  */
 export interface UseInjectionValue<T> {
   /**
-   * The service identifier used for injection.
+   * The service token used for injection.
    */
-  injectionId: ServiceIdentifier<T>;
+  token: ServiceIdentifier<T>;
   /**
    * The injected service instance.
    */
@@ -54,7 +54,7 @@ export interface UseInjectionValue<T> {
  * @group Consumption
  *
  * @param host - Host element.
- * @param optionsOrInjectionId - Service token or options.
+ * @param optionsOrToken - Service token or options.
  * @returns Mutable injection holder.
  *
  * @example
@@ -71,7 +71,7 @@ export interface UseInjectionValue<T> {
  * @example
  * ```typescript
  * class MyElement extends LitElement {
- *   private myService = useInjection(this, { injectionId: MyService, once: true });
+ *   private myService = useInjection(this, { token: MyService, once: true });
  *
  *   render() {
  *     return html`<div>${this.myService.value.getName()}</div>`;
@@ -81,28 +81,28 @@ export interface UseInjectionValue<T> {
  */
 export function useInjection<T>(
   host: ReactiveControllerHost & HTMLElement,
-  optionsOrInjectionId: UseInjectionOptions<T> | ServiceIdentifier<T>
+  optionsOrToken: UseInjectionOptions<T> | ServiceIdentifier<T>
 ): UseInjectionValue<T> {
   const options: UseInjectionOptions<T> =
-    typeof optionsOrInjectionId === "object" && optionsOrInjectionId !== null && "injectionId" in optionsOrInjectionId
-      ? optionsOrInjectionId
-      : { injectionId: optionsOrInjectionId as ServiceIdentifier<T> };
+    typeof optionsOrToken === "object" && optionsOrToken !== null && "token" in optionsOrToken
+      ? optionsOrToken
+      : { token: optionsOrToken as ServiceIdentifier<T> };
 
-  const { once, injectionId, value } = options;
+  const { once, token, value } = options;
 
   dbg.info(prefix(__filename), "Creating:", {
     host,
     once,
-    injectionId,
+    token,
   });
 
-  const current: UseInjectionValue<T> = { value: value as unknown as T, injectionId };
+  const current: UseInjectionValue<T> = { value: value as unknown as T, token };
 
   new ContextConsumer(host, {
     context: ContainerContext,
     subscribe: !once,
     callback: (container) => {
-      current.value = container.get(injectionId);
+      current.value = container.get(token);
     },
   });
 

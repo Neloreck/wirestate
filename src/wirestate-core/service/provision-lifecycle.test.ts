@@ -58,7 +58,7 @@ describe("provision lifecycle", () => {
       bindings: [
         {
           bindingType: BindingType.Instance,
-          id: TOKEN,
+          token: TOKEN,
           value: LifecycleService,
         },
       ],
@@ -68,7 +68,7 @@ describe("provision lifecycle", () => {
     provisionContainer(container, lifecycle, [
       {
         bindingType: BindingType.Instance,
-        id: TOKEN,
+        token: TOKEN,
         value: LifecycleService,
       },
     ]);

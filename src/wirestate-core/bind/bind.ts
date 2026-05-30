@@ -61,7 +61,7 @@ export interface BindOptions extends BindInstanceOptions {
  * @param options - Binding options for class bindings.
  * @returns The same container for chaining or immediate resolution.
  *
- * @throws {@link WirestateError} If the descriptor has no `id`, has an unknown
+ * @throws {@link WirestateError} If the descriptor has no `token`, has an unknown
  * `bindingType` or `scopeBindingType`, or is missing fields required by the
  * selected binding strategy.
  *
@@ -78,12 +78,12 @@ export interface BindOptions extends BindInstanceOptions {
  *
  * bind(container, UserService);
  * bind(container, {
- *   id: API_URL,
+ *   token: API_URL,
  *   bindingType: BindingType.ConstantValue,
  *   value: "https://api.example.com",
  * });
  * bind(container, {
- *   id: "USER_SERVICE_FACTORY",
+ *   token: "USER_SERVICE_FACTORY",
  *   bindingType: BindingType.Factory,
  *   factory: () => () => container.get(UserService),
  * });
@@ -117,7 +117,7 @@ export function bind<T extends object = object>(
     case BindingType.Instance:
       return bindInstanceWithToken(
         container,
-        binding.id as ServiceIdentifier<T>,
+        binding.token as ServiceIdentifier<T>,
         (binding as InstanceBindingDescriptor<T>).value as unknown as Newable<T>,
         binding as InstanceBindingDescriptor<T>,
         options

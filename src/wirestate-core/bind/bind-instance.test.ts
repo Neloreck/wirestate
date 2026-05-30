@@ -134,7 +134,7 @@ describe("bindInstance", () => {
     const container: Container = mockContainer();
     const binding = {
       bindingType: BindingType.Instance,
-      id: GenericService,
+      token: GenericService,
       value: "not-a-constructor",
     } as unknown as InstanceBindingDescriptor;
 
@@ -146,7 +146,7 @@ describe("bindInstance", () => {
     );
   });
 
-  it("should throw for instance descriptor without id", () => {
+  it("should throw for instance descriptor without token", () => {
     const container: Container = mockContainer();
     const binding = {
       bindingType: BindingType.Instance,
@@ -157,7 +157,7 @@ describe("bindInstance", () => {
       expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
     );
     expect(() => bindInstanceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
-      "Binding descriptor must provide an 'id' token."
+      "Binding descriptor must provide a 'token' property."
     );
   });
 
@@ -165,7 +165,7 @@ describe("bindInstance", () => {
     const container: Container = mockContainer();
     const binding = {
       bindingType: BindingType.Instance,
-      id: GenericService,
+      token: GenericService,
       scopeBindingType: "UNKNOWN",
       value: GenericService,
     } as unknown as InstanceBindingDescriptor;

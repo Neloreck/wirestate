@@ -57,16 +57,16 @@ export function getContainerBindings(container: Container): Bindings {
  * @internal
  *
  * @param container - Container losing the binding.
- * @param identifier - Binding token removed from the container.
+ * @param token - Binding token removed from the container.
  */
-export function unregisterBinding(container: Container, identifier: ServiceIdentifier): void {
+export function unregisterBinding(container: Container, token: ServiceIdentifier): void {
   const bindings: Maybe<Array<Binding>> = CONTAINER_BINDINGS.get(container);
 
   if (!bindings) {
     return;
   }
 
-  const remaining: Array<Binding> = bindings.filter((binding) => !Object.is(getBindingToken(binding), identifier));
+  const remaining: Array<Binding> = bindings.filter((binding) => !Object.is(getBindingToken(binding), token));
 
   if (remaining.length) {
     CONTAINER_BINDINGS.set(container, remaining);

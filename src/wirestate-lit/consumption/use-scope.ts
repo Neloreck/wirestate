@@ -42,10 +42,10 @@ export type UseScopeValue = UseInjectionValue<WireScope>;
 export function useScope<E extends ReactiveControllerHost & HTMLElement>(host: E): UseScopeValue {
   dbg.info(prefix(__filename), "Creating:", {
     host,
-    injectionId: WireScope,
+    token: WireScope,
   });
 
-  const current: UseInjectionValue<WireScope> = { value: undefined as unknown as WireScope, injectionId: WireScope };
+  const current: UseInjectionValue<WireScope> = { value: undefined as unknown as WireScope, token: WireScope };
 
   new ContextConsumer(host, {
     context: ContainerContext,

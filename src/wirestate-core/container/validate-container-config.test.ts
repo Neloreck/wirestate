@@ -27,7 +27,7 @@ describe("validateContainerConfig", () => {
         bindings: [
           {
             bindingType: BindingType.Instance,
-            id: TOKEN,
+            token: TOKEN,
             value: TestService,
           },
         ],

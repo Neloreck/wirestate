@@ -9,19 +9,19 @@ describe("getBindingToken", () => {
     expect(getBindingToken(GenericService)).toBe(GenericService);
   });
 
-  it("should return the id if the binding is a descriptor with value", () => {
-    expect(getBindingToken({ id: "test-value", value: { a: 1 } })).toBe("test-value");
+  it("should return the token if the binding is a descriptor with value", () => {
+    expect(getBindingToken({ token: "test-value", value: { a: 1 } })).toBe("test-value");
   });
 
-  it("should return the id if the binding is a descriptor with factory", () => {
-    expect(getBindingToken({ bindingType: BindingType.DynamicValue, id: "test-factory", factory: () => "test" })).toBe(
+  it("should return the token if the binding is a descriptor with factory", () => {
+    expect(getBindingToken({ bindingType: BindingType.DynamicValue, token: "test-factory", factory: () => "test" })).toBe(
       "test-factory"
     );
   });
 
-  it("should return the symbol id if the binding is a descriptor with symbol id", () => {
-    const id: unique symbol = Symbol("my-service");
+  it("should return the symbol token if the binding is a descriptor with symbol token", () => {
+    const token: unique symbol = Symbol("my-service");
 
-    expect(getBindingToken({ id, value: GenericService })).toBe(id);
+    expect(getBindingToken({ token, value: GenericService })).toBe(token);
   });
 });

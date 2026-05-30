@@ -27,7 +27,7 @@ describe("injection", () => {
   it("should inject service using options object", () => {
     @customElement("test-injection-options-element")
     class TestOptionsElement extends ReactiveElement {
-      @injection({ injectionId: GenericService })
+      @injection({ token: GenericService })
       public service!: GenericService;
     }
 
@@ -39,7 +39,7 @@ describe("injection", () => {
     expect(element.service.getValue()).toBe("test-value");
   });
 
-  it("should inject service using direct injectionId", () => {
+  it("should inject service using direct token", () => {
     @customElement("test-injection-direct-element")
     class TestDirectElement extends ReactiveElement {
       @injection(GenericService)
@@ -58,7 +58,7 @@ describe("injection", () => {
     const API_URL: unique symbol = Symbol("api-url");
 
     bind(fixture.container, {
-      id: API_URL,
+      token: API_URL,
       value: "https://api.example.com",
     });
 
@@ -80,7 +80,7 @@ describe("injection", () => {
     const READY_STATUS: unique symbol = Symbol("ready-status");
 
     bind(fixture.container, {
-      id: STATUS_TOKEN,
+      token: STATUS_TOKEN,
       value: READY_STATUS,
     });
 

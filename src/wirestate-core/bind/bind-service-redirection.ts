@@ -49,7 +49,7 @@ function validateServiceRedirectionDescriptor(descriptor: ServiceRedirectionBind
  * @template T - Resolved service type.
  *
  * @param container - Container to bind into.
- * @param descriptor - Descriptor with `id`, `bindingType`, and `service`.
+ * @param descriptor - Descriptor with `token`, `bindingType`, and `service`.
  * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
@@ -65,7 +65,7 @@ export function bindServiceRedirection<T>(
     container,
   });
 
-  container.bind<T>(descriptor.id as ServiceIdentifier<T>).toService(descriptor.service as ServiceIdentifier<T>);
+  container.bind<T>(descriptor.token as ServiceIdentifier<T>).toService(descriptor.service as ServiceIdentifier<T>);
 
   registerBinding(container, descriptor);
 

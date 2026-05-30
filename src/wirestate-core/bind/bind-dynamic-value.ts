@@ -51,7 +51,7 @@ function validateDynamicValueDescriptor(descriptor: DynamicValueBindingDescripto
  * @template T - Value type.
  *
  * @param container - Container to bind into.
- * @param descriptor - Descriptor with `id`, `factory`, and optional scope.
+ * @param descriptor - Descriptor with `token`, `factory`, and optional scope.
  * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
@@ -67,7 +67,7 @@ export function bindDynamicValue<T>(container: Container, descriptor: DynamicVal
   });
 
   const binding: BindInWhenOnFluentSyntax<T> = container
-    .bind(descriptor.id)
+    .bind(descriptor.token)
     .toDynamicValue((context) =>
       (descriptor.factory as DynamicValueBuilder<T>)(context)
     ) as BindInWhenOnFluentSyntax<T>;

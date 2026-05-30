@@ -77,7 +77,7 @@ describe("ContainerProvider", () => {
     }
 
     const { getByTestId, rerender } = render(
-      <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "first" }] }}>
+      <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "first" }] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
@@ -85,7 +85,7 @@ describe("ContainerProvider", () => {
     expect(getByTestId("value").textContent).toBe("first");
 
     rerender(
-      <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "second" }] }}>
+      <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "second" }] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
@@ -97,7 +97,7 @@ describe("ContainerProvider", () => {
 
   it("should keep managed container when bindings are shallow-equal", () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
-    const binding = { id: CONFIG_TOKEN, value: "stable" };
+    const binding = { token: CONFIG_TOKEN, value: "stable" };
     const containers: Array<Container> = [];
 
     function TrackingConsumer() {
@@ -211,7 +211,7 @@ describe("ContainerProvider", () => {
     }
 
     const { rerender } = render(
-      <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "first" }] }}>
+      <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "first" }] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
@@ -219,7 +219,7 @@ describe("ContainerProvider", () => {
     const unbindAllSpy = jest.spyOn(containers[0], "unbindAll");
 
     rerender(
-      <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "second" }] }}>
+      <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "second" }] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
@@ -242,7 +242,7 @@ describe("ContainerProvider", () => {
 
     const { rerender } = render(
       <StrictMode>
-        <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "first" }] }}>
+        <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "first" }] }}>
           <TrackingConsumer />
         </ContainerProvider>
       </StrictMode>
@@ -250,7 +250,7 @@ describe("ContainerProvider", () => {
 
     rerender(
       <StrictMode>
-        <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "second" }] }}>
+        <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "second" }] }}>
           <TrackingConsumer />
         </ContainerProvider>
       </StrictMode>
@@ -274,7 +274,7 @@ describe("ContainerProvider", () => {
 
     const { getByTestId } = render(
       <StrictMode>
-        <ContainerProvider config={{ bindings: [{ id: CONFIG_TOKEN, value: "strict" }] }}>
+        <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "strict" }] }}>
           <TrackingConsumer />
         </ContainerProvider>
       </StrictMode>
@@ -295,7 +295,7 @@ describe("ContainerProvider lifecycle", () => {
           bindings: [
             {
               bindingType: BindingType.Instance,
-              id: TOKEN,
+              token: TOKEN,
               value: LifecycleService,
             },
           ],

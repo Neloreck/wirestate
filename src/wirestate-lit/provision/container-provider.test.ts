@@ -233,7 +233,7 @@ describe("ContainerProvider", () => {
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
-      config: { bindings: [{ id: CONFIG_TOKEN, value: "managed" }] },
+      config: { bindings: [{ token: CONFIG_TOKEN, value: "managed" }] },
     });
 
     expect(controller.value).toBeUndefined();
@@ -481,7 +481,7 @@ describe("ContainerProvider", () => {
           DirectService,
           {
             bindingType: BindingType.Instance,
-            id: "DESCRIPTOR",
+            token: "DESCRIPTOR",
             value: DescriptorService,
           },
         ],

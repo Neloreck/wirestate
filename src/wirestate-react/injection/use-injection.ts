@@ -17,29 +17,29 @@ import { AnyObject } from "../types/general";
  *
  * @template T - The type of the value being resolved.
  *
- * @param injectionId - The service identifier (string, symbol, or constructor).
+ * @param token - The service token (string, symbol, or constructor).
  *
  * @returns The resolved instance or value.
  *
  * @throws {WirestateError} If the container is not found in context.
- * @throws {Error} If Inversify fails to resolve the identifier.
+ * @throws {Error} If Inversify fails to resolve the token.
  *
  * @example
  * ```tsx
  * const api: ApiService = useInjection(ApiService);
  * ```
  */
-export function useInjection<T>(injectionId: ServiceIdentifier<T>): T {
+export function useInjection<T>(token: ServiceIdentifier<T>): T {
   const container: Container = useContainer();
 
   // Revision bump causes a container reset; force re-resolution to drop stale instances.
   return useMemo(() => {
     dbg.info(prefix(__filename), "Resolving injection:", {
-      token: injectionId,
-      name: (injectionId as AnyObject)?.name ?? injectionId,
+      token,
+      name: (token as AnyObject)?.name ?? token,
       container,
     });
 
-    return container.get<T>(injectionId);
-  }, [container, injectionId]);
+    return container.get<T>(token);
+  }, [container, token]);
 }

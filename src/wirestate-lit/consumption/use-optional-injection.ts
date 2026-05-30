@@ -34,11 +34,11 @@ export interface UseOptionalInjectionOptions<T, F = null> {
    */
   value?: T | F;
   /**
-   * The service identifier to inject.
+   * The service token to inject.
    */
-  injectionId: ServiceIdentifier<T>;
+  token: ServiceIdentifier<T>;
   /**
-   * Provides a value when the service identifier is not bound.
+   * Provides a value when the service token is not bound.
    */
   onFallback?: OptionalInjectionFallback<F>;
 }
@@ -50,9 +50,9 @@ export interface UseOptionalInjectionOptions<T, F = null> {
  */
 export interface UseOptionalInjectionValue<T, F = null> {
   /**
-   * The service identifier used for injection.
+   * The service token used for injection.
    */
-  injectionId: ServiceIdentifier<T>;
+  token: ServiceIdentifier<T>;
   /**
    * The injected service instance, fallback value, or `null`.
    */
@@ -71,7 +71,7 @@ export interface UseOptionalInjectionValue<T, F = null> {
  * @template F - The type returned by the fallback function.
  *
  * @param host - Host element.
- * @param optionsOrInjectionId - Service token or options.
+ * @param optionsOrToken - Service token or options.
  * @param onFallback - Fallback for missing bindings.
  * @returns Mutable injection holder.
  *
@@ -88,45 +88,45 @@ export interface UseOptionalInjectionValue<T, F = null> {
  */
 export function useOptionalInjection<T, F = null>(
   host: ReactiveControllerHost & HTMLElement,
-  optionsOrInjectionId: UseOptionalInjectionOptions<T, F> | ServiceIdentifier<T>,
+  optionsOrToken: UseOptionalInjectionOptions<T, F> | ServiceIdentifier<T>,
   onFallback?: OptionalInjectionFallback<F>
 ): UseOptionalInjectionValue<T, F> {
   const options: UseOptionalInjectionOptions<T, F> =
-    typeof optionsOrInjectionId === "object" && optionsOrInjectionId !== null && "injectionId" in optionsOrInjectionId
-      ? optionsOrInjectionId
-      : { injectionId: optionsOrInjectionId as ServiceIdentifier<T>, onFallback };
+    typeof optionsOrToken === "object" && optionsOrToken !== null && "token" in optionsOrToken
+      ? optionsOrToken
+      : { token: optionsOrToken as ServiceIdentifier<T>, onFallback };
 
-  const { injectionId, once, value } = options;
+  const { once, token, value } = options;
   const fallback: Optional<OptionalInjectionFallback<F>> = options.onFallback ?? onFallback ?? null;
 
   dbg.info(prefix(__filename), "Creating:", {
     host,
     once,
-    injectionId,
+    token,
   });
 
   const current: UseOptionalInjectionValue<T, F> = {
     value: (value === undefined ? null : value) as T | F,
-    injectionId,
+    token,
   };
 
   new ContextConsumer(host, {
     context: ContainerContext,
     subscribe: !once,
     callback: (container) => {
-      if (container.isBound(injectionId)) {
+      if (container.isBound(token)) {
         dbg.info(prefix(__filename), "Resolving injection:", {
-          token: injectionId,
-          name: (injectionId as AnyObject)?.name ?? injectionId,
+          token,
+          name: (token as AnyObject)?.name ?? token,
           container,
           onFallback: fallback,
         });
 
-        current.value = container.get(injectionId);
+        current.value = container.get(token);
       } else if (fallback) {
         dbg.info(prefix(__filename), "Injection not found, using fallback handler:", {
-          token: injectionId,
-          name: (injectionId as AnyObject)?.name ?? injectionId,
+          token,
+          name: (token as AnyObject)?.name ?? token,
           container,
           onFallback: fallback,
         });
@@ -134,8 +134,8 @@ export function useOptionalInjection<T, F = null>(
         current.value = fallback(container);
       } else {
         dbg.info(prefix(__filename), "Injection not found, returning null:", {
-          token: injectionId,
-          name: (injectionId as AnyObject)?.name ?? injectionId,
+          token,
+          name: (token as AnyObject)?.name ?? token,
           container,
           onFallback: fallback,
         });

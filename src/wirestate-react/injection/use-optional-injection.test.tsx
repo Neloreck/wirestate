@@ -117,12 +117,12 @@ describe("useOptionalInjection", () => {
 
     container.bind(token).toConstantValue("bound-value");
 
-    jest.spyOn(container, "get").mockImplementation((injectionId) => {
-      if (injectionId === token) {
+    jest.spyOn(container, "get").mockImplementation((requestedToken) => {
+      if (requestedToken === token) {
         resolveCount++;
       }
 
-      return originalGet(injectionId);
+      return originalGet(requestedToken);
     });
 
     function FallbackComponent({ value }: { value: string }) {

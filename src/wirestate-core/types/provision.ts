@@ -35,17 +35,17 @@ export interface ConstantValueBindingDescriptor<T = unknown> {
   readonly bindingType?: typeof BindingTypeValues.ConstantValue;
 
   /**
-   * Token used to resolve the binding.
-   */
-  readonly id: ServiceIdentifier<T>;
-
-  /**
    * Lifetime scope for the fixed value.
    *
    * @remarks
    * Constant values can only be singleton-scoped.
    */
   readonly scopeBindingType?: typeof ScopeBindingTypeValues.Singleton;
+
+  /**
+   * Token used to resolve the binding.
+   */
+  readonly token: ServiceIdentifier<T>;
 
   /**
    * Fixed value to bind.
@@ -70,14 +70,14 @@ export interface DynamicValueBindingDescriptor<T = unknown> {
   readonly factory: DynamicValueBuilder<T>;
 
   /**
-   * Token used to resolve the binding.
-   */
-  readonly id: ServiceIdentifier<T>;
-
-  /**
    * Lifetime scope for created values.
    */
   readonly scopeBindingType?: ScopeBindingType;
+
+  /**
+   * Token used to resolve the binding.
+   */
+  readonly token: ServiceIdentifier<T>;
 }
 
 /**
@@ -99,7 +99,7 @@ export interface FactoryBindingDescriptor<T = unknown> {
   /**
    * Token used to resolve the factory.
    */
-  readonly id: ServiceIdentifier<T>;
+  readonly token: ServiceIdentifier<T>;
 }
 
 /**
@@ -116,7 +116,7 @@ export interface InstanceBindingDescriptor<T extends object = object> {
   /**
    * Token used to resolve the service.
    */
-  readonly id: ServiceIdentifier<T>;
+  readonly token: ServiceIdentifier<T>;
 
   /**
    * Service constructor to bind.
@@ -141,11 +141,6 @@ export interface ResolvedValueBindingDescriptor<T = unknown, TArgs extends Array
   readonly factory: (...args: TArgs) => T | Promise<T>;
 
   /**
-   * Token used to resolve the binding.
-   */
-  readonly id: ServiceIdentifier<T>;
-
-  /**
    * Injection options for factory arguments.
    */
   readonly injectOptions?: MapToResolvedValueInjectOptions<TArgs>;
@@ -154,6 +149,11 @@ export interface ResolvedValueBindingDescriptor<T = unknown, TArgs extends Array
    * Lifetime scope for created values.
    */
   readonly scopeBindingType?: ScopeBindingType;
+
+  /**
+   * Token used to resolve the binding.
+   */
+  readonly token: ServiceIdentifier<T>;
 }
 
 /**
@@ -168,14 +168,14 @@ export interface ServiceRedirectionBindingDescriptor<T = unknown> {
   readonly bindingType: typeof BindingTypeValues.ServiceRedirection;
 
   /**
-   * Token used to resolve the redirected binding.
-   */
-  readonly id: ServiceIdentifier<T>;
-
-  /**
    * Existing service token to redirect to.
    */
   readonly service: ServiceIdentifier<T>;
+
+  /**
+   * Token used to resolve the redirected binding.
+   */
+  readonly token: ServiceIdentifier<T>;
 }
 
 /**
@@ -199,7 +199,7 @@ export interface ServiceRedirectionBindingDescriptor<T = unknown> {
  * const API_URL = Symbol("API_URL");
  *
  * const descriptor: BindingDescriptor<string> = {
- *   id: API_URL,
+ *   token: API_URL,
  *   bindingType: BindingType.ConstantValue,
  *   value: "https://api.example.com",
  * };

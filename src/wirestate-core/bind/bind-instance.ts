@@ -134,7 +134,7 @@ export function bindInstance<T extends object>(
  * @template T - Type of the service instance.
  *
  * @param container - Target Inversify {@link Container}.
- * @param token - Service identifier used to resolve the binding.
+ * @param token - Service token used to resolve the binding.
  * @param binding - Service class constructor.
  * @param registeredBinding - Binding recorded as container-owned.
  * @param options - Configuration options for the binding.

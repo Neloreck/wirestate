@@ -289,7 +289,7 @@ counter.increment();
 expect(counter.count).toBe(1);
 
 unbind(container, CounterService);
-bind(container, { id: CounterService, value: fakeCounter });
+bind(container, { token: CounterService, value: fakeCounter });
 ```
 
 ## License
