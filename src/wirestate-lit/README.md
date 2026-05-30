@@ -22,13 +22,13 @@ Lit component behavior is covered by the official [Lit docs](https://lit.dev/doc
   - **Events**: Subscribe to events from the active container's event bus using `@onEvent` or `useOnEvents`.
   - **Commands**: Register command handlers using `@onCommand` or `useOnCommand`.
   - **Queries**: Register query handlers using `@onQuery` or `useOnQuery`.
-- **Container Provisioning**: Provide and manage containers within the Lit component tree using `@provideContainer` or `useContainerProvision`.
+- **Container Provisioning**: Provide and manage containers within the Lit component tree using `@provideContainer` or `useContainerProvider`.
 - **Child containers**: Create managed child containers derived from the parent context using `@provideChildContainer`, `useChildContainerProvider`, or `ChildContainerProvider`.
 - **Test Utilities**: Simplified setup for unit testing components with IoC dependencies.
 
 ## Provisioning
 
-### `@provideContainer(options)` / `useContainerProvision(host, options)`
+### `@provideContainer(options)` / `useContainerProvider(host, options)`
 
 Provides a container to the component tree. It uses Lit Context to propagate the container to child elements.
 

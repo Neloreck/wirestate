@@ -3,11 +3,11 @@ import { ReactiveControllerHost } from "@lit/reactive-element";
 import { ContainerProvider, ContainerProviderOptions } from "./container-provider";
 
 /**
- * Represents options for {@link useContainerProvision}.
+ * Represents options for {@link useContainerProvider}.
  *
  * @group Provision
  */
-export type UseContainerProvisionOptions = ContainerProviderOptions;
+export type UseContainerProviderOptions = ContainerProviderOptions;
 
 /**
  * Hook that provides a container to the host element and its children.
@@ -33,7 +33,7 @@ export type UseContainerProvisionOptions = ContainerProviderOptions;
  * @example
  * ```typescript
  * class MyRootElement extends LitElement {
- *   private containerProvider: ContainerProvider = useContainerProvision(this, {
+ *   private containerProvider: ContainerProvider = useContainerProvider(this, {
  *     config: {
  *       activate: [LoggerService],
  *       bindings: [LoggerService],
@@ -45,13 +45,13 @@ export type UseContainerProvisionOptions = ContainerProviderOptions;
  * @example
  * ```typescript
  * class MyRootElement extends LitElement {
- *   private containerProvider: ContainerProvider = useContainerProvision(this, { container: container });
+ *   private containerProvider: ContainerProvider = useContainerProvider(this, { container: container });
  * }
  * ```
  */
-export function useContainerProvision<E extends ReactiveControllerHost & HTMLElement>(
+export function useContainerProvider<E extends ReactiveControllerHost & HTMLElement>(
   host: E,
-  options: UseContainerProvisionOptions
+  options: UseContainerProviderOptions
 ): ContainerProvider<E> {
   return new ContainerProvider(host, options);
 }

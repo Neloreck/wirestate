@@ -32,14 +32,14 @@ handles.
 
 ## Controller Root Provider
 
-Use `useContainerProvision` when a controller-style field fits the element better than a decorator.
+Use `useContainerProvider` when a controller-style field fits the element better than a decorator.
 
 ```ts
-import { ContainerProvider, useContainerProvision } from "@wirestate/lit";
+import { ContainerProvider, useContainerProvider } from "@wirestate/lit";
 import { LitElement } from "lit";
 
 export class ApplicationRoot extends LitElement {
-  private readonly provider: ContainerProvider = useContainerProvision(this, {
+  private readonly provider: ContainerProvider = useContainerProvider(this, {
     config: { bindings: [CounterService] },
   });
 }
@@ -85,6 +85,6 @@ The child container is recreated when the parent context changes and destroyed w
 
 [`provideContainer`](/api/wirestate-lit/functions/provideContainer),
 [`ContainerProvider`](/api/wirestate-lit/classes/ContainerProvider),
-[`useContainerProvision`](/api/wirestate-lit/functions/useContainerProvision),
+[`useContainerProvider`](/api/wirestate-lit/functions/useContainerProvider),
 [`provideChildContainer`](/api/wirestate-lit/functions/provideChildContainer),
 [`ChildContainerProvider`](/api/wirestate-lit/classes/ChildContainerProvider).

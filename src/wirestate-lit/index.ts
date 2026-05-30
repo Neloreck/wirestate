@@ -38,5 +38,5 @@ export { ContainerProvider, ContainerProviderOptions } from "./provision/contain
 export { ChildContainerProvider, ChildContainerProviderOptions } from "./provision/child-container-provider";
 export { provideContainer, ProvideContainerDecorator } from "./provision/provide-container";
 export { provideChildContainer, ProvideChildContainerDecorator } from "./provision/provide-child-container";
-export { useContainerProvision, UseContainerProvisionOptions } from "./provision/use-container-provision";
+export { useContainerProvider, UseContainerProviderOptions } from "./provision/use-container-provision";
 export { useChildContainerProvider } from "./provision/use-child-container-provider";

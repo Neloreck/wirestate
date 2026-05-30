@@ -8,9 +8,9 @@ import { ContainerContext } from "../context/container-context";
 import { Maybe } from "../types/general";
 
 import { ContainerProvider } from "./container-provider";
-import { useContainerProvision } from "./use-container-provision";
+import { useContainerProvider } from "./use-container-provision";
 
-describe("useContainerProvision hook", () => {
+describe("useContainerProvider hook", () => {
   @customElement("ws-use-ioc-provision-host")
   class TestProviderElement extends ReactiveElement {}
 
@@ -24,14 +24,14 @@ describe("useContainerProvision hook", () => {
   it("should return an instance of ContainerProvider", () => {
     const container: Container = mockContainer();
     const element: TestProviderElement = new TestProviderElement();
-    const provider: ContainerProvider = useContainerProvision(element, { container });
+    const provider: ContainerProvider = useContainerProvider(element, { container });
 
     expect(provider).toBeInstanceOf(ContainerProvider);
   });
 
   it("should create a managed container from creation options when connected", () => {
     const element: TestProviderElement = new TestProviderElement();
-    const provider: ContainerProvider = useContainerProvision(element, { config: {} });
+    const provider: ContainerProvider = useContainerProvider(element, { config: {} });
 
     expect(provider.value).toBeUndefined();
 
@@ -48,7 +48,7 @@ describe("useContainerProvision hook", () => {
   it("should use the provided container", () => {
     const container: Container = createContainer();
     const element: TestProviderElement = new TestProviderElement();
-    const provider: ContainerProvider = useContainerProvision(element, { container });
+    const provider: ContainerProvider = useContainerProvider(element, { container });
 
     expect(provider.value).toBeUndefined();
 
@@ -65,7 +65,7 @@ describe("useContainerProvision hook", () => {
     const container: Container = createContainer();
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
-    const provider: ContainerProvider = useContainerProvision(element, { container });
+    const provider: ContainerProvider = useContainerProvider(element, { container });
 
     document.body.appendChild(element);
 
