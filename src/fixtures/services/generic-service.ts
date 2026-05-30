@@ -54,15 +54,15 @@ export class GenericService {
   }
 
   public testQueryData(): void {
-    this.scope.queryData("TEST_QUERY", { data: 1 });
+    this.scope.query("TEST_QUERY", { data: 1 });
   }
 
   public testSendSyncCommand(): void {
-    this.scope.queryData("TEST_SYNC_COMMAND", 100);
+    this.scope.query("TEST_SYNC_COMMAND", 100);
   }
 
   public testSendAsyncCommand(): void {
-    this.scope.queryData("TEST_ASYNC_COMMAND", 500);
+    this.scope.query("TEST_ASYNC_COMMAND", 500);
   }
 
   @OnQuery("TEST_QUERY")

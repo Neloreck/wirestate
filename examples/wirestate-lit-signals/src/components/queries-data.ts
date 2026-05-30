@@ -71,11 +71,11 @@ export class QueriesData extends LitElement {
   private summary: Optional<ICounterSnapshot> = null;
 
   public async onQuerySummary(): Promise<void> {
-    this.summary = await this.scope.queryData(ECounterServiceQuery.GET_COUNTER_SUMMARY, { value: "some-data" });
+    this.summary = await this.scope.query(ECounterServiceQuery.GET_COUNTER_SUMMARY, { value: "some-data" });
   }
 
   public async onQuerySnapshot(): Promise<void> {
-    this.snapshot = await this.scope.queryData<ICounterSnapshot>(ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT);
+    this.snapshot = await this.scope.query<ICounterSnapshot>(ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT);
   }
 
   public render() {

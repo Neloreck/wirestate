@@ -148,7 +148,7 @@ export class CounterService {
 
   /*
    * Async query handler — simulates a network round-trip. Callers can
-   * simply `await` the return of `queryData` / `useAsyncQueryExecutor` without
+   * simply `await` the return of `query` / `useAsyncQueryExecutor` without
    * caring whether the responder is sync or async.
    */
   @OnQuery(ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT)

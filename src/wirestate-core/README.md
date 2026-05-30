@@ -145,8 +145,8 @@ export class AnotherService {
   public constructor(@Inject(WireScope) private scope: WireScope) {}
 
   public async someActionRequiringItems(): Promise<void> {
-    const syncItems: Array<string> = this.scope.queryData("STORE_ITEMS");
-    const asyncItems: Array<string> = await this.scope.queryDataAsync("STORE_ITEMS");
+    const syncItems: Array<string> = this.scope.query("STORE_ITEMS");
+    const asyncItems: Array<string> = await this.scope.queryAsync("STORE_ITEMS");
   }
 }
 ```
@@ -235,10 +235,10 @@ Injected `WireScope` instances expose lifecycle state for async guards:
 | `emitEvent(type, payload?, options?)`     | Emit an event; `options.from` defaults to the current scope                                 |
 | `subscribeToEvent(handler)`               | Subscribe a handler to all events; returns unsubscribe function                             |
 | `unsubscribeFromEvent(handler)`           | Remove a specific event subscription by handler reference                                   |
-| `queryData(type, data?)`                  | Dispatch a synchronous query and return the result                                          |
-| `queryDataAsync(type, data?)`             | Dispatch a query and return the result as a promise                                         |
-| `queryOptionalData(type, data?)`          | Dispatch a synchronous query; returns `null` if no handler is registered                    |
-| `queryOptionalDataAsync(type, data?)`     | Dispatch a query as a promise; returns `null` if no handler is registered                   |
+| `query(type, data?)`                      | Dispatch a synchronous query and return the result                                          |
+| `queryAsync(type, data?)`                 | Dispatch a query and return the result as a promise                                         |
+| `queryOptional(type, data?)`              | Dispatch a synchronous query; returns `null` if no handler is registered                    |
+| `queryOptionalAsync(type, data?)`         | Dispatch a query as a promise; returns `null` if no handler is registered                   |
 | `registerQueryHandler(type, handler)`     | Register a query handler; returns unregister function                                       |
 | `unregisterQueryHandler(type, handler)`   | Remove a specific query handler by type and reference                                       |
 | `executeCommand(type, data?)`             | Dispatch a command and return a descriptor                                                  |

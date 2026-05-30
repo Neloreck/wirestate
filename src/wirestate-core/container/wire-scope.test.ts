@@ -128,7 +128,7 @@ describe("WireScope", () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
-  it("should query data via query bus", () => {
+  it("should query via query bus", () => {
     const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
     const scope: WireScope = new WireScope(container);
@@ -138,18 +138,18 @@ describe("WireScope", () => {
     jest.spyOn(bus, "query");
     jest.spyOn(bus, "queryOptional");
 
-    const result: string = scope.queryData("TEST_QUERY", { param: 1 });
+    const result: string = scope.query("TEST_QUERY", { param: 1 });
 
     expect(result).toBe("result-from-bus");
     expect(bus.query).toHaveBeenCalledWith("TEST_QUERY", { param: 1 });
 
-    const missing: Optional<unknown> = scope.queryOptionalData("MISSING_QUERY", "string-value");
+    const missing: Optional<unknown> = scope.queryOptional("MISSING_QUERY", "string-value");
 
     expect(missing).toBeNull();
     expect(bus.queryOptional).toHaveBeenCalledWith("MISSING_QUERY", "string-value");
   });
 
-  it("should query async data via query bus", async () => {
+  it("should query async via query bus", async () => {
     const container: Container = mockContainer();
     const bus: QueryBus = container.get(QueryBus);
     const scope: WireScope = new WireScope(container);
@@ -160,13 +160,13 @@ describe("WireScope", () => {
     jest.spyOn(bus, "queryAsync");
     jest.spyOn(bus, "queryOptionalAsync");
 
-    await expect(scope.queryDataAsync("TEST_SYNC_QUERY", { param: 100 })).resolves.toBe("result-from-bus-1");
+    await expect(scope.queryAsync("TEST_SYNC_QUERY", { param: 100 })).resolves.toBe("result-from-bus-1");
     expect(bus.queryAsync).toHaveBeenCalledWith("TEST_SYNC_QUERY", { param: 100 });
 
-    await expect(scope.queryDataAsync("TEST_ASYNC_QUERY", { param: 1000 })).resolves.toBe("result-from-bus-2");
+    await expect(scope.queryAsync("TEST_ASYNC_QUERY", { param: 1000 })).resolves.toBe("result-from-bus-2");
     expect(bus.queryAsync).toHaveBeenCalledWith("TEST_ASYNC_QUERY", { param: 1000 });
 
-    await expect(scope.queryOptionalDataAsync("MISSING_QUERY", "string-value")).resolves.toBeNull();
+    await expect(scope.queryOptionalAsync("MISSING_QUERY", "string-value")).resolves.toBeNull();
     expect(bus.queryOptionalAsync).toHaveBeenCalledWith("MISSING_QUERY", "string-value");
   });
 
@@ -361,7 +361,7 @@ describe("WireScope", () => {
     scope.emitEvent("TEST_EVENT");
     expect(service.onEvent).toHaveBeenCalledTimes(1);
 
-    expect(scope.queryData("TEST_QUERY")).toBe("query-value");
+    expect(scope.query("TEST_QUERY")).toBe("query-value");
     expect(service.onQuery).toHaveBeenCalledTimes(1);
 
     expect(await scope.executeCommand("TEST_COMMAND").task).toBe("command-value");
@@ -376,7 +376,7 @@ describe("WireScope", () => {
     expect(() => scope.emitEvent("TEST_EVENT")).not.toThrow();
     expect(service.onEvent).toHaveBeenCalledTimes(1);
 
-    expect(() => scope.queryData("TEST_QUERY")).toThrow(
+    expect(() => scope.query("TEST_QUERY")).toThrow(
       "No query handler registered in container for type: 'TEST_QUERY'."
     );
     expect(service.onQuery).toHaveBeenCalledTimes(1);

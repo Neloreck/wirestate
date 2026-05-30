@@ -34,17 +34,17 @@ export class HeaderCartService {
   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
   public getCheckoutSummary(): { itemCount: number; total: number } {
-    return this.scope.queryData("CHECKOUT_SUMMARY");
+    return this.scope.query("CHECKOUT_SUMMARY");
   }
 }
 ```
 
 Choose the query call by return shape:
 
-- `queryData` returns the handler result as-is.
-- `queryDataAsync` always returns a Promise.
-- `queryOptionalData` returns `null` if no handler exists.
-- `queryOptionalDataAsync` combines optional lookup and Promise wrapping.
+- `query` returns the handler result as-is.
+- `queryAsync` always returns a Promise.
+- `queryOptional` returns `null` if no handler exists.
+- `queryOptionalAsync` combines optional lookup and Promise wrapping.
 
 Use an async variant when the handler may return a Promise, so callers can always `await` the result without checking
 whether the handler is sync or async.

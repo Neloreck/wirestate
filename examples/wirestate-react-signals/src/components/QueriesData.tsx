@@ -29,20 +29,20 @@ export function QueriesData() {
   const loggerService: Optional<LoggerService> =
     useOptionalInjection(LoggerService);
 
-  const queryAsyncData: AsyncQueryExecutor = useAsyncQueryExecutor();
-  const queryData: QueryExecutor = useQueryExecutor();
+  const query: QueryExecutor = useQueryExecutor();
+  const queryAsync: AsyncQueryExecutor = useAsyncQueryExecutor();
 
   const onPullSummary = useCallback(() => {
-    const value: ICounterSummary = queryData<ICounterSummary>(
+    const value: ICounterSummary = query<ICounterSummary>(
       ECounterServiceQuery.GET_COUNTER_SUMMARY,
       { value: "some-data" },
     );
 
     setSummary(value);
-  }, [queryData]);
+  }, [query]);
 
   const onFetchSnapshot = useCallback(async () => {
-    const value: ICounterSnapshot = await queryAsyncData<ICounterSnapshot>(
+    const value: ICounterSnapshot = await queryAsync<ICounterSnapshot>(
       ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT,
     );
 
@@ -51,7 +51,7 @@ export function QueriesData() {
     if (loggerService) {
       loggerService.log(`[QueriesData] Fetched snapshot:`, value);
     }
-  }, [queryAsyncData, loggerService]);
+  }, [queryAsync, loggerService]);
 
   useQueryHandler<Theme>(
     EGlobalQuery.GET_ACTIVE_THEME,

@@ -253,11 +253,11 @@ export class WireScope {
    *
    * @example
    * ```typescript
-   * const user: User = scope.queryData("GET_USER", { id: 1 });
+   * const user: User = scope.query("GET_USER", { id: 1 });
    * ```
    */
-  public queryData<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): R {
-    dbg.info(prefix(__filename), "Query data:", { type, data });
+  public query<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): R {
+    dbg.info(prefix(__filename), "Query:", { type, data });
 
     return this.getContainer().get(QueryBus).query<R, D>(type, data);
   }
@@ -278,11 +278,11 @@ export class WireScope {
    *
    * @example
    * ```typescript
-   * const user: User = await scope.queryDataAsync("GET_USER", { id: 1 });
+   * const user: User = await scope.queryAsync("GET_USER", { id: 1 });
    * ```
    */
-  public queryDataAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Promise<R> {
-    dbg.info(prefix(__filename), "Async query data:", { type, data });
+  public queryAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Promise<R> {
+    dbg.info(prefix(__filename), "Async query:", { type, data });
 
     return this.getContainer().get(QueryBus).queryAsync<R, D>(type, data);
   }
@@ -302,11 +302,11 @@ export class WireScope {
    *
    * @example
    * ```typescript
-   * const config: Config | null = scope.queryOptionalData("GET_CONFIG");
+   * const config: Config | null = scope.queryOptional("GET_CONFIG");
    * ```
    */
-  public queryOptionalData<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Optional<R> {
-    dbg.info(prefix(__filename), "Query optional data:", { type, data });
+  public queryOptional<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Optional<R> {
+    dbg.info(prefix(__filename), "Query optional:", { type, data });
 
     return this.getContainer().get(QueryBus).queryOptional<R, D>(type, data);
   }
@@ -326,14 +326,14 @@ export class WireScope {
    *
    * @example
    * ```typescript
-   * const config: Config | null = await scope.queryOptionalDataAsync("GET_CONFIG");
+   * const config: Config | null = await scope.queryOptionalAsync("GET_CONFIG");
    * ```
    */
-  public queryOptionalDataAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(
+  public queryOptionalAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(
     type: T,
     data?: D
   ): Promise<Optional<R>> {
-    dbg.info(prefix(__filename), "Optional async query data:", { type, data });
+    dbg.info(prefix(__filename), "Optional async query:", { type, data });
 
     return this.getContainer().get(QueryBus).queryOptionalAsync<R, D>(type, data);
   }

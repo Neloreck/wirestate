@@ -163,7 +163,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
         logs.push(`seed:${settings.label}`);
         this.scope.emitEvent(DEACTIVATE_EVENT, "cleanup");
-        logs.push(`query-result:${this.scope.queryData(DEACTIVATE_QUERY)}`);
+        logs.push(`query-result:${this.scope.query(DEACTIVATE_QUERY)}`);
 
         task = this.scope.executeCommand<string>(DEACTIVATE_COMMAND).task;
       }
@@ -269,7 +269,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
       public onDeactivation(): void {
         logs.push("coordinator-deactivation");
         this.scope.emitEvent(PEER_DEACTIVATE_EVENT, "from-coordinator");
-        logs.push(`coordinator-query:${this.scope.queryData(PEER_DEACTIVATE_QUERY, "from-coordinator")}`);
+        logs.push(`coordinator-query:${this.scope.query(PEER_DEACTIVATE_QUERY, "from-coordinator")}`);
 
         task = this.scope.executeCommand<string, string>(PEER_DEACTIVATE_COMMAND, "from-coordinator").task;
 

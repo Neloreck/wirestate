@@ -49,7 +49,7 @@ export class CheckoutSummaryButton extends LitElement {
   private itemCount: number = 0;
 
   private readSummary(): void {
-    const summary = this.scope.queryData<{ itemCount: number; total: number }>("CHECKOUT_SUMMARY");
+    const summary = this.scope.query<{ itemCount: number; total: number }>("CHECKOUT_SUMMARY");
 
     this.itemCount = summary.itemCount;
   }
