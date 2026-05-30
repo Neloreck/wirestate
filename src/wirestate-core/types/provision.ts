@@ -1,25 +1,26 @@
 import type { DynamicValueBuilder, MapToResolvedValueInjectOptions, ResolutionContext } from "inversify";
 
-import {
-  BindingScope as BindingScopeValues,
-  BindingType as BindingTypeValues,
-  type Newable,
-  type ServiceIdentifier,
-} from "../alias";
+import { type Newable, type ServiceIdentifier } from "../alias";
 
 /**
  * Inversify binding strategy name.
  *
  * @group Bind
  */
-export type BindingType = (typeof BindingTypeValues)[keyof typeof BindingTypeValues];
+export type BindingType =
+  | "ConstantValue"
+  | "DynamicValue"
+  | "Factory"
+  | "Instance"
+  | "ResolvedValue"
+  | "ServiceRedirection";
 
 /**
  * Inversify lifetime scope name.
  *
  * @group Bind
  */
-export type BindingScope = (typeof BindingScopeValues)[keyof typeof BindingScopeValues];
+export type BindingScope = "Request" | "Singleton" | "Transient";
 
 /**
  * Describes a fixed value binding.
@@ -32,7 +33,7 @@ export interface ConstantValueBindingDescriptor<T = unknown> {
    *
    * @default `BindingType.ConstantValue`
    */
-  readonly type?: typeof BindingTypeValues.ConstantValue;
+  readonly type?: "ConstantValue";
 
   /**
    * Lifetime scope for the fixed value.
@@ -40,7 +41,7 @@ export interface ConstantValueBindingDescriptor<T = unknown> {
    * @remarks
    * Constant values can only be singleton-scoped.
    */
-  readonly scope?: typeof BindingScopeValues.Singleton;
+  readonly scope?: "Singleton";
 
   /**
    * Token used to resolve the binding.
@@ -62,7 +63,7 @@ export interface DynamicValueBindingDescriptor<T = unknown> {
   /**
    * Binding strategy.
    */
-  readonly type: typeof BindingTypeValues.DynamicValue;
+  readonly type: "DynamicValue";
 
   /**
    * Factory used to produce the value at resolution time.
@@ -89,7 +90,7 @@ export interface FactoryBindingDescriptor<T = unknown> {
   /**
    * Binding strategy.
    */
-  readonly type: typeof BindingTypeValues.Factory;
+  readonly type: "Factory";
 
   /**
    * Factory creator passed to Inversify.
@@ -111,7 +112,7 @@ export interface InstanceBindingDescriptor<T extends object = object> {
   /**
    * Binding strategy.
    */
-  readonly type: typeof BindingTypeValues.Instance;
+  readonly type: "Instance";
 
   /**
    * Token used to resolve the service.
@@ -133,7 +134,7 @@ export interface ResolvedValueBindingDescriptor<T = unknown, TArgs extends Array
   /**
    * Binding strategy.
    */
-  readonly type: typeof BindingTypeValues.ResolvedValue;
+  readonly type: "ResolvedValue";
 
   /**
    * Factory called by Inversify with injected arguments.
@@ -165,7 +166,7 @@ export interface ServiceRedirectionBindingDescriptor<T = unknown> {
   /**
    * Binding strategy.
    */
-  readonly type: typeof BindingTypeValues.ServiceRedirection;
+  readonly type: "ServiceRedirection";
 
   /**
    * Existing service token to redirect to.
@@ -217,8 +218,8 @@ export type BindingDescriptor<T = unknown, FA extends Array<unknown> = Array<unk
  * Represents a single binding accepted by Wirestate registration APIs.
  *
  * @remarks
- * A binding is either a service class constructor or a descriptor for constants,
- * factories, resolved values, service redirection, or custom-token class bindings.
+ * A binding is either a service class  {@link Newable} constructor or a {@link BindingDescriptor}
+ * for constants, factories, resolved values, service redirection, or custom-token class bindings.
  *
  * @group Bind
  */

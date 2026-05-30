@@ -6,7 +6,7 @@ import { Optional } from "../types/general";
 import { OnEventController } from "./on-event-controller";
 
 /**
- * Represents options for {@link useOnEvents}.
+ * Describes options for {@link useOnEvents}.
  *
  * @group Events
  */

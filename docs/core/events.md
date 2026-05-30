@@ -66,7 +66,15 @@ unsubscribe();
 When a service owns a dynamic subscription, attach it during provider lifecycle and remove it during deprovision.
 
 ```ts
-import { EventUnsubscriber, Inject, Injectable, OnDeprovision, OnProvision, WireEvent, WireScope } from "@wirestate/core";
+import {
+  EventUnsubscriber,
+  Inject,
+  Injectable,
+  OnDeprovision,
+  OnProvision,
+  WireEvent,
+  WireScope,
+} from "@wirestate/core";
 
 @Injectable()
 export class CartActivityService {

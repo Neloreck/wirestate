@@ -10,7 +10,7 @@ interface ReflectWithMetadata {
 }
 
 /**
- * Represents options for {@link hasWireScopeInjection}.
+ * Describes options for {@link hasWireScopeInjection}.
  *
  * @internal
  */

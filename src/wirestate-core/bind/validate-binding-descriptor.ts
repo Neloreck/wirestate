@@ -35,10 +35,7 @@ export function validateBindingDescriptor(binding: UnsafeBindingDescriptor): voi
     );
   }
 
-  if (
-    binding.scope !== undefined &&
-    !Object.values(BindingScopeValues).includes(binding.scope as BindingScope)
-  ) {
+  if (binding.scope !== undefined && !Object.values(BindingScopeValues).includes(binding.scope as BindingScope)) {
     throw new WirestateError(
       ERROR_CODE_BINDING_SCOPE,
       `Binding descriptor has unknown scope '${String(binding.scope)}'.`

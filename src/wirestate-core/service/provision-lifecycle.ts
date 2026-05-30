@@ -388,11 +388,7 @@ function isServiceProvisionedForToken(service: object, token: ServiceIdentifier)
  * @returns Service constructor for instance descriptors, otherwise the binding token.
  */
 function getProviderLifecycleMetadataToken(binding: Binding): ServiceIdentifier {
-  if (
-    typeof binding !== "function" &&
-    binding.type === BindingType.Instance &&
-    typeof binding.value === "function"
-  ) {
+  if (typeof binding !== "function" && binding.type === BindingType.Instance && typeof binding.value === "function") {
     return binding.value as ServiceIdentifier;
   }
 

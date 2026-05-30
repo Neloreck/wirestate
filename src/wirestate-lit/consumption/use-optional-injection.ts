@@ -16,7 +16,7 @@ import { AnyObject, Optional } from "../types/general";
 export type OptionalInjectionFallback<T> = (container: Container) => T;
 
 /**
- * Represents options for {@link useOptionalInjection}.
+ * Describes options for {@link useOptionalInjection}.
  *
  * @group Consumption
  */
@@ -44,7 +44,7 @@ export interface UseOptionalInjectionOptions<T, F = null> {
 }
 
 /**
- * Represents value returned by {@link useOptionalInjection}.
+ * Describes value returned by {@link useOptionalInjection}.
  *
  * @group Consumption
  */

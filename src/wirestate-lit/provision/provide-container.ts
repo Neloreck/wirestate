@@ -5,7 +5,7 @@ import { FieldMustMatchProvidedType, Interface, Maybe } from "../types/general";
 import { ContainerProvider, ContainerProviderOptions } from "./container-provider";
 
 /**
- * Represents the type returned by {@link provideContainer}.
+ * Describes the type returned by {@link provideContainer}.
  *
  * @remarks
  * Supports both TC39 and legacy experimental decorators.

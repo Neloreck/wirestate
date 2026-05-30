@@ -21,7 +21,7 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { Maybe } from "../types/general";
 
 /**
- * Represents options for {@link ContainerProvider}.
+ * Describes options for {@link ContainerProvider}.
  *
  * @remarks
  * Pass either `container` or `config`. Passing both is an error.

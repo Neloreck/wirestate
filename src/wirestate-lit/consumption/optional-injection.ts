@@ -8,7 +8,7 @@ import { AnyObject, FieldMustMatchProvidedType, Interface, Optional } from "../t
 import type { OptionalInjectionFallback } from "./use-optional-injection";
 
 /**
- * Represents type returned by {@link optionalInjection}.
+ * Describes type returned by {@link optionalInjection}.
  *
  * @remarks
  * Supports both TC39 and legacy experimental decorators.
@@ -29,7 +29,7 @@ export interface OptionalInjectionDecorator<T, F = null> {
 }
 
 /**
- * Represents options for {@link optionalInjection}.
+ * Describes options for {@link optionalInjection}.
  *
  * @group Consumption
  */

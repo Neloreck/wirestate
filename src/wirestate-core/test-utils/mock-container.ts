@@ -5,7 +5,7 @@ import { createContainer, CreateContainerOptions } from "../container/create-con
 import { validateContainerConfig } from "../container/validate-container-config";
 
 /**
- * Represents options for {@link mockContainer}.
+ * Describes options for {@link mockContainer}.
  *
  * @group Test-utils
  */

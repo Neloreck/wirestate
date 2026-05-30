@@ -6,7 +6,7 @@ import { AnyObject, Interface, MaybePromise } from "../types/general";
 import { OnCommandController } from "./on-command-controller";
 
 /**
- * Represents type returned by {@link onCommand}.
+ * Describes type returned by {@link onCommand}.
  *
  * @remarks
  * Supports both TC39 and legacy experimental decorators.

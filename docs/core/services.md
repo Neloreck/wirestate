@@ -162,7 +162,7 @@ Use descriptors when the binding needs an explicit token or strategy. That inclu
 classes registered behind a token that is different from the class itself.
 
 ```ts
-import { BindingType, bind, createContainer } from "@wirestate/core";
+import { BindingScope, BindingType, bind, createContainer } from "@wirestate/core";
 
 const API_URL = Symbol("API_URL");
 const DATE_NOW = Symbol("DATE_NOW");
@@ -172,6 +172,7 @@ bind(container, { token: API_URL, value: "https://api.example.com" });
 bind(container, {
   token: DATE_NOW,
   type: BindingType.DynamicValue,
+  scope: BindingScope.Singleton,
   factory: () => new Date(),
 });
 ```

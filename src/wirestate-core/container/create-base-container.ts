@@ -11,7 +11,7 @@ import { SeedBindings, SeedsMap } from "../types/initial-state";
 import { CONTAINER_PARENT_TOKEN } from "./tokens";
 
 /**
- * Represents options for {@link createBaseContainer}.
+ * Describes options for {@link createBaseContainer}.
  *
  * @group Container
  */

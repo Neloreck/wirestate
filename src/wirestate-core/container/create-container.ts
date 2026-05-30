@@ -23,7 +23,7 @@ import { WireScope } from "./wire-scope";
 export type ContainerActivation = boolean | ReadonlyArray<ServiceIdentifier>;
 
 /**
- * Represents options for {@link createContainer}.
+ * Describes options for {@link createContainer}.
  *
  * @group Container
  */

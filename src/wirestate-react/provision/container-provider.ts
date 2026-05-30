@@ -17,7 +17,7 @@ import { shallowEqualActivation, shallowEqualArrays, shallowEqualObjects } from 
 import { ProvisionLifecycle, retainContainer, scheduleContainerDestruction } from "./provision-lifecycle";
 
 /**
- * Represents props for {@link ContainerProvider}.
+ * Describes props for {@link ContainerProvider}.
  *
  * @remarks
  * Pass either `container` or `config`. Passing both is an error.

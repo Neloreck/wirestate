@@ -6,7 +6,7 @@ import { AnyObject, Interface, Optional } from "../types/general";
 import { OnEventController } from "./on-event-controller";
 
 /**
- * Represents type returned by {@link onEvent}.
+ * Describes type returned by {@link onEvent}.
  *
  * @remarks
  * Supports both TC39 and legacy experimental decorators.
@@ -64,7 +64,9 @@ export interface OnEventDecorator<E extends WireEvent = WireEvent> {
  * }
  * ```
  */
-export function onEvent<E extends WireEvent = WireEvent>(types?: EventType | ReadonlyArray<EventType>): OnEventDecorator<E> {
+export function onEvent<E extends WireEvent = WireEvent>(
+  types?: EventType | ReadonlyArray<EventType>
+): OnEventDecorator<E> {
   const normalized: Optional<ReadonlyArray<EventType>> =
     types === undefined ? null : Array.isArray(types) ? [...(types as ReadonlyArray<EventType>)] : [types as EventType];
 

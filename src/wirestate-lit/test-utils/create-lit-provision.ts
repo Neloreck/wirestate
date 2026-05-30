@@ -9,7 +9,7 @@ let isProviderDefined: boolean = false;
 export class WsTestProviderElement extends ReactiveElement {}
 
 /**
- * Represents fixture returned by {@link createLitProvision}.
+ * Describes fixture returned by {@link createLitProvision}.
  *
  * @group Test-utils
  */

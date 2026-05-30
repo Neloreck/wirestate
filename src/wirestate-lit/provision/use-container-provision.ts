@@ -3,7 +3,7 @@ import { ReactiveControllerHost } from "@lit/reactive-element";
 import { ContainerProvider, ContainerProviderOptions } from "./container-provider";
 
 /**
- * Represents options for {@link useContainerProvider}.
+ * Describes options for {@link useContainerProvider}.
  *
  * @group Provision
  */

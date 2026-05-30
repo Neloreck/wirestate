@@ -8,7 +8,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { ContainerContext } from "../context/container-context";
 
 /**
- * Represents value returned by {@link useContainer}.
+ * Describes value returned by {@link useContainer}.
  *
  * @group Consumption
  */

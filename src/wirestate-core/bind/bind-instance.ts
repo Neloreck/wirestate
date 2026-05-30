@@ -55,7 +55,7 @@ function validateInstanceDescriptor(descriptor: InstanceBindingDescriptor): void
 }
 
 /**
- * Represents options for {@link bindInstance}.
+ * Describes options for {@link bindInstance}.
  *
  * @group Bind
  */

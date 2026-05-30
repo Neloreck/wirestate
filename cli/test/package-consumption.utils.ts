@@ -131,7 +131,7 @@ export function writeTsConfig(fileName: string, module: string, moduleResolution
 
 function typecheckSource(): string {
   return [
-    'import { createContainer, type ContainerConfig } from "@wirestate/core";',
+    'import { bind, createContainer, type BindingDescriptor, type ContainerConfig } from "@wirestate/core";',
     'import { ContainerProvider as LitContainerProvider } from "@wirestate/lit";',
     'import { signal as litSignal } from "@wirestate/lit-signals";',
     'import type { WatchDirectiveFunction } from "@wirestate/lit-signals";',

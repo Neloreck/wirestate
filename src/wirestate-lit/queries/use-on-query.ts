@@ -4,7 +4,7 @@ import { QueryHandler, QueryType } from "@wirestate/core";
 import { OnQueryController } from "./on-query-controller";
 
 /**
- * Represents options for {@link useOnQuery}.
+ * Describes options for {@link useOnQuery}.
  *
  * @group Queries
  */

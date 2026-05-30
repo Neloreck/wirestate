@@ -19,7 +19,7 @@ import { bindResolvedValue } from "./bind-resolved-value";
 import { bindServiceRedirection } from "./bind-service-redirection";
 
 /**
- * Represents options for {@link bind}.
+ * Describes options for {@link bind}.
  *
  * @group Bind
  */

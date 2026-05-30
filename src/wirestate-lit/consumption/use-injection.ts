@@ -9,7 +9,7 @@ import { ContainerContext } from "../context/container-context";
 import { Optional } from "../types/general";
 
 /**
- * Represents options for {@link useInjection}.
+ * Describes options for {@link useInjection}.
  *
  * @group Consumption
  */
@@ -33,7 +33,7 @@ export interface UseInjectionOptions<T> {
 }
 
 /**
- * Represents value returned by {@link useInjection}.
+ * Describes value returned by {@link useInjection}.
  *
  * @group Consumption
  */

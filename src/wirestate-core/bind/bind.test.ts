@@ -62,6 +62,25 @@ describe("bind", () => {
     expect(container.get(TOKEN)).toEqual({ count: 3 });
   });
 
+  it("should bind descriptors with string literal type and scope", () => {
+    const container: Container = mockContainer();
+    const TOKEN: unique symbol = Symbol("literal-dynamic");
+
+    const descriptor: DynamicValueBindingDescriptor = {
+      token: TOKEN,
+      type: "DynamicValue",
+      scope: "Singleton",
+      factory: () => ({ value: "created" }),
+    };
+
+    bind(container, descriptor);
+
+    const first = container.get(TOKEN);
+
+    expect(first).toEqual({ value: "created" });
+    expect(container.get(TOKEN)).toBe(first);
+  });
+
   it("should bind an instance descriptor", () => {
     const container: Container = mockContainer();
 

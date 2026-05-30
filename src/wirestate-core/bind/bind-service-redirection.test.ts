@@ -38,7 +38,9 @@ describe("bindServiceRedirection", () => {
     expect(() => bindServiceRedirection(container, binding)).toThrow(
       expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
     );
-    expect(() => bindServiceRedirection(container, binding)).toThrow("Binding descriptor must provide a 'token' property.");
+    expect(() => bindServiceRedirection(container, binding)).toThrow(
+      "Binding descriptor must provide a 'token' property."
+    );
   });
 
   it("should throw if service is missing", () => {

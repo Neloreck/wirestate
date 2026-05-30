@@ -6,7 +6,7 @@ import { ContainerContext } from "../context/container-context";
 import { AnyObject, FieldMustMatchProvidedType, Interface } from "../types/general";
 
 /**
- * Represents type returned by {@link injection}.
+ * Describes type returned by {@link injection}.
  *
  * @remarks
  * Supports both TC39 and legacy experimental decorators.
@@ -27,7 +27,7 @@ export interface InjectionDecorator<T> {
 }
 
 /**
- * Represents options for {@link injection}.
+ * Describes options for {@link injection}.
  *
  * @group Consumption
  */

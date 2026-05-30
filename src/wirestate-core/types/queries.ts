@@ -50,7 +50,7 @@ export type QueryHandler<D = unknown, R = unknown> = (data: D) => MaybePromise<R
 export type QueryUnregister = () => void;
 
 /**
- * Represents metadata for methods decorated with {@link OnQuery}.
+ * Describes metadata for methods decorated with {@link OnQuery}.
  *
  * @remarks
  * This interface is used internally to track which methods should be registered
