@@ -40,7 +40,7 @@ export interface BindOptions extends BindInstanceOptions {
  * class constructor directly, or pass a descriptor when the binding needs a
  * custom token, fixed value, factory, resolved value, or token redirection.
  *
- * Descriptors without `bindingType` are treated as `ConstantValue` bindings.
+ * Descriptors without `type` are treated as `ConstantValue` bindings.
  * Descriptors with `Factory`, `ResolvedValue`, and `ServiceRedirection` are
  * delegated to their dedicated Inversify binding helpers.
  *
@@ -62,7 +62,7 @@ export interface BindOptions extends BindInstanceOptions {
  * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor has no `token`, has an unknown
- * `bindingType` or `scopeBindingType`, or is missing fields required by the
+ * `type` or `scope`, or is missing fields required by the
  * selected binding strategy.
  *
  * @example
@@ -79,12 +79,12 @@ export interface BindOptions extends BindInstanceOptions {
  * bind(container, UserService);
  * bind(container, {
  *   token: API_URL,
- *   bindingType: BindingType.ConstantValue,
+ *   type: BindingType.ConstantValue,
  *   value: "https://api.example.com",
  * });
  * bind(container, {
  *   token: "USER_SERVICE_FACTORY",
- *   bindingType: BindingType.Factory,
+ *   type: BindingType.Factory,
  *   factory: () => () => container.get(UserService),
  * });
  * ```
@@ -98,7 +98,7 @@ export function bind<T extends object = object>(
     return bindInstance(container, binding, options);
   }
 
-  switch (binding.bindingType ?? BindingType.ConstantValue) {
+  switch (binding.type ?? BindingType.ConstantValue) {
     case BindingType.ConstantValue:
       return bindConstant(container, binding as ConstantValueBindingDescriptor);
 
@@ -126,7 +126,7 @@ export function bind<T extends object = object>(
     default:
       throw new WirestateError(
         ERROR_CODE_INVALID_ARGUMENTS,
-        `Binding descriptor has unknown binding type '${String(binding.bindingType)}'.`
+        `Binding descriptor has unknown type '${String(binding.type)}'.`
       );
   }
 }

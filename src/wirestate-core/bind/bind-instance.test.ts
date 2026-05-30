@@ -133,7 +133,7 @@ describe("bindInstance", () => {
   it("should throw for instance descriptor without constructor value", () => {
     const container: Container = mockContainer();
     const binding = {
-      bindingType: BindingType.Instance,
+      type: BindingType.Instance,
       token: GenericService,
       value: "not-a-constructor",
     } as unknown as InstanceBindingDescriptor;
@@ -149,7 +149,7 @@ describe("bindInstance", () => {
   it("should throw for instance descriptor without token", () => {
     const container: Container = mockContainer();
     const binding = {
-      bindingType: BindingType.Instance,
+      type: BindingType.Instance,
       value: GenericService,
     } as unknown as InstanceBindingDescriptor;
 
@@ -161,12 +161,12 @@ describe("bindInstance", () => {
     );
   });
 
-  it("should throw for instance descriptor with unknown scopeBindingType", () => {
+  it("should throw for instance descriptor with unknown scope", () => {
     const container: Container = mockContainer();
     const binding = {
-      bindingType: BindingType.Instance,
+      type: BindingType.Instance,
       token: GenericService,
-      scopeBindingType: "UNKNOWN",
+      scope: "UNKNOWN",
       value: GenericService,
     } as unknown as InstanceBindingDescriptor;
 
@@ -174,7 +174,7 @@ describe("bindInstance", () => {
       expect.objectContaining({ code: ERROR_CODE_BINDING_SCOPE })
     );
     expect(() => bindInstanceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
-      "Binding descriptor has unknown scope binding type 'UNKNOWN'."
+      "Binding descriptor has unknown scope 'UNKNOWN'."
     );
   });
 

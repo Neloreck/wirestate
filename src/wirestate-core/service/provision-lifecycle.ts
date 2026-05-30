@@ -390,7 +390,7 @@ function isServiceProvisionedForToken(service: object, token: ServiceIdentifier)
 function getProviderLifecycleMetadataToken(binding: Binding): ServiceIdentifier {
   if (
     typeof binding !== "function" &&
-    binding.bindingType === BindingType.Instance &&
+    binding.type === BindingType.Instance &&
     typeof binding.value === "function"
   ) {
     return binding.value as ServiceIdentifier;

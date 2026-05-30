@@ -1,11 +1,11 @@
-import { BindingType as Binding, ScopeBindingType as ScopeBinding } from "../alias";
+import { BindingScope as BindingScopeValues, BindingType as BindingTypeValues } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { BindingType, ScopeBindingType } from "../types/provision";
+import { BindingType, BindingScope } from "../types/provision";
 
 interface UnsafeBindingDescriptor {
-  readonly bindingType?: unknown;
-  readonly scopeBindingType?: unknown;
+  readonly type?: unknown;
+  readonly scope?: unknown;
   readonly token?: unknown;
 }
 
@@ -28,20 +28,20 @@ export function validateBindingDescriptor(binding: UnsafeBindingDescriptor): voi
     throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, "Binding descriptor must provide a 'token' property.");
   }
 
-  if (binding.bindingType !== undefined && !Object.values(Binding).includes(binding.bindingType as BindingType)) {
+  if (binding.type !== undefined && !Object.values(BindingTypeValues).includes(binding.type as BindingType)) {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
-      `Binding descriptor has unknown binding type '${String(binding.bindingType)}'.`
+      `Binding descriptor has unknown type '${String(binding.type)}'.`
     );
   }
 
   if (
-    binding.scopeBindingType !== undefined &&
-    !Object.values(ScopeBinding).includes(binding.scopeBindingType as ScopeBindingType)
+    binding.scope !== undefined &&
+    !Object.values(BindingScopeValues).includes(binding.scope as BindingScope)
   ) {
     throw new WirestateError(
       ERROR_CODE_BINDING_SCOPE,
-      `Binding descriptor has unknown scope binding type '${String(binding.scopeBindingType)}'.`
+      `Binding descriptor has unknown scope '${String(binding.scope)}'.`
     );
   }
 }

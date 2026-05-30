@@ -294,7 +294,7 @@ describe("ContainerProvider lifecycle", () => {
         config={{
           bindings: [
             {
-              bindingType: BindingType.Instance,
+              type: BindingType.Instance,
               token: TOKEN,
               value: LifecycleService,
             },

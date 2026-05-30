@@ -12,7 +12,7 @@ describe("Library exported API from wirestate-core", () => {
     "Named",
     "Newable",
     "Optional",
-    "ScopeBindingType",
+    "BindingScope",
     "ServiceIdentifier",
     "Tagged",
     "forwardRef",

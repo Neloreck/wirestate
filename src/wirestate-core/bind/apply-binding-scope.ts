@@ -1,7 +1,7 @@
 import type { BindInWhenOnFluentSyntax } from "inversify";
 
-import { ScopeBindingType as ScopeBinding } from "../alias";
-import { ScopeBindingType } from "../types/provision";
+import { BindingScope as BindingScopeValues } from "../alias";
+import { BindingScope } from "../types/provision";
 
 /**
  * Applies an optional Inversify binding scope.
@@ -10,16 +10,16 @@ import { ScopeBindingType } from "../types/provision";
  * @internal
  *
  * @param binding - Fluent binding syntax returned by Inversify.
- * @param scopeBindingType - Optional scope value from a Wirestate binding descriptor.
+ * @param scope - Optional scope value from a Wirestate binding descriptor.
  */
-export function applyBindingScope<T>(binding: BindInWhenOnFluentSyntax<T>, scopeBindingType?: ScopeBindingType): void {
-  if (!scopeBindingType) {
+export function applyBindingScope<T>(binding: BindInWhenOnFluentSyntax<T>, scope?: BindingScope): void {
+  if (!scope) {
     return;
   }
 
-  if (scopeBindingType === ScopeBinding.Transient) {
+  if (scope === BindingScopeValues.Transient) {
     binding.inTransientScope();
-  } else if (scopeBindingType === ScopeBinding.Request) {
+  } else if (scope === BindingScopeValues.Request) {
     binding.inRequestScope();
   } else {
     binding.inSingletonScope();

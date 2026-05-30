@@ -14,7 +14,7 @@ describe("getBindingToken", () => {
   });
 
   it("should return the token if the binding is a descriptor with factory", () => {
-    expect(getBindingToken({ bindingType: BindingType.DynamicValue, token: "test-factory", factory: () => "test" })).toBe(
+    expect(getBindingToken({ type: BindingType.DynamicValue, token: "test-factory", factory: () => "test" })).toBe(
       "test-factory"
     );
   });

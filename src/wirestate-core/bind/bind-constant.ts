@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType, Container, ScopeBindingType, type ServiceIdentifier } from "../alias";
+import { BindingType, Container, BindingScope, type ServiceIdentifier } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { ConstantValueBindingDescriptor } from "../types/provision";
@@ -17,20 +17,20 @@ import { validateBindingDescriptor } from "./validate-binding-descriptor";
  *
  * @param descriptor - Descriptor to validate.
  *
- * @throws {@link WirestateError} If the descriptor is missing a token, uses a non-constant binding type,
+ * @throws {@link WirestateError} If the descriptor is missing a token, uses a non-constant type,
  * uses a non-singleton scope, or omits the `value` field.
  */
 function validateConstantDescriptor(descriptor: ConstantValueBindingDescriptor): void {
   validateBindingDescriptor(descriptor);
 
-  if (descriptor.bindingType !== undefined && descriptor.bindingType !== BindingType.ConstantValue) {
+  if (descriptor.type !== undefined && descriptor.type !== BindingType.ConstantValue) {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
-      `bindConstant expected binding type '${BindingType.ConstantValue}'.`
+      `bindConstant expected type '${BindingType.ConstantValue}'.`
     );
   }
 
-  if (descriptor.scopeBindingType && descriptor.scopeBindingType !== ScopeBindingType.Singleton) {
+  if (descriptor.scope && descriptor.scope !== BindingScope.Singleton) {
     throw new WirestateError(ERROR_CODE_BINDING_SCOPE, "Provided unexpected binding scope for constant value.");
   }
 
@@ -57,7 +57,7 @@ function validateConstantDescriptor(descriptor: ConstantValueBindingDescriptor):
  * @param descriptor - Descriptor with `token` and `value`.
  * @returns The same container for chaining or immediate resolution.
  *
- * @throws {@link WirestateError} If `descriptor.scopeBindingType` is not `Singleton`.
+ * @throws {@link WirestateError} If `descriptor.scope` is not `Singleton`.
  *
  * @internal
  */

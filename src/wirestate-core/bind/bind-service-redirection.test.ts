@@ -14,7 +14,7 @@ describe("bindServiceRedirection", () => {
     const container: Container = createContainer();
     const TOKEN: unique symbol = Symbol("generic-service-alias");
     const binding: ServiceRedirectionBindingDescriptor<GenericService> = {
-      bindingType: BindingType.ServiceRedirection,
+      type: BindingType.ServiceRedirection,
       token: TOKEN,
       service: GenericService,
     };
@@ -31,7 +31,7 @@ describe("bindServiceRedirection", () => {
   it("should throw if token is missing", () => {
     const container: Container = new Container();
     const binding = {
-      bindingType: BindingType.ServiceRedirection,
+      type: BindingType.ServiceRedirection,
       service: GenericService,
     } as unknown as ServiceRedirectionBindingDescriptor;
 
@@ -46,34 +46,34 @@ describe("bindServiceRedirection", () => {
 
     expect(() =>
       bindServiceRedirection(container, {
-        bindingType: BindingType.ServiceRedirection,
+        type: BindingType.ServiceRedirection,
         token: "redirected-binding",
       } as ServiceRedirectionBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindServiceRedirection(container, {
-        bindingType: BindingType.ServiceRedirection,
+        type: BindingType.ServiceRedirection,
         token: "redirected-binding",
       } as ServiceRedirectionBindingDescriptor)
     ).toThrow("Service redirection descriptor must provide a 'service' token.");
   });
 
-  it("should throw if descriptor uses another binding type", () => {
+  it("should throw if descriptor uses another type", () => {
     const container: Container = new Container();
 
     expect(() =>
       bindServiceRedirection(container, {
-        bindingType: BindingType.Instance,
+        type: BindingType.Instance,
         token: "redirected-binding",
         service: GenericService,
       } as unknown as ServiceRedirectionBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindServiceRedirection(container, {
-        bindingType: BindingType.Instance,
+        type: BindingType.Instance,
         token: "redirected-binding",
         service: GenericService,
       } as unknown as ServiceRedirectionBindingDescriptor)
-    ).toThrow("bindServiceRedirection expected binding type 'ServiceRedirection'.");
+    ).toThrow("bindServiceRedirection expected type 'ServiceRedirection'.");
   });
 });

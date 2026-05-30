@@ -171,7 +171,7 @@ const container = createContainer();
 bind(container, { token: API_URL, value: "https://api.example.com" });
 bind(container, {
   token: DATE_NOW,
-  bindingType: BindingType.DynamicValue,
+  type: BindingType.DynamicValue,
   factory: () => new Date(),
 });
 ```

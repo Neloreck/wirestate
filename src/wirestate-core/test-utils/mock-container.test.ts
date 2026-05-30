@@ -28,7 +28,7 @@ describe("mockContainer", () => {
         activate: true,
         bindings: [
           {
-            bindingType: BindingType.Instance,
+            type: BindingType.Instance,
             token: TOKEN,
             value: TestService,
           },

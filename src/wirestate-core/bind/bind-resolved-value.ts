@@ -27,10 +27,10 @@ function validateResolvedValueDescriptor<T, TArgs extends Array<unknown>>(
 ): void {
   validateBindingDescriptor(descriptor);
 
-  if (descriptor.bindingType !== BindingType.ResolvedValue) {
+  if (descriptor.type !== BindingType.ResolvedValue) {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
-      `bindResolvedValue expected binding type '${BindingType.ResolvedValue}'.`
+      `bindResolvedValue expected type '${BindingType.ResolvedValue}'.`
     );
   }
 
@@ -47,7 +47,7 @@ function validateResolvedValueDescriptor<T, TArgs extends Array<unknown>>(
  * @template T - Resolved value type.
  *
  * @param container - Container to bind into.
- * @param descriptor - Descriptor with `token`, `bindingType`, `factory`, and optional `injectOptions`.
+ * @param descriptor - Descriptor with `token`, `type`, `factory`, and optional `injectOptions`.
  * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
@@ -74,7 +74,7 @@ export function bindResolvedValue<T, FA extends Array<unknown> = Array<unknown>>
         .bind<T>(descriptor.token as ServiceIdentifier<T>)
         .toResolvedValue(descriptor.factory as () => T | Promise<T>);
 
-  applyBindingScope(binding, descriptor.scopeBindingType);
+  applyBindingScope(binding, descriptor.scope);
   registerBinding(container, descriptor as ResolvedValueBindingDescriptor);
 
   return container;

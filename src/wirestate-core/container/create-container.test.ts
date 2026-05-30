@@ -186,7 +186,7 @@ describe("createContainer", () => {
       activate: [TOKEN],
       bindings: [
         {
-          bindingType: BindingType.Instance,
+          type: BindingType.Instance,
           token: TOKEN,
           value: TestService,
         },

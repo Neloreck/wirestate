@@ -10,7 +10,7 @@ describe("bindFactory", () => {
     const container: Container = new Container();
     const TOKEN: unique symbol = Symbol("greeting-factory");
     const binding: FactoryBindingDescriptor<() => string> = {
-      bindingType: BindingType.Factory,
+      type: BindingType.Factory,
       factory: () => () => "hello",
       token: TOKEN,
     };
@@ -27,7 +27,7 @@ describe("bindFactory", () => {
   it("should throw if token is missing", () => {
     const container: Container = new Container();
     const binding = {
-      bindingType: BindingType.Factory,
+      type: BindingType.Factory,
       factory: () => () => "value",
     } as unknown as FactoryBindingDescriptor;
 
@@ -42,34 +42,34 @@ describe("bindFactory", () => {
 
     expect(() =>
       bindFactory(container, {
-        bindingType: BindingType.Factory,
+        type: BindingType.Factory,
         token: "factory-binding",
       } as FactoryBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindFactory(container, {
-        bindingType: BindingType.Factory,
+        type: BindingType.Factory,
         token: "factory-binding",
       } as FactoryBindingDescriptor)
     ).toThrow("Factory descriptor 'factory' must be a function.");
   });
 
-  it("should throw if descriptor uses another binding type", () => {
+  it("should throw if descriptor uses another type", () => {
     const container: Container = new Container();
 
     expect(() =>
       bindFactory(container, {
-        bindingType: BindingType.DynamicValue,
+        type: BindingType.DynamicValue,
         factory: () => () => "value",
         token: "factory-binding",
       } as unknown as FactoryBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bindFactory(container, {
-        bindingType: BindingType.DynamicValue,
+        type: BindingType.DynamicValue,
         factory: () => () => "value",
         token: "factory-binding",
       } as unknown as FactoryBindingDescriptor)
-    ).toThrow("bindFactory expected binding type 'Factory'.");
+    ).toThrow("bindFactory expected type 'Factory'.");
   });
 });

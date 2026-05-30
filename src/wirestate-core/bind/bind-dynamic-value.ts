@@ -20,16 +20,16 @@ import { validateBindingDescriptor } from "./validate-binding-descriptor";
  *
  * @param descriptor - Descriptor to validate.
  *
- * @throws {@link WirestateError} If the descriptor is missing a token, uses a non-dynamic binding type,
+ * @throws {@link WirestateError} If the descriptor is missing a token, uses a non-dynamic type,
  * omits `factory`, or provides a non-function `factory`.
  */
 function validateDynamicValueDescriptor(descriptor: DynamicValueBindingDescriptor): void {
   validateBindingDescriptor(descriptor);
 
-  if (descriptor.bindingType !== undefined && descriptor.bindingType !== BindingType.DynamicValue) {
+  if (descriptor.type !== undefined && descriptor.type !== BindingType.DynamicValue) {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
-      `bindDynamicValue expected binding type '${BindingType.DynamicValue}'.`
+      `bindDynamicValue expected type '${BindingType.DynamicValue}'.`
     );
   }
 
@@ -72,7 +72,7 @@ export function bindDynamicValue<T>(container: Container, descriptor: DynamicVal
       (descriptor.factory as DynamicValueBuilder<T>)(context)
     ) as BindInWhenOnFluentSyntax<T>;
 
-  applyBindingScope(binding, descriptor.scopeBindingType);
+  applyBindingScope(binding, descriptor.scope);
 
   registerBinding(container, descriptor);
 

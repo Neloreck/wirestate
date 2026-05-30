@@ -23,7 +23,7 @@ export {
  * @group External-inversify-binding
  * @see {@link https://inversify.io/}
  */
-export { bindingTypeValues as BindingType, bindingScopeValues as ScopeBindingType } from "inversify";
+export { bindingTypeValues as BindingType, bindingScopeValues as BindingScope } from "inversify";
 
 /**
  * Wraps a token for circular constructor dependencies.

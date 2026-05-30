@@ -22,10 +22,10 @@ import { validateBindingDescriptor } from "./validate-binding-descriptor";
 function validateServiceRedirectionDescriptor(descriptor: ServiceRedirectionBindingDescriptor): void {
   validateBindingDescriptor(descriptor);
 
-  if (descriptor.bindingType !== BindingType.ServiceRedirection) {
+  if (descriptor.type !== BindingType.ServiceRedirection) {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
-      `bindServiceRedirection expected binding type '${BindingType.ServiceRedirection}'.`
+      `bindServiceRedirection expected type '${BindingType.ServiceRedirection}'.`
     );
   }
 
@@ -49,7 +49,7 @@ function validateServiceRedirectionDescriptor(descriptor: ServiceRedirectionBind
  * @template T - Resolved service type.
  *
  * @param container - Container to bind into.
- * @param descriptor - Descriptor with `token`, `bindingType`, and `service`.
+ * @param descriptor - Descriptor with `token`, `type`, and `service`.
  * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.

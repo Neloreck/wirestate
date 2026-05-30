@@ -46,7 +46,7 @@ import { validateBindingDescriptor } from "./validate-binding-descriptor";
 function validateInstanceDescriptor(descriptor: InstanceBindingDescriptor): void {
   validateBindingDescriptor(descriptor);
 
-  if (descriptor.bindingType === BindingType.Instance && typeof descriptor.value !== "function") {
+  if (descriptor.type === BindingType.Instance && typeof descriptor.value !== "function") {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
       "Instance descriptor 'value' must be a service constructor."

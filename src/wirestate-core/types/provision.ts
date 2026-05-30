@@ -1,8 +1,8 @@
 import type { DynamicValueBuilder, MapToResolvedValueInjectOptions, ResolutionContext } from "inversify";
 
 import {
+  BindingScope as BindingScopeValues,
   BindingType as BindingTypeValues,
-  ScopeBindingType as ScopeBindingTypeValues,
   type Newable,
   type ServiceIdentifier,
 } from "../alias";
@@ -19,7 +19,7 @@ export type BindingType = (typeof BindingTypeValues)[keyof typeof BindingTypeVal
  *
  * @group Bind
  */
-export type ScopeBindingType = (typeof ScopeBindingTypeValues)[keyof typeof ScopeBindingTypeValues];
+export type BindingScope = (typeof BindingScopeValues)[keyof typeof BindingScopeValues];
 
 /**
  * Describes a fixed value binding.
@@ -32,7 +32,7 @@ export interface ConstantValueBindingDescriptor<T = unknown> {
    *
    * @default `BindingType.ConstantValue`
    */
-  readonly bindingType?: typeof BindingTypeValues.ConstantValue;
+  readonly type?: typeof BindingTypeValues.ConstantValue;
 
   /**
    * Lifetime scope for the fixed value.
@@ -40,7 +40,7 @@ export interface ConstantValueBindingDescriptor<T = unknown> {
    * @remarks
    * Constant values can only be singleton-scoped.
    */
-  readonly scopeBindingType?: typeof ScopeBindingTypeValues.Singleton;
+  readonly scope?: typeof BindingScopeValues.Singleton;
 
   /**
    * Token used to resolve the binding.
@@ -62,7 +62,7 @@ export interface DynamicValueBindingDescriptor<T = unknown> {
   /**
    * Binding strategy.
    */
-  readonly bindingType: typeof BindingTypeValues.DynamicValue;
+  readonly type: typeof BindingTypeValues.DynamicValue;
 
   /**
    * Factory used to produce the value at resolution time.
@@ -72,7 +72,7 @@ export interface DynamicValueBindingDescriptor<T = unknown> {
   /**
    * Lifetime scope for created values.
    */
-  readonly scopeBindingType?: ScopeBindingType;
+  readonly scope?: BindingScope;
 
   /**
    * Token used to resolve the binding.
@@ -89,7 +89,7 @@ export interface FactoryBindingDescriptor<T = unknown> {
   /**
    * Binding strategy.
    */
-  readonly bindingType: typeof BindingTypeValues.Factory;
+  readonly type: typeof BindingTypeValues.Factory;
 
   /**
    * Factory creator passed to Inversify.
@@ -111,7 +111,7 @@ export interface InstanceBindingDescriptor<T extends object = object> {
   /**
    * Binding strategy.
    */
-  readonly bindingType: typeof BindingTypeValues.Instance;
+  readonly type: typeof BindingTypeValues.Instance;
 
   /**
    * Token used to resolve the service.
@@ -133,7 +133,7 @@ export interface ResolvedValueBindingDescriptor<T = unknown, TArgs extends Array
   /**
    * Binding strategy.
    */
-  readonly bindingType: typeof BindingTypeValues.ResolvedValue;
+  readonly type: typeof BindingTypeValues.ResolvedValue;
 
   /**
    * Factory called by Inversify with injected arguments.
@@ -148,7 +148,7 @@ export interface ResolvedValueBindingDescriptor<T = unknown, TArgs extends Array
   /**
    * Lifetime scope for created values.
    */
-  readonly scopeBindingType?: ScopeBindingType;
+  readonly scope?: BindingScope;
 
   /**
    * Token used to resolve the binding.
@@ -165,7 +165,7 @@ export interface ServiceRedirectionBindingDescriptor<T = unknown> {
   /**
    * Binding strategy.
    */
-  readonly bindingType: typeof BindingTypeValues.ServiceRedirection;
+  readonly type: typeof BindingTypeValues.ServiceRedirection;
 
   /**
    * Existing service token to redirect to.
@@ -200,7 +200,7 @@ export interface ServiceRedirectionBindingDescriptor<T = unknown> {
  *
  * const descriptor: BindingDescriptor<string> = {
  *   token: API_URL,
- *   bindingType: BindingType.ConstantValue,
+ *   type: BindingType.ConstantValue,
  *   value: "https://api.example.com",
  * };
  * ```

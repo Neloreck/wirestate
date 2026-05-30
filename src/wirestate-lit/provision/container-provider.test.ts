@@ -480,7 +480,7 @@ describe("ContainerProvider", () => {
         bindings: [
           DirectService,
           {
-            bindingType: BindingType.Instance,
+            type: BindingType.Instance,
             token: "DESCRIPTOR",
             value: DescriptorService,
           },

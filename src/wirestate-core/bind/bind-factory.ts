@@ -24,10 +24,10 @@ import { validateBindingDescriptor } from "./validate-binding-descriptor";
 function validateFactoryDescriptor(descriptor: FactoryBindingDescriptor): void {
   validateBindingDescriptor(descriptor);
 
-  if (descriptor.bindingType !== BindingType.Factory) {
+  if (descriptor.type !== BindingType.Factory) {
     throw new WirestateError(
       ERROR_CODE_INVALID_ARGUMENTS,
-      `bindFactory expected binding type '${BindingType.Factory}'.`
+      `bindFactory expected type '${BindingType.Factory}'.`
     );
   }
 
@@ -44,7 +44,7 @@ function validateFactoryDescriptor(descriptor: FactoryBindingDescriptor): void {
  * @template T - Factory function type.
  *
  * @param container - Container to bind into.
- * @param descriptor - Descriptor with `token`, `bindingType`, and `factory`.
+ * @param descriptor - Descriptor with `token`, `type`, and `factory`.
  * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
