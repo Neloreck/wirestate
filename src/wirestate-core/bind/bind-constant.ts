@@ -59,20 +59,7 @@ function validateConstantDescriptor(descriptor: ConstantValueBindingDescriptor):
  *
  * @throws {@link WirestateError} If `descriptor.scopeBindingType` is not `Singleton`.
  *
- * @example
- * ```typescript
- * import { bindConstant, createContainer } from "@wirestate/core";
- *
- * const API_URL = Symbol("API_URL");
- * const container = createContainer();
- *
- * bindConstant(container, {
- *   id: API_URL,
- *   value: "https://api.example.com",
- * });
- *
- * const apiUrl = container.get<string>(API_URL);
- * ```
+ * @internal
  */
 export function bindConstant<T>(container: Container, descriptor: ConstantValueBindingDescriptor<T>): Container {
   validateConstantDescriptor(descriptor);

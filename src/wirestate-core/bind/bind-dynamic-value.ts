@@ -56,22 +56,7 @@ function validateDynamicValueDescriptor(descriptor: DynamicValueBindingDescripto
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
  *
- * @example
- * ```typescript
- * import { BindingType, ScopeBindingType, bindDynamicValue, createContainer } from "@wirestate/core";
- *
- * const DATE_NOW = Symbol("DATE_NOW");
- * const container = createContainer();
- *
- * bindDynamicValue(container, {
- *   id: DATE_NOW,
- *   bindingType: BindingType.DynamicValue,
- *   scopeBindingType: ScopeBindingType.Transient,
- *   factory: () => new Date(),
- * });
- *
- * const now = container.get<Date>(DATE_NOW);
- * ```
+ * @internal
  */
 export function bindDynamicValue<T>(container: Container, descriptor: DynamicValueBindingDescriptor<T>): Container {
   validateDynamicValueDescriptor(descriptor);

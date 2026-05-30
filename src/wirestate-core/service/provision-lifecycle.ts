@@ -204,19 +204,7 @@ export function deprovisionContainerBindings(container: Container): void {
  * @param bindings - Bindings controlled by the provider.
  * @returns Services that were resolved for provider lifecycle management.
  *
- * @example
- * ```typescript
- * import { Injectable, OnProvision, createContainer, provisionServices } from "@wirestate/core";
- *
- * @Injectable()
- * class PanelService {
- *   @OnProvision()
- *   public connect(): void {}
- * }
- *
- * const container = createContainer({ bindings: [PanelService] });
- * const services = provisionServices(container, [PanelService]);
- * ```
+ * @internal
  */
 export function provisionServices(container: Container, bindings: Bindings = []): Array<object> {
   const services: Array<object> = [];
@@ -257,24 +245,9 @@ export function provisionServices(container: Container, bindings: Bindings = [])
  * Calls deprovision hooks for provisioned services.
  *
  * @group Service
+ * @internal
  *
  * @param services - Services resolved during provider provisioning.
- *
- * @example
- * ```typescript
- * import { Injectable, OnDeprovision, createContainer, deprovisionServices, provisionServices } from "@wirestate/core";
- *
- * @Injectable()
- * class PanelService {
- *   @OnDeprovision()
- *   public disconnect(): void {}
- * }
- *
- * const container = createContainer({ bindings: [PanelService] });
- * const services = provisionServices(container, [PanelService]);
- *
- * deprovisionServices(services);
- * ```
  */
 export function deprovisionServices(services: ReadonlyArray<object>): void {
   for (let index: number = services.length - 1; index >= 0; index -= 1) {

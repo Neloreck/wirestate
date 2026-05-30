@@ -39,7 +39,7 @@ export interface MockContainerOptions extends CreateContainerOptions {
  * @example
  * ```typescript
  * const container: Container = mockContainer({
- *   activate: true
+ *   activate: true,
  *   bindings: [UserService, AuthService],
  * });
  * ```

@@ -2,8 +2,8 @@
 
 Use `@wirestate/react-mobx` when React services should store MobX state.
 
-The package re-exports MobX and `mobx-react-lite`, plus decorator aliases such as `Observable`, `Action`, and
-`Computed`.
+The package re-exports MobX and `mobx-react-lite`, plus decorator aliases such as `Observable`, `Action`,
+`BoundAction`, and `Computed`.
 
 For MobX behavior and React integration details, use the official [MobX docs](https://mobx.js.org/README.html),
 [React integration docs](https://mobx.js.org/react-integration.html), and
@@ -81,5 +81,6 @@ export class CounterService {
 ## API Reference
 
 [`Observable`](/api/wirestate-react-mobx/functions/Observable), [`Action`](/api/wirestate-react-mobx/functions/Action),
-[`Computed`](/api/wirestate-react-mobx/functions/Computed), [`makeObservable`](/api/wirestate-react-mobx/functions/makeObservable),
+[`BoundAction`](/api/wirestate-react-mobx/functions/BoundAction), [`Computed`](/api/wirestate-react-mobx/functions/Computed),
+[`makeObservable`](/api/wirestate-react-mobx/functions/makeObservable),
 [`observer`](/api/wirestate-react-mobx/functions/observer).

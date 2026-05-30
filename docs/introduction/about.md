@@ -46,6 +46,7 @@ Signal reads in render are the React subscription point. Create signals in servi
 import { Injectable } from "@wirestate/core";
 import { ContainerProvider, useInjection } from "@wirestate/react";
 import { signal, Signal } from "@wirestate/react-signals";
+import { useMemo } from "react";
 
 @Injectable()
 class CounterService {
@@ -79,6 +80,7 @@ function Counter() {
 import { Injectable } from "@wirestate/core";
 import { ContainerProvider, useInjection } from "@wirestate/react";
 import { Action, Observable, makeObservable, observer } from "@wirestate/react-mobx";
+import { useMemo } from "react";
 
 @Injectable()
 class CounterService {

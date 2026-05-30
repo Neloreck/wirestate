@@ -550,7 +550,7 @@ export class WireScope {
   public getSeed<T>(seed: SeedKey): Optional<T>;
 
   public getSeed<T>(seed?: SeedKey): Optional<T> {
-    dbg.info(prefix(__filename), "Get initial state for key:", {
+    dbg.info(prefix(__filename), "Get seed for key:", {
       key: (seed as AnyObject)?.name ?? seed,
     });
 

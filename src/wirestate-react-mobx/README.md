@@ -19,7 +19,15 @@ npm install @wirestate/react-mobx mobx mobx-react-lite
 ## Usage
 
 ```ts
-import { makeObservable, observer, Observable, ShallowObservable, Action, Computed } from "@wirestate/react-mobx";
+import {
+  Action,
+  BoundAction,
+  Computed,
+  Observable,
+  ShallowObservable,
+  makeObservable,
+  observer,
+} from "@wirestate/react-mobx";
 ```
 
 ## Decorator wrappers
@@ -31,6 +39,7 @@ import { makeObservable, observer, Observable, ShallowObservable, Action, Comput
 | `RefObservable()`     | `observable.ref`     |
 | `DeepObservable()`    | `observable.deep`    |
 | `Action()`            | `action`             |
+| `BoundAction()`       | `action.bound`       |
 | `Computed()`          | `computed`           |
 
 Example:

@@ -14,7 +14,7 @@ export type SeedKey = Newable | string | symbol;
  * Represents a map of targeted seed values.
  *
  * @remarks
- * Used to store initial state values that are injected into services
+ * Used to store seed values that are injected into services
  * based on their class constructor or a custom token.
  *
  * @group Seeds
