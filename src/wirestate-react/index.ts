@@ -5,7 +5,9 @@
  */
 
 export { useCommandExecutor } from "./commands/use-command-executor";
+export { useAsyncCommandExecutor } from "./commands/use-async-command-executor";
 export { useOptionalCommandExecutor } from "./commands/use-optional-command-executor";
+export { useOptionalAsyncCommandExecutor } from "./commands/use-optional-async-command-executor";
 export { useCommandHandler } from "./commands/use-command-handler";
 
 export { useContainer } from "./context/use-container";
@@ -27,7 +29,12 @@ export { useOptionalQueryExecutor } from "./queries/use-optional-query-executor"
 export { useOptionalAsyncQueryExecutor } from "./queries/use-optional-async-query-executor";
 export { useQueryHandler } from "./queries/use-query-handler";
 
-export { OptionalCommandExecutor, CommandExecutor } from "./types/commands";
+export {
+  AsyncCommandExecutor,
+  CommandExecutor,
+  OptionalAsyncCommandExecutor,
+  OptionalCommandExecutor,
+} from "./types/commands";
 export { EventEmitter } from "./types/events";
 export {
   QueryResponder,

@@ -65,39 +65,3 @@ export interface CommandHandlerMetadata {
   readonly methodName: string | symbol;
   readonly type: CommandType;
 }
-
-/**
- * Represents the current state of a command execution.
- *
- * @group Commands
- */
-export enum CommandStatus {
-  /** The command has started but not yet completed. */
-  PENDING = "pending",
-  /** The command has successfully completed. */
-  SUCCESS = "success",
-  /** The command failed with an error. */
-  ERROR = "error",
-}
-
-/**
- * Represents a running command execution.
- *
- * @remarks
- * Returned by the command bus when a command is dispatched. It allows tracking
- * the progress and result of the command execution.
- *
- * @group Commands
- *
- * @template R - Type of the result produced by the command.
- */
-export interface CommandExecution<R = unknown> {
-  /**
-   * A promise that resolves with the command result or rejects with an error.
-   */
-  readonly result: Promise<R>;
-  /**
-   * The current execution status of the command.
-   */
-  readonly status: CommandStatus;
-}

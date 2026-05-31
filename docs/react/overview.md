@@ -67,7 +67,8 @@ activated, then discarded before the committed provider lifecycle continues. Put
 - `ContainerProvider` publishes containers through React context.
 - `useInjection`, `useOptionalInjection`, `useContainer`, and `useScope` read from the active container.
 - `useEvent`, `useEvents`, `useEventsHandler`, and `useEventEmitter` work with the event bus.
-- `useCommandExecutor`, `useOptionalCommandExecutor`, and `useCommandHandler` work with the command bus.
+- `useCommandExecutor`, `useAsyncCommandExecutor`, `useOptionalCommandExecutor`,
+  `useOptionalAsyncCommandExecutor`, and `useCommandHandler` work with the command bus.
 - `useQueryExecutor`, `useAsyncQueryExecutor`, `useOptionalQueryExecutor`, `useOptionalAsyncQueryExecutor`, and
   `useQueryHandler` work with the query bus.
 

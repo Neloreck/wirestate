@@ -116,12 +116,14 @@ export class AnotherService {
   public constructor(@Inject(WireScope) private scope: WireScope) {}
 
   public async login(): Promise<void> {
-    await this.scope.executeCommand("LOGIN").result;
+    await this.scope.executeCommandAsync("LOGIN");
   }
 }
 ```
 
-Use `executeOptionalCommand` from `WireScope` or `CommandBus.executeOptional` when a handler may not be registered; both return `null` instead of throwing.
+Use `executeCommand` / `CommandBus.execute` for synchronous command handlers. Use `executeCommandAsync` /
+`CommandBus.executeAsync` when callers should consistently receive a Promise. Use optional variants when a handler may
+not be registered; they return `null` instead of throwing.
 
 ## Queries
 
@@ -240,8 +242,10 @@ Injected `WireScope` instances expose lifecycle state for async guards:
 | `queryOptionalAsync(type, data?)`         | Dispatch a query as a promise; returns `null` if no handler is registered                   |
 | `registerQueryHandler(type, handler)`     | Register a query handler; returns unregister function                                       |
 | `unregisterQueryHandler(type, handler)`   | Remove a specific query handler by type and reference                                       |
-| `executeCommand(type, data?)`             | Dispatch a command and return a command execution                                           |
-| `executeOptionalCommand(type, data?)`     | Dispatch a command; returns `null` if no handler is registered                              |
+| `executeCommand(type, data?)`             | Dispatch a command and return the result                                                    |
+| `executeCommandAsync(type, data?)`        | Dispatch a command and return the result as a promise                                       |
+| `executeOptionalCommand(type, data?)`     | Dispatch a command result; returns `null` if no handler is registered                       |
+| `executeOptionalCommandAsync(type, data?)` | Dispatch a command as a promise; returns `null` if no handler is registered                 |
 | `registerCommandHandler(type, handler)`   | Register a command handler; returns unregister function                                     |
 | `unregisterCommandHandler(type, handler)` | Remove a specific command handler by type and reference                                     |
 

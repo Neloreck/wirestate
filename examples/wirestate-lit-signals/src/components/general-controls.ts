@@ -1,5 +1,5 @@
 import { watch } from "@lit-labs/signals";
-import { Command, WireScope, Event } from "@wirestate/core";
+import { WireScope, Event } from "@wirestate/core";
 import { injection, onEvent } from "@wirestate/lit";
 import { Computed, computed } from "@wirestate/lit-signals";
 import { css, CSSResult, html, LitElement } from "lit";
@@ -100,19 +100,12 @@ export class GeneralControls extends LitElement {
   }
 
   public onDumpData(): void {
-    const command: Command = this.scope.executeCommand(EGlobalCommand.DUMP_DATA, {
+    const result: unknown = this.scope.executeCommand(EGlobalCommand.DUMP_DATA, {
       at: Date.now(),
     });
 
-    console.info("[general-controls] Dump data task scheduled:", {
-      status: command.status,
-    });
-
-    command.task.then((result: unknown) => {
-      console.info("[general-controls] Dump data result:", {
-        result,
-        status: command.status,
-      });
+    console.info("[general-controls] Dump data result:", {
+      result,
     });
   }
 

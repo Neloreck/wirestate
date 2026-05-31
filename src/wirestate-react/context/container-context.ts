@@ -1,5 +1,5 @@
-import { type Container } from "@wirestate/core";
-import { type Context, createContext } from "react";
+import { Container } from "@wirestate/core";
+import { Context, createContext } from "react";
 
 import { Optional } from "../types/general";
 

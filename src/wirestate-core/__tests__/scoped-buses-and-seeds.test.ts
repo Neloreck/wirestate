@@ -108,8 +108,8 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     expect(child.get(CommandBus)).not.toBe(parent.get(CommandBus));
     expect(child.get(QueryBus)).not.toBe(parent.get(QueryBus));
 
-    expect(await parent.get(CommandBus).execute(ADD_COMMAND, 2).result).toBe(3);
-    expect(await child.get(CommandBus).execute(ADD_COMMAND, 2).result).toBe(112);
+    expect(parent.get(CommandBus).execute(ADD_COMMAND, 2)).toBe(3);
+    expect(child.get(CommandBus).execute(ADD_COMMAND, 2)).toBe(112);
     expect(parent.get(QueryBus).query(COUNT_QUERY)).toBe("root-label:3");
     expect(child.get(QueryBus).query(COUNT_QUERY)).toBe("child-label:112");
 
@@ -121,7 +121,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     child.unbindAll();
 
-    expect(await parent.get(CommandBus).execute(ADD_COMMAND, 2).result).toBe(6);
+    expect(parent.get(CommandBus).execute(ADD_COMMAND, 2)).toBe(6);
     expect(parent.get(QueryBus).query(COUNT_QUERY)).toBe("root-label:6");
 
     parent.get(EventBus).emit(LOG_EVENT, "from-parent");
@@ -165,7 +165,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
         this.scope.emitEvent(DEACTIVATE_EVENT, "cleanup");
         logs.push(`query-result:${this.scope.query(DEACTIVATE_QUERY)}`);
 
-        commandResult = this.scope.executeCommand<string>(DEACTIVATE_COMMAND).result;
+        commandResult = this.scope.executeCommandAsync<string>(DEACTIVATE_COMMAND);
       }
 
       @OnCommand(DEACTIVATE_COMMAND)
@@ -196,7 +196,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     container.unbindAll();
 
-    expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result"]);
+    expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
     expect(commandResult).not.toBeNull();
 
     const result: Optional<string> = await commandResult;
@@ -271,7 +271,10 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
         this.scope.emitEvent(PEER_DEACTIVATE_EVENT, "from-coordinator");
         logs.push(`coordinator-query:${this.scope.query(PEER_DEACTIVATE_QUERY, "from-coordinator")}`);
 
-        commandResult = this.scope.executeCommand<string, string>(PEER_DEACTIVATE_COMMAND, "from-coordinator").result;
+        commandResult = this.scope.executeCommandAsync<string, string>(
+          PEER_DEACTIVATE_COMMAND,
+          "from-coordinator"
+        );
 
         fromDeactivationCoordinatorService.push(
           this.scope.resolve(WireScope),
@@ -293,6 +296,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
       "peer-event:from-coordinator",
       "peer-query:from-coordinator",
       "coordinator-query:peer-query-result",
+      "peer-command:from-coordinator",
       "peer-deactivation",
     ]);
     expect(commandResult).not.toBeNull();
@@ -303,8 +307,8 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
       "peer-event:from-coordinator",
       "peer-query:from-coordinator",
       "coordinator-query:peer-query-result",
-      "peer-deactivation",
       "peer-command:from-coordinator",
+      "peer-deactivation",
     ]);
 
     expect(fromDeactivationCoordinatorService).toHaveLength(3);

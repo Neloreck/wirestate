@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { CommandBus, CommandExecution, CommandStatus } from "@wirestate/core";
+import { CommandBus } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
@@ -40,7 +40,7 @@ describe("@onCommand", () => {
     expect(bus.has("TEST_COMMAND")).toBe(false);
   });
 
-  it("should call decorated method when command is dispatched", async () => {
+  it("should call decorated method when command is dispatched", () => {
     const { provider, container } = fixture;
 
     const bus: CommandBus = container.get(CommandBus);
@@ -48,11 +48,9 @@ describe("@onCommand", () => {
 
     provider.appendChild(element);
 
-    const execution: CommandExecution<string> = bus.execute("TEST_COMMAND", "input");
-    const result: string = await execution.result;
+    const result: string = bus.execute("TEST_COMMAND", "input");
 
     expect(result).toBe("input-handled");
-    expect(execution.status).toBe(CommandStatus.SUCCESS);
 
     element.remove();
 

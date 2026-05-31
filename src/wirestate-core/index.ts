@@ -53,6 +53,6 @@ export {
   ResolvedValueBindingDescriptor,
   ServiceRedirectionBindingDescriptor,
 } from "./types/provision";
-export { CommandStatus, CommandExecution, CommandHandler, CommandType, CommandUnregister } from "./types/commands";
+export { CommandHandler, CommandType, CommandUnregister } from "./types/commands";
 export { QueryHandler, QueryType, QueryUnregister } from "./types/queries";
 export { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "./types/events";

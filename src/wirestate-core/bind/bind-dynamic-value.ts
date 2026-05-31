@@ -1,4 +1,4 @@
-import type { BindInWhenOnFluentSyntax, DynamicValueBuilder } from "inversify";
+import { BindInWhenOnFluentSyntax, DynamicValueBuilder } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";

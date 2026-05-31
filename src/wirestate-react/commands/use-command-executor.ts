@@ -1,4 +1,4 @@
-import { Container, CommandBus, CommandExecution, CommandType } from "@wirestate/core";
+import { Container, CommandBus, CommandType } from "@wirestate/core";
 import { useCallback } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -31,7 +31,7 @@ export function useCommandExecutor(): CommandExecutor {
   const container: Container = useContainer();
 
   return useCallback(
-    <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): CommandExecution<R> => {
+    <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): R => {
       dbg.info(prefix(__filename), "Command:", {
         type,
         data,

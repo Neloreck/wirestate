@@ -1,0 +1,72 @@
+import { render, cleanup } from "@testing-library/react";
+import { Container, CommandBus } from "@wirestate/core";
+import { mockContainer } from "@wirestate/core/test-utils";
+
+import { withContainerProvider } from "../test-utils/with-container-provider";
+import { AsyncCommandExecutor } from "../types/commands";
+
+import { useAsyncCommandExecutor } from "./use-async-command-executor";
+
+describe("useAsyncCommandExecutor", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  it("should return an executor that dispatches sync commands as promises", async () => {
+    const container: Container = mockContainer();
+    const bus: CommandBus = container.get(CommandBus);
+    const handler = jest.fn((data: string) => data + "-result");
+
+    bus.register("TEST_COMMAND", handler);
+    jest.spyOn(bus, "executeAsync");
+
+    let executor: AsyncCommandExecutor = null as unknown as AsyncCommandExecutor;
+
+    function TestComponent() {
+      executor = useAsyncCommandExecutor();
+
+      return null;
+    }
+
+    render(withContainerProvider(<TestComponent />, container));
+
+    await expect(executor<string, string>("TEST_COMMAND", "some-data")).resolves.toBe("some-data-result");
+    expect(handler).toHaveBeenCalledWith("some-data");
+    expect(bus.executeAsync).toHaveBeenCalledWith("TEST_COMMAND", "some-data");
+  });
+
+  it("should dispatch async command handlers", async () => {
+    const container: Container = mockContainer();
+
+    container.get(CommandBus).register("ASYNC_COMMAND", async (data: string) => data + "-result");
+
+    let executor: AsyncCommandExecutor = null as unknown as AsyncCommandExecutor;
+
+    function TestComponent() {
+      executor = useAsyncCommandExecutor();
+
+      return null;
+    }
+
+    render(withContainerProvider(<TestComponent />, container));
+
+    await expect(executor<string, string>("ASYNC_COMMAND", "some-data")).resolves.toBe("some-data-result");
+  });
+
+  it("should reject on unhandled commands", async () => {
+    const container: Container = mockContainer();
+    let executor: AsyncCommandExecutor = null as unknown as AsyncCommandExecutor;
+
+    function TestComponent() {
+      executor = useAsyncCommandExecutor();
+
+      return null;
+    }
+
+    render(withContainerProvider(<TestComponent />, container));
+
+    await expect(executor("NOT_EXISTING", 1000)).rejects.toThrow(
+      "No command handler registered in container for type: 'NOT_EXISTING'."
+    );
+  });
+});

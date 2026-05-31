@@ -1,4 +1,4 @@
-import type { ResolutionContext } from "inversify";
+import { ResolutionContext } from "inversify";
 
 import { Container, BindingType, BindingScope } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";

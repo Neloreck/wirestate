@@ -1,4 +1,4 @@
-import { CommandExecution, CommandType } from "@wirestate/core";
+import { CommandType } from "@wirestate/core";
 
 import { Optional } from "./general";
 
@@ -6,8 +6,9 @@ import { Optional } from "./general";
  * Represents the function returned by {@link useCommandExecutor}.
  *
  * @remarks
- * Typically returned by {@link useCommandExecutor}. Dispatched commands are
- * automatically wrapped in a {@link CommandExecution}.
+ * Typically returned by {@link useCommandExecutor}. Returns the command handler
+ * result as-is. Use {@link useAsyncCommandExecutor} when consumers should
+ * consistently receive a Promise.
  *
  * @group Commands
  *
@@ -18,12 +19,32 @@ import { Optional } from "./general";
  * @param type - The command identifier.
  * @param data - Optional payload for the command.
  *
- * @returns A command containing the execution promise and status.
+ * @returns The command result.
  */
-export type CommandExecutor = <R = unknown, D = unknown, T extends CommandType = CommandType>(
+export type CommandExecutor = <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D) => R;
+
+/**
+ * Represents the function returned by {@link useAsyncCommandExecutor}.
+ *
+ * @remarks
+ * Typically returned by {@link useAsyncCommandExecutor}. Sync command results
+ * are wrapped, and async command results are passed through.
+ *
+ * @group Commands
+ *
+ * @template R - The expected result type of the command.
+ * @template D - The type of the data payload.
+ * @template T - The command identifier type.
+ *
+ * @param type - The command identifier.
+ * @param data - Optional payload for the command.
+ *
+ * @returns A Promise resolving to the command result.
+ */
+export type AsyncCommandExecutor = <R = unknown, D = unknown, T extends CommandType = CommandType>(
   type: T,
   data?: D
-) => CommandExecution<R>;
+) => Promise<R>;
 
 /**
  * Represents the function returned by {@link useOptionalCommandExecutor}.
@@ -41,9 +62,32 @@ export type CommandExecutor = <R = unknown, D = unknown, T extends CommandType =
  * @param type - The command identifier.
  * @param data - Optional payload for the command.
  *
- * @returns A command if a handler was found, or `null` otherwise.
+ * @returns The command result if a handler was found, or `null` otherwise.
  */
 export type OptionalCommandExecutor = <R = unknown, D = unknown, T extends CommandType = CommandType>(
   type: T,
   data?: D
-) => Optional<CommandExecution<R>>;
+) => Optional<R>;
+
+/**
+ * Represents the function returned by {@link useOptionalAsyncCommandExecutor}.
+ *
+ * @remarks
+ * Typically returned by {@link useOptionalAsyncCommandExecutor}. Returns `null`
+ * if no handler is registered for the command type.
+ *
+ * @group Commands
+ *
+ * @template R - The expected result type of the command.
+ * @template D - The type of the data payload.
+ * @template T - The command identifier type.
+ *
+ * @param type - The command identifier.
+ * @param data - Optional payload for the command.
+ *
+ * @returns A Promise resolving to the command result, or `null` if no handler was found.
+ */
+export type OptionalAsyncCommandExecutor = <R = unknown, D = unknown, T extends CommandType = CommandType>(
+  type: T,
+  data?: D
+) => Promise<Optional<R>>;

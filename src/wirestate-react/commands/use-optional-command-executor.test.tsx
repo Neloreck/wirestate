@@ -29,7 +29,7 @@ describe("useOptionalCommandExecutor", () => {
     expect((executor as unknown as OptionalCommandExecutor)("MISSING_CMD")).toBeNull();
   });
 
-  it("should return a command if handler exists", async () => {
+  it("should return a command result if handler exists", () => {
     const container: Container = mockContainer();
 
     container.get(CommandBus).register("EXISTING_COMMAND", () => "ok");
@@ -44,9 +44,8 @@ describe("useOptionalCommandExecutor", () => {
 
     render(withContainerProvider(<TestComponent />, container));
 
-    const command = (executor as unknown as OptionalCommandExecutor)("EXISTING_COMMAND");
+    const result: string | null = (executor as OptionalCommandExecutor)<string>("EXISTING_COMMAND");
 
-    expect(command).not.toBeNull();
-    expect(await command!.result).toBe("ok");
+    expect(result).toBe("ok");
   });
 });

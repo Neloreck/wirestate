@@ -1,7 +1,8 @@
 # Core Commands
 
-Commands trigger write work. A command has one active handler and returns a `CommandExecution` with `status` and
-`result`.
+Commands trigger work. A command has one active handler. Use the synchronous APIs when the handler is synchronous
+and the caller needs the result immediately. Use the async APIs when the handler may return a Promise or the caller wants
+a Promise-normalized result.
 
 Each command type uses a stack of handlers. The newest registration wins. When it unregisters, the previous handler is
 active again.
@@ -12,10 +13,14 @@ active again.
 import { Injectable, OnCommand } from "@wirestate/core";
 
 @Injectable()
-export class AuthService {
-  @OnCommand("LOGOUT")
-  public async logout(): Promise<void> {
-    await revokeSession();
+export class SearchService {
+  private open: boolean = false;
+
+  @OnCommand("OPEN_SEARCH")
+  public openSearch(): boolean {
+    this.open = true;
+
+    return this.open;
   }
 }
 ```
@@ -29,24 +34,51 @@ import { Inject, Injectable, WireScope } from "@wirestate/core";
 export class HeaderService {
   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
-  public async logout(): Promise<void> {
-    const execution = this.scope.executeCommand("LOGOUT");
+  public openSearch(): void {
+    const opened: boolean = this.scope.executeCommand("OPEN_SEARCH");
 
-    await execution.result;
+    if (!opened) {
+      console.error("Failed to open search")
+    }
   }
 }
 ```
 
 `executeCommand` throws `WirestateError` when no handler exists.
 
-Use optional commands when absence is normal.
+## Handle An Async Command
 
 ```ts
-const execution = this.scope.executeOptionalCommand("REFRESH_DEVTOOLS");
+import { Inject, Injectable, OnCommand, WireScope } from "@wirestate/core";
 
-if (execution) {
-  await execution.result;
+@Injectable()
+export class AuthService {
+  @OnCommand("LOGOUT")
+  public async logout(): Promise<void> {
+    await revokeSession();
+  }
 }
+
+@Injectable()
+export class HeaderService {
+  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+
+  public async logout(): Promise<void> {
+    await this.scope.executeCommandAsync("LOGOUT");
+  }
+}
+```
+
+`executeCommandAsync` wraps synchronous handler results and passes asynchronous results through.
+
+## Execute Optional Commands
+
+Use optional commands when absence is normal, such as an optional devtools integration.
+
+```ts
+const refreshed: boolean | null = this.scope.executeOptionalCommand("REFRESH_DEVTOOLS");
+
+const uploaded: UploadReceipt | null = await this.scope.executeOptionalCommandAsync("UPLOAD_DRAFT", draft);
 ```
 
 ## Register Directly
@@ -61,8 +93,16 @@ const unregister = bus.register("SAVE_CART", async (cart: Cart) => {
   await saveCart(cart);
 });
 
-await bus.execute("SAVE_CART", cart).result;
+await bus.executeAsync("SAVE_CART", cart);
 unregister();
+```
+
+For synchronous handlers, use `execute` directly:
+
+```ts
+bus.register("RESET_CART", () => cart.clear());
+
+bus.execute("RESET_CART");
 ```
 
 ## Register From A Service
@@ -104,5 +144,4 @@ Use this pattern when the command handler depends on runtime state or cannot be 
 
 [`CommandBus`](/api/wirestate-core/classes/CommandBus), [`WireScope`](/api/wirestate-core/classes/WireScope),
 [`OnCommand`](/api/wirestate-core/functions/OnCommand),
-[`CommandExecution`](/api/wirestate-core/interfaces/CommandExecution),
 [`CommandUnregister`](/api/wirestate-core/type-aliases/CommandUnregister).

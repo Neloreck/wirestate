@@ -3,13 +3,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import {
-  type CommandExecution,
-  CommandStatus,
-  type CommandHandler,
-  type CommandType,
-  type CommandUnregister,
-} from "../types/commands";
+import { CommandHandler, CommandType, CommandUnregister } from "../types/commands";
 import { Maybe, Optional } from "../types/general";
 
 interface CommandHandlerDescriptor {
@@ -20,8 +14,7 @@ interface CommandHandlerDescriptor {
  * Dispatches named commands to one active handler.
  *
  * @remarks
- * Commands are writes: save, login, reset, send. The caller gets a
- * {@link CommandExecution} immediately and can await `execution.result`.
+ * Commands are writes: save, login, reset, send.
  *
  * Handlers are stacked by type. The newest handler wins. Unregister it and the
  * previous handler takes over again.
@@ -35,8 +28,7 @@ interface CommandHandlerDescriptor {
  * const bus = new CommandBus();
  * bus.register("SAVE_USER", async (user: User) => saveUser(user));
  *
- * const execution = bus.execute<void, User>("SAVE_USER", user);
- * await execution.result;
+ * await bus.executeAsync<void, User>("SAVE_USER", user);
  * ```
  */
 export class CommandBus {
@@ -54,28 +46,27 @@ export class CommandBus {
   }
 
   /**
-   * Dispatches a command to the newest handler.
+   * Dispatches a command and returns the handler result as-is.
    *
    * @remarks
-   * The handler result is always wrapped in a Promise. The command starts
-   * as `PENDING`, then becomes `SUCCESS` or `ERROR`.
+   * If a handler returns a Promise, this method returns that Promise. Use
+   * {@link executeAsync} when the caller should always receive a Promise.
    *
    * @template R - Type of the command result.
    * @template D - Type of the command payload data.
    *
    * @param type - Command token.
    * @param data - Command payload.
-   * @returns The running command handle.
+   * @returns The command handler result.
    *
    * @throws {@link WirestateError} If no handler is registered.
    *
    * @example
    * ```typescript
-   * const execution: CommandExecution<User> = commandBus.execute<User, string>("GET_USER", "id-123");
-   * const user: User = await execution.result;
+   * const user: User = commandBus.execute<User, string>("GET_USER", "id-123");
    * ```
    */
-  public execute<R = unknown, D = unknown>(type: CommandType, data?: D): CommandExecution<R> {
+  public execute<R = unknown, D = unknown>(type: CommandType, data?: D): R {
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (!stack?.length) {
@@ -87,25 +78,35 @@ export class CommandBus {
 
     const handler = stack[stack.length - 1].handler as CommandHandler<D, R>;
 
-    const execution: CommandExecution<R> = {
-      result: null as unknown as Promise<R>,
-      status: CommandStatus.PENDING,
-    };
+    return handler(data as D) as R;
+  }
 
-    (execution as { result: Promise<R> }).result = Promise.resolve()
-      .then(() => handler(data as D))
-      .then((result: R) => {
-        (execution as { status: CommandStatus }).status = CommandStatus.SUCCESS;
+  /**
+   * Dispatches a command and Promise-wraps the result.
+   *
+   * @remarks
+   * Sync values are wrapped. Async values are passed through.
+   *
+   * @template R - Type of the command result.
+   * @template D - Type of the command payload data.
+   *
+   * @param type - Command token.
+   * @param data - Command payload.
+   * @returns A Promise resolving to the command result.
+   *
+   * @throws {@link WirestateError} If no handler is registered.
+   */
+  public async executeAsync<R = unknown, D = unknown>(type: CommandType, data?: D): Promise<R> {
+    const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
-        return result;
-      })
-      .catch((error: unknown) => {
-        (execution as { status: CommandStatus }).status = CommandStatus.ERROR;
+    if (stack?.length) {
+      return (stack[stack.length - 1].handler as CommandHandler<D, R>)(data as D);
+    }
 
-        throw error;
-      });
-
-    return execution as CommandExecution<R>;
+    throw new WirestateError(
+      ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER,
+      `No command handler registered in container for type: '${String(type)}'.`
+    );
   }
 
   /**
@@ -116,10 +117,30 @@ export class CommandBus {
    *
    * @param type - Command identifier.
    * @param data - Optional payload for the handler.
-   * @returns The running command execution, or `null` when no handler exists.
+   * @returns The command result, or `null` when no handler exists.
    */
-  public executeOptional<R = unknown, D = unknown>(type: CommandType, data?: D): Optional<CommandExecution<R>> {
+  public executeOptional<R = unknown, D = unknown>(type: CommandType, data?: D): Optional<R> {
     return this.handlers.get(type)?.length ? this.execute<R, D>(type, data) : null;
+  }
+
+  /**
+   * Dispatches an optional command and Promise-wraps the result.
+   *
+   * @template R - Type of the command result.
+   * @template D - Type of the command payload data.
+   *
+   * @param type - Command identifier.
+   * @param data - Optional payload for the handler.
+   * @returns A Promise resolving to the command result, or `null` if no handler is found.
+   */
+  public async executeOptionalAsync<R = unknown, D = unknown>(type: CommandType, data?: D): Promise<Optional<R>> {
+    const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
+
+    if (stack?.length) {
+      return (stack[stack.length - 1].handler as CommandHandler<D, R>)(data as D);
+    }
+
+    return null;
   }
 
   /**

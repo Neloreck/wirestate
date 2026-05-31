@@ -4,7 +4,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { Maybe, Optional } from "../types/general";
-import { type QueryHandler, type QueryType, type QueryUnregister } from "../types/queries";
+import { QueryHandler, QueryType, QueryUnregister } from "../types/queries";
 
 interface QueryHandlerDescriptor {
   handler: QueryHandler;

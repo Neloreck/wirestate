@@ -4,34 +4,77 @@ React command hooks dispatch commands and register component-lifetime command ha
 
 ## Execute A Command
 
+Use `useCommandExecutor` when the active handler is synchronous and the caller needs the result immediately.
+
 ```tsx
 import { useCommandExecutor } from "@wirestate/react";
 
-function LogoutButton() {
+function AddItemButton({ item }: { item: CartItem }) {
   const executeCommand = useCommandExecutor();
 
-  return <button onClick={() => void executeCommand("LOGOUT").result}>Log out</button>;
+  return (
+    <button
+      onClick={() => {
+        const itemCount: number = executeCommand("ADD_CART_ITEM", item);
+
+        console.info("Cart item count:", itemCount);
+      }}
+    >
+      Add item
+    </button>
+  );
 }
 ```
 
 `useCommandExecutor` throws through the core command bus when no handler exists.
 
-## Execute Optional Commands
+## Execute An Async Command
+
+Use `useAsyncCommandExecutor` when the handler may return a Promise, or when
+the component should always work in an async way.
 
 ```tsx
-import { useOptionalCommandExecutor } from "@wirestate/react";
+import { useAsyncCommandExecutor } from "@wirestate/react";
+import { useCallback, useState } from "react";
 
-function RefreshButton() {
-  const executeOptionalCommand = useOptionalCommandExecutor();
+function LogoutButton() {
+  const executeCommandAsync = useAsyncCommandExecutor();
+  const [pending, setPending] = useState(false);
+
+  const logout = useCallback(async () => {
+    setPending(true);
+
+    try {
+      await executeCommandAsync("LOGOUT");
+    } finally {
+      setPending(false);
+    }
+  }, [executeCommandAsync]);
 
   return (
-    <button
-      onClick={() => {
-        void executeOptionalCommand("REFRESH_DEVTOOLS")?.result;
-      }}
-    >
-      Refresh
+    <button disabled={pending} onClick={() => void logout()}>
+      Log out
     </button>
+  );
+}
+```
+
+## Execute Optional Commands
+
+Use optional executors when a feature is intentionally absent in some containers.
+
+```tsx
+import { useOptionalAsyncCommandExecutor, useOptionalCommandExecutor } from "@wirestate/react";
+
+function DevtoolsButtons() {
+  const executeOptionalCommand = useOptionalCommandExecutor();
+  const executeOptionalCommandAsync = useOptionalAsyncCommandExecutor();
+
+  return (
+    <>
+      <button onClick={() => executeOptionalCommand("TOGGLE_DEVTOOLS")}>Toggle devtools</button>
+      <button onClick={() => void executeOptionalCommandAsync("EXPORT_DEVTOOLS_TRACE")}>Export trace</button>
+    </>
   );
 }
 ```
@@ -57,5 +100,7 @@ for the same command type.
 ## API Reference
 
 [`useCommandExecutor`](/api/wirestate-react/functions/useCommandExecutor),
+[`useAsyncCommandExecutor`](/api/wirestate-react/functions/useAsyncCommandExecutor),
 [`useOptionalCommandExecutor`](/api/wirestate-react/functions/useOptionalCommandExecutor),
+[`useOptionalAsyncCommandExecutor`](/api/wirestate-react/functions/useOptionalAsyncCommandExecutor),
 [`useCommandHandler`](/api/wirestate-react/functions/useCommandHandler).

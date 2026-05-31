@@ -8,7 +8,7 @@ import { WirestateError } from "../error/wirestate-error";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
-import { CommandExecution, CommandHandler, CommandUnregister, CommandType } from "../types/commands";
+import { CommandHandler, CommandUnregister, CommandType } from "../types/commands";
 import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 import { Optional, AnyObject } from "../types/general";
 import { SeedKey, SeedsMap } from "../types/initial-state";
@@ -390,7 +390,7 @@ export class WireScope {
   }
 
   /**
-   * Dispatches a command and returns progress.
+   * Dispatches a command and returns the handler result as-is.
    *
    * @template R - Type of the command result.
    * @template D - Type of the command payload.
@@ -398,27 +398,52 @@ export class WireScope {
    *
    * @param type - Command identifier.
    * @param data - Payload for the command.
-   * @returns A command execution with `status` and `result`.
+   * @returns The command result.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
    * @throws {@link WirestateError} If no command handler is registered.
    *
    * @example
    * ```typescript
-   * const execution: CommandExecution = scope.executeCommand("LOGOUT");
-   *
-   * await execution.result;
+   * scope.executeCommand("LOGOUT");
    * ```
    */
-  public executeCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(
-    type: T,
-    data?: D
-  ): CommandExecution<R> {
+  public executeCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): R {
     dbg.info(prefix(__filename), "Execute command:", { type, data });
 
     this.assertActive();
 
     return this.commandBus.execute<R, D>(type, data);
+  }
+
+  /**
+   * Dispatches a command and returns the result as a Promise.
+   *
+   * @template R - Type of the command result.
+   * @template D - Type of the command payload.
+   * @template T - Type of the command identifier.
+   *
+   * @param type - Command identifier.
+   * @param data - Payload for the command.
+   * @returns A Promise resolving to the command result.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   * @throws {@link WirestateError} If no command handler is registered.
+   *
+   * @example
+   * ```typescript
+   * await scope.executeCommandAsync("LOGOUT");
+   * ```
+   */
+  public executeCommandAsync<R = unknown, D = unknown, T extends CommandType = CommandType>(
+    type: T,
+    data?: D
+  ): Promise<R> {
+    dbg.info(prefix(__filename), "Execute async command:", { type, data });
+
+    this.assertActive();
+
+    return this.commandBus.executeAsync<R, D>(type, data);
   }
 
   /**
@@ -430,28 +455,53 @@ export class WireScope {
    *
    * @param type - Command identifier.
    * @param data - Payload for the command.
-   * @returns A {@link CommandExecution} or `null`.
+   * @returns The command result or `null`.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
    *
    * @example
    * ```typescript
-   * const execution: CommandExecution | null = scope.executeOptionalCommand("CLEANUP_CACHE");
-   *
-   * if (execution) {
-   *   await execution.result;
-   * }
+   * scope.executeOptionalCommand("CLEANUP_CACHE");
    * ```
    */
   public executeOptionalCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(
     type: T,
     data?: D
-  ): Optional<CommandExecution<R>> {
+  ): Optional<R> {
     dbg.info(prefix(__filename), "Execute command:", { type, data });
 
     this.assertActive();
 
     return this.commandBus.executeOptional<R, D>(type, data);
+  }
+
+  /**
+   * Dispatches an optional command and returns the result as a Promise.
+   *
+   * @template R - Type of the command result.
+   * @template D - Type of the command payload.
+   * @template T - Type of the command identifier.
+   *
+   * @param type - Command identifier.
+   * @param data - Payload for the command.
+   * @returns A Promise resolving to the command result or `null`.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * const result: string | null = await scope.executeOptionalCommandAsync("CLEANUP_CACHE");
+   * ```
+   */
+  public executeOptionalCommandAsync<R = unknown, D = unknown, T extends CommandType = CommandType>(
+    type: T,
+    data?: D
+  ): Promise<Optional<R>> {
+    dbg.info(prefix(__filename), "Execute optional async command:", { type, data });
+
+    this.assertActive();
+
+    return this.commandBus.executeOptionalAsync<R, D>(type, data);
   }
 
   /**

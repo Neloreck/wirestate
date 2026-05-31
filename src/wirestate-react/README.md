@@ -160,19 +160,36 @@ useEventsHandler((event) => {
 
 ### `useCommandExecutor()`
 
-Returns a function that dispatches a command and returns a `CommandExecution`.
+Returns a function that dispatches a command and returns the handler result as-is.
 
 ```tsx
 const executeCommand = useCommandExecutor();
 
+function handleClick() {
+  executeCommand("LOGIN", { username: "alice" });
+}
+```
+
+### `useAsyncCommandExecutor()`
+
+Returns a function that dispatches a command and resolves its return value as a promise. It accepts both synchronous and
+asynchronous handlers.
+
+```tsx
+const executeCommandAsync = useAsyncCommandExecutor();
+
 async function handleClick() {
-  await executeCommand("LOGIN", { username: "alice" }).result;
+  await executeCommandAsync("LOGIN", { username: "alice" });
 }
 ```
 
 ### `useOptionalCommandExecutor()`
 
 Same as `useCommandExecutor` but returns `null` if no handler is registered.
+
+### `useOptionalAsyncCommandExecutor()`
+
+Same as `useAsyncCommandExecutor` but resolves to `null` if no handler is registered.
 
 ### `useCommandHandler(type, handler)`
 

@@ -12,7 +12,6 @@ import { QueryBus } from "../queries/query-bus";
 import { OnActivated } from "../service/on-activated";
 import { OnDeactivation } from "../service/on-deactivation";
 import { mockContainer } from "../test-utils";
-import { CommandStatus } from "../types/commands";
 import { Optional } from "../types/general";
 import { InstanceBindingDescriptor } from "../types/provision";
 
@@ -96,11 +95,7 @@ describe("bindInstance", () => {
     expect(container.get(QueryBus).query("TEST_STRING_QUERY")).toBe("string-query-response");
 
     // Test command from external source.
-    expect(container.get(CommandBus).execute("TEST_SYNC_COMMAND", 800)).toEqual({
-      status: CommandStatus.PENDING,
-      result: expect.any(Promise),
-    });
-    expect(await container.get(CommandBus).execute("TEST_SYNC_COMMAND", 800).result).toBe(1800);
+    expect(container.get(CommandBus).execute("TEST_SYNC_COMMAND", 800)).toBe(1800);
 
     // Test deactivation.
     (instance.scope as { isDeprovisioned: boolean }).isDeprovisioned = false;

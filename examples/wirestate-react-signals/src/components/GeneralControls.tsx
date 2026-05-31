@@ -22,19 +22,12 @@ export function GeneralControls() {
   const emitEvent: EventEmitter = useEventEmitter();
 
   const onDumpData = useCallback(() => {
-    const command = executeCommand(EGlobalCommand.DUMP_DATA, {
+    const result = executeCommand(EGlobalCommand.DUMP_DATA, {
       at: Date.now(),
     });
 
-    console.info("[GeneralControls] Dump data task scheduled:", {
-      status: command.status,
-    });
-
-    command.task.then((result: unknown) => {
-      console.info("[GeneralControls] Dump data result:", {
-        result,
-        status: command.status,
-      });
+    console.info("[GeneralControls] Dump data result:", {
+      result,
     });
   }, [executeCommand]);
 

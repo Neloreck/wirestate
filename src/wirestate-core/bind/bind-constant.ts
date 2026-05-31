@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType, Container, BindingScope, type ServiceIdentifier } from "../alias";
+import { BindingType, Container, BindingScope, ServiceIdentifier } from "../alias";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { ConstantValueBindingDescriptor } from "../types/provision";

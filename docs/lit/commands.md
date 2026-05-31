@@ -45,7 +45,25 @@ class SearchPanel extends LitElement {
 }
 ```
 
+Handlers may also be asynchronous.
+
+```ts
+import { onCommand } from "@wirestate/lit";
+import { LitElement } from "lit";
+import { customElement } from "lit/decorators.js";
+
+@customElement("draft-commands")
+export class DraftCommands extends LitElement {
+  @onCommand("SAVE_DRAFT")
+  private async saveDraft(draft: Draft): Promise<void> {
+    await persistDraft(draft);
+  }
+}
+```
+
 ## Execute From An Element
+
+Use `executeCommand` for synchronous handlers.
 
 ```ts
 import { WireScope } from "@wirestate/core";
@@ -57,9 +75,46 @@ class SearchButton extends LitElement {
   private scope!: WireScope;
 
   protected render() {
-    return html`<button @click=${() => void this.scope.executeCommand("OPEN_SEARCH").result}>Search</button>`;
+    return html`<button @click=${() => this.scope.executeCommand("OPEN_SEARCH")}>Search</button>`;
   }
 }
+```
+
+Use `executeCommandAsync` for async work.
+
+```ts
+import { WireScope } from "@wirestate/core";
+import { injection } from "@wirestate/lit";
+import { LitElement, html } from "lit";
+import { state } from "lit/decorators.js";
+
+class SaveButton extends LitElement {
+  @injection(WireScope)
+  private scope!: WireScope;
+
+  @state()
+  private saving: boolean = false;
+
+  private async save(): Promise<void> {
+    this.saving = true;
+
+    try {
+      await this.scope.executeCommandAsync("SAVE_DOCUMENT");
+    } finally {
+      this.saving = false;
+    }
+  }
+
+  protected render() {
+    return html`<button ?disabled=${this.saving} @click=${() => void this.save()}>Save</button>`;
+  }
+}
+```
+
+Use optional commands when the current container may not provide a handler.
+
+```ts
+await this.scope.executeOptionalCommandAsync("EXPORT_TRACE");
 ```
 
 Newer handlers shadow older handlers for the same command type.

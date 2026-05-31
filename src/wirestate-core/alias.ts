@@ -1,4 +1,4 @@
-import { LazyServiceIdentifier, type ServiceIdentifier } from "inversify";
+import { LazyServiceIdentifier, ServiceIdentifier } from "inversify";
 
 /**
  * @group External-inversify

@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { CommandBus, CommandExecution } from "@wirestate/core";
+import { CommandBus } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
@@ -39,7 +39,7 @@ describe("useOnCommand hook", () => {
     expect(bus.has("HOOK_COMMAND")).toBe(false);
   });
 
-  it("should call handler with correct data via hook", async () => {
+  it("should call handler with correct data via hook", () => {
     const { provider, container } = fixture;
 
     const bus: CommandBus = container.get(CommandBus);
@@ -50,8 +50,7 @@ describe("useOnCommand hook", () => {
 
     provider.appendChild(element);
 
-    const execution: CommandExecution<number> = bus.execute<number, number>("HOOK_COMMAND", 5);
-    const result: number = await execution.result;
+    const result: number = bus.execute<number, number>("HOOK_COMMAND", 5);
 
     expect(result).toBe(105);
     expect(handler).toHaveBeenCalledWith(5);

@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { CommandBus, CommandExecution, CommandStatus, Container } from "@wirestate/core";
+import { CommandBus, Container } from "@wirestate/core";
 import { mockContainer } from "@wirestate/core/test-utils";
 import { customElement } from "lit/decorators.js";
 
@@ -38,7 +38,7 @@ describe("OnCommandController", () => {
     expect(bus.has("TEST_COMMAND")).toBe(false);
   });
 
-  it("should invoke handler with correct data when command is dispatched", async () => {
+  it("should invoke handler with correct data when command is dispatched", () => {
     const { provider, container } = fixture;
 
     const bus: CommandBus = container.get(CommandBus);
@@ -49,11 +49,9 @@ describe("OnCommandController", () => {
 
     provider.appendChild(element);
 
-    const execution: CommandExecution<string> = bus.execute("SOME_COMMAND", "payload");
-    const result: string = await execution.result;
+    const result: string = bus.execute("SOME_COMMAND", "payload");
 
     expect(handler).toHaveBeenCalledWith("payload");
-    expect(execution.status).toBe(CommandStatus.SUCCESS);
     expect(result).toBe("payload-result");
 
     element.remove();
@@ -73,9 +71,7 @@ describe("OnCommandController", () => {
 
     provider.appendChild(element);
 
-    const execution: CommandExecution<number> = bus.execute("ASYNC_COMMAND", 21);
-
-    expect(await execution.result).toBe(42);
+    await expect(bus.executeAsync<number, number>("ASYNC_COMMAND", 21)).resolves.toBe(42);
   });
 
   it("should re-register when container context is updated", () => {

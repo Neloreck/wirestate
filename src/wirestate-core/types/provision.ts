@@ -1,6 +1,6 @@
-import type { DynamicValueBuilder, MapToResolvedValueInjectOptions, ResolutionContext } from "inversify";
+import { DynamicValueBuilder, MapToResolvedValueInjectOptions, ResolutionContext } from "inversify";
 
-import { type Newable, type ServiceIdentifier } from "../alias";
+import { Newable, ServiceIdentifier } from "../alias";
 
 /**
  * Inversify binding strategy name.

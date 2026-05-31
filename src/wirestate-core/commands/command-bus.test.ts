@@ -1,23 +1,25 @@
-import { CommandStatus, CommandExecution, CommandUnregister } from "../types/commands";
+import { CommandUnregister } from "../types/commands";
+import { Optional } from "../types/general";
 
 import { CommandBus } from "./command-bus";
 
 describe("CommandBus", () => {
-  it("should register and dispatch a command handler", async () => {
+  it("should register and dispatch a command handler synchronously", () => {
     const bus: CommandBus = new CommandBus();
     const handler = jest.fn().mockReturnValue("result");
+    let wasExecuted: boolean = false;
 
-    bus.register("TEST", handler);
+    bus.register("TEST", (data: string) => {
+      wasExecuted = true;
 
-    const execution: CommandExecution<string> = bus.execute("TEST", "data");
+      return handler(data);
+    });
 
-    expect(execution.status).toBe(CommandStatus.PENDING);
-
-    const result: string = await execution.result;
+    const result: string = bus.execute("TEST", "data");
 
     expect(result).toBe("result");
+    expect(wasExecuted).toBe(true);
     expect(handler).toHaveBeenCalledWith("data");
-    expect(execution.status).toBe(CommandStatus.SUCCESS);
   });
 
   it("should throw when no handler is registered", () => {
@@ -26,15 +28,13 @@ describe("CommandBus", () => {
     expect(() => bus.execute("MISSING")).toThrow("No command handler registered in container for type: 'MISSING'.");
   });
 
-  it("should support handler shadowing (stack)", async () => {
+  it("should support handler shadowing (stack)", () => {
     const bus: CommandBus = new CommandBus();
 
     bus.register("TYPE", () => "first");
     bus.register("TYPE", () => "second");
 
-    const execution: CommandExecution<string> = bus.execute("TYPE");
-
-    expect(await execution.result).toBe("second");
+    expect(bus.execute("TYPE")).toBe("second");
   });
 
   it("should unregister a handler", () => {
@@ -49,22 +49,22 @@ describe("CommandBus", () => {
     expect(bus.has("TYPE")).toBe(false);
   });
 
-  it("should fall back to previous handler after unregistering top of stack", async () => {
+  it("should fall back to previous handler after unregistering top of stack", () => {
     const bus: CommandBus = new CommandBus();
 
     const unregisterFirst: CommandUnregister = bus.register("TYPE", () => "first");
     const unregisterSecond: CommandUnregister = bus.register("TYPE", () => "second");
 
-    expect(await bus.execute("TYPE").result).toBe("second");
+    expect(bus.execute("TYPE")).toBe("second");
 
     unregisterSecond();
-    expect(await bus.execute("TYPE").result).toBe("first");
+    expect(bus.execute("TYPE")).toBe("first");
 
     unregisterFirst();
     expect(() => bus.execute("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
   });
 
-  it("should unregister only one duplicate handler registration per returned callback", async () => {
+  it("should unregister only one duplicate handler registration per returned callback", () => {
     const bus: CommandBus = new CommandBus();
     const handler = jest.fn(() => "value");
 
@@ -74,29 +74,50 @@ describe("CommandBus", () => {
     unregisterSecond();
     unregisterSecond();
 
-    expect(await bus.execute("TYPE").result).toBe("value");
+    expect(bus.execute("TYPE")).toBe("value");
 
     unregisterFirst();
 
     expect(() => bus.execute("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
   });
 
-  it("should handle async handlers", async () => {
+  it("should return promise values from execute when the handler returns a Promise", async () => {
     const bus: CommandBus = new CommandBus();
 
     bus.register("ASYNC", async (data: number) => data * 2);
 
-    const execution: CommandExecution<number> = bus.execute<number>("ASYNC", 5);
+    const result: Promise<number> = bus.execute<Promise<number>, number>("ASYNC", 5);
 
-    expect(execution.status).toBe(CommandStatus.PENDING);
-
-    const result: number = await execution.result;
-
-    expect(result).toBe(10);
-    expect(execution.status).toBe(CommandStatus.SUCCESS);
+    await expect(result).resolves.toBe(10);
   });
 
-  it("should set error status on handler rejection", async () => {
+  it("should handle async handlers through executeAsync", async () => {
+    const bus: CommandBus = new CommandBus();
+
+    bus.register("ASYNC", async (data: number) => data * 2);
+
+    const result: number = await bus.executeAsync<number>("ASYNC", 5);
+
+    expect(result).toBe(10);
+  });
+
+  it("should wrap sync handler results through executeAsync", async () => {
+    const bus: CommandBus = new CommandBus();
+
+    bus.register("SYNC", (data: number) => data * 2);
+
+    await expect(bus.executeAsync<number>("SYNC", 5)).resolves.toBe(10);
+  });
+
+  it("should reject through executeAsync when no handler is registered", async () => {
+    const bus: CommandBus = new CommandBus();
+
+    await expect(bus.executeAsync("MISSING")).rejects.toThrow(
+      "No command handler registered in container for type: 'MISSING'."
+    );
+  });
+
+  it("should throw synchronous handler errors from execute", () => {
     const bus: CommandBus = new CommandBus();
     const error = new Error("command failed");
 
@@ -104,16 +125,10 @@ describe("CommandBus", () => {
       throw error;
     });
 
-    const execution: CommandExecution = bus.execute("FAIL");
-
-    expect(execution.status).toBe(CommandStatus.PENDING);
-
-    await expect(execution.result).rejects.toThrow("command failed");
-
-    expect(execution.status).toBe(CommandStatus.ERROR);
+    expect(() => bus.execute("FAIL")).toThrow("command failed");
   });
 
-  it("should set error status on async handler rejection", async () => {
+  it("should reject async handler errors through executeAsync", async () => {
     const bus: CommandBus = new CommandBus();
     const error = new Error("async failed");
 
@@ -121,11 +136,7 @@ describe("CommandBus", () => {
       throw error;
     });
 
-    const execution: CommandExecution = bus.execute("FAIL_ASYNC");
-
-    await expect(execution.result).rejects.toThrow("async failed");
-
-    expect(execution.status).toBe(CommandStatus.ERROR);
+    await expect(bus.executeAsync("FAIL_ASYNC")).rejects.toThrow("async failed");
   });
 
   it("should check if handler exists", () => {
@@ -158,27 +169,22 @@ describe("CommandBus", () => {
     expect(() => unregister()).not.toThrow();
   });
 
-  it("should support symbol command types", async () => {
+  it("should support symbol command types", () => {
     const bus: CommandBus = new CommandBus();
     const type: unique symbol = Symbol("command");
 
     bus.register(type, () => "symbol-result");
 
-    const execution: CommandExecution<string> = bus.execute(type);
-
-    expect(await execution.result).toBe("symbol-result");
+    expect(bus.execute(type)).toBe("symbol-result");
   });
 
   describe("executeOptional", () => {
-    it("should return a command execution when handler exists", async () => {
+    it("should return a command result when handler exists", () => {
       const bus: CommandBus = new CommandBus();
 
       bus.register("TYPE", () => "value");
 
-      const execution = bus.executeOptional("TYPE");
-
-      expect(execution).not.toBeNull();
-      expect(await execution!.result).toBe("value");
+      expect(bus.executeOptional("TYPE")).toBe("value");
     });
 
     it("should return null when no handler is registered", () => {
@@ -187,15 +193,59 @@ describe("CommandBus", () => {
       expect(bus.executeOptional("MISSING")).toBeNull();
     });
 
-    it("should support async handlers", async () => {
+    it("should return promise values from executeOptional when the handler returns a Promise", async () => {
       const bus: CommandBus = new CommandBus();
 
       bus.register("ASYNC", async () => "async-value");
 
-      const execution = bus.executeOptional("ASYNC");
+      const result: Optional<Promise<string>> = bus.executeOptional<Promise<string>>("ASYNC");
 
-      expect(execution).not.toBeNull();
-      expect(await execution!.result).toBe("async-value");
+      await expect(result).resolves.toBe("async-value");
+    });
+
+    it("should support async handlers through executeOptionalAsync", async () => {
+      const bus: CommandBus = new CommandBus();
+
+      bus.register("ASYNC", async () => "async-value");
+
+      const result: Optional<string> = await bus.executeOptionalAsync("ASYNC");
+
+      expect(result).toBe("async-value");
+    });
+
+    it("should wrap sync handler results through executeOptionalAsync", async () => {
+      const bus: CommandBus = new CommandBus();
+
+      bus.register("SYNC", () => "sync-value");
+
+      await expect(bus.executeOptionalAsync("SYNC")).resolves.toBe("sync-value");
+    });
+
+    it("should resolve null through executeOptionalAsync when no handler is registered", async () => {
+      const bus: CommandBus = new CommandBus();
+
+      await expect(bus.executeOptionalAsync("MISSING")).resolves.toBeNull();
+    });
+
+    it("should support symbol command types", () => {
+      const bus: CommandBus = new CommandBus();
+      const type: unique symbol = Symbol("optional-command");
+
+      bus.register(type, () => "symbol-result");
+
+      expect(bus.executeOptional(type)).toBe("symbol-result");
+    });
+
+    it("should return null after unregistering last handler", () => {
+      const bus: CommandBus = new CommandBus();
+
+      const unregister: CommandUnregister = bus.register("TYPE", () => "value");
+
+      expect(bus.executeOptional("TYPE")).toBe("value");
+
+      unregister();
+
+      expect(bus.executeOptional("TYPE")).toBeNull();
     });
   });
 
@@ -218,7 +268,7 @@ describe("CommandBus", () => {
       expect(() => bus.unregister("MISSING", handler)).not.toThrow();
     });
 
-    it("should not affect other handlers for the same type", async () => {
+    it("should not affect other handlers for the same type", () => {
       const bus: CommandBus = new CommandBus();
       const handlerA = jest.fn(() => "a");
       const handlerB = jest.fn(() => "b");
@@ -227,10 +277,10 @@ describe("CommandBus", () => {
       bus.register("TYPE", handlerB);
       bus.unregister("TYPE", handlerB);
 
-      expect(await bus.execute("TYPE").result).toBe("a");
+      expect(bus.execute("TYPE")).toBe("a");
     });
 
-    it("should not affect handlers for other types", async () => {
+    it("should not affect handlers for other types", () => {
       const bus: CommandBus = new CommandBus();
       const handlerA = jest.fn(() => "a");
       const handlerB = jest.fn(() => "b");
@@ -240,10 +290,10 @@ describe("CommandBus", () => {
       bus.unregister("TYPE_A", handlerA);
 
       expect(bus.has("TYPE_A")).toBe(false);
-      expect(await bus.execute("TYPE_B").result).toBe("b");
+      expect(bus.execute("TYPE_B")).toBe("b");
     });
 
-    it("should not throw when unregistering a handler not present in the stack", async () => {
+    it("should not throw when unregistering a handler not present in the stack", () => {
       const bus: CommandBus = new CommandBus();
       const registered = jest.fn(() => "value");
       const unregistered = jest.fn();
@@ -251,10 +301,10 @@ describe("CommandBus", () => {
       bus.register("TYPE", registered);
 
       expect(() => bus.unregister("TYPE", unregistered)).not.toThrow();
-      expect(await bus.execute("TYPE").result).toBe("value");
+      expect(bus.execute("TYPE")).toBe("value");
     });
 
-    it("should unregister only one duplicate handler registration by type and reference per call", async () => {
+    it("should unregister only one duplicate handler registration by type and reference per call", () => {
       const bus: CommandBus = new CommandBus();
       const handler = jest.fn(() => "value");
 
@@ -263,7 +313,7 @@ describe("CommandBus", () => {
 
       bus.unregister("TYPE", handler);
 
-      expect(await bus.execute("TYPE").result).toBe("value");
+      expect(bus.execute("TYPE")).toBe("value");
 
       bus.unregister("TYPE", handler);
 
