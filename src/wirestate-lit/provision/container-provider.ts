@@ -98,20 +98,20 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
   public constructor(host: E, options: ContainerProviderOptions) {
     if (!options.container && !options.config) {
       throw new WirestateError(
-        ERROR_CODE_INVALID_ARGUMENTS,
-        "ContainerProvider requires a valid container instance or creation config."
+        "ContainerProvider requires a valid container instance or creation config.",
+        ERROR_CODE_INVALID_ARGUMENTS
       );
     } else if (options.container && options.config) {
       throw new WirestateError(
-        ERROR_CODE_INVALID_ARGUMENTS,
-        "ContainerProvider requires only container or valid config object to be provided."
+        "ContainerProvider requires only container or valid config object to be provided.",
+        ERROR_CODE_INVALID_ARGUMENTS
       );
     } else if (options.config) {
       validateContainerConfig(options.config);
     } else if (!(options.container instanceof Container)) {
       throw new WirestateError(
-        ERROR_CODE_INVALID_ARGUMENTS,
-        "ContainerProvider requires a valid container instance or creation config."
+        "ContainerProvider requires a valid container instance or creation config.",
+        ERROR_CODE_INVALID_ARGUMENTS
       );
     }
 
@@ -155,8 +155,8 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
   public setValue(container: Container, force?: boolean): void {
     if (this.config) {
       throw new WirestateError(
-        ERROR_CODE_INVALID_ARGUMENTS,
-        "ContainerProvider owns managed containers. Use `setConfig(config)` to replace the managed container."
+        "ContainerProvider owns managed containers. Use `setConfig(config)` to replace the managed container.",
+        ERROR_CODE_INVALID_ARGUMENTS
       );
     }
 
@@ -192,8 +192,8 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
   public setConfig(config: ContainerConfig): void {
     if (!this.config) {
       throw new WirestateError(
-        ERROR_CODE_INVALID_ARGUMENTS,
-        "ContainerProvider uses an external container. Use `setValue(container)` to replace it."
+        "ContainerProvider uses an external container. Use `setValue(container)` to replace it.",
+        ERROR_CODE_INVALID_ARGUMENTS
       );
     }
 

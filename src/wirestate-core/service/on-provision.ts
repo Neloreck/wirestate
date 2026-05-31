@@ -48,8 +48,8 @@ export function OnProvision(): MethodDecorator {
 
     if (PROVISION_HANDLER_METADATA.has(constructor)) {
       throw new WirestateError(
-        ERROR_CODE_VALIDATION_ERROR,
-        `Only one @OnProvision method can be declared on provider '${constructor.name}'.`
+        `Only one @OnProvision method can be declared on provider '${constructor.name}'.`,
+        ERROR_CODE_VALIDATION_ERROR
       );
     }
 
@@ -85,9 +85,9 @@ export function getProvisionHandlerMetadata(instance: object): Maybe<string | sy
     if (own) {
       if (handler && handler !== own) {
         throw new WirestateError(
-          ERROR_CODE_VALIDATION_ERROR,
           `Only one @OnProvision method can be declared across provider hierarchy '${instance.constructor.name}'. ` +
-            `Found '${String(handler)}' on '${ownerName ?? "unknown"}' and '${String(own)}' on '${constructor.name}'.`
+            `Found '${String(handler)}' on '${ownerName ?? "unknown"}' and '${String(own)}' on '${constructor.name}'.`,
+          ERROR_CODE_VALIDATION_ERROR
         );
       }
 

@@ -630,14 +630,14 @@ export class WireScope {
 
     if (this.isDisposed) {
       throw new WirestateError(
-        ERROR_CODE_ACCESS_AFTER_DISPOSAL,
-        "WireScope::container accessed after deactivation. Ensure service is properly disposed."
+        "WireScope::container accessed after deactivation. Ensure service is properly disposed.",
+        ERROR_CODE_ACCESS_AFTER_DISPOSAL
       );
     } else {
       throw new WirestateError(
-        ERROR_CODE_ACCESS_BEFORE_ACTIVATION,
         "WireScope::container accessed before activation. " +
-          "Ensure service is bound to container and is properly resolved."
+          "Ensure service is bound to container and is properly resolved.",
+        ERROR_CODE_ACCESS_BEFORE_ACTIVATION
       );
     }
   }

@@ -47,8 +47,8 @@ export function OnDeprovision(): MethodDecorator {
 
     if (DEPROVISION_HANDLER_METADATA.has(constructor)) {
       throw new WirestateError(
-        ERROR_CODE_VALIDATION_ERROR,
-        `Only one @OnDeprovision method can be declared on provider '${constructor.name}'.`
+        `Only one @OnDeprovision method can be declared on provider '${constructor.name}'.`,
+        ERROR_CODE_VALIDATION_ERROR
       );
     }
 
@@ -84,9 +84,9 @@ export function getDeprovisionHandlerMetadata(instance: object): Maybe<string | 
     if (own) {
       if (handler && handler !== own) {
         throw new WirestateError(
-          ERROR_CODE_VALIDATION_ERROR,
           `Only one @OnDeprovision method can be declared across provider hierarchy '${instance.constructor.name}'. ` +
-            `Found '${String(handler)}' on '${ownerName ?? "unknown"}' and '${String(own)}' on '${constructor.name}'.`
+            `Found '${String(handler)}' on '${ownerName ?? "unknown"}' and '${String(own)}' on '${constructor.name}'.`,
+          ERROR_CODE_VALIDATION_ERROR
         );
       }
 

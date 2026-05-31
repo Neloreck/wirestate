@@ -24,8 +24,8 @@ function validateServiceRedirectionDescriptor(descriptor: ServiceRedirectionBind
 
   if (descriptor.type !== BindingType.ServiceRedirection) {
     throw new WirestateError(
-      ERROR_CODE_INVALID_ARGUMENTS,
-      `bindServiceRedirection expected type '${BindingType.ServiceRedirection}'.`
+      `bindServiceRedirection expected type '${BindingType.ServiceRedirection}'.`,
+      ERROR_CODE_INVALID_ARGUMENTS
     );
   }
 
@@ -35,8 +35,8 @@ function validateServiceRedirectionDescriptor(descriptor: ServiceRedirectionBind
     descriptor.service === null
   ) {
     throw new WirestateError(
-      ERROR_CODE_INVALID_ARGUMENTS,
-      "Service redirection descriptor must provide a 'service' token."
+      "Service redirection descriptor must provide a 'service' token.",
+      ERROR_CODE_INVALID_ARGUMENTS
     );
   }
 }

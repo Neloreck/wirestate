@@ -48,8 +48,8 @@ function validateInstanceDescriptor(descriptor: InstanceBindingDescriptor): void
 
   if (descriptor.type === BindingType.Instance && typeof descriptor.value !== "function") {
     throw new WirestateError(
-      ERROR_CODE_INVALID_ARGUMENTS,
-      "Instance descriptor 'value' must be a service constructor."
+      "Instance descriptor 'value' must be a service constructor.",
+      ERROR_CODE_INVALID_ARGUMENTS
     );
   }
 }

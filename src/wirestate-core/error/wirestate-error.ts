@@ -29,9 +29,9 @@ export class WirestateError extends Error {
    */
   public readonly name: string = "WirestateError";
   /**
-   * Numeric error code identifying the specific failure type.
+   * String error code identifying the specific failure type.
    */
-  public readonly code: number;
+  public readonly code: string;
   /**
    * Human-readable description of the error.
    */
@@ -40,13 +40,13 @@ export class WirestateError extends Error {
   /**
    * Creates a Wirestate error.
    *
-   * @param code - Numeric error code.
-   * @param detail - Error message.
+   * @param message - Error message.
+   * @param code - String error code.
    */
-  public constructor(code: number = ERROR_CODE_GENERIC, detail?: string) {
-    super();
+  public constructor(message: string, code: string = ERROR_CODE_GENERIC) {
+    super(message);
 
     this.code = code;
-    this.message = detail || "Wirestate error.";
+    this.message = message;
   }
 }

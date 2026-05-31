@@ -125,8 +125,8 @@ export function bind<T extends object = object>(
 
     default:
       throw new WirestateError(
-        ERROR_CODE_INVALID_ARGUMENTS,
-        `Binding descriptor has unknown type '${String(binding.type)}'.`
+        `Binding descriptor has unknown type '${String(binding.type)}'.`,
+        ERROR_CODE_INVALID_ARGUMENTS
       );
   }
 }

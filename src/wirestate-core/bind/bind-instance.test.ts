@@ -5,7 +5,7 @@ import { CommandBus } from "../commands/command-bus";
 import { OnCommand } from "../commands/on-command";
 import { createContainer } from "../container/create-container";
 import { WireScope } from "../container/wire-scope";
-import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
+import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { EventBus } from "../events/event-bus";
 import { OnEvent } from "../events/on-event";
 import { OnQuery } from "../queries/on-query";
@@ -166,7 +166,7 @@ describe("bindInstance", () => {
     } as unknown as InstanceBindingDescriptor;
 
     expect(() => bindInstanceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
-      expect.objectContaining({ code: ERROR_CODE_BINDING_SCOPE })
+      expect.objectContaining({ code: ERROR_CODE_INVALID_BINDING_SCOPE })
     );
     expect(() => bindInstanceWithToken(container, GenericService, GenericService, binding, {})).toThrow(
       "Binding descriptor has unknown scope 'UNKNOWN'."

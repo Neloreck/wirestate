@@ -28,13 +28,13 @@ function validateDynamicValueDescriptor(descriptor: DynamicValueBindingDescripto
 
   if (descriptor.type !== undefined && descriptor.type !== BindingType.DynamicValue) {
     throw new WirestateError(
-      ERROR_CODE_INVALID_ARGUMENTS,
-      `bindDynamicValue expected type '${BindingType.DynamicValue}'.`
+      `bindDynamicValue expected type '${BindingType.DynamicValue}'.`,
+      ERROR_CODE_INVALID_ARGUMENTS
     );
   }
 
   if (typeof descriptor.factory !== "function") {
-    throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, "Dynamic value descriptor 'factory' must be a function.");
+    throw new WirestateError("Dynamic value descriptor 'factory' must be a function.", ERROR_CODE_INVALID_ARGUMENTS);
   }
 }
 

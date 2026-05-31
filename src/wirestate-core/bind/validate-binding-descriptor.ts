@@ -1,5 +1,5 @@
 import { BindingScope as BindingScopeValues, BindingType as BindingTypeValues } from "../alias";
-import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
+import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { BindingType, BindingScope } from "../types/provision";
 
@@ -25,20 +25,20 @@ export function validateBindingDescriptor(binding: UnsafeBindingDescriptor): voi
     binding.token === undefined ||
     binding.token === null
   ) {
-    throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, "Binding descriptor must provide a 'token' property.");
+    throw new WirestateError("Binding descriptor must provide a 'token' property.", ERROR_CODE_INVALID_ARGUMENTS);
   }
 
   if (binding.type !== undefined && !Object.values(BindingTypeValues).includes(binding.type as BindingType)) {
     throw new WirestateError(
-      ERROR_CODE_INVALID_ARGUMENTS,
-      `Binding descriptor has unknown type '${String(binding.type)}'.`
+      `Binding descriptor has unknown type '${String(binding.type)}'.`,
+      ERROR_CODE_INVALID_ARGUMENTS
     );
   }
 
   if (binding.scope !== undefined && !Object.values(BindingScopeValues).includes(binding.scope as BindingScope)) {
     throw new WirestateError(
-      ERROR_CODE_BINDING_SCOPE,
-      `Binding descriptor has unknown scope '${String(binding.scope)}'.`
+      `Binding descriptor has unknown scope '${String(binding.scope)}'.`,
+      ERROR_CODE_INVALID_BINDING_SCOPE
     );
   }
 }

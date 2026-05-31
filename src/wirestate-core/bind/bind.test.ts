@@ -2,7 +2,7 @@ import { GenericService } from "@/fixtures/services/generic-service";
 
 import { BindingType, Container, BindingScope } from "../alias";
 import { createContainer } from "../container/create-container";
-import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
+import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { BindingDescriptor, DynamicValueBindingDescriptor, InstanceBindingDescriptor } from "../types/provision";
 
 import { bind } from "./bind";
@@ -129,7 +129,7 @@ describe("bind", () => {
       value: GenericService,
     } as unknown as BindingDescriptor;
 
-    expect(() => bind(container, binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_BINDING_SCOPE }));
+    expect(() => bind(container, binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_BINDING_SCOPE }));
     expect(() => bind(container, binding)).toThrow("Binding descriptor has unknown scope 'UNKNOWN'.");
   });
 
@@ -162,7 +162,7 @@ describe("bind", () => {
         scope: "UNKNOWN",
         value: "my-value",
       } as unknown as BindingDescriptor)
-    ).toThrow(expect.objectContaining({ code: ERROR_CODE_BINDING_SCOPE }));
+    ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_BINDING_SCOPE }));
     expect(() =>
       bind(container, {
         token: "bad-scope",

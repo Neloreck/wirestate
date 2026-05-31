@@ -41,8 +41,8 @@ export function hasWireScopeInjection(token: ServiceIdentifier, options: HasWire
   if (!getMetadata) {
     if (options.isRequired) {
       throw new WirestateError(
-        ERROR_CODE_REFLECT_METADATA_MISSING,
-        'reflect-metadata is required for Wirestate service activation. Import "reflect-metadata" once at your application entry point before creating Wirestate containers.'
+        'reflect-metadata is required for Wirestate service activation. Import "reflect-metadata" once at your application entry point before creating Wirestate containers.',
+        ERROR_CODE_REFLECT_METADATA_MISSING
       );
     } else {
       return false;

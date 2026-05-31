@@ -1,7 +1,7 @@
 import { ResolutionContext } from "inversify";
 
 import { Container, BindingType, BindingScope } from "../alias";
-import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
+import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { AnyObject } from "../types/general";
 import { DynamicValueBindingDescriptor } from "../types/provision";
 
@@ -204,7 +204,7 @@ describe("bindDynamicValue", () => {
         token: "bad-scope",
         scope: "UNKNOWN",
       } as unknown as DynamicValueBindingDescriptor)
-    ).toThrow(expect.objectContaining({ code: ERROR_CODE_BINDING_SCOPE }));
+    ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_BINDING_SCOPE }));
     expect(() =>
       bindDynamicValue(container, {
         factory: () => "my-value",

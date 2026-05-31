@@ -71,8 +71,8 @@ export class CommandBus {
 
     if (!stack?.length) {
       throw new WirestateError(
-        ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER,
-        `No command handler registered in container for type: '${String(type)}'.`
+        `No command handler registered in container for type: '${String(type)}'.`,
+        ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER
       );
     }
 
@@ -104,8 +104,8 @@ export class CommandBus {
     }
 
     throw new WirestateError(
-      ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER,
-      `No command handler registered in container for type: '${String(type)}'.`
+      `No command handler registered in container for type: '${String(type)}'.`,
+      ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER
     );
   }
 

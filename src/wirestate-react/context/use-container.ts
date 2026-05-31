@@ -29,8 +29,8 @@ export function useContainer(): Container {
 
   if (!value) {
     throw new WirestateError(
-      ERROR_CODE_INVALID_CONTEXT,
-      "Trying to access container context from React subtree not wrapped in <ContainerProvider>."
+      "Trying to access container context from React subtree not wrapped in <ContainerProvider>.",
+      ERROR_CODE_INVALID_CONTEXT
     );
   }
 

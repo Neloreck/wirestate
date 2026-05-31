@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { BindingType, Container, BindingScope, ServiceIdentifier } from "../alias";
-import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
+import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { ConstantValueBindingDescriptor } from "../types/provision";
 
@@ -25,19 +25,19 @@ function validateConstantDescriptor(descriptor: ConstantValueBindingDescriptor):
 
   if (descriptor.type !== undefined && descriptor.type !== BindingType.ConstantValue) {
     throw new WirestateError(
-      ERROR_CODE_INVALID_ARGUMENTS,
-      `bindConstant expected type '${BindingType.ConstantValue}'.`
+      `bindConstant expected type '${BindingType.ConstantValue}'.`,
+      ERROR_CODE_INVALID_ARGUMENTS
     );
   }
 
   if (descriptor.scope && descriptor.scope !== BindingScope.Singleton) {
-    throw new WirestateError(ERROR_CODE_BINDING_SCOPE, "Provided unexpected binding scope for constant value.");
+    throw new WirestateError("Provided unexpected binding scope for constant value.", ERROR_CODE_INVALID_BINDING_SCOPE);
   }
 
   if (!Object.prototype.hasOwnProperty.call(descriptor, "value")) {
     throw new WirestateError(
-      ERROR_CODE_INVALID_ARGUMENTS,
-      "Constant value descriptor must provide a 'value' property."
+      "Constant value descriptor must provide a 'value' property.",
+      ERROR_CODE_INVALID_ARGUMENTS
     );
   }
 }

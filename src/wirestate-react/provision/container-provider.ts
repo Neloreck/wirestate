@@ -102,23 +102,23 @@ export function ContainerProvider(props: ContainerProviderProps) {
 
   if (hasConfig && (configValue === null || typeof configValue !== "object" || Array.isArray(configValue))) {
     throw new WirestateError(
-      ERROR_CODE_VALIDATION_ERROR,
-      "ContainerProvider requires a valid container instance or creation config."
+      "ContainerProvider requires a valid container instance or creation config.",
+      ERROR_CODE_VALIDATION_ERROR
     );
   } else if (!props.container && !hasConfig) {
     throw new WirestateError(
-      ERROR_CODE_VALIDATION_ERROR,
-      "ContainerProvider requires a valid container instance or creation config."
+      "ContainerProvider requires a valid container instance or creation config.",
+      ERROR_CODE_VALIDATION_ERROR
     );
   } else if (props.container && hasConfig) {
     throw new WirestateError(
-      ERROR_CODE_VALIDATION_ERROR,
-      "ContainerProvider requires only container or valid config object to be provided."
+      "ContainerProvider requires only container or valid config object to be provided.",
+      ERROR_CODE_VALIDATION_ERROR
     );
   } else if (props.container !== undefined && !(props.container instanceof Container)) {
     throw new WirestateError(
-      ERROR_CODE_VALIDATION_ERROR,
-      "ContainerProvider requires a valid container instance or creation config."
+      "ContainerProvider requires a valid container instance or creation config.",
+      ERROR_CODE_VALIDATION_ERROR
     );
   }
 
@@ -143,8 +143,8 @@ export function ContainerProvider(props: ContainerProviderProps) {
 
   if (ownedRef.current !== owned) {
     throw new WirestateError(
-      ERROR_CODE_VALIDATION_ERROR,
-      "ContainerProvider cannot switch between external and managed container modes. Pass a React key to remount the provider."
+      "ContainerProvider cannot switch between external and managed container modes. Pass a React key to remount the provider.",
+      ERROR_CODE_VALIDATION_ERROR
     );
   }
 

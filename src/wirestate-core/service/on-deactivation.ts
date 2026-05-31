@@ -46,8 +46,8 @@ export function OnDeactivation(): MethodDecorator {
 
     if (DEACTIVATION_HANDLER_METADATA.has(constructor)) {
       throw new WirestateError(
-        ERROR_CODE_VALIDATION_ERROR,
-        `Only one @OnDeactivation method can be declared on service '${constructor.name}'.`
+        `Only one @OnDeactivation method can be declared on service '${constructor.name}'.`,
+        ERROR_CODE_VALIDATION_ERROR
       );
     }
 
@@ -91,9 +91,9 @@ export function getDeactivationHandlerMetadata(instance: object): Maybe<string |
     if (own) {
       if (handler && handler !== own) {
         throw new WirestateError(
-          ERROR_CODE_VALIDATION_ERROR,
           `Only one @OnDeactivation method can be declared across service hierarchy '${instance.constructor.name}'. ` +
-            `Found '${String(handler)}' on '${ownerName ?? "unknown"}' and '${String(own)}' on '${constructor.name}'.`
+            `Found '${String(handler)}' on '${ownerName ?? "unknown"}' and '${String(own)}' on '${constructor.name}'.`,
+          ERROR_CODE_VALIDATION_ERROR
         );
       }
 

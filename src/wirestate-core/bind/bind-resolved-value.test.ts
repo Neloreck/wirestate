@@ -1,5 +1,5 @@
 import { BindingType, Container, BindingScope, type ServiceIdentifier } from "../alias";
-import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
+import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { ResolvedValueBindingDescriptor } from "../types/provision";
 
 import { bindConstant } from "./bind-constant";
@@ -128,7 +128,7 @@ describe("bindResolvedValue", () => {
         token: "bad-scope",
         scope: "UNKNOWN",
       } as unknown as ResolvedValueBindingDescriptor)
-    ).toThrow(expect.objectContaining({ code: ERROR_CODE_BINDING_SCOPE }));
+    ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_BINDING_SCOPE }));
     expect(() =>
       bindResolvedValue(container, {
         type: BindingType.ResolvedValue,

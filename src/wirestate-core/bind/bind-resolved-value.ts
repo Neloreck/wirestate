@@ -29,13 +29,13 @@ function validateResolvedValueDescriptor<T, TArgs extends Array<unknown>>(
 
   if (descriptor.type !== BindingType.ResolvedValue) {
     throw new WirestateError(
-      ERROR_CODE_INVALID_ARGUMENTS,
-      `bindResolvedValue expected type '${BindingType.ResolvedValue}'.`
+      `bindResolvedValue expected type '${BindingType.ResolvedValue}'.`,
+      ERROR_CODE_INVALID_ARGUMENTS
     );
   }
 
   if (typeof descriptor.factory !== "function") {
-    throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, "Resolved value descriptor 'factory' must be a function.");
+    throw new WirestateError("Resolved value descriptor 'factory' must be a function.", ERROR_CODE_INVALID_ARGUMENTS);
   }
 }
 

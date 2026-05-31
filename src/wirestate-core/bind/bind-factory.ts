@@ -25,11 +25,11 @@ function validateFactoryDescriptor(descriptor: FactoryBindingDescriptor): void {
   validateBindingDescriptor(descriptor);
 
   if (descriptor.type !== BindingType.Factory) {
-    throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, `bindFactory expected type '${BindingType.Factory}'.`);
+    throw new WirestateError(`bindFactory expected type '${BindingType.Factory}'.`, ERROR_CODE_INVALID_ARGUMENTS);
   }
 
   if (typeof descriptor.factory !== "function") {
-    throw new WirestateError(ERROR_CODE_INVALID_ARGUMENTS, "Factory descriptor 'factory' must be a function.");
+    throw new WirestateError("Factory descriptor 'factory' must be a function.", ERROR_CODE_INVALID_ARGUMENTS);
   }
 }
 

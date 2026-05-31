@@ -185,8 +185,8 @@ export class QueryBus {
     }
 
     throw new WirestateError(
-      ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER,
-      `No query handler registered in container for type: '${String(type)}'.`
+      `No query handler registered in container for type: '${String(type)}'.`,
+      ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER
     );
   }
 
@@ -214,8 +214,8 @@ export class QueryBus {
     }
 
     throw new WirestateError(
-      ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER,
-      `No query handler registered in container for type: '${String(type)}'.`
+      `No query handler registered in container for type: '${String(type)}'.`,
+      ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER
     );
   }
 

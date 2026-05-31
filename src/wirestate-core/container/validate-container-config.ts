@@ -39,8 +39,8 @@ export function validateContainerConfig(config: ContainerConfig): void {
 
   if (!config.bindings?.length) {
     throw new WirestateError(
-      ERROR_CODE_VALIDATION_ERROR,
-      "Supplied activation list while container bindings are not provided."
+      "Supplied activation list while container bindings are not provided.",
+      ERROR_CODE_VALIDATION_ERROR
     );
   }
 
@@ -49,8 +49,8 @@ export function validateContainerConfig(config: ContainerConfig): void {
   for (const eager of activate) {
     if (!bindingTokens.includes(eager)) {
       throw new WirestateError(
-        ERROR_CODE_VALIDATION_ERROR,
-        `createContainer: '${String(eager)}' is listed in 'activate' but was not provided in 'bindings'.`
+        `createContainer: '${String(eager)}' is listed in 'activate' but was not provided in 'bindings'.`,
+        ERROR_CODE_VALIDATION_ERROR
       );
     }
   }
