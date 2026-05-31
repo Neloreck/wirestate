@@ -1,18 +1,33 @@
 # Lit Testing
 
-Test services with `createContainer`. Use `@wirestate/lit/test-utils` when an element needs a container context.
+Test services with `createContainer`. Use `ContainerProvider` when an element needs a container context.
 
-## Create a Lit Provision
+## Provide a Test Container
 
-`createLitProvision` creates a test host and publishes a container through Lit context.
+Create a small host element that publishes the test container through Lit context, then append tested elements under it.
 
 ```ts
-import { createContainer } from "@wirestate/core";
-import { injection } from "@wirestate/lit";
-import { createLitProvision, LitProvisionFixture } from "@wirestate/lit/test-utils";
-import { LitElement } from "lit";
+import { Container, createContainer } from "@wirestate/core";
+import { ContainerProvider, injection } from "@wirestate/lit";
+import { html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 import { CounterService } from "./CounterService";
+
+@customElement("test-host")
+class TestHost extends LitElement {
+  public container!: Container;
+
+  private provider?: ContainerProvider<this>;
+
+  public connectedCallback() {
+    this.provider = new ContainerProvider(this, { container: this.container });
+    super.connectedCallback();
+  }
+
+  public render() {
+    return html`<slot></slot>`;
+  }
+}
 
 @customElement("counter-view")
 class CounterView extends LitElement {
@@ -21,32 +36,34 @@ class CounterView extends LitElement {
 }
 
 describe("CounterView", () => {
-  let fixture: LitProvisionFixture;
+  let host: TestHost;
+  let container: Container;
 
   beforeEach(() => {
-    const container = createContainer({ bindings: [CounterService], activate: [CounterService] });
+    container = createContainer({ bindings: [CounterService], activate: [CounterService] });
+    host = new TestHost();
+    host.container = container;
 
-    fixture = createLitProvision(container);
+    document.body.appendChild(host);
   });
 
   afterEach(() => {
-    fixture.cleanup();
+    host.remove();
   });
 
   test("injects from the test container", () => {
     const element = new CounterView();
 
-    fixture.provider.appendChild(element);
+    host.appendChild(element);
 
-    expect(element.counter).toBe(fixture.container.get(CounterService));
+    expect(element.counter).toBe(container.get(CounterService));
   });
 });
 ```
 
-Append elements under `fixture.provider` so they can consume the provided context.
+Append elements under the host so they can consume the provided context.
 
 ## API Reference
 
-[`createLitProvision`](/api/wirestate-lit/test-utils/functions/createLitProvision),
-[`LitProvisionFixture`](/api/wirestate-lit/test-utils/interfaces/LitProvisionFixture),
+[`ContainerProvider`](/api/wirestate-lit/classes/ContainerProvider),
 [`createContainer`](/api/wirestate-core/functions/createContainer).

@@ -228,34 +228,6 @@ class MyQuerier extends LitElement {
 }
 ```
 
-## Test Utilities
-
-### `createLitProvision(container?)`
-
-Creates a test fixture with a provider element and an IoC container. Useful for unit testing components that use injections.
-
-```typescript
-import { createLitProvision } from "@wirestate/lit/test-utils";
-
-describe("MyComponent", () => {
-  let fixture: ReturnType<typeof createLitProvision>;
-
-  beforeEach(() => {
-    fixture = createLitProvision();
-  });
-
-  afterEach(() => {
-    fixture.cleanup();
-  });
-
-  it("should work", () => {
-    const el = document.createElement("my-component");
-    fixture.provider.appendChild(el);
-    // ...
-  });
-});
-```
-
 ## License
 
 MIT

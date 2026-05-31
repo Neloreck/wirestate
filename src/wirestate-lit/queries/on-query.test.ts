@@ -2,7 +2,7 @@ import { ReactiveElement } from "@lit/reactive-element";
 import { QueryBus } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
-import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
+import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
 
 import { onQuery } from "./on-query";
 

@@ -3,8 +3,7 @@
 ### Added
 
 - Add `@wirestate/lit` with Lit context provisioning, `ContainerProvider`, `provideContainer`,
-  `useContainerProvider`, injection decorators/controllers, event/command/query decorators, controllers, and test
-  utilities.
+  `useContainerProvider`, injection decorators/controllers, event/command/query decorators, and controllers.
 - Add `@wirestate/lit-signals` with `@lit-labs/signals` and `signal-polyfill` re-exports.
 - Add the compatibility `wirestate` package with core, React, React MobX, and React Signals entry points.
 - Add portable ESM bundle entry points for core, React MobX, React Signals, and Lit Signals targets.
@@ -64,7 +63,7 @@
 - Correct service activation cleanup when `@OnActivated` throws.
 - Keep Lit consumers from receiving undefined context notifications on disconnection.
 - Correct missing public exports and export-list tests for core, React, React MobX, React Signals, and Lit packages.
-- Correct package structure for React/Lit test utilities, compatibility packages, and portable bundles.
+- Correct package structure for compatibility packages and portable bundles.
 
 ### Removed
 
