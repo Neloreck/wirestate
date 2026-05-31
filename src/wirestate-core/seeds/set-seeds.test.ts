@@ -35,6 +35,23 @@ describe("setSeeds", () => {
     expect(state.has(GenericService)).toBe(true);
   });
 
+  it("should create a child seed map from inherited seeds", () => {
+    const parent: Container = createContainer({
+      seeds: [["ParentService", { parent: true }]],
+    });
+    const container: Container = createContainer({ parent });
+
+    setSeeds(container, [["ChildService", { child: true }]]);
+
+    const parentSeeds: SeedsMap = parent.get(SEEDS_TOKEN);
+    const childSeeds: SeedsMap = container.get(SEEDS_TOKEN);
+
+    expect(childSeeds).not.toBe(parentSeeds);
+    expect(parentSeeds.has("ChildService")).toBe(false);
+    expect(childSeeds.get("ParentService")).toEqual({ parent: true });
+    expect(childSeeds.get("ChildService")).toEqual({ child: true });
+  });
+
   it("should not rebind states token", () => {
     const container: Container = createContainer();
 

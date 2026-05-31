@@ -99,9 +99,9 @@ export interface CreateContainerOptions {
  * - Transient `WireScope`, so each service gets its own scope handle.
  * - Singleton default scope for normal services.
  *
- * Child containers inherit parent bindings, but get their own buses and seeds.
- * Think of a child container like a nested workbench: it can borrow parent
- * tools, but it keeps its own inbox.
+ * Child containers inherit parent bindings and seed defaults, but get their
+ * own buses. Passing `seed` or `seeds`, or calling seed helpers on a child,
+ * creates child-local seed state.
  *
  * @group Container
  *
@@ -147,8 +147,21 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
 
   container.bind(CONTAINER_PARENT_TOKEN).toConstantValue(config.parent);
   container.bind(Container).toConstantValue(container);
-  container.bind(SEEDS_TOKEN).toConstantValue(new Map() as SeedsMap);
-  container.bind(SEED_TOKEN).toConstantValue(config.seed ?? {});
+
+  // Merge with parent seeds map.
+  container
+    .bind(SEEDS_TOKEN)
+    .toConstantValue(
+      new Map(config.parent?.isBound(SEEDS_TOKEN) ? (config.parent.get<SeedsMap>(SEEDS_TOKEN) ?? []) : []) as SeedsMap
+    );
+
+  // Fallback to parent config as default value.
+  container
+    .bind(SEED_TOKEN)
+    .toConstantValue(
+      config.seed ?? (config.parent?.isBound(SEED_TOKEN) ? (config.parent.get<AnyObject>(SEED_TOKEN) ?? {}) : {})
+    );
+
   container
     .bind(WireScope)
     .toResolvedValue((): WireScope => new WireScope(container))

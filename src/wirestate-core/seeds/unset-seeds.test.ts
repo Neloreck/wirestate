@@ -33,6 +33,26 @@ describe("unsetSeeds", () => {
     expect(state.has(GenericService)).toBe(false);
   });
 
+  it("should remove inherited seeds from a child copy without changing the parent", () => {
+    const parent: Container = createContainer({
+      seeds: [
+        ["ParentService", { parent: true }],
+        ["SharedService", { shared: true }],
+      ],
+    });
+    const container: Container = createContainer({ parent });
+
+    unsetSeeds(container, [["ParentService", null]]);
+
+    const parentSeeds: SeedsMap = parent.get(SEEDS_TOKEN);
+    const childSeeds: SeedsMap = container.get(SEEDS_TOKEN);
+
+    expect(childSeeds).not.toBe(parentSeeds);
+    expect(parentSeeds.has("ParentService")).toBe(true);
+    expect(childSeeds.has("ParentService")).toBe(false);
+    expect(childSeeds.get("SharedService")).toEqual({ shared: true });
+  });
+
   it("should do nothing when targeted initial state is not bound", () => {
     const container: Container = createContainer();
     const seeds: SeedsMap = container.get(SEEDS_TOKEN);

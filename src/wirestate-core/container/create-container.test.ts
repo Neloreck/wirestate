@@ -138,38 +138,67 @@ describe("createContainer", () => {
     expect(getConfiguredWirestateInternalErrorHandler(container)).toBe(onError);
   });
 
-  it("should isolate Wirestate essentials from a Wirestate parent container", () => {
-    const parent: Container = createContainer();
+  it("should isolate messaging while inheriting parent seed defaults", () => {
+    const PARENT_TOKEN: unique symbol = Symbol("PARENT_TOKEN");
+    const PARENT_VALUE = { source: "parent-token" };
+
+    const parent: Container = createContainer({
+      seed: { source: "parent" },
+      seeds: [[PARENT_TOKEN, PARENT_VALUE]],
+    });
     const container: Container = createContainer({ parent });
 
     expect(container.get(EventBus)).not.toBe(parent.get(EventBus));
     expect(container.get(QueryBus)).not.toBe(parent.get(QueryBus));
     expect(container.get(CommandBus)).not.toBe(parent.get(CommandBus));
 
+    expect(container.isCurrentBound(SEEDS_TOKEN)).toBe(true);
     expect(container.get(SEEDS_TOKEN)).not.toBe(parent.get(SEEDS_TOKEN));
-    expect(container.get(SEEDS_TOKEN)).toEqual(parent.get(SEEDS_TOKEN));
-    expect(container.get(SEED_TOKEN)).not.toBe(parent.get(SEED_TOKEN));
-    expect(container.get(SEED_TOKEN)).toEqual(parent.get(SEED_TOKEN));
+    expect(container.get<Map<unknown, unknown>>(SEEDS_TOKEN).get(PARENT_TOKEN)).toBe(PARENT_VALUE);
+
+    expect(container.isCurrentBound(SEED_TOKEN)).toBe(true);
+    expect(container.get(SEED_TOKEN)).toBe(parent.get(SEED_TOKEN));
   });
 
-  it("should resolve parent seed bindings when a parent container is provided", () => {
-    const TEST_TOKEN: unique symbol = Symbol.for("TEST_TOKEN");
+  it("should inherit parent targeted seeds when child seeds are provided", () => {
+    const PARENT_TOKEN: unique symbol = Symbol("PARENT_TOKEN");
+    const CHILD_TOKEN: unique symbol = Symbol("CHILD_TOKEN");
 
     const parent: Container = createContainer({
       seed: { source: "parent" },
-      seeds: [[TEST_TOKEN, { source: "parent-token" }]],
+      seeds: [[PARENT_TOKEN, { source: "parent-token" }]],
     });
 
     const container: Container = createContainer({
       parent,
       seed: { source: "child" },
-      seeds: [[TEST_TOKEN, { source: "child-token" }]],
+      seeds: [[CHILD_TOKEN, { source: "child-token" }]],
     });
 
     expect(parent.get(SEED_TOKEN)).toEqual({ source: "parent" });
-    expect(parent.get<Map<unknown, unknown>>(SEEDS_TOKEN).get(TEST_TOKEN)).toEqual({ source: "parent-token" });
+    expect(parent.get<Map<unknown, unknown>>(SEEDS_TOKEN).size).toBe(1);
+    expect(parent.get<Map<unknown, unknown>>(SEEDS_TOKEN).get(PARENT_TOKEN)).toEqual({ source: "parent-token" });
 
+    expect(container.isCurrentBound(SEED_TOKEN)).toBe(true);
+    expect(container.isCurrentBound(SEEDS_TOKEN)).toBe(true);
     expect(container.get(SEED_TOKEN)).toEqual({ source: "child" });
+    expect(container.get<Map<unknown, unknown>>(SEEDS_TOKEN).size).toBe(2);
+    expect(container.get<Map<unknown, unknown>>(SEEDS_TOKEN).get(PARENT_TOKEN)).toEqual({ source: "parent-token" });
+    expect(container.get<Map<unknown, unknown>>(SEEDS_TOKEN).get(CHILD_TOKEN)).toEqual({ source: "child-token" });
+  });
+
+  it("should override parent targeted seeds with child targeted seeds", () => {
+    const TEST_TOKEN: unique symbol = Symbol("TEST_TOKEN");
+
+    const parent: Container = createContainer({
+      seeds: [[TEST_TOKEN, { source: "parent-token" }]],
+    });
+    const container: Container = createContainer({
+      parent,
+      seeds: [[TEST_TOKEN, { source: "child-token" }]],
+    });
+
+    expect(parent.get<Map<unknown, unknown>>(SEEDS_TOKEN).get(TEST_TOKEN)).toEqual({ source: "parent-token" });
     expect(container.get<Map<unknown, unknown>>(SEEDS_TOKEN).get(TEST_TOKEN)).toEqual({ source: "child-token" });
   });
 

@@ -25,6 +25,16 @@ describe("setSharedSeed", () => {
     expect(state).toEqual({ y: 2 });
   });
 
+  it("should bind child shared seed without changing inherited parent seed", () => {
+    const parent: Container = createContainer({ seed: { source: "parent" } });
+    const container: Container = createContainer({ parent });
+
+    setSharedSeed(container, { source: "child" });
+
+    expect(parent.get(SEED_TOKEN)).toEqual({ source: "parent" });
+    expect(container.get(SEED_TOKEN)).toEqual({ source: "child" });
+  });
+
   it("should not rebind states token", () => {
     const container: Container = createContainer();
 
