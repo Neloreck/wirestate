@@ -261,10 +261,10 @@ import { createContainer } from "@wirestate/core";
 Creates a configured IoC container for application code and tests. Use the first argument for reusable container config:
 
 | Config     | Type                                  | Description                                                                             |
-| ---------- | ------------------------------------- | --------------------------------------------------------------------------------------- |
+| ---------- |---------------------------------------| --------------------------------------------------------------------------------------- |
 | `activate` | `boolean \| Array<ServiceIdentifier>` | `true` to resolve all bindings, or specific tokens to resolve immediately after binding |
 | `bindings` | `Array<Newable \| BindingDescriptor>` | Services or descriptors to bind                                                         |
-| `onError`  | `WirestateInternalErrorHandler`       | Handles isolated internal errors; defaults to `console.error`                           |
+| `onError`  | `InternalErrorHandler`                | Handles isolated internal errors; defaults to `console.error`                           |
 | `parent`   | `Container`                           | Parent container for inherited bindings                                                 |
 | `seed`     | `object`                              | Shared seed object                                                                      |
 | `seeds`    | `SeedBindings`                        | Seed values keyed by service class, string, or symbol                                   |

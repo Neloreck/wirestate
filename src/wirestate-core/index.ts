@@ -22,12 +22,7 @@ export { validateContainerConfig } from "./container/validate-container-config";
 export { WireScope } from "./container/wire-scope";
 
 export { WirestateError } from "./error/wirestate-error";
-export {
-  defaultInternalErrorHandler,
-  InternalErrorDescriptor,
-  InternalErrorHandler,
-  InternalErrorSource,
-} from "./error/internal-error-handler";
+export { defaultInternalErrorHandler } from "./error/internal-error-handler";
 
 export { OnEvent } from "./events/on-event";
 export { EventBus } from "./events/event-bus";
@@ -43,6 +38,7 @@ export { OnDeprovision } from "./service/on-deprovision";
 export { OnProvision } from "./service/on-provision";
 
 export { CommandHandler, CommandType, CommandUnregister } from "./types/commands";
+export { InternalErrorHandler, InternalErrorDescriptor, InternalErrorSource } from "./types/error";
 export { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "./types/events";
 export {
   BindingDescriptor,

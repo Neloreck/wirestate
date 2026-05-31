@@ -1,7 +1,7 @@
 import { Container, ServiceIdentifier } from "./alias";
 import { WireScope } from "./container/wire-scope";
-import { InternalErrorHandler } from "./error/internal-error-handler";
 import { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
+import { InternalErrorHandler } from "./types/error";
 import { EventHandlerMetadata, EventUnsubscriber } from "./types/events";
 import { Binding } from "./types/provision";
 import { QueryHandlerMetadata, QueryUnregister } from "./types/queries";

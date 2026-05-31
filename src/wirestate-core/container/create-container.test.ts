@@ -4,7 +4,7 @@ import { BindingType, Container, Inject, Injectable } from "../alias";
 import { bind } from "../bind/bind";
 import { unbindAll } from "../bind/unbind";
 import { CommandBus } from "../commands/command-bus";
-import { getConfiguredWirestateInternalErrorHandler } from "../error/internal-error-handler";
+import { getConfiguredInternalErrorHandler } from "../error/internal-error-handler";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
 import { CONTAINER_PARENT_TOKEN, SEED_TOKEN, SEEDS_TOKEN } from "../registry";
@@ -30,7 +30,7 @@ describe("createContainer", () => {
     expect(container.isCurrentBound(SEEDS_TOKEN)).toBe(true);
     expect(container.isCurrentBound(SEED_TOKEN)).toBe(true);
     expect(container.isCurrentBound(WireScope)).toBe(true);
-    expect(getConfiguredWirestateInternalErrorHandler(container)).toBeUndefined();
+    expect(getConfiguredInternalErrorHandler(container)).toBeUndefined();
   });
 
   it("should bind core buses as singletons by default", () => {
@@ -127,7 +127,7 @@ describe("createContainer", () => {
     const onError = jest.fn();
     const container: Container = createContainer({ onError });
 
-    expect(getConfiguredWirestateInternalErrorHandler(container)).toBe(onError);
+    expect(getConfiguredInternalErrorHandler(container)).toBe(onError);
   });
 
   it("should inherit parent error handler when none is configured", () => {
@@ -135,7 +135,7 @@ describe("createContainer", () => {
     const parent: Container = createContainer({ onError });
     const container: Container = createContainer({ parent });
 
-    expect(getConfiguredWirestateInternalErrorHandler(container)).toBe(onError);
+    expect(getConfiguredInternalErrorHandler(container)).toBe(onError);
   });
 
   it("should isolate messaging while inheriting parent seed defaults", () => {

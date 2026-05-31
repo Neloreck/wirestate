@@ -5,14 +5,11 @@ import { Container, ServiceIdentifier } from "../alias";
 import { bind } from "../bind/bind";
 import { getBindingToken } from "../bind/get-binding-token";
 import { CommandBus } from "../commands/command-bus";
-import {
-  getConfiguredWirestateInternalErrorHandler,
-  setWirestateInternalErrorHandler,
-  InternalErrorHandler,
-} from "../error/internal-error-handler";
+import { getConfiguredInternalErrorHandler, setInternalErrorHandler } from "../error/internal-error-handler";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
 import { CONTAINER_PARENT_TOKEN, SEED_TOKEN, SEEDS_TOKEN } from "../registry";
+import { InternalErrorHandler } from "../types/error";
 import { AnyObject, Maybe } from "../types/general";
 import { Bindings } from "../types/provision";
 import { SeedBindings, SeedsMap } from "../types/seeds";
@@ -141,8 +138,7 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
     defaultScope: "Singleton",
     parent: config.parent,
   });
-  const errorHandler: Maybe<InternalErrorHandler> =
-    config.onError ?? getConfiguredWirestateInternalErrorHandler(config.parent);
+  const errorHandler: Maybe<InternalErrorHandler> = config.onError ?? getConfiguredInternalErrorHandler(config.parent);
 
   container.bind(CONTAINER_PARENT_TOKEN).toConstantValue(config.parent);
   container.bind(Container).toConstantValue(container);
@@ -173,7 +169,7 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
     .inTransientScope();
 
   if (errorHandler) {
-    setWirestateInternalErrorHandler(container, errorHandler);
+    setInternalErrorHandler(container, errorHandler);
   }
 
   if (!options.skipMessaging) {
