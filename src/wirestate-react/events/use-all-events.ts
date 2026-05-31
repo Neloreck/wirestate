@@ -20,12 +20,12 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  *
  * @example
  * ```tsx
- * useEventsHandler((event) => {
+ * useAllEvents((event) => {
  *   console.log("Event received:", event.type, event.payload);
  * });
  * ```
  */
-export function useEventsHandler(handler: EventHandler): void {
+export function useAllEvents(handler: EventHandler): void {
   const handlerRef: RefObject<Maybe<EventHandler>> = useRef(handler);
   const container: Container = useContainer();
 

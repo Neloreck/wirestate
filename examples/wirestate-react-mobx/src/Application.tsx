@@ -3,7 +3,7 @@ import "./Application.css";
 import {
   useInjection,
   useEvent,
-  useEventsHandler,
+  useAllEvents,
   useEvents,
 } from "@wirestate/react";
 import { observer } from "@wirestate/react-mobx";
@@ -28,7 +28,7 @@ export const Application = observer(() => {
     console.info("[Application] Counter was reset (array of events)");
   });
 
-  useEventsHandler((event) => {
+  useAllEvents((event) => {
     console.info(
       "[Application] Log all events:",
       event.type,

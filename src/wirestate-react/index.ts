@@ -13,9 +13,9 @@ export { useCommandHandler } from "./commands/use-command-handler";
 export { useContainer } from "./context/use-container";
 export { useScope } from "./context/use-scope";
 
+export { useAllEvents } from "./events/use-all-events";
 export { useEvent } from "./events/use-event";
 export { useEvents } from "./events/use-events";
-export { useEventsHandler } from "./events/use-events-handler";
 export { useEventEmitter } from "./events/use-event-emitter";
 
 export { useInjection } from "./injection/use-injection";

@@ -4,9 +4,9 @@ import { useLayoutEffect } from "react";
 
 import { ContainerProvider } from "../provision/container-provider";
 
-import { useEventsHandler } from "./use-events-handler";
+import { useAllEvents } from "./use-all-events";
 
-describe("useEventsHandler", () => {
+describe("useAllEvents", () => {
   afterEach(() => {
     cleanup();
   });
@@ -17,7 +17,7 @@ describe("useEventsHandler", () => {
     const handler = jest.fn();
 
     function TestComponent(): null {
-      useEventsHandler(handler);
+      useAllEvents(handler);
 
       return null;
     }
@@ -44,7 +44,7 @@ describe("useEventsHandler", () => {
     const handler = jest.fn();
 
     function TestComponent() {
-      useEventsHandler(handler);
+      useAllEvents(handler);
 
       return null;
     }
@@ -80,7 +80,7 @@ describe("useEventsHandler", () => {
     const handler2 = jest.fn();
 
     function TestComponent({ fire, handler }: { fire: boolean; handler: jest.Mock }) {
-      useEventsHandler(handler);
+      useAllEvents(handler);
 
       useLayoutEffect(() => {
         if (fire) {

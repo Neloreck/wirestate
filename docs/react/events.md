@@ -47,10 +47,10 @@ function CartActivity() {
 ## Listen To All Events
 
 ```tsx
-import { useEventsHandler } from "@wirestate/react";
+import { useAllEvents } from "@wirestate/react";
 
 function EventLog() {
-  useEventsHandler((event) => {
+  useAllEvents((event) => {
     console.log(event.type);
   });
 
@@ -63,4 +63,4 @@ Subscriptions unregister when the component unmounts or the active container cha
 ## API Reference
 
 [`useEventEmitter`](/api/wirestate-react/functions/useEventEmitter), [`useEvent`](/api/wirestate-react/functions/useEvent),
-[`useEvents`](/api/wirestate-react/functions/useEvents), [`useEventsHandler`](/api/wirestate-react/functions/useEventsHandler).
+[`useEvents`](/api/wirestate-react/functions/useEvents), [`useAllEvents`](/api/wirestate-react/functions/useAllEvents).

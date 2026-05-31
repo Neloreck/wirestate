@@ -146,12 +146,12 @@ useEvents(["RESET", "CLEAR"], (event) => {
 });
 ```
 
-### `useEventsHandler(handler)`
+### `useAllEvents(handler)`
 
 Subscribes to all events. The handler receives the event type and payload.
 
 ```tsx
-useEventsHandler((event) => {
+useAllEvents((event) => {
   logger.log(event.type, event.payload);
 });
 ```

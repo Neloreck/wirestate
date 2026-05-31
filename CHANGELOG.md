@@ -31,6 +31,7 @@
 - Make `QueryBus.query` and `QueryBus.queryOptional` synchronous by default, with async variants for Promise-normalized
   consumers.
 - Rename React command/query APIs from `Caller` naming to `Executor` naming.
+- Rename React `useEventsHandler` to `useAllEvents`.
 - Change event emitters to accept `(type, payload?, options?)` with `options.from` instead of a positional source
   argument.
 - Split React `ContainerProvider` props into external `container` mode and managed `config` mode; managed providers

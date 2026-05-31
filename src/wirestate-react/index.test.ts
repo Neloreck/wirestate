@@ -2,8 +2,8 @@ describe("Library exported API from wirestate-react", () => {
   const libRoot = require("./index");
 
   const expectedLibExports: Array<string> = [
-    "AsyncQueryExecutor",
     "AsyncCommandExecutor",
+    "AsyncQueryExecutor",
     "CommandExecutor",
     "ContainerProvider",
     "ContainerProviderProps",
@@ -13,6 +13,7 @@ describe("Library exported API from wirestate-react", () => {
     "OptionalCommandExecutor",
     "OptionalQueryExecutor",
     "QueryExecutor",
+    "useAllEvents",
     "useAsyncCommandExecutor",
     "useAsyncQueryExecutor",
     "useCommandExecutor",
@@ -21,7 +22,6 @@ describe("Library exported API from wirestate-react", () => {
     "useEvent",
     "useEventEmitter",
     "useEvents",
-    "useEventsHandler",
     "useInjection",
     "useOptionalAsyncCommandExecutor",
     "useOptionalAsyncQueryExecutor",
