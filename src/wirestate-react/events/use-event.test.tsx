@@ -2,7 +2,7 @@ import { render, cleanup, act } from "@testing-library/react";
 import { Container, EventBus, createContainer } from "@wirestate/core";
 import { useLayoutEffect } from "react";
 
-import { withContainerProvider } from "../test-utils/with-container-provider";
+import { ContainerProvider } from "../provision/container-provider";
 
 import { useEvent } from "./use-event";
 
@@ -22,7 +22,11 @@ describe("useEvent", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     act(() => bus.emit("X"));
     act(() => bus.emit("Y", 1));
@@ -45,7 +49,11 @@ describe("useEvent", () => {
 
     act(() => bus.emit("X"));
 
-    const { unmount } = render(withContainerProvider(<TestComponent />, container));
+    const { unmount } = render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     act(() => bus.emit("X"));
     act(() => bus.emit("X"));
@@ -81,10 +89,16 @@ describe("useEvent", () => {
     }
 
     const { rerender } = render(
-      withContainerProvider(<TestComponent fire={false} handler={handler1} type={"A"} />, container)
+      <ContainerProvider container={container}>
+        <TestComponent fire={false} handler={handler1} type={"A"} />
+      </ContainerProvider>
     );
 
-    rerender(withContainerProvider(<TestComponent fire={true} handler={handler2} type={"B"} />, container));
+    rerender(
+      <ContainerProvider container={container}>
+        <TestComponent fire={true} handler={handler2} type={"B"} />
+      </ContainerProvider>
+    );
 
     expect(handler1).not.toHaveBeenCalled();
     expect(handler2).toHaveBeenCalledWith({ type: "B", payload: "payload" });

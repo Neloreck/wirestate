@@ -1,7 +1,7 @@
 import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus, createContainer } from "@wirestate/core";
 
-import { withContainerProvider } from "../test-utils/with-container-provider";
+import { ContainerProvider } from "../provision/container-provider";
 import { AsyncCommandExecutor } from "../types/commands";
 
 import { useAsyncCommandExecutor } from "./use-async-command-executor";
@@ -27,7 +27,11 @@ describe("useAsyncCommandExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     await expect(executor<string, string>("TEST_COMMAND", "some-data")).resolves.toBe("some-data-result");
     expect(handler).toHaveBeenCalledWith("some-data");
@@ -47,7 +51,11 @@ describe("useAsyncCommandExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     await expect(executor<string, string>("ASYNC_COMMAND", "some-data")).resolves.toBe("some-data-result");
   });
@@ -62,7 +70,11 @@ describe("useAsyncCommandExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     await expect(executor("NOT_EXISTING", 1000)).rejects.toThrow(
       "No command handler registered in container for type: 'NOT_EXISTING'."

@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { Container, QueryBus, createContainer } from "@wirestate/core";
 
-import { withContainerProvider } from "../test-utils/with-container-provider";
+import { ContainerProvider } from "../provision/container-provider";
 import { AsyncQueryExecutor } from "../types/queries";
 
 import { useAsyncQueryExecutor } from "./use-async-query-executor";
@@ -24,7 +24,11 @@ describe("useAsyncQueryExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     const result: string = await (executor as AsyncQueryExecutor)("TEST_QUERY", "some-data");
 
@@ -47,7 +51,11 @@ describe("useAsyncQueryExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     const result: string = await (executor as AsyncQueryExecutor)("ASYNC_QUERY", "value");
 
@@ -68,7 +76,11 @@ describe("useAsyncQueryExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     await expect((executor as AsyncQueryExecutor)("NOT_EXISTING", "data")).rejects.toThrow(
       "No query handler registered in container for type: 'NOT_EXISTING'."
@@ -86,9 +98,17 @@ describe("useAsyncQueryExecutor", () => {
       return null;
     }
 
-    const { rerender } = render(withContainerProvider(<TestComponent />, container));
+    const { rerender } = render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
-    rerender(withContainerProvider(<TestComponent />, container));
+    rerender(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     expect(executors).toHaveLength(2);
     expect(executors[0]).toBe(executors[1]);
@@ -109,7 +129,11 @@ describe("useAsyncQueryExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     await expect((executor as AsyncQueryExecutor)(type)).resolves.toBe("symbol-result");
   });

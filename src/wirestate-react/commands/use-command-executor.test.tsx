@@ -1,7 +1,7 @@
 import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus, createContainer } from "@wirestate/core";
 
-import { withContainerProvider } from "../test-utils/with-container-provider";
+import { ContainerProvider } from "../provision/container-provider";
 import { CommandExecutor } from "../types/commands";
 import { Optional } from "../types/general";
 
@@ -26,7 +26,11 @@ describe("useCommandExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     const result: string = (executor as unknown as CommandExecutor)<string, string>("TEST_COMMAND", "some-data");
 
@@ -44,7 +48,11 @@ describe("useCommandExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     expect(() => (executor as unknown as CommandExecutor)("NOT_EXISTING", 1000)).toThrow(
       "No command handler registered in container for type: 'NOT_EXISTING'."

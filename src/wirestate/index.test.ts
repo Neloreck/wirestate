@@ -24,11 +24,4 @@ describe("Library exported API from wirestate", () => {
 
     expect(Object.keys(signalsRoot).sort()).toEqual(exportedKeys(reactSignalsRoot));
   });
-
-  it("should export current React test utils from wirestate/test-utils", () => {
-    const testUtilsRoot = require("./test-utils") as Record<string, unknown>;
-    const reactTestUtilsRoot = require("../wirestate-react/test-utils") as Record<string, unknown>;
-
-    expect(Object.keys(testUtilsRoot).sort()).toEqual(exportedKeys(reactTestUtilsRoot));
-  });
 });

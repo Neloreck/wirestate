@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { Container, createContainer } from "@wirestate/core";
 
-import { withContainerProvider } from "../test-utils/with-container-provider";
+import { ContainerProvider } from "../provision/container-provider";
 import { Optional } from "../types/general";
 
 import { useContainer } from "./use-container";
@@ -17,7 +17,11 @@ describe("useContainer", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     expect(componentContainer).not.toBeNull();
     expect(componentContainer).toBeInstanceOf(Container);

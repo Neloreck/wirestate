@@ -12,10 +12,7 @@ export const PACKAGES = [
   },
   {
     name: "wirestate-react",
-    entries: [
-      path.resolve(SRC_PATH, "wirestate-react/index.ts"),
-      path.resolve(SRC_PATH, "wirestate-react/test-utils.ts"),
-    ],
+    entries: [path.resolve(SRC_PATH, "wirestate-react/index.ts")],
     external: [...EXTERNAL_DEPENDENCIES, "@wirestate/core"],
   },
   {
@@ -42,7 +39,6 @@ export const PACKAGES = [
     name: "wirestate",
     entries: [
       path.resolve(SRC_PATH, "wirestate/index.ts"),
-      path.resolve(SRC_PATH, "wirestate/test-utils.ts"),
       path.resolve(SRC_PATH, "wirestate/mobx.ts"),
       path.resolve(SRC_PATH, "wirestate/signals.ts"),
     ],

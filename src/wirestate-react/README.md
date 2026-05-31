@@ -258,14 +258,6 @@ Returns the current `WireScope` linked to the nearest container.
 Use `scope.isInactive` as the usual async guard in services; it becomes `true` after service disposal or provider
 deprovision.
 
-## Test utilities
-
-```ts
-import { withContainerProvider } from "@wirestate/react/test-utils";
-```
-
-`withContainerProvider(children, container?)` wraps a React tree with a `ContainerProvider` for use in tests.
-
 ## License
 
 MIT

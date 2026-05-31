@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import { Container, QueryBus, createContainer } from "@wirestate/core";
 import { useLayoutEffect } from "react";
 
-import { withContainerProvider } from "../test-utils/with-container-provider";
+import { ContainerProvider } from "../provision/container-provider";
 import { AnyObject } from "../types/general";
 
 import { useQueryHandler } from "./use-query-handler";
@@ -21,7 +21,11 @@ describe("useQueryHandler", () => {
 
     expect(bus.has("TEST_QUERY")).toBe(false);
 
-    const { unmount } = render(withContainerProvider(<TestComponent />, container));
+    const { unmount } = render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     expect(bus.has("TEST_QUERY")).toBe(true);
 
@@ -48,11 +52,19 @@ describe("useQueryHandler", () => {
       return null;
     }
 
-    const { rerender } = render(withContainerProvider(<TestComponent handler={handler1} />, container));
+    const { rerender } = render(
+      <ContainerProvider container={container}>
+        <TestComponent handler={handler1} />
+      </ContainerProvider>
+    );
 
     expect(bus.query("TEST_QUERY")).toBe("result1");
 
-    rerender(withContainerProvider(<TestComponent handler={handler2} />, container));
+    rerender(
+      <ContainerProvider container={container}>
+        <TestComponent handler={handler2} />
+      </ContainerProvider>
+    );
 
     expect(bus.query("TEST_QUERY")).toBe("result2");
   });
@@ -68,12 +80,20 @@ describe("useQueryHandler", () => {
       return null;
     }
 
-    const { rerender } = render(withContainerProvider(<TestComponent type={"QUERY_A"} />, container));
+    const { rerender } = render(
+      <ContainerProvider container={container}>
+        <TestComponent type={"QUERY_A"} />
+      </ContainerProvider>
+    );
 
     expect(bus.has("QUERY_A")).toBe(true);
     expect(bus.has("QUERY_B")).toBe(false);
 
-    rerender(withContainerProvider(<TestComponent type={"QUERY_B"} />, container));
+    rerender(
+      <ContainerProvider container={container}>
+        <TestComponent type={"QUERY_B"} />
+      </ContainerProvider>
+    );
 
     expect(bus.has("QUERY_A")).toBe(false);
     expect(bus.has("QUERY_B")).toBe(true);
@@ -92,13 +112,19 @@ describe("useQueryHandler", () => {
     }
 
     const { rerender, unmount } = render(
-      withContainerProvider(<TestComponent type={"QUERY"} handler={handler1} />, container)
+      <ContainerProvider container={container}>
+        <TestComponent type={"QUERY"} handler={handler1} />
+      </ContainerProvider>
     );
 
     expect(bus.has("QUERY")).toBe(true);
     expect(bus.query("QUERY")).toBe("value1");
 
-    rerender(withContainerProvider(<TestComponent type={"QUERY"} handler={handler2} />, container));
+    rerender(
+      <ContainerProvider container={container}>
+        <TestComponent type={"QUERY"} handler={handler2} />
+      </ContainerProvider>
+    );
 
     expect(bus.has("QUERY")).toBe(true);
     expect(bus.query("QUERY")).toBe("value2");
@@ -129,11 +155,19 @@ describe("useQueryHandler", () => {
       return null;
     }
 
-    const { rerender } = render(withContainerProvider(<TestComponent fire={false} handler={handler1} />, container));
+    const { rerender } = render(
+      <ContainerProvider container={container}>
+        <TestComponent fire={false} handler={handler1} />
+      </ContainerProvider>
+    );
 
     expect(result).toBeUndefined();
 
-    rerender(withContainerProvider(<TestComponent fire={true} handler={handler2} />, container));
+    rerender(
+      <ContainerProvider container={container}>
+        <TestComponent fire={true} handler={handler2} />
+      </ContainerProvider>
+    );
 
     expect(result).toBe("result2");
     expect(handler1).not.toHaveBeenCalled();
@@ -151,7 +185,11 @@ describe("useQueryHandler", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     const result: string = await bus.queryAsync<string>("ASYNC_QUERY", "input");
 

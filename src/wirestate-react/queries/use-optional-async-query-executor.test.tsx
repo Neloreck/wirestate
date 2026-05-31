@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { Container, QueryBus, createContainer } from "@wirestate/core";
 
-import { withContainerProvider } from "../test-utils/with-container-provider";
+import { ContainerProvider } from "../provision/container-provider";
 import { Optional } from "../types/general";
 import { OptionalAsyncQueryExecutor } from "../types/queries";
 
@@ -25,7 +25,11 @@ describe("useOptionalAsyncQueryExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     const result: Optional<string> = await (executor as OptionalAsyncQueryExecutor)("TEST_QUERY", "some-data");
 
@@ -47,7 +51,11 @@ describe("useOptionalAsyncQueryExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     const result: Optional<string> = await (executor as OptionalAsyncQueryExecutor)("NOT_EXISTING", "data");
 
@@ -69,7 +77,11 @@ describe("useOptionalAsyncQueryExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     const result: Optional<string> = await (executor as OptionalAsyncQueryExecutor)("ASYNC_QUERY", "value");
 
@@ -86,9 +98,17 @@ describe("useOptionalAsyncQueryExecutor", () => {
       return null;
     }
 
-    const { rerender } = render(withContainerProvider(<TestComponent />, container));
+    const { rerender } = render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
-    rerender(withContainerProvider(<TestComponent />, container));
+    rerender(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     expect(executors).toHaveLength(2);
     expect(executors[0]).toBe(executors[1]);
@@ -109,7 +129,11 @@ describe("useOptionalAsyncQueryExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     await expect((executor as OptionalAsyncQueryExecutor)(type)).resolves.toBe("symbol-result");
   });

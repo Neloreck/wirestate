@@ -1,7 +1,7 @@
 import { render } from "@testing-library/react";
 import { Container, EventBus, createContainer } from "@wirestate/core";
 
-import { withContainerProvider } from "../test-utils/with-container-provider";
+import { ContainerProvider } from "../provision/container-provider";
 import { EventEmitter } from "../types/events";
 
 import { useEventEmitter } from "./use-event-emitter";
@@ -24,7 +24,11 @@ describe("useEventEmitter", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     (emitter as EventEmitter)("TEST_EVENT", { foo: "bar" }, { from: "source" });
 

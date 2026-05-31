@@ -3,7 +3,7 @@ import { Container, Injectable, Newable, createContainer } from "@wirestate/core
 
 import { ErrorLogBoundary } from "@/fixtures/react-components/error-log-boundary";
 
-import { withContainerProvider } from "../test-utils/with-container-provider";
+import { ContainerProvider } from "../provision/container-provider";
 
 import { useInjection } from "./use-injection";
 
@@ -21,11 +21,11 @@ describe("useInjection", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     const { getByText } = render(
-      withContainerProvider(
+      <ContainerProvider container={createContainer()}>
         <ErrorLogBoundary>
           <TestComponent />
         </ErrorLogBoundary>
-      )
+      </ContainerProvider>
     );
 
     consoleSpy.mockRestore();
@@ -36,7 +36,11 @@ describe("useInjection", () => {
   it("should resolve bound service from container", () => {
     const container: Container = createContainer({ bindings: [SimpleService] });
 
-    const { getByTestId } = render(withContainerProvider(<TestComponent />, container));
+    const { getByTestId } = render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     expect(getByTestId("injectable-name").textContent).toBe("SimpleService");
   });
@@ -71,12 +75,20 @@ describe("useInjection", () => {
       return originalGet(token);
     });
 
-    const { rerender } = render(withContainerProvider(<TestComponent />, container));
+    const { rerender } = render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     expect(resolveCount).toBe(1);
 
     for (let i = 0; i < 10; i++) {
-      rerender(withContainerProvider(<TestComponent />, container));
+      rerender(
+        <ContainerProvider container={container}>
+          <TestComponent />
+        </ContainerProvider>
+      );
     }
 
     // Should NOT re-resolve because container and revision didn't change.
@@ -90,11 +102,19 @@ describe("useInjection", () => {
       bindings: [SimpleService, AnotherService],
     });
 
-    const { rerender, getByTestId } = render(withContainerProvider(<TestComponent token={SimpleService} />, container));
+    const { rerender, getByTestId } = render(
+      <ContainerProvider container={container}>
+        <TestComponent token={SimpleService} />
+      </ContainerProvider>
+    );
 
     expect(getByTestId("injectable-name").textContent).toBe("SimpleService");
 
-    rerender(withContainerProvider(<TestComponent token={AnotherService} />, container));
+    rerender(
+      <ContainerProvider container={container}>
+        <TestComponent token={AnotherService} />
+      </ContainerProvider>
+    );
 
     expect(getByTestId("injectable-name").textContent).toBe("AnotherService");
   });

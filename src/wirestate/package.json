@@ -21,17 +21,6 @@
         "default": "./cjs/development/index.js"
       }
     },
-    "./test-utils": {
-      "types": "./test-utils.d.ts",
-      "import": {
-        "production": "./esm/production/wirestate/test-utils.js",
-        "default": "./esm/development/wirestate/test-utils.js"
-      },
-      "require": {
-        "production": "./cjs/production/test-utils.js",
-        "default": "./cjs/development/test-utils.js"
-      }
-    },
     "./mobx": {
       "types": "./mobx.d.ts",
       "import": {

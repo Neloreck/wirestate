@@ -6,8 +6,7 @@
   `useContainerProvider`, injection decorators/controllers, event/command/query decorators, controllers, and test
   utilities.
 - Add `@wirestate/lit-signals` with `@lit-labs/signals` and `signal-polyfill` re-exports.
-- Add the compatibility `wirestate` package with core, React, React MobX, React Signals, and React test-utils entry
-  points.
+- Add the compatibility `wirestate` package with core, React, React MobX, and React Signals entry points.
 - Add portable ESM bundle entry points for core, React MobX, React Signals, and Lit Signals targets.
 - Add `createContainer`, `ContainerConfig`, `CreateContainerOptions`, and `ContainerActivation` as the current container
   creation API.
@@ -18,7 +17,6 @@
   `isInactive`.
 - Add React `useContainer`, `useScope`, `useAsyncCommandExecutor`, `useOptionalAsyncCommandExecutor`,
   `useAsyncQueryExecutor`, and `useOptionalAsyncQueryExecutor`.
-- Add React `withContainerProvider` test utility and `@wirestate/react/test-utils` package export entries.
 - Add expanded MobX, React Signals, Lit Signals, and Inversify alias exports.
 - Add scoped-bus, seed, service shadowing, lifecycle, SSR, package-consumption, and provider replacement regression tests.
 

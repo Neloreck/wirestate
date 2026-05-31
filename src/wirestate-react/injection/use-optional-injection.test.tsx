@@ -3,7 +3,7 @@ import { Container, ServiceIdentifier, createContainer } from "@wirestate/core";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { withContainerProvider } from "../test-utils/with-container-provider";
+import { ContainerProvider } from "../provision/container-provider";
 import { AnyObject, Optional } from "../types/general";
 
 import { useOptionalInjection } from "./use-optional-injection";
@@ -25,7 +25,9 @@ describe("useOptionalInjection", () => {
     const container: Container = createContainer();
 
     const { getByTestId } = render(
-      withContainerProvider(<TestComponent token={Symbol("optional-token")} />, container)
+      <ContainerProvider container={container}>
+        <TestComponent token={Symbol("optional-token")} />
+      </ContainerProvider>
     );
 
     expect(getByTestId("injectable-name").textContent).toBe("null");
@@ -36,7 +38,11 @@ describe("useOptionalInjection", () => {
       bindings: [GenericService],
     });
 
-    const { getByTestId } = render(withContainerProvider(<TestComponent token={GenericService} />, container));
+    const { getByTestId } = render(
+      <ContainerProvider container={container}>
+        <TestComponent token={GenericService} />
+      </ContainerProvider>
+    );
 
     expect(getByTestId("injectable-name").textContent).toBe(GenericService.name);
   });
@@ -51,7 +57,11 @@ describe("useOptionalInjection", () => {
       return <div data-testid={"result"}>{data}</div>;
     }
 
-    const { getByTestId } = render(withContainerProvider(<FallbackComponent />, container));
+    const { getByTestId } = render(
+      <ContainerProvider container={container}>
+        <FallbackComponent />
+      </ContainerProvider>
+    );
 
     expect(getByTestId("result").textContent).toBe("fallback-value");
   });
@@ -66,7 +76,11 @@ describe("useOptionalInjection", () => {
       return <div data-testid={"result"}>{data}</div>;
     }
 
-    const { getByTestId } = render(withContainerProvider(<FallbackComponent />, container));
+    const { getByTestId } = render(
+      <ContainerProvider container={container}>
+        <FallbackComponent />
+      </ContainerProvider>
+    );
 
     expect(getByTestId("result").textContent).toBe("10");
   });
@@ -84,7 +98,11 @@ describe("useOptionalInjection", () => {
       return <div data-testid={"result"}>{data}</div>;
     }
 
-    const { getByTestId } = render(withContainerProvider(<FallbackComponent />, container));
+    const { getByTestId } = render(
+      <ContainerProvider container={container}>
+        <FallbackComponent />
+      </ContainerProvider>
+    );
 
     expect(getByTestId("result").textContent).toBe("bound-value");
   });
@@ -99,11 +117,19 @@ describe("useOptionalInjection", () => {
       return <div data-testid={"result"}>{data}</div>;
     }
 
-    const { getByTestId, rerender } = render(withContainerProvider(<FallbackComponent value={"first"} />, container));
+    const { getByTestId, rerender } = render(
+      <ContainerProvider container={container}>
+        <FallbackComponent value={"first"} />
+      </ContainerProvider>
+    );
 
     expect(getByTestId("result").textContent).toBe("first");
 
-    rerender(withContainerProvider(<FallbackComponent value={"second"} />, container));
+    rerender(
+      <ContainerProvider container={container}>
+        <FallbackComponent value={"second"} />
+      </ContainerProvider>
+    );
 
     expect(getByTestId("result").textContent).toBe("first");
   });
@@ -130,12 +156,20 @@ describe("useOptionalInjection", () => {
       return <div data-testid={"result"}>{data}</div>;
     }
 
-    const { getByTestId, rerender } = render(withContainerProvider(<FallbackComponent value={"first"} />, container));
+    const { getByTestId, rerender } = render(
+      <ContainerProvider container={container}>
+        <FallbackComponent value={"first"} />
+      </ContainerProvider>
+    );
 
     expect(getByTestId("result").textContent).toBe("bound-value");
     expect(resolveCount).toBe(1);
 
-    rerender(withContainerProvider(<FallbackComponent value={"second"} />, container));
+    rerender(
+      <ContainerProvider container={container}>
+        <FallbackComponent value={"second"} />
+      </ContainerProvider>
+    );
 
     expect(getByTestId("result").textContent).toBe("bound-value");
     expect(resolveCount).toBe(1);

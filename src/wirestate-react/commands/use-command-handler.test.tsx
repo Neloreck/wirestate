@@ -2,7 +2,7 @@ import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus, CommandHandler, createContainer } from "@wirestate/core";
 import { useLayoutEffect } from "react";
 
-import { withContainerProvider } from "../test-utils/with-container-provider";
+import { ContainerProvider } from "../provision/container-provider";
 
 import { useCommandHandler } from "./use-command-handler";
 
@@ -24,7 +24,11 @@ describe("useCommandHandler", () => {
 
     expect(bus.has("HOOK_COMMAND")).toBe(false);
 
-    const { unmount } = render(withContainerProvider(<TestComponent />, container));
+    const { unmount } = render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     expect(bus.has("HOOK_COMMAND")).toBe(true);
 
@@ -51,12 +55,20 @@ describe("useCommandHandler", () => {
       return null;
     }
 
-    const { rerender } = render(withContainerProvider(<TestComponent handler={handler1} />, container));
+    const { rerender } = render(
+      <ContainerProvider container={container}>
+        <TestComponent handler={handler1} />
+      </ContainerProvider>
+    );
 
     bus.execute("UPDATE_COMMAND");
     expect(handler1).toHaveBeenCalled();
 
-    rerender(withContainerProvider(<TestComponent handler={handler2} />, container));
+    rerender(
+      <ContainerProvider container={container}>
+        <TestComponent handler={handler2} />
+      </ContainerProvider>
+    );
 
     bus.execute("UPDATE_COMMAND");
     expect(handler2).toHaveBeenCalled();
@@ -81,9 +93,17 @@ describe("useCommandHandler", () => {
       return null;
     }
 
-    const { rerender } = render(withContainerProvider(<TestComponent fire={false} handler={handler1} />, container));
+    const { rerender } = render(
+      <ContainerProvider container={container}>
+        <TestComponent fire={false} handler={handler1} />
+      </ContainerProvider>
+    );
 
-    rerender(withContainerProvider(<TestComponent fire={true} handler={handler2} />, container));
+    rerender(
+      <ContainerProvider container={container}>
+        <TestComponent fire={true} handler={handler2} />
+      </ContainerProvider>
+    );
 
     expect(handler1).not.toHaveBeenCalled();
     expect(handler2).toHaveBeenCalled();

@@ -1,7 +1,7 @@
 import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus, createContainer } from "@wirestate/core";
 
-import { withContainerProvider } from "../test-utils/with-container-provider";
+import { ContainerProvider } from "../provision/container-provider";
 import { OptionalAsyncCommandExecutor } from "../types/commands";
 import { Optional } from "../types/general";
 
@@ -23,7 +23,11 @@ describe("useOptionalAsyncCommandExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     expect(executor as unknown).toBeInstanceOf(Function);
     await expect(executor("MISSING_CMD")).resolves.toBeNull();
@@ -44,7 +48,11 @@ describe("useOptionalAsyncCommandExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     const result: Optional<string> = await executor<string>("EXISTING_COMMAND");
 
@@ -65,7 +73,11 @@ describe("useOptionalAsyncCommandExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     await expect(executor<string>("ASYNC_COMMAND")).resolves.toBe("async-ok");
   });

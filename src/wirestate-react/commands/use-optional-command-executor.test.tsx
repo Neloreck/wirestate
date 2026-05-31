@@ -1,7 +1,7 @@
 import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus, createContainer } from "@wirestate/core";
 
-import { withContainerProvider } from "../test-utils/with-container-provider";
+import { ContainerProvider } from "../provision/container-provider";
 import { OptionalCommandExecutor } from "../types/commands";
 
 import { useOptionalCommandExecutor } from "./use-optional-command-executor";
@@ -22,7 +22,11 @@ describe("useOptionalCommandExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     expect(executor as unknown).toBeInstanceOf(Function);
     expect((executor as unknown as OptionalCommandExecutor)("MISSING_CMD")).toBeNull();
@@ -41,7 +45,11 @@ describe("useOptionalCommandExecutor", () => {
       return null;
     }
 
-    render(withContainerProvider(<TestComponent />, container));
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
 
     const result: string | null = (executor as OptionalCommandExecutor)<string>("EXISTING_COMMAND");
 
