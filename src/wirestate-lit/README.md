@@ -23,7 +23,6 @@ Lit component behavior is covered by the official [Lit docs](https://lit.dev/doc
   - **Commands**: Register command handlers using `@onCommand` or `useOnCommand`.
   - **Queries**: Register query handlers using `@onQuery` or `useOnQuery`.
 - **Container Provisioning**: Provide and manage containers within the Lit component tree using `@provideContainer` or `useContainerProvider`.
-- **Test Utilities**: Simplified setup for unit testing components with IoC dependencies.
 
 ## Provisioning
 

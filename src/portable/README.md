@@ -11,16 +11,11 @@ This directory contains entry points for building "portable" bundles of Wirestat
 - **Lit Signals (`wirestate-lit-signals.ts`)**
   - Bundles `@wirestate/core`, `@wirestate/lit`, and `@wirestate/lit-signals`.
   - Full Wirestate stack for Lit components using Signals for reactivity.
-  - Includes Lit test utilities.
 
 - **React MobX (`wirestate-react-mobx.ts`)**
   - Bundles `@wirestate/core`, `@wirestate/react`, and `@wirestate/react-mobx`.
   - Full Wirestate stack for React components using MobX for reactivity.
-  - Includes React test utilities.
 
 - **React Signals (`wirestate-react-signals.ts`)**
   - Bundles `@wirestate/core`, `@wirestate/react`, and `@wirestate/react-signals`.
   - Full Wirestate stack for React components using Preact Signals for reactivity.
-  - Includes React test utilities.
-
-Framework-specific entries re-export the matching framework test utilities.

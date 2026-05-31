@@ -102,10 +102,8 @@ export default defineConfig({
             items: [
               { text: "@wirestate/core", link: "/api/wirestate-core/" },
               { text: "@wirestate/lit", link: "/api/wirestate-lit/" },
-              { text: "@wirestate/lit/test-utils", link: "/api/wirestate-lit/test-utils/" },
               { text: "@wirestate/lit-signals", link: "/api/wirestate-lit-signals/" },
               { text: "@wirestate/react", link: "/api/wirestate-react/" },
-              { text: "@wirestate/react/test-utils", link: "/api/wirestate-react/test-utils/" },
               { text: "@wirestate/react-mobx", link: "/api/wirestate-react-mobx/" },
               { text: "@wirestate/react-signals", link: "/api/wirestate-react-signals/" },
             ],

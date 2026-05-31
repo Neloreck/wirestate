@@ -4,10 +4,8 @@
   "entryPoints": [
     "src/wirestate-core/index.ts",
     "src/wirestate-lit/index.ts",
-    "src/wirestate-lit/test-utils.ts",
     "src/wirestate-lit-signals/index.ts",
     "src/wirestate-react/index.ts",
-    "src/wirestate-react/test-utils.ts",
     "src/wirestate-react-mobx/index.ts",
     "src/wirestate-react-signals/index.ts"
   ],
