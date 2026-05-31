@@ -21,7 +21,7 @@ export {
   defaultInternalErrorHandler,
   InternalErrorDescriptor,
   InternalErrorHandler,
-  WirestateInternalErrorSource,
+  InternalErrorSource,
 } from "./error/internal-error-handler";
 
 export { OnEvent } from "./events/on-event";

@@ -9,7 +9,7 @@ import { WireEvent } from "../types/events";
  *
  * @group Error
  */
-export type WirestateInternalErrorSource =
+export type InternalErrorSource =
   | "event-handler"
   | "service-event-handler"
   | "service-activation"
@@ -66,7 +66,7 @@ export interface InternalErrorDescriptor {
   /**
    * Internal subsystem that caught the failure.
    */
-  readonly source: WirestateInternalErrorSource;
+  readonly source: InternalErrorSource;
 }
 
 /**

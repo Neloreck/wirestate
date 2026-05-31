@@ -61,7 +61,7 @@ describe("Library exported API from wirestate-core", () => {
     "WireEvent",
     "WireScope",
     "WirestateError",
-    "WirestateInternalErrorSource",
+    "WirestateErrorSource",
     "bind",
     "createContainer",
     "defaultInternalErrorHandler",
