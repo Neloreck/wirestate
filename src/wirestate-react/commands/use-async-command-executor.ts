@@ -1,5 +1,5 @@
 import { Container, CommandBus, CommandType } from "@wirestate/core";
-import { useCallback } from "react";
+import { useMemo } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -11,7 +11,7 @@ import { AsyncCommandExecutor } from "../types/commands";
  * Returns a stable function to dispatch async-capable commands on the active container.
  *
  * @remarks
- * The returned executor is memoized using `useCallback` and stays stable
+ * The returned executor is memoized using `useMemo` and stays stable
  * for the lifetime of the container. It uses {@link CommandBus.executeAsync} internally.
  *
  * @group Commands
@@ -30,15 +30,16 @@ import { AsyncCommandExecutor } from "../types/commands";
 export function useAsyncCommandExecutor(): AsyncCommandExecutor {
   const container: Container = useContainer();
 
-  return useCallback(
-    (type: CommandType, data?: unknown) => {
+  return useMemo(() => {
+    const bus: CommandBus = container.get(CommandBus);
+
+    return ((type: CommandType, data?: unknown) => {
       dbg.info(prefix(__filename), "Async command:", {
         type,
         data,
       });
 
-      return container.get(CommandBus).executeAsync(type, data);
-    },
-    [container]
-  ) as AsyncCommandExecutor;
+      return bus.executeAsync(type, data);
+    }) as AsyncCommandExecutor;
+  }, [container]);
 }

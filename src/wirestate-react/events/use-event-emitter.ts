@@ -1,5 +1,5 @@
 import { Container, EventBus, EventEmitOptions, EventType } from "@wirestate/core";
-import { useCallback } from "react";
+import { useMemo } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -11,7 +11,7 @@ import { EventEmitter } from "../types/events";
  * Returns a stable function to emit events via the {@link EventBus}.
  *
  * @remarks
- * The returned emitter is memoized using `useCallback` and stays stable
+ * The returned emitter is memoized using `useMemo` and stays stable
  * for the lifetime of the container.
  *
  * @group Events
@@ -32,16 +32,17 @@ import { EventEmitter } from "../types/events";
 export function useEventEmitter<P = unknown, T extends EventType = EventType, F = unknown>(): EventEmitter<P, T, F> {
   const container: Container = useContainer();
 
-  return useCallback(
-    <P, T extends EventType>(type: T, payload?: P, options?: EventEmitOptions<F>) => {
+  return useMemo(() => {
+    const bus: EventBus = container.get(EventBus);
+
+    return <P, T extends EventType>(type: T, payload?: P, options?: EventEmitOptions<F>) => {
       dbg.info(prefix(__filename), "Emit event:", {
         type,
         payload,
         options,
       });
 
-      container.get(EventBus).emit(type, payload, options);
-    },
-    [container]
-  );
+      bus.emit(type, payload, options);
+    };
+  }, [container]);
 }

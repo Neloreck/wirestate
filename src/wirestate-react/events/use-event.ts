@@ -40,5 +40,5 @@ export function useEvent(type: EventType, handler: EventHandler): void {
         handlerRef.current?.(event);
       }
     });
-  }, [container, type]);
+  }, [container]);
 }

@@ -1,5 +1,5 @@
 import { Container, QueryBus, QueryType } from "@wirestate/core";
-import { useCallback } from "react";
+import { useMemo } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -11,7 +11,7 @@ import { OptionalAsyncQueryExecutor } from "../types/queries";
  * Returns a stable function to dispatch optional async-capable queries on the active container.
  *
  * @remarks
- * The returned executor is memoized using `useCallback` and stays stable
+ * The returned executor is memoized using `useMemo` and stays stable
  * for the lifetime of the container. It returns `null` instead of throwing
  * if no handler is registered and uses {@link QueryBus.queryOptionalAsync} internally.
  *
@@ -32,15 +32,16 @@ import { OptionalAsyncQueryExecutor } from "../types/queries";
 export function useOptionalAsyncQueryExecutor(): OptionalAsyncQueryExecutor {
   const container: Container = useContainer();
 
-  return useCallback(
-    (type: QueryType, data?: unknown) => {
+  return useMemo(() => {
+    const bus: QueryBus = container.get(QueryBus);
+
+    return ((type: QueryType, data?: unknown) => {
       dbg.info(prefix(__filename), "Optional async query data:", {
         type,
         data,
       });
 
-      return container.get(QueryBus).queryOptionalAsync(type, data);
-    },
-    [container]
-  ) as OptionalAsyncQueryExecutor;
+      return bus.queryOptionalAsync(type, data);
+    }) as OptionalAsyncQueryExecutor;
+  }, [container]);
 }

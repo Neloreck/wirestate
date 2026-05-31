@@ -1,5 +1,5 @@
 import { Container, CommandBus, CommandType } from "@wirestate/core";
-import { useCallback } from "react";
+import { useMemo } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -11,7 +11,7 @@ import { CommandExecutor } from "../types/commands";
  * Returns a stable function to dispatch commands on the active container.
  *
  * @remarks
- * The returned executor is memoized using `useCallback` and stays stable
+ * The returned executor is memoized using `useMemo` and stays stable
  * for the lifetime of the container. It uses {@link CommandBus.execute} internally.
  *
  * @group Commands
@@ -30,15 +30,16 @@ import { CommandExecutor } from "../types/commands";
 export function useCommandExecutor(): CommandExecutor {
   const container: Container = useContainer();
 
-  return useCallback(
-    <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): R => {
+  return useMemo(() => {
+    const bus: CommandBus = container.get(CommandBus);
+
+    return <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): R => {
       dbg.info(prefix(__filename), "Command:", {
         type,
         data,
       });
 
-      return container.get(CommandBus).execute<R, D>(type, data);
-    },
-    [container]
-  );
+      return bus.execute<R, D>(type, data);
+    };
+  }, [container]);
 }

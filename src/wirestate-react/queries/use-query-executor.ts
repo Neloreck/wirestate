@@ -1,5 +1,5 @@
 import { Container, QueryBus, QueryType } from "@wirestate/core";
-import { useCallback } from "react";
+import { useMemo } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -11,7 +11,7 @@ import { QueryExecutor } from "../types/queries";
  * Returns a stable function to dispatch synchronous queries on the active container.
  *
  * @remarks
- * The returned executor is memoized using `useCallback` and stays stable
+ * The returned executor is memoized using `useMemo` and stays stable
  * for the lifetime of the container. It uses {@link QueryBus.query} internally.
  * Use {@link useAsyncQueryExecutor} when consumers should consistently receive a Promise.
  *
@@ -32,15 +32,16 @@ import { QueryExecutor } from "../types/queries";
 export function useQueryExecutor(): QueryExecutor {
   const container: Container = useContainer();
 
-  return useCallback(
-    (type: QueryType, data?: unknown) => {
+  return useMemo(() => {
+    const bus: QueryBus = container.get(QueryBus);
+
+    return ((type: QueryType, data?: unknown) => {
       dbg.info(prefix(__filename), "Query data:", {
         type,
         data,
       });
 
-      return container.get(QueryBus).query(type, data);
-    },
-    [container]
-  ) as QueryExecutor;
+      return bus.query(type, data);
+    }) as QueryExecutor;
+  }, [container]);
 }
