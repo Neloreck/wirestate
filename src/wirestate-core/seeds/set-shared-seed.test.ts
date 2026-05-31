@@ -1,6 +1,6 @@
 import { Container } from "../alias";
 import { mockContainer } from "../test-utils/mock-container";
-import { SeedsMap } from "../types/initial-state";
+import { SeedsMap } from "../types/seeds";
 
 import { setSharedSeed } from "./set-shared-seed";
 import { SEED_TOKEN } from "./tokens";

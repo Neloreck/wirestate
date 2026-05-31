@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { Container } from "../alias";
-import { SeedBindings, SeedsMap } from "../types/initial-state";
+import { SeedBindings, SeedsMap } from "../types/seeds";
 
 import { SEEDS_TOKEN } from "./tokens";
 

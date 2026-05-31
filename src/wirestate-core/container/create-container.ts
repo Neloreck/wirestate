@@ -10,8 +10,8 @@ import { QueryBus } from "../queries/query-bus";
 import { setSeeds } from "../seeds/set-seeds";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 import { AnyObject } from "../types/general";
-import { SeedBindings, SeedsMap } from "../types/initial-state";
 import { Bindings } from "../types/provision";
+import { SeedBindings, SeedsMap } from "../types/seeds";
 
 import { CONTAINER_PARENT_TOKEN } from "./tokens";
 import { validateContainerConfig } from "./validate-container-config";

@@ -11,8 +11,8 @@ import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 import { CommandHandler, CommandUnregister, CommandType } from "../types/commands";
 import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 import { Optional, AnyObject } from "../types/general";
-import { SeedKey, SeedsMap } from "../types/initial-state";
 import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
+import { SeedKey, SeedsMap } from "../types/seeds";
 
 /**
  * Per-service handle for container work.

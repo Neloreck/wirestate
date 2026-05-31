@@ -2,7 +2,7 @@ import { GenericService } from "@/fixtures/services/generic-service";
 
 import { Container } from "../alias";
 import { mockContainer } from "../test-utils/mock-container";
-import { SeedsMap } from "../types/initial-state";
+import { SeedsMap } from "../types/seeds";
 
 import { setSeeds } from "./set-seeds";
 import { SEEDS_TOKEN } from "./tokens";
