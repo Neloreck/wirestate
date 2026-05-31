@@ -54,4 +54,12 @@ describe("validateContainerConfig", () => {
       })
     ).toThrow("is listed in 'activate' but was not provided in 'bindings'.");
   });
+
+  it("should throw if onError is not a function", () => {
+    expect(() =>
+      validateContainerConfig({
+        onError: "not-a-function",
+      } as never)
+    ).toThrow("createContainer: 'onError' must be a function.");
+  });
 });

@@ -30,6 +30,10 @@ import type { ContainerConfig } from "./create-container";
  * ```
  */
 export function validateContainerConfig(config: ContainerConfig): void {
+  if (config.onError !== undefined && typeof config.onError !== "function") {
+    throw new WirestateError("createContainer: 'onError' must be a function.", ERROR_CODE_VALIDATION_ERROR);
+  }
+
   const activate: ReadonlyArray<ServiceIdentifier> =
     (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
 

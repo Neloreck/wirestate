@@ -1,5 +1,6 @@
 import { Container, ServiceIdentifier } from "./alias";
 import { WireScope } from "./container/wire-scope";
+import { InternalErrorHandler } from "./error/internal-error-handler";
 import { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
 import { EventHandlerMetadata, EventUnsubscriber } from "./types/events";
 import { Binding } from "./types/provision";
@@ -172,6 +173,14 @@ export const PROVISION_LIFECYCLES_BY_CONTAINER: WeakMap<Container, Set<Map<Conta
  * @internal
  */
 export const PROVISION_TOKENS_BY_SERVICE: WeakMap<object, Set<ServiceIdentifier>> = new WeakMap();
+
+/**
+ * Internal storage for container error handlers.
+ *
+ * @group Error
+ * @internal
+ */
+export const WIRESTATE_INTERNAL_ERROR_HANDLERS: WeakMap<Container, InternalErrorHandler> = new WeakMap();
 
 /**
  * Token used to expose a container's parent container through dependency injection.

@@ -1,6 +1,8 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { Container } from "../alias";
+import { reportWirestateInternalError } from "../error/internal-error-handler";
 import { EventDispatchEntry, EventHandler } from "../types/events";
 import { Optional } from "../types/general";
 
@@ -20,6 +22,7 @@ import { getEventHandlerMetadata } from "./get-event-handler-metadata";
  * @template T - Type of the service instance.
  *
  * @param instance - Service instance to scan for handlers.
+ * @param container - Container that owns the service instance.
  * @returns A unified event handler, or `null` if no handlers are declared.
  *
  * @example
@@ -31,7 +34,7 @@ import { getEventHandlerMetadata } from "./get-event-handler-metadata";
  * }
  * ```
  */
-export function buildEventDispatcher<T extends object>(instance: T): Optional<EventHandler> {
+export function buildEventDispatcher<T extends object>(instance: T, container?: Container): Optional<EventHandler> {
   dbg.info(prefix(__filename), "Build event dispatcher for:", { name: instance.constructor.name, instance });
 
   const entries: Array<EventDispatchEntry> = [];
@@ -62,7 +65,15 @@ export function buildEventDispatcher<T extends object>(instance: T): Optional<Ev
           try {
             entry.handler(event);
           } catch (error) {
-            console.error("[wirestate] Event handler threw:", error);
+            reportWirestateInternalError({
+              container,
+              error,
+              event,
+              message: "Event handler threw",
+              service: instance,
+              serviceName: instance.constructor.name,
+              source: "service-event-handler",
+            });
           }
         }
       }

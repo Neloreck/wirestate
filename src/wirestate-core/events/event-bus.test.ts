@@ -1,3 +1,4 @@
+import { createContainer } from "../container/create-container";
 import { EventUnsubscriber } from "../types/events";
 
 import { EventBus } from "./event-bus";
@@ -156,5 +157,28 @@ describe("EventBus", () => {
 
     expect(firstHandler).not.toHaveBeenCalled();
     expect(secondHandler).not.toHaveBeenCalled();
+  });
+
+  it("should report handler errors to container error handler", () => {
+    const error = new Error("handler error");
+    const onError = jest.fn();
+    const container = createContainer({ onError });
+    const bus: EventBus = container.get(EventBus);
+
+    bus.subscribe(() => {
+      throw error;
+    });
+
+    bus.emit("TEST", 42);
+
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        container,
+        error,
+        event: { type: "TEST", payload: 42 },
+        message: "Event handler threw",
+        source: "event-handler",
+      })
+    );
   });
 });

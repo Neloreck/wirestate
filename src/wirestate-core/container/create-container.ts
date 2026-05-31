@@ -5,11 +5,16 @@ import { Container, ServiceIdentifier } from "../alias";
 import { bind } from "../bind/bind";
 import { getBindingToken } from "../bind/get-binding-token";
 import { CommandBus } from "../commands/command-bus";
+import {
+  getConfiguredWirestateInternalErrorHandler,
+  setWirestateInternalErrorHandler,
+  InternalErrorHandler,
+} from "../error/internal-error-handler";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
 import { CONTAINER_PARENT_TOKEN, SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 import { setSeeds } from "../seeds/set-seeds";
-import { AnyObject } from "../types/general";
+import { AnyObject, Maybe } from "../types/general";
 import { Bindings } from "../types/provision";
 import { SeedBindings, SeedsMap } from "../types/seeds";
 
@@ -44,6 +49,12 @@ export interface ContainerConfig {
    * Parent container for inherited bindings.
    */
   readonly parent?: Container;
+
+  /**
+   * Handles isolated internal errors that Wirestate catches instead of
+   * rethrowing, such as event handler failures and lifecycle rejections.
+   */
+  readonly onError?: InternalErrorHandler;
 
   /**
    * Shared seed object. Read it with `scope.getSeed()` or inject `SEED`.
@@ -139,6 +150,8 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
     defaultScope: "Singleton",
     parent: config.parent,
   });
+  const errorHandler: Maybe<InternalErrorHandler> =
+    config.onError ?? getConfiguredWirestateInternalErrorHandler(config.parent);
 
   container.bind(CONTAINER_PARENT_TOKEN).toConstantValue(config.parent);
   container.bind(Container).toConstantValue(container);
@@ -149,12 +162,16 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
     .toResolvedValue((): WireScope => new WireScope(container))
     .inTransientScope();
 
+  if (errorHandler) {
+    setWirestateInternalErrorHandler(container, errorHandler);
+  }
+
   if (config.seeds) {
     setSeeds(container, config.seeds);
   }
 
   if (!options.skipMessaging) {
-    container.bind(EventBus).toConstantValue(new EventBus());
+    container.bind(EventBus).toConstantValue(new EventBus(container));
     container.bind(QueryBus).toConstantValue(new QueryBus());
     container.bind(CommandBus).toConstantValue(new CommandBus());
   }

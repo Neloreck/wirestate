@@ -5,6 +5,7 @@ import { BindingType, Container, ServiceIdentifier } from "../alias";
 import { getBindingToken } from "../bind/get-binding-token";
 import { hasWireScopeInjection } from "../bind/has-wire-scope-injection";
 import { getContainerBindings } from "../bind/register-binding";
+import { reportWirestateInternalError } from "../error/internal-error-handler";
 import {
   CONTAINER_REFS_BY_SERVICE,
   PROVISION_LIFECYCLES_BY_CONTAINER,
@@ -432,6 +433,7 @@ function isProviderLifecycleParticipant(token: ServiceIdentifier): boolean {
  */
 function callLifecycleHandler(service: object, methodName: string | symbol, decoratorName: string): void {
   const method: unknown = (service as Record<string | symbol, unknown>)[methodName];
+  const source = decoratorName === "@OnProvision" ? "provider-provision" : "provider-deprovision";
 
   if (typeof method !== "function") {
     return;
@@ -449,15 +451,28 @@ function callLifecycleHandler(service: object, methodName: string | symbol, deco
 
     if (result && typeof (result as Promise<void>).then === "function") {
       (result as Promise<void>).catch((error) => {
-        console.error(
-          "[wirestate] " + decoratorName + " rejected for:",
-          service.constructor.name,
-          String(methodName),
-          error
-        );
+        reportWirestateInternalError({
+          container: CONTAINER_REFS_BY_SERVICE.get(service),
+          details: [service.constructor.name, String(methodName)],
+          error,
+          message: decoratorName + " rejected",
+          methodName,
+          service,
+          serviceName: service.constructor.name,
+          source,
+        });
       });
     }
   } catch (error) {
-    console.error("[wirestate] " + decoratorName + " failed for:", service.constructor.name, String(methodName), error);
+    reportWirestateInternalError({
+      container: CONTAINER_REFS_BY_SERVICE.get(service),
+      details: [service.constructor.name, String(methodName)],
+      error,
+      message: decoratorName + " failed for",
+      methodName,
+      service,
+      serviceName: service.constructor.name,
+      source,
+    });
   }
 }

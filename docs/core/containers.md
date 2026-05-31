@@ -33,6 +33,26 @@ Eager activation is still resolution-time work. Do not use it to start resources
 lifecycle for that boundary: `provisionContainer`/`deprovisionContainer` in core, or the provider lifecycle exposed by a
 UI adapter.
 
+## Internal Errors
+
+Pass `onError` to route isolated internal errors to application logging.
+Without it, Wirestate reports them with `console.error`.
+
+```ts
+const container = createContainer({
+  bindings: [AuthService],
+  onError: (descriptor) => {
+    reportError(descriptor.error, {
+      source: descriptor.source,
+      service: descriptor.serviceName,
+    });
+  },
+});
+```
+
+Wirestate uses this for failures it catches to keep the container running, such as event handler errors and lifecycle
+hook rejections.
+
 ## Child Containers
 
 Pass `parent` to create a child container.

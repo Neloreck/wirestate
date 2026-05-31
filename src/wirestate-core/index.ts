@@ -22,6 +22,12 @@ export { validateContainerConfig } from "./container/validate-container-config";
 export { WireScope } from "./container/wire-scope";
 
 export { WirestateError } from "./error/wirestate-error";
+export {
+  defaultInternalErrorHandler,
+  InternalErrorDescriptor,
+  InternalErrorHandler,
+  WirestateInternalErrorSource,
+} from "./error/internal-error-handler";
 
 export { OnEvent } from "./events/on-event";
 export { EventBus } from "./events/event-bus";

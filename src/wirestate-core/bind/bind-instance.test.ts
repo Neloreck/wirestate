@@ -16,6 +16,7 @@ import { Optional } from "../types/general";
 import { InstanceBindingDescriptor } from "../types/provision";
 
 import { bindInstance, bindInstanceWithToken } from "./bind-instance";
+import { unbindAll } from "./unbind";
 
 interface ReflectMetadata {
   getMetadata?: (metadataKey: string, target: object) => unknown;
@@ -186,7 +187,7 @@ describe("bindInstance", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      "[wirestate] @OnActivated rejected for:",
+      "[wirestate] @OnActivated rejected:",
       "AsyncFailService",
       "onActivated",
       expect.any(Error)
@@ -299,13 +300,88 @@ describe("bindInstance", () => {
 
     expect(container.get(QueryBus).has("SYNC_FAIL_DEACTIVATION_QUERY")).toBe(false);
     expect(consoleSpy).toHaveBeenCalledWith(
-      "[wirestate] @OnDeactivation failed for:",
+      "[wirestate] @OnDeactivation failed:",
       "SyncFailDeactivationService",
       "onDeactivation",
       expect.any(Error)
     );
 
     consoleSpy.mockRestore();
+  });
+
+  it("should report async @OnActivated errors to container error handler", async () => {
+    const onError = jest.fn();
+    const container: Container = createContainer({
+      activate: true,
+      bindings: [AsyncFailService],
+      onError,
+    });
+
+    // Need to wait for next tick for the caught promise.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        container,
+        details: ["AsyncFailService", "onActivated"],
+        message: "@OnActivated rejected",
+        serviceName: "AsyncFailService",
+        source: "service-activation",
+      })
+    );
+  });
+
+  it("should keep configured error handler available during container cleanup", () => {
+    const onError = jest.fn();
+    const container: Container = createContainer({
+      activate: true,
+      bindings: [SyncFailDeactivationService],
+
+      onError,
+    });
+
+    expect(() => unbindAll(container)).not.toThrow();
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        container,
+        details: ["SyncFailDeactivationService", "onDeactivation"],
+        message: "@OnDeactivation failed",
+        serviceName: "SyncFailDeactivationService",
+        source: "service-deactivation",
+      })
+    );
+  });
+
+  it("should report decorated event handler errors to container error handler", () => {
+    const error = new Error("decorated-event-fail");
+    const onError = jest.fn();
+
+    @Injectable()
+    class FailingEventService {
+      @OnEvent("FAILING_EVENT")
+      public onEvent(): void {
+        throw error;
+      }
+    }
+
+    const container: Container = createContainer({
+      activate: true,
+      bindings: [FailingEventService],
+      onError,
+    });
+
+    container.get(EventBus).emit("FAILING_EVENT");
+
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        container,
+        error,
+        event: { type: "FAILING_EVENT" },
+        message: "Event handler threw",
+        serviceName: "FailingEventService",
+        source: "service-event-handler",
+      })
+    );
   });
 
   it("should handle non-function @OnQuery or @OnActivated properties during activation", () => {

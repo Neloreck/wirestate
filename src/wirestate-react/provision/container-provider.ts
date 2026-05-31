@@ -152,6 +152,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
     state &&
     normalizedSource &&
     (state.source.parent !== normalizedSource.parent ||
+      state.source.onError !== normalizedSource.onError ||
       !shallowEqualObjects(state.source.seed, normalizedSource.seed) ||
       !shallowEqualObjects(state.source.seeds as Maybe<AnyObject>, normalizedSource.seeds as Maybe<AnyObject>) ||
       !shallowEqualArrays(state.source.bindings, normalizedSource.bindings) ||

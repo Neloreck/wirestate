@@ -1,6 +1,8 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { Container } from "../alias";
+import { reportWirestateInternalError } from "../error/internal-error-handler";
 import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "../types/events";
 
 /**
@@ -26,6 +28,8 @@ import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent
  */
 export class EventBus {
   private readonly handlers: Set<EventHandler> = new Set();
+
+  public constructor(private readonly container?: Container) {}
 
   /**
    * Broadcasts an event to all subscribers.
@@ -57,23 +61,29 @@ export class EventBus {
     const snapshot: Array<EventHandler> = Array.from(this.handlers);
 
     for (const handler of snapshot) {
+      const event: WireEvent<P, T, F> = {
+        type,
+      };
+
+      if (payload !== undefined) {
+        (event as { payload: P }).payload = payload;
+      }
+
+      if (options?.from !== undefined) {
+        (event as { from: F }).from = options.from;
+      }
+
       try {
-        const event: WireEvent<P, T, F> = {
-          type,
-        };
-
-        if (payload !== undefined) {
-          (event as { payload: P }).payload = payload;
-        }
-
-        if (options?.from !== undefined) {
-          (event as { from: F }).from = options.from;
-        }
-
         handler(event);
       } catch (error) {
         // Prevent one failing listener from stalling the entire bus.
-        console.error("[wirestate] Event handler threw:", error);
+        reportWirestateInternalError({
+          container: this.container,
+          error,
+          event,
+          message: "Event handler threw",
+          source: "event-handler",
+        });
       }
     }
   }

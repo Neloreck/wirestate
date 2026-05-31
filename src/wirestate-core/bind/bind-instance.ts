@@ -8,6 +8,7 @@ import { CommandBus } from "../commands/command-bus";
 import { getCommandHandlerMetadata } from "../commands/get-command-handler-metadata";
 import { WireScope } from "../container/wire-scope";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
+import { reportWirestateInternalError } from "../error/internal-error-handler";
 import { WirestateError } from "../error/wirestate-error";
 import { buildEventDispatcher } from "../events/build-event-dispatcher";
 import { EventBus } from "../events/event-bus";
@@ -181,7 +182,7 @@ export function bindInstanceWithToken<T extends object>(
 
       // Compose all events listeners into a single bus subscription so we only
       // pay one Set lookup per emitted event.
-      const dispatcher: Optional<EventHandler> = buildEventDispatcher(instance);
+      const dispatcher: Optional<EventHandler> = buildEventDispatcher(instance, container);
 
       if (dispatcher) {
         attachEventsSubscription(instance, dispatcher);
@@ -243,7 +244,16 @@ export function bindInstanceWithToken<T extends object>(
 
             if (result && typeof (result as Promise<void>).then === "function") {
               (result as Promise<void>).catch((error) => {
-                console.error("[wirestate] @OnActivated rejected for:", binding.name, String(methodName), error);
+                reportWirestateInternalError({
+                  container,
+                  details: [binding.name, String(methodName)],
+                  error,
+                  message: "@OnActivated rejected",
+                  methodName,
+                  service: instance,
+                  serviceName: binding.name,
+                  source: "service-activation",
+                });
               });
             }
           }
@@ -289,17 +299,30 @@ export function bindInstanceWithToken<T extends object>(
 
             if (result && typeof (result as Promise<void>).then === "function") {
               (result as Promise<void>).catch((error) => {
-                console.error("[wirestate] @OnDeactivation rejected for:", binding.name, String(methodName), error);
+                reportWirestateInternalError({
+                  container,
+                  details: [binding.name, String(methodName)],
+                  error,
+                  message: "@OnDeactivation rejected",
+                  methodName,
+                  service: instance,
+                  serviceName: binding.name,
+                  source: "service-deactivation",
+                });
               });
             }
           }
         } catch (error) {
-          console.error(
-            "[wirestate] @OnDeactivation failed for:",
-            binding.name,
-            String(deactivationMethodName ?? "unknown"),
-            error
-          );
+          reportWirestateInternalError({
+            container,
+            details: [binding.name, String(deactivationMethodName ?? "unknown")],
+            error,
+            message: "@OnDeactivation failed",
+            methodName: deactivationMethodName ?? undefined,
+            service: instance,
+            serviceName: binding.name,
+            source: "service-deactivation",
+          });
         }
       }
     }
