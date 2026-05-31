@@ -91,14 +91,14 @@ export function optionalInjection<T, F = null>(
     nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, T | F>
   ): void => {
     const { once, token } = options;
-    const fallback: Optional<OptionalInjectionFallback<F>> = options.fallback ?? fallback ?? null;
+    const resolvedFallback: Optional<OptionalInjectionFallback<F>> = options.fallback ?? fallback ?? null;
 
     const resolve = (container: Container): T | F => {
       if (container.isBound(token)) {
         return container.get(token);
       }
 
-      return fallback ? fallback(container) : (null as F);
+      return resolvedFallback ? resolvedFallback(container) : (null as F);
     };
 
     // Standard decorators branch.

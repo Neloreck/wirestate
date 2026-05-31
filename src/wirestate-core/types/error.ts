@@ -1,5 +1,6 @@
-import { Container } from "@wirestate/core/alias";
-import { WireEvent } from "@wirestate/core/types/events";
+import { Container } from "../alias";
+
+import { WireEvent } from "./events";
 
 /**
  * Internal Wirestate error source.

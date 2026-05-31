@@ -100,7 +100,7 @@ export function useOptionalInjection<T, F = null>(
       : { token: optionsOrToken as ServiceIdentifier<T>, fallback: fallback };
 
   const { once, token, value } = options;
-  const fallback: Optional<OptionalInjectionFallback<F>> = options.fallback ?? fallback ?? null;
+  const resolvedFallback: Optional<OptionalInjectionFallback<F>> = options.fallback ?? fallback ?? null;
 
   dbg.info(prefix(__filename), "Creating:", {
     host,
@@ -122,25 +122,25 @@ export function useOptionalInjection<T, F = null>(
           token,
           name: (token as AnyObject)?.name ?? token,
           container,
-          fallback,
+          fallback: resolvedFallback,
         });
 
         current.value = container.get(token);
-      } else if (fallback) {
+      } else if (resolvedFallback) {
         dbg.info(prefix(__filename), "Injection not found, using fallback handler:", {
           token,
           name: (token as AnyObject)?.name ?? token,
           container,
-          fallback,
+          fallback: resolvedFallback,
         });
 
-        current.value = fallback(container);
+        current.value = resolvedFallback(container);
       } else {
         dbg.info(prefix(__filename), "Injection not found, returning null:", {
           token,
           name: (token as AnyObject)?.name ?? token,
           container,
-          fallback,
+          fallback: resolvedFallback,
         });
 
         current.value = null as F;
