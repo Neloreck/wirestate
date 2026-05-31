@@ -29,6 +29,9 @@ commits. In Strict Mode, React can create an extra container, discard it, then c
 subscriptions, sockets, and provider-scoped async work in `@OnProvision`, and clean them up in `@OnDeprovision`.
 Write provision hooks so setup can be fully undone and run again.
 
+Managed providers recreate the container when `parent`, `seed`, `seeds`, `bindings`, or `activate` changes by shallow
+comparison. Keep config objects and arrays stable with `useMemo` when the container should not be replaced.
+
 ## External Root Container
 
 Pass `container` when ownership stays with your code.

@@ -101,7 +101,6 @@ export default defineConfig({
             text: "Packages",
             items: [
               { text: "@wirestate/core", link: "/api/wirestate-core/" },
-              { text: "@wirestate/core/test-utils", link: "/api/wirestate-core/test-utils/" },
               { text: "@wirestate/lit", link: "/api/wirestate-lit/" },
               { text: "@wirestate/lit/test-utils", link: "/api/wirestate-lit/test-utils/" },
               { text: "@wirestate/lit-signals", link: "/api/wirestate-lit-signals/" },

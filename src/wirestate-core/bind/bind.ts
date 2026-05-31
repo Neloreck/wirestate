@@ -38,14 +38,14 @@ export interface BindOptions extends BindInstanceOptions {
  * @remarks
  * `bind` is the router behind `createContainer({ bindings })`. Pass a service
  * class constructor directly, or pass a descriptor when the binding needs a
- * custom token, fixed value, factory, resolved value, or token redirection.
+ * custom token, constant value, factory, resolved value, or token redirection.
  *
  * Descriptors without `type` are treated as `ConstantValue` bindings.
  * Descriptors with `Factory`, `ResolvedValue`, and `ServiceRedirection` are
  * delegated to their dedicated Inversify binding helpers.
  *
  * - Class constructor: singleton service binding.
- * - `ConstantValue`: fixed value binding.
+ * - `ConstantValue`: constant value binding.
  * - `DynamicValue`: factory value binding.
  * - `Instance`: service class behind a custom token.
  * - `Factory`: factory creator binding.

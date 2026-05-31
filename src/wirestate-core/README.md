@@ -235,7 +235,7 @@ Injected `WireScope` instances expose lifecycle state for async guards:
 | `resolve(token)`                           | Resolve a service or value by token                                                         |
 | `resolveOptional(token)`                   | Resolve a service or value, returns `null` if not bound                                     |
 | `getSeed(token?)`                          | Get the per-service or shared seed                                                          |
-| `emitEvent(type, payload?, options?)`      | Emit an event; `options.from` defaults to the current scope                                 |
+| `emitEvent(type, payload?, options?)`      | Emit an event; pass `options.from` when the event should carry an explicit source           |
 | `subscribeToEvent(handler)`                | Subscribe a handler to all events; returns unsubscribe function                             |
 | `unsubscribeFromEvent(handler)`            | Remove a specific event subscription by handler reference                                   |
 | `query(type, data?)`                       | Dispatch a synchronous query and return the result                                          |
@@ -297,6 +297,10 @@ const container = createContainer({ bindings: [CounterService] }, { skipLifecycl
 ```ts
 const container = createContainer({ bindings: [CounterService] }, { skipMessaging: true });
 ```
+
+`skipMessaging` is for rare containers that only need dependency injection and seeds. A child container can still inherit
+messaging buses from a parent. If no parent provides the buses, resolving `WireScope` will fail because `WireScope`
+depends on `EventBus`, `QueryBus`, and `CommandBus`.
 
 Use core `bind` and `unbind` with a fresh container when a test needs to add or remove one binding.
 

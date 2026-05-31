@@ -7,9 +7,10 @@ This package builds the current core and React adapter into one distributable pa
 - `wirestate` includes `@wirestate/core` and `@wirestate/react` APIs.
 - `wirestate/mobx` includes the `@wirestate/react-mobx` APIs.
 - `wirestate/signals` includes the `@wirestate/react-signals` APIs.
-- `wirestate/test-utils` includes the core and React test utilities.
+- `wirestate/test-utils` includes the React test utilities.
 
-New focused work lives in the scoped packages, but this package keeps the unscoped name.
+New focused work lives in the scoped packages, but this package keeps the unscoped name. Lit APIs are available from the
+scoped `@wirestate/lit` and `@wirestate/lit-signals` packages.
 
 ### Monorepo
 

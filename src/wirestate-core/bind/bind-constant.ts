@@ -43,7 +43,7 @@ function validateConstantDescriptor(descriptor: ConstantValueBindingDescriptor):
 }
 
 /**
- * Binds a fixed value to a token.
+ * Binds a constant value to a token.
  *
  * @remarks
  * Use constants for config, adapters, and test doubles. The same value comes

@@ -31,7 +31,7 @@ import { signal, computed, State, Computed } from "@wirestate/lit-signals";
 @Injectable()
 export class CounterService {
   public readonly count: State<number> = signal(0);
-  public readonly isEven: Computed<boolean> = computed(() => this.count.get() % 2 === 0);
+  public readonly parity: Computed<"even" | "odd"> = computed(() => (this.count.get() % 2 === 0 ? "even" : "odd"));
 
   public constructor(@Inject(WireScope) private scope: WireScope) {}
 
@@ -47,7 +47,7 @@ Example Lit element:
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 import { injection } from "@wirestate/lit";
-import { watch, computed } from "@wirestate/lit-signals";
+import { watch } from "@wirestate/lit-signals";
 
 import { CounterService } from "./services";
 
@@ -56,12 +56,10 @@ class MyComponent extends LitElement {
   @injection({ token: CounterService })
   private readonly counterService!: CounterService;
 
-  private isOddLabel = computed(() => (this.counterService.count.get() % 2 === 0 ? "even" : "odd"));
-
   render() {
     return html`
       <button @click="${() => this.counterService.increment()}">
-        count: ${watch(this.counterService.count)} (${watch(this.isOddLabel)})
+        count: ${watch(this.counterService.count)} (${watch(this.counterService.parity)})
       </button>
     `;
   }

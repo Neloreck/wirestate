@@ -23,20 +23,18 @@ export type BindingType =
 export type BindingScope = "Request" | "Singleton" | "Transient";
 
 /**
- * Describes a fixed value binding.
+ * Describes a constant value binding.
  *
  * @group Bind
  */
 export interface ConstantValueBindingDescriptor<T = unknown> {
   /**
    * Binding strategy.
-   *
-   * @default `BindingType.ConstantValue`
    */
   readonly type?: "ConstantValue";
 
   /**
-   * Lifetime scope for the fixed value.
+   * Lifetime scope for the constant value.
    *
    * @remarks
    * Constant values can only be singleton-scoped.
@@ -49,7 +47,7 @@ export interface ConstantValueBindingDescriptor<T = unknown> {
   readonly token: ServiceIdentifier<T>;
 
   /**
-   * Fixed value to bind.
+   * Constant value to bind.
    */
   readonly value: T;
 }

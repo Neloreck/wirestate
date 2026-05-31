@@ -81,6 +81,10 @@ export class CartService {
 
 `WireScope` is transient. Each service gets its own handle.
 
+`WireScope` depends on the container's `EventBus`, `QueryBus`, and `CommandBus`. Containers created with
+`createContainer(config, { skipMessaging: true })` can only resolve `WireScope` when those buses are inherited from a
+parent container. Without inherited messaging, use direct container injection instead of `WireScope`.
+
 - `scope.isDisposed` becomes `true` after service deactivation.
 - `scope.isDeprovisioned` tracks provider ownership: `null`, then `false`, then `true`.
 - `scope.isInactive` is the normal guard for async work that may finish late.

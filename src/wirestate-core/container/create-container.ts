@@ -69,6 +69,10 @@ export interface CreateContainerOptions {
    * Use this for tests or integration points that only need dependency
    * injection, seeds, and scope support.
    *
+   * A container created with this option can inherit messaging buses from a
+   * parent container. If it has no inherited buses, resolving `WireScope` will
+   * fail because `WireScope` depends on `EventBus`, `QueryBus`, and `CommandBus`.
+   *
    * @default `false`
    */
   readonly skipMessaging?: boolean;
