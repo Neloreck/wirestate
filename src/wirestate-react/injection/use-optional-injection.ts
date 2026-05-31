@@ -20,7 +20,7 @@ import { AnyObject } from "../types/general";
  * @template F - The type returned by the fallback function.
  *
  * @param token - The service token (string, symbol, or constructor).
- * @param onFallback - Optional function called to provide a value if the token is not bound.
+ * @param fallback - Optional function called to provide a value if the token is not bound.
  *
  * @returns The resolved value, the result of the fallback function, or `null` when no fallback is provided.
  *
@@ -31,7 +31,7 @@ import { AnyObject } from "../types/general";
  */
 export function useOptionalInjection<T, F = null>(
   token: ServiceIdentifier<T>,
-  onFallback?: (container: Container) => F
+  fallback?: (container: Container) => F
 ): T | F {
   const container: Container = useContainer();
 
@@ -42,25 +42,25 @@ export function useOptionalInjection<T, F = null>(
         token,
         name: (token as AnyObject)?.name ?? token,
         container,
-        onFallback,
+        fallback,
       });
 
       return container.get<T>(token);
-    } else if (onFallback) {
+    } else if (fallback) {
       dbg.info(prefix(__filename), "Injection not found, using fallback handler:", {
         token,
         name: (token as AnyObject)?.name ?? token,
         container,
-        onFallback,
+        fallback,
       });
 
-      return onFallback(container);
+      return fallback(container);
     } else {
       dbg.info(prefix(__filename), "Injection not found, returning null:", {
         token,
         name: (token as AnyObject)?.name ?? token,
         container,
-        onFallback,
+        fallback,
       });
 
       return null as F;

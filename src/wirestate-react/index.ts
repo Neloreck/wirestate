@@ -36,10 +36,4 @@ export {
   OptionalCommandExecutor,
 } from "./types/commands";
 export { EventEmitter } from "./types/events";
-export {
-  QueryResponder,
-  QueryExecutor,
-  AsyncQueryExecutor,
-  OptionalQueryExecutor,
-  OptionalAsyncQueryExecutor,
-} from "./types/queries";
+export { QueryExecutor, AsyncQueryExecutor, OptionalQueryExecutor, OptionalAsyncQueryExecutor } from "./types/queries";

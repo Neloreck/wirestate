@@ -1,20 +1,6 @@
 import { QueryType } from "@wirestate/core";
 
-import { MaybePromise, Optional } from "./general";
-
-/**
- * Represents the function that answers a query.
- *
- * @group Queries
- *
- * @template R - The result type of the query.
- * @template D - The type of the data payload.
- *
- * @param data - Optional payload for the query.
- *
- * @returns The query result, possibly as a promise.
- */
-export type QueryResponder<R = unknown, D = unknown> = (data?: D) => MaybePromise<R>;
+import { Optional } from "./general";
 
 /**
  * Represents the function returned by {@link useQueryExecutor}.

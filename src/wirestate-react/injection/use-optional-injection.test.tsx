@@ -47,7 +47,7 @@ describe("useOptionalInjection", () => {
     expect(getByTestId("injectable-name").textContent).toBe(GenericService.name);
   });
 
-  it("should use onFallback when token is not bound", () => {
+  it("should use fallback when token is not bound", () => {
     const container: Container = createContainer();
     const token: unique symbol = Symbol("optional-token");
 
@@ -85,7 +85,7 @@ describe("useOptionalInjection", () => {
     expect(getByTestId("result").textContent).toBe("10");
   });
 
-  it("should provide container to onFallback", () => {
+  it("should provide container to fallback", () => {
     const container: Container = createContainer();
     const unboundToken: unique symbol = Symbol("unbound-token");
     const boundToken: unique symbol = Symbol("bound-token");
@@ -134,7 +134,7 @@ describe("useOptionalInjection", () => {
     expect(getByTestId("result").textContent).toBe("first");
   });
 
-  it("should not re-resolve bound token when onFallback changes", () => {
+  it("should not re-resolve bound token when fallback changes", () => {
     const container: Container = createContainer();
     const token: unique symbol = Symbol("optional-token");
     const originalGet = container.get.bind(container);

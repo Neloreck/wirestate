@@ -29,18 +29,21 @@ export interface UseOptionalInjectionOptions<T, F = null> {
    * Defaults to `false`.
    */
   once?: boolean;
+
   /**
    * Initial value before the service is fetched.
    */
   value?: T | F;
+
   /**
    * The service token to inject.
    */
   token: ServiceIdentifier<T>;
+
   /**
    * Provides a value when the service token is not bound.
    */
-  onFallback?: OptionalInjectionFallback<F>;
+  fallback?: OptionalInjectionFallback<F>;
 }
 
 /**
@@ -72,7 +75,7 @@ export interface UseOptionalInjectionValue<T, F = null> {
  *
  * @param host - Host element.
  * @param optionsOrToken - Service token or options.
- * @param onFallback - Fallback for missing bindings.
+ * @param fallback - Fallback for missing bindings.
  * @returns Mutable injection holder.
  *
  * @example
@@ -89,15 +92,15 @@ export interface UseOptionalInjectionValue<T, F = null> {
 export function useOptionalInjection<T, F = null>(
   host: ReactiveControllerHost & HTMLElement,
   optionsOrToken: UseOptionalInjectionOptions<T, F> | ServiceIdentifier<T>,
-  onFallback?: OptionalInjectionFallback<F>
+  fallback?: OptionalInjectionFallback<F>
 ): UseOptionalInjectionValue<T, F> {
   const options: UseOptionalInjectionOptions<T, F> =
     typeof optionsOrToken === "object" && optionsOrToken !== null && "token" in optionsOrToken
       ? optionsOrToken
-      : { token: optionsOrToken as ServiceIdentifier<T>, onFallback };
+      : { token: optionsOrToken as ServiceIdentifier<T>, fallback: fallback };
 
   const { once, token, value } = options;
-  const fallback: Optional<OptionalInjectionFallback<F>> = options.onFallback ?? onFallback ?? null;
+  const fallback: Optional<OptionalInjectionFallback<F>> = options.fallback ?? fallback ?? null;
 
   dbg.info(prefix(__filename), "Creating:", {
     host,
@@ -119,7 +122,7 @@ export function useOptionalInjection<T, F = null>(
           token,
           name: (token as AnyObject)?.name ?? token,
           container,
-          onFallback: fallback,
+          fallback,
         });
 
         current.value = container.get(token);
@@ -128,7 +131,7 @@ export function useOptionalInjection<T, F = null>(
           token,
           name: (token as AnyObject)?.name ?? token,
           container,
-          onFallback: fallback,
+          fallback,
         });
 
         current.value = fallback(container);
@@ -137,7 +140,7 @@ export function useOptionalInjection<T, F = null>(
           token,
           name: (token as AnyObject)?.name ?? token,
           container,
-          onFallback: fallback,
+          fallback,
         });
 
         current.value = null as F;

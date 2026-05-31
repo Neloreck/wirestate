@@ -137,7 +137,7 @@ class MyComponent extends LitElement {
 }
 ```
 
-### `@optionalInjection(optionsOrToken, onFallback?)` / `useOptionalInjection(host, optionsOrToken, onFallback?)`
+### `@optionalInjection(optionsOrToken, fallback?)` / `useOptionalInjection(host, optionsOrToken, fallback?)`
 
 Safely resolves a service from the nearest parent container. Returns `null` when the service is not bound, or calls the
 fallback function when one is provided.

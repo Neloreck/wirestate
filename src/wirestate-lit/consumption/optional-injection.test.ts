@@ -55,7 +55,7 @@ describe("optionalInjection", () => {
     expect(element.service?.getValue()).toBe("test-value");
   });
 
-  it("should use onFallback when token is not bound", () => {
+  it("should use fallback when token is not bound", () => {
     const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
@@ -93,7 +93,7 @@ describe("optionalInjection", () => {
     expect(element.value).toBe(10);
   });
 
-  it("should provide container to onFallback", () => {
+  it("should provide container to fallback", () => {
     const container: Container = createContainer();
     const unboundToken: ServiceIdentifier<string> = Symbol("unbound-token");
     const boundToken: ServiceIdentifier<string> = Symbol("bound-token");
@@ -128,7 +128,7 @@ describe("optionalInjection", () => {
     class TestOptionsElement extends ReactiveElement {
       @optionalInjection({
         token,
-        onFallback: () => "options-fallback",
+        fallback: () => "options-fallback",
       })
       public value: Optional<string> = null;
     }
@@ -170,7 +170,7 @@ describe("optionalInjection", () => {
       @optionalInjection(
         {
           token,
-          onFallback: () => "options-fallback",
+          fallback: () => "options-fallback",
         },
         () => "parameter-fallback"
       )
@@ -194,7 +194,7 @@ describe("optionalInjection", () => {
     class TestTypedOptionsElement extends ReactiveElement {
       @optionalInjection({
         token,
-        onFallback: () => 20,
+        fallback: () => 20,
       })
       public value: string | number = 0;
     }
