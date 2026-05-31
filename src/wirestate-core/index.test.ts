@@ -26,7 +26,6 @@ describe("Library exported API from wirestate-core", () => {
     "CommandType",
     "CommandUnregister",
     "ConstantValueBindingDescriptor",
-    "ContainerActivation",
     "ContainerConfig",
     "CreateContainerOptions",
     "DynamicValueBindingDescriptor",

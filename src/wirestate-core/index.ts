@@ -12,12 +12,7 @@ export { unbind, unbindAll } from "./bind/unbind";
 export { OnCommand } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";
 
-export {
-  createContainer,
-  ContainerActivation,
-  ContainerConfig,
-  CreateContainerOptions,
-} from "./container/create-container";
+export { createContainer, ContainerConfig, CreateContainerOptions } from "./container/create-container";
 export { validateContainerConfig } from "./container/validate-container-config";
 export { WireScope } from "./container/wire-scope";
 

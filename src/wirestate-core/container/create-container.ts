@@ -22,14 +22,6 @@ import { validateContainerConfig } from "./validate-container-config";
 import { WireScope } from "./wire-scope";
 
 /**
- * Services to resolve right after binding.
- *
- * `true` resolves every binding. An array resolves only those tokens. `false` or
- * `undefined` leaves services lazy.
- */
-export type ContainerActivation = boolean | ReadonlyArray<ServiceIdentifier>;
-
-/**
  * Describes reusable {@link createContainer} config.
  *
  * @group Container
@@ -38,7 +30,7 @@ export interface ContainerConfig {
   /**
    * Bindings to resolve immediately after binding.
    */
-  readonly activate?: ContainerActivation;
+  readonly activate?: boolean | ReadonlyArray<ServiceIdentifier>;
 
   /**
    * Services or binding descriptors to register.

@@ -7,8 +7,7 @@
 - Add `@wirestate/lit-signals` with `@lit-labs/signals` and `signal-polyfill` re-exports.
 - Add the compatibility `wirestate` package with core, React, React MobX, and React Signals entry points.
 - Add portable ESM bundle entry points for core, React MobX, React Signals, and Lit Signals targets.
-- Add `createContainer`, `ContainerConfig`, `CreateContainerOptions`, and `ContainerActivation` as the current container
-  creation API.
+- Add `createContainer`, `ContainerConfig`, and `CreateContainerOptions` as the current container creation API.
 - Add `OnProvision` and `OnDeprovision` to `@wirestate/core`, plus provider lifecycle helpers used by React and Lit
   adapters.
 - Add explicit handler cleanup APIs: `EventBus.unsubscribe`, `CommandBus.unregister`, and `QueryBus.unregister`.
