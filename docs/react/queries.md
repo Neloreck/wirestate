@@ -1,11 +1,11 @@
 # React Queries
 
-React query hooks dispatch queries and register component-lifetime query handlers on the active container.
+Query hooks let React components ask the active container for data and register handlers while the component is mounted.
 
 Query execution can resolve services and run user handlers. Avoid calling query executors directly during render; call
 them from an effect, event handler, or memoized callback and render cached component state.
 
-## Execute A Query
+## Execute a Query
 
 ```tsx
 import { useQueryExecutor } from "@wirestate/react";
@@ -28,7 +28,7 @@ function CheckoutSummaryBadge() {
 }
 ```
 
-## Async And Optional Executors
+## Async and Optional Executors
 
 Choose the hook by return shape:
 
@@ -37,7 +37,7 @@ Choose the hook by return shape:
 - `useOptionalQueryExecutor` returns `null` when no handler exists.
 - `useOptionalAsyncQueryExecutor` combines optional lookup and Promise wrapping.
 
-Use an async variant when the handler may return a Promise, so callers can always `await` the result without checking
+Use an async variant when the handler may return a Promise. Callers can then always `await` the result without checking
 whether the handler is sync or async.
 
 ```tsx
@@ -61,7 +61,7 @@ function ShippingQuoteButton() {
 }
 ```
 
-## Handle A Query
+## Handle a Query
 
 ```tsx
 import { useQueryHandler } from "@wirestate/react";
@@ -76,8 +76,8 @@ function CheckoutQueries(props: { cart: Array<{ price: number }> }) {
 }
 ```
 
-Handlers unregister when the component unmounts or the active container changes. Newer handlers shadow older handlers
-for the same query type.
+Handlers unregister when the component unmounts or the active container changes. If several handlers use the same query
+type, the newest one handles the query.
 
 ## API Reference
 

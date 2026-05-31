@@ -2,8 +2,9 @@
 
 `@wirestate/react` connects Wirestate containers to a React tree.
 
-Use it for [providers](/api/wirestate-react/functions/ContainerProvider), scoped containers, service injection, and
-component-lifetime event, command, and query handlers.
+Use it when React components need access to a Wirestate container. It provides a
+[provider](/api/wirestate-react/functions/ContainerProvider), injection hooks, and hooks for local events, commands,
+and queries.
 Choose a separate reactivity package for service state.
 
 ## Install
@@ -21,6 +22,8 @@ For reactive service state, use a separate package such as [React Signals](/reac
 [React MobX](/react-mobx/overview).
 
 ## Root Provider
+
+Wrap a React subtree in `ContainerProvider` to make services available to child components.
 
 ```tsx
 import { Injectable } from "@wirestate/core";
@@ -58,9 +61,9 @@ your own update mechanism for reactive UI state.
 
 ## Provider Lifecycle
 
-React providers provision containers from an effect. In React Strict Mode, a managed container can be created and
-activated, then discarded before the committed provider lifecycle continues. Put provider-owned work in
-`@OnProvision`, and clean it up in `@OnDeprovision`.
+`ContainerProvider` provisions containers from a React effect. In React Strict Mode, React may create a managed
+container, discard it, then continue with another one. Put provider-owned work in `@OnProvision`, and clean it up in
+`@OnDeprovision`.
 
 ## React Package Surface
 

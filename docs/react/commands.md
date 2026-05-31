@@ -1,8 +1,9 @@
 # React Commands
 
-React command hooks dispatch commands and register component-lifetime command handlers on the active container.
+Command hooks let React components send commands to the active container and register handlers while the component is
+mounted.
 
-## Execute A Command
+## Execute a Command
 
 Use `useCommandExecutor` when the active handler is synchronous and the caller needs the result immediately.
 
@@ -28,7 +29,7 @@ function AddItemButton({ item }: { item: CartItem }) {
 
 `useCommandExecutor` throws through the core command bus when no handler exists.
 
-## Execute An Async Command
+## Execute an Async Command
 
 Use `useAsyncCommandExecutor` when the handler may return a Promise, or when
 the component should always work in an async way.
@@ -61,7 +62,7 @@ function LogoutButton() {
 
 ## Execute Optional Commands
 
-Use optional executors when a feature is intentionally absent in some containers.
+Use optional executors when a command handler may be absent in some containers.
 
 ```tsx
 import { useOptionalAsyncCommandExecutor, useOptionalCommandExecutor } from "@wirestate/react";
@@ -79,7 +80,7 @@ function DevtoolsButtons() {
 }
 ```
 
-## Handle A Command
+## Handle a Command
 
 ```tsx
 import { useCommandHandler } from "@wirestate/react";
@@ -94,8 +95,8 @@ function SearchPanel() {
 }
 ```
 
-Handlers unregister when the component unmounts or the active container changes. Newer handlers shadow older handlers
-for the same command type.
+Handlers unregister when the component unmounts or the active container changes. If several handlers use the same
+command type, the newest one handles the command.
 
 ## API Reference
 

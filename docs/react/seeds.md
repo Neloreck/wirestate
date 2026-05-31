@@ -1,6 +1,6 @@
 # React Seeds
 
-React providers pass seed data through container config. There are two keys:
+React providers pass startup and hydration data through container config. There are two seed keys:
 
 - `seed`: one shared object for the whole container, read with `scope.getSeed()`.
 - `seeds`: values keyed by token, read with `scope.getSeed(Token)`.
@@ -31,11 +31,11 @@ function ApplicationRoot() {
 }
 ```
 
-## Read Seeds In Services
+## Read Seeds in Services
 
-Read static targeted seeds in `@OnActivated`. Seed values are already bound before service activation, and activation is
-the right lifecycle for cheap resolution-time initialization that does not need cleanup. Keep `@OnProvision` for
-provider-owned work such as subscriptions, timers, sockets, or async resources.
+Read static targeted seeds in `@OnActivated`. Seed values are bound before service activation. Use this lifecycle for
+cheap initialization that does not need cleanup. Keep `@OnProvision` for provider-owned work such as subscriptions,
+timers, sockets, or async resources.
 
 ```ts
 import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
@@ -57,7 +57,7 @@ export class CounterService {
 }
 ```
 
-Changing provider seeds recreates managed provider containers when the shallow provider inputs change.
+Changing provider seeds recreates managed containers when the shallow provider inputs change.
 
 ## API Reference
 

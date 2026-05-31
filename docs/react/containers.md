@@ -1,10 +1,11 @@
 # React Containers
 
-React [providers](/api/wirestate-react/functions/ContainerProvider) publish Wirestate containers through context.
+`ContainerProvider` makes a Wirestate container available to a React subtree.
 
 ## Managed Root Container
 
-Pass `config` when the provider should create, provision, deprovision, and dispose the container.
+Pass `config` when React should create and own the container. The provider provisions it while mounted and disposes it
+on unmount.
 
 ```tsx
 import { ContainerProvider } from "@wirestate/react";
@@ -22,19 +23,19 @@ export function Application() {
 }
 ```
 
-Managed containers activate all bindings by default. Pass `activate: false` to keep bindings lazy.
+Managed containers activate all bindings by default. Pass `activate: false` to resolve services lazily.
 
-Activation is not the right place for resource work. React providers create managed containers before their effect
-commits. In Strict Mode, React can create an extra container, discard it, then commit another one. Start timers,
-subscriptions, sockets, and provider-scoped async work in `@OnProvision`, and clean them up in `@OnDeprovision`.
-Write provision hooks so setup can be fully undone and run again.
+Do not start resource work during activation. React creates managed containers before the provider effect commits. In
+Strict Mode, React may create and discard an extra container. Start timers, subscriptions, sockets, and provider-scoped
+async work in `@OnProvision`, and clean them up in `@OnDeprovision`. Write provision hooks so setup can be fully undone
+and run again.
 
 Managed providers recreate the container when `parent`, `onError`, `seed`, `seeds`, `bindings`, or `activate` changes by
 shallow comparison. Keep config objects and arrays stable with `useMemo` when the container should not be replaced.
 
 ## External Root Container
 
-Pass `container` when ownership stays with your code.
+Pass `container` when your code creates and owns the container.
 
 ```tsx
 import { Container, createContainer } from "@wirestate/core";
@@ -53,15 +54,13 @@ export function Application() {
 }
 ```
 
-External containers are provisioned and deprovisioned by the provider, but they are not disposed.
-
-For external containers, provider lifecycle still runs while the provider is mounted. Disposal remains the caller's
-responsibility.
+External containers are provisioned while the provider is mounted, but they are not disposed. Disposal remains the
+caller's responsibility.
 
 ## Direct Access
 
-Prefer `useInjection` for normal service use. Reach for `useContainer` or `useScope` when a component needs the
-container edge.
+Prefer `useInjection` for normal service use. Use `useContainer` or `useScope` when a component needs container-level
+operations.
 
 ```tsx
 import { Container, WireScope } from "@wirestate/core";

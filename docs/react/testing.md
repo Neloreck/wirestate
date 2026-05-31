@@ -1,10 +1,10 @@
 # React Testing
 
-Use `createContainer` for services. Use `@wirestate/react/test-utils` when a component needs a Wirestate provider.
+Test services with `createContainer`. Use `@wirestate/react/test-utils` when a component needs a Wirestate provider.
 
-## Render With A Container
+## Render with a Container
 
-`withContainerProvider` wraps a React tree with a test container.
+`withContainerProvider` wraps a React tree in `ContainerProvider` for tests.
 
 ```tsx
 import { render } from "@testing-library/react";
@@ -24,7 +24,7 @@ test("renders count", () => {
 
 ## Test Hook Handlers Through UI
 
-Command, query, and event hooks register against the active container. Render the component under a container, then drive
+Command, query, and event hooks register against the active container. Render the component with a container, then drive
 the behavior through user events or the container bus.
 
 ```tsx
@@ -43,7 +43,7 @@ test("opens search from command", async () => {
 });
 ```
 
-For async command handlers, use the async bus method so the test waits for the handler to finish.
+For async command handlers, use the async bus method so the test waits for the handler.
 
 ```tsx
 import { CommandBus, createContainer } from "@wirestate/core";

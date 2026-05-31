@@ -1,6 +1,7 @@
 # React Events
 
-React event hooks subscribe to the active container's `EventBus` for the component lifetime.
+Event hooks let React components emit and subscribe to events on the active container's `EventBus`. Subscriptions are
+tied to the component lifetime.
 
 ## Emit Events
 

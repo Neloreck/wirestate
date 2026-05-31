@@ -1,8 +1,10 @@
 # React Injection
 
-Use [`useInjection`](/api/wirestate-react/functions/useInjection) to resolve a service or value from the active container.
+Injection hooks let React components read services and values from the active container.
 
 ## Required Injection
+
+Use [`useInjection`](/api/wirestate-react/functions/useInjection) when the value must exist.
 
 ```tsx
 import { useInjection } from "@wirestate/react";
@@ -19,7 +21,7 @@ export function Counter() {
 
 ## Optional Injection
 
-Use `useOptionalInjection` when absence is expected.
+Use `useOptionalInjection` when a missing value is valid.
 
 ```tsx
 import { useOptionalInjection } from "@wirestate/react";
@@ -39,7 +41,7 @@ const logger = useOptionalInjection(FileLogger, (container) => container.get(Con
 
 ## Container
 
-`useContainer` returns the current container. Use it when a component needs container-level operations.
+`useContainer` returns the active container. Use it when a component needs container-level operations.
 
 ```tsx
 import { useContainer } from "@wirestate/react";
@@ -53,8 +55,8 @@ function DebugFlag() {
 
 ## Scope
 
-`useScope` returns the `WireScope` bound in the current container. Use it for events, commands, queries, seeds, or lazy
-resolution from a component.
+`useScope` returns the `WireScope` bound in the active container. Use it for events, commands, queries, seeds, or lazy
+resolution.
 
 ```tsx
 import { useScope } from "@wirestate/react";
