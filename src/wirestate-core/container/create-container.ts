@@ -7,13 +7,12 @@ import { getBindingToken } from "../bind/get-binding-token";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
+import { CONTAINER_PARENT_TOKEN, SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 import { setSeeds } from "../seeds/set-seeds";
-import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 import { AnyObject } from "../types/general";
 import { Bindings } from "../types/provision";
 import { SeedBindings, SeedsMap } from "../types/seeds";
 
-import { CONTAINER_PARENT_TOKEN } from "./tokens";
 import { validateContainerConfig } from "./validate-container-config";
 import { WireScope } from "./wire-scope";
 
@@ -63,6 +62,17 @@ export interface ContainerConfig {
  * @group Container
  */
 export interface CreateContainerOptions {
+  /**
+   * Skip binding container-scoped event, query, and command buses.
+   *
+   * @remarks
+   * Use this for tests or integration points that only need dependency
+   * injection, seeds, and scope support.
+   *
+   * @default `false`
+   */
+  readonly skipMessaging?: boolean;
+
   /**
    * Skip service lifecycle hooks for class bindings.
    *
@@ -139,9 +149,11 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
     setSeeds(container, config.seeds);
   }
 
-  container.bind(EventBus).toConstantValue(new EventBus());
-  container.bind(QueryBus).toConstantValue(new QueryBus());
-  container.bind(CommandBus).toConstantValue(new CommandBus());
+  if (!options.skipMessaging) {
+    container.bind(EventBus).toConstantValue(new EventBus());
+    container.bind(QueryBus).toConstantValue(new QueryBus());
+    container.bind(CommandBus).toConstantValue(new CommandBus());
+  }
 
   dbg.info(prefix(__filename), "Injecting bindings on creation:", { container, config, options });
 

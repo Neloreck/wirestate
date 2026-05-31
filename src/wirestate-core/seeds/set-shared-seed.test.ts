@@ -1,9 +1,9 @@
 import { Container } from "../alias";
 import { createContainer } from "../container/create-container";
+import { SEED_TOKEN } from "../registry";
 import { SeedsMap } from "../types/seeds";
 
 import { setSharedSeed } from "./set-shared-seed";
-import { SEED_TOKEN } from "./tokens";
 
 describe("setSharedSeed", () => {
   it("should bind initial state to container when not yet bound", () => {

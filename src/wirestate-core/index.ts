@@ -29,8 +29,8 @@ export { EventBus } from "./events/event-bus";
 export { QueryBus } from "./queries/query-bus";
 export { OnQuery } from "./queries/on-query";
 
-export { SEEDS_TOKEN as SEEDS } from "./seeds/tokens";
-export { SEED_TOKEN as SEED } from "./seeds/tokens";
+export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "./registry";
+
 export { setSeeds } from "./seeds/set-seeds";
 export { setSharedSeed } from "./seeds/set-shared-seed";
 export { unsetSeeds } from "./seeds/unset-seeds";

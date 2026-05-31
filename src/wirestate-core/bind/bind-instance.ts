@@ -6,7 +6,6 @@ import { prefix } from "@/macroses/prefix.macro";
 import { BindingType, Container, Newable, ServiceIdentifier } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { getCommandHandlerMetadata } from "../commands/get-command-handler-metadata";
-import { hasWireScopeInjection } from "../container/has-wire-scope-injection";
 import { WireScope } from "../container/wire-scope";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
@@ -29,6 +28,7 @@ import { Maybe, MaybePromise, Optional } from "../types/general";
 import { InstanceBindingDescriptor } from "../types/provision";
 import { QueryHandler, QueryUnregister } from "../types/queries";
 
+import { hasWireScopeInjection } from "./has-wire-scope-injection";
 import { registerBinding } from "./register-binding";
 import { validateBindingDescriptor } from "./validate-binding-descriptor";
 

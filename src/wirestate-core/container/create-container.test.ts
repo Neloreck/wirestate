@@ -6,10 +6,9 @@ import { unbindAll } from "../bind/unbind";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
-import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
+import { CONTAINER_PARENT_TOKEN, SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 
 import { createContainer } from "./create-container";
-import { CONTAINER_PARENT_TOKEN } from "./tokens";
 import { WireScope } from "./wire-scope";
 
 describe("createContainer", () => {
@@ -41,6 +40,18 @@ describe("createContainer", () => {
     expect(container.get(QueryBus)).toBe(container.get(QueryBus));
     expect(container.get(CommandBus)).toBeInstanceOf(CommandBus);
     expect(container.get(CommandBus)).toBe(container.get(CommandBus));
+  });
+
+  it("should skip core buses when skipMessaging is true", () => {
+    const container: Container = createContainer({}, { skipMessaging: true });
+
+    expect(container.isCurrentBound(EventBus)).toBe(false);
+    expect(container.isCurrentBound(QueryBus)).toBe(false);
+    expect(container.isCurrentBound(CommandBus)).toBe(false);
+    expect(container.isCurrentBound(Container)).toBe(true);
+    expect(container.isCurrentBound(SEEDS_TOKEN)).toBe(true);
+    expect(container.isCurrentBound(SEED_TOKEN)).toBe(true);
+    expect(container.isCurrentBound(WireScope)).toBe(true);
   });
 
   it("should bind WireScope in transient scope", () => {

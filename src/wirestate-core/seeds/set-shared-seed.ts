@@ -2,9 +2,8 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { Container } from "../alias";
+import { SEED_TOKEN } from "../registry";
 import { AnyObject } from "../types/general";
-
-import { SEED_TOKEN } from "./tokens";
 
 /**
  * Replaces the shared seed object.

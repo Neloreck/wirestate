@@ -2,9 +2,8 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { Container } from "../alias";
+import { SEEDS_TOKEN } from "../registry";
 import { SeedBindings, SeedsMap } from "../types/seeds";
-
-import { SEEDS_TOKEN } from "./tokens";
 
 /**
  * Adds targeted seed values to a container.

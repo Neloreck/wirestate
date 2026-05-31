@@ -273,6 +273,7 @@ Use the second argument for lifecycle and container creation tweaks:
 
 | Option          | Type      | Description                                   |
 | --------------- | --------- | --------------------------------------------- |
+| `skipMessaging` | `boolean` | Skip `EventBus`, `QueryBus`, and `CommandBus` |
 | `skipLifecycle` | `boolean` | Skip `@OnActivated` / `@OnDeactivation` hooks |
 
 ```ts
@@ -291,6 +292,10 @@ const container = createContainer({
 
 ```ts
 const container = createContainer({ bindings: [CounterService] }, { skipLifecycle: true });
+```
+
+```ts
+const container = createContainer({ bindings: [CounterService] }, { skipMessaging: true });
 ```
 
 Use core `bind` and `unbind` with a fresh container when a test needs to add or remove one binding.

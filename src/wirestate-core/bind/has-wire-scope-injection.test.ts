@@ -1,9 +1,9 @@
 import { Inject, Injectable } from "../alias";
+import { WireScope } from "../container/wire-scope";
 import { ERROR_CODE_REFLECT_METADATA_MISSING } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 
 import { hasWireScopeInjection } from "./has-wire-scope-injection";
-import { WireScope } from "./wire-scope";
 
 interface ReflectMetadata {
   getMetadata?: (metadataKey: string, target: object) => unknown;

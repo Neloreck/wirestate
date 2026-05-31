@@ -2,10 +2,10 @@ import { GenericService } from "@/fixtures/services/generic-service";
 
 import { Container } from "../alias";
 import { createContainer } from "../container/create-container";
+import { SEEDS_TOKEN } from "../registry";
 import { SeedsMap } from "../types/seeds";
 
 import { setSeeds } from "./set-seeds";
-import { SEEDS_TOKEN } from "./tokens";
 
 describe("setSeeds", () => {
   it("should bind seeds to container when not yet bound", () => {

@@ -7,7 +7,7 @@ import { ERROR_CODE_ACCESS_AFTER_DISPOSAL, ERROR_CODE_ACCESS_BEFORE_ACTIVATION }
 import { WirestateError } from "../error/wirestate-error";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
-import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
+import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 import { CommandHandler, CommandUnregister, CommandType } from "../types/commands";
 import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 import { Optional, AnyObject } from "../types/general";

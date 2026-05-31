@@ -28,6 +28,7 @@
 
 - Replace `createIocContainer` with `createContainer` and align public docs/examples around the new container API.
 - Split `createContainer(config, options)` so reusable container config is separate from lifecycle and creation tweaks.
+- Add `createContainer` `skipMessaging` option for containers that do not need core event, query, or command buses.
 - Split activation and provision into separate lifecycle phases so framework rendering lifecycles are no longer coupled to service activation.
 - Track provider deprovision state for services that inject `WireScope`, even when they do not declare `@OnProvision` or `@OnDeprovision`.
 - Move provider lifecycle decorators and lifecycle execution helpers from framework packages into `@wirestate/core`.

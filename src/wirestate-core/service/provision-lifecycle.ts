@@ -3,8 +3,8 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { BindingType, Container, ServiceIdentifier } from "../alias";
 import { getBindingToken } from "../bind/get-binding-token";
+import { hasWireScopeInjection } from "../bind/has-wire-scope-injection";
 import { getContainerBindings } from "../bind/register-binding";
-import { hasWireScopeInjection } from "../container/has-wire-scope-injection";
 import {
   CONTAINER_REFS_BY_SERVICE,
   PROVISION_LIFECYCLES_BY_CONTAINER,

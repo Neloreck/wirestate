@@ -1,9 +1,8 @@
 import { ServiceIdentifier } from "../alias";
+import { WireScope } from "../container/wire-scope";
 import { ERROR_CODE_REFLECT_METADATA_MISSING } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { Maybe } from "../types/general";
-
-import { WireScope } from "./wire-scope";
 
 interface ReflectWithMetadata {
   readonly getMetadata?: (metadataKey: string, target: object) => unknown;
