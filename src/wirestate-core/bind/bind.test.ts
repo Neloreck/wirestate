@@ -1,8 +1,8 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
 import { BindingType, Container, BindingScope } from "../alias";
+import { createContainer } from "../container/create-container";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
-import { mockContainer } from "../test-utils/mock-container";
 import { BindingDescriptor, DynamicValueBindingDescriptor, InstanceBindingDescriptor } from "../types/provision";
 
 import { bind } from "./bind";
@@ -10,7 +10,7 @@ import { getContainerBindings } from "./register-binding";
 
 describe("bind", () => {
   it("should bind a service class directly", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const result: Container = bind(container, GenericService);
 
     expect(result).toBe(container);
@@ -20,7 +20,7 @@ describe("bind", () => {
   it("should bind a constant value descriptor", () => {
     const TOKEN: unique symbol = Symbol("config");
 
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const result: Container = bind(container, {
       token: TOKEN,
       value: { key: "value" },
@@ -32,7 +32,7 @@ describe("bind", () => {
   });
 
   it("should bind a constant value when type is undefined", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const TOKEN: unique symbol = Symbol("config");
 
     bind(container, { token: TOKEN, value: 42 });
@@ -41,7 +41,7 @@ describe("bind", () => {
   });
 
   it("should bind a dynamic value descriptor", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const TOKEN: unique symbol = Symbol("dynamic");
 
     let callCount: number = 0;
@@ -63,7 +63,7 @@ describe("bind", () => {
   });
 
   it("should bind descriptors with string literal type and scope", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const TOKEN: unique symbol = Symbol("literal-dynamic");
 
     const descriptor: DynamicValueBindingDescriptor = {
@@ -82,7 +82,7 @@ describe("bind", () => {
   });
 
   it("should bind an instance descriptor", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     bind(container, {
       type: BindingType.Instance,
@@ -94,7 +94,7 @@ describe("bind", () => {
   });
 
   it("should bind an instance descriptor to its descriptor token", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const TOKEN: unique symbol = Symbol("generic-service");
     const binding: BindingDescriptor = {
       type: BindingType.Instance,
@@ -110,7 +110,7 @@ describe("bind", () => {
   });
 
   it("should throw for instance descriptor without token", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const binding = {
       type: BindingType.Instance,
       value: GenericService,
@@ -121,7 +121,7 @@ describe("bind", () => {
   });
 
   it("should throw for instance descriptor with unknown scope", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const binding = {
       type: BindingType.Instance,
       token: GenericService,
@@ -134,7 +134,7 @@ describe("bind", () => {
   });
 
   it("should throw for unknown type", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const binding = {
       type: "UNKNOWN",
       token: GenericService,
@@ -146,7 +146,7 @@ describe("bind", () => {
   });
 
   it("should throw for missing descriptor token", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const binding = { value: "my-value" } as unknown as BindingDescriptor;
 
     expect(() => bind(container, binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
@@ -154,7 +154,7 @@ describe("bind", () => {
   });
 
   it("should throw for unknown scope", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     expect(() =>
       bind(container, {
@@ -173,7 +173,7 @@ describe("bind", () => {
   });
 
   it("should throw for descriptors without value or factory", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     expect(() =>
       bind(container, {
@@ -190,7 +190,7 @@ describe("bind", () => {
   });
 
   it("should throw for dynamic descriptor with invalid factory", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     expect(() =>
       bind(container, {

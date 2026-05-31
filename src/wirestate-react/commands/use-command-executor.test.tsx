@@ -1,6 +1,5 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, CommandBus } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { Container, CommandBus, createContainer } from "@wirestate/core";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
 import { CommandExecutor } from "../types/commands";
@@ -14,7 +13,7 @@ describe("useCommandExecutor", () => {
   });
 
   it("should return an executor that dispatches commands", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const handler = jest.fn((data: string) => data + "-result");
 
     container.get(CommandBus).register("TEST_COMMAND", handler);
@@ -36,7 +35,7 @@ describe("useCommandExecutor", () => {
   });
 
   it("should throw on unhandled commands", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     let executor: CommandExecutor = null as unknown as CommandExecutor;
 
     function TestComponent() {

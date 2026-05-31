@@ -1,7 +1,7 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
 import { Container } from "../alias";
-import { mockContainer } from "../test-utils/mock-container";
+import { createContainer } from "../container/create-container";
 import { SeedsMap } from "../types/seeds";
 
 import { setSeeds } from "./set-seeds";
@@ -9,7 +9,7 @@ import { SEEDS_TOKEN } from "./tokens";
 
 describe("setSeeds", () => {
   it("should bind seeds to container when not yet bound", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     setSeeds(container, [["ServiceA", { a: 1 }]]);
 
@@ -22,7 +22,7 @@ describe("setSeeds", () => {
   });
 
   it("should merge targeted bindings when initial state already exists", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     setSeeds(container, [["ServiceA", { a: 1 }]]);
     setSeeds(container, [["ServiceB", { b: 2 }]]);
@@ -36,7 +36,7 @@ describe("setSeeds", () => {
   });
 
   it("should not rebind states token", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     const bindSpy = jest.spyOn(container, "bind");
     const rebindSpy = jest.spyOn(container, "rebind");

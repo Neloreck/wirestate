@@ -1,6 +1,5 @@
 import { render } from "@testing-library/react";
-import { Container, QueryBus } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { Container, QueryBus, createContainer } from "@wirestate/core";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
 import { QueryExecutor } from "../types/queries";
@@ -9,7 +8,7 @@ import { useQueryExecutor } from "./use-query-executor";
 
 describe("useQueryExecutor", () => {
   it("should return an executor that dispatches queries", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((data: string) => data + "-result");
 
@@ -35,7 +34,7 @@ describe("useQueryExecutor", () => {
   });
 
   it("should throw on unhandled queries", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
 
     jest.spyOn(bus, "query");
@@ -57,7 +56,7 @@ describe("useQueryExecutor", () => {
   });
 
   it("should return promise values when the active handler returns a Promise", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
 
     bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
@@ -78,7 +77,7 @@ describe("useQueryExecutor", () => {
   });
 
   it("should return a stable executor between re-renders", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const executors: Array<QueryExecutor> = [];
 
     function TestComponent() {
@@ -96,7 +95,7 @@ describe("useQueryExecutor", () => {
   });
 
   it("should support symbol query types", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const type: unique symbol = Symbol("test-query");
 

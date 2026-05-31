@@ -1,7 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { Container, createContainer } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { ContainerContext } from "../context/container-context";
@@ -13,7 +12,7 @@ import { provideContainer } from "./provide-container";
 describe("provideContainer", () => {
   @customElement("ws-provide-container-decorated")
   class DecoratedElement extends ReactiveElement {
-    @provideContainer({ container: mockContainer() })
+    @provideContainer({ container: createContainer() })
     public containerProvider!: ContainerProvider;
   }
 

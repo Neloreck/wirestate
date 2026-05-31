@@ -1,6 +1,5 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, CommandBus } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { Container, CommandBus, createContainer } from "@wirestate/core";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
 import { OptionalCommandExecutor } from "../types/commands";
@@ -13,7 +12,7 @@ describe("useOptionalCommandExecutor", () => {
   });
 
   it("should return null if no handler exists", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     let executor: OptionalCommandExecutor = null as unknown as OptionalCommandExecutor;
 
@@ -30,7 +29,7 @@ describe("useOptionalCommandExecutor", () => {
   });
 
   it("should return a command result if handler exists", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     container.get(CommandBus).register("EXISTING_COMMAND", () => "ok");
 

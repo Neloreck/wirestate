@@ -1,6 +1,5 @@
 import { render, cleanup, act } from "@testing-library/react";
-import { Container, EventBus } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { Container, EventBus, createContainer } from "@wirestate/core";
 import { useLayoutEffect } from "react";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
@@ -13,7 +12,7 @@ describe("useEvent", () => {
   });
 
   it("should filter by single event type", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 
@@ -34,7 +33,7 @@ describe("useEvent", () => {
   });
 
   it("should unsubscribe on unmount", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 
@@ -64,7 +63,7 @@ describe("useEvent", () => {
   });
 
   it("should use latest type and handler when event is emitted during rerender layout effects", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: EventBus = container.get(EventBus);
     const handler1 = jest.fn();
     const handler2 = jest.fn();

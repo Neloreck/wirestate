@@ -1,7 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
 import { Container, createContainer } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
 import { customElement } from "lit/decorators.js";
 
 import { ContainerContext } from "../context/container-context";
@@ -22,7 +21,7 @@ describe("useContainerProvider hook", () => {
   });
 
   it("should return an instance of ContainerProvider", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const element: TestProviderElement = new TestProviderElement();
     const provider: ContainerProvider = useContainerProvider(element, { container });
 

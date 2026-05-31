@@ -1,6 +1,5 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, CommandBus } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { Container, CommandBus, createContainer } from "@wirestate/core";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
 import { AsyncCommandExecutor } from "../types/commands";
@@ -13,7 +12,7 @@ describe("useAsyncCommandExecutor", () => {
   });
 
   it("should return an executor that dispatches sync commands as promises", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
     const handler = jest.fn((data: string) => data + "-result");
 
@@ -36,7 +35,7 @@ describe("useAsyncCommandExecutor", () => {
   });
 
   it("should dispatch async command handlers", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     container.get(CommandBus).register("ASYNC_COMMAND", async (data: string) => data + "-result");
 
@@ -54,7 +53,7 @@ describe("useAsyncCommandExecutor", () => {
   });
 
   it("should reject on unhandled commands", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     let executor: AsyncCommandExecutor = null as unknown as AsyncCommandExecutor;
 
     function TestComponent() {

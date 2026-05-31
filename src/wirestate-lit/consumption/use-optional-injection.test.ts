@@ -1,6 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, ServiceIdentifier } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { Container, ServiceIdentifier, createContainer } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { GenericService } from "@/fixtures/services/generic-service";
@@ -18,7 +17,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should return null when token is not bound", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: unique symbol = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -36,7 +35,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should resolve bound service", () => {
-    const container: Container = mockContainer({
+    const container: Container = createContainer({
       bindings: [GenericService],
     });
 
@@ -56,7 +55,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should use onFallback when token is not bound", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: unique symbol = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -74,7 +73,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should type fallback values separately from injection values", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -95,7 +94,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should provide container to onFallback", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const unboundToken: unique symbol = Symbol("unbound-token");
     const boundToken: unique symbol = Symbol("bound-token");
 
@@ -116,7 +115,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should use fallback from options object", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -137,7 +136,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should use separate fallback parameter with options object", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -158,7 +157,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should prefer options fallback over separate fallback parameter", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -183,7 +182,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should type fallback values from options object separately from injection values", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -207,7 +206,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should expose initial value until context resolves", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);

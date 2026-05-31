@@ -10,14 +10,14 @@ import { QueryBus } from "../queries/query-bus";
 import { setSeeds } from "../seeds/set-seeds";
 import { OnActivated } from "../service/on-activated";
 import { OnDeactivation } from "../service/on-deactivation";
-import { mockContainer } from "../test-utils/mock-container";
 import { Optional } from "../types/general";
 
+import { createContainer } from "./create-container";
 import { WireScope } from "./wire-scope";
 
 describe("WireScope", () => {
   it("should throw error if accessed after disposal", () => {
-    const scope: WireScope = new WireScope(mockContainer());
+    const scope: WireScope = new WireScope(createContainer());
 
     (scope as { isDisposed: boolean }).isDisposed = true;
     (scope as unknown as { container: Optional<Container> }).container = null;
@@ -27,14 +27,14 @@ describe("WireScope", () => {
   });
 
   it("should resolve container if activated", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const scope: WireScope = new WireScope(container);
 
     expect(scope.resolve(Container)).toBe(container);
   });
 
   it("should report inactive state after disposal or deprovision", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const scope: WireScope = new WireScope(container);
 
     expect(scope.isInactive).toBe(false);
@@ -53,7 +53,7 @@ describe("WireScope", () => {
   });
 
   it("should resolve from container", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const scope: WireScope = new WireScope(container);
 
     container.bind("TEST").toConstantValue("VALUE");
@@ -63,7 +63,7 @@ describe("WireScope", () => {
   });
 
   it("should resolve optional from container", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const scope: WireScope = new WireScope(container);
 
     container.bind("TEST").toConstantValue("VALUE");
@@ -73,7 +73,7 @@ describe("WireScope", () => {
   });
 
   it("should emit events via event bus", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: EventBus = container.get(EventBus);
     const scope: WireScope = new WireScope(container);
 
@@ -88,7 +88,7 @@ describe("WireScope", () => {
   });
 
   it("should subscribe to events via scope", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: EventBus = container.get(EventBus);
     const scope: WireScope = new WireScope(container);
     const handler = jest.fn();
@@ -105,7 +105,7 @@ describe("WireScope", () => {
   });
 
   it("should unsubscribe from events via scope", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: EventBus = container.get(EventBus);
     const scope: WireScope = new WireScope(container);
     const handler = jest.fn();
@@ -122,7 +122,7 @@ describe("WireScope", () => {
   });
 
   it("should query via query bus", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const scope: WireScope = new WireScope(container);
 
@@ -143,7 +143,7 @@ describe("WireScope", () => {
   });
 
   it("should query async via query bus", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const scope: WireScope = new WireScope(container);
 
@@ -164,7 +164,7 @@ describe("WireScope", () => {
   });
 
   it("should execute commands via command bus", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
     const scope: WireScope = new WireScope(container);
 
@@ -187,7 +187,7 @@ describe("WireScope", () => {
   });
 
   it("should execute async commands via command bus", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
     const scope: WireScope = new WireScope(container);
 
@@ -212,7 +212,7 @@ describe("WireScope", () => {
   });
 
   it("should execute optional commands via command bus", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
     const scope: WireScope = new WireScope(container);
 
@@ -234,7 +234,7 @@ describe("WireScope", () => {
   });
 
   it("should execute optional async commands via command bus", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
     const scope: WireScope = new WireScope(container);
 
@@ -253,7 +253,7 @@ describe("WireScope", () => {
   });
 
   it("should inject core buses during construction", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const eventBus: EventBus = container.get(EventBus);
     const queryBus: QueryBus = container.get(QueryBus);
     const commandBus: CommandBus = container.get(CommandBus);
@@ -280,7 +280,7 @@ describe("WireScope", () => {
   });
 
   it("should register query handler via scope", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const scope: WireScope = new WireScope(container);
     const handler = jest.fn().mockReturnValue("result");
@@ -295,7 +295,7 @@ describe("WireScope", () => {
   });
 
   it("should register command handler via scope", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
     const scope: WireScope = new WireScope(container);
     const handler = jest.fn().mockReturnValue("result");
@@ -310,7 +310,7 @@ describe("WireScope", () => {
   });
 
   it("should unregister query handler via scope", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const scope: WireScope = new WireScope(container);
     const handler = jest.fn().mockReturnValue("value");
@@ -325,7 +325,7 @@ describe("WireScope", () => {
   });
 
   it("should unregister command handler via scope", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
     const scope: WireScope = new WireScope(container);
     const handler = jest.fn().mockReturnValue("value");
@@ -340,14 +340,14 @@ describe("WireScope", () => {
   });
 
   it("should get global seed from container", () => {
-    const container: Container = mockContainer({ seed: { key: "val" } });
+    const container: Container = createContainer({ seed: { key: "val" } });
     const scope: WireScope = new WireScope(container);
 
     expect(scope.getSeed()).toEqual({ key: "val" });
   });
 
   it("should get bound seed from container", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const scope: WireScope = new WireScope(container);
 
     setSeeds(container, [[GenericService, { a: 1, b: 2 }]]);
@@ -357,7 +357,7 @@ describe("WireScope", () => {
   });
 
   it("should get falsy bound seeds from container", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const scope: WireScope = new WireScope(container);
 
     setSeeds(container, [
@@ -401,7 +401,7 @@ describe("WireScope", () => {
       public onQuery = jest.fn(() => "query-value");
     }
 
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const eventBus: EventBus = container.get(EventBus);
     const queryBus: QueryBus = container.get(QueryBus);
     const commandBus: CommandBus = container.get(CommandBus);

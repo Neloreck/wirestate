@@ -1,5 +1,8 @@
+import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
+
 import { BindingType, Container, Injectable } from "../alias";
 import { bind } from "../bind/bind";
+import { unbindAll } from "../bind/unbind";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
@@ -244,6 +247,41 @@ describe("createContainer", () => {
     });
 
     expect(activated).toBe(false);
+  });
+
+  it("should handle activation lifecycle when skipLifecycle is false", () => {
+    const { LifecycleService, events } = createLifecycleService();
+
+    const container: Container = createContainer({
+      activate: [LifecycleService],
+      bindings: [LifecycleService],
+    });
+
+    expect(container.get(LifecycleService)).toBeInstanceOf(LifecycleService);
+    expect(events).toEqual(["activated"]);
+
+    unbindAll(container);
+
+    expect(events).toEqual(["activated", "deactivation"]);
+  });
+
+  it("should skip activation lifecycle when skipLifecycle is true", () => {
+    const { LifecycleService, events } = createLifecycleService();
+
+    const container: Container = createContainer(
+      {
+        activate: [LifecycleService],
+        bindings: [LifecycleService],
+      },
+      { skipLifecycle: true }
+    );
+
+    expect(container.get(LifecycleService)).toBeInstanceOf(LifecycleService);
+    expect(events).toEqual([]);
+
+    unbindAll(container);
+
+    expect(events).toEqual([]);
   });
 
   it("should throw error if activate is provided without bindings", () => {

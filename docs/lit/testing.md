@@ -1,13 +1,13 @@
 # Lit Testing
 
-Use core test helpers for services. Use `@wirestate/lit/test-utils` when an element needs a container context.
+Use `createContainer` for services. Use `@wirestate/lit/test-utils` when an element needs a container context.
 
 ## Create A Lit Provision
 
 `createLitProvision` creates a test host and publishes a container through Lit context.
 
 ```ts
-import { mockContainer } from "@wirestate/core/test-utils";
+import { createContainer } from "@wirestate/core";
 import { injection } from "@wirestate/lit";
 import { createLitProvision, LitProvisionFixture } from "@wirestate/lit/test-utils";
 import { LitElement } from "lit";
@@ -24,7 +24,7 @@ describe("CounterView", () => {
   let fixture: LitProvisionFixture;
 
   beforeEach(() => {
-    const container = mockContainer({ bindings: [CounterService], activate: [CounterService] });
+    const container = createContainer({ bindings: [CounterService], activate: [CounterService] });
 
     fixture = createLitProvision(container);
   });
@@ -49,4 +49,4 @@ Append elements under `fixture.provider` so they can consume the provided contex
 
 [`createLitProvision`](/api/wirestate-lit/test-utils/functions/createLitProvision),
 [`LitProvisionFixture`](/api/wirestate-lit/test-utils/interfaces/LitProvisionFixture),
-[`mockContainer`](/api/wirestate-core/test-utils/functions/mockContainer).
+[`createContainer`](/api/wirestate-core/functions/createContainer).

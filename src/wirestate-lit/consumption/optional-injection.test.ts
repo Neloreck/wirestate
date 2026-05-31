@@ -1,6 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { bind, Container, ServiceIdentifier } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { bind, Container, ServiceIdentifier, createContainer } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { GenericService } from "@/fixtures/services/generic-service";
@@ -18,7 +17,7 @@ describe("optionalInjection", () => {
   });
 
   it("should assign null when token is not bound", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -37,7 +36,7 @@ describe("optionalInjection", () => {
   });
 
   it("should inject bound service", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     bind(container, GenericService);
     fixture = createLitProvision(container);
@@ -57,7 +56,7 @@ describe("optionalInjection", () => {
   });
 
   it("should use onFallback when token is not bound", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -76,7 +75,7 @@ describe("optionalInjection", () => {
   });
 
   it("should type fallback values separately from injection values", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -95,7 +94,7 @@ describe("optionalInjection", () => {
   });
 
   it("should provide container to onFallback", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const unboundToken: ServiceIdentifier<string> = Symbol("unbound-token");
     const boundToken: ServiceIdentifier<string> = Symbol("bound-token");
 
@@ -120,7 +119,7 @@ describe("optionalInjection", () => {
   });
 
   it("should use fallback from options object", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -142,7 +141,7 @@ describe("optionalInjection", () => {
   });
 
   it("should use separate fallback parameter with options object", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -161,7 +160,7 @@ describe("optionalInjection", () => {
   });
 
   it("should prefer options fallback over separate fallback parameter", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -186,7 +185,7 @@ describe("optionalInjection", () => {
   });
 
   it("should type fallback values from options object separately from injection values", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -244,7 +243,7 @@ describe("optionalInjection (new standard decorator)", () => {
   });
 
   it("should assign null for standard accessors when token is not bound", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const token: ServiceIdentifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
@@ -276,7 +275,7 @@ describe("optionalInjection (new standard decorator)", () => {
   });
 
   it("should inject bound service for standard accessors", () => {
-    const container: Container = mockContainer({
+    const container: Container = createContainer({
       bindings: [GenericService],
     });
 

@@ -1,6 +1,5 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, CommandBus, CommandHandler } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { Container, CommandBus, CommandHandler, createContainer } from "@wirestate/core";
 import { useLayoutEffect } from "react";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
@@ -13,7 +12,7 @@ describe("useCommandHandler", () => {
   });
 
   it("should register handler and unregister on unmount", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
     const handler = jest.fn(() => Promise.resolve("async-data"));
 
@@ -40,7 +39,7 @@ describe("useCommandHandler", () => {
   });
 
   it("should update handler ref when handler changes", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
 
     const handler1 = jest.fn().mockReturnValue("first");
@@ -64,7 +63,7 @@ describe("useCommandHandler", () => {
   });
 
   it("should call latest handler when command is dispatched during rerender layout effects", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
 
     const handler1 = jest.fn().mockReturnValue("first");

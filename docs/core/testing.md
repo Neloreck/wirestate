@@ -1,7 +1,7 @@
 # Core Testing
 
 Services are TypeScript classes, but most services are designed to be resolved by a container. Test simple services
-directly when their constructor and methods do not need Wirestate. Use a mock container when dependency injection,
+directly when their constructor and methods do not need Wirestate. Use a fresh container when dependency injection,
 lifecycle, seeds, or buses are part of the behavior.
 
 ## No Container
@@ -23,15 +23,14 @@ test("logs a message", () => {
 
 ## One Service
 
-Use `bind` with a fresh `mockContainer` when one service needs Wirestate wiring.
+Use `bind` with a fresh `createContainer` when one service needs Wirestate wiring.
 
 ```ts
-import { bind } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { bind, createContainer } from "@wirestate/core";
 import { CounterService } from "./CounterService";
 
 test("increments count", () => {
-  const service = bind(mockContainer(), CounterService).get(CounterService);
+  const service = bind(createContainer(), CounterService).get(CounterService);
 
   service.increment();
 
@@ -42,24 +41,22 @@ test("increments count", () => {
 Skip lifecycle when hook setup is noise for the test.
 
 ```ts
-import { bind } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { createContainer } from "@wirestate/core";
 
-const service = bind(mockContainer(), CounterService, { skipLifecycle: true }).get(CounterService);
+const service = createContainer({ bindings: [CounterService] }, { skipLifecycle: true }).get(CounterService);
 ```
 
 ## Several Services
 
-`mockContainer` binds a group of services. Use `activate` when resolution-time behavior needs to run before assertions.
+`createContainer` binds a group of services. Use `activate` when resolution-time behavior needs to run before assertions.
 Use `provisionContainer` when the behavior under test lives in `@OnProvision` or `@OnDeprovision`.
 
 ```ts
-import { EventBus } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { EventBus, createContainer } from "@wirestate/core";
 import { CounterService, LoggerService } from "./services";
 
 test("counter emits event on increment", () => {
-  const container = mockContainer({
+  const container = createContainer({
     activate: [CounterService],
     bindings: [LoggerService, CounterService],
   });
@@ -80,12 +77,11 @@ test("counter emits event on increment", () => {
 Use `bind` when a test starts from an existing container and needs one more service or descriptor.
 
 ```ts
-import { bind } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { bind, createContainer } from "@wirestate/core";
 import { CartService, PricingService } from "./services";
 
 test("cart uses pricing service", () => {
-  const container = mockContainer({ bindings: [CartService] });
+  const container = createContainer({ bindings: [CartService] });
 
   bind(container, PricingService);
 
@@ -98,10 +94,9 @@ test("cart uses pricing service", () => {
 Use `unbind` to remove a binding through Wirestate's cleanup path.
 
 ```ts
-import { bind, unbind } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { bind, createContainer, unbind } from "@wirestate/core";
 
-const container = mockContainer({ bindings: [CartService] });
+const container = createContainer({ bindings: [CartService] });
 
 bind(container, PricingService);
 unbind(container, PricingService);
@@ -112,11 +107,10 @@ unbind(container, PricingService);
 Bind a constant under the dependency token before resolving the service under test.
 
 ```ts
-import { bind } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { bind, createContainer } from "@wirestate/core";
 
 test("cart uses mocked api client", async () => {
-  const container = mockContainer({ bindings: [CartService] });
+  const container = createContainer({ bindings: [CartService] });
   const api = { post: jest.fn().mockResolvedValue({ ok: true }) };
 
   bind(container, { token: ApiClient, value: api as unknown as ApiClient });
@@ -130,5 +124,5 @@ test("cart uses mocked api client", async () => {
 
 ## API Reference
 
-[`mockContainer`](/api/wirestate-core/test-utils/functions/mockContainer), [`bind`](/api/wirestate-core/functions/bind),
+[`createContainer`](/api/wirestate-core/functions/createContainer), [`bind`](/api/wirestate-core/functions/bind),
 [`unbind`](/api/wirestate-core/functions/unbind).

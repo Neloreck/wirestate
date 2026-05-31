@@ -1,6 +1,5 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, CommandBus } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { Container, CommandBus, createContainer } from "@wirestate/core";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
 import { OptionalAsyncCommandExecutor } from "../types/commands";
@@ -14,7 +13,7 @@ describe("useOptionalAsyncCommandExecutor", () => {
   });
 
   it("should resolve null if no handler exists", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     let executor: OptionalAsyncCommandExecutor = null as unknown as OptionalAsyncCommandExecutor;
 
@@ -31,7 +30,7 @@ describe("useOptionalAsyncCommandExecutor", () => {
   });
 
   it("should return a command result if handler exists", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
 
     bus.register("EXISTING_COMMAND", () => "ok");
@@ -54,7 +53,7 @@ describe("useOptionalAsyncCommandExecutor", () => {
   });
 
   it("should support async command handlers", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     container.get(CommandBus).register("ASYNC_COMMAND", async () => "async-ok");
 

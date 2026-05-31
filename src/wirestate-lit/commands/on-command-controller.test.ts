@@ -1,6 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { CommandBus, Container } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { CommandBus, Container, createContainer } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
@@ -75,8 +74,8 @@ describe("OnCommandController", () => {
   });
 
   it("should re-register when container context is updated", () => {
-    const firstContainer: Container = mockContainer();
-    const secondContainer: Container = mockContainer();
+    const firstContainer: Container = createContainer();
+    const secondContainer: Container = createContainer();
     const bus: CommandBus = firstContainer.get(CommandBus);
     const element: TestConsumerElement = new TestConsumerElement();
     const handler = jest.fn();

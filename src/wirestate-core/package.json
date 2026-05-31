@@ -20,17 +20,6 @@
         "production": "./cjs/production/index.js",
         "default": "./cjs/development/index.js"
       }
-    },
-    "./test-utils": {
-      "types": "./test-utils.d.ts",
-      "import": {
-        "production": "./esm/production/test-utils.js",
-        "default": "./esm/development/test-utils.js"
-      },
-      "require": {
-        "production": "./cjs/production/test-utils.js",
-        "default": "./cjs/development/test-utils.js"
-      }
     }
   },
   "repository": {

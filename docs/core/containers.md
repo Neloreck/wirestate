@@ -85,7 +85,7 @@ Wirestate's registered binding list.
 
 ## API Reference
 
-[`createContainer`](/api/wirestate-core/functions/createContainer), [`ContainerConfig`](/api/wirestate-core/type-aliases/ContainerConfig),
+[`createContainer`](/api/wirestate-core/functions/createContainer), [`ContainerConfig`](/api/wirestate-core/interfaces/ContainerConfig),
 [`Container`](/api/wirestate-core/classes/Container), [`provisionContainer`](/api/wirestate-core/functions/provisionContainer),
 [`deprovisionContainer`](/api/wirestate-core/functions/deprovisionContainer),
 [`unbind`](/api/wirestate-core/functions/unbind), [`unbindAll`](/api/wirestate-core/functions/unbindAll).

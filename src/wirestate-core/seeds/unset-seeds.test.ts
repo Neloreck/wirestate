@@ -1,7 +1,7 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
 import { Container } from "../alias";
-import { mockContainer } from "../test-utils/mock-container";
+import { createContainer } from "../container/create-container";
 import { SeedsMap } from "../types/seeds";
 
 import { setSeeds } from "./set-seeds";
@@ -10,7 +10,7 @@ import { unsetSeeds } from "./unset-seeds";
 
 describe("unsetSeeds", () => {
   it("should remove specific bindings from initial state", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const state: SeedsMap = container.get(SEEDS_TOKEN);
 
     setSeeds(container, [
@@ -34,7 +34,7 @@ describe("unsetSeeds", () => {
   });
 
   it("should do nothing when targeted initial state is not bound", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const seeds: SeedsMap = container.get(SEEDS_TOKEN);
 
     expect(seeds.size).toBe(0);

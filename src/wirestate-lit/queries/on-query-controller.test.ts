@@ -1,6 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { QueryBus, Container } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { QueryBus, Container, createContainer } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "../test-utils/create-lit-provision";
@@ -66,8 +65,8 @@ describe("OnQueryController", () => {
   });
 
   it("should re-register when container context is updated", () => {
-    const firstContainer: Container = mockContainer();
-    const secondContainer: Container = mockContainer();
+    const firstContainer: Container = createContainer();
+    const secondContainer: Container = createContainer();
     const bus: QueryBus = firstContainer.get(QueryBus);
     const element: TestConsumerElement = new TestConsumerElement();
     const handler = jest.fn(() => "test-result");

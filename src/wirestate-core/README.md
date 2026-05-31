@@ -251,44 +251,54 @@ Injected `WireScope` instances expose lifecycle state for async guards:
 | `registerCommandHandler(type, handler)`    | Register a command handler; returns unregister function                                     |
 | `unregisterCommandHandler(type, handler)`  | Remove a specific command handler by type and reference                                     |
 
-## Test utilities
-
-Available via `@wirestate/core/test-utils`:
+## Testing containers
 
 ```ts
-import { mockContainer } from "@wirestate/core/test-utils";
+import { createContainer } from "@wirestate/core";
 ```
 
-### `mockContainer(options?)`
+### `createContainer(config?, options?)`
 
-Creates a configured IoC container for testing. Accepts an optional object:
+Creates a configured IoC container for application code and tests. Use the first argument for reusable container config:
 
-| Option          | Type                                  | Description                                                                             |
-| --------------- | ------------------------------------- | --------------------------------------------------------------------------------------- |
-| `activate`      | `boolean \| Array<ServiceIdentifier>` | `true` to resolve all bindings, or specific tokens to resolve immediately after binding |
-| `bindings`      | `Array<Newable \| BindingDescriptor>` | Services or descriptors to bind                                                         |
-| `skipLifecycle` | `boolean`                             | Skip `@OnActivated` / `@OnDeactivation` hooks                                           |
+| Config     | Type                                  | Description                                                                             |
+| ---------- | ------------------------------------- | --------------------------------------------------------------------------------------- |
+| `activate` | `boolean \| Array<ServiceIdentifier>` | `true` to resolve all bindings, or specific tokens to resolve immediately after binding |
+| `bindings` | `Array<Newable \| BindingDescriptor>` | Services or descriptors to bind                                                         |
+| `parent`   | `Container`                           | Parent container for inherited bindings                                                 |
+| `seed`     | `object`                              | Shared seed object                                                                      |
+| `seeds`    | `SeedBindings`                        | Seed values keyed by service class, string, or symbol                                   |
+
+Use the second argument for lifecycle and container creation tweaks:
+
+| Option          | Type      | Description                                   |
+| --------------- | --------- | --------------------------------------------- |
+| `skipLifecycle` | `boolean` | Skip `@OnActivated` / `@OnDeactivation` hooks |
 
 ```ts
-const container = mockContainer({
+const container = createContainer({
   activate: [CounterService],
   bindings: [CounterService, LoggerService],
 });
 ```
 
 ```ts
-const container = mockContainer({
+const container = createContainer({
   activate: true,
   bindings: [CounterService, LoggerService],
 });
 ```
 
-Use core `bind` and `unbind` with a mock container when a test needs to add or remove one binding.
+```ts
+const container = createContainer({ bindings: [CounterService] }, { skipLifecycle: true });
+```
+
+Use core `bind` and `unbind` with a fresh container when a test needs to add or remove one binding.
 
 ```ts
 import { bind, unbind } from "@wirestate/core";
 
-const container = mockContainer();
+const container = createContainer();
 const counter = bind(container, CounterService).get(CounterService);
 
 counter.increment();

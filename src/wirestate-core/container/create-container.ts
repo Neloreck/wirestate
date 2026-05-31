@@ -26,11 +26,11 @@ import { WireScope } from "./wire-scope";
 export type ContainerActivation = boolean | ReadonlyArray<ServiceIdentifier>;
 
 /**
- * Describes options for {@link createContainer}.
+ * Describes reusable {@link createContainer} config.
  *
  * @group Container
  */
-export interface CreateContainerOptions {
+export interface ContainerConfig {
   /**
    * Bindings to resolve immediately after binding.
    */
@@ -58,15 +58,18 @@ export interface CreateContainerOptions {
 }
 
 /**
- * Represents reusable {@link createContainer} config.
- *
- * @remarks
- * Alias for {@link CreateContainerOptions}. Use it for provider configs stored
- * outside JSX or element code.
+ * Describes options for {@link createContainer}.
  *
  * @group Container
  */
-export type ContainerConfig = CreateContainerOptions;
+export interface CreateContainerOptions {
+  /**
+   * Skip service lifecycle hooks for class bindings.
+   *
+   * @default `false`
+   */
+  readonly skipLifecycle?: boolean;
+}
 
 /**
  * Creates a Wirestate container.
@@ -85,7 +88,8 @@ export type ContainerConfig = CreateContainerOptions;
  *
  * @group Container
  *
- * @param options - Container setup.
+ * @param config - Container setup config.
+ * @param options - Container creation options.
  * @returns A new Wirestate-ready {@link Container}.
  *
  * @throws {@link WirestateError} If `activate` names a token missing from `bindings`.
@@ -109,40 +113,41 @@ export type ContainerConfig = CreateContainerOptions;
  * const logger = container.get(LoggerService);
  * ```
  */
-export function createContainer(options: CreateContainerOptions = {}): Container {
-  dbg.info(prefix(__filename), "Creating IOC container:", { options });
+export function createContainer(config: ContainerConfig = {}, options: CreateContainerOptions = {}): Container {
+  dbg.info(prefix(__filename), "Creating IOC container:", { config, options });
 
-  validateContainerConfig(options);
+  validateContainerConfig(config);
 
   const activate: ReadonlyArray<ServiceIdentifier> =
-    (options.activate === true ? options.bindings?.map(getBindingToken) : options.activate) || [];
+    (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
 
   const container: Container = new Container({
     defaultScope: "Singleton",
-    parent: options.parent,
+    parent: config.parent,
   });
 
-  container.bind(CONTAINER_PARENT_TOKEN).toConstantValue(options.parent);
+  container.bind(CONTAINER_PARENT_TOKEN).toConstantValue(config.parent);
   container.bind(Container).toConstantValue(container);
-  container.bind(EventBus).toConstantValue(new EventBus());
-  container.bind(QueryBus).toConstantValue(new QueryBus());
-  container.bind(CommandBus).toConstantValue(new CommandBus());
   container.bind(SEEDS_TOKEN).toConstantValue(new Map() as SeedsMap);
-  container.bind(SEED_TOKEN).toConstantValue(options.seed ?? {});
+  container.bind(SEED_TOKEN).toConstantValue(config.seed ?? {});
   container
     .bind(WireScope)
     .toResolvedValue((): WireScope => new WireScope(container))
     .inTransientScope();
 
-  if (options.seeds) {
-    setSeeds(container, options.seeds);
+  if (config.seeds) {
+    setSeeds(container, config.seeds);
   }
 
-  dbg.info(prefix(__filename), "Injecting bindings on creation:", { container, options });
+  container.bind(EventBus).toConstantValue(new EventBus());
+  container.bind(QueryBus).toConstantValue(new QueryBus());
+  container.bind(CommandBus).toConstantValue(new CommandBus());
 
-  if (options.bindings) {
-    for (const binding of options.bindings) {
-      bind(container, binding);
+  dbg.info(prefix(__filename), "Injecting bindings on creation:", { container, config, options });
+
+  if (config.bindings) {
+    for (const binding of config.bindings) {
+      bind(container, binding, options);
     }
   }
 

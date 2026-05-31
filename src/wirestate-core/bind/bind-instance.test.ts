@@ -3,6 +3,7 @@ import { GenericService } from "@/fixtures/services/generic-service";
 import { BindingType, Container, Inject, Injectable } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { OnCommand } from "../commands/on-command";
+import { createContainer } from "../container/create-container";
 import { WireScope } from "../container/wire-scope";
 import { ERROR_CODE_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { EventBus } from "../events/event-bus";
@@ -11,7 +12,6 @@ import { OnQuery } from "../queries/on-query";
 import { QueryBus } from "../queries/query-bus";
 import { OnActivated } from "../service/on-activated";
 import { OnDeactivation } from "../service/on-deactivation";
-import { mockContainer } from "../test-utils";
 import { Optional } from "../types/general";
 import { InstanceBindingDescriptor } from "../types/provision";
 
@@ -72,7 +72,7 @@ describe("bindInstance", () => {
   }
 
   it("should bind service and handle lifecycle", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     const result: Container = bindInstance(container, GenericService);
 
@@ -114,7 +114,7 @@ describe("bindInstance", () => {
   });
 
   it("should skip lifecycle if skipLifecycle is true", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     bindInstance(container, GenericService, { skipLifecycle: true });
 
@@ -126,7 +126,7 @@ describe("bindInstance", () => {
   });
 
   it("should throw for instance descriptor without constructor value", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const binding = {
       type: BindingType.Instance,
       token: GenericService,
@@ -142,7 +142,7 @@ describe("bindInstance", () => {
   });
 
   it("should throw for instance descriptor without token", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const binding = {
       type: BindingType.Instance,
       value: GenericService,
@@ -157,7 +157,7 @@ describe("bindInstance", () => {
   });
 
   it("should throw for instance descriptor with unknown scope", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const binding = {
       type: BindingType.Instance,
       token: GenericService,
@@ -176,7 +176,7 @@ describe("bindInstance", () => {
   it("should handle async @OnActivated and catch errors", async () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     bindInstance(container, AsyncFailService);
 
@@ -198,7 +198,7 @@ describe("bindInstance", () => {
   it("should throw on failing @OnActivated methods without failing resolution", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     bindInstance(container, SyncFailActivationService);
 
@@ -246,7 +246,7 @@ describe("bindInstance", () => {
       }
     }
 
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     bindInstance(container, SyncFailActivationWithHandlersService);
 
@@ -281,7 +281,7 @@ describe("bindInstance", () => {
   it("should catch and log failing @OnDeactivation methods while preserving cleanup", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     bindInstance(container, SyncFailDeactivationService);
 
@@ -309,7 +309,7 @@ describe("bindInstance", () => {
   });
 
   it("should handle non-function @OnQuery or @OnActivated properties during activation", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     bindInstance(container, CorruptedService);
 
@@ -328,7 +328,7 @@ describe("bindInstance", () => {
 
     const reflectMetadata: ReflectMetadata = Reflect as ReflectMetadata;
     const originalGetMetadata = reflectMetadata.getMetadata;
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     try {
       delete reflectMetadata.getMetadata;

@@ -44,7 +44,7 @@ export const PACKAGE_CHECKS: Array<PackageCheckDescriptor> = [
   { exportName: "createContainer", name: "wirestate" },
   { exportName: "Action", name: "wirestate/mobx" },
   { exportName: "signal", name: "wirestate/signals" },
-  { exportName: "mockContainer", name: "wirestate/test-utils" },
+  { exportName: "withContainerProvider", name: "wirestate/test-utils" },
 ];
 
 function writeJson(filePath: string, value: Record<string, unknown>): void {
@@ -145,7 +145,7 @@ function typecheckSource(): string {
     'import type { AnnotationMapEntry as WirestateAnnotationMapEntry, IActionFactory as WirestateActionFactory } from "wirestate/mobx";',
     'import { signal as wirestateSignal } from "wirestate/signals";',
     'import type { Model as WirestateModel, ReadonlySignal as WirestateReadonlySignal } from "wirestate/signals";',
-    'import { mockContainer as wirestateMockContainer } from "wirestate/test-utils";',
+    'import { withContainerProvider as wirestateWithContainerProvider } from "wirestate/test-utils";',
     "",
     "type MobxTypeExportSmoke = AnnotationMapEntry | IActionFactory | WirestateAnnotationMapEntry | WirestateActionFactory;",
     "type ReactSignalsTypeExportSmoke = Model<unknown> | ReadonlySignal<unknown> | WirestateModel<unknown> | WirestateReadonlySignal<unknown>;",
@@ -170,7 +170,7 @@ function typecheckSource(): string {
     "void WirestateContainerProvider;",
     "void WirestateAction;",
     "void wirestateSignal;",
-    "void wirestateMockContainer;",
+    "void wirestateWithContainerProvider;",
     "",
   ].join("\n");
 }

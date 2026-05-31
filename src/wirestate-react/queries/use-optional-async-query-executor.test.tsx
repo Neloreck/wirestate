@@ -1,6 +1,5 @@
 import { render } from "@testing-library/react";
-import { Container, QueryBus } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { Container, QueryBus, createContainer } from "@wirestate/core";
 
 import { withContainerProvider } from "../test-utils/with-container-provider";
 import { Optional } from "../types/general";
@@ -10,7 +9,7 @@ import { useOptionalAsyncQueryExecutor } from "./use-optional-async-query-execut
 
 describe("useOptionalAsyncQueryExecutor", () => {
   it("should return an executor that dispatches sync queries as promises", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((data: string) => data + "-result");
 
@@ -36,7 +35,7 @@ describe("useOptionalAsyncQueryExecutor", () => {
   });
 
   it("should resolve null on unhandled queries", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     let executor: Optional<OptionalAsyncQueryExecutor> = null as Optional<OptionalAsyncQueryExecutor>;
 
@@ -57,7 +56,7 @@ describe("useOptionalAsyncQueryExecutor", () => {
   });
 
   it("should resolve async handler results", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
 
     bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
@@ -78,7 +77,7 @@ describe("useOptionalAsyncQueryExecutor", () => {
   });
 
   it("should return a stable executor between re-renders", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const executors: Array<OptionalAsyncQueryExecutor> = [];
 
     function TestComponent() {
@@ -96,7 +95,7 @@ describe("useOptionalAsyncQueryExecutor", () => {
   });
 
   it("should support symbol query types", async () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
     const type: unique symbol = Symbol("optional-query");
 

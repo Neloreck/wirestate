@@ -8,7 +8,7 @@
 - Add `@wirestate/lit-signals` with `@lit-labs/signals` and `signal-polyfill` re-exports and package metadata.
 - Add `@wirestate/lit/test-utils` with `createLitProvision`, plus package build and export entries.
 - Add portable bundle entry points for core, React MobX, React Signals, and Lit Signals targets.
-- Add `createContainer`, `CreateContainerOptions`, `ContainerConfig`, and `ContainerActivation` as the current core container creation API.
+- Add `createContainer`, `ContainerConfig`, `CreateContainerOptions`, and `ContainerActivation` as the current core container creation API.
 - Add immediate seed application, service provisioning, and activation options to `createContainer`.
 - Add `getContainerBindings` and `getBindingToken` for inspecting bindings registered through Wirestate binding helpers.
 - Add core `OnProvision` and `OnDeprovision` decorators plus `provisionContainer`, `deprovisionContainer`, `provisionServices`, and `deprovisionServices`.
@@ -18,8 +18,8 @@
 - Add `useScope` and context-level `useContainer` exports in `@wirestate/react`.
 - Add React `SubContainerProvider` for managed child container provisioning.
 - Add React `useAsyncQueryExecutor` and `useOptionalAsyncQueryExecutor` for Promise-normalized query calls.
-- Add ESM/CJS package export entries for `@wirestate/core/test-utils` and `@wirestate/react/test-utils`.
-- Add React `withContainerProvider` test utility and expand `mockContainer` coverage in core test utilities.
+- Add ESM/CJS package export entries for `@wirestate/react/test-utils`.
+- Add React `withContainerProvider` test utility.
 - Add centralized Inversify alias exports from `@wirestate/core`, including the missing `decorate` export.
 - Add missing MobX alias exports in `@wirestate/react-mobx`.
 - Add scoped-bus, seed, service shadowing, lifecycle, and provider replacement regression tests across core, React, and Lit.
@@ -27,6 +27,7 @@
 ### Changed
 
 - Replace `createIocContainer` with `createContainer` and align public docs/examples around the new container API.
+- Split `createContainer(config, options)` so reusable container config is separate from lifecycle and creation tweaks.
 - Split activation and provision into separate lifecycle phases so framework rendering lifecycles are no longer coupled to service activation.
 - Track provider deprovision state for services that inject `WireScope`, even when they do not declare `@OnProvision` or `@OnDeprovision`.
 - Move provider lifecycle decorators and lifecycle execution helpers from framework packages into `@wirestate/core`.
@@ -72,6 +73,7 @@
 ### Removed
 
 - Remove `createIocContainer`; use `createContainer`.
+- Remove `@wirestate/core/test-utils`.
 - Remove React `IocProvider`, `createInjectablesProvider`, `useIocContext`, and provider-local `useContainer` / `useInjection` / `useOptionalInjection` paths in favor of context and provider APIs exported from `@wirestate/react`.
 - Remove experimental React `useRootContainer` and `useContainerRevision`.
 - Remove low-value core shortcut helpers: `command`, `commandOptional`, `emitEvent`, `query`, and `queryOptional`.

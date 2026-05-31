@@ -1,5 +1,5 @@
 import { Container } from "../alias";
-import { mockContainer } from "../test-utils/mock-container";
+import { createContainer } from "../container/create-container";
 import { SeedsMap } from "../types/seeds";
 
 import { setSharedSeed } from "./set-shared-seed";
@@ -7,7 +7,7 @@ import { SEED_TOKEN } from "./tokens";
 
 describe("setSharedSeed", () => {
   it("should bind initial state to container when not yet bound", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     setSharedSeed(container, { key: "value" });
 
@@ -15,7 +15,7 @@ describe("setSharedSeed", () => {
   });
 
   it("should overwrite shared state", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     setSharedSeed(container, { x: 1 });
     setSharedSeed(container, { y: 2 });
@@ -26,7 +26,7 @@ describe("setSharedSeed", () => {
   });
 
   it("should not rebind states token", () => {
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
 
     const bindSpy = jest.spyOn(container, "bind");
     const rebindSpy = jest.spyOn(container, "rebind");

@@ -1,6 +1,5 @@
 import { render } from "@testing-library/react";
-import { Container, Injectable, Newable } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
+import { Container, Injectable, Newable, createContainer } from "@wirestate/core";
 
 import { ErrorLogBoundary } from "@/fixtures/react-components/error-log-boundary";
 
@@ -35,7 +34,7 @@ describe("useInjection", () => {
   });
 
   it("should resolve bound service from container", () => {
-    const container: Container = mockContainer({ bindings: [SimpleService] });
+    const container: Container = createContainer({ bindings: [SimpleService] });
 
     const { getByTestId } = render(withContainerProvider(<TestComponent />, container));
 
@@ -59,7 +58,7 @@ describe("useInjection", () => {
   });
 
   it("should memoize service instance", () => {
-    const container: Container = mockContainer({ bindings: [SimpleService] });
+    const container: Container = createContainer({ bindings: [SimpleService] });
 
     const originalGet = container.get.bind(container);
     let resolveCount = 0;
@@ -87,7 +86,7 @@ describe("useInjection", () => {
   it("should re-resolve when token changes", () => {
     class AnotherService {}
 
-    const container: Container = mockContainer({
+    const container: Container = createContainer({
       bindings: [SimpleService, AnotherService],
     });
 

@@ -1,7 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
 import { BindingType, Container, createContainer, Injectable, OnActivated, OnDeactivation } from "@wirestate/core";
-import { mockContainer } from "@wirestate/core/test-utils";
 import { customElement } from "lit/decorators.js";
 
 import { GenericService } from "@/fixtures/services/generic-service";
@@ -26,7 +25,7 @@ describe("ContainerProvider", () => {
 
   it("should use the provided container", () => {
     const element: TestProviderElement = new TestProviderElement();
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const controller: ContainerProvider = new ContainerProvider(element, {
       container: container,
     });
@@ -52,7 +51,7 @@ describe("ContainerProvider", () => {
 
   it("should provide container to child consumers", () => {
     const element: TestProviderElement = new TestProviderElement();
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const child: TestChildElement = new TestChildElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
       container,
@@ -85,8 +84,8 @@ describe("ContainerProvider", () => {
 
   it("should propagate external container value updates to child consumers", () => {
     const element: TestProviderElement = new TestProviderElement();
-    const initialContainer: Container = mockContainer();
-    const nextContainer: Container = mockContainer();
+    const initialContainer: Container = createContainer();
+    const nextContainer: Container = createContainer();
     const child: TestChildElement = new TestChildElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
       container: initialContainer,
@@ -120,7 +119,7 @@ describe("ContainerProvider", () => {
 
   it("should not dispose provided external container on disconnect", () => {
     const element: TestProviderElement = new TestProviderElement();
-    const container: Container = mockContainer();
+    const container: Container = createContainer();
     const unbindAllSpy = jest.spyOn(container, "unbindAll");
 
     new ContainerProvider(element, {
@@ -135,8 +134,8 @@ describe("ContainerProvider", () => {
 
   it("should store external container updates while disconnected without publishing values", () => {
     const element: TestProviderElement = new TestProviderElement();
-    const initialContainer: Container = mockContainer();
-    const nextContainer: Container = mockContainer();
+    const initialContainer: Container = createContainer();
+    const nextContainer: Container = createContainer();
     const controller: ContainerProvider = new ContainerProvider(element, { container: initialContainer });
 
     controller.setValue(nextContainer);
@@ -221,7 +220,7 @@ describe("ContainerProvider", () => {
 
   it("should reject config updates for external container providers", () => {
     const element: TestProviderElement = new TestProviderElement();
-    const controller: ContainerProvider = new ContainerProvider(element, { container: mockContainer() });
+    const controller: ContainerProvider = new ContainerProvider(element, { container: createContainer() });
 
     expect(() => controller.setConfig({ bindings: [] })).toThrow(
       "ContainerProvider uses an external container. Use `setValue(container)` to replace it."
@@ -327,7 +326,7 @@ describe("ContainerProvider", () => {
     const element: TestProviderElement = new TestProviderElement();
     const controller: ContainerProvider = new ContainerProvider(element, { config: { bindings: [GenericService] } });
 
-    expect(() => controller.setValue(mockContainer())).toThrow(
+    expect(() => controller.setValue(createContainer())).toThrow(
       "ContainerProvider owns managed containers. Use `setConfig(config)` to replace the managed container."
     );
   });
