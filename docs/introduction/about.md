@@ -2,22 +2,32 @@
 
 Wirestate is a foundation for DI-backed TypeScript application architecture.
 
-It gives a UI framework layer the pieces it needs but should not invent every time: scoped ownership, injectable
-services, lifecycle, local messaging, and hydration data.
+It provides reusable building blocks for UI frameworks: scoped ownership, injectable services, lifecycle management,
+local messaging, and hydration data.
 
-Application logic lives in services. UI adapters provide those services to component trees. Services talk through
+Application logic lives in services, which UI adapters provide to component trees. Services communicate through
 container-local events, commands, and queries instead of reaching across UI boundaries.
 
-Reactivity stays outside the core. Use MobX, Preact Signals, Lit Signals, or plain TypeScript.
+Reactivity stays outside the core. Use MobX, Preact Signals, Lit Signals, or other solutions.
 
 ## What It Gives You
 
-- Scoped containers for root apps, subtrees, tests, tenants, modals, and feature branches.
-- `@Injectable` services as state owners and workflow owners.
-- Lifecycle hooks for setup, cleanup, provider attach, and provider detach.
+- Scoped containers for apps, subtrees, tests, tenants, modals, and feature areas.
+- `@Injectable` services for state, workflows, and shared application logic.
+- Lifecycle hooks for setup, cleanup, and provider boundaries.
 - Container-local `EventBus`, `CommandBus`, and `QueryBus`.
-- Seeds for SSR hydration, deterministic tests, and per-subtree startup data.
-- React and Lit adapters that keep framework glue thin.
+- Seeds for SSR hydration, deterministic tests, and subtree startup data.
+- React and Lit adapters for connecting services to UI trees.
+
+## When It Fits
+
+Use Wirestate when a feature has application logic, state, or workflows that should live outside UI components.
+
+It is a good fit when you need:
+
+- Services scoped to an app, subtree, modal, tenant, or test.
+- Logic that can be tested without rendering UI.
+- Clear boundaries between UI components and application services.
 
 ## Docs Layout
 
@@ -26,15 +36,6 @@ Reactivity stays outside the core. Use MobX, Preact Signals, Lit Signals, or pla
 - [Lit](/lit/overview) covers Lit providers, decorators, controllers, messaging, seeds, and tests.
 - [React Signals](/react-signals/overview), [React MobX](/react-mobx/overview), and
   [Lit Signals](/lit-signals/overview) cover framework-specific reactivity packages.
-
-## When It Fits
-
-- You want application logic outside UI components.
-- You want service lifetime scoped to a container or subtree.
-- You want testable services without rendering UI.
-
-Wirestate fits complex applications where a page grows into a long-lived feature with its own state, workflows,
-and service boundaries.
 
 ## Examples
 

@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: "Wirestate"
-  tagline: "A DI foundation for service-owned state and workflows"
+  tagline: "A DI foundation for service-owned state"
   actions:
     - theme: brand
       text: Get Started
@@ -18,5 +18,5 @@ features:
   - title: Scoped Messaging
     details: Events broadcast. Commands write. Queries read. Containers keep their own buses.
   - title: Bring Reactivity
-    details: Use MobX, Preact Signals, Lit Signals, or plain TypeScript.
+    details: Use MobX, Preact Signals, Lit Signals, or other solutions.
 ---
