@@ -31,9 +31,11 @@ export function unbind<T = unknown>(container: Container, token: ServiceIdentifi
  * Unbinds every token through Wirestate-owned lifecycle cleanup.
  *
  * @remarks
- * This wraps Inversify's `container.unbindAll()` and also clears the Wirestate
- * binding registry. Any provider lifecycle services still owned by the container
- * are deprovisioned before Inversify deactivation.
+ * This uses Inversify's batch `container.unbindAll()` so services can still
+ * resolve each other while deactivation is running. Any provider lifecycle
+ * services still owned by the container are deprovisioned before Inversify
+ * deactivation. After this call, the container is disposed and should be
+ * discarded.
  *
  * @group Bind
  *

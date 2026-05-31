@@ -66,8 +66,8 @@ metadata stay registered consistently.
 
 ## Removing Bindings
 
-Use [`unbind`](/api/wirestate-core/functions/unbind) or [`unbindAll`](/api/wirestate-core/functions/unbindAll) when
-removing bindings that were added through Wirestate.
+Use [`unbind`](/api/wirestate-core/functions/unbind) when removing one binding added through Wirestate. Use
+[`unbindAll`](/api/wirestate-core/functions/unbindAll) when disposing a container completely.
 
 ```ts
 import { unbind, unbindAll } from "@wirestate/core";
@@ -77,7 +77,8 @@ unbindAll(child);
 ```
 
 These wrappers call the underlying Inversify unbind operation and also clean Wirestate-owned bookkeeping. If a provider
-currently owns the service, `@OnDeprovision` runs before service deactivation.
+currently owns the service, `@OnDeprovision` runs before service deactivation. After `unbindAll`, discard the container
+and create a new one for future work.
 
 Raw `container.unbind(...)` and `container.unbindAll()` remain available as Inversify escape hatches, but they do not clean
 Wirestate's registered binding list.

@@ -38,7 +38,7 @@ export class HeaderService {
     const opened: boolean = this.scope.executeCommand("OPEN_SEARCH");
 
     if (!opened) {
-      console.error("Failed to open search")
+      console.error("Failed to open search");
     }
   }
 }

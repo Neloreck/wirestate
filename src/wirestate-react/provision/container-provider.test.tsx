@@ -216,8 +216,6 @@ describe("ContainerProvider", () => {
       </ContainerProvider>
     );
 
-    const unbindAllSpy = jest.spyOn(containers[0], "unbindAll");
-
     rerender(
       <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "second" }] }}>
         <TrackingConsumer />
@@ -226,7 +224,7 @@ describe("ContainerProvider", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(unbindAllSpy).toHaveBeenCalledTimes(1);
+    expect(containers[0].isCurrentBound(CONFIG_TOKEN)).toBe(false);
     expect(containers).toHaveLength(2);
   });
 

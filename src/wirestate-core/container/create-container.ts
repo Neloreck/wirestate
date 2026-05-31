@@ -4,13 +4,16 @@ import { prefix } from "@/macroses/prefix.macro";
 import { Container, ServiceIdentifier } from "../alias";
 import { bind } from "../bind/bind";
 import { getBindingToken } from "../bind/get-binding-token";
+import { CommandBus } from "../commands/command-bus";
+import { EventBus } from "../events/event-bus";
+import { QueryBus } from "../queries/query-bus";
 import { setSeeds } from "../seeds/set-seeds";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../seeds/tokens";
 import { AnyObject } from "../types/general";
 import { SeedBindings, SeedsMap } from "../types/initial-state";
 import { Bindings } from "../types/provision";
 
-import { createBaseContainer } from "./create-base-container";
+import { CONTAINER_PARENT_TOKEN } from "./tokens";
 import { validateContainerConfig } from "./validate-container-config";
 import { WireScope } from "./wire-scope";
 
@@ -116,21 +119,24 @@ export function createContainer(options: CreateContainerOptions = {}): Container
 
   const container: Container = new Container({
     defaultScope: "Singleton",
-    parent: createBaseContainer({ ...options, seeds: null, seed: null }),
+    parent: options.parent,
   });
 
+  container.bind(CONTAINER_PARENT_TOKEN).toConstantValue(options.parent);
   container.bind(Container).toConstantValue(container);
+  container.bind(EventBus).toConstantValue(new EventBus());
+  container.bind(QueryBus).toConstantValue(new QueryBus());
+  container.bind(CommandBus).toConstantValue(new CommandBus());
   container.bind(SEEDS_TOKEN).toConstantValue(new Map() as SeedsMap);
   container.bind(SEED_TOKEN).toConstantValue(options.seed ?? {});
-
-  if (options.seeds) {
-    setSeeds(container, options.seeds);
-  }
-
   container
     .bind(WireScope)
     .toResolvedValue((): WireScope => new WireScope(container))
     .inTransientScope();
+
+  if (options.seeds) {
+    setSeeds(container, options.seeds);
+  }
 
   dbg.info(prefix(__filename), "Injecting bindings on creation:", { container, options });
 

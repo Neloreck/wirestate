@@ -21,6 +21,12 @@ describe("createContainer", () => {
     expect(container.get(SEEDS_TOKEN)).toBeInstanceOf(Map);
     expect(container.get(SEED_TOKEN)).toEqual({});
     expect(container.get(WireScope)).toBeInstanceOf(WireScope);
+    expect(container.isCurrentBound(EventBus)).toBe(true);
+    expect(container.isCurrentBound(QueryBus)).toBe(true);
+    expect(container.isCurrentBound(CommandBus)).toBe(true);
+    expect(container.isCurrentBound(SEEDS_TOKEN)).toBe(true);
+    expect(container.isCurrentBound(SEED_TOKEN)).toBe(true);
+    expect(container.isCurrentBound(WireScope)).toBe(true);
   });
 
   it("should bind core buses as singletons by default", () => {

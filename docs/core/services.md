@@ -179,7 +179,7 @@ bind(container, {
 
 ## Remove Services
 
-Use `unbind` or `unbindAll` when removing Wirestate bindings.
+Use `unbind` when removing one Wirestate binding. Use `unbindAll` when disposing the whole container.
 
 ```ts
 import { unbind, unbindAll } from "@wirestate/core";
@@ -189,7 +189,8 @@ unbindAll(container);
 ```
 
 The wrappers keep Wirestate's registered binding list and provider lifecycle state in sync with Inversify. If a provider
-owns a service when it is removed, `@OnDeprovision` runs before `@OnDeactivation`.
+owns a service when it is removed, `@OnDeprovision` runs before `@OnDeactivation`. After `unbindAll`, discard the
+container and create a new one for future work.
 
 ## API Reference
 

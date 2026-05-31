@@ -11,6 +11,7 @@ import {
   QueryBus,
   WireScope,
   createContainer,
+  unbindAll,
 } from "../index";
 import { Optional } from "../types/general";
 
@@ -119,7 +120,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     expect(parent.get(ParentCounterService).events).toEqual(["parent:from-parent"]);
     expect(child.get(ChildCounterService).events).toEqual(["child:from-child"]);
 
-    child.unbindAll();
+    unbindAll(child);
 
     expect(parent.get(CommandBus).execute(ADD_COMMAND, 2)).toBe(6);
     expect(parent.get(QueryBus).query(COUNT_QUERY)).toBe("root-label:6");
@@ -194,7 +195,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
       seeds: [[SETTINGS_TOKEN, { label: "cleanup-label", offset: 0 }]],
     });
 
-    container.unbindAll();
+    unbindAll(container);
 
     expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
     expect(commandResult).not.toBeNull();
@@ -203,10 +204,10 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     expect(result).toBe("command-result");
     expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
-
-    expect(container.get(EventBus).has()).toBe(false);
-    expect(container.get(QueryBus).has(DEACTIVATE_QUERY)).toBe(false);
-    expect(container.get(CommandBus).has(DEACTIVATE_COMMAND)).toBe(false);
+    expect(container.isBound(CleanupService)).toBe(false);
+    expect(container.isBound(EventBus)).toBe(false);
+    expect(container.isBound(QueryBus)).toBe(false);
+    expect(container.isBound(CommandBus)).toBe(false);
   });
 
   it("keeps services able to communicate with each other while deactivating", async () => {
@@ -271,10 +272,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
         this.scope.emitEvent(PEER_DEACTIVATE_EVENT, "from-coordinator");
         logs.push(`coordinator-query:${this.scope.query(PEER_DEACTIVATE_QUERY, "from-coordinator")}`);
 
-        commandResult = this.scope.executeCommandAsync<string, string>(
-          PEER_DEACTIVATE_COMMAND,
-          "from-coordinator"
-        );
+        commandResult = this.scope.executeCommandAsync<string, string>(PEER_DEACTIVATE_COMMAND, "from-coordinator");
 
         fromDeactivationCoordinatorService.push(
           this.scope.resolve(WireScope),
@@ -289,7 +287,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
       bindings: [DeactivationCoordinatorService, DeactivationPeerService],
     });
 
-    container.unbindAll();
+    unbindAll(container);
 
     expect(logs).toEqual([
       "coordinator-deactivation",

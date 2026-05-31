@@ -1,6 +1,7 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { BindingType, Container, Inject, Injectable } from "../alias";
+import { unbindAll } from "../bind/unbind";
 import { createContainer } from "../container/create-container";
 import { WireScope } from "../container/wire-scope";
 import { Optional } from "../types/general";
@@ -36,7 +37,7 @@ describe("provision lifecycle", () => {
       "deprovision-first",
     ]);
 
-    container.unbindAll();
+    unbindAll(container);
 
     expect(events).toEqual([
       "activated-first",
@@ -150,7 +151,7 @@ describe("provision lifecycle", () => {
 
     expect(events).toEqual(["provision", "deprovision"]);
 
-    container.unbindAll();
+    unbindAll(container);
 
     expect(events).toEqual(["provision", "deprovision", "deactivation"]);
   });

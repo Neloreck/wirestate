@@ -1,6 +1,7 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { BindingType, Container, Injectable } from "../alias";
+import { unbindAll } from "../bind/unbind";
 
 import { mockContainer } from "./mock-container";
 
@@ -67,7 +68,7 @@ describe("mockContainer", () => {
     expect(container.get(LifecycleService)).toBeInstanceOf(LifecycleService);
     expect(events).toEqual(["activated"]);
 
-    container.unbindAll();
+    unbindAll(container);
 
     expect(events).toEqual(["activated", "deactivation"]);
   });
@@ -84,7 +85,7 @@ describe("mockContainer", () => {
     expect(container.get(LifecycleService)).toBeInstanceOf(LifecycleService);
     expect(events).toEqual([]);
 
-    container.unbindAll();
+    unbindAll(container);
 
     expect(events).toEqual([]);
   });
