@@ -254,7 +254,7 @@ describe("bindInstance", () => {
     expect(() => container.get(SyncFailActivationWithHandlersService)).toThrow("sync-activation-handlers-fail");
     expect(container.get(CommandBus).has(ACTIVATION_FAILURE_COMMAND)).toBe(false);
     expect(container.get(QueryBus).has(ACTIVATION_FAILURE_QUERY)).toBe(false);
-    expect(container.get(EventBus).has()).toBe(false);
+    expect(container.get(EventBus).hasSubscribers()).toBe(false);
     expect(scopeRef.current).not.toBeNull();
 
     const activatedScope: WireScope = scopeRef.current as WireScope;

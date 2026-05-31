@@ -403,13 +403,13 @@ describe("WireScope", () => {
     const queryBus: QueryBus = container.get(QueryBus);
     const commandBus: CommandBus = container.get(CommandBus);
 
-    expect(eventBus.has()).toBe(false);
+    expect(eventBus.hasSubscribers()).toBe(false);
     expect(commandBus.has("TEST_COMMAND")).toBe(false);
     expect(queryBus.has("TEST_QUERY")).toBe(false);
 
     const service: ServiceWithManualSubs = bind(container, ServiceWithManualSubs).get(ServiceWithManualSubs);
 
-    expect(eventBus.has()).toBe(true);
+    expect(eventBus.hasSubscribers()).toBe(true);
     expect(commandBus.has("TEST_COMMAND")).toBe(true);
     expect(queryBus.has("TEST_QUERY")).toBe(true);
 
@@ -426,7 +426,7 @@ describe("WireScope", () => {
 
     container.unbind(ServiceWithManualSubs);
 
-    expect(eventBus.has()).toBe(false);
+    expect(eventBus.hasSubscribers()).toBe(false);
     expect(commandBus.has("TEST_COMMAND")).toBe(false);
     expect(queryBus.has("TEST_QUERY")).toBe(false);
 

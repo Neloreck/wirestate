@@ -134,7 +134,7 @@ export class EventBus {
    *
    * @returns `true` if at least one handler is registered, `false` otherwise.
    */
-  public has(): boolean {
+  public hasSubscribers(): boolean {
     return this.handlers.size > 0;
   }
 

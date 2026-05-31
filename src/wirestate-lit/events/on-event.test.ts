@@ -41,13 +41,13 @@ describe("onEvent", () => {
     const bus: EventBus = container.get(EventBus);
     const element: DecoratedEventElement = new DecoratedEventElement();
 
-    expect(bus.has()).toBe(false);
+    expect(bus.hasSubscribers()).toBe(false);
 
     provider.appendChild(element);
-    expect(bus.has()).toBe(true);
+    expect(bus.hasSubscribers()).toBe(true);
 
     element.remove();
-    expect(bus.has()).toBe(false);
+    expect(bus.hasSubscribers()).toBe(false);
   });
 
   it("should handle specific event types", () => {
