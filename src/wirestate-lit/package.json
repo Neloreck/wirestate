@@ -1,7 +1,7 @@
 {
   "name": "@wirestate/lit",
   "version": "0.7.0-experimental.8",
-  "description": "Lit elements integration for wirestate",
+  "description": "Lit providers, decorators, and controllers for Wirestate services",
   "sideEffects": false,
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/Neloreck/wirestate#readme",

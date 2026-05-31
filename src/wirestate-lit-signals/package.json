@@ -1,7 +1,7 @@
 {
   "name": "@wirestate/lit-signals",
   "version": "0.7.0-experimental.8",
-  "description": "Signals re-exports for wirestate lit elements",
+  "description": "Lit Signals re-exports for Wirestate Lit services",
   "sideEffects": false,
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/Neloreck/wirestate#readme",

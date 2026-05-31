@@ -1,7 +1,7 @@
 {
   "name": "@wirestate/react-signals",
   "version": "0.7.0-experimental.8",
-  "description": "Preact signals alias and adapters for wirestate",
+  "description": "Preact Signals re-exports for Wirestate React services",
   "sideEffects": false,
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/Neloreck/wirestate#readme",

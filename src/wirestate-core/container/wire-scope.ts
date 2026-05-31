@@ -564,18 +564,18 @@ export class WireScope {
    * @remarks
    * Call without a key to get the one shared seed for this container.
    *
-   * @template T - Expected type of the global seed object.
-   * @returns The global seed object.
+   * @template T - Expected type of the shared seed object.
+   * @returns The shared seed object.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
    *
    * @example
    * ```typescript
-   * interface GlobalSeed {
+   * interface ApplicationSeed {
    *   apiUrl: string;
    * }
    *
-   * const seeds: GlobalSeed = scope.getSeed();
+   * const seed: ApplicationSeed = scope.getSeed();
    * ```
    */
   public getSeed<T extends AnyObject>(): T;

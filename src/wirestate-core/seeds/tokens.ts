@@ -8,7 +8,9 @@
  *
  * @example
  * ```typescript
- * const seedsMap: SeedsMap = container.get(SEEDS_TOKEN);
+ * import { SEEDS, type SeedsMap } from "@wirestate/core";
+ *
+ * const seedsMap: SeedsMap = container.get(SEEDS);
  * ```
  */
 export const SEEDS_TOKEN: unique symbol = Symbol("@wirestate/core/seeds");
@@ -17,13 +19,15 @@ export const SEEDS_TOKEN: unique symbol = Symbol("@wirestate/core/seeds");
  * Unique symbol used as a token for the container-scoped shared seed object.
  *
  * @remarks
- * This token is used to bind and resolve the global shared seed object in the Inversify {@link Container}.
+ * This token is used to bind and resolve the shared seed object in the Inversify {@link Container}.
  *
  * @group Seeds
  *
  * @example
  * ```typescript
- * const sharedSeed: AnyObject = container.get(SEED_TOKEN);
+ * import { SEED } from "@wirestate/core";
+ *
+ * const sharedSeed: Record<string, unknown> = container.get(SEED);
  * ```
  */
 export const SEED_TOKEN: unique symbol = Symbol("@wirestate/core/seed");

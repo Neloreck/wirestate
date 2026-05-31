@@ -1,7 +1,7 @@
 {
   "name": "@wirestate/react",
   "version": "0.7.0-experimental.8",
-  "description": "React alias and adapters for wirestate",
+  "description": "React providers and hooks for Wirestate services",
   "sideEffects": false,
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/Neloreck/wirestate#readme",

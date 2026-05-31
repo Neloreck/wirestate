@@ -3,7 +3,7 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   base: "/wirestate/",
   title: "Wirestate",
-  description: "State management framework based on InversifyJS",
+  description: "Dependency-injected service state for React and Lit applications",
   head: [["link", { rel: "icon", type: "image/svg+xml", href: "/wirestate/logo.svg" }]],
   async transformPageData(pageData) {
     if (pageData.relativePath.startsWith("api/wirestate-")) {

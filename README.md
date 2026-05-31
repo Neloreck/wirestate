@@ -1,7 +1,7 @@
 # Wirestate
 
 [![docs](https://img.shields.io/badge/docs-github_pages-blue)](https://neloreck.github.io/wirestate)
-[![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/master/LICENSE)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
 
 Wirestate is a set of TypeScript packages for building application state around dependency-injected services.
 
@@ -184,7 +184,7 @@ class CounterButton extends LitElement {
 ## Docs
 
 - [General](https://neloreck.github.io/wirestate/)
-- [API](https://neloreck.github.io/wirestate/api/modules.html)
+- [API](https://neloreck.github.io/wirestate/api/)
 
 ## License
 

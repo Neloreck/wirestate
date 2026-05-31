@@ -1,4 +1,4 @@
-# @wirestate/portable [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://neloreck.github.io/wirestate/)]
+# Portable Bundle Entries [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://neloreck.github.io/wirestate/)]
 
 This directory contains entry points for building "portable" bundles of Wirestate. These entries combine core functionality with framework bindings and reactivity integrations into single entry points, suitable for specific target environments or simplified distribution.
 

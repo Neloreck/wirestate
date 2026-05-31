@@ -1,12 +1,12 @@
 # wirestate
 
-Compatibility package for the `@wirestate`.
+Compatibility package for the unscoped `wirestate` name.
 
 This package builds the current core and React adapter into one distributable package:
 
 - `wirestate` includes `@wirestate/core` and `@wirestate/react` APIs.
-- `wirestate/mobx` includes the React MobX adapter APIs.
-- `wirestate/signals` includes the React Signals adapter APIs.
+- `wirestate/mobx` includes the `@wirestate/react-mobx` APIs.
+- `wirestate/signals` includes the `@wirestate/react-signals` APIs.
 - `wirestate/test-utils` includes the core and React test utilities.
 
 New focused work lives in the scoped packages, but this package keeps the unscoped name.
