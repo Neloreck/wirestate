@@ -1,6 +1,6 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { BindingType, Container, Injectable } from "../alias";
+import { BindingType, Container, Inject, Injectable } from "../alias";
 import { bind } from "../bind/bind";
 import { unbindAll } from "../bind/unbind";
 import { CommandBus } from "../commands/command-bus";
@@ -52,6 +52,44 @@ describe("createContainer", () => {
     expect(container.isCurrentBound(SEEDS_TOKEN)).toBe(true);
     expect(container.isCurrentBound(SEED_TOKEN)).toBe(true);
     expect(container.isCurrentBound(WireScope)).toBe(true);
+  });
+
+  it("should let a skipMessaging child use parent messaging bindings", () => {
+    const receivedEvents: Array<string> = [];
+
+    @Injectable()
+    class ParentMessagingService {
+      public constructor(@Inject(EventBus) eventBus: EventBus) {
+        eventBus.subscribe((event) => receivedEvents.push(String(event.payload)));
+      }
+    }
+
+    @Injectable()
+    class ChildMessagingService {
+      public constructor(@Inject(EventBus) private readonly eventBus: EventBus) {}
+
+      public emit(message: string): void {
+        this.eventBus.emit("child-message", message);
+      }
+    }
+
+    const parent: Container = createContainer({
+      activate: true,
+      bindings: [ParentMessagingService],
+    });
+    const child: Container = createContainer({ parent, bindings: [ChildMessagingService] }, { skipMessaging: true });
+
+    expect(child.isCurrentBound(EventBus)).toBe(false);
+    expect(child.isBound(EventBus)).toBe(true);
+    expect(child.isCurrentBound(QueryBus)).toBe(false);
+    expect(child.isBound(QueryBus)).toBe(true);
+    expect(child.isCurrentBound(CommandBus)).toBe(false);
+    expect(child.isBound(CommandBus)).toBe(true);
+    expect(child.get(EventBus)).toBe(parent.get(EventBus));
+
+    child.get(ChildMessagingService).emit("from-child");
+
+    expect(receivedEvents).toEqual(["from-child"]);
   });
 
   it("should bind WireScope in transient scope", () => {
