@@ -2,9 +2,9 @@
 
 Events are broadcast notifications. They say "this happened" and do not return a value.
 
-Each container owns its own `EventBus`. Child container events do not bubble to a parent container.
+Each container owns its own `EventBus`. Events stay in that container and do not bubble to a parent container.
 
-## Emit From A Service
+## Emit from a Service
 
 ```ts
 import { Inject, Injectable, WireScope } from "@wirestate/core";
@@ -19,7 +19,7 @@ export class CartService {
 }
 ```
 
-## Handle With A Decorator
+## Handle with a Decorator
 
 ```ts
 import { Injectable, OnEvent, WireEvent } from "@wirestate/core";
@@ -45,7 +45,7 @@ Useful forms:
 
 ## Subscribe Directly
 
-Use direct subscriptions when a handler is dynamic.
+Use direct subscriptions when the handler is dynamic or created at runtime.
 
 ```ts
 import { EventBus, createContainer } from "@wirestate/core";
@@ -61,7 +61,7 @@ bus.emit("CART_VIEWED");
 unsubscribe();
 ```
 
-## Subscribe From A Service
+## Subscribe from a Service
 
 When a service owns a dynamic subscription, attach it during provider lifecycle and remove it during deprovision.
 
@@ -105,7 +105,7 @@ export class CartActivityService {
 
 Use this pattern when the subscription depends on runtime state or cannot be expressed with `@OnEvent`.
 
-A throwing event handler is logged. The next handler still runs.
+If an event handler throws, Wirestate logs the error and continues with the next handler.
 
 ## API Reference
 

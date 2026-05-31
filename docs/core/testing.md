@@ -2,7 +2,7 @@
 
 Services are TypeScript classes, but most services are designed to be resolved by a container. Test simple services
 directly when their constructor and methods do not need Wirestate. Use a fresh container when dependency injection,
-lifecycle, seeds, or buses are part of the behavior.
+lifecycle, seeds, or message buses are part of the behavior.
 
 ## No Container
 
@@ -38,7 +38,7 @@ test("increments count", () => {
 });
 ```
 
-Skip lifecycle when hook setup is noise for the test.
+Skip lifecycle hooks when that setup is unrelated to the test.
 
 ```ts
 import { createContainer } from "@wirestate/core";
@@ -48,8 +48,8 @@ const service = createContainer({ bindings: [CounterService] }, { skipLifecycle:
 
 ## Several Services
 
-`createContainer` binds a group of services. Use `activate` when resolution-time behavior needs to run before assertions.
-Use `provisionContainer` when the behavior under test lives in `@OnProvision` or `@OnDeprovision`.
+`createContainer` binds a group of services. Use `activate` when activation behavior needs to run before assertions. Use
+`provisionContainer` when the behavior under test lives in `@OnProvision` or `@OnDeprovision`.
 
 ```ts
 import { EventBus, createContainer } from "@wirestate/core";

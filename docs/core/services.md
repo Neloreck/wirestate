@@ -3,7 +3,7 @@
 A service is an `@Injectable` class bound to a container. Put state ownership, workflows, IO coordination, and business
 logic there.
 
-## Declare A Service
+## Declare a Service
 
 ```ts
 import { Injectable } from "@wirestate/core";
@@ -63,8 +63,8 @@ export class OrderService {
 
 ## WireScope
 
-Inject [`WireScope`](/api/wirestate-core/classes/WireScope) when a service needs the container edge: lazy resolution, events,
-commands, queries, or seeds.
+Inject [`WireScope`](/api/wirestate-core/classes/WireScope) when a service needs lazy resolution, events, commands,
+queries, or seeds from its container.
 
 ```ts
 import { Inject, Injectable, WireScope } from "@wirestate/core";
@@ -79,7 +79,7 @@ export class CartService {
 }
 ```
 
-`WireScope` is transient. Each service gets its own handle.
+`WireScope` is transient. Each service gets its own scope handle.
 
 `WireScope` depends on the container's `EventBus`, `QueryBus`, and `CommandBus`. Containers created with
 `createContainer(config, { skipMessaging: true })` can only resolve `WireScope` when those buses are inherited from a
@@ -91,7 +91,7 @@ parent container. Without inherited messaging, use direct container injection in
 
 ## Lifecycle
 
-Wirestate has two lifecycle layers.
+Wirestate has two lifecycle layers:
 
 - `@OnActivated` runs when the service is first resolved.
 - `@OnDeactivation` runs when the service is unbound or the container is disposed.
@@ -99,8 +99,8 @@ Wirestate has two lifecycle layers.
 - `@OnDeprovision` runs before that provider releases or replaces the container.
 
 Use provider lifecycle for work that needs cleanup: timers, subscriptions, sockets, observers, provider-scoped fetch
-loops, and external resource handles. Activation is resolution-time work. It can happen before a provider boundary is
-committed, so it should stay cheap and not open resources that depend on provider ownership.
+loops, and external resource handles. Activation happens when a service is resolved. It can run before a provider
+boundary is committed, so it should stay cheap and avoid resources that depend on provider ownership.
 
 ```ts
 import { Injectable, OnDeprovision, OnProvision } from "@wirestate/core";
@@ -128,8 +128,8 @@ export class PollingService {
 }
 ```
 
-When you use core directly, call `provisionContainer` and `deprovisionContainer` at the boundary that owns the service
-work.
+When you use core directly, call `provisionContainer` and `deprovisionContainer` at the boundary that owns provider
+lifecycle work.
 
 ```ts
 import { deprovisionContainer, provisionContainer } from "@wirestate/core";
@@ -160,10 +160,10 @@ export class NotificationService {
 }
 ```
 
-## Constants And Factories
+## Constants and Factories
 
-Use descriptors when the binding needs an explicit token or strategy. That includes constants, factories, and service
-classes registered behind a token that is different from the class itself.
+Use descriptors when a binding needs an explicit token or binding strategy. This includes constants, factories, and
+service classes registered behind a token that is different from the class itself.
 
 ```ts
 import { BindingScope, BindingType, bind, createContainer } from "@wirestate/core";

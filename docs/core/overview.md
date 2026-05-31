@@ -2,8 +2,8 @@
 
 `@wirestate/core` contains the framework-agnostic part of Wirestate.
 
-Use it to define services, [create scoped containers](/api/wirestate-core/functions/createContainer), run lifecycle hooks,
-pass seed data, and communicate through container-local events, commands, and queries.
+Use it to define services, [create scoped containers](/api/wirestate-core/functions/createContainer), run lifecycle
+hooks, pass seed data, and communicate through container-local events, commands, and queries.
 
 The core package does not choose a reactivity system. A service can hold plain values, immutable data, external stores,
 or reactive objects created by another package.
@@ -54,11 +54,11 @@ const counter = container.get(CounterService);
 counter.increment();
 ```
 
-## What Belongs In Core
+## What Belongs in Core
 
 - Service classes and dependency injection.
 - Root and child containers.
-- Service activation, deactivation, provision, and deprovision hooks.
+- Lifecycle hooks for service activation, service deactivation, provider provision, and provider deprovision.
 - Events for broadcast notifications.
 - Commands for one-handler write operations.
 - Queries for one-handler read operations.

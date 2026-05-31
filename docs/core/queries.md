@@ -2,10 +2,10 @@
 
 Queries read data owned elsewhere. A query has one active handler and returns that handler's result.
 
-Each query type uses a stack of handlers. The newest registration answers. When it unregisters, the previous handler is
-active again.
+Each query type uses a stack of handlers. The newest registration answers the query. When it unregisters, the previous
+handler becomes active again.
 
-## Handle A Query
+## Handle a Query
 
 ```ts
 import { Injectable, OnQuery } from "@wirestate/core";
@@ -24,7 +24,7 @@ export class CartSummaryService {
 }
 ```
 
-## Run A Query
+## Run a Query
 
 ```ts
 import { Inject, Injectable, WireScope } from "@wirestate/core";
@@ -46,7 +46,7 @@ Choose the query call by return shape:
 - `queryOptional` returns `null` if no handler exists.
 - `queryOptionalAsync` combines optional lookup and Promise wrapping.
 
-Use an async variant when the handler may return a Promise, so callers can always `await` the result without checking
+Use an async variant when the handler may return a Promise. Callers can then always `await` the result without checking
 whether the handler is sync or async.
 
 ## Register Directly
@@ -63,9 +63,10 @@ const user = bus.query<{ id: string }>("CURRENT_USER");
 unregister();
 ```
 
-## Register From A Service
+## Register from a Service
 
-When a service owns a dynamic query handler, register it during provider lifecycle and unregister it during deprovision.
+When a service owns a dynamic query handler, register it during provider lifecycle and unregister it during
+deprovision.
 
 ```ts
 import { Inject, Injectable, OnDeprovision, OnProvision, QueryUnregister, WireScope } from "@wirestate/core";

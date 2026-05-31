@@ -1,6 +1,6 @@
 # Core Seeds
 
-Seeds are container-scoped input data. Use them for hydration, per-instance parameters, static configuration, and
+Seeds are input data scoped to one container. Use them for hydration, per-instance parameters, static configuration, and
 deterministic tests.
 
 There are two kinds:
@@ -52,8 +52,8 @@ setSharedSeed(container, { apiUrl: "https://api.next.example.com", locale: "uk-U
 
 ## Targeted Seeds
 
-Targeted seeds belong to one key. They do not touch the shared seed object. Use them for service-specific startup data
-or static config that should stay tied to one token.
+Targeted seeds belong to one key. They do not change the shared seed object. Use them for service-specific startup data
+or static config tied to one token.
 
 ```ts
 import { Container, createContainer } from "@wirestate/core";
@@ -69,8 +69,8 @@ const container: Container = createContainer({
 ```
 
 Read targeted seeds through `WireScope`. Seeds exist from container creation, so apply static seed values in
-`@OnActivated`. That is cheap resolution-time work with no cleanup. Keep `@OnProvision` for provider-owned resources
-such as timers, subscriptions, or sockets.
+`@OnActivated`. Use that hook for cheap setup that does not need cleanup. Keep `@OnProvision` for provider-owned
+resources such as timers, subscriptions, or sockets.
 
 ```ts
 import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
@@ -94,7 +94,7 @@ export class CounterService {
 
 `scope.getSeed(Token)` returns `null` when no targeted seed exists. Falsy values are preserved.
 
-`@OnActivated` runs the first time the service is resolved. Resolve or activate the service so the hook runs.
+`@OnActivated` runs the first time the service is resolved. Resolve or eagerly activate the service so the hook runs.
 
 ```ts
 const counter = container.get(CounterService);
@@ -102,7 +102,8 @@ const counter = container.get(CounterService);
 
 ## Updating Seeds
 
-`setSeeds` updates targeted seeds in place. `unsetSeeds` removes targeted seeds by key.
+`setSeeds` updates targeted seeds in place. `unsetSeeds` removes targeted seeds by key. The value passed to
+`unsetSeeds` is ignored; only the key matters.
 
 ```ts
 import { setSeeds, unsetSeeds } from "@wirestate/core";
@@ -111,7 +112,7 @@ setSeeds(container, [[CounterService, { count: 50 }]]);
 unsetSeeds(container, [[CounterService, null]]);
 ```
 
-Seed updates do not rewind already provisioned services. Apply seeds before the provider provisions the container, or
+Seed updates do not rewind already provisioned services. Apply seeds before a provider provisions the container, or
 explicitly re-apply the value in your own service method.
 
 ## API Reference

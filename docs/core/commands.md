@@ -1,13 +1,14 @@
 # Core Commands
 
-Commands trigger work. A command has one active handler. Use the synchronous APIs when the handler is synchronous
-and the caller needs the result immediately. Use the async APIs when the handler may return a Promise or the caller wants
-a Promise-normalized result.
+Commands trigger work. A command has one active handler.
 
-Each command type uses a stack of handlers. The newest registration wins. When it unregisters, the previous handler is
-active again.
+Use synchronous APIs when the handler is synchronous and the caller needs the result immediately. Use async APIs when the
+handler may return a Promise or the caller should always receive a Promise.
 
-## Handle A Command
+Each command type uses a stack of handlers. The newest registration handles the command. When it unregisters, the
+previous handler becomes active again.
+
+## Handle a Command
 
 ```ts
 import { Injectable, OnCommand } from "@wirestate/core";
@@ -25,7 +26,7 @@ export class SearchService {
 }
 ```
 
-## Execute A Command
+## Execute a Command
 
 ```ts
 import { Inject, Injectable, WireScope } from "@wirestate/core";
@@ -46,7 +47,7 @@ export class HeaderService {
 
 `executeCommand` throws `WirestateError` when no handler exists.
 
-## Handle An Async Command
+## Handle an Async Command
 
 ```ts
 import { Inject, Injectable, OnCommand, WireScope } from "@wirestate/core";
@@ -69,11 +70,11 @@ export class HeaderService {
 }
 ```
 
-`executeCommandAsync` wraps synchronous handler results and passes asynchronous results through.
+`executeCommandAsync` wraps synchronous handler results in a Promise and passes asynchronous results through.
 
 ## Execute Optional Commands
 
-Use optional commands when absence is normal, such as an optional devtools integration.
+Use optional commands when a missing handler is valid, such as an optional devtools integration.
 
 ```ts
 const refreshed: boolean | null = this.scope.executeOptionalCommand("REFRESH_DEVTOOLS");
@@ -105,7 +106,7 @@ bus.register("RESET_CART", () => cart.clear());
 bus.execute("RESET_CART");
 ```
 
-## Register From A Service
+## Register from a Service
 
 When a service owns a dynamic command handler, register it during provider lifecycle and unregister it during
 deprovision.

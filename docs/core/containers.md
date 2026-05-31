@@ -2,8 +2,8 @@
 
 A [container](/api/wirestate-core/classes/Container) owns service instances, seed data, and one set of message buses.
 
-Same container means same `EventBus`, `CommandBus`, and `QueryBus`. Child container means inherited bindings with
-separate buses and local seed data.
+Services in the same container share the same `EventBus`, `CommandBus`, and `QueryBus`. Child containers inherit parent
+bindings, but keep their own buses and seed data.
 
 ## Root Container
 
@@ -29,14 +29,13 @@ const container: Container = createContainer({
 - `false` or omitted keeps services lazy.
 - An array resolves only the listed tokens.
 
-Eager activation is still resolution-time work. Do not use it to start resources that need cleanup. Use provider
-lifecycle for that boundary: `provisionContainer`/`deprovisionContainer` in core, or the provider lifecycle exposed by a
-UI adapter.
+Eager activation only resolves services. Do not use it to start resources that need cleanup. Use provider lifecycle for
+that boundary: `provisionContainer`/`deprovisionContainer` in core, or the provider lifecycle exposed by a UI adapter.
 
 ## Internal Errors
 
-Pass `onError` to route isolated internal errors to application logging.
-Without it, Wirestate reports them with `console.error`.
+Pass `onError` to send isolated internal errors to application logging. Without it, Wirestate reports them with
+`console.error`.
 
 ```ts
 const container = createContainer({
@@ -66,14 +65,15 @@ const child: Container = createContainer({
 });
 ```
 
-Child containers inherit parent bindings. Their buses and targeted seeds stay local.
+Child containers inherit parent bindings. Their buses and targeted seeds stay local to the child.
 
-Use child containers for modal state, checkout flows, tenant scope, tests, or any branch that needs different services.
+Use child containers for modal state, checkout flows, tenant scope, tests, or any branch that needs its own services or
+local messaging.
 
 ## Direct Container Work
 
-`createContainer` returns an Inversify `Container`. You can still use normal container methods when the local model needs
-them.
+`createContainer` returns an Inversify `Container`. You can still use normal container methods when a lower-level
+operation needs them.
 
 ```ts
 if (container.isBound(UserService)) {
@@ -81,8 +81,8 @@ if (container.isBound(UserService)) {
 }
 ```
 
-Prefer bindings and Wirestate's bind/unbind helpers for Wirestate services so lifecycle, provider ownership, and messaging
-metadata stay registered consistently.
+Prefer Wirestate bindings and bind/unbind helpers for Wirestate services. They keep lifecycle, provider ownership, and
+messaging metadata in sync.
 
 ## Removing Bindings
 
@@ -96,9 +96,9 @@ unbind(container, UserService);
 unbindAll(child);
 ```
 
-These wrappers call the underlying Inversify unbind operation and also clean Wirestate-owned bookkeeping. If a provider
-currently owns the service, `@OnDeprovision` runs before service deactivation. After `unbindAll`, discard the container
-and create a new one for future work.
+These wrappers call the underlying Inversify unbind operation and clean Wirestate-owned bookkeeping. If a provider owns
+the service, `@OnDeprovision` runs before service deactivation. After `unbindAll`, discard the container and create a
+new one for future work.
 
 Raw `container.unbind(...)` and `container.unbindAll()` remain available as Inversify escape hatches, but they do not clean
 Wirestate's registered binding list.
