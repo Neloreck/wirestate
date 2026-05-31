@@ -274,7 +274,7 @@ export class QueryBus {
    * @param type - Unique query identifier.
    * @returns `true` if a handler is available, `false` otherwise.
    */
-  public has(type: QueryType): boolean {
+  public hasHandler(type: QueryType): boolean {
     const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
 
     return Boolean(stack && stack.length);

@@ -28,13 +28,13 @@ describe("OnCommandController", () => {
     const handler = jest.fn();
 
     new OnCommandController(element, "TEST_COMMAND", handler);
-    expect(bus.has("TEST_COMMAND")).toBe(false);
+    expect(bus.hasHandler("TEST_COMMAND")).toBe(false);
 
     provider.appendChild(element);
-    expect(bus.has("TEST_COMMAND")).toBe(true);
+    expect(bus.hasHandler("TEST_COMMAND")).toBe(true);
 
     element.remove();
-    expect(bus.has("TEST_COMMAND")).toBe(false);
+    expect(bus.hasHandler("TEST_COMMAND")).toBe(false);
   });
 
   it("should invoke handler with correct data when command is dispatched", () => {
@@ -85,10 +85,10 @@ describe("OnCommandController", () => {
     new OnCommandController(element, "REVISION_COMMAND", handler);
 
     provider.appendChild(element);
-    expect(bus.has("REVISION_COMMAND")).toBe(true);
+    expect(bus.hasHandler("REVISION_COMMAND")).toBe(true);
 
     contextProvider.setValue(secondContainer);
-    expect(firstContainer.get(CommandBus).has("REVISION_COMMAND")).toBe(false);
-    expect(secondContainer.get(CommandBus).has("REVISION_COMMAND")).toBe(true);
+    expect(firstContainer.get(CommandBus).hasHandler("REVISION_COMMAND")).toBe(false);
+    expect(secondContainer.get(CommandBus).hasHandler("REVISION_COMMAND")).toBe(true);
   });
 });

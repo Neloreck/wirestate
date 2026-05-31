@@ -31,13 +31,13 @@ describe("@onCommand", () => {
     const bus: CommandBus = container.get(CommandBus);
     const element: DecoratedCommandElement = new DecoratedCommandElement();
 
-    expect(bus.has("TEST_COMMAND")).toBe(false);
+    expect(bus.hasHandler("TEST_COMMAND")).toBe(false);
 
     provider.appendChild(element);
-    expect(bus.has("TEST_COMMAND")).toBe(true);
+    expect(bus.hasHandler("TEST_COMMAND")).toBe(true);
 
     element.remove();
-    expect(bus.has("TEST_COMMAND")).toBe(false);
+    expect(bus.hasHandler("TEST_COMMAND")).toBe(false);
   });
 
   it("should call decorated method when command is dispatched", () => {

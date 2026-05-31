@@ -22,7 +22,7 @@ describe("useCommandHandler", () => {
       return null;
     }
 
-    expect(bus.has("HOOK_COMMAND")).toBe(false);
+    expect(bus.hasHandler("HOOK_COMMAND")).toBe(false);
 
     const { unmount } = render(
       <ContainerProvider container={container}>
@@ -30,7 +30,7 @@ describe("useCommandHandler", () => {
       </ContainerProvider>
     );
 
-    expect(bus.has("HOOK_COMMAND")).toBe(true);
+    expect(bus.hasHandler("HOOK_COMMAND")).toBe(true);
 
     const result: string = await bus.executeAsync<string, string>("HOOK_COMMAND", "data");
 
@@ -38,7 +38,7 @@ describe("useCommandHandler", () => {
 
     unmount();
 
-    expect(bus.has("HOOK_COMMAND")).toBe(false);
+    expect(bus.hasHandler("HOOK_COMMAND")).toBe(false);
     expect(result).toBe("async-data");
   });
 

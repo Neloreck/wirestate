@@ -252,8 +252,8 @@ describe("bindInstance", () => {
     bindInstance(container, SyncFailActivationWithHandlersService);
 
     expect(() => container.get(SyncFailActivationWithHandlersService)).toThrow("sync-activation-handlers-fail");
-    expect(container.get(CommandBus).has(ACTIVATION_FAILURE_COMMAND)).toBe(false);
-    expect(container.get(QueryBus).has(ACTIVATION_FAILURE_QUERY)).toBe(false);
+    expect(container.get(CommandBus).hasHandler(ACTIVATION_FAILURE_COMMAND)).toBe(false);
+    expect(container.get(QueryBus).hasHandler(ACTIVATION_FAILURE_QUERY)).toBe(false);
     expect(container.get(EventBus).hasSubscribers()).toBe(false);
     expect(scopeRef.current).not.toBeNull();
 
@@ -298,7 +298,7 @@ describe("bindInstance", () => {
     expect(instance.scope["eventBus"]).toBeNull();
     expect(instance.scope["queryBus"]).toBeNull();
 
-    expect(container.get(QueryBus).has("SYNC_FAIL_DEACTIVATION_QUERY")).toBe(false);
+    expect(container.get(QueryBus).hasHandler("SYNC_FAIL_DEACTIVATION_QUERY")).toBe(false);
     expect(consoleSpy).toHaveBeenCalledWith(
       "[wirestate] @OnDeactivation failed:",
       "SyncFailDeactivationService",

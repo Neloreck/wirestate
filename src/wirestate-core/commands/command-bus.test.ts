@@ -42,11 +42,11 @@ describe("CommandBus", () => {
 
     const unregister: CommandUnregister = bus.register("TYPE", () => "value");
 
-    expect(bus.has("TYPE")).toBe(true);
+    expect(bus.hasHandler("TYPE")).toBe(true);
 
     unregister();
 
-    expect(bus.has("TYPE")).toBe(false);
+    expect(bus.hasHandler("TYPE")).toBe(false);
   });
 
   it("should fall back to previous handler after unregistering top of stack", () => {
@@ -142,11 +142,11 @@ describe("CommandBus", () => {
   it("should check if handler exists", () => {
     const bus: CommandBus = new CommandBus();
 
-    expect(bus.has("TYPE")).toBe(false);
+    expect(bus.hasHandler("TYPE")).toBe(false);
 
     bus.register("TYPE", () => null);
 
-    expect(bus.has("TYPE")).toBe(true);
+    expect(bus.hasHandler("TYPE")).toBe(true);
   });
 
   it("should clear all handlers", () => {
@@ -157,8 +157,8 @@ describe("CommandBus", () => {
 
     bus.clear();
 
-    expect(bus.has("A")).toBe(false);
-    expect(bus.has("B")).toBe(false);
+    expect(bus.hasHandler("A")).toBe(false);
+    expect(bus.hasHandler("B")).toBe(false);
   });
 
   it("should handle unregistering when stack is already empty", () => {
@@ -257,7 +257,7 @@ describe("CommandBus", () => {
       bus.register("TYPE", handler);
       bus.unregister("TYPE", handler);
 
-      expect(bus.has("TYPE")).toBe(false);
+      expect(bus.hasHandler("TYPE")).toBe(false);
       expect(() => bus.execute("TYPE")).toThrow("No command handler registered in container for type: 'TYPE'.");
     });
 
@@ -289,7 +289,7 @@ describe("CommandBus", () => {
       bus.register("TYPE_B", handlerB);
       bus.unregister("TYPE_A", handlerA);
 
-      expect(bus.has("TYPE_A")).toBe(false);
+      expect(bus.hasHandler("TYPE_A")).toBe(false);
       expect(bus.execute("TYPE_B")).toBe("b");
     });
 
@@ -329,15 +329,15 @@ describe("CommandBus", () => {
 
       bus.unregister("TYPE", handler);
 
-      expect(bus.has("TYPE")).toBe(true);
+      expect(bus.hasHandler("TYPE")).toBe(true);
 
       unregisterSecond();
 
-      expect(bus.has("TYPE")).toBe(true);
+      expect(bus.hasHandler("TYPE")).toBe(true);
 
       unregisterFirst();
 
-      expect(bus.has("TYPE")).toBe(false);
+      expect(bus.hasHandler("TYPE")).toBe(false);
     });
   });
 });

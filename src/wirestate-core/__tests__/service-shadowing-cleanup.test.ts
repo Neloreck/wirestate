@@ -95,8 +95,8 @@ describe("core service shadowing and cleanup integration", () => {
       bindings: [PrimaryHandlerService, SecondaryHandlerService],
     });
 
-    expect(container.get(CommandBus).has(FORMAT_COMMAND)).toBe(true);
-    expect(container.get(QueryBus).has(CURRENT_QUERY)).toBe(true);
+    expect(container.get(CommandBus).hasHandler(FORMAT_COMMAND)).toBe(true);
+    expect(container.get(QueryBus).hasHandler(CURRENT_QUERY)).toBe(true);
     expect(lifecycle).toEqual(["primary:activated", "secondary:activated"]);
 
     expect(container.get(CommandBus).execute(FORMAT_COMMAND, "first")).toBe("secondary:first");
@@ -110,8 +110,8 @@ describe("core service shadowing and cleanup integration", () => {
 
     container.unbind(PrimaryHandlerService);
 
-    expect(container.get(CommandBus).has(FORMAT_COMMAND)).toBe(false);
-    expect(container.get(QueryBus).has(CURRENT_QUERY)).toBe(false);
+    expect(container.get(CommandBus).hasHandler(FORMAT_COMMAND)).toBe(false);
+    expect(container.get(QueryBus).hasHandler(CURRENT_QUERY)).toBe(false);
 
     expect(() => container.get(CommandBus).execute(FORMAT_COMMAND, "third")).toThrow(
       "No command handler registered in container for type: 'FORMAT_COMMAND'."

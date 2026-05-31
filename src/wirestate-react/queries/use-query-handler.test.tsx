@@ -19,7 +19,7 @@ describe("useQueryHandler", () => {
       return null;
     }
 
-    expect(bus.has("TEST_QUERY")).toBe(false);
+    expect(bus.hasHandler("TEST_QUERY")).toBe(false);
 
     const { unmount } = render(
       <ContainerProvider container={container}>
@@ -27,7 +27,7 @@ describe("useQueryHandler", () => {
       </ContainerProvider>
     );
 
-    expect(bus.has("TEST_QUERY")).toBe(true);
+    expect(bus.hasHandler("TEST_QUERY")).toBe(true);
 
     const result: string = bus.query("TEST_QUERY", "data");
 
@@ -36,7 +36,7 @@ describe("useQueryHandler", () => {
 
     unmount();
 
-    expect(bus.has("TEST_QUERY")).toBe(false);
+    expect(bus.hasHandler("TEST_QUERY")).toBe(false);
   });
 
   it("should update handler ref when handler changes", () => {
@@ -86,8 +86,8 @@ describe("useQueryHandler", () => {
       </ContainerProvider>
     );
 
-    expect(bus.has("QUERY_A")).toBe(true);
-    expect(bus.has("QUERY_B")).toBe(false);
+    expect(bus.hasHandler("QUERY_A")).toBe(true);
+    expect(bus.hasHandler("QUERY_B")).toBe(false);
 
     rerender(
       <ContainerProvider container={container}>
@@ -95,8 +95,8 @@ describe("useQueryHandler", () => {
       </ContainerProvider>
     );
 
-    expect(bus.has("QUERY_A")).toBe(false);
-    expect(bus.has("QUERY_B")).toBe(true);
+    expect(bus.hasHandler("QUERY_A")).toBe(false);
+    expect(bus.hasHandler("QUERY_B")).toBe(true);
   });
 
   it("should call latest handler registered during render", () => {
@@ -117,7 +117,7 @@ describe("useQueryHandler", () => {
       </ContainerProvider>
     );
 
-    expect(bus.has("QUERY")).toBe(true);
+    expect(bus.hasHandler("QUERY")).toBe(true);
     expect(bus.query("QUERY")).toBe("value1");
 
     rerender(
@@ -126,12 +126,12 @@ describe("useQueryHandler", () => {
       </ContainerProvider>
     );
 
-    expect(bus.has("QUERY")).toBe(true);
+    expect(bus.hasHandler("QUERY")).toBe(true);
     expect(bus.query("QUERY")).toBe("value2");
 
     unmount();
 
-    expect(bus.has("QUERY")).toBe(false);
+    expect(bus.hasHandler("QUERY")).toBe(false);
   });
 
   it("should call latest handler when query is dispatched during rerender layout effects", () => {

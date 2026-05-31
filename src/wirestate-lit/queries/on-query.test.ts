@@ -31,13 +31,13 @@ describe("onQuery", () => {
     const bus: QueryBus = container.get(QueryBus);
     const element = new DecoratedQueryElement();
 
-    expect(bus.has("TEST_QUERY")).toBe(false);
+    expect(bus.hasHandler("TEST_QUERY")).toBe(false);
 
     provider.appendChild(element);
-    expect(bus.has("TEST_QUERY")).toBe(true);
+    expect(bus.hasHandler("TEST_QUERY")).toBe(true);
 
     element.remove();
-    expect(bus.has("TEST_QUERY")).toBe(false);
+    expect(bus.hasHandler("TEST_QUERY")).toBe(false);
   });
 
   it("should call decorated method when query is dispatched", async () => {

@@ -30,13 +30,13 @@ describe("useOnQuery", () => {
     const controller = useOnQuery(element, { type: "TEST_QUERY", handler });
 
     expect(controller).toBeInstanceOf(OnQueryController);
-    expect(bus.has("TEST_QUERY")).toBe(false);
+    expect(bus.hasHandler("TEST_QUERY")).toBe(false);
 
     provider.appendChild(element);
-    expect(bus.has("TEST_QUERY")).toBe(true);
+    expect(bus.hasHandler("TEST_QUERY")).toBe(true);
 
     element.remove();
-    expect(bus.has("TEST_QUERY")).toBe(false);
+    expect(bus.hasHandler("TEST_QUERY")).toBe(false);
   });
 
   it("should call handler with correct data via hook", async () => {

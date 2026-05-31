@@ -320,7 +320,7 @@ describe("WireScope", () => {
     scope.unregisterQueryHandler("TEST_QUERY", handler);
 
     expect(bus.unregister).toHaveBeenCalledWith("TEST_QUERY", handler);
-    expect(bus.has("TEST_QUERY")).toBe(false);
+    expect(bus.hasHandler("TEST_QUERY")).toBe(false);
   });
 
   it("should unregister command handler via scope", () => {
@@ -335,7 +335,7 @@ describe("WireScope", () => {
     scope.unregisterCommandHandler("TEST_COMMAND", handler);
 
     expect(bus.unregister).toHaveBeenCalledWith("TEST_COMMAND", handler);
-    expect(bus.has("TEST_COMMAND")).toBe(false);
+    expect(bus.hasHandler("TEST_COMMAND")).toBe(false);
   });
 
   it("should get global seed from container", () => {
@@ -404,14 +404,14 @@ describe("WireScope", () => {
     const commandBus: CommandBus = container.get(CommandBus);
 
     expect(eventBus.hasSubscribers()).toBe(false);
-    expect(commandBus.has("TEST_COMMAND")).toBe(false);
-    expect(queryBus.has("TEST_QUERY")).toBe(false);
+    expect(commandBus.hasHandler("TEST_COMMAND")).toBe(false);
+    expect(queryBus.hasHandler("TEST_QUERY")).toBe(false);
 
     const service: ServiceWithManualSubs = bind(container, ServiceWithManualSubs).get(ServiceWithManualSubs);
 
     expect(eventBus.hasSubscribers()).toBe(true);
-    expect(commandBus.has("TEST_COMMAND")).toBe(true);
-    expect(queryBus.has("TEST_QUERY")).toBe(true);
+    expect(commandBus.hasHandler("TEST_COMMAND")).toBe(true);
+    expect(queryBus.hasHandler("TEST_QUERY")).toBe(true);
 
     const scope: WireScope = container.get(WireScope);
 
@@ -427,8 +427,8 @@ describe("WireScope", () => {
     container.unbind(ServiceWithManualSubs);
 
     expect(eventBus.hasSubscribers()).toBe(false);
-    expect(commandBus.has("TEST_COMMAND")).toBe(false);
-    expect(queryBus.has("TEST_QUERY")).toBe(false);
+    expect(commandBus.hasHandler("TEST_COMMAND")).toBe(false);
+    expect(queryBus.hasHandler("TEST_QUERY")).toBe(false);
 
     expect(() => scope.emitEvent("TEST_EVENT")).not.toThrow();
     expect(service.onEvent).toHaveBeenCalledTimes(1);

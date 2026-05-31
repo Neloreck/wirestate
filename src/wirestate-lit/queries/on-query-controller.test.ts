@@ -28,13 +28,13 @@ describe("OnQueryController", () => {
     const handler = jest.fn();
 
     new OnQueryController(element, "TEST_QUERY", handler);
-    expect(bus.has("TEST_QUERY")).toBe(false);
+    expect(bus.hasHandler("TEST_QUERY")).toBe(false);
 
     provider.appendChild(element);
-    expect(bus.has("TEST_QUERY")).toBe(true);
+    expect(bus.hasHandler("TEST_QUERY")).toBe(true);
 
     element.remove();
-    expect(bus.has("TEST_QUERY")).toBe(false);
+    expect(bus.hasHandler("TEST_QUERY")).toBe(false);
   });
 
   it("should invoke handler with correct data when query is dispatched", () => {
@@ -76,10 +76,10 @@ describe("OnQueryController", () => {
     new OnQueryController(element, "REVISION_QUERY", handler);
 
     provider.appendChild(element);
-    expect(bus.has("REVISION_QUERY")).toBe(true);
+    expect(bus.hasHandler("REVISION_QUERY")).toBe(true);
 
     contextProvider.setValue(secondContainer);
-    expect(firstContainer.get(QueryBus).has("REVISION_QUERY")).toBe(false);
-    expect(secondContainer.get(QueryBus).has("REVISION_QUERY")).toBe(true);
+    expect(firstContainer.get(QueryBus).hasHandler("REVISION_QUERY")).toBe(false);
+    expect(secondContainer.get(QueryBus).hasHandler("REVISION_QUERY")).toBe(true);
   });
 });

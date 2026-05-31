@@ -30,13 +30,13 @@ describe("useOnCommand hook", () => {
     const controller = useOnCommand(element, { type: "HOOK_COMMAND", handler });
 
     expect(controller).toBeInstanceOf(OnCommandController);
-    expect(bus.has("HOOK_COMMAND")).toBe(false);
+    expect(bus.hasHandler("HOOK_COMMAND")).toBe(false);
 
     provider.appendChild(element);
-    expect(bus.has("HOOK_COMMAND")).toBe(true);
+    expect(bus.hasHandler("HOOK_COMMAND")).toBe(true);
 
     element.remove();
-    expect(bus.has("HOOK_COMMAND")).toBe(false);
+    expect(bus.hasHandler("HOOK_COMMAND")).toBe(false);
   });
 
   it("should call handler with correct data via hook", () => {

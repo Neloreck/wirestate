@@ -34,11 +34,11 @@ describe("QueryBus", () => {
 
     const unregister: QueryUnregister = bus.register("TYPE", () => "value");
 
-    expect(bus.has("TYPE")).toBe(true);
+    expect(bus.hasHandler("TYPE")).toBe(true);
 
     unregister();
 
-    expect(bus.has("TYPE")).toBe(false);
+    expect(bus.hasHandler("TYPE")).toBe(false);
   });
 
   it("should fall back to previous handler after unregistering top of stack", () => {
@@ -112,11 +112,11 @@ describe("QueryBus", () => {
   it("should check if handler exists", () => {
     const bus: QueryBus = new QueryBus();
 
-    expect(bus.has("TYPE")).toBe(false);
+    expect(bus.hasHandler("TYPE")).toBe(false);
 
     bus.register("TYPE", () => null);
 
-    expect(bus.has("TYPE")).toBe(true);
+    expect(bus.hasHandler("TYPE")).toBe(true);
   });
 
   it("should clear all handlers", () => {
@@ -127,8 +127,8 @@ describe("QueryBus", () => {
 
     bus.clear();
 
-    expect(bus.has("A")).toBe(false);
-    expect(bus.has("B")).toBe(false);
+    expect(bus.hasHandler("A")).toBe(false);
+    expect(bus.hasHandler("B")).toBe(false);
   });
 
   it("should not throw when calling unregister after clear", () => {
@@ -138,7 +138,7 @@ describe("QueryBus", () => {
     bus.clear();
 
     expect(() => unregister()).not.toThrow();
-    expect(bus.has("TYPE")).toBe(false);
+    expect(bus.hasHandler("TYPE")).toBe(false);
   });
 
   it("should not throw when calling unregister twice while other handlers remain", () => {
@@ -242,7 +242,7 @@ describe("QueryBus", () => {
       bus.register("TYPE", handler);
       bus.unregister("TYPE", handler);
 
-      expect(bus.has("TYPE")).toBe(false);
+      expect(bus.hasHandler("TYPE")).toBe(false);
       expect(() => bus.query("TYPE")).toThrow("No query handler registered in container for type: 'TYPE'.");
     });
 
@@ -277,7 +277,7 @@ describe("QueryBus", () => {
       bus.register("TYPE_B", handlerB);
       bus.unregister("TYPE_A", handlerA);
 
-      expect(bus.has("TYPE_A")).toBe(false);
+      expect(bus.hasHandler("TYPE_A")).toBe(false);
       expect(bus.query("TYPE_B")).toBe("b");
     });
 
@@ -318,15 +318,15 @@ describe("QueryBus", () => {
 
       bus.unregister("TYPE", handler);
 
-      expect(bus.has("TYPE")).toBe(true);
+      expect(bus.hasHandler("TYPE")).toBe(true);
 
       unregisterSecond();
 
-      expect(bus.has("TYPE")).toBe(true);
+      expect(bus.hasHandler("TYPE")).toBe(true);
 
       unregisterFirst();
 
-      expect(bus.has("TYPE")).toBe(false);
+      expect(bus.hasHandler("TYPE")).toBe(false);
     });
   });
 });

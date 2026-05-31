@@ -149,7 +149,7 @@ export class CommandBus {
    * @param type - Command identifier.
    * @returns `true` if a handler is available, `false` otherwise.
    */
-  public has(type: CommandType): boolean {
+  public hasHandler(type: CommandType): boolean {
     return Boolean(this.handlers.get(type)?.length);
   }
 
