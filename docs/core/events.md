@@ -61,20 +61,21 @@ bus.emit("CART_VIEWED");
 unsubscribe();
 ```
 
+Pass one or more event types to receive only matching events. The bus indexes handlers by type, so unmatched
+events never reach the handler and no manual filtering is needed.
+
+```ts
+const unsubscribe = bus.subscribe(["CART_VIEWED", "CART_CLEARED"], (event) => {
+  console.log(event.type);
+});
+```
+
 ## Subscribe from a Service
 
 When a service owns a dynamic subscription, attach it during provider lifecycle and remove it during deprovision.
 
 ```ts
-import {
-  EventUnsubscriber,
-  Inject,
-  Injectable,
-  OnDeprovision,
-  OnProvision,
-  WireEvent,
-  WireScope,
-} from "@wirestate/core";
+import { EventUnsubscriber, Inject, Injectable, OnDeprovision, OnProvision, WireScope } from "@wirestate/core";
 
 @Injectable()
 export class CartActivityService {
@@ -84,10 +85,8 @@ export class CartActivityService {
 
   @OnProvision()
   public onProvision(): void {
-    this.unsubscribe = this.scope.subscribeToEvent((event: WireEvent) => {
-      if (event.type === "CART_VIEWED") {
-        this.recordView();
-      }
+    this.unsubscribe = this.scope.subscribeToEvent("CART_VIEWED", () => {
+      this.recordView();
     });
   }
 

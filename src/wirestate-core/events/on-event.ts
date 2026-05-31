@@ -33,9 +33,13 @@ import { Maybe, Optional } from "../types/general";
  * ```
  */
 export function OnEvent(types?: EventType | ReadonlyArray<EventType>): MethodDecorator {
-  // Normalize types to an array or null for catch-all.
+  // Normalize types to a deduplicated array, or null for catch-all.
   const normalized: Optional<ReadonlyArray<EventType>> =
-    types === undefined ? null : Array.isArray(types) ? [...(types as ReadonlyArray<EventType>)] : [types as EventType];
+    types === undefined
+      ? null
+      : Array.isArray(types)
+        ? Array.from(new Set(types as ReadonlyArray<EventType>))
+        : [types as EventType];
 
   return (target, propertyKey) => {
     dbg.info(prefix(__filename), "Attaching OnEvent metadata:", {

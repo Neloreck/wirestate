@@ -181,4 +181,204 @@ describe("EventBus", () => {
       })
     );
   });
+
+  describe("type-indexed subscriptions", () => {
+    it("should only deliver matching events to a single-type subscriber", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      bus.subscribe("A", handler);
+
+      bus.emit("B", 1);
+      bus.emit("A", 2);
+      bus.emit("C", 3);
+
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(handler).toHaveBeenCalledWith({ type: "A", payload: 2 });
+    });
+
+    it("should deliver matching events to a multi-type subscriber", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      bus.subscribe(["A", "B"], handler);
+
+      bus.emit("A");
+      bus.emit("B");
+      bus.emit("C");
+
+      expect(handler).toHaveBeenCalledTimes(2);
+      expect(handler).toHaveBeenNthCalledWith(1, { type: "A" });
+      expect(handler).toHaveBeenNthCalledWith(2, { type: "B" });
+    });
+
+    it("should treat an 0 type list as a catch-all subscription", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      bus.subscribe(0, handler);
+
+      bus.emit("A");
+      bus.emit("B");
+      bus.emit(0);
+
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it("should treat an undefined type list as a catch-all subscription", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      bus.subscribe(handler);
+
+      bus.emit("A");
+      bus.emit("B");
+
+      expect(handler).toHaveBeenCalledTimes(2);
+    });
+
+    it("should treat a null type list as a catch-all subscription", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      bus.subscribe(null, handler);
+
+      bus.emit("A");
+      bus.emit("B");
+
+      expect(handler).toHaveBeenCalledTimes(2);
+    });
+
+    it("should not deliver events to an empty type list subscriber", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      bus.subscribe([], handler);
+
+      bus.emit("A");
+      bus.emit("B");
+
+      expect(handler).not.toHaveBeenCalled();
+    });
+
+    it("should deduplicate repeated types and invoke the handler once per emit", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      bus.subscribe(["DUPLICATED", "DUPLICATED"], handler);
+      bus.emit("DUPLICATED");
+
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it("should run catch-all handlers before type-specific handlers", () => {
+      const bus: EventBus = new EventBus();
+      const calls: Array<string> = [];
+
+      bus.subscribe("TYPED", () => calls.push("TYPED"));
+      bus.subscribe((event) => calls.push(`all:${String(event.type)}`));
+
+      bus.emit("TYPED");
+
+      expect(calls).toEqual(["all:TYPED", "TYPED"]);
+    });
+
+    it("should unsubscribe a typed handler via the returned function", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      const unsubscribe: EventUnsubscriber = bus.subscribe(["A", "B"], handler);
+
+      unsubscribe();
+      bus.emit("A");
+      bus.emit("B");
+
+      expect(handler).not.toHaveBeenCalled();
+      expect(bus.hasSubscribers()).toBe(false);
+    });
+
+    it("should keep a shared type bucket alive until its last handler unsubscribes", () => {
+      const bus: EventBus = new EventBus();
+      const first = jest.fn();
+      const second = jest.fn();
+
+      const unsubscribeFirst: EventUnsubscriber = bus.subscribe("SHARED", first);
+
+      bus.subscribe("SHARED", second);
+
+      unsubscribeFirst();
+      bus.emit("SHARED");
+
+      expect(first).not.toHaveBeenCalled();
+      expect(second).toHaveBeenCalledTimes(1);
+      expect(bus.hasSubscribers()).toBe(true);
+    });
+
+    it("should report typed handler errors without stopping other handlers", () => {
+      const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+      const bus: EventBus = new EventBus();
+
+      const survivor = jest.fn();
+      const failing = jest.fn().mockImplementation(() => {
+        throw new Error("typed handler error");
+      });
+
+      bus.subscribe("THROW", failing);
+      bus.subscribe("THROW", survivor);
+      bus.emit("THROW");
+
+      expect(failing).toHaveBeenCalledTimes(1);
+      expect(survivor).toHaveBeenCalledTimes(1);
+      expect(errorSpy).toHaveBeenCalledWith("[wirestate] Event handler threw:", expect.any(Error));
+
+      errorSpy.mockRestore();
+    });
+
+    it("should not invoke handlers subscribed during the same emit", () => {
+      const bus: EventBus = new EventBus();
+      const late = jest.fn();
+
+      bus.subscribe("CHAIN", () => {
+        bus.subscribe("CHAIN", late);
+      });
+
+      bus.emit("CHAIN");
+
+      expect(late).not.toHaveBeenCalled();
+
+      bus.emit("CHAIN");
+
+      expect(late).toHaveBeenCalledTimes(1);
+    });
+
+    it("should allow a handler to unsubscribe itself during emit", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      const unsubscribe: EventUnsubscriber = bus.subscribe("ONCE", () => {
+        handler();
+        unsubscribe();
+      });
+
+      bus.emit("ONCE");
+      bus.emit("ONCE");
+
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it("should report no subscribers once all typed and catch-all handlers are removed", () => {
+      const bus: EventBus = new EventBus();
+
+      const unsubscribeTyped: EventUnsubscriber = bus.subscribe("A", jest.fn());
+      const unsubscribeCatchAll: EventUnsubscriber = bus.subscribe(jest.fn());
+
+      expect(bus.hasSubscribers()).toBe(true);
+
+      unsubscribeTyped();
+      expect(bus.hasSubscribers()).toBe(true);
+
+      unsubscribeCatchAll();
+      expect(bus.hasSubscribers()).toBe(false);
+    });
+  });
 });

@@ -203,12 +203,44 @@ export class WireScope {
    * });
    * ```
    */
-  public subscribeToEvent(handler: EventHandler): EventUnsubscriber {
-    dbg.info(prefix(__filename), "Subscribe event:", { handler });
+  public subscribeToEvent(handler: EventHandler): EventUnsubscriber;
+
+  /**
+   * Subscribes to one or more event types on the {@link EventBus}.
+   *
+   * @remarks
+   * The handler is indexed by type, so it is only called for matching events.
+   * Pass `null` to subscribe to every event.
+   *
+   * @param types - Event type, list of event types, or `null` for every event.
+   * @param handler - Function called for matching events.
+   * @returns A function to unsubscribe.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * const unsubscribe: EventUnsubscriber = scope.subscribeToEvent("USER_LOGGED_IN", (event) => {
+   *   console.log("User logged in:", event);
+   * });
+   * ```
+   */
+  public subscribeToEvent(
+    types: Optional<EventType | ReadonlyArray<EventType>>,
+    handler: EventHandler
+  ): EventUnsubscriber;
+
+  public subscribeToEvent(
+    typesOrHandler: EventHandler | Optional<EventType | ReadonlyArray<EventType>>,
+    handler?: EventHandler
+  ): EventUnsubscriber {
+    dbg.info(prefix(__filename), "Subscribe to event:", { typesOrHandler, handler });
 
     this.assertActive();
 
-    return this.eventBus.subscribe(handler);
+    return handler
+      ? this.eventBus.subscribe(typesOrHandler as Optional<EventType | ReadonlyArray<EventType>>, handler)
+      : this.eventBus.subscribe(typesOrHandler as EventHandler);
   }
 
   /**

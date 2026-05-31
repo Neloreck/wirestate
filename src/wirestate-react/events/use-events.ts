@@ -2,6 +2,7 @@ import { Container, EventBus, EventHandler, EventType } from "@wirestate/core";
 import { RefObject, useRef } from "react";
 
 import { useContainer } from "../context/use-container";
+import { shallowEqualArrays } from "../utils/shallow-equal";
 import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect";
 
 /**
@@ -10,7 +11,6 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * @remarks
  * Similar to {@link useEvent}, but allows listening for a collection of event
  * types using a single handler.
- * The handler and type list are synced via `useRef` to avoid stale closures.
  *
  * @group Events
  *
@@ -29,16 +29,18 @@ export function useEvents(types: ReadonlyArray<EventType>, handler: EventHandler
   const handlerRef: RefObject<EventHandler> = useRef(handler);
   const container: Container = useContainer();
 
-  useIsomorphicLayoutEffect(() => {
+  // Keep a stable reference while membership is unchanged so inline type arrays do not resubscribe on every render.
+  if (!shallowEqualArrays(typesRef.current, types)) {
     typesRef.current = types;
+  }
+
+  const subscribedTypes: ReadonlyArray<EventType> = typesRef.current;
+
+  useIsomorphicLayoutEffect(() => {
     handlerRef.current = handler;
   });
 
   useIsomorphicLayoutEffect(() => {
-    return container.get(EventBus).subscribe((event) => {
-      if (typesRef.current.includes(event.type)) {
-        handlerRef.current?.(event);
-      }
-    });
-  }, [container]);
+    return container.get(EventBus).subscribe(subscribedTypes, (event) => handlerRef.current?.(event));
+  }, [container, subscribedTypes]);
 }

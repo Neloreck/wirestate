@@ -76,6 +76,69 @@ describe("useEvents", () => {
     expect(handler).toHaveBeenCalledTimes(2);
   });
 
+  it("should resubscribe when the listened type membership changes", () => {
+    const container: Container = createContainer();
+    const bus: EventBus = container.get(EventBus);
+    const handler = jest.fn();
+
+    function TestComponent({ types }: { types: ReadonlyArray<string> }) {
+      useEvents(types, handler);
+
+      return null;
+    }
+
+    const { rerender } = render(
+      <ContainerProvider container={container}>
+        <TestComponent types={["A", "B"]} />
+      </ContainerProvider>
+    );
+
+    act(() => bus.emit("A"));
+    act(() => bus.emit("C"));
+
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <ContainerProvider container={container}>
+        <TestComponent types={["B", "C"]} />
+      </ContainerProvider>
+    );
+
+    act(() => bus.emit("A"));
+    act(() => bus.emit("C"));
+
+    expect(handler).toHaveBeenCalledTimes(2);
+    expect(handler).toHaveBeenLastCalledWith({ type: "C" });
+  });
+
+  it("should not leak subscriptions when re-rendered with an equal inline type array", () => {
+    const container: Container = createContainer();
+    const bus: EventBus = container.get(EventBus);
+    const handler = jest.fn();
+
+    function TestComponent() {
+      useEvents(["A", "B"], handler);
+
+      return null;
+    }
+
+    const { rerender } = render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
+
+    rerender(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
+
+    act(() => bus.emit("A"));
+
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
   it("should use latest types and handler when event is emitted during rerender layout effects", () => {
     const container: Container = createContainer();
     const bus: EventBus = container.get(EventBus);

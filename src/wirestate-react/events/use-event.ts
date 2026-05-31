@@ -9,8 +9,7 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  *
  * @remarks
  * The subscription is active for the component's lifetime and is automatically
- * cleaned up on unmount. The handler is synced via `useRef` to avoid stale
- * closures without requiring manual memoization of the handler function.
+ * cleaned up on unmount.
  *
  * @group Events
  *
@@ -25,20 +24,14 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * ```
  */
 export function useEvent(type: EventType, handler: EventHandler): void {
-  const typeRef: RefObject<EventType> = useRef(type);
   const handlerRef: RefObject<EventHandler> = useRef(handler);
   const container: Container = useContainer();
 
   useIsomorphicLayoutEffect(() => {
-    typeRef.current = type;
     handlerRef.current = handler;
   });
 
   useIsomorphicLayoutEffect(() => {
-    return container.get(EventBus).subscribe((event) => {
-      if (event.type === typeRef.current) {
-        handlerRef.current?.(event);
-      }
-    });
-  }, [container]);
+    return container.get(EventBus).subscribe(type, (event) => handlerRef.current?.(event));
+  }, [container, type]);
 }

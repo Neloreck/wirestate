@@ -20,7 +20,7 @@ import { MaybePromise } from "./general";
  * }
  * ```
  */
-export type CommandType = string | symbol;
+export type CommandType = string | symbol | number;
 
 /**
  * Represents the function that handles a command.

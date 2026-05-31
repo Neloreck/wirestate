@@ -103,6 +103,28 @@ describe("WireScope", () => {
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
+  it("should subscribe to specific event types via scope", () => {
+    const container: Container = createContainer();
+    const bus: EventBus = container.get(EventBus);
+    const scope: WireScope = new WireScope(container);
+    const handler = jest.fn();
+
+    jest.spyOn(bus, "subscribe");
+
+    const unsubscribe = scope.subscribeToEvent(["FIRST", "SECOND"], handler);
+
+    expect(bus.subscribe).toHaveBeenCalledWith(["FIRST", "SECOND"], handler);
+    expect(typeof unsubscribe).toBe("function");
+
+    bus.emit("FIRST");
+    bus.emit("SECOND");
+    bus.emit("THIRD");
+
+    expect(handler).toHaveBeenCalledTimes(2);
+    expect(handler).toHaveBeenCalledWith({ type: "FIRST" });
+    expect(handler).toHaveBeenCalledWith({ type: "SECOND" });
+  });
+
   it("should unsubscribe from events via scope", () => {
     const container: Container = createContainer();
     const bus: EventBus = container.get(EventBus);

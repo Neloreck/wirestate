@@ -5,7 +5,7 @@ import { Optional } from "./general";
  *
  * @group Events
  */
-export type EventType = string | symbol;
+export type EventType = string | symbol | number;
 
 /**
  * Represents event payload delivered to handlers.
@@ -47,18 +47,27 @@ export type EventHandler<E extends WireEvent = WireEvent> = (event: E) => void;
 export type EventUnsubscriber = () => void;
 
 /**
- * Represents internal event dispatch entry.
+ * Represents a single bus subscription for one decorated method.
+ *
+ * @remarks
+ * Produced by `buildEventDispatcher`, one per `@OnEvent` method. `types` is
+ * `null` for catch-all handlers and the method's event types otherwise, so the
+ * bus indexes the {@link handler} directly under the matching buckets.
  *
  * @group Events
  * @internal
  */
-export interface EventDispatchEntry {
-  readonly types: Optional<ReadonlyArray<WireEvent["type"]>>;
+export interface EventDispatch {
+  readonly types: Optional<ReadonlyArray<EventType>>;
   readonly handler: EventHandler;
 }
 
 /**
  * Represents metadata for `@OnEvent` decorated methods.
+ *
+ * @remarks
+ * Type lists are normalized to a deduplicated array at registration, or `null`
+ * for catch-all handlers.
  *
  * @group Events
  * @internal

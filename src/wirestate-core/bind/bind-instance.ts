@@ -10,7 +10,7 @@ import { WireScope } from "../container/wire-scope";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { reportWirestateInternalError } from "../error/internal-error-handler";
 import { WirestateError } from "../error/wirestate-error";
-import { buildEventDispatcher } from "../events/build-event-dispatcher";
+import { buildEventDispatchers } from "../events/build-event-dispatchers";
 import { EventBus } from "../events/event-bus";
 import { getQueryHandlerMetadata } from "../queries/get-query-handler-metadata";
 import { QueryBus } from "../queries/query-bus";
@@ -24,7 +24,7 @@ import {
 import { getActivatedHandlerMetadata } from "../service/on-activated";
 import { getDeactivationHandlerMetadata } from "../service/on-deactivation";
 import { CommandHandler, CommandUnregister } from "../types/commands";
-import { EventHandler, EventUnsubscriber } from "../types/events";
+import { EventDispatch, EventUnsubscriber } from "../types/events";
 import { Maybe, MaybePromise, Optional } from "../types/general";
 import { InstanceBindingDescriptor } from "../types/provision";
 import { QueryHandler, QueryUnregister } from "../types/queries";
@@ -180,12 +180,12 @@ export function bindInstanceWithToken<T extends object>(
       CONTAINER_REFS_BY_SERVICE.set(instance, container);
       attachWireScopes(instance, binding);
 
-      // Compose all events listeners into a single bus subscription so we only
-      // pay one Set lookup per emitted event.
-      const dispatcher: Optional<EventHandler> = buildEventDispatcher(instance, container);
+      // Subscribe each @OnEvent method to the bus independently so it is indexed
+      // under its own types and unrelated events never reach it.
+      const dispatches: ReadonlyArray<EventDispatch> = buildEventDispatchers(instance, container);
 
-      if (dispatcher) {
-        attachEventsSubscription(instance, dispatcher);
+      if (dispatches.length) {
+        attachEventsSubscription(instance, dispatches);
       }
 
       // Register every `@OnQuery` handler on the container's QueryBus, and
@@ -341,19 +341,34 @@ export function bindInstanceWithToken<T extends object>(
 }
 
 /**
- * Attaches an event subscription to a service.
+ * Subscribes each of a service's event handlers to the bus.
  *
  * @internal
  *
+ * @remarks
+ * Every decorated method is subscribed independently, and the resulting
+ * unsubscribers are folded into one so the service tears them all down together
+ * on deactivation.
+ *
  * @param service - Service instance.
- * @param handler - Event handler.
+ * @param dispatches - One subscription descriptor per decorated method.
  */
-function attachEventsSubscription<T extends object>(service: T, handler: EventHandler): void {
+function attachEventsSubscription<T extends object>(service: T, dispatches: ReadonlyArray<EventDispatch>): void {
   const bus: Maybe<EventBus> = CONTAINER_REFS_BY_SERVICE.get(service)?.get(EventBus);
 
-  if (bus) {
-    EVENT_UNSUBSCRIBERS_BY_SERVICE.set(service, bus.subscribe(handler));
+  if (!bus) {
+    return;
   }
+
+  const unsubscribers: Array<EventUnsubscriber> = dispatches.map((dispatch) =>
+    bus.subscribe(dispatch.types, dispatch.handler)
+  );
+
+  EVENT_UNSUBSCRIBERS_BY_SERVICE.set(service, () => {
+    for (const unsubscribe of unsubscribers) {
+      unsubscribe();
+    }
+  });
 }
 
 /**

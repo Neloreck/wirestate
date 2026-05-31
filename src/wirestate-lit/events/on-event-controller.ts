@@ -77,16 +77,7 @@ export class OnEventController<E extends WireEvent = WireEvent> implements React
 
     if (this.bus) {
       dbg.info(prefix(__filename), "Registering events handler:", { types: this.types });
-
-      if (this.types === null) {
-        this.unsubscriber = this.bus.subscribe(this.handler as EventHandler);
-      } else {
-        this.unsubscriber = this.bus.subscribe((event) => {
-          if ((this.types as ReadonlyArray<EventType>).includes(event.type)) {
-            this.handler(event as E);
-          }
-        });
-      }
+      this.unsubscriber = this.bus.subscribe(this.types, this.handler as EventHandler);
     }
   }
 

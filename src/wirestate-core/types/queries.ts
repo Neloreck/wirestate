@@ -14,7 +14,7 @@ import { MaybePromise } from "./general";
  * const GET_USER_QUERY: QueryType = Symbol("GET_USER");
  * ```
  */
-export type QueryType = string | symbol;
+export type QueryType = string | symbol | number;
 
 /**
  * Represents the function that handles a query.
