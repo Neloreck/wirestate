@@ -15,6 +15,7 @@ export const EXTERNAL_DEPENDENCIES = [
   "@preact/signals-react",
   "@preact/signals-react/runtime",
   "tslib",
+  "lit",
   "@lit/reactive-element",
   "@lit/context",
   "@lit-labs/signals",

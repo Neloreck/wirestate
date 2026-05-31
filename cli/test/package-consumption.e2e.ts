@@ -5,6 +5,7 @@ import {
   STAGED_PACKAGES,
   packageBinPath,
   packageExportCheckScript,
+  packageIdentityCheckScript,
   prepareConsumerFixture,
   readConsumerText,
   run,
@@ -44,6 +45,18 @@ describe("built package consumption", () => {
 
     expect(result.stderr).toBe("");
     expect(productionResult.stderr).toBe("");
+  });
+
+  it("keeps unscoped compatibility exports identical to scoped package exports", () => {
+    writeConsumerText("identity-consumer.cjs", packageIdentityCheckScript("require"));
+
+    run(process.execPath, ["identity-consumer.cjs"]);
+    run(process.execPath, ["--conditions=production", "identity-consumer.cjs"]);
+
+    const script = packageIdentityCheckScript("import");
+
+    run(process.execPath, ["--input-type=module", "--eval", script]);
+    run(process.execPath, ["--conditions=production", "--input-type=module", "--eval", script]);
   });
 
   it("bundles package imports with Vite", () => {

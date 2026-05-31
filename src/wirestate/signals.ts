@@ -1,1 +1,1 @@
-export * from "../wirestate-react-signals";
+export * from "@wirestate/react-signals";

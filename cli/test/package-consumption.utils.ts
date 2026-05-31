@@ -88,6 +88,37 @@ export function packageExportCheckScript(mode: PackageExportCheckMode): string {
   ].join("\n");
 }
 
+export function packageIdentityCheckScript(mode: PackageExportCheckMode): string {
+  const load = (name: string): string => {
+    return mode === "require" ? `require("${name}")` : `await import("${name}")`;
+  };
+
+  return [
+    `const core = ${load("@wirestate/core")};`,
+    `const react = ${load("@wirestate/react")};`,
+    `const reactMobx = ${load("@wirestate/react-mobx")};`,
+    `const reactSignals = ${load("@wirestate/react-signals")};`,
+    `const wirestate = ${load("wirestate")};`,
+    `const wirestateMobx = ${load("wirestate/mobx")};`,
+    `const wirestateSignals = ${load("wirestate/signals")};`,
+    "const checks = [",
+    '  ["wirestate.createContainer", wirestate.createContainer, core.createContainer],',
+    '  ["wirestate.WireScope", wirestate.WireScope, core.WireScope],',
+    '  ["wirestate.SEED", wirestate.SEED, core.SEED],',
+    '  ["wirestate.ContainerProvider", wirestate.ContainerProvider, react.ContainerProvider],',
+    '  ["wirestate.useInjection", wirestate.useInjection, react.useInjection],',
+    '  ["wirestate/mobx.Action", wirestateMobx.Action, reactMobx.Action],',
+    '  ["wirestate/signals.signal", wirestateSignals.signal, reactSignals.signal],',
+    "];",
+    "for (const [name, actual, expected] of checks) {",
+    "  if (actual !== expected) {",
+    "    throw new Error(`${name} does not share identity with the scoped package export`);",
+    "  }",
+    "}",
+    "",
+  ].join("\n");
+}
+
 export function prepareConsumerFixture(): void {
   fs.rmSync(CONSUMER_ROOT, { force: true, recursive: true });
   fs.mkdirSync(path.resolve(CONSUMER_ROOT, "node_modules", "@wirestate"), { recursive: true });

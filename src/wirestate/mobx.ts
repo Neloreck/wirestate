@@ -1,1 +1,1 @@
-export * from "../wirestate-react-mobx";
+export * from "@wirestate/react-mobx";
