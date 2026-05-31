@@ -1,6 +1,6 @@
 # Lit Containers
 
-Lit [providers](/api/wirestate-lit/classes/ContainerProvider) publish Wirestate containers through Lit context.
+Lit [providers](/api/wirestate-lit/classes/ContainerProvider) make Wirestate containers available through Lit context.
 
 ## Decorator Root Provider
 
@@ -27,8 +27,7 @@ Managed containers are created when the host connects and disposed when it disco
 default unless `activate` is provided.
 
 Use `@OnProvision` for resource work that belongs to the connected provider lifetime. Use `@OnDeprovision` to clean it
-up. Keep `@OnActivated` for cheap resolution-time initialization that does not open timers, subscriptions, or external
-handles.
+up. Keep `@OnActivated` for cheap setup that does not open timers, subscriptions, or external handles.
 
 ## Controller Root Provider
 
@@ -47,8 +46,8 @@ export class ApplicationRoot extends LitElement {
 
 ## External Container
 
-Pass `container` to expose an existing container. The Lit provider provisions and deprovisions it while connected, but
-does not dispose it.
+Pass `container` to expose an existing container. The Lit provider provisions it while connected and deprovisions it on
+disconnect, but does not dispose it.
 
 ```ts
 import { createContainer } from "@wirestate/core";

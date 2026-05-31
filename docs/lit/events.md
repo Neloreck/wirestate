@@ -1,6 +1,6 @@
 # Lit Events
 
-Lit event helpers register handlers against the active container while the element is connected.
+Event helpers let Lit elements subscribe to events on the active container while the element is connected.
 
 ## Decorator Handler
 
@@ -39,7 +39,7 @@ class CartLogger extends LitElement {
 }
 ```
 
-## Emit From An Element
+## Emit from an Element
 
 Inject `WireScope` when an element needs to emit.
 

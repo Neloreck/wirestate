@@ -1,8 +1,8 @@
 # Lit Testing
 
-Use `createContainer` for services. Use `@wirestate/lit/test-utils` when an element needs a container context.
+Test services with `createContainer`. Use `@wirestate/lit/test-utils` when an element needs a container context.
 
-## Create A Lit Provision
+## Create a Lit Provision
 
 `createLitProvision` creates a test host and publishes a container through Lit context.
 

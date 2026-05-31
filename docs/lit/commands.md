@@ -1,6 +1,6 @@
 # Lit Commands
 
-Lit command helpers register command handlers against the active container while the element is connected.
+Command helpers let Lit elements register command handlers on the active container while the element is connected.
 
 ## Decorator Handler
 
@@ -61,7 +61,7 @@ export class DraftCommands extends LitElement {
 }
 ```
 
-## Execute From An Element
+## Execute from an Element
 
 Use `executeCommand` for synchronous handlers.
 
@@ -111,13 +111,13 @@ class SaveButton extends LitElement {
 }
 ```
 
-Use optional commands when the current container may not provide a handler.
+Use optional commands when a missing handler is valid.
 
 ```ts
 await this.scope.executeOptionalCommandAsync("EXPORT_TRACE");
 ```
 
-Newer handlers shadow older handlers for the same command type.
+If several handlers use the same command type, the newest one handles the command.
 
 ## API Reference
 

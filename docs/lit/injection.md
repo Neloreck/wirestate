@@ -1,6 +1,6 @@
 # Lit Injection
 
-Lit can consume Wirestate services with decorators or controller helpers.
+Injection helpers let Lit elements read services and values from the nearest Wirestate container.
 
 ## Decorator Injection
 
@@ -31,7 +31,7 @@ private cart!: CartService;
 
 ## Optional Injection
 
-Use `optionalInjection` when absence is expected.
+Use `optionalInjection` when a missing value is valid.
 
 ```ts
 import { optionalInjection } from "@wirestate/lit";
@@ -44,7 +44,7 @@ class DiagnosticsPanel extends LitElement {
 
 ## Controller Helpers
 
-`useInjection` returns a mutable holder. Read `holder.value` in element methods.
+`useInjection` returns a mutable holder. Read `holder.value` in element methods and templates.
 
 ```ts
 import { useInjection } from "@wirestate/lit";
@@ -58,7 +58,7 @@ class CartIcon extends LitElement {
 }
 ```
 
-`useContainer` and `useScope` expose the current container and `WireScope`.
+`useContainer` and `useScope` expose the active container and `WireScope`.
 
 ```ts
 import { useScope } from "@wirestate/lit";

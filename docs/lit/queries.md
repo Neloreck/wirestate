@@ -1,6 +1,6 @@
 # Lit Queries
 
-Lit query helpers register query handlers against the active container while the element is connected.
+Query helpers let Lit elements register query handlers on the active container while the element is connected.
 
 ## Decorator Handler
 
@@ -32,7 +32,7 @@ class CheckoutAnswer extends LitElement {
 }
 ```
 
-## Execute From An Element
+## Execute from an Element
 
 ```ts
 import { WireScope } from "@wirestate/core";
@@ -60,7 +60,7 @@ export class CheckoutSummaryButton extends LitElement {
 }
 ```
 
-Newer handlers shadow older handlers for the same query type.
+If several handlers use the same query type, the newest one handles the query.
 
 ## API Reference
 

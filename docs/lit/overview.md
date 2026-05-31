@@ -2,9 +2,11 @@
 
 `@wirestate/lit` connects Wirestate containers to Lit elements.
 
-Use it for [container providers](/api/wirestate-lit/functions/provideContainer), service injection, and element-lifetime
-event, command, and query handlers. Use [Lit Signals](/lit-signals/overview) when Lit services should expose signal
-state to templates.
+Use it when Lit elements need access to a Wirestate container. It provides
+[container providers](/api/wirestate-lit/functions/provideContainer), injection helpers, and element handlers for local
+events, commands, and queries.
+
+Use [Lit Signals](/lit-signals/overview) when Lit services should expose signal state to templates.
 
 ## Install
 
@@ -19,6 +21,8 @@ The example below uses Lit Signals for service state. Install [Lit Signals](/lit
 pattern.
 
 ## Root Element
+
+Provide a container from a root element, then inject services in child elements.
 
 ```ts
 import { Injectable } from "@wirestate/core";
@@ -59,9 +63,9 @@ class CounterButton extends LitElement {
 
 ## Provider Lifecycle
 
-Lit providers provision containers while the host is connected. Put work that depends on the connected provider -
-timers, subscriptions, sockets - in `@OnProvision`, and clean it up in `@OnDeprovision`. Use activation only for cheap
-resolution-time initialization that does not need cleanup.
+Lit providers provision containers while the host element is connected. Put work that depends on that connected lifetime
+in `@OnProvision`, such as timers, subscriptions, and sockets. Clean it up in `@OnDeprovision`. Use activation only for
+cheap setup that does not need cleanup.
 
 ## Lit Package Surface
 
