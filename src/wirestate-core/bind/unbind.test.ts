@@ -1,14 +1,18 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { Container } from "../alias";
+import {
+  ContainerProvisionLifecycle,
+  deprovisionContainer,
+  provisionContainer,
+} from "../container/container-provision-lifecycle";
 import { createContainer } from "../container/create-container";
-import { deprovisionContainer, provisionContainer, ProvisionLifecycle } from "../service/provision-lifecycle";
 
 import { getContainerBindings } from "./register-binding";
 import { unbind, unbindAll } from "./unbind";
 
 describe("unbind", () => {
-  function createProvisionLifecycle(): ProvisionLifecycle {
+  function createProvisionLifecycle(): ContainerProvisionLifecycle {
     return new Map();
   }
 
@@ -50,7 +54,7 @@ describe("unbind", () => {
     const container: Container = createContainer({
       bindings: [LifecycleService],
     });
-    const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle);
 
@@ -73,7 +77,7 @@ describe("unbind", () => {
     const container: Container = createContainer({
       bindings: [LifecycleService],
     });
-    const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle);
 

@@ -13,6 +13,11 @@ export { OnCommand } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";
 
 export { createContainer, ContainerConfig, CreateContainerOptions } from "./container/create-container";
+export {
+  ContainerProvisionLifecycle,
+  deprovisionContainer,
+  provisionContainer,
+} from "./container/container-provision-lifecycle";
 export { validateContainerConfig } from "./container/validate-container-config";
 export { WireScope } from "./container/wire-scope";
 
@@ -36,7 +41,6 @@ export { OnActivated } from "./service/on-activated";
 export { OnDeactivation } from "./service/on-deactivation";
 export { OnDeprovision } from "./service/on-deprovision";
 export { OnProvision } from "./service/on-provision";
-export { ProvisionLifecycle, deprovisionContainer, provisionContainer } from "./service/provision-lifecycle";
 
 export { CommandHandler, CommandType, CommandUnregister } from "./types/commands";
 export { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "./types/events";

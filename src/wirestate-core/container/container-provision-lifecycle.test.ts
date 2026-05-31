@@ -2,16 +2,16 @@ import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { BindingType, Container, Inject, Injectable } from "../alias";
 import { unbindAll } from "../bind/unbind";
-import { createContainer } from "../container/create-container";
-import { WireScope } from "../container/wire-scope";
+import { OnActivated } from "../service/on-activated";
+import { OnProvision } from "../service/on-provision";
 import { Optional } from "../types/general";
 
-import { OnActivated } from "./on-activated";
-import { OnProvision } from "./on-provision";
-import { deprovisionContainer, provisionContainer, ProvisionLifecycle } from "./provision-lifecycle";
+import { ContainerProvisionLifecycle, deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
+import { createContainer } from "./create-container";
+import { WireScope } from "./wire-scope";
 
 describe("provision lifecycle", () => {
-  function createProvisionLifecycle(): ProvisionLifecycle {
+  function createProvisionLifecycle(): ContainerProvisionLifecycle {
     return new Map();
   }
 
@@ -21,7 +21,7 @@ describe("provision lifecycle", () => {
     const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
 
     const container: Container = createContainer({ activate: false, bindings: [FirstService, SecondService] });
-    const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle);
 
@@ -65,7 +65,7 @@ describe("provision lifecycle", () => {
         },
       ],
     });
-    const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle, [
       {
@@ -92,7 +92,7 @@ describe("provision lifecycle", () => {
     const container: Container = createContainer({
       bindings: [PlainService],
     });
-    const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle, [PlainService]);
 
@@ -118,7 +118,7 @@ describe("provision lifecycle", () => {
     const container: Container = createContainer({
       bindings: [ScopedPlainService],
     });
-    const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle, [ScopedPlainService]);
 
@@ -143,7 +143,7 @@ describe("provision lifecycle", () => {
     const container: Container = createContainer({
       bindings: [LifecycleService],
     });
-    const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle, [LifecycleService]);
     provisionContainer(container, lifecycle, [LifecycleService]);
@@ -186,7 +186,7 @@ describe("provision lifecycle", () => {
     });
 
     const container: Container = createContainer({ bindings: [FirstService, SecondService] });
-    const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     state.first = container.get(FirstService);
     state.second = container.get(SecondService);
@@ -249,7 +249,7 @@ describe("provision lifecycle", () => {
       bindings: [FailingProvisionService],
       onError,
     });
-    const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle, [FailingProvisionService]);
 
@@ -282,7 +282,7 @@ describe("provision lifecycle", () => {
       onError,
     });
 
-    const lifecycle: ProvisionLifecycle = createProvisionLifecycle();
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle, [AsyncFailingProvisionService]);
 

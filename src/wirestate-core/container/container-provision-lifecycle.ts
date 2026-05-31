@@ -12,20 +12,19 @@ import {
   PROVISION_TOKENS_BY_SERVICE,
   WIRE_SCOPES_BY_SERVICE,
 } from "../registry";
+import { getDeprovisionHandlerMetadata } from "../service/on-deprovision";
+import { getProvisionHandlerMetadata } from "../service/on-provision";
 import { Maybe, MaybePromise, Optional } from "../types/general";
 import { Binding, Bindings } from "../types/provision";
-
-import { getDeprovisionHandlerMetadata } from "./on-deprovision";
-import { getProvisionHandlerMetadata } from "./on-provision";
 
 /**
  * Represents provider lifecycle state keyed by container.
  *
  * Framework adapters keep one map per provider tree.
  *
- * @group Service
+ * @group Container
  */
-export type ProvisionLifecycle = Map<Container, Array<object>>;
+export type ContainerProvisionLifecycle = Map<Container, Array<object>>;
 
 /**
  * Provisions a container for a framework provider.
@@ -35,7 +34,7 @@ export type ProvisionLifecycle = Map<Container, Array<object>>;
  * provision cycle. It also tracks injected `WireScope` instances so
  * `scope.isDeprovisioned` matches provider ownership.
  *
- * @group Service
+ * @group Container
  *
  * @param container - Container entering provider ownership.
  * @param lifecycle - Provider lifecycle state.
@@ -59,7 +58,7 @@ export type ProvisionLifecycle = Map<Container, Array<object>>;
  */
 export function provisionContainer(
   container: Container,
-  lifecycle: ProvisionLifecycle,
+  lifecycle: ContainerProvisionLifecycle,
   bindings: Bindings = getContainerBindings(container)
 ): void {
   if (lifecycle.has(container)) {
@@ -80,7 +79,7 @@ export function provisionContainer(
 /**
  * Deprovisions a container for a framework provider.
  *
- * @group Service
+ * @group Container
  *
  * @param container - Container leaving provider ownership.
  * @param lifecycle - Provider lifecycle state.
@@ -102,7 +101,7 @@ export function provisionContainer(
  * deprovisionContainer(container, lifecycle);
  * ```
  */
-export function deprovisionContainer(container: Container, lifecycle: ProvisionLifecycle): void {
+export function deprovisionContainer(container: Container, lifecycle: ContainerProvisionLifecycle): void {
   const services: Maybe<Array<object>> = lifecycle.get(container);
 
   if (services) {
@@ -126,14 +125,14 @@ export function deprovisionContainer(container: Container, lifecycle: ProvisionL
 /**
  * Deprovisions any provider lifecycle service represented by a binding token.
  *
- * @group Service
+ * @group Container
  * @internal
  *
  * @param container - Container losing the binding.
  * @param token - Binding token removed from the container.
  */
 export function deprovisionContainerBinding(container: Container, token: ServiceIdentifier): void {
-  const lifecycles: Maybe<Set<ProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
+  const lifecycles: Maybe<Set<ContainerProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
 
   if (!lifecycles) {
     return;
@@ -176,13 +175,13 @@ export function deprovisionContainerBinding(container: Container, token: Service
 /**
  * Deprovisions all provider lifecycle services owned by a container.
  *
- * @group Service
+ * @group Container
  * @internal
  *
  * @param container - Container leaving provider ownership.
  */
 export function deprovisionContainerBindings(container: Container): void {
-  const lifecycles: Maybe<Set<ProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
+  const lifecycles: Maybe<Set<ContainerProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
 
   if (!lifecycles) {
     return;
@@ -204,7 +203,7 @@ export function deprovisionContainerBindings(container: Container): void {
  *
  * Services that inject `WireScope` participate even without provider hooks.
  *
- * @group Service
+ * @group Container
  *
  * @param container - Container that owns the bindings.
  * @param bindings - Bindings controlled by the provider.
@@ -250,7 +249,7 @@ export function provisionServices(container: Container, bindings: Bindings = [])
 /**
  * Calls deprovision hooks for provisioned services.
  *
- * @group Service
+ * @group Container
  * @internal
  *
  * @param services - Services resolved during provider provisioning.
@@ -296,8 +295,8 @@ function markServiceDeprovisionStatus(service: object, isDeprovisioned: Optional
  * @param container - Provisioned container.
  * @param lifecycle - Provider lifecycle state.
  */
-function trackProvisionLifecycle(container: Container, lifecycle: ProvisionLifecycle): void {
-  let lifecycles: Maybe<Set<ProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
+function trackProvisionLifecycle(container: Container, lifecycle: ContainerProvisionLifecycle): void {
+  let lifecycles: Maybe<Set<ContainerProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
 
   if (!lifecycles) {
     lifecycles = new Set();
@@ -315,8 +314,8 @@ function trackProvisionLifecycle(container: Container, lifecycle: ProvisionLifec
  * @param container - Deprovisioned container.
  * @param lifecycle - Provider lifecycle state.
  */
-function untrackProvisionLifecycle(container: Container, lifecycle: ProvisionLifecycle): void {
-  const lifecycles: Maybe<Set<ProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
+function untrackProvisionLifecycle(container: Container, lifecycle: ContainerProvisionLifecycle): void {
+  const lifecycles: Maybe<Set<ContainerProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
 
   if (!lifecycles) {
     return;

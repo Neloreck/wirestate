@@ -1,5 +1,5 @@
 import { Container, ServiceIdentifier } from "../alias";
-import { deprovisionContainerBinding, deprovisionContainerBindings } from "../service/provision-lifecycle";
+import { deprovisionContainerBinding, deprovisionContainerBindings } from "../container/container-provision-lifecycle";
 
 import { unregisterAllBindings, unregisterBinding } from "./register-binding";
 

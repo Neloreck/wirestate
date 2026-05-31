@@ -3,12 +3,12 @@ import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-elemen
 import {
   Container,
   ContainerConfig,
+  ContainerProvisionLifecycle,
   WirestateError,
   createContainer,
   deprovisionContainer,
   provisionContainer,
   unbindAll,
-  type ProvisionLifecycle,
   validateContainerConfig,
 } from "@wirestate/core";
 
@@ -84,7 +84,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
   extends ContextProvider<typeof ContainerContext, E>
   implements ReactiveController
 {
-  protected readonly lifecycle: ProvisionLifecycle = new Map();
+  protected readonly lifecycle: ContainerProvisionLifecycle = new Map();
 
   protected config: Maybe<ContainerConfig>;
   protected container: Maybe<Container>;

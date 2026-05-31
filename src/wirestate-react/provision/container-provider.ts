@@ -13,7 +13,7 @@ import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { AnyObject, Maybe, Optional } from "../types/general";
 import { shallowEqualActivation, shallowEqualArrays, shallowEqualObjects } from "../utils/shallow-equal";
 
-import { ProvisionLifecycle, retainContainer, scheduleContainerDestruction } from "./provision-lifecycle";
+import { ReactContainerProvisionLifecycle, retainContainer, scheduleContainerDestruction } from "./provision-lifecycle";
 
 /**
  * Describes props for {@link ContainerProvider}.
@@ -127,7 +127,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
   const owned: boolean = Boolean(managedSource);
   const ownedRef = useRef<boolean>(owned);
 
-  const lifecycleRef = useRef<Optional<ProvisionLifecycle>>(null);
+  const lifecycleRef = useRef<Optional<ReactContainerProvisionLifecycle>>(null);
   const normalizedSource: Maybe<ContainerConfig> = managedSource
     ? { ...managedSource, activate: managedSource.activate ?? true }
     : null;
@@ -173,10 +173,10 @@ export function ContainerProvider(props: ContainerProviderProps) {
   const activeContainer: Container = activeState ? activeState.container : (externalContainer as Container);
 
   useEffect(() => {
-    const lifecycle: ProvisionLifecycle = (lifecycleRef.current ??= {
+    const lifecycle: ReactContainerProvisionLifecycle = (lifecycleRef.current ??= {
       pendingDestruction: new Map(),
       provisionedServices: new Map(),
-    } as ProvisionLifecycle);
+    } as ReactContainerProvisionLifecycle);
 
     retainContainer(activeContainer, lifecycle);
     provisionContainer(activeContainer, lifecycle.provisionedServices);

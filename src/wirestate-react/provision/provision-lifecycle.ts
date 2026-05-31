@@ -1,8 +1,8 @@
 import {
   Container,
+  ContainerProvisionLifecycle as CoreContainerProvisionLifecycle,
   deprovisionContainer,
   unbindAll,
-  type ProvisionLifecycle as CoreProvisionLifecycle,
 } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -16,7 +16,7 @@ import { Maybe } from "../types/general";
  * @group Provision
  * @internal
  */
-export interface ProvisionLifecycle {
+export interface ReactContainerProvisionLifecycle {
   /**
    * Containers waiting for delayed destruction after React cleanup.
    */
@@ -25,7 +25,7 @@ export interface ProvisionLifecycle {
   /**
    * Services resolved for provider lifecycle hooks by container.
    */
-  readonly provisionedServices: CoreProvisionLifecycle;
+  readonly provisionedServices: CoreContainerProvisionLifecycle;
 }
 
 /**
@@ -37,7 +37,7 @@ export interface ProvisionLifecycle {
  * @param container - Container to retain.
  * @param lifecycle - Provider lifecycle state.
  */
-export function retainContainer(container: Container, lifecycle: ProvisionLifecycle): void {
+export function retainContainer(container: Container, lifecycle: ReactContainerProvisionLifecycle): void {
   const timeout: Maybe<ReturnType<typeof setTimeout>> = lifecycle.pendingDestruction.get(container);
 
   if (timeout) {
@@ -57,7 +57,7 @@ export function retainContainer(container: Container, lifecycle: ProvisionLifecy
  * @param container - Container to dispose if it is not retained.
  * @param lifecycle - Provider lifecycle state.
  */
-export function scheduleContainerDestruction(container: Container, lifecycle: ProvisionLifecycle): void {
+export function scheduleContainerDestruction(container: Container, lifecycle: ReactContainerProvisionLifecycle): void {
   if (lifecycle.pendingDestruction.has(container)) {
     return;
   }
