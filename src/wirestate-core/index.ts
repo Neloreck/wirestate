@@ -32,10 +32,6 @@ export { OnQuery } from "./queries/on-query";
 
 export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "./registry";
 
-export { setSeeds } from "./seeds/set-seeds";
-export { setSharedSeed } from "./seeds/set-shared-seed";
-export { unsetSeeds } from "./seeds/unset-seeds";
-
 export { OnActivated } from "./service/on-activated";
 export { OnDeactivation } from "./service/on-deactivation";
 export { OnDeprovision } from "./service/on-deprovision";

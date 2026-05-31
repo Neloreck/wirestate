@@ -176,9 +176,8 @@ export class OtherService {
 }
 ```
 
-Seeds are applied via `setSeeds` / `setSharedSeed` and removed via `unsetSeeds`.
-For managed containers, pass `seed` or `seeds` inside provider config. For external containers, pass seeds to
-`createContainer` or apply them before services are resolved or provisioned.
+Seeds are set when the container is created. For managed containers, pass `seed` or `seeds` inside provider config. For
+external containers, pass seeds to `createContainer`.
 
 ## Lifecycle
 

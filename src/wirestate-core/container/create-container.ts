@@ -13,7 +13,6 @@ import {
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
 import { CONTAINER_PARENT_TOKEN, SEED_TOKEN, SEEDS_TOKEN } from "../registry";
-import { setSeeds } from "../seeds/set-seeds";
 import { AnyObject, Maybe } from "../types/general";
 import { Bindings } from "../types/provision";
 import { SeedBindings, SeedsMap } from "../types/seeds";
@@ -149,11 +148,17 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
   container.bind(Container).toConstantValue(container);
 
   // Merge with parent seeds map.
-  container
-    .bind(SEEDS_TOKEN)
-    .toConstantValue(
-      new Map(config.parent?.isBound(SEEDS_TOKEN) ? (config.parent.get<SeedsMap>(SEEDS_TOKEN) ?? []) : []) as SeedsMap
-    );
+  const seeds = new Map(
+    config.parent?.isBound(SEEDS_TOKEN) ? (config.parent.get<SeedsMap>(SEEDS_TOKEN) ?? []) : []
+  ) as SeedsMap;
+
+  if (config.seeds) {
+    for (const [key, value] of config.seeds) {
+      seeds.set(key, value);
+    }
+  }
+
+  container.bind(SEEDS_TOKEN).toConstantValue(seeds);
 
   // Fallback to parent config as default value.
   container
@@ -169,10 +174,6 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
 
   if (errorHandler) {
     setWirestateInternalErrorHandler(container, errorHandler);
-  }
-
-  if (config.seeds) {
-    setSeeds(container, config.seeds);
   }
 
   if (!options.skipMessaging) {

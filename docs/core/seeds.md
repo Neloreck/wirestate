@@ -42,14 +42,6 @@ const container: Container = createContainer({
 });
 ```
 
-Replace the shared seed with `setSharedSeed`.
-
-```ts
-import { setSharedSeed } from "@wirestate/core";
-
-setSharedSeed(container, { apiUrl: "https://api.next.example.com", locale: "uk-UA" });
-```
-
 ## Targeted Seeds
 
 Targeted seeds belong to one key. They do not change the shared seed object. Use them for service-specific startup data
@@ -100,23 +92,10 @@ export class CounterService {
 const counter = container.get(CounterService);
 ```
 
-## Updating Seeds
-
-`setSeeds` updates targeted seeds in place. `unsetSeeds` removes targeted seeds by key. The value passed to
-`unsetSeeds` is ignored; only the key matters.
-
-```ts
-import { setSeeds, unsetSeeds } from "@wirestate/core";
-
-setSeeds(container, [[CounterService, { count: 50 }]]);
-unsetSeeds(container, [[CounterService, null]]);
-```
-
-Seed updates do not rewind already provisioned services. Apply seeds before a provider provisions the container, or
-explicitly re-apply the value in your own service method.
+Seeds are fixed at container construction time. To use different seed values, create a new container or let a managed
+React/Lit provider recreate its container from changed `seed` or `seeds` config.
 
 ## API Reference
 
 [`SEED`](/api/wirestate-core/variables/SEED), [`SEEDS`](/api/wirestate-core/variables/SEEDS),
-[`setSharedSeed`](/api/wirestate-core/functions/setSharedSeed), [`setSeeds`](/api/wirestate-core/functions/setSeeds),
-[`unsetSeeds`](/api/wirestate-core/functions/unsetSeeds), [`SeedBindings`](/api/wirestate-core/type-aliases/SeedBindings).
+[`SeedBindings`](/api/wirestate-core/type-aliases/SeedBindings).

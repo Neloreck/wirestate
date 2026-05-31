@@ -7,7 +7,6 @@ import { ERROR_CODE_ACCESS_AFTER_DISPOSAL } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
-import { setSeeds } from "../seeds/set-seeds";
 import { OnActivated } from "../service/on-activated";
 import { OnDeactivation } from "../service/on-deactivation";
 import { Optional } from "../types/general";
@@ -347,24 +346,22 @@ describe("WireScope", () => {
   });
 
   it("should get bound seed from container", () => {
-    const container: Container = createContainer();
+    const container: Container = createContainer({ seeds: [[GenericService, { a: 1, b: 2 }]] });
     const scope: WireScope = new WireScope(container);
-
-    setSeeds(container, [[GenericService, { a: 1, b: 2 }]]);
 
     expect(scope.getSeed(GenericService)).toEqual({ a: 1, b: 2 });
     expect(scope.getSeed("NOT_EXISTING")).toBeNull();
   });
 
   it("should get falsy bound seeds from container", () => {
-    const container: Container = createContainer();
+    const container: Container = createContainer({
+      seeds: [
+        ["FALSE_SEED", false],
+        ["ZERO_SEED", 0],
+        ["EMPTY_STRING_SEED", ""],
+      ],
+    });
     const scope: WireScope = new WireScope(container);
-
-    setSeeds(container, [
-      ["FALSE_SEED", false],
-      ["ZERO_SEED", 0],
-      ["EMPTY_STRING_SEED", ""],
-    ]);
 
     expect(scope.getSeed("FALSE_SEED")).toBe(false);
     expect(scope.getSeed("ZERO_SEED")).toBe(0);
