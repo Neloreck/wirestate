@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/react-signals",
-  "version": "0.7.0-experimental.8",
+  "version": "1.0.0-experimental.0",
   "description": "Preact Signals re-exports for Wirestate React services",
   "sideEffects": false,
   "author": "Syrotenko Igor",

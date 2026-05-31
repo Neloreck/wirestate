@@ -1,6 +1,6 @@
 {
   "name": "wirestate",
-  "version": "0.7.0-experimental.8",
+  "version": "1.0.0-experimental.0",
   "description": "Compatibility package for Wirestate core, React, MobX, and Signals APIs",
   "sideEffects": false,
   "author": "Syrotenko Igor",
