@@ -381,6 +381,34 @@ describe("ContainerProvider lifecycle", () => {
     expect(events).toEqual(["activated", "provision"]);
   });
 
+  it("should provision managed services in binding order and deprovision them in reverse order", () => {
+    const events: Array<string> = [];
+    const { LifecycleService: FirstService } = createLifecycleService({
+      events,
+      methods: ["provision", "deprovision"],
+      suffix: "first",
+    });
+    const { LifecycleService: SecondService } = createLifecycleService({
+      events,
+      methods: ["provision", "deprovision"],
+      suffix: "second",
+    });
+
+    const { unmount } = render(
+      <ContainerProvider
+        config={{
+          bindings: [FirstService, SecondService],
+        }}
+      />
+    );
+
+    expect(events).toEqual(["provision-first", "provision-second"]);
+
+    unmount();
+
+    expect(events).toEqual(["provision-first", "provision-second", "deprovision-second", "deprovision-first"]);
+  });
+
   it("should not provision the same managed container twice on stable rerender", async () => {
     const { LifecycleService, events } = createLifecycleService({ methods: ["provision", "deprovision"] });
 

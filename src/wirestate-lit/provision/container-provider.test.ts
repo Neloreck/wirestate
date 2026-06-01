@@ -603,6 +603,36 @@ describe("ContainerProvider", () => {
     element.remove();
   });
 
+  it("should provision managed services in binding order and deprovision them in reverse order", () => {
+    const events: Array<string> = [];
+    const { LifecycleService: FirstService } = createLifecycleService({
+      events,
+      methods: ["provision", "deprovision"],
+      suffix: "first",
+    });
+    const { LifecycleService: SecondService } = createLifecycleService({
+      events,
+      methods: ["provision", "deprovision"],
+      suffix: "second",
+    });
+
+    const element: TestProviderElement = new TestProviderElement();
+
+    new ContainerProvider(element, {
+      config: {
+        bindings: [FirstService, SecondService],
+      },
+    });
+
+    document.body.appendChild(element);
+
+    expect(events).toEqual(["provision-first", "provision-second"]);
+
+    element.remove();
+
+    expect(events).toEqual(["provision-first", "provision-second", "deprovision-second", "deprovision-first"]);
+  });
+
   it("should not activate managed bindings when activate is false", () => {
     const events: Array<string> = [];
 
