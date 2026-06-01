@@ -7,6 +7,14 @@ import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent
 import { Maybe, Optional } from "../types/general";
 
 /**
+ * Private key under which catch-all handlers are stored.
+ *
+ * @remarks
+ * A module-private symbol, so it can never collide with a user event type.
+ */
+const ALL_EVENTS_TYPE: unique symbol = Symbol("@wirestate/core/event-bus/all-events");
+
+/**
  * Broadcasts events to every subscriber in one container.
  *
  * @remarks
@@ -29,14 +37,9 @@ import { Maybe, Optional } from "../types/general";
  */
 export class EventBus {
   /**
-   * Handlers subscribed to every event regardless of type.
+   * Handlers indexed by event type.
    */
-  private readonly allHandlers: Set<EventHandler> = new Set();
-
-  /**
-   * Handlers indexed by the event type they subscribed to.
-   */
-  private readonly typedHandlers: Map<EventType, Set<EventHandler>> = new Map();
+  private readonly handlers: Map<EventType, Set<EventHandler>> = new Map();
 
   public constructor(private readonly container?: Container) {}
 
@@ -77,11 +80,14 @@ export class EventBus {
     }
 
     // Snapshot each bucket so handlers may subscribe or unsubscribe during emit.
-    if (this.allHandlers.size) {
-      this.dispatch(Array.from(this.allHandlers), event);
+    // Catch-all handlers run before type-specific ones.
+    const allEventsHandlers: Maybe<Set<EventHandler>> = this.handlers.get(ALL_EVENTS_TYPE);
+
+    if (allEventsHandlers) {
+      this.dispatch(Array.from(allEventsHandlers), event);
     }
 
-    const typedHandlers: Optional<Set<EventHandler>> = this.typedHandlers.get(type) ?? null;
+    const typedHandlers: Maybe<Set<EventHandler>> = this.handlers.get(type);
 
     if (typedHandlers) {
       this.dispatch(Array.from(typedHandlers), event);
@@ -138,30 +144,29 @@ export class EventBus {
       bus: this,
     });
 
-    if (types === null) {
-      this.allHandlers.add(resolvedHandler);
-
-      return () => this.allHandlers.delete(resolvedHandler);
-    }
-
-    // Index the handler under each distinct type so dispatch can find it by key.
+    // Catch-all subscriptions are stored under the private CATCH_ALL key, so
+    // every subscription follows the same indexing path.
+    const keys: Set<EventType> =
+      types === null
+        ? new Set<EventType>([ALL_EVENTS_TYPE])
+        : new Set<EventType>(Array.isArray(types) ? types : [types]);
     const registered: Array<EventType> = [];
 
-    for (const type of new Set(Array.isArray(types) ? types : [types])) {
-      let bucket: Maybe<Set<EventHandler>> = this.typedHandlers.get(type);
+    for (const key of keys) {
+      let bucket: Maybe<Set<EventHandler>> = this.handlers.get(key);
 
       if (!bucket) {
         bucket = new Set();
-        this.typedHandlers.set(type, bucket);
+        this.handlers.set(key, bucket);
       }
 
       bucket.add(resolvedHandler);
-      registered.push(type);
+      registered.push(key);
     }
 
     return () => {
-      for (const type of registered) {
-        this.removeFromBucket(type, resolvedHandler);
+      for (const key of registered) {
+        this.removeFromBucket(key, resolvedHandler);
       }
     };
   }
@@ -170,8 +175,8 @@ export class EventBus {
    * Removes a previously registered event handler.
    *
    * @remarks
-   * Removes the handler from the catch-all set and every type bucket it was
-   * registered under. If the handler was not subscribed, this does nothing.
+   * Removes the handler from every bucket it was registered under, including the
+   * catch-all bucket. If the handler was not subscribed, this does nothing.
    *
    * @param handler - The handler function instance to remove.
    */
@@ -181,10 +186,8 @@ export class EventBus {
       bus: this,
     });
 
-    this.allHandlers.delete(handler);
-
-    for (const type of this.typedHandlers.keys()) {
-      this.removeFromBucket(type, handler);
+    for (const key of this.handlers.keys()) {
+      this.removeFromBucket(key, handler);
     }
   }
 
@@ -194,7 +197,7 @@ export class EventBus {
    * @returns `true` if at least one handler is registered, `false` otherwise.
    */
   public hasSubscribers(): boolean {
-    return this.allHandlers.size > 0 || this.typedHandlers.size > 0;
+    return this.handlers.size > 0;
   }
 
   /**
@@ -203,21 +206,20 @@ export class EventBus {
    * @internal
    */
   public clear(): void {
-    this.allHandlers.clear();
-    this.typedHandlers.clear();
+    this.handlers.clear();
   }
 
   /**
-   * Removes a handler from a type bucket and drops the bucket once it is empty.
+   * Removes a handler from a bucket and drops the bucket once it is empty.
    *
-   * @param type - Event type bucket to update.
+   * @param key - Event type, or the {@link ALL_EVENTS_TYPE} key, whose bucket to update.
    * @param handler - Handler to remove.
    */
-  private removeFromBucket(type: EventType, handler: EventHandler): void {
-    const bucket: Maybe<Set<EventHandler>> = this.typedHandlers.get(type);
+  private removeFromBucket(key: EventType, handler: EventHandler): void {
+    const bucket: Maybe<Set<EventHandler>> = this.handlers.get(key);
 
     if (bucket && bucket.delete(handler) && bucket.size === 0) {
-      this.typedHandlers.delete(type);
+      this.handlers.delete(key);
     }
   }
 
