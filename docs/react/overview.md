@@ -9,21 +9,22 @@ Choose a separate reactivity package for service state.
 
 ## Install
 
-Install the React bridge with core:
+Install the React bridge with core and MobX-backed service state:
 
 ```bash
-npm install @wirestate/core @wirestate/react reflect-metadata
+npm install @wirestate/core @wirestate/react @wirestate/react-mobx mobx mobx-react-lite reflect-metadata
 ```
 
 For React APIs and runtime behavior, use the official [React reference](https://react.dev/reference/react) and
 [`react` package](https://www.npmjs.com/package/react).
 
-For reactive service state, use a separate package such as [React Signals](/react-signals/overview) or
-[React MobX](/react-mobx/overview).
+This quickstart uses [React MobX](/react-mobx/overview) because `@wirestate/react` provides container access, not
+automatic React rendering for plain service fields. [React Signals](/react-signals/overview) is also available.
 
-## Root Provider
+## Root Provider with Reactive State
 
-Wrap a React subtree in `ContainerProvider` to make services available to child components.
+Wrap a React subtree in `ContainerProvider` to make services available to child components. Store UI state in a reactive
+package such as MobX, then wrap React components that read observable state with `observer`.
 
 ```tsx
 import { Injectable } from "@wirestate/core";
@@ -56,8 +57,9 @@ function Counter() {
 }
 ```
 
-Plain fields do not trigger React renders by themselves. Use `@wirestate/react-signals`, `@wirestate/react-mobx`, or
-your own update mechanism for reactive UI state.
+Plain service fields still work for non-UI state, but they do not trigger React renders by themselves. Use
+`@wirestate/react-mobx`, `@wirestate/react-signals`, or your own React state bridge when components need to update from
+service state changes.
 
 ## Provider Lifecycle
 
