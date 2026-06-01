@@ -1,5 +1,5 @@
-import { Newable, ServiceIdentifier } from "../alias";
-import { BindingDescriptor } from "../types/provision";
+import { Newable, ServiceIdentifier } from "../../alias";
+import { BindingDescriptor } from "../../types/provision";
 
 /**
  * Returns the token for a binding.

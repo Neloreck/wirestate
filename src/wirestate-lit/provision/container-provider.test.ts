@@ -1,13 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
-import {
-  BindingType,
-  Container,
-  Injectable,
-  OnActivated,
-  OnDeactivation,
-  createContainer,
-} from "@wirestate/core";
+import { BindingType, Container, Injectable, OnActivated, OnDeactivation, createContainer } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { GenericService } from "@/fixtures/services/generic-service";

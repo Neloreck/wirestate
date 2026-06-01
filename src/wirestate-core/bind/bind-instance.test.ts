@@ -138,7 +138,7 @@ describe("bindInstance", () => {
       expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS })
     );
     expect(() => bindInstanceWithToken(container, GenericService, binding.value as never, binding, {})).toThrow(
-      "Instance descriptor 'value' must be a service constructor."
+      "Instance descriptor 'value' must be a constructor."
     );
   });
 
@@ -442,7 +442,7 @@ describe("bindInstance", () => {
       bindInstance(container, ServiceWithoutMetadataPolyfill);
 
       expect(() => container.get(ServiceWithoutMetadataPolyfill)).toThrow(
-        'reflect-metadata is required for Wirestate service activation. Import "reflect-metadata" once at your application entry point before creating Wirestate containers.'
+        'reflect-metadata is required for Wirestate activation. Import "reflect-metadata" once at your application entry point before creating Wirestate containers.'
       );
     } finally {
       reflectMetadata.getMetadata = originalGetMetadata;

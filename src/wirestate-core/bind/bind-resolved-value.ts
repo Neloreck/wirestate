@@ -8,9 +8,9 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { ResolvedValueBindingDescriptor } from "../types/provision";
 
-import { applyBindingScope } from "./apply-binding-scope";
-import { registerBinding } from "./register-binding";
-import { validateBindingDescriptor } from "./validate-binding-descriptor";
+import { applyBindingScope } from "./utils/apply-binding-scope";
+import { registerBinding } from "./utils/register-binding";
+import { validateBindingDescriptor } from "./utils/validate-binding-descriptor";
 
 /**
  * Validates that a descriptor can be bound by {@link bindResolvedValue}.

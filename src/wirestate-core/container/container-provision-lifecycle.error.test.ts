@@ -95,12 +95,7 @@ describe("provision lifecycle errors", () => {
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     expect(() => provisionContainer(container, lifecycle)).toThrow(error);
-    expect(events).toEqual([
-      "provision-first",
-      "provision-failing",
-      "deprovision-failing",
-      "deprovision-first",
-    ]);
+    expect(events).toEqual(["provision-first", "provision-failing", "deprovision-failing", "deprovision-first"]);
     expect(lifecycle.has(container)).toBe(false);
     expect(onError).toHaveBeenCalledWith(
       expect.objectContaining({

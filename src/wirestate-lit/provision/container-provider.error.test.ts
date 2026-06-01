@@ -1,11 +1,4 @@
-import {
-  Container,
-  Injectable,
-  OnDeactivation,
-  OnDeprovision,
-  OnProvision,
-  createContainer,
-} from "@wirestate/core";
+import { Container, Injectable, OnDeactivation, OnDeprovision, OnProvision, createContainer } from "@wirestate/core";
 import { ReactiveElement } from "lit";
 import { customElement } from "lit/decorators.js";
 
@@ -19,6 +12,7 @@ describe("ContainerProvider provision errors", () => {
     const element: TestProviderElement = new TestProviderElement();
     const error = new Error("external-provision-fail");
     const events: Array<string> = [];
+    const onError = jest.fn();
 
     @Injectable()
     class FirstProvisionService {
@@ -50,18 +44,15 @@ describe("ContainerProvider provision errors", () => {
 
     const container: Container = createContainer({
       bindings: [FirstProvisionService, FailingProvisionService],
+      onError: onError,
     });
     const unbindAllSpy = jest.spyOn(container, "unbindAll");
     const controller: ContainerProvider = new ContainerProvider(element, { container });
 
     expect(() => controller.hostConnected()).toThrow(error);
+    expect(onError).toHaveBeenCalledTimes(1);
     expect(controller.value).toBeUndefined();
-    expect(events).toEqual([
-      "provision-first",
-      "provision-failing",
-      "deprovision-failing",
-      "deprovision-first",
-    ]);
+    expect(events).toEqual(["provision-first", "provision-failing", "deprovision-failing", "deprovision-first"]);
     expect(unbindAllSpy).not.toHaveBeenCalled();
     expect(container.isBound(FirstProvisionService)).toBe(true);
     expect(container.isBound(FailingProvisionService)).toBe(true);
@@ -71,6 +62,7 @@ describe("ContainerProvider provision errors", () => {
     const element: TestProviderElement = new TestProviderElement();
     const error = new Error("managed-provision-fail");
     const events: Array<string> = [];
+    const onError = jest.fn();
 
     @Injectable()
     class FirstProvisionService {
@@ -125,11 +117,13 @@ describe("ContainerProvider provision errors", () => {
 
     const controller: ContainerProvider = new ContainerProvider(element, {
       config: {
+        onError: onError,
         bindings: [FirstProvisionService, FailingProvisionService, ThirdProvisionService],
       },
     });
 
     expect(() => controller.hostConnected()).toThrow(error);
+    expect(onError).toHaveBeenCalledTimes(1);
     expect(controller.value).toBeUndefined();
     expect(events).toEqual([
       "provision-first",

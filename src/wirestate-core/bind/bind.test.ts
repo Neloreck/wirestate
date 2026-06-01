@@ -6,7 +6,7 @@ import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "
 import { BindingDescriptor, DynamicValueBindingDescriptor, InstanceBindingDescriptor } from "../types/provision";
 
 import { bind } from "./bind";
-import { getContainerBindings } from "./register-binding";
+import { getContainerBindings } from "./utils/register-binding";
 
 describe("bind", () => {
   it("should bind a service class directly", () => {

@@ -8,8 +8,8 @@ import {
 } from "../container/container-provision-lifecycle";
 import { createContainer } from "../container/create-container";
 
-import { getContainerBindings } from "./register-binding";
 import { unbind, unbindAll } from "./unbind";
+import { getContainerBindings } from "./utils/register-binding";
 
 describe("unbind", () => {
   function createProvisionLifecycle(): ContainerProvisionLifecycle {

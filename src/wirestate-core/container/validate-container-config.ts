@@ -1,5 +1,5 @@
 import { ServiceIdentifier } from "../alias";
-import { getBindingToken } from "../bind/get-binding-token";
+import { getBindingToken } from "../bind/utils/get-binding-token";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 

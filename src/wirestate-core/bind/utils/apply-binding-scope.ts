@@ -1,7 +1,7 @@
 import type { BindInWhenOnFluentSyntax } from "inversify";
 
-import { BindingScope as BindingScopeValues } from "../alias";
-import { BindingScope } from "../types/provision";
+import { BindingScope as BindingScopeValues } from "../../alias";
+import { BindingScope } from "../../types/provision";
 
 /**
  * Applies an optional Inversify binding scope.

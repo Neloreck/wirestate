@@ -6,8 +6,8 @@ import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "
 import { WirestateError } from "../error/wirestate-error";
 import { ConstantValueBindingDescriptor } from "../types/provision";
 
-import { registerBinding } from "./register-binding";
-import { validateBindingDescriptor } from "./validate-binding-descriptor";
+import { registerBinding } from "./utils/register-binding";
+import { validateBindingDescriptor } from "./utils/validate-binding-descriptor";
 
 /**
  * Validates that a descriptor can be bound by {@link bindConstant}.

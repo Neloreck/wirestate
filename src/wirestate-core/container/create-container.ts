@@ -3,7 +3,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { Container, ServiceIdentifier } from "../alias";
 import { bind } from "../bind/bind";
-import { getBindingToken } from "../bind/get-binding-token";
+import { getBindingToken } from "../bind/utils/get-binding-token";
 import { CommandBus } from "../commands/command-bus";
 import { getConfiguredInternalErrorHandler, setInternalErrorHandler } from "../error/internal-error-handler";
 import { EventBus } from "../events/event-bus";

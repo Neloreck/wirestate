@@ -1,7 +1,7 @@
-import { Container, ServiceIdentifier } from "../alias";
-import { CONTAINER_BINDINGS } from "../registry";
-import { Maybe } from "../types/general";
-import { Binding, Bindings } from "../types/provision";
+import { Container, ServiceIdentifier } from "../../alias";
+import { CONTAINER_BINDINGS } from "../../registry";
+import { Maybe } from "../../types/general";
+import { Binding, Bindings } from "../../types/provision";
 
 import { getBindingToken } from "./get-binding-token";
 

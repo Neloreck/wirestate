@@ -3,7 +3,7 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { FactoryBindingDescriptor } from "../types/provision";
 
 import { bindFactory } from "./bind-factory";
-import { getContainerBindings } from "./register-binding";
+import { getContainerBindings } from "./utils/register-binding";
 
 describe("bindFactory", () => {
   it("should bind a factory creator", () => {

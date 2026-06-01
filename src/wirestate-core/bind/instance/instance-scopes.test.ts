@@ -1,9 +1,9 @@
-import { Inject, Injectable } from "../alias";
-import { WireScope } from "../container/wire-scope";
-import { ERROR_CODE_REFLECT_METADATA_MISSING } from "../error/error-code";
-import { WirestateError } from "../error/wirestate-error";
+import { Inject, Injectable } from "../../alias";
+import { WireScope } from "../../container/wire-scope";
+import { ERROR_CODE_REFLECT_METADATA_MISSING } from "../../error/error-code";
+import { WirestateError } from "../../error/wirestate-error";
 
-import { hasWireScopeInjection } from "./has-wire-scope-injection";
+import { hasScopeInjection } from "./instance-scopes";
 
 interface ReflectMetadata {
   getMetadata?: (metadataKey: string, target: object) => unknown;
@@ -22,15 +22,15 @@ describe("hasWireScopeInjection", () => {
   class PlainService {}
 
   it("should detect direct WireScope constructor injection", () => {
-    expect(hasWireScopeInjection(ScopedService)).toBe(true);
+    expect(hasScopeInjection(ScopedService)).toBe(true);
   });
 
   it("should return false for services without WireScope injection", () => {
-    expect(hasWireScopeInjection(PlainService)).toBe(false);
+    expect(hasScopeInjection(PlainService)).toBe(false);
   });
 
   it("should return false for non-constructor tokens", () => {
-    expect(hasWireScopeInjection("TOKEN")).toBe(false);
+    expect(hasScopeInjection("TOKEN")).toBe(false);
   });
 
   it("should return false when reflect-metadata is missing and metadata is not required", () => {
@@ -40,7 +40,7 @@ describe("hasWireScopeInjection", () => {
     try {
       delete reflectMetadata.getMetadata;
 
-      expect(hasWireScopeInjection(ScopedService)).toBe(false);
+      expect(hasScopeInjection(ScopedService)).toBe(false);
     } finally {
       reflectMetadata.getMetadata = originalGetMetadata;
     }
@@ -53,8 +53,8 @@ describe("hasWireScopeInjection", () => {
     try {
       delete reflectMetadata.getMetadata;
 
-      expect(() => hasWireScopeInjection(ScopedService, { isRequired: true })).toThrow(WirestateError);
-      expect(() => hasWireScopeInjection(ScopedService, { isRequired: true })).toThrow(
+      expect(() => hasScopeInjection(ScopedService, { isRequired: true })).toThrow(WirestateError);
+      expect(() => hasScopeInjection(ScopedService, { isRequired: true })).toThrow(
         expect.objectContaining({ code: ERROR_CODE_REFLECT_METADATA_MISSING })
       );
     } finally {

@@ -4,7 +4,7 @@ import { ResolvedValueBindingDescriptor } from "../types/provision";
 
 import { bindConstant } from "./bind-constant";
 import { bindResolvedValue } from "./bind-resolved-value";
-import { getContainerBindings } from "./register-binding";
+import { getContainerBindings } from "./utils/register-binding";
 
 describe("bindResolvedValue", () => {
   it("should bind a resolved value without injected arguments", () => {

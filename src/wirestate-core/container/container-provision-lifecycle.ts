@@ -2,9 +2,9 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { BindingType, Container, ServiceIdentifier } from "../alias";
-import { getBindingToken } from "../bind/get-binding-token";
-import { hasWireScopeInjection } from "../bind/has-wire-scope-injection";
-import { getContainerBindings } from "../bind/register-binding";
+import { hasScopeInjection } from "../bind/instance/instance-scopes";
+import { getBindingToken } from "../bind/utils/get-binding-token";
+import { getContainerBindings } from "../bind/utils/register-binding";
 import { reportWirestateInternalError } from "../error/internal-error-handler";
 import {
   CONTAINER_REFS_BY_SERVICE,
@@ -434,7 +434,7 @@ function isProviderLifecycleParticipant(token: ServiceIdentifier): boolean {
 
   return prototype
     ? Boolean(getProvisionHandlerMetadata(prototype) || getDeprovisionHandlerMetadata(prototype)) ||
-        hasWireScopeInjection(token)
+        hasScopeInjection(token)
     : false;
 }
 

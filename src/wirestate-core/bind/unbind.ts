@@ -1,7 +1,7 @@
 import { Container, ServiceIdentifier } from "../alias";
 import { deprovisionContainerBinding, deprovisionContainerBindings } from "../container/container-provision-lifecycle";
 
-import { unregisterAllBindings, unregisterBinding } from "./register-binding";
+import { unregisterAllBindings, unregisterBinding } from "./utils/register-binding";
 
 /**
  * Unbinds a token through Wirestate-owned lifecycle cleanup.

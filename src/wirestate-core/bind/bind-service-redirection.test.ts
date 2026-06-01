@@ -7,7 +7,7 @@ import { ServiceRedirectionBindingDescriptor } from "../types/provision";
 
 import { bind } from "./bind";
 import { bindServiceRedirection } from "./bind-service-redirection";
-import { getContainerBindings } from "./register-binding";
+import { getContainerBindings } from "./utils/register-binding";
 
 describe("bindServiceRedirection", () => {
   it("should bind a service redirection descriptor", () => {
