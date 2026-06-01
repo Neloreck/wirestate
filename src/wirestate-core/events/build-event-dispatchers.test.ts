@@ -2,6 +2,7 @@ import { EventDispatch, EventType } from "../types/events";
 import { Optional } from "../types/general";
 
 import { buildEventDispatchers } from "./build-event-dispatchers";
+import { EventBus } from "./event-bus";
 import { OnEvent } from "./on-event";
 
 describe("buildEventDispatcher", () => {
@@ -143,5 +144,124 @@ describe("buildEventDispatcher", () => {
     const types: Optional<ReadonlyArray<EventType>> = dispatches[0].types;
 
     expect(types).toBeNull();
+  });
+
+  describe("a method decorated multiple times", () => {
+    function subscribeAll(instance: object): EventBus {
+      const bus: EventBus = new EventBus();
+
+      for (const dispatch of buildEventDispatchers(instance)) {
+        bus.subscribe(dispatch.types, dispatch.handler);
+      }
+
+      return bus;
+    }
+
+    it("should merge stacked decorations of one method into a single descriptor", () => {
+      class TestService {
+        @OnEvent("A")
+        @OnEvent("B")
+        public onEvent(): void {
+          return void 0;
+        }
+      }
+
+      const dispatches: ReadonlyArray<EventDispatch> = buildEventDispatchers(new TestService());
+
+      expect(dispatches).toHaveLength(1);
+      expect([...(dispatches[0].types ?? [])].sort()).toEqual(["A", "B"]);
+    });
+
+    it("should invoke a method decorated with the same type twice only once per event", () => {
+      const onEvent = jest.fn();
+
+      class TestService {
+        @OnEvent("A")
+        @OnEvent("A")
+        public onEvent(): void {
+          onEvent();
+        }
+      }
+
+      subscribeAll(new TestService()).emit("A");
+
+      expect(onEvent).toHaveBeenCalledTimes(1);
+    });
+
+    it("should invoke a method once per event for overlapping type lists", () => {
+      const onEvent = jest.fn();
+
+      class TestService {
+        @OnEvent(["A", "B"])
+        @OnEvent(["B", "C"])
+        public onEvent(): void {
+          onEvent();
+        }
+      }
+
+      const bus: EventBus = subscribeAll(new TestService());
+
+      bus.emit("B");
+      expect(onEvent).toHaveBeenCalledTimes(1);
+
+      bus.emit("A");
+      bus.emit("C");
+      expect(onEvent).toHaveBeenCalledTimes(3);
+    });
+
+    it("should collapse to catch-all when a method mixes catch-all and typed decorations", () => {
+      const onEvent = jest.fn();
+
+      class TestService {
+        @OnEvent()
+        @OnEvent("A")
+        public onEvent(): void {
+          onEvent();
+        }
+      }
+
+      const dispatches: ReadonlyArray<EventDispatch> = buildEventDispatchers(new TestService());
+
+      expect(dispatches).toHaveLength(1);
+      expect(dispatches[0].types).toBeNull();
+
+      const bus: EventBus = new EventBus();
+
+      for (const dispatch of dispatches) {
+        bus.subscribe(dispatch.types, dispatch.handler);
+      }
+
+      bus.emit("A");
+      bus.emit("B");
+
+      // Once for "A" (not twice) and once for "B", as a single catch-all handler.
+      expect(onEvent).toHaveBeenCalledTimes(2);
+    });
+
+    it("should merge a redeclared handler across the inheritance chain", () => {
+      const onEvent = jest.fn();
+
+      class BaseService {
+        @OnEvent("SHARED")
+        public onEvent(): void {
+          onEvent();
+        }
+      }
+
+      class DerivedService extends BaseService {
+        @OnEvent("SHARED")
+        public onEvent(): void {
+          onEvent();
+        }
+      }
+
+      const dispatches: ReadonlyArray<EventDispatch> = buildEventDispatchers(new DerivedService());
+
+      expect(dispatches).toHaveLength(1);
+
+      subscribeAll(new DerivedService()).emit("SHARED");
+
+      expect(onEvent).toHaveBeenCalledTimes(1);
+    });
   });
 });

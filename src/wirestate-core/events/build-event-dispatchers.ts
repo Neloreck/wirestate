@@ -3,9 +3,21 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { Container } from "../alias";
 import { reportWirestateInternalError } from "../error/internal-error-handler";
-import { EventDispatch, EventHandler } from "../types/events";
+import { EventDispatch, EventHandler, EventType } from "../types/events";
+import { Maybe } from "../types/general";
 
 import { getEventHandlerMetadata } from "./get-event-handler-metadata";
+
+/**
+ * Accumulates a single method's merged `@OnEvent` decorations during a build pass.
+ *
+ * @internal
+ */
+interface DispatcherPlan {
+  readonly invoke: EventHandler;
+  readonly types: Set<EventType>;
+  catchAll: boolean;
+}
 
 /**
  * Builds one bus subscription descriptor per `@OnEvent` method on a service.
@@ -15,6 +27,12 @@ import { getEventHandlerMetadata } from "./get-event-handler-metadata";
  * descriptor for each, pairing the method's event types with an error-isolating
  * handler. Each descriptor is subscribed independently, so the bus indexes every
  * method directly under its own types.
+ *
+ * All `@OnEvent` decorations of the same method are merged into a single
+ * subscription: their types are unioned, and any catch-all decoration makes the
+ * whole method catch-all. A method is therefore invoked at most once per event,
+ * regardless of how many times it was decorated. Methods keep parent-to-child
+ * first-seen order.
  *
  * @group Events
  * @internal
@@ -27,7 +45,7 @@ import { getEventHandlerMetadata } from "./get-event-handler-metadata";
  *
  * @example
  * ```typescript
- * for (const dispatch of buildEventDispatcher(myServiceInstance)) {
+ * for (const dispatch of buildEventDispatchers(myServiceInstance)) {
  *   eventBus.subscribe(dispatch.types, dispatch.handler);
  * }
  * ```
@@ -38,9 +56,10 @@ export function buildEventDispatchers<T extends object>(
 ): ReadonlyArray<EventDispatch> {
   dbg.info(prefix(__filename), "Build event dispatchers for:", { name: instance.constructor.name, instance });
 
-  const dispatchers: Array<EventDispatch> = [];
+  // Merge every @OnEvent decoration of the same method into one plan, keyed by
+  // method name in parent-to-child first-seen order.
+  const plans: Map<string | symbol, DispatcherPlan> = new Map();
 
-  // One subscription per @OnEvent method, kept in parent-to-child order.
   for (const meta of getEventHandlerMetadata(instance)) {
     const method = (instance as unknown as Record<string | symbol, unknown>)[meta.methodName];
 
@@ -48,13 +67,30 @@ export function buildEventDispatchers<T extends object>(
       continue;
     }
 
-    const handler: EventHandler = (method as EventHandler).bind(instance);
+    let plan: Maybe<DispatcherPlan> = plans.get(meta.methodName);
 
+    if (!plan) {
+      plan = { invoke: (method as EventHandler).bind(instance), types: new Set(), catchAll: false };
+      plans.set(meta.methodName, plan);
+    }
+
+    if (meta.types === null) {
+      plan.catchAll = true;
+    } else {
+      for (const type of meta.types) {
+        plan.types.add(type);
+      }
+    }
+  }
+
+  const dispatchers: Array<EventDispatch> = [];
+
+  for (const plan of plans.values()) {
     dispatchers.push({
-      types: meta.types,
+      types: plan.catchAll ? null : Array.from(plan.types),
       handler: (event) => {
         try {
-          handler(event);
+          plan.invoke(event);
         } catch (error) {
           // Isolate each method so one failure cannot stall the others.
           reportWirestateInternalError({

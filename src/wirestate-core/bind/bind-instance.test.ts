@@ -384,6 +384,36 @@ describe("bindInstance", () => {
     );
   });
 
+  it("should invoke a multiply-decorated event method only once per event", () => {
+    const onEvent = jest.fn();
+
+    @Injectable()
+    class MultiDecoratedService {
+      @OnEvent("SHARED")
+      @OnEvent("SHARED")
+      @OnEvent(["SHARED", "OTHER"])
+      public onEvent(): void {
+        onEvent();
+      }
+    }
+
+    const container: Container = createContainer({
+      activate: true,
+      bindings: [MultiDecoratedService],
+    });
+
+    const bus: EventBus = container.get(EventBus);
+
+    bus.emit("SHARED");
+    expect(onEvent).toHaveBeenCalledTimes(1);
+
+    bus.emit("OTHER");
+    expect(onEvent).toHaveBeenCalledTimes(2);
+
+    bus.emit("UNRELATED");
+    expect(onEvent).toHaveBeenCalledTimes(2);
+  });
+
   it("should handle non-function @OnQuery or @OnActivated properties during activation", () => {
     const container: Container = createContainer();
 
