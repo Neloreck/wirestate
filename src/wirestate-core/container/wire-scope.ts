@@ -244,7 +244,12 @@ export class WireScope {
   }
 
   /**
-   * Unsubscribes a specific handler from the {@link EventBus}.
+   * Removes one of a handler's catch-all subscriptions from the {@link EventBus}.
+   *
+   * @remarks
+   * Prefer the unsubscriber returned by {@link subscribeToEvent}. This
+   * by-reference form removes the most recently added catch-all subscription
+   * using the handler (one per call).
    *
    * @param handler - The handler instance to remove.
    *
@@ -255,12 +260,36 @@ export class WireScope {
    * scope.unsubscribeFromEvent(this.onEvent);
    * ```
    */
-  public unsubscribeFromEvent(handler: EventHandler): void {
-    dbg.info(prefix(__filename), "Unsubscribe event:", { handler });
+  public unsubscribeFromEvent(handler: EventHandler): void;
+
+  /**
+   * Removes one of a handler's subscriptions per event type from the {@link EventBus}.
+   *
+   * @param types - Event type, list of event types, or `null` for catch-all.
+   * @param handler - The handler instance to remove.
+   *
+   * @throws {@link WirestateError} If accessed before activation or after disposal.
+   *
+   * @example
+   * ```typescript
+   * scope.unsubscribeFromEvent("USER_LOGGED_IN", this.onEvent);
+   * ```
+   */
+  public unsubscribeFromEvent(types: Optional<EventType | ReadonlyArray<EventType>>, handler: EventHandler): void;
+
+  public unsubscribeFromEvent(
+    typesOrHandler: EventHandler | Optional<EventType | ReadonlyArray<EventType>>,
+    handler?: EventHandler
+  ): void {
+    dbg.info(prefix(__filename), "Unsubscribe event:", { typesOrHandler, handler });
 
     this.assertActive();
 
-    this.eventBus.unsubscribe(handler);
+    if (handler) {
+      this.eventBus.unsubscribe(typesOrHandler as Optional<EventType | ReadonlyArray<EventType>>, handler);
+    } else {
+      this.eventBus.unsubscribe(typesOrHandler as EventHandler);
+    }
   }
 
   /**

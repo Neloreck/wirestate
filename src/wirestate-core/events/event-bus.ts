@@ -15,6 +15,22 @@ import { Maybe, Optional } from "../types/general";
 const ALL_EVENTS_TYPE: unique symbol = Symbol("@wirestate/core/event-bus/all-events");
 
 /**
+ * A single event subscription.
+ *
+ * @remarks
+ * Each `subscribe` call creates exactly one, giving every subscription a stable
+ * identity. The returned unsubscriber removes this object specifically, so
+ * subscriptions that share the same handler function are tracked and torn down
+ * independently.
+ *
+ * @group Events
+ * @internal
+ */
+interface EventSubscription {
+  readonly handler: EventHandler;
+}
+
+/**
  * Broadcasts events to every subscriber in one container.
  *
  * @remarks
@@ -37,9 +53,9 @@ const ALL_EVENTS_TYPE: unique symbol = Symbol("@wirestate/core/event-bus/all-eve
  */
 export class EventBus {
   /**
-   * Handlers indexed by event type.
+   * Subscriptions indexed by event type.
    */
-  private readonly handlers: Map<EventType, Set<EventHandler>> = new Map();
+  private readonly handlers: Map<EventType, Set<EventSubscription>> = new Map();
 
   public constructor(private readonly container?: Container) {}
 
@@ -47,9 +63,9 @@ export class EventBus {
    * Broadcasts an event to all subscribers.
    *
    * @remarks
-   * Each bucket is snapshotted before dispatch, so a handler can subscribe or unsubscribe while
-   * an event is being emitted. A thrown handler is logged and the next handler
-   * still runs. Catch-all handlers run before type-specific ones.
+   * Each bucket is snapshotted before dispatch, so a handler can subscribe or
+   * unsubscribe while an event is being emitted. A thrown handler is logged and
+   * the next handler still runs. Catch-all handlers run before type-specific ones.
    *
    * @template P - Type of the event payload.
    * @template T - Type of the event identifier.
@@ -79,18 +95,18 @@ export class EventBus {
       (event as { from: F }).from = options.from;
     }
 
-    // Snapshot each bucket so handlers may subscribe or unsubscribe during emit.
-    // Catch-all handlers run before type-specific ones.
-    const allEventsHandlers: Maybe<Set<EventHandler>> = this.handlers.get(ALL_EVENTS_TYPE);
+    // Snapshot each bucket so subscriptions may change during emit.
+    // Catch-all subscriptions run before type-specific ones.
+    const allEventsSubscriptions: Maybe<Set<EventSubscription>> = this.handlers.get(ALL_EVENTS_TYPE);
 
-    if (allEventsHandlers) {
-      this.dispatch(Array.from(allEventsHandlers), event);
+    if (allEventsSubscriptions) {
+      this.dispatch(Array.from(allEventsSubscriptions), event);
     }
 
-    const typedHandlers: Maybe<Set<EventHandler>> = this.handlers.get(type);
+    const typedSubscriptions: Maybe<Set<EventSubscription>> = this.handlers.get(type);
 
-    if (typedHandlers) {
-      this.dispatch(Array.from(typedHandlers), event);
+    if (typedSubscriptions) {
+      this.dispatch(Array.from(typedSubscriptions), event);
     }
   }
 
@@ -114,7 +130,10 @@ export class EventBus {
    *
    * @remarks
    * The handler is indexed by type, so it is only invoked for matching events.
-   * Pass `null` to subscribe to every event. An empty array never matches.
+   * Pass `null` to subscribe to every event.
+   * Each call is an independent subscription: subscribing the same function twice
+   * delivers the event to it twice, and each returned unsubscriber removes only
+   * its own subscription.
    *
    * @param types - Event type, list of event types, or `null` for every event.
    * @param handler - Event handler invoked for matching events.
@@ -144,50 +163,74 @@ export class EventBus {
       bus: this,
     });
 
-    // Catch-all subscriptions are stored under the private CATCH_ALL key, so
-    // every subscription follows the same indexing path.
-    const keys: Set<EventType> =
-      types === null
-        ? new Set<EventType>([ALL_EVENTS_TYPE])
-        : new Set<EventType>(Array.isArray(types) ? types : [types]);
+    // One subscription identity is shared across every bucket it registers in,
+    // so the returned unsubscriber removes exactly this subscription and nothing
+    // that another call registered for the same handler.
+    const subscription: EventSubscription = { handler: resolvedHandler };
     const registered: Array<EventType> = [];
 
-    for (const key of keys) {
-      let bucket: Maybe<Set<EventHandler>> = this.handlers.get(key);
+    for (const key of this.resolveKeys(types)) {
+      let bucket: Maybe<Set<EventSubscription>> = this.handlers.get(key);
 
       if (!bucket) {
         bucket = new Set();
         this.handlers.set(key, bucket);
       }
 
-      bucket.add(resolvedHandler);
+      bucket.add(subscription);
       registered.push(key);
     }
 
     return () => {
       for (const key of registered) {
-        this.removeFromBucket(key, resolvedHandler);
+        this.removeSubscription(key, subscription);
       }
     };
   }
 
   /**
-   * Removes a previously registered event handler.
+   * Removes one of a handler's catch-all subscriptions.
    *
    * @remarks
-   * Removes the handler from every bucket it was registered under, including the
-   * catch-all bucket. If the handler was not subscribed, this does nothing.
+   * Prefer the unsubscriber returned by {@link subscribe}. This by-reference form
+   * removes the most recently added catch-all subscription that uses the handler
+   * (one per call, like the command and query buses). If none match, it does
+   * nothing.
    *
    * @param handler - The handler function instance to remove.
    */
-  public unsubscribe(handler: EventHandler): void {
+  public unsubscribe(handler: EventHandler): void;
+
+  /**
+   * Removes one of a handler's subscriptions for one or more event types.
+   *
+   * @remarks
+   * For each given type, removes the most recently added subscription that uses
+   * the handler (one per type per call). Pass `null` to target catch-all
+   * subscriptions. If none match, it does nothing.
+   *
+   * @param types - Event type, list of event types, or `null` for catch-all.
+   * @param handler - The handler function instance to remove.
+   */
+  public unsubscribe(types: Optional<EventType | ReadonlyArray<EventType>>, handler: EventHandler): void;
+
+  public unsubscribe(
+    typesOrHandler: EventHandler | Optional<EventType | ReadonlyArray<EventType>>,
+    handler?: EventHandler
+  ): void {
+    // Resolve the overloads: a single function argument targets catch-all.
+    const resolvedHandler: EventHandler = handler ?? (typesOrHandler as EventHandler);
+    const types: Optional<EventType | ReadonlyArray<EventType>> =
+      handler === undefined ? null : (typesOrHandler as Optional<EventType | ReadonlyArray<EventType>>);
+
     dbg.info(prefix(__filename), "Removing event subscription:", {
-      handler,
+      handler: resolvedHandler,
+      types,
       bus: this,
     });
 
-    for (const key of this.handlers.keys()) {
-      this.removeFromBucket(key, handler);
+    for (const key of this.resolveKeys(types)) {
+      this.removeByHandler(key, resolvedHandler);
     }
   }
 
@@ -210,29 +253,74 @@ export class EventBus {
   }
 
   /**
-   * Removes a handler from a bucket and drops the bucket once it is empty.
+   * Resolves the bucket keys a subscription targets.
+   *
+   * @remarks
+   * `null` (catch-all) maps to the private {@link ALL_EVENTS_TYPE} key. Types are
+   * deduplicated so one call registers a subscription once per distinct type.
+   *
+   * @param types - Event type, list of event types, or `null` for catch-all.
+   * @returns The distinct bucket keys.
+   */
+  private resolveKeys(types: Optional<EventType | ReadonlyArray<EventType>>): Set<EventType> {
+    if (types === null) {
+      return new Set<EventType>([ALL_EVENTS_TYPE]);
+    }
+
+    return new Set<EventType>(Array.isArray(types) ? types : [types]);
+  }
+
+  /**
+   * Removes one subscription from a bucket and drops the bucket once it is empty.
    *
    * @param key - Event type, or the {@link ALL_EVENTS_TYPE} key, whose bucket to update.
-   * @param handler - Handler to remove.
+   * @param subscription - The subscription instance to remove.
    */
-  private removeFromBucket(key: EventType, handler: EventHandler): void {
-    const bucket: Maybe<Set<EventHandler>> = this.handlers.get(key);
+  private removeSubscription(key: EventType, subscription: EventSubscription): void {
+    const bucket: Maybe<Set<EventSubscription>> = this.handlers.get(key);
 
-    if (bucket && bucket.delete(handler) && bucket.size === 0) {
+    if (bucket && bucket.delete(subscription) && bucket.size === 0) {
       this.handlers.delete(key);
     }
   }
 
   /**
-   * Invokes a snapshot of handlers, isolating individual handler failures.
+   * Removes a single subscription that uses a handler from a bucket and drops the bucket once it is empty.
+   
+   * @param key - Event type, or the {@link ALL_EVENTS_TYPE} key, whose bucket to update.
+   * @param handler - Handler whose subscription to remove.
+   */
+  private removeByHandler(key: EventType, handler: EventHandler): void {
+    const bucket: Maybe<Set<EventSubscription>> = this.handlers.get(key);
+
+    if (!bucket) {
+      return;
+    }
+
+    // Sets iterate in insertion order, so the last match is the newest.
+    let match: Maybe<EventSubscription>;
+
+    for (const subscription of bucket) {
+      if (subscription.handler === handler) {
+        match = subscription;
+      }
+    }
+
+    if (match && bucket.delete(match) && bucket.size === 0) {
+      this.handlers.delete(key);
+    }
+  }
+
+  /**
+   * Invokes a snapshot of subscriptions, isolating individual handler failures.
    *
-   * @param handlers - Snapshot of handlers to invoke.
+   * @param subscriptions - Snapshot of subscriptions to invoke.
    * @param event - Event passed to each handler.
    */
-  private dispatch(handlers: ReadonlyArray<EventHandler>, event: WireEvent): void {
-    for (const handler of handlers) {
+  private dispatch(subscriptions: ReadonlyArray<EventSubscription>, event: WireEvent): void {
+    for (const subscription of subscriptions) {
       try {
-        handler(event);
+        subscription.handler(event);
       } catch (error) {
         // Prevent one failing listener from stalling the entire bus.
         reportWirestateInternalError({

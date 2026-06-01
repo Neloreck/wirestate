@@ -381,4 +381,100 @@ describe("EventBus", () => {
       expect(bus.hasSubscribers()).toBe(false);
     });
   });
+
+  describe("registration identity", () => {
+    it("should deliver an event once per separate subscription of the same handler", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      bus.subscribe("A", handler);
+      bus.subscribe("A", handler);
+
+      bus.emit("A");
+
+      expect(handler).toHaveBeenCalledTimes(2);
+    });
+
+    it("should remove only its own subscription via the returned unsubscriber", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      const unsubscribeFirst: EventUnsubscriber = bus.subscribe("A", handler);
+
+      bus.subscribe("A", handler);
+
+      unsubscribeFirst();
+      bus.emit("A");
+
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it("should manage overlapping multi-type subscriptions of one handler independently", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      const unsubscribeFirst: EventUnsubscriber = bus.subscribe(["A", "B"], handler);
+
+      bus.subscribe(["B", "C"], handler);
+
+      // Removing the first subscription must not disturb the second's "B".
+      unsubscribeFirst();
+
+      bus.emit("A");
+      bus.emit("B");
+      bus.emit("C");
+
+      expect(handler).toHaveBeenCalledTimes(2);
+      expect(handler).toHaveBeenCalledWith({ type: "B" });
+      expect(handler).toHaveBeenCalledWith({ type: "C" });
+    });
+
+    it("should remove a handler only for the given types via unsubscribe(types, handler)", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      bus.subscribe(["A", "B"], handler);
+      bus.unsubscribe(["A"], handler);
+
+      bus.emit("A");
+      bus.emit("B");
+
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(handler).toHaveBeenCalledWith({ type: "B" });
+    });
+
+    it("should remove only one subscription per unsubscribe(type, handler) call", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      const unsubscribeFirst = bus.subscribe("A", handler);
+
+      bus.subscribe("A", handler);
+
+      bus.unsubscribe("A", handler);
+      bus.emit("A");
+
+      expect(handler).toHaveBeenCalledTimes(1);
+
+      unsubscribeFirst();
+      bus.emit("A");
+
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(bus.hasSubscribers()).toBe(false);
+    });
+
+    it("should not let catch-all unsubscribe touch typed subscriptions", () => {
+      const bus: EventBus = new EventBus();
+      const handler = jest.fn();
+
+      bus.subscribe(handler);
+      bus.subscribe("A", handler);
+
+      bus.unsubscribe(handler);
+
+      bus.emit("A");
+
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+  });
 });
