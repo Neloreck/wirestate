@@ -14,6 +14,7 @@
   "groupOrder": ["*", "External-inversify", "External-inversify-binding"],
   "entryFileName": "index.md",
   "hideGenerator": true,
+  "excludeInternal": true,
   "cleanOutputDir": true,
   "parametersFormat": "table",
   "enumMembersFormat": "table",

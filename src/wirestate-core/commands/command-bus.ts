@@ -40,6 +40,8 @@ export class CommandBus {
 
   /**
    * Removes all registered command handlers from the bus.
+   *
+   * @internal
    */
   public clear(): void {
     this.handlers.clear();

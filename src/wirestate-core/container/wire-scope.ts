@@ -76,6 +76,12 @@ export class WireScope {
    */
   private readonly queryBus: QueryBus;
 
+  /**
+   * Creates a scope for a container.
+   *
+   * @param container - Owner container of the scope.
+   * @internal
+   */
   public constructor(private readonly container: Container) {
     this.commandBus = container.get(CommandBus);
     this.eventBus = container.get(EventBus);
@@ -99,9 +105,9 @@ export class WireScope {
    * Resolves a service or value from the container.
    *
    * @remarks
-   * Use this for lazy work or to soften a circular dependency. Constructor
-   * injection is a handshake at startup; `resolve` is knocking only when you
-   * actually need the other service.
+   * Use this for lazy work or to reduce direct constructor dependencies.
+   * Constructor injection resolves dependencies during service creation;
+   * `resolve` looks up a dependency later, only when the method is called.
    *
    * @template T - Type of the service or value to resolve.
    *
