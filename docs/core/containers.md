@@ -44,7 +44,7 @@ const container = createContainer({
   onError: (descriptor) => {
     reportError(descriptor.error, {
       source: descriptor.source,
-      service: descriptor.serviceName,
+      name: descriptor.instanceName,
     });
   },
 });

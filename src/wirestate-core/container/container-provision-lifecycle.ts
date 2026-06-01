@@ -480,8 +480,8 @@ function callLifecycleHandler(
           error,
           message: decoratorName + " rejected",
           methodName,
-          service,
-          serviceName: service.constructor.name,
+          instance: service,
+          instanceName: service.constructor.name,
           source,
         });
       });
@@ -493,8 +493,8 @@ function callLifecycleHandler(
       error,
       message: decoratorName + " failed for",
       methodName,
-      service,
-      serviceName: service.constructor.name,
+      instance: service,
+      instanceName: service.constructor.name,
       source,
     });
 

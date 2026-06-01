@@ -79,8 +79,8 @@ function onInstanceDeactivation<T extends object>(container: Container, binding:
             error,
             message: "@OnDeactivation rejected",
             methodName,
-            service: instance,
-            serviceName: binding.name,
+            instance: instance,
+            instanceName: binding.name,
             source: "service-deactivation",
           });
         });
@@ -93,8 +93,8 @@ function onInstanceDeactivation<T extends object>(container: Container, binding:
       error,
       message: "@OnDeactivation failed",
       methodName,
-      service: instance,
-      serviceName: binding.name,
+      instance: instance,
+      instanceName: binding.name,
       source: "service-deactivation",
     });
 

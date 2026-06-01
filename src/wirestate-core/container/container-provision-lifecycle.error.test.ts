@@ -36,7 +36,7 @@ describe("provision lifecycle errors", () => {
         details: ["FailingProvisionService", "onProvision"],
         error,
         message: "@OnProvision failed for",
-        serviceName: "FailingProvisionService",
+        instanceName: "FailingProvisionService",
         source: "provider-provision",
       })
     );
@@ -103,7 +103,7 @@ describe("provision lifecycle errors", () => {
         details: ["FailingProvisionService", "onProvision"],
         error,
         message: "@OnProvision failed for",
-        serviceName: "FailingProvisionService",
+        instanceName: "FailingProvisionService",
         source: "provider-provision",
       })
     );
@@ -138,7 +138,7 @@ describe("provision lifecycle errors", () => {
         details: ["AsyncFailingProvisionService", "onProvision"],
         error,
         message: "@OnProvision rejected",
-        serviceName: "AsyncFailingProvisionService",
+        instanceName: "AsyncFailingProvisionService",
         source: "provider-provision",
       })
     );

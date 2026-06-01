@@ -110,7 +110,7 @@ describe("ContainerProvider provision errors", () => {
       expect.objectContaining({
         error,
         message: "@OnProvision failed for",
-        serviceName: "FailingProvisionService",
+        instanceName: "FailingProvisionService",
         source: "provider-provision",
       })
     );

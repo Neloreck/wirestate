@@ -52,14 +52,14 @@ export interface InternalErrorDescriptor {
   readonly methodName?: string | symbol;
 
   /**
-   * Service instance that owns the failed handler, when known.
+   * Instance that owns the failed handler, when known.
    */
-  readonly service?: object;
+  readonly instance?: object;
 
   /**
-   * Service class name, when known.
+   * Instance class name, when known.
    */
-  readonly serviceName?: string;
+  readonly instanceName?: string;
 
   /**
    * Internal subsystem that caught the failure.

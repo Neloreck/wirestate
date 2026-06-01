@@ -98,8 +98,8 @@ function onInstanceActivated<T extends object>(container: Container, binding: Ne
         error,
         message: "@OnActivated rejected",
         methodName,
-        service: instance,
-        serviceName: binding.name,
+        instance: instance,
+        instanceName: binding.name,
         source: "service-activation",
       });
     });
