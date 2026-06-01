@@ -11,29 +11,29 @@ import type { BindInstanceOptions } from "../bind-instance";
 import { unregisterInstanceHandlers } from "./instance-handlers";
 import { detachScopes } from "./instance-scopes";
 
-interface CreateServiceDeactivationHandlerOptions<T extends object> {
+interface CreateInstanceDeactivationHandlerOptions<T extends object> {
   readonly binding: Newable<T>;
   readonly container: Container;
   readonly options?: BindInstanceOptions;
 }
 
 /**
- * Creates the Inversify deactivation hook for a Wirestate service binding.
+ * Creates the Inversify deactivation hook for a Wirestate instance binding.
  *
  * @internal
  *
- * @template T - Service instance type.
+ * @template T - Instance type.
  *
  * @param handlerOptions - Deactivation handler options.
  * @returns Inversify deactivation handler.
  */
 export function createInstanceDeactivationHandler<T extends object>(
-  handlerOptions: CreateServiceDeactivationHandlerOptions<T>
+  handlerOptions: CreateInstanceDeactivationHandlerOptions<T>
 ): (instance: T) => void {
   const { binding, container, options } = handlerOptions;
 
   return (instance: T): void => {
-    dbg.info(prefix(__filename), "Deactivating service:", {
+    dbg.info(prefix(__filename), "Deactivating instance:", {
       name: binding.name,
       container,
       instance,
@@ -81,7 +81,7 @@ function onInstanceDeactivation<T extends object>(container: Container, binding:
             methodName,
             instance: instance,
             instanceName: binding.name,
-            source: "service-deactivation",
+            source: "instance-deactivation",
           });
         });
       }
@@ -95,7 +95,7 @@ function onInstanceDeactivation<T extends object>(container: Container, binding:
       methodName,
       instance: instance,
       instanceName: binding.name,
-      source: "service-deactivation",
+      source: "instance-deactivation",
     });
 
     // No rethrow on deactivation.

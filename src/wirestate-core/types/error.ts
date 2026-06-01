@@ -9,9 +9,9 @@ import { WireEvent } from "./events";
  */
 export type InternalErrorSource =
   | "event-handler"
-  | "service-event-handler"
-  | "service-activation"
-  | "service-deactivation"
+  | "instance-event-handler"
+  | "instance-activation"
+  | "instance-deactivation"
   | "provider-provision"
   | "provider-deprovision";
 

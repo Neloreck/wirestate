@@ -100,7 +100,7 @@ export function buildEventDispatchers<T extends object>(
             message: "Event handler threw",
             instance: instance,
             instanceName: instance.constructor.name,
-            source: "service-event-handler",
+            source: "instance-event-handler",
           });
         }
       },

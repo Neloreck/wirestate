@@ -35,7 +35,7 @@ export function createInstanceActivatedHandler<T extends object>(
   const { binding, container, options } = handlerOptions;
 
   return (context: ResolutionContext, instance: T): T => {
-    dbg.info(prefix(__filename), "Activating service:", {
+    dbg.info(prefix(__filename), "Activating instance:", {
       name: binding.name,
       context,
       container,
@@ -100,7 +100,7 @@ function onInstanceActivated<T extends object>(container: Container, binding: Ne
         methodName,
         instance: instance,
         instanceName: binding.name,
-        source: "service-activation",
+        source: "instance-activation",
       });
     });
   }
