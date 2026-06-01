@@ -1,15 +1,57 @@
-import { execSync } from "node:child_process";
+import * as cp from "node:child_process";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
 import { PKG_ROOT } from "../config/build.constants";
 import { PACKAGES, STABLE_PACKAGE_VERSION_PATTERN } from "../config/packages";
 
+const PUBLISH_TAG_PATTERN = /^[A-Za-z][A-Za-z0-9-]{0,15}$/;
+
 export interface PublishPackage {
   displayName: string;
   dir: string;
   name: string;
   version: string;
+}
+
+interface PublishCommand {
+  args: Array<string>;
+  command: string;
+}
+
+function assertPublishTag(tag: string): void {
+  if (!PUBLISH_TAG_PATTERN.test(tag)) {
+    throw new Error("Publish tag must be 1-16 letters, numbers, or dashes and start with a letter.");
+  }
+}
+
+function createPublishCommand(tag?: string): PublishCommand {
+  const npmArgs: Array<string> = ["publish", "--access", "public"];
+
+  if (tag) {
+    npmArgs.push("--tag", tag);
+  }
+
+  if (process.platform !== "win32") {
+    return {
+      args: npmArgs,
+      command: "npm",
+    };
+  }
+
+  const npmCliPath = path.resolve(path.dirname(process.execPath), "node_modules", "npm", "bin", "npm-cli.js");
+
+  if (fs.existsSync(npmCliPath)) {
+    return {
+      args: [npmCliPath, ...npmArgs],
+      command: process.execPath,
+    };
+  }
+
+  return {
+    args: npmArgs,
+    command: "npm.cmd",
+  };
 }
 
 export function assertCanPublishPackageVersions(packages: Array<PublishPackage>, tag?: string): void {
@@ -49,6 +91,8 @@ export function resolvePublishTag(args: Array<string>): string | undefined {
     throw new Error("Missing publish tag after --tag.");
   }
 
+  assertPublishTag(tag);
+
   return tag;
 }
 
@@ -74,12 +118,16 @@ export function readPublishPackages(): Array<PublishPackage> {
 }
 
 export function publishPackages(packages: Array<PublishPackage>, tag?: string): void {
+  if (tag) {
+    assertPublishTag(tag);
+  }
+
   assertCanPublishPackageVersions(packages, tag);
 
   for (const pkg of packages) {
-    const tagArg = tag ? ` --tag ${tag}` : "";
+    const command = createPublishCommand(tag);
 
     console.log(`Publishing ${pkg.name}${tag ? ` [${tag}]` : ""}...`);
-    execSync(`npm publish --access public${tagArg}`, { cwd: pkg.dir, stdio: "inherit" });
+    cp.execFileSync(command.command, command.args, { cwd: pkg.dir, stdio: "inherit" });
   }
 }

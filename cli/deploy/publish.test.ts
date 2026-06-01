@@ -1,4 +1,4 @@
-import { assertCanPublishPackageVersions, PublishPackage, resolvePublishTag } from "./publish.utils";
+import { assertCanPublishPackageVersions, PublishPackage, publishPackages, resolvePublishTag } from "./publish.utils";
 
 describe("publish package version guard", () => {
   function createPackage(name: string, version: string): PublishPackage {
@@ -34,5 +34,19 @@ describe("publish package version guard", () => {
 
   it("rejects a missing publish tag value", () => {
     expect(() => resolvePublishTag(["--tag"])).toThrow("Missing publish tag after --tag.");
+  });
+
+  it("rejects publish tags with shell metacharacters", () => {
+    expect(() => resolvePublishTag(["--tag", "experimental;echo injected"])).toThrow(
+      "Publish tag must be 1-16 letters"
+    );
+  });
+
+  it("rejects publish tags longer than 16 characters", () => {
+    expect(() => resolvePublishTag(["--tag", "experimental-beta"])).toThrow("Publish tag must be 1-16 letters");
+  });
+
+  it("rejects unsafe tags passed directly to publish", () => {
+    expect(() => publishPackages([], "experimental&&echo injected")).toThrow("Publish tag must be 1-16 letters");
   });
 });
