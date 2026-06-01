@@ -48,10 +48,10 @@ export function validateContainerConfig(config: ContainerConfig): void {
     );
   }
 
-  const bindingTokens: ReadonlyArray<ServiceIdentifier> = config.bindings.map(getBindingToken);
+  const bindingTokens: ReadonlySet<ServiceIdentifier> = new Set(config.bindings.map(getBindingToken));
 
   for (const eager of activate) {
-    if (!bindingTokens.includes(eager)) {
+    if (!bindingTokens.has(eager)) {
       throw new WirestateError(
         `createContainer: '${String(eager)}' is listed in 'activate' but was not provided in 'bindings'.`,
         ERROR_CODE_VALIDATION_ERROR
