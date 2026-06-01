@@ -65,7 +65,8 @@ class CounterButton extends LitElement {
 
 Lit providers provision containers while the host element is connected. Put work that depends on that connected lifetime
 in `@OnProvision`, such as timers, subscriptions, and sockets. Clean it up in `@OnDeprovision`. Use activation only for
-cheap setup that does not need cleanup.
+cheap setup that does not need cleanup. The core [lifecycle map](/core/lifecycle) shows where Lit connect, disconnect,
+activation, and disposal fit together.
 
 ## Lit Package Surface
 

@@ -28,7 +28,7 @@ Managed containers activate all bindings by default. Pass `activate: false` to r
 Do not start resource work during activation. React creates managed containers before the provider effect commits. In
 Strict Mode, React may create and discard an extra container. Start timers, subscriptions, sockets, and provider-scoped
 async work in `@OnProvision`, and clean them up in `@OnDeprovision`. Write provision hooks so setup can be fully undone
-and run again.
+and run again. See [Core Lifecycle](/core/lifecycle) for the cross-framework lifecycle map.
 
 Managed providers recreate the container when `parent`, `onError`, `seed`, `seeds`, `bindings`, or `activate` changes by
 shallow comparison. Keep config objects and arrays stable with `useMemo` when the container should not be replaced.

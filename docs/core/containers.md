@@ -31,6 +31,7 @@ const container: Container = createContainer({
 
 Eager activation only resolves services. Do not use it to start resources that need cleanup. Use provider lifecycle for
 that boundary: `provisionContainer`/`deprovisionContainer` in core, or the provider lifecycle exposed by a UI adapter.
+See [Core Lifecycle](/core/lifecycle) for the full resolution, provision, and disposal map.
 
 ## Internal Errors
 
@@ -98,7 +99,8 @@ unbindAll(child);
 
 These wrappers call the underlying Inversify unbind operation and clean Wirestate-owned bookkeeping. If a provider owns
 the service, `@OnDeprovision` runs before service deactivation. After `unbindAll`, discard the container and create a
-new one for future work.
+new one for future work. The [lifecycle map](/core/lifecycle) shows how this relates to provider unmount and container
+disposal.
 
 Raw `container.unbind(...)` and `container.unbindAll()` remain available as Inversify escape hatches, but they do not clean
 Wirestate's registered binding list.

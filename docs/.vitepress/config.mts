@@ -47,6 +47,7 @@ export default defineConfig({
           { text: "Overview", link: "/core/overview" },
           { text: "Services", link: "/core/services" },
           { text: "Containers", link: "/core/containers" },
+          { text: "Lifecycle", link: "/core/lifecycle" },
           { text: "Events", link: "/core/events" },
           { text: "Commands", link: "/core/commands" },
           { text: "Queries", link: "/core/queries" },

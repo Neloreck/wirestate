@@ -58,7 +58,8 @@ counter.increment();
 
 - Service classes and dependency injection.
 - Root and child containers.
-- Lifecycle hooks for service activation, service deactivation, provider provision, and provider deprovision.
+- [Lifecycle hooks](/core/lifecycle) for service activation, service deactivation, provider provision, and provider
+  deprovision.
 - Events for broadcast notifications.
 - Commands for one-handler write operations.
 - Queries for one-handler read operations.

@@ -91,7 +91,8 @@ parent container. Without inherited messaging, use direct container injection in
 
 ## Lifecycle
 
-Wirestate has two lifecycle layers:
+Wirestate has two lifecycle layers. See [Core Lifecycle](/core/lifecycle) for the full table that maps constructor
+resolution, container activation, provider mount/connect, provider unmount/disconnect, and container disposal.
 
 - `@OnActivated` runs when the service is first resolved.
 - `@OnDeactivation` runs when the service is unbound or the container is disposed.
