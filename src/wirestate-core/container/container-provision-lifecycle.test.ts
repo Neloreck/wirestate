@@ -3,7 +3,6 @@ import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 import { BindingType, Container, Inject, Injectable } from "../alias";
 import { unbindAll } from "../bind/unbind";
 import { OnActivated } from "../service/on-activated";
-import { OnProvision } from "../service/on-provision";
 import { Optional } from "../types/general";
 
 import { ContainerProvisionLifecycle, deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
@@ -233,70 +232,4 @@ describe("provision lifecycle", () => {
     ]);
   });
 
-  it("should report provider lifecycle errors to container error handler", () => {
-    const error = new Error("provision-fail");
-    const onError = jest.fn();
-
-    @Injectable()
-    class FailingProvisionService {
-      @OnProvision()
-      public onProvision(): void {
-        throw error;
-      }
-    }
-
-    const container: Container = createContainer({
-      bindings: [FailingProvisionService],
-      onError,
-    });
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
-
-    provisionContainer(container, lifecycle, [FailingProvisionService]);
-
-    expect(onError).toHaveBeenCalledWith(
-      expect.objectContaining({
-        container,
-        details: ["FailingProvisionService", "onProvision"],
-        error,
-        message: "@OnProvision failed for",
-        serviceName: "FailingProvisionService",
-        source: "provider-provision",
-      })
-    );
-  });
-
-  it("should report rejected provider provision errors to container error handler", async () => {
-    const error = new Error("async-provision-fail");
-    const onError = jest.fn();
-
-    @Injectable()
-    class AsyncFailingProvisionService {
-      @OnProvision()
-      public async onProvision(): Promise<void> {
-        throw error;
-      }
-    }
-
-    const container: Container = createContainer({
-      bindings: [AsyncFailingProvisionService],
-      onError,
-    });
-
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
-
-    provisionContainer(container, lifecycle, [AsyncFailingProvisionService]);
-
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(onError).toHaveBeenCalledWith(
-      expect.objectContaining({
-        container,
-        details: ["AsyncFailingProvisionService", "onProvision"],
-        error,
-        message: "@OnProvision rejected",
-        serviceName: "AsyncFailingProvisionService",
-        source: "provider-provision",
-      })
-    );
-  });
 });

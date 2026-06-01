@@ -213,6 +213,7 @@ export function deprovisionContainerBindings(container: Container): void {
  */
 export function provisionServices(container: Container, bindings: Bindings = []): Array<object> {
   const services: Array<object> = [];
+  const trackedTokens: Array<readonly [object, ServiceIdentifier]> = [];
   const visited: Set<ServiceIdentifier> = new Set();
 
   for (const binding of bindings) {
@@ -225,6 +226,7 @@ export function provisionServices(container: Container, bindings: Bindings = [])
       const service: object = container.get(token) as object;
 
       trackProvisionToken(service, token);
+      trackedTokens.push([service, token]);
       services.push(service);
     }
   }
@@ -233,13 +235,28 @@ export function provisionServices(container: Container, bindings: Bindings = [])
     markServiceDeprovisionStatus(service, null);
   }
 
-  for (const service of services) {
+  for (let index: number = 0; index < services.length; index += 1) {
+    const service: object = services[index];
     const methodName: Maybe<string | symbol> = getProvisionHandlerMetadata(service);
 
     markServiceDeprovisionStatus(service, false);
 
-    if (methodName) {
-      callLifecycleHandler(service, methodName, "@OnProvision");
+    try {
+      if (methodName) {
+        callLifecycleHandler(service, methodName, "@OnProvision", { rethrowSync: true });
+      }
+    } catch (error) {
+      const reachedServices: Array<object> = services.slice(0, index + 1);
+
+      deprovisionServices(
+        reachedServices.filter((reachedService) => CONTAINER_REFS_BY_SERVICE.get(reachedService) === container)
+      );
+
+      for (const [service, token] of trackedTokens) {
+        untrackProvisionToken([service], token);
+      }
+
+      throw error;
     }
   }
 
@@ -429,8 +446,15 @@ function isProviderLifecycleParticipant(token: ServiceIdentifier): boolean {
  * @param service - Service instance that owns the handler.
  * @param methodName - Handler method name.
  * @param decoratorName - Decorator name used in diagnostics.
+ * @param options - Handler call behavior.
+ * @param options.rethrowSync - Whether synchronous failures should be rethrown after reporting.
  */
-function callLifecycleHandler(service: object, methodName: string | symbol, decoratorName: string): void {
+function callLifecycleHandler(
+  service: object,
+  methodName: string | symbol,
+  decoratorName: string,
+  options: { readonly rethrowSync?: boolean } = {}
+): void {
   const method: unknown = (service as Record<string | symbol, unknown>)[methodName];
   const source = decoratorName === "@OnProvision" ? "provider-provision" : "provider-deprovision";
 
@@ -473,5 +497,9 @@ function callLifecycleHandler(service: object, methodName: string | symbol, deco
       serviceName: service.constructor.name,
       source,
     });
+
+    if (options.rethrowSync) {
+      throw error;
+    }
   }
 }

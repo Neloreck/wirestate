@@ -132,11 +132,21 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
       ? (this.container = createContainer(this.config))
       : (this.container as Container);
 
-    super.setValue(container);
+    try {
+      provisionContainer(container, this.lifecycle);
 
-    provisionContainer(container, this.lifecycle);
+      super.setValue(container);
+      super.hostConnected();
+    } catch (error) {
+      if (this.config) {
+        this.destroyManagedContainer(container);
+      } else {
+        // Expect container to be deprovisioned by this moment, but leaving deprovision as explicit operation.
+        deprovisionContainer(container, this.lifecycle);
+      }
 
-    super.hostConnected();
+      throw error;
+    }
   }
 
   public hostDisconnected(): void {
@@ -172,9 +182,16 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
           deprovisionContainer(previous, this.lifecycle);
         }
 
-        super.setValue(container, force);
+        try {
+          provisionContainer(container, this.lifecycle);
 
-        provisionContainer(container, this.lifecycle);
+          super.setValue(container, force);
+        } catch (error) {
+          // Expect container to be deprovisioned by this moment, but leaving deprovision as explicit operation.
+          deprovisionContainer(container, this.lifecycle);
+
+          throw error;
+        }
       }
     }
   }
@@ -209,9 +226,16 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
       const container: Container = createContainer(this.config);
 
       this.container = container;
-      super.setValue(container);
 
-      provisionContainer(container, this.lifecycle);
+      try {
+        provisionContainer(container, this.lifecycle);
+
+        super.setValue(container);
+      } catch (error) {
+        this.destroyManagedContainer(container);
+
+        throw error;
+      }
     }
   }
 

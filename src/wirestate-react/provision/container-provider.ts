@@ -59,6 +59,13 @@ interface ContainerProviderState {
 }
 
 /**
+ * Captures a provider provision failure so it can be thrown from render.
+ */
+interface ContainerProvisionError {
+  readonly error: unknown;
+}
+
+/**
  * Provides a root Wirestate container to a React subtree.
  *
  * @remarks
@@ -132,6 +139,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
     ? { ...managedSource, activate: managedSource.activate ?? true }
     : null;
 
+  const [error, setError] = useState<Optional<ContainerProvisionError>>(null);
   const [state, setState] = useState<Optional<ContainerProviderState>>(() =>
     normalizedSource
       ? {
@@ -179,7 +187,21 @@ export function ContainerProvider(props: ContainerProviderProps) {
     } as ReactContainerProvisionLifecycle);
 
     retainContainer(activeContainer, lifecycle);
-    provisionContainer(activeContainer, lifecycle.provisionedServices);
+
+    try {
+      provisionContainer(activeContainer, lifecycle.provisionedServices);
+    } catch (error) {
+      if (owned) {
+        scheduleContainerDestruction(activeContainer, lifecycle);
+      } else {
+        // Expect container to be deprovisioned by this moment, but leaving deprovision as explicit operation.
+        deprovisionContainer(activeContainer, lifecycle.provisionedServices);
+      }
+
+      setError({ error });
+
+      return;
+    }
 
     return () => {
       if (owned) {
@@ -189,6 +211,10 @@ export function ContainerProvider(props: ContainerProviderProps) {
       }
     };
   }, [activeContainer, owned]);
+
+  if (error) {
+    throw error.error;
+  }
 
   return createElement(ContainerReactContext.Provider, { value: activeContainer }, props.children ?? null);
 }
