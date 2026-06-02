@@ -50,8 +50,8 @@ export function createInstanceActivatedHandler<T extends object>(
       attachScopes(instance, binding);
       registerInstanceHandlers(container, instance);
 
-      if (options?.skipLifecycle) {
-        dbg.info(prefix(__filename), "Skip lifecycle @onActivated method:", {
+      if (options?.skipActivationHooks) {
+        dbg.info(prefix(__filename), "Skip @OnActivated method:", {
           name: binding.name,
           context,
           container,

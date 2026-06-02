@@ -38,12 +38,12 @@ test("increments count", () => {
 });
 ```
 
-Skip lifecycle hooks when that setup is unrelated to the test.
+Skip activation hooks when that setup is unrelated to the test.
 
 ```ts
 import { createContainer } from "@wirestate/core";
 
-const service = createContainer({ bindings: [CounterService] }, { skipLifecycle: true }).get(CounterService);
+const service = createContainer({ bindings: [CounterService] }, { skipActivationHooks: true }).get(CounterService);
 ```
 
 ## Several Services

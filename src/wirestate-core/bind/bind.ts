@@ -25,11 +25,11 @@ import { bindServiceRedirection } from "./bind-service-redirection";
  */
 export interface BindOptions extends BindInstanceOptions {
   /**
-   * Skip lifecycle hooks for class bindings.
+   * Skip `@OnActivated` and `@OnDeactivation` hooks for class bindings.
    *
    * @default `false`
    */
-  readonly skipLifecycle?: boolean;
+  readonly skipActivationHooks?: boolean;
 }
 
 /**

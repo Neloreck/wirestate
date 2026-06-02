@@ -269,12 +269,12 @@ Creates a configured IoC container for application code and tests. Use the first
 | `seed`     | `object`                              | Shared seed object                                                                      |
 | `seeds`    | `SeedBindings`                        | Seed values keyed by service class, string, or symbol                                   |
 
-Use the second argument for lifecycle and container creation tweaks:
+Use the second argument for activation hook and container creation tweaks:
 
-| Option          | Type      | Description                                   |
-| --------------- | --------- | --------------------------------------------- |
-| `skipMessaging` | `boolean` | Skip `EventBus`, `QueryBus`, and `CommandBus` |
-| `skipLifecycle` | `boolean` | Skip `@OnActivated` / `@OnDeactivation` hooks |
+| Option                | Type      | Description                                    |
+| --------------------- | --------- |------------------------------------------------|
+| `skipMessaging`       | `boolean` | Skip `EventBus`, `QueryBus`, and `CommandBus`  |
+| `skipActivationHooks` | `boolean` | Skip `@OnActivated` / `@OnDeactivation` hooks; |
 
 ```ts
 const container = createContainer({
@@ -291,7 +291,7 @@ const container = createContainer({
 ```
 
 ```ts
-const container = createContainer({ bindings: [CounterService] }, { skipLifecycle: true });
+const container = createContainer({ bindings: [CounterService] }, { skipActivationHooks: true });
 ```
 
 ```ts

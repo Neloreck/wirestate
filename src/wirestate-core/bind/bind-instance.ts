@@ -45,7 +45,7 @@ export interface BindInstanceOptions {
    *
    * @default false
    */
-  readonly skipLifecycle?: boolean;
+  readonly skipActivationHooks?: boolean;
 }
 
 /**

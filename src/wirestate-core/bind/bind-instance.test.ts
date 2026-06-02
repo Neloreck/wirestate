@@ -114,16 +114,30 @@ describe("bindInstance", () => {
     expect(() => container.get(QueryBus).query("TEST_QUERY")).toThrow();
   });
 
-  it("should skip lifecycle if skipLifecycle is true", () => {
+  it("should skip activation hooks while keeping message decorators wired", () => {
     const container: Container = createContainer();
 
-    bindInstance(container, GenericService, { skipLifecycle: true });
+    bindInstance(container, GenericService, { skipActivationHooks: true });
 
     const instance: GenericService = container.get(GenericService);
 
     expect(instance.isActivated).toBe(false);
     expect(instance.scope.isDisposed).toBe(false);
     expect(instance.scope.isInactive).toBe(false);
+
+    container.get(EventBus).emit("TEST_STRING_EVENT", "string-event-data");
+
+    expect(instance.isTestStringEventReceived).toBe(true);
+    expect(instance.testStingEventPayload).toBe("string-event-data");
+    expect(container.get(QueryBus).query("TEST_STRING_QUERY")).toBe("string-query-response");
+    expect(container.get(CommandBus).execute("TEST_SYNC_COMMAND", 800)).toBe(1800);
+
+    container.unbind(GenericService);
+
+    expect(container.get(QueryBus).hasHandler("TEST_STRING_QUERY")).toBe(false);
+    expect(container.get(CommandBus).hasHandler("TEST_SYNC_COMMAND")).toBe(false);
+    expect(instance.scope.isDisposed).toBe(true);
+    expect(instance.scope.isInactive).toBe(true);
   });
 
   it("should throw for instance descriptor without constructor value", () => {

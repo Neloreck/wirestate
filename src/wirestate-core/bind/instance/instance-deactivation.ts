@@ -39,8 +39,8 @@ export function createInstanceDeactivationHandler<T extends object>(
       instance,
     });
 
-    if (options?.skipLifecycle) {
-      dbg.info(prefix(__filename), "Skip lifecycle @OnDeactivation method:", {
+    if (options?.skipActivationHooks) {
+      dbg.info(prefix(__filename), "Skip @OnDeactivation method:", {
         name: binding.name,
         container,
         binding,
