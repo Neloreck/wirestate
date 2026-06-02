@@ -72,6 +72,8 @@ export interface ProvideContainerDecorator<E extends ReactiveElement = ReactiveE
 export function provideContainer<E extends ReactiveElement>(
   options: ContainerProviderOptions
 ): ProvideContainerDecorator<E> {
+  const controllerKey: unique symbol = Symbol("@wirestate/lit/provide-container");
+
   return ((
     protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, ContainerProvider<E>>,
     nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, ContainerProvider<E>>
@@ -82,15 +84,14 @@ export function provideContainer<E extends ReactiveElement>(
         protoOrTarget.set.call(this, new ContainerProvider(this as unknown as E, options));
       });
     } else {
-      let controller: Maybe<ContainerProvider<E>>;
-
       (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement): void => {
-        controller = new ContainerProvider(element as E, options);
+        (element as ReactiveElement & Record<typeof controllerKey, Maybe<ContainerProvider<E>>>)[controllerKey] =
+          new ContainerProvider(element as E, options);
       });
 
       return {
         get(this: ReactiveElement): ContainerProvider<E> {
-          return controller as ContainerProvider<E>;
+          return (this as ReactiveElement & Record<typeof controllerKey, ContainerProvider<E>>)[controllerKey];
         },
         set(): void {},
         configurable: true,

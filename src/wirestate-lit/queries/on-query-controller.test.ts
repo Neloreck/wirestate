@@ -65,21 +65,35 @@ describe("OnQueryController", () => {
   });
 
   it("should re-register when container context is updated", () => {
-    const firstContainer: Container = createContainer();
+    const { provider, contextProvider, container: firstContainer } = fixture;
+
+    const QUERY: string = "TEST_QUERY";
+
+    const firstBus: QueryBus = firstContainer.get(QueryBus);
     const secondContainer: Container = createContainer();
-    const bus: QueryBus = firstContainer.get(QueryBus);
+    const secondBus: QueryBus = secondContainer.get(QueryBus);
+
     const element: TestConsumerElement = new TestConsumerElement();
     const handler = jest.fn(() => "test-result");
 
-    const { provider, contextProvider } = createLitProvision(firstContainer);
+    new OnQueryController(element, QUERY, handler);
 
-    new OnQueryController(element, "REVISION_QUERY", handler);
+    expect(firstBus.hasHandler(QUERY)).toBe(false);
 
     provider.appendChild(element);
-    expect(bus.hasHandler("REVISION_QUERY")).toBe(true);
+
+    expect(firstBus.hasHandler(QUERY)).toBe(true);
+    expect(firstBus.query(QUERY)).toBe("test-result");
 
     contextProvider.setValue(secondContainer);
-    expect(firstContainer.get(QueryBus).hasHandler("REVISION_QUERY")).toBe(false);
-    expect(secondContainer.get(QueryBus).hasHandler("REVISION_QUERY")).toBe(true);
+
+    expect(firstBus.hasHandler(QUERY)).toBe(false);
+    expect(secondBus.hasHandler(QUERY)).toBe(true);
+    expect(secondBus.query(QUERY)).toBe("test-result");
+
+    element.remove();
+
+    expect(firstBus.hasHandler(QUERY)).toBe(false);
+    expect(secondBus.hasHandler(QUERY)).toBe(false);
   });
 });

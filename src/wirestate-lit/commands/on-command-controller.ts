@@ -53,6 +53,7 @@ export class OnCommandController<D = unknown, R = unknown> implements ReactiveCo
       context: ContainerContext,
       subscribe: true,
       callback: (container) => {
+        this.cleanup();
         this.bus = container.get(CommandBus);
 
         if (host.isConnected) {

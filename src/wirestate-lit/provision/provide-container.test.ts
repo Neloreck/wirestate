@@ -1,6 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { ContainerContext } from "../context/container-context";
@@ -12,7 +12,7 @@ import { provideContainer } from "./provide-container";
 describe("provideContainer", () => {
   @customElement("ws-provide-container-decorated")
   class DecoratedElement extends ReactiveElement {
-    @provideContainer({ container: createContainer() })
+    @provideContainer({ config: {} })
     public containerProvider!: ContainerProvider;
   }
 
@@ -60,5 +60,29 @@ describe("provideContainer", () => {
     expect(receivedContainer).toBe(element.containerProvider.value);
 
     element.remove();
+  });
+
+  it("should create an independent provider for each decorated element instance", () => {
+    const firstElement: DecoratedElement = new DecoratedElement();
+    const firstProvider: ContainerProvider = firstElement.containerProvider;
+
+    const secondElement: DecoratedElement = new DecoratedElement();
+    const secondProvider: ContainerProvider = secondElement.containerProvider;
+
+    expect(firstProvider).toBeInstanceOf(ContainerProvider);
+    expect(secondProvider).toBeInstanceOf(ContainerProvider);
+    expect(firstProvider).not.toBe(secondProvider);
+
+    document.body.appendChild(firstElement);
+    document.body.appendChild(secondElement);
+
+    expect(firstProvider.value).toBeInstanceOf(Container);
+    expect(secondProvider.value).toBeInstanceOf(Container);
+    expect(firstProvider.value).not.toBe(secondProvider.value);
+
+    firstElement.remove();
+
+    expect(firstProvider.value).toBeUndefined();
+    expect(secondProvider.value).toBeInstanceOf(Container);
   });
 });

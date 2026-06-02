@@ -53,6 +53,7 @@ export class OnEventController<E extends WireEvent = WireEvent> implements React
       context: ContainerContext,
       subscribe: true,
       callback: (container) => {
+        this.cleanup();
         this.bus = container.get(EventBus);
 
         if (host.isConnected) {

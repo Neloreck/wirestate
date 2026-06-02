@@ -261,7 +261,7 @@ import { createContainer } from "@wirestate/core";
 Creates a configured IoC container for application code and tests. Use the first argument for reusable container config:
 
 | Config     | Type                                  | Description                                                                             |
-| ---------- |---------------------------------------| --------------------------------------------------------------------------------------- |
+| ---------- | ------------------------------------- | --------------------------------------------------------------------------------------- |
 | `activate` | `boolean \| Array<Identifier>`        | `true` to resolve all bindings, or specific tokens to resolve immediately after binding |
 | `bindings` | `Array<Newable \| BindingDescriptor>` | Services or descriptors to bind                                                         |
 | `onError`  | `InternalErrorHandler`                | Handles isolated internal errors; defaults to `console.error`                           |
@@ -272,7 +272,7 @@ Creates a configured IoC container for application code and tests. Use the first
 Use the second argument for activation hook and container creation tweaks:
 
 | Option                | Type      | Description                                    |
-| --------------------- | --------- |------------------------------------------------|
+| --------------------- | --------- | ---------------------------------------------- |
 | `skipMessaging`       | `boolean` | Skip `EventBus`, `QueryBus`, and `CommandBus`  |
 | `skipActivationHooks` | `boolean` | Skip `@OnActivated` / `@OnDeactivation` hooks; |
 

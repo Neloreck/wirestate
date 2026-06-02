@@ -54,6 +54,7 @@ export class OnQueryController<D = unknown, R = unknown> implements ReactiveCont
       context: ContainerContext,
       subscribe: true,
       callback: (container) => {
+        this.cleanup();
         this.bus = container.get(QueryBus);
 
         if (host.isConnected) {

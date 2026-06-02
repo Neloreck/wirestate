@@ -74,21 +74,35 @@ describe("OnCommandController", () => {
   });
 
   it("should re-register when container context is updated", () => {
-    const firstContainer: Container = createContainer();
+    const { provider, contextProvider, container: firstContainer } = fixture;
+
+    const COMMAND: string = "TEST_COMMAND";
+
+    const firstBus: CommandBus = firstContainer.get(CommandBus);
     const secondContainer: Container = createContainer();
-    const bus: CommandBus = firstContainer.get(CommandBus);
+    const secondBus: CommandBus = secondContainer.get(CommandBus);
+
     const element: TestConsumerElement = new TestConsumerElement();
-    const handler = jest.fn();
 
-    const { provider, contextProvider } = createLitProvision(firstContainer);
+    new OnCommandController(element, COMMAND, () => "element-handler");
 
-    new OnCommandController(element, "REVISION_COMMAND", handler);
+    expect(firstBus.hasHandler(COMMAND)).toBe(false);
 
     provider.appendChild(element);
-    expect(bus.hasHandler("REVISION_COMMAND")).toBe(true);
+
+    expect(firstBus.hasHandler(COMMAND)).toBe(true);
+    expect(firstBus.execute(COMMAND)).toBe("element-handler");
 
     contextProvider.setValue(secondContainer);
-    expect(firstContainer.get(CommandBus).hasHandler("REVISION_COMMAND")).toBe(false);
-    expect(secondContainer.get(CommandBus).hasHandler("REVISION_COMMAND")).toBe(true);
+
+    expect(firstBus.hasHandler(COMMAND)).toBe(false);
+
+    expect(secondBus.hasHandler(COMMAND)).toBe(true);
+    expect(secondBus.execute(COMMAND)).toBe("element-handler");
+
+    element.remove();
+
+    expect(firstBus.hasHandler(COMMAND)).toBe(false);
+    expect(secondBus.hasHandler(COMMAND)).toBe(false);
   });
 });
