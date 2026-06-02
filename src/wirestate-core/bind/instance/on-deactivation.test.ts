@@ -23,7 +23,7 @@ describe("OnDeactivation", () => {
       }
 
       return MyService;
-    }).toThrow("Only one @OnDeactivation method can be declared on service 'MyService'.");
+    }).toThrow("Only one @OnDeactivation method can be declared on 'MyService'.");
   });
 
   it("should allow redecorating the same deactivation method across a hierarchy", () => {
@@ -52,7 +52,7 @@ describe("OnDeactivation", () => {
     }
 
     expect(() => getDeactivationHandlerMetadata(new ChildService())).toThrow(
-      "Only one @OnDeactivation method can be declared across service hierarchy 'ChildService'."
+      "Only one @OnDeactivation method can be declared across class hierarchy for 'ChildService'."
     );
   });
 });

@@ -7,14 +7,14 @@ import { DEACTIVATION_HANDLER_METADATA } from "../../registry";
 import { Maybe } from "../../types/general";
 
 /**
- * Runs a service method during container deactivation.
+ * Runs an instance method during container deactivation.
  *
  * @remarks
- * Deactivation happens when the container unbinds or disposes the service.
+ * Deactivation happens when the container unbinds or disposes the instance.
  *
  * Use it for container-disposal cleanup. Prefer `@OnDeprovision` for work
  * started by provider ownership, such as subscriptions, timers, sockets, and
- * observers. A service hierarchy may have one deactivation hook name.
+ * observers. A class hierarchy may have one deactivation hook name.
  *
  * @group Lifecycle
  *
@@ -46,7 +46,7 @@ export function OnDeactivation(): MethodDecorator {
 
     if (DEACTIVATION_HANDLER_METADATA.has(constructor)) {
       throw new WirestateError(
-        `Only one @OnDeactivation method can be declared on service '${constructor.name}'.`,
+        `Only one @OnDeactivation method can be declared on '${constructor.name}'.`,
         ERROR_CODE_VALIDATION_ERROR
       );
     }
@@ -59,7 +59,7 @@ export function OnDeactivation(): MethodDecorator {
  * Retrieves the method decorated with {@link OnDeactivation} by traversing the prototype chain.
  *
  * @remarks
- * A service hierarchy may declare one deactivation hook name. Subclasses can
+ * A class hierarchy may declare one deactivation hook name. Subclasses can
  * override a decorated base method and may redecorate that same method name;
  * declaring a different decorated method in the same hierarchy is a validation
  * error.
@@ -67,7 +67,7 @@ export function OnDeactivation(): MethodDecorator {
  * @group Lifecycle
  * @internal
  *
- * @param instance - The service instance to scan for deactivation handlers.
+ * @param instance - The instance to scan for deactivation handlers.
  * @returns The method name (string or symbol), or `null` when no hook exists.
  *
  * @example
@@ -91,7 +91,7 @@ export function getDeactivationHandlerMetadata(instance: object): Maybe<string |
     if (own) {
       if (handler && handler !== own) {
         throw new WirestateError(
-          `Only one @OnDeactivation method can be declared across service hierarchy '${instance.constructor.name}'. ` +
+          `Only one @OnDeactivation method can be declared across class hierarchy for '${instance.constructor.name}'. ` +
             `Found '${String(handler)}' on '${ownerName ?? "unknown"}' and '${String(own)}' on '${constructor.name}'.`,
           ERROR_CODE_VALIDATION_ERROR
         );

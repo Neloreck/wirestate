@@ -20,7 +20,7 @@ describe("getBindingToken", () => {
   });
 
   it("should return the symbol token if the binding is a descriptor with symbol token", () => {
-    const token: unique symbol = Symbol("my-service");
+    const token: unique symbol = Symbol("token");
 
     expect(getBindingToken({ token, value: GenericService })).toBe(token);
   });

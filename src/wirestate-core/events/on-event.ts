@@ -6,11 +6,11 @@ import { EventHandlerMetadata, EventType } from "../types/events";
 import { Maybe, Optional } from "../types/general";
 
 /**
- * Marks a service method as an event handler.
+ * Marks a method as an event handler.
  *
  * @remarks
- * The handler registers when the service activates and unregisters when the
- * service deactivates.
+ * The handler registers when the instance activates and unregisters when the
+ * instance deactivates.
  *
  * Omit `types` to receive every event in the container.
  *

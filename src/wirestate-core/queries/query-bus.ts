@@ -35,7 +35,7 @@ interface QueryHandlerDescriptor {
 export class QueryBus {
   /**
    * Internal handler storage.
-   * Uses a stack for each query type to support shadowing (e.g., component-level vs service-level).
+   * Uses a stack for each query type to support shadowing.
    */
   private readonly handlers: Map<QueryType, Array<QueryHandlerDescriptor>> = new Map();
 

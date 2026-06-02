@@ -6,7 +6,7 @@ import { EventBus } from "./event-bus";
 import { OnEvent } from "./on-event";
 
 describe("buildEventDispatcher", () => {
-  it("should return an empty list when the service declares no handlers", () => {
+  it("should return an empty list when the instance declares no handlers", () => {
     class PlainService {
       public example(): void {
         return void 0;
@@ -112,7 +112,7 @@ describe("buildEventDispatcher", () => {
     expect(calls).toEqual(["base", "derived"]);
   });
 
-  it("should isolate and report a thrown handler with service context", () => {
+  it("should isolate and report a thrown handler with instance context", () => {
     const error = new Error("handler failed");
     const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 

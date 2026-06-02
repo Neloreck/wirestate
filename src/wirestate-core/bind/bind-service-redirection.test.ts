@@ -12,7 +12,7 @@ import { getContainerBindings } from "./utils/register-binding";
 describe("bindServiceRedirection", () => {
   it("should bind a service redirection descriptor", () => {
     const container: Container = createContainer();
-    const TOKEN: unique symbol = Symbol("generic-service-alias");
+    const TOKEN: unique symbol = Symbol("token");
     const binding: ServiceRedirectionBindingDescriptor<GenericService> = {
       type: BindingType.ServiceRedirection,
       token: TOKEN,

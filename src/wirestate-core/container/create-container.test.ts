@@ -276,7 +276,7 @@ describe("createContainer", () => {
   });
 
   it("should activate instance descriptors by descriptor token", () => {
-    const TOKEN: unique symbol = Symbol("test-service");
+    const TOKEN: unique symbol = Symbol("token");
     let activated: boolean = false;
 
     @Injectable()
@@ -387,7 +387,7 @@ describe("createContainer", () => {
     ).toThrow("Supplied activation list while container bindings are not provided.");
   });
 
-  it("should throw error if activated service is not in bindings", () => {
+  it("should throw error if activated instance is not in bindings", () => {
     @Injectable()
     class TestService {}
 

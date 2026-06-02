@@ -16,7 +16,7 @@ describe("validateContainerConfig", () => {
   });
 
   it("should validate activate true against descriptor bindings", () => {
-    const TOKEN: unique symbol = Symbol("test-service");
+    const TOKEN: unique symbol = Symbol("token");
 
     @Injectable()
     class TestService {}
@@ -43,7 +43,7 @@ describe("validateContainerConfig", () => {
     ).toThrow("Supplied activation list while container bindings are not provided.");
   });
 
-  it("should throw if activated service is not in bindings", () => {
+  it("should throw if activated instance is not in bindings", () => {
     @Injectable()
     class TestService {}
 

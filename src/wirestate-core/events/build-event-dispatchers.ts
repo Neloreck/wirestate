@@ -20,7 +20,7 @@ interface DispatcherPlan {
 }
 
 /**
- * Builds one bus subscription descriptor per `@OnEvent` method on a service.
+ * Builds one bus subscription descriptor per `@OnEvent` method on an instance.
  *
  * @remarks
  * Scans the instance for methods decorated with {@link OnEvent} and returns a
@@ -37,10 +37,10 @@ interface DispatcherPlan {
  * @group Events
  * @internal
  *
- * @template T - Type of the service instance.
+ * @template T - Type of the instance.
  *
- * @param instance - Service instance to scan for handlers.
- * @param container - Container that owns the service instance.
+ * @param instance - The instance to scan for handlers.
+ * @param container - Container that owns the instance.
  * @returns One subscription descriptor per decorated method; empty when none are declared.
  *
  * @example

@@ -25,7 +25,7 @@ import { bindServiceRedirection } from "./bind-service-redirection";
  */
 export interface BindOptions extends BindInstanceOptions {
   /**
-   * Skip service lifecycle hooks for class bindings.
+   * Skip lifecycle hooks for class bindings.
    *
    * @default `false`
    */
@@ -36,7 +36,7 @@ export interface BindOptions extends BindInstanceOptions {
  * Binds a {@link Binding} into a container.
  *
  * @remarks
- * `bind` is the router behind `createContainer({ bindings })`. Pass a service
+ * `bind` is the router behind `createContainer({ bindings })`. Pass a
  * class constructor directly, or pass a descriptor when the binding needs a
  * custom token, constant value, factory, resolved value, or token redirection.
  *
@@ -44,10 +44,10 @@ export interface BindOptions extends BindInstanceOptions {
  * Descriptors with `Factory`, `ResolvedValue`, and `ServiceRedirection` are
  * delegated to their dedicated Inversify binding helpers.
  *
- * - Class constructor: singleton service binding.
+ * - Class constructor: singleton instance binding.
  * - `ConstantValue`: constant value binding.
  * - `DynamicValue`: factory value binding.
- * - `Instance`: service class behind a custom token.
+ * - `Instance`: singleton instance behind a custom token.
  * - `Factory`: factory creator binding.
  * - `ResolvedValue`: injected factory binding.
  * - `ServiceRedirection`: token redirection binding.

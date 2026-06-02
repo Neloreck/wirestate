@@ -11,11 +11,11 @@ import { Maybe } from "../../types/general";
  *
  * @remarks
  * React and Lit providers call this when a container enters a UI subtree.
- * This is provider lifetime, not service lifetime.
+ * This is provider lifetime, not instance lifetime.
  *
  * Use it for subscriptions, timers, sockets, observers, provider-scoped async
  * work, or any resource that should be cleaned up when the provider releases
- * the container. A service hierarchy may have one provision hook name.
+ * the container. A class hierarchy may have one provision hook name.
  *
  * @group Lifecycle
  *
@@ -61,7 +61,7 @@ export function OnProvision(): MethodDecorator {
  * Retrieves the method decorated with {@link OnProvision} by traversing the prototype chain.
  *
  * @remarks
- * A service hierarchy may declare one provision hook name. Subclasses can
+ * A class hierarchy may declare one provision hook name. Subclasses can
  * override a decorated base method and may redecorate that same method name;
  * declaring a different decorated method in the same hierarchy is a validation
  * error.
@@ -69,7 +69,7 @@ export function OnProvision(): MethodDecorator {
  * @group Lifecycle
  * @internal
  *
- * @param instance - The service instance to scan for provision handlers.
+ * @param instance - The instance to scan for provision handlers.
  * @returns The method name, or `null` when no hook exists.
  */
 export function getProvisionHandlerMetadata(instance: object): Maybe<string | symbol> {

@@ -6,7 +6,7 @@ import { Maybe } from "../types/general";
 import { QueryHandlerMetadata } from "../types/queries";
 
 /**
- * Retrieves query handler metadata for a service instance by traversing its prototype chain.
+ * Retrieves query handler metadata for an instance by traversing its prototype chain.
  *
  * @remarks
  * This utility collects metadata registered via the {@link OnQuery} decorator.
@@ -17,7 +17,7 @@ import { QueryHandlerMetadata } from "../types/queries";
  * @group Queries
  * @internal
  *
- * @param instance - The service instance to scan for query handlers.
+ * @param instance - The instance to scan for query handlers.
  * @returns A read-only array of query handler metadata, ordered from base to derived class.
  *
  * @example

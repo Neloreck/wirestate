@@ -52,7 +52,7 @@ describe("provision lifecycle", () => {
   });
 
   it("should provision instance descriptors bound behind custom tokens", () => {
-    const TOKEN: unique symbol = Symbol("service");
+    const TOKEN: unique symbol = Symbol("token");
     const { LifecycleService, events } = createLifecycleService({ methods: ["provision"] });
 
     const container: Container = createContainer({

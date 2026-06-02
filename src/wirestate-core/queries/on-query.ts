@@ -6,11 +6,11 @@ import { Maybe } from "../types/general";
 import { QueryHandlerMetadata, QueryType } from "../types/queries";
 
 /**
- * Marks a service method as a query handler.
+ * Marks a method as a query handler.
  *
  * @remarks
- * The handler registers when the service activates and unregisters when the
- * service deactivates.
+ * The handler registers when the instance activates and unregisters when the
+ * instance deactivates.
  *
  * Queries answer reads. If several handlers use the same token, the newest one
  * answers. Think stack of sticky notes: read the top note first.

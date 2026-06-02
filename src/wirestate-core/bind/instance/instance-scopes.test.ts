@@ -25,7 +25,7 @@ describe("hasWireScopeInjection", () => {
     expect(hasScopeInjection(ScopedService)).toBe(true);
   });
 
-  it("should return false for services without WireScope injection", () => {
+  it("should return false for instances without WireScope injection", () => {
     expect(hasScopeInjection(PlainService)).toBe(false);
   });
 

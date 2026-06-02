@@ -6,11 +6,11 @@ import { CommandHandlerMetadata, CommandType } from "../types/commands";
 import { Maybe } from "../types/general";
 
 /**
- * Marks a service method as a command handler.
+ * Marks a method as a command handler.
  *
  * @remarks
- * The handler registers when the service activates and unregisters when the
- * service deactivates. One command call goes to one handler: the newest
+ * The handler registers when the instance activates and unregisters when the
+ * instance deactivates. One command call goes to one handler: the newest
  * registered handler for that token.
  *
  * @group Commands

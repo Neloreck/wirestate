@@ -113,7 +113,7 @@ export interface InstanceBindingDescriptor<T extends object = object> {
   readonly type: "Instance";
 
   /**
-   * Token used to resolve the service.
+   * Token used to resolve the instance.
    */
   readonly token: ServiceIdentifier<T>;
 
@@ -216,7 +216,7 @@ export type BindingDescriptor<T = unknown, FA extends Array<unknown> = Array<unk
  * Represents a single binding accepted by Wirestate registration APIs.
  *
  * @remarks
- * A binding is either a service class  {@link Newable} constructor or a {@link BindingDescriptor}
+ * A binding is either a class {@link Newable} constructor or a {@link BindingDescriptor}
  * for constants, factories, resolved values, service redirection, or custom-token class bindings.
  *
  * @group Bind
@@ -227,7 +227,7 @@ export type Binding<T extends object = object> = Newable<T> | BindingDescriptor;
  * Represents bindings accepted by Wirestate registration APIs.
  *
  * @remarks
- * Each item is either a service class or an {@link BindingDescriptor}.
+ * Each item is either a class reference or an {@link BindingDescriptor}.
  *
  * @group Bind
  */

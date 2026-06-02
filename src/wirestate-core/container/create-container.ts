@@ -50,7 +50,7 @@ export interface ContainerConfig {
   readonly seed?: AnyObject;
 
   /**
-   * Seed values keyed by service class, string, or symbol.
+   * Seed values keyed by class, string, or symbol.
    */
   readonly seeds?: SeedBindings;
 }
@@ -77,7 +77,7 @@ export interface CreateContainerOptions {
   readonly skipMessaging?: boolean;
 
   /**
-   * Skip service lifecycle hooks for class bindings.
+   * Skip lifecycle hooks for class bindings.
    *
    * @default `false`
    */
@@ -92,8 +92,8 @@ export interface CreateContainerOptions {
  *
  * - Shared seed and targeted seed tokens.
  * - Container-scoped `EventBus`, `CommandBus`, and `QueryBus`.
- * - Transient `WireScope`, so each service gets its own scope handle.
- * - Singleton default scope for normal services.
+ * - Transient `WireScope`, so each instance gets its own scope handle.
+ * - Singleton default scope for declared classes.
  *
  * Child containers inherit parent bindings and seed defaults, but get their
  * own buses. Passing `seed` or `seeds`, or calling seed helpers on a child,

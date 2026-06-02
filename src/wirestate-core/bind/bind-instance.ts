@@ -129,7 +129,7 @@ export function bindInstanceWithToken<T extends object>(
     validateInstanceDescriptor(registeredBinding);
   }
 
-  dbg.info(prefix(__filename), "Binding service:", {
+  dbg.info(prefix(__filename), "Binding instance:", {
     name: binding.name,
     token,
     binding,

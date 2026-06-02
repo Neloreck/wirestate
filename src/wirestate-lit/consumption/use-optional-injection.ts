@@ -25,23 +25,23 @@ export interface UseOptionalInjectionOptions<T, F = null> {
    * Resolve only the first context value.
    *
    * @remarks
-   * If true, the service will not update when the container context changes.
+   * If true, the value will not update when the container context changes.
    * Defaults to `false`.
    */
   once?: boolean;
 
   /**
-   * Initial value before the service is fetched.
+   * Initial value before the value is fetched.
    */
   value?: T | F;
 
   /**
-   * The service token to inject.
+   * The token to inject.
    */
   token: ServiceIdentifier<T>;
 
   /**
-   * Provides a value when the service token is not bound.
+   * Provides a value when the token is not bound.
    */
   fallback?: OptionalInjectionFallback<F>;
 }
@@ -53,17 +53,17 @@ export interface UseOptionalInjectionOptions<T, F = null> {
  */
 export interface UseOptionalInjectionValue<T, F = null> {
   /**
-   * The service token used for injection.
+   * The token used for injection.
    */
   token: ServiceIdentifier<T>;
   /**
-   * The injected service instance, fallback value, or `null`.
+   * The injected instance, fallback value, or `null`.
    */
   value: T | F;
 }
 
 /**
- * Consumes a service if the nearest container has it.
+ * Consumes a token if the nearest container has it.
  *
  * @remarks
  * Missing token means fallback result, or `null` when no fallback exists.

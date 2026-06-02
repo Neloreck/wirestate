@@ -12,7 +12,7 @@ import {
   createContainer,
 } from "../index";
 
-describe("core service shadowing and cleanup integration", () => {
+describe("core instance shadowing and cleanup integration", () => {
   const FORMAT_COMMAND: string = "FORMAT_COMMAND";
   const CURRENT_QUERY: string = "CURRENT_QUERY";
   const TOUCH_EVENT: string = "TOUCH_EVENT";
@@ -89,7 +89,7 @@ describe("core service shadowing and cleanup integration", () => {
     events.length = 0;
   });
 
-  it("restores previous command and query handlers after the shadowing service is removed", async () => {
+  it("restores previous command and query handlers after the shadowing instance is removed", async () => {
     const container: Container = createContainer({
       activate: [PrimaryHandlerService, SecondaryHandlerService],
       bindings: [PrimaryHandlerService, SecondaryHandlerService],

@@ -54,7 +54,7 @@ export type QueryUnregister = () => void;
  *
  * @remarks
  * This interface is used internally to track which methods should be registered
- * on the {@link QueryBus} during service activation.
+ * on the {@link QueryBus} during instance activation.
  *
  * @group Queries
  * @internal

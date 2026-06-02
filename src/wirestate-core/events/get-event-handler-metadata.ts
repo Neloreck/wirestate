@@ -6,7 +6,7 @@ import { EventHandlerMetadata } from "../types/events";
 import { Maybe } from "../types/general";
 
 /**
- * Retrieves event handler metadata for a service instance by traversing its prototype chain.
+ * Retrieves event handler metadata for an instance by traversing its prototype chain.
  *
  * @remarks
  * This utility collects metadata registered via the {@link OnEvent} decorator.
@@ -16,7 +16,7 @@ import { Maybe } from "../types/general";
  * @group Events
  * @internal
  *
- * @param instance - The service instance to scan for event handlers.
+ * @param instance - The instance to scan for event handlers.
  * @returns A read-only array of event handler metadata, ordered from base to derived class.
  *
  * @example

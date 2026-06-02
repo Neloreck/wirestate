@@ -15,7 +15,7 @@ import { Maybe } from "../types/general";
  * @group Commands
  * @internal
  *
- * @param instance - The service instance to inspect.
+ * @param instance - The instance to inspect.
  * @returns A read-only array of metadata for all discovered command handlers.
  */
 export function getCommandHandlerMetadata(instance: object): ReadonlyArray<CommandHandlerMetadata> {

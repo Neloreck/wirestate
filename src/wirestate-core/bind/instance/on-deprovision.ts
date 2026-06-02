@@ -11,9 +11,9 @@ import { Maybe } from "../../types/general";
  *
  * @remarks
  * React and Lit providers call this when a container leaves a UI subtree.
- * This is provider lifetime, not service lifetime.
+ * This is provider lifetime, not instance lifetime.
  *
- * Use it to clean up work started by `@OnProvision`. A service hierarchy may
+ * Use it to clean up work started by `@OnProvision`. A class hierarchy may
  * have one deprovision hook name.
  *
  * @group Lifecycle
@@ -60,7 +60,7 @@ export function OnDeprovision(): MethodDecorator {
  * Retrieves the method decorated with {@link OnDeprovision} by traversing the prototype chain.
  *
  * @remarks
- * A service hierarchy may declare one deprovision hook name. Subclasses can
+ * A class hierarchy may declare one deprovision hook name. Subclasses can
  * override a decorated base method and may redecorate that same method name;
  * declaring a different decorated method in the same hierarchy is a validation
  * error.
@@ -68,7 +68,7 @@ export function OnDeprovision(): MethodDecorator {
  * @group Lifecycle
  * @internal
  *
- * @param instance - The service instance to scan for deprovision handlers.
+ * @param instance - The instance to scan for deprovision handlers.
  * @returns The method name, or `null` when no hook exists.
  */
 export function getDeprovisionHandlerMetadata(instance: object): Maybe<string | symbol> {

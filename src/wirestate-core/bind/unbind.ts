@@ -8,8 +8,8 @@ import { unregisterAllBindings, unregisterBinding } from "./utils/register-bindi
  *
  * @remarks
  * This wraps Inversify's `container.unbind(token)` and also removes the
- * matching Wirestate binding registry entries. If a provider has provisioned a
- * service for the token, `@OnDeprovision` runs before Inversify deactivation.
+ * matching Wirestate binding registry entries. If a provider has provisioned an
+ * instance for the token, `@OnDeprovision` runs before Inversify deactivation.
  *
  * @group Bind
  *

@@ -72,7 +72,7 @@ describe("bindInstance", () => {
     public sabotagedActivated: string = "not-a-function";
   }
 
-  it("should bind service and handle lifecycle", async () => {
+  it("should bind instances and handle lifecycle", async () => {
     const container: Container = createContainer();
 
     const result: Container = bindInstance(container, GenericService);

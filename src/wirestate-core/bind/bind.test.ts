@@ -9,7 +9,7 @@ import { bind } from "./bind";
 import { getContainerBindings } from "./utils/register-binding";
 
 describe("bind", () => {
-  it("should bind a service class directly", () => {
+  it("should bind a class directly", () => {
     const container: Container = createContainer();
     const result: Container = bind(container, GenericService);
 
@@ -95,7 +95,7 @@ describe("bind", () => {
 
   it("should bind an instance descriptor to its descriptor token", () => {
     const container: Container = createContainer();
-    const TOKEN: unique symbol = Symbol("generic-service");
+    const TOKEN: unique symbol = Symbol("token");
     const binding: BindingDescriptor = {
       type: BindingType.Instance,
       token: TOKEN,

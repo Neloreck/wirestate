@@ -22,7 +22,7 @@ describe("injection", () => {
     fixture.cleanup();
   });
 
-  it("should inject service using options object", () => {
+  it("should inject instance using options object", () => {
     @customElement("test-injection-options-element")
     class TestOptionsElement extends ReactiveElement {
       @injection({ token: GenericService })

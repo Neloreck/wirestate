@@ -15,13 +15,13 @@ import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 import { SeedKey, SeedsMap } from "../types/seeds";
 
 /**
- * Per-service handle for container work.
+ * Per-instance handle for container work.
  *
  * @remarks
- * Inject `WireScope` when a service needs buses, seeds, or lazy resolution.
+ * Inject `WireScope` when an instance needs buses, seeds, or lazy resolution.
  *
- * Each bound service gets its own transient scope. The scope is valid after
- * service activation and before deactivation. After disposal it throws instead
+ * Each bound instance gets its own transient scope. The scope is valid after
+ * instance activation and before deactivation. After disposal it throws instead
  * of letting dead services keep talking to the container.
  *
  * @group Container
@@ -46,7 +46,7 @@ export class WireScope {
    * Whether the scope was deactivated and disposed from the container.
    *
    * @remarks
-   * This becomes `true` after service deactivation, usually when an owned
+   * This becomes `true` after instance deactivation, usually when an owned
    * container is disposed. It remains `false` when only provider ownership ends.
    */
   public readonly isDisposed: boolean = false;
@@ -89,7 +89,7 @@ export class WireScope {
   }
 
   /**
-   * Whether this scope should stop user work because its service or provider lifecycle ended.
+   * Whether this scope should stop user work because its instance or provider lifecycle ended.
    *
    * @remarks
    * Use this as the default async-work guard. It is `true` when either
@@ -102,20 +102,20 @@ export class WireScope {
   }
 
   /**
-   * Resolves a service or value from the container.
+   * Resolves an instance or value from the container.
    *
    * @remarks
    * Use this for lazy work or to reduce direct constructor dependencies.
-   * Constructor injection resolves dependencies during service creation;
+   * Constructor injection resolves dependencies during instance creation;
    * `resolve` looks up a dependency later, only when the method is called.
    *
-   * @template T - Type of the service or value to resolve.
+   * @template T - Type of the instance or value to resolve.
    *
-   * @param token - Service token (class constructor, symbol, or string).
+   * @param token - The token (class constructor, symbol, or string).
    * @returns The resolved instance or value.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
-   * @throws {Error} If the service cannot be resolved from the container.
+   * @throws {Error} If the token cannot be resolved from the container.
    *
    * @example
    * ```typescript
@@ -134,9 +134,9 @@ export class WireScope {
   }
 
   /**
-   * Lazily resolves a service if it is bound, otherwise returns null.
+   * Lazily resolves an instance if it is bound, otherwise returns null.
    *
-   * @template T - Type of the service or value to resolve.
+   * @template T - Type of the instance or value to resolve.
    *
    * @param token - Service token (class constructor, symbol, or string).
    * @returns The resolved instance, value, or `null` if not bound.
@@ -651,7 +651,7 @@ export class WireScope {
    * Reads a targeted seed value.
    *
    * @remarks
-   * Targeted seeds are keyed by service class, string, or symbol.
+   * Targeted seeds are keyed by class, string, or symbol.
    *
    * @template T - Expected type of the seed value.
    * @param seed - Lookup token for the seed.
@@ -685,7 +685,7 @@ export class WireScope {
   }
 
   /**
-   * Verifies that this scope still belongs to an active service instance.
+   * Verifies that this scope still belongs to an active instance.
    *
    * @throws {@link WirestateError} If the scope is accessed before activation
    * or after disposal.
@@ -697,13 +697,13 @@ export class WireScope {
 
     if (this.isDisposed) {
       throw new WirestateError(
-        "WireScope::container accessed after deactivation. Ensure service is properly disposed.",
+        "WireScope::container accessed after deactivation. Ensure instance is properly disposed.",
         ERROR_CODE_ACCESS_AFTER_DISPOSAL
       );
     } else {
       throw new WirestateError(
         "WireScope::container accessed before activation. " +
-          "Ensure service is bound to container and is properly resolved.",
+          "Ensure instance is bound to container and is properly resolved.",
         ERROR_CODE_ACCESS_BEFORE_ACTIVATION
       );
     }

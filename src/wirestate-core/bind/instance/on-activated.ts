@@ -7,14 +7,14 @@ import { ACTIVATED_HANDLER_METADATA } from "../../registry";
 import { Maybe } from "../../types/general";
 
 /**
- * Runs a service method after container activation.
+ * Runs an instance method after container activation.
  *
  * @remarks
- * Activation happens the first time the singleton service is resolved.
+ * Activation happens the first time the singleton instance is resolved.
  *
  * Use it for cheap resolution-time initialization that does not open resources.
  * Prefer `@OnProvision` for subscriptions, timers, sockets, observers, and
- * async work that needs cleanup. A service hierarchy may have one activation
+ * async work that needs cleanup. A class hierarchy may have one activation
  * hook name.
  *
  * @group Lifecycle
@@ -47,7 +47,7 @@ export function OnActivated(): MethodDecorator {
 
     if (ACTIVATED_HANDLER_METADATA.has(constructor)) {
       throw new WirestateError(
-        `Only one @OnActivated method can be declared on service '${constructor.name}'.`,
+        `Only one @OnActivated method can be declared on '${constructor.name}'.`,
         ERROR_CODE_VALIDATION_ERROR
       );
     }
@@ -60,7 +60,7 @@ export function OnActivated(): MethodDecorator {
  * Retrieves the method decorated with {@link OnActivated} by traversing the prototype chain.
  *
  * @remarks
- * A service hierarchy may declare one activation hook name. Subclasses can
+ * A class hierarchy may declare one activation hook name. Subclasses can
  * override a decorated base method and may redecorate that same method name;
  * declaring a different decorated method in the same hierarchy is a validation
  * error.
@@ -68,7 +68,7 @@ export function OnActivated(): MethodDecorator {
  * @group Lifecycle
  * @internal
  *
- * @param instance - The service instance to scan for activation handlers.
+ * @param instance - The instance to scan for activation handlers.
  * @returns The method name (string or symbol), or `null` when no hook exists.
  *
  * @example
@@ -92,7 +92,7 @@ export function getActivatedHandlerMetadata(instance: object): Maybe<string | sy
     if (own) {
       if (handler && handler !== own) {
         throw new WirestateError(
-          `Only one @OnActivated method can be declared across service hierarchy '${instance.constructor.name}'. ` +
+          `Only one @OnActivated method can be declared across class hierarchy for '${instance.constructor.name}'. ` +
             `Found '${String(handler)}' on '${ownerName ?? "unknown"}' and '${String(own)}' on '${constructor.name}'.`,
           ERROR_CODE_VALIDATION_ERROR
         );
