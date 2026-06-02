@@ -69,7 +69,7 @@ export class EventBus {
    *
    * @template P - Type of the event payload.
    * @template T - Type of the event identifier.
-   * @template F - Type of the event source.
+   * @template S - Type of the event source.
    *
    * @param type - Event token.
    * @param payload - Event payload.
@@ -77,22 +77,22 @@ export class EventBus {
    *
    * @example
    * ```typescript
-   * eventBus.emit("USER_LOGGED_IN", { userId: "123" }, { from: authService });
+   * eventBus.emit("USER_LOGGED_IN", { userId: "123" }, { source: authService });
    * ```
    */
-  public emit<P = unknown, T extends EventType = EventType, F = unknown>(
+  public emit<P = unknown, T extends EventType = EventType, S = unknown>(
     type: T,
     payload?: P,
-    options?: EventEmitOptions<F>
+    options?: EventEmitOptions<S>
   ): void {
-    const event: WireEvent<P, T, F> = { type };
+    const event: WireEvent<P, T, S> = { type };
 
     if (payload !== undefined) {
       (event as { payload: P }).payload = payload;
     }
 
-    if (options?.from !== undefined) {
-      (event as { from: F }).from = options.from;
+    if (options?.source !== undefined) {
+      (event as { source: S }).source = options.source;
     }
 
     // Snapshot each bucket so subscriptions may change during emit.

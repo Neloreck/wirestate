@@ -166,6 +166,7 @@ export class WireScope {
    *
    * @template P - Type of the event payload.
    * @template T - Type of the event identifier.
+   * @template S - Type of the event source.
    *
    * @param type - Event identifier.
    * @param payload - Optional event payload.
@@ -178,10 +179,10 @@ export class WireScope {
    * scope.emitEvent("VALUE_CHANGED", { value: "abcd" });
    * ```
    */
-  public emitEvent<P, T extends EventType = EventType, F = unknown>(
+  public emitEvent<P, T extends EventType = EventType, S = unknown>(
     type: T,
     payload?: P,
-    options?: EventEmitOptions<F>
+    options?: EventEmitOptions<S>
   ): void {
     dbg.info(prefix(__filename), "Emit event:", {
       type,

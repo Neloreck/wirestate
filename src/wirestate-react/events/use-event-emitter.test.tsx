@@ -30,13 +30,13 @@ describe("useEventEmitter", () => {
       </ContainerProvider>
     );
 
-    (emitter as EventEmitter)("TEST_EVENT", { foo: "bar" }, { from: "source" });
+    (emitter as EventEmitter)("TEST_EVENT", { foo: "bar" }, { source: "source" });
 
-    expect(bus.emit).toHaveBeenCalledWith("TEST_EVENT", { foo: "bar" }, { from: "source" });
+    expect(bus.emit).toHaveBeenCalledWith("TEST_EVENT", { foo: "bar" }, { source: "source" });
     expect(handler).toHaveBeenCalledWith({
       type: "TEST_EVENT",
       payload: { foo: "bar" },
-      from: "source",
+      source: "source",
     });
   });
 });

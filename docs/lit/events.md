@@ -53,7 +53,7 @@ class CartButton extends LitElement {
   private scope!: WireScope;
 
   protected render() {
-    return html`<button @click=${() => this.scope.emitEvent("CART_VIEWED", undefined, { from: this })}>Cart</button>`;
+    return html`<button @click=${() => this.scope.emitEvent("CART_VIEWED", undefined, { source: this })}>Cart</button>`;
   }
 }
 ```

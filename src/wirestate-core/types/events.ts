@@ -12,10 +12,10 @@ export type EventType = string | symbol | number;
  *
  * @group Events
  */
-export interface WireEvent<P = unknown, T extends EventType = EventType, F = unknown> {
+export interface WireEvent<P = unknown, T extends EventType = EventType, S = unknown> {
   readonly type: T;
   readonly payload?: P;
-  readonly from?: F;
+  readonly source?: S;
 }
 
 /**
@@ -23,13 +23,13 @@ export interface WireEvent<P = unknown, T extends EventType = EventType, F = unk
  *
  * @group Events
  *
- * @template F - Type of the event source.
+ * @template S - Type of the event source.
  */
-export interface EventEmitOptions<F = unknown> {
+export interface EventEmitOptions<S = unknown> {
   /**
    * Optional source identifier attached to the emitted event.
    */
-  readonly from?: F;
+  readonly source?: S;
 }
 
 /**

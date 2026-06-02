@@ -123,7 +123,7 @@ const emit = useEventEmitter();
 
 emit("RESET");
 emit("ADD", { amount: 5 });
-emit("OPENED", { panel: "cart" }, { from: "cart-button" });
+emit("OPENED", { panel: "cart" }, { source: "cart-button" });
 ```
 
 ### `useEvent(type, handler)`

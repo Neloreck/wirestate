@@ -10,14 +10,14 @@ import { EventEmitOptions, EventType } from "@wirestate/core";
  *
  * @template P - The type of the event payload.
  * @template T - The event identifier type.
- * @template F - The type of the event source identifier.
+ * @template S - The type of the event source identifier.
  *
  * @param type - The event identifier.
  * @param payload - Optional event payload.
  * @param options - Optional emit options.
  */
-export type EventEmitter<P = unknown, T extends EventType = EventType, F = unknown> = (
+export type EventEmitter<P = unknown, T extends EventType = EventType, S = unknown> = (
   type: T,
   payload?: P,
-  options?: EventEmitOptions<F>
+  options?: EventEmitOptions<S>
 ) => void;

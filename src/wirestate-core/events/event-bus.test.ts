@@ -14,7 +14,7 @@ describe("EventBus", () => {
     expect(handler).toHaveBeenCalledWith({ type: "TEST", payload: 42 });
   });
 
-  it("should omit payload and from fields when they are undefined", () => {
+  it("should omit payload and source fields when they are undefined", () => {
     const bus: EventBus = new EventBus();
     const handler = jest.fn();
 
@@ -25,7 +25,7 @@ describe("EventBus", () => {
 
     expect(event).toStrictEqual({ type: "TEST" });
     expect(Object.prototype.hasOwnProperty.call(event, "payload")).toBe(false);
-    expect(Object.prototype.hasOwnProperty.call(event, "from")).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(event, "source")).toBe(false);
   });
 
   it("should omit only undefined fields while preserving provided fields", () => {
@@ -33,31 +33,31 @@ describe("EventBus", () => {
     const handler = jest.fn();
 
     bus.subscribe(handler);
-    bus.emit("TEST_WITH_SOURCE", undefined, { from: "source" });
+    bus.emit("TEST_WITH_SOURCE", undefined, { source: "source" });
     bus.emit("TEST_WITH_PAYLOAD", 42, {});
 
     const sourceEvent = handler.mock.calls[0][0];
     const payloadEvent = handler.mock.calls[1][0];
 
-    expect(sourceEvent).toStrictEqual({ type: "TEST_WITH_SOURCE", from: "source" });
+    expect(sourceEvent).toStrictEqual({ type: "TEST_WITH_SOURCE", source: "source" });
     expect(Object.prototype.hasOwnProperty.call(sourceEvent, "payload")).toBe(false);
 
     expect(payloadEvent).toStrictEqual({ type: "TEST_WITH_PAYLOAD", payload: 42 });
-    expect(Object.prototype.hasOwnProperty.call(payloadEvent, "from")).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(payloadEvent, "source")).toBe(false);
   });
 
-  it("should preserve falsy payload and from values when they are not undefined", () => {
+  it("should preserve falsy payload and source values when they are not undefined", () => {
     const bus: EventBus = new EventBus();
     const handler = jest.fn();
 
     bus.subscribe(handler);
-    bus.emit("NULL_VALUES", null, { from: null });
-    bus.emit("ZERO_VALUES", 0, { from: 0 });
-    bus.emit("FALSE_VALUES", false, { from: false });
+    bus.emit("NULL_VALUES", null, { source: null });
+    bus.emit("ZERO_VALUES", 0, { source: 0 });
+    bus.emit("FALSE_VALUES", false, { source: false });
 
-    expect(handler).toHaveBeenNthCalledWith(1, { type: "NULL_VALUES", payload: null, from: null });
-    expect(handler).toHaveBeenNthCalledWith(2, { type: "ZERO_VALUES", payload: 0, from: 0 });
-    expect(handler).toHaveBeenNthCalledWith(3, { type: "FALSE_VALUES", payload: false, from: false });
+    expect(handler).toHaveBeenNthCalledWith(1, { type: "NULL_VALUES", payload: null, source: null });
+    expect(handler).toHaveBeenNthCalledWith(2, { type: "ZERO_VALUES", payload: 0, source: 0 });
+    expect(handler).toHaveBeenNthCalledWith(3, { type: "FALSE_VALUES", payload: false, source: false });
   });
 
   it("should support multiple subscribers", () => {

@@ -18,7 +18,7 @@ import { EventEmitter } from "../types/events";
  *
  * @template P - Default payload type for emitted events.
  * @template T - Default event identifier type.
- * @template F - Default source identifier type.
+ * @template S - Default source identifier type.
  *
  * @returns An event emitter function.
  *
@@ -26,16 +26,16 @@ import { EventEmitter } from "../types/events";
  * ```tsx
  * const emit: EventEmitter = useEventEmitter();
  *
- * const onClick = () => emit("BUTTON_CLICKED", { id: "submit" }, { from: "submit-button" });
+ * const onClick = () => emit("BUTTON_CLICKED", { id: "submit" }, { source: "submit-button" });
  * ```
  */
-export function useEventEmitter<P = unknown, T extends EventType = EventType, F = unknown>(): EventEmitter<P, T, F> {
+export function useEventEmitter<P = unknown, T extends EventType = EventType, S = unknown>(): EventEmitter<P, T, S> {
   const container: Container = useContainer();
 
   return useMemo(() => {
     const bus: EventBus = container.get(EventBus);
 
-    return <P, T extends EventType>(type: T, payload?: P, options?: EventEmitOptions<F>) => {
+    return <P, T extends EventType>(type: T, payload?: P, options?: EventEmitOptions<S>) => {
       dbg.info(prefix(__filename), "Emit event:", {
         type,
         payload,

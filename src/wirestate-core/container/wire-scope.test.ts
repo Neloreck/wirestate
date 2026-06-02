@@ -79,11 +79,11 @@ describe("WireScope", () => {
     jest.spyOn(bus, "emit");
 
     scope.emitEvent("TEST_FIRST_EVENT", { data: 1 });
-    scope.emitEvent("TEST_SECOND_EVENT", "string-data", { from: window });
+    scope.emitEvent("TEST_SECOND_EVENT", "string-data", { source: window });
 
     expect(bus.emit).toHaveBeenCalledTimes(2);
     expect(bus.emit).toHaveBeenCalledWith("TEST_FIRST_EVENT", { data: 1 }, undefined);
-    expect(bus.emit).toHaveBeenCalledWith("TEST_SECOND_EVENT", "string-data", { from: window });
+    expect(bus.emit).toHaveBeenCalledWith("TEST_SECOND_EVENT", "string-data", { source: window });
   });
 
   it("should subscribe to events via scope", () => {
