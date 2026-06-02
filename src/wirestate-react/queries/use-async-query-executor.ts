@@ -34,13 +34,13 @@ export function useAsyncQueryExecutor(): AsyncQueryExecutor {
   return useMemo(() => {
     const bus: QueryBus = container.get(QueryBus);
 
-    return ((type: QueryType, data?: unknown) => {
-      dbg.info(prefix(__filename), "Async query data:", {
+    return ((type: QueryType, payload?: unknown) => {
+      dbg.info(prefix(__filename), "Async query payload:", {
         type,
-        data,
+        payload,
       });
 
-      return bus.queryAsync(type, data);
+      return bus.queryAsync(type, payload);
     }) as AsyncQueryExecutor;
   }, [container]);
 }

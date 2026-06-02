@@ -23,8 +23,8 @@ import { Optional } from "../types/general";
  * import { OnCommandController } from "@wirestate/lit";
  *
  * class SaveButton extends LitElement {
- *   private readonly saveCommand = new OnCommandController(this, "SAVE", (data: FormData) => {
- *     console.log("save", data);
+ *   private readonly saveCommand = new OnCommandController(this, "SAVE", (payload: FormData) => {
+ *     console.log("save", payload);
  *   });
  * }
  * ```

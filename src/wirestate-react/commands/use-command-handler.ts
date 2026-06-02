@@ -16,15 +16,15 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * @group Commands
  *
  * @template R - Result type of the command.
- * @template D - Data/payload type of the command.
+ * @template D - Payload type of the command.
  *
  * @param type - Command type (string or symbol).
  * @param handler - Command handler function.
  *
  * @example
  * ```tsx
- * useCommandHandler("SAVE_COMMAND", (data) => {
- *   return api.save(data);
+ * useCommandHandler("SAVE_COMMAND", (payload) => {
+ *   return api.save(payload);
  * });
  * ```
  */
@@ -38,6 +38,6 @@ export function useCommandHandler<R = unknown, D = unknown>(type: CommandType, h
   });
 
   useIsomorphicLayoutEffect(() => {
-    return container.get(CommandBus).register<D, R>(type, (data) => handlerRef.current(data));
+    return container.get(CommandBus).register<D, R>(type, (payload) => handlerRef.current(payload));
   }, [container, type]);
 }

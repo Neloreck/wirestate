@@ -26,7 +26,7 @@ describe("useOnCommand hook", () => {
 
     const bus: CommandBus = container.get(CommandBus);
     const element: TestConsumerElement = new TestConsumerElement();
-    const handler = jest.fn((data: string) => "hook-" + data);
+    const handler = jest.fn((payload: string) => "hook-" + payload);
     const controller = useOnCommand(element, { type: "HOOK_COMMAND", handler });
 
     expect(controller).toBeInstanceOf(OnCommandController);
@@ -39,12 +39,12 @@ describe("useOnCommand hook", () => {
     expect(bus.hasHandler("HOOK_COMMAND")).toBe(false);
   });
 
-  it("should call handler with correct data via hook", () => {
+  it("should call handler with correct payload via hook", () => {
     const { provider, container } = fixture;
 
     const bus: CommandBus = container.get(CommandBus);
     const element: TestConsumerElement = new TestConsumerElement();
-    const handler = jest.fn((data: number) => data + 100);
+    const handler = jest.fn((payload: number) => payload + 100);
 
     useOnCommand(element, { type: "HOOK_COMMAND", handler });
 

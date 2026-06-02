@@ -33,13 +33,13 @@ export function useAsyncCommandExecutor(): AsyncCommandExecutor {
   return useMemo(() => {
     const bus: CommandBus = container.get(CommandBus);
 
-    return ((type: CommandType, data?: unknown) => {
+    return ((type: CommandType, payload?: unknown) => {
       dbg.info(prefix(__filename), "Async command:", {
         type,
-        data,
+        payload,
       });
 
-      return bus.executeAsync(type, data);
+      return bus.executeAsync(type, payload);
     }) as AsyncCommandExecutor;
   }, [container]);
 }

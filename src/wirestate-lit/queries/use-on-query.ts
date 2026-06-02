@@ -35,7 +35,7 @@ export interface UseOnQueryOptions<D = unknown, R = unknown> {
  * class MyElement extends LitElement {
  *   private getUserController = useOnQuery(this, {
  *     type: "GET_USER",
- *     handler: (data) => ({ name: "Alice" }),
+ *     handler: (payload) => ({ name: "Alice" }),
  *   });
  * }
  * ```

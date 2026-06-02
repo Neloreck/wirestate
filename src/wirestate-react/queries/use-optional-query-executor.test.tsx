@@ -11,7 +11,7 @@ describe("useOptionalQueryExecutor", () => {
   it("should return an executor that dispatches queries", () => {
     const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
-    const handler = jest.fn((data: string) => data + "-result");
+    const handler = jest.fn((payload: string) => payload + "-result");
 
     bus.register("TEST_QUERY", handler);
 
@@ -31,11 +31,11 @@ describe("useOptionalQueryExecutor", () => {
       </ContainerProvider>
     );
 
-    const result: Optional<string> = (executor as OptionalQueryExecutor)("TEST_QUERY", "some-data");
+    const result: Optional<string> = (executor as OptionalQueryExecutor)("TEST_QUERY", "some-payload");
 
-    expect(result).toBe("some-data-result");
-    expect(handler).toHaveBeenCalledWith("some-data");
-    expect(bus.queryOptional).toHaveBeenCalledWith("TEST_QUERY", "some-data");
+    expect(result).toBe("some-payload-result");
+    expect(handler).toHaveBeenCalledWith("some-payload");
+    expect(bus.queryOptional).toHaveBeenCalledWith("TEST_QUERY", "some-payload");
   });
 
   it("should return null on unhandled queries", () => {
@@ -57,17 +57,17 @@ describe("useOptionalQueryExecutor", () => {
       </ContainerProvider>
     );
 
-    const result: Optional<string> = (executor as OptionalQueryExecutor)("NOT_EXISTING", "data");
+    const result: Optional<string> = (executor as OptionalQueryExecutor)("NOT_EXISTING", "payload");
 
     expect(result).toBeNull();
-    expect(bus.queryOptional).toHaveBeenCalledWith("NOT_EXISTING", "data");
+    expect(bus.queryOptional).toHaveBeenCalledWith("NOT_EXISTING", "payload");
   });
 
   it("should return promise values when the active handler returns a Promise", async () => {
     const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
 
-    bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
+    bus.register("ASYNC_QUERY", async (payload: string) => payload + "-async");
 
     let executor: Optional<OptionalQueryExecutor> = null as Optional<OptionalQueryExecutor>;
 

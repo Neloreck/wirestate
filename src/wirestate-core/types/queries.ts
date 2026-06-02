@@ -25,7 +25,7 @@ export type QueryType = string | symbol | number;
  *
  * @group Queries
  *
- * @template D - Type of the input data (payload).
+ * @template D - Type of the query payload.
  * @template R - Type of the returned result.
  *
  * @example
@@ -33,7 +33,7 @@ export type QueryType = string | symbol | number;
  * const handler: QueryHandler<string, User> = (userId) => userRepository.find(userId);
  * ```
  */
-export type QueryHandler<D = unknown, R = unknown> = (data: D) => MaybePromise<R>;
+export type QueryHandler<D = unknown, R = unknown> = (payload: D) => MaybePromise<R>;
 
 /**
  * Represents the function returned by query registration.

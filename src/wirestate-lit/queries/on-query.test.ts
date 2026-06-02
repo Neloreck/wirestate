@@ -10,8 +10,8 @@ describe("onQuery", () => {
   @customElement("ws-query-decorated")
   class DecoratedQueryElement extends ReactiveElement {
     @onQuery("TEST_QUERY")
-    public onTestQuery(data: string): string {
-      return data + "-result";
+    public onTestQuery(payload: string): string {
+      return payload + "-result";
     }
   }
 

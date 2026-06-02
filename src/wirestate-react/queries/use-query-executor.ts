@@ -35,13 +35,13 @@ export function useQueryExecutor(): QueryExecutor {
   return useMemo(() => {
     const bus: QueryBus = container.get(QueryBus);
 
-    return ((type: QueryType, data?: unknown) => {
-      dbg.info(prefix(__filename), "Query data:", {
+    return ((type: QueryType, payload?: unknown) => {
+      dbg.info(prefix(__filename), "Query payload:", {
         type,
-        data,
+        payload,
       });
 
-      return bus.query(type, data);
+      return bus.query(type, payload);
     }) as QueryExecutor;
   }, [container]);
 }

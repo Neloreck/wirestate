@@ -10,8 +10,8 @@ describe("QueryBus", () => {
 
     bus.register("TEST", handler);
 
-    expect(bus.query("TEST", "data")).toBe("result");
-    expect(handler).toHaveBeenCalledWith("data");
+    expect(bus.query("TEST", "payload")).toBe("result");
+    expect(handler).toHaveBeenCalledWith("payload");
   });
 
   it("should throw when no handler is registered", () => {
@@ -76,7 +76,7 @@ describe("QueryBus", () => {
   it("should return promise values from query when the handler returns a Promise", async () => {
     const bus: QueryBus = new QueryBus();
 
-    bus.register("ASYNC", async (data: number) => data * 2);
+    bus.register("ASYNC", async (payload: number) => payload * 2);
 
     const result: Promise<number> = bus.query<Promise<number>, number>("ASYNC", 5);
 
@@ -86,7 +86,7 @@ describe("QueryBus", () => {
   it("should handle async handlers through queryAsync", async () => {
     const bus: QueryBus = new QueryBus();
 
-    bus.register("ASYNC", async (data: number) => data * 2);
+    bus.register("ASYNC", async (payload: number) => payload * 2);
 
     const result: number = await bus.queryAsync<number>("ASYNC", 5);
 
@@ -96,7 +96,7 @@ describe("QueryBus", () => {
   it("should wrap sync handler results through queryAsync", async () => {
     const bus: QueryBus = new QueryBus();
 
-    bus.register("SYNC", (data: number) => data * 2);
+    bus.register("SYNC", (payload: number) => payload * 2);
 
     await expect(bus.queryAsync<number>("SYNC", 5)).resolves.toBe(10);
   });

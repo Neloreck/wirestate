@@ -168,7 +168,7 @@ export class WireScope {
    * @template T - Type of the event identifier.
    *
    * @param type - Event identifier.
-   * @param payload - Optional data associated with the event.
+   * @param payload - Optional event payload.
    * @param options - Event emission options.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
@@ -302,11 +302,11 @@ export class WireScope {
    * Dispatches a query and returns the handler result as-is.
    *
    * @template R - Type of the query result.
-   * @template D - Type of the query data (payload).
+   * @template D - Type of the query payload.
    * @template T - Type of the query identifier.
    *
    * @param type - Query identifier.
-   * @param data - Input data for the query handler.
+   * @param payload - Payload for the query handler.
    * @returns The query result.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
@@ -317,23 +317,23 @@ export class WireScope {
    * const user: User = scope.query("GET_USER", { id: 1 });
    * ```
    */
-  public query<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): R {
-    dbg.info(prefix(__filename), "Query:", { type, data });
+  public query<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, payload?: D): R {
+    dbg.info(prefix(__filename), "Query:", { type, payload });
 
     this.assertActive();
 
-    return this.queryBus.query<R, D>(type, data);
+    return this.queryBus.query<R, D>(type, payload);
   }
 
   /**
    * Dispatches a query and returns the result as a Promise.
    *
    * @template R - Type of the query result.
-   * @template D - Type of the query data (payload).
+   * @template D - Type of the query payload.
    * @template T - Type of the query identifier.
    *
    * @param type - Query identifier.
-   * @param data - Input data for the query handler.
+   * @param payload - Payload for the query handler.
    * @returns A Promise resolving to the query result.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
@@ -344,23 +344,23 @@ export class WireScope {
    * const user: User = await scope.queryAsync("GET_USER", { id: 1 });
    * ```
    */
-  public queryAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Promise<R> {
-    dbg.info(prefix(__filename), "Async query:", { type, data });
+  public queryAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, payload?: D): Promise<R> {
+    dbg.info(prefix(__filename), "Async query:", { type, payload });
 
     this.assertActive();
 
-    return this.queryBus.queryAsync<R, D>(type, data);
+    return this.queryBus.queryAsync<R, D>(type, payload);
   }
 
   /**
    * Dispatches a query and returns the handler result as-is, or null if no handler is registered.
    *
    * @template R - Type of the query result.
-   * @template D - Type of the query data (payload).
+   * @template D - Type of the query payload.
    * @template T - Type of the query identifier.
    *
    * @param type - Query identifier.
-   * @param data - Input data for the query handler.
+   * @param payload - Payload for the query handler.
    * @returns The query result or `null`.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
@@ -370,23 +370,23 @@ export class WireScope {
    * const config: Config | null = scope.queryOptional("GET_CONFIG");
    * ```
    */
-  public queryOptional<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Optional<R> {
-    dbg.info(prefix(__filename), "Query optional:", { type, data });
+  public queryOptional<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, payload?: D): Optional<R> {
+    dbg.info(prefix(__filename), "Query optional:", { type, payload });
 
     this.assertActive();
 
-    return this.queryBus.queryOptional<R, D>(type, data);
+    return this.queryBus.queryOptional<R, D>(type, payload);
   }
 
   /**
    * Dispatches a query and returns the result as a Promise, or null if no handler is registered.
    *
    * @template R - Type of the query result.
-   * @template D - Type of the query data (payload).
+   * @template D - Type of the query payload.
    * @template T - Type of the query identifier.
    *
    * @param type - Query identifier.
-   * @param data - Input data for the query handler.
+   * @param payload - Payload for the query handler.
    * @returns A Promise resolving to the query result or `null`.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
@@ -398,19 +398,19 @@ export class WireScope {
    */
   public queryOptionalAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(
     type: T,
-    data?: D
+    payload?: D
   ): Promise<Optional<R>> {
-    dbg.info(prefix(__filename), "Optional async query:", { type, data });
+    dbg.info(prefix(__filename), "Optional async query:", { type, payload });
 
     this.assertActive();
 
-    return this.queryBus.queryOptionalAsync<R, D>(type, data);
+    return this.queryBus.queryOptionalAsync<R, D>(type, payload);
   }
 
   /**
    * Registers a handler for a specific query type.
    *
-   * @template D - Type of the query data (payload).
+   * @template D - Type of the query payload.
    * @template R - Type of the query result.
    *
    * @param type - Query identifier.
@@ -435,7 +435,7 @@ export class WireScope {
   /**
    * Removes a specific query handler registration.
    *
-   * @template D - Type of the query data (payload).
+   * @template D - Type of the query payload.
    * @template R - Type of the query result.
    *
    * @param type - Query identifier.
@@ -464,7 +464,7 @@ export class WireScope {
    * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
-   * @param data - Payload for the command.
+   * @param payload - Payload for the command.
    * @returns The command result.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
@@ -475,12 +475,12 @@ export class WireScope {
    * scope.executeCommand("LOGOUT");
    * ```
    */
-  public executeCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): R {
-    dbg.info(prefix(__filename), "Execute command:", { type, data });
+  public executeCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, payload?: D): R {
+    dbg.info(prefix(__filename), "Execute command:", { type, payload });
 
     this.assertActive();
 
-    return this.commandBus.execute<R, D>(type, data);
+    return this.commandBus.execute<R, D>(type, payload);
   }
 
   /**
@@ -491,7 +491,7 @@ export class WireScope {
    * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
-   * @param data - Payload for the command.
+   * @param payload - Payload for the command.
    * @returns A Promise resolving to the command result.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
@@ -504,13 +504,13 @@ export class WireScope {
    */
   public executeCommandAsync<R = unknown, D = unknown, T extends CommandType = CommandType>(
     type: T,
-    data?: D
+    payload?: D
   ): Promise<R> {
-    dbg.info(prefix(__filename), "Execute async command:", { type, data });
+    dbg.info(prefix(__filename), "Execute async command:", { type, payload });
 
     this.assertActive();
 
-    return this.commandBus.executeAsync<R, D>(type, data);
+    return this.commandBus.executeAsync<R, D>(type, payload);
   }
 
   /**
@@ -521,7 +521,7 @@ export class WireScope {
    * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
-   * @param data - Payload for the command.
+   * @param payload - Payload for the command.
    * @returns The command result or `null`.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
@@ -533,13 +533,13 @@ export class WireScope {
    */
   public executeOptionalCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(
     type: T,
-    data?: D
+    payload?: D
   ): Optional<R> {
-    dbg.info(prefix(__filename), "Execute command:", { type, data });
+    dbg.info(prefix(__filename), "Execute command:", { type, payload });
 
     this.assertActive();
 
-    return this.commandBus.executeOptional<R, D>(type, data);
+    return this.commandBus.executeOptional<R, D>(type, payload);
   }
 
   /**
@@ -550,7 +550,7 @@ export class WireScope {
    * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
-   * @param data - Payload for the command.
+   * @param payload - Payload for the command.
    * @returns A Promise resolving to the command result or `null`.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
@@ -562,13 +562,13 @@ export class WireScope {
    */
   public executeOptionalCommandAsync<R = unknown, D = unknown, T extends CommandType = CommandType>(
     type: T,
-    data?: D
+    payload?: D
   ): Promise<Optional<R>> {
-    dbg.info(prefix(__filename), "Execute optional async command:", { type, data });
+    dbg.info(prefix(__filename), "Execute optional async command:", { type, payload });
 
     this.assertActive();
 
-    return this.commandBus.executeOptionalAsync<R, D>(type, data);
+    return this.commandBus.executeOptionalAsync<R, D>(type, payload);
   }
 
   /**

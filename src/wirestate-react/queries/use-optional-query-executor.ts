@@ -36,13 +36,13 @@ export function useOptionalQueryExecutor(): OptionalQueryExecutor {
   return useMemo(() => {
     const bus: QueryBus = container.get(QueryBus);
 
-    return ((type: QueryType, data?: unknown) => {
-      dbg.info(prefix(__filename), "Optional query data:", {
+    return ((type: QueryType, payload?: unknown) => {
+      dbg.info(prefix(__filename), "Optional query payload:", {
         type,
-        data,
+        payload,
       });
 
-      return bus.queryOptional(type, data);
+      return bus.queryOptional(type, payload);
     }) as OptionalQueryExecutor;
   }, [container]);
 }

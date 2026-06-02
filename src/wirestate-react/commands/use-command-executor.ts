@@ -16,7 +16,7 @@ import { CommandExecutor } from "../types/commands";
  *
  * @group Commands
  *
- * @returns A command executor function that takes a type and optional data.
+ * @returns A command executor function that takes a type and optional payload.
  *
  * @example
  * ```tsx
@@ -33,13 +33,13 @@ export function useCommandExecutor(): CommandExecutor {
   return useMemo(() => {
     const bus: CommandBus = container.get(CommandBus);
 
-    return <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): R => {
+    return <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, payload?: D): R => {
       dbg.info(prefix(__filename), "Command:", {
         type,
-        data,
+        payload,
       });
 
-      return bus.execute<R, D>(type, data);
+      return bus.execute<R, D>(type, payload);
     };
   }, [container]);
 }

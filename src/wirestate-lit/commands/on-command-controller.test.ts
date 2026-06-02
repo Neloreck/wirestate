@@ -37,12 +37,12 @@ describe("OnCommandController", () => {
     expect(bus.hasHandler("TEST_COMMAND")).toBe(false);
   });
 
-  it("should invoke handler with correct data when command is dispatched", () => {
+  it("should invoke handler with correct payload when command is dispatched", () => {
     const { provider, container } = fixture;
 
     const bus: CommandBus = container.get(CommandBus);
     const element: TestConsumerElement = new TestConsumerElement();
-    const handler = jest.fn((data: string) => data + "-result");
+    const handler = jest.fn((payload: string) => payload + "-result");
 
     new OnCommandController(element, "SOME_COMMAND", handler);
 
@@ -64,7 +64,7 @@ describe("OnCommandController", () => {
 
     const bus: CommandBus = container.get(CommandBus);
     const element: TestConsumerElement = new TestConsumerElement();
-    const handler = jest.fn(async (data: number) => data * 2);
+    const handler = jest.fn(async (payload: number) => payload * 2);
 
     new OnCommandController(element, "ASYNC_COMMAND", handler);
 

@@ -26,7 +26,7 @@ describe("useOnQuery", () => {
 
     const bus: QueryBus = container.get(QueryBus);
     const element: TestConsumerElement = new TestConsumerElement();
-    const handler = jest.fn((data: string) => "hook-" + data);
+    const handler = jest.fn((payload: string) => "hook-" + payload);
     const controller = useOnQuery(element, { type: "TEST_QUERY", handler });
 
     expect(controller).toBeInstanceOf(OnQueryController);
@@ -39,12 +39,12 @@ describe("useOnQuery", () => {
     expect(bus.hasHandler("TEST_QUERY")).toBe(false);
   });
 
-  it("should call handler with correct data via hook", async () => {
+  it("should call handler with correct payload via hook", async () => {
     const { provider, container } = fixture;
 
     const bus: QueryBus = container.get(QueryBus);
     const element: TestConsumerElement = new TestConsumerElement();
-    const handler = jest.fn((data: number) => data + 100);
+    const handler = jest.fn((payload: number) => payload + 100);
 
     useOnQuery(element, { type: "TEST_QUERY_DATA", handler });
 

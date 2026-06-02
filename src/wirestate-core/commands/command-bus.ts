@@ -55,10 +55,10 @@ export class CommandBus {
    * {@link executeAsync} when the caller should always receive a Promise.
    *
    * @template R - Type of the command result.
-   * @template D - Type of the command payload data.
+   * @template D - Type of the command payload.
    *
    * @param type - Command token.
-   * @param data - Command payload.
+   * @param payload - Command payload.
    * @returns The command handler result.
    *
    * @throws {@link WirestateError} If no handler is registered.
@@ -68,7 +68,7 @@ export class CommandBus {
    * const user: User = commandBus.execute<User, string>("GET_USER", "id-123");
    * ```
    */
-  public execute<R = unknown, D = unknown>(type: CommandType, data?: D): R {
+  public execute<R = unknown, D = unknown>(type: CommandType, payload?: D): R {
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (!stack?.length) {
@@ -80,7 +80,7 @@ export class CommandBus {
 
     const handler = stack[stack.length - 1].handler as CommandHandler<D, R>;
 
-    return handler(data as D) as R;
+    return handler(payload as D) as R;
   }
 
   /**
@@ -90,19 +90,19 @@ export class CommandBus {
    * Sync values are wrapped. Async values are passed through.
    *
    * @template R - Type of the command result.
-   * @template D - Type of the command payload data.
+   * @template D - Type of the command payload.
    *
    * @param type - Command token.
-   * @param data - Command payload.
+   * @param payload - Command payload.
    * @returns A Promise resolving to the command result.
    *
    * @throws {@link WirestateError} If no handler is registered.
    */
-  public async executeAsync<R = unknown, D = unknown>(type: CommandType, data?: D): Promise<R> {
+  public async executeAsync<R = unknown, D = unknown>(type: CommandType, payload?: D): Promise<R> {
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
-      return (stack[stack.length - 1].handler as CommandHandler<D, R>)(data as D);
+      return (stack[stack.length - 1].handler as CommandHandler<D, R>)(payload as D);
     }
 
     throw new WirestateError(
@@ -115,31 +115,31 @@ export class CommandBus {
    * Dispatches a command if a handler exists.
    *
    * @template R - Type of the command result.
-   * @template D - Type of the command payload data.
+   * @template D - Type of the command payload.
    *
    * @param type - Command identifier.
-   * @param data - Optional payload for the handler.
+   * @param payload - Optional payload for the handler.
    * @returns The command result, or `null` when no handler exists.
    */
-  public executeOptional<R = unknown, D = unknown>(type: CommandType, data?: D): Optional<R> {
-    return this.handlers.get(type)?.length ? this.execute<R, D>(type, data) : null;
+  public executeOptional<R = unknown, D = unknown>(type: CommandType, payload?: D): Optional<R> {
+    return this.handlers.get(type)?.length ? this.execute<R, D>(type, payload) : null;
   }
 
   /**
    * Dispatches an optional command and Promise-wraps the result.
    *
    * @template R - Type of the command result.
-   * @template D - Type of the command payload data.
+   * @template D - Type of the command payload.
    *
    * @param type - Command identifier.
-   * @param data - Optional payload for the handler.
+   * @param payload - Optional payload for the handler.
    * @returns A Promise resolving to the command result, or `null` if no handler is found.
    */
-  public async executeOptionalAsync<R = unknown, D = unknown>(type: CommandType, data?: D): Promise<Optional<R>> {
+  public async executeOptionalAsync<R = unknown, D = unknown>(type: CommandType, payload?: D): Promise<Optional<R>> {
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
-      return (stack[stack.length - 1].handler as CommandHandler<D, R>)(data as D);
+      return (stack[stack.length - 1].handler as CommandHandler<D, R>)(payload as D);
     }
 
     return null;
@@ -161,7 +161,7 @@ export class CommandBus {
    * @remarks
    * Multiple handlers for one type form a stack. The newest handler is active.
    *
-   * @template D - Type of the command payload data.
+   * @template D - Type of the command payload.
    * @template R - Type of the command execution result.
    *
    * @param type - Command identifier.
@@ -234,7 +234,7 @@ export class CommandBus {
    * @remarks
    * If the handler was not registered for the given type, this operation does nothing.
    *
-   * @template D - Type of the command payload data.
+   * @template D - Type of the command payload.
    * @template R - Type of the command execution result.
    *
    * @param type - Command identifier.

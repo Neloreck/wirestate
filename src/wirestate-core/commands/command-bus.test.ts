@@ -9,17 +9,17 @@ describe("CommandBus", () => {
     const handler = jest.fn().mockReturnValue("result");
     let wasExecuted: boolean = false;
 
-    bus.register("TEST", (data: string) => {
+    bus.register("TEST", (payload: string) => {
       wasExecuted = true;
 
-      return handler(data);
+      return handler(payload);
     });
 
-    const result: string = bus.execute("TEST", "data");
+    const result: string = bus.execute("TEST", "payload");
 
     expect(result).toBe("result");
     expect(wasExecuted).toBe(true);
-    expect(handler).toHaveBeenCalledWith("data");
+    expect(handler).toHaveBeenCalledWith("payload");
   });
 
   it("should throw when no handler is registered", () => {
@@ -84,7 +84,7 @@ describe("CommandBus", () => {
   it("should return promise values from execute when the handler returns a Promise", async () => {
     const bus: CommandBus = new CommandBus();
 
-    bus.register("ASYNC", async (data: number) => data * 2);
+    bus.register("ASYNC", async (payload: number) => payload * 2);
 
     const result: Promise<number> = bus.execute<Promise<number>, number>("ASYNC", 5);
 
@@ -94,7 +94,7 @@ describe("CommandBus", () => {
   it("should handle async handlers through executeAsync", async () => {
     const bus: CommandBus = new CommandBus();
 
-    bus.register("ASYNC", async (data: number) => data * 2);
+    bus.register("ASYNC", async (payload: number) => payload * 2);
 
     const result: number = await bus.executeAsync<number>("ASYNC", 5);
 
@@ -104,7 +104,7 @@ describe("CommandBus", () => {
   it("should wrap sync handler results through executeAsync", async () => {
     const bus: CommandBus = new CommandBus();
 
-    bus.register("SYNC", (data: number) => data * 2);
+    bus.register("SYNC", (payload: number) => payload * 2);
 
     await expect(bus.executeAsync<number>("SYNC", 5)).resolves.toBe(10);
   });

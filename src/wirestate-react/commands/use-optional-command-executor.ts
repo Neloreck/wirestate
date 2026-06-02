@@ -24,8 +24,8 @@ import { OptionalCommandExecutor } from "../types/commands";
  * const executeOptionalCommand: OptionalCommandExecutor = useOptionalCommandExecutor();
  *
  * const onClick = useCallback(() => {
- *   const result: string | null = executeOptionalCommand("OPTIONAL_COMMAND", data);
- * }, [data, executeOptionalCommand]);
+ *   const result: string | null = executeOptionalCommand("OPTIONAL_COMMAND", payload);
+ * }, [payload, executeOptionalCommand]);
  * ```
  */
 export function useOptionalCommandExecutor(): OptionalCommandExecutor {
@@ -34,13 +34,13 @@ export function useOptionalCommandExecutor(): OptionalCommandExecutor {
   return useMemo(() => {
     const bus: CommandBus = container.get(CommandBus);
 
-    return <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, data?: D): R | null => {
+    return <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, payload?: D): R | null => {
       dbg.info(prefix(__filename), "Optional command:", {
         type,
-        data,
+        payload,
       });
 
-      return bus.executeOptional<R, D>(type, data);
+      return bus.executeOptional<R, D>(type, payload);
     };
   }, [container]);
 }

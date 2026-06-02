@@ -14,7 +14,7 @@ describe("useCommandExecutor", () => {
 
   it("should return an executor that dispatches commands", () => {
     const container: Container = createContainer();
-    const handler = jest.fn((data: string) => data + "-result");
+    const handler = jest.fn((payload: string) => payload + "-result");
 
     container.get(CommandBus).register("TEST_COMMAND", handler);
 
@@ -32,10 +32,10 @@ describe("useCommandExecutor", () => {
       </ContainerProvider>
     );
 
-    const result: string = (executor as unknown as CommandExecutor)<string, string>("TEST_COMMAND", "some-data");
+    const result: string = (executor as unknown as CommandExecutor)<string, string>("TEST_COMMAND", "some-payload");
 
-    expect(result).toBe("some-data-result");
-    expect(handler).toHaveBeenCalledWith("some-data");
+    expect(result).toBe("some-payload-result");
+    expect(handler).toHaveBeenCalledWith("some-payload");
   });
 
   it("should throw on unhandled commands", () => {

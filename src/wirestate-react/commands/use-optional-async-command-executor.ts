@@ -23,8 +23,8 @@ import { OptionalAsyncCommandExecutor } from "../types/commands";
  * const executeOptionalCommandAsync: OptionalAsyncCommandExecutor = useOptionalAsyncCommandExecutor();
  *
  * const onClick = useCallback(async () => {
- *   const result: string | null = await executeOptionalCommandAsync("OPTIONAL_COMMAND", data);
- * }, [data, executeOptionalCommandAsync]);
+ *   const result: string | null = await executeOptionalCommandAsync("OPTIONAL_COMMAND", payload);
+ * }, [payload, executeOptionalCommandAsync]);
  * ```
  */
 export function useOptionalAsyncCommandExecutor(): OptionalAsyncCommandExecutor {
@@ -33,13 +33,13 @@ export function useOptionalAsyncCommandExecutor(): OptionalAsyncCommandExecutor 
   return useMemo(() => {
     const bus: CommandBus = container.get(CommandBus);
 
-    return ((type: CommandType, data?: unknown) => {
+    return ((type: CommandType, payload?: unknown) => {
       dbg.info(prefix(__filename), "Optional async command:", {
         type,
-        data,
+        payload,
       });
 
-      return bus.executeOptionalAsync(type, data);
+      return bus.executeOptionalAsync(type, payload);
     }) as OptionalAsyncCommandExecutor;
   }, [container]);
 }

@@ -27,7 +27,7 @@ export type CommandType = string | symbol | number;
  *
  * @group Commands
  *
- * @template D - Type of the input payload (data) for the command.
+ * @template D - Type of the command payload.
  * @template R - Type of the result returned by the handler (can be wrapped in a Promise).
  *
  * @example

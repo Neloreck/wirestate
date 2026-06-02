@@ -35,13 +35,13 @@ export function useOptionalAsyncQueryExecutor(): OptionalAsyncQueryExecutor {
   return useMemo(() => {
     const bus: QueryBus = container.get(QueryBus);
 
-    return ((type: QueryType, data?: unknown) => {
-      dbg.info(prefix(__filename), "Optional async query data:", {
+    return ((type: QueryType, payload?: unknown) => {
+      dbg.info(prefix(__filename), "Optional async query payload:", {
         type,
-        data,
+        payload,
       });
 
-      return bus.queryOptionalAsync(type, data);
+      return bus.queryOptionalAsync(type, payload);
     }) as OptionalAsyncQueryExecutor;
   }, [container]);
 }

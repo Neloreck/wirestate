@@ -11,7 +11,7 @@ describe("useQueryHandler", () => {
   it("should register and unregister a query handler", () => {
     const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
-    const handler = jest.fn((data: string) => data + "-result");
+    const handler = jest.fn((payload: string) => payload + "-result");
 
     function TestComponent() {
       useQueryHandler("TEST_QUERY", handler);
@@ -29,10 +29,10 @@ describe("useQueryHandler", () => {
 
     expect(bus.hasHandler("TEST_QUERY")).toBe(true);
 
-    const result: string = bus.query("TEST_QUERY", "data");
+    const result: string = bus.query("TEST_QUERY", "payload");
 
-    expect(result).toBe("data-result");
-    expect(handler).toHaveBeenCalledWith("data");
+    expect(result).toBe("payload-result");
+    expect(handler).toHaveBeenCalledWith("payload");
 
     unmount();
 
@@ -177,7 +177,7 @@ describe("useQueryHandler", () => {
   it("should support async handlers", async () => {
     const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
-    const handler = jest.fn(async (data: string) => data + "-async");
+    const handler = jest.fn(async (payload: string) => payload + "-async");
 
     function TestComponent() {
       useQueryHandler("ASYNC_QUERY", handler);

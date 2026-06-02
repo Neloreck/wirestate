@@ -10,8 +10,8 @@ describe("@onCommand", () => {
   @customElement("ws-on-command-test-component")
   class DecoratedCommandElement extends ReactiveElement {
     @onCommand("TEST_COMMAND")
-    public handleTestCommand(data: string): string {
-      return data + "-handled";
+    public handleTestCommand(payload: string): string {
+      return payload + "-handled";
     }
   }
 

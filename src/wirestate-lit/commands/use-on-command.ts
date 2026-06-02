@@ -35,7 +35,7 @@ export interface UseOnCommandOptions<D = unknown, R = unknown> {
  * class MyElement extends LitElement {
  *   private onSave = useOnCommand(this, {
  *     type: "SAVE",
- *     handler: (data) => console.log("Saving:", data),
+ *     handler: (payload) => console.log("Saving:", payload),
  *   });
  * }
  * ```

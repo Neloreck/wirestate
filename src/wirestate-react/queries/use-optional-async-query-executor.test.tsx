@@ -11,7 +11,7 @@ describe("useOptionalAsyncQueryExecutor", () => {
   it("should return an executor that dispatches sync queries as promises", async () => {
     const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
-    const handler = jest.fn((data: string) => data + "-result");
+    const handler = jest.fn((payload: string) => payload + "-result");
 
     bus.register("TEST_QUERY", handler);
 
@@ -31,11 +31,11 @@ describe("useOptionalAsyncQueryExecutor", () => {
       </ContainerProvider>
     );
 
-    const result: Optional<string> = await (executor as OptionalAsyncQueryExecutor)("TEST_QUERY", "some-data");
+    const result: Optional<string> = await (executor as OptionalAsyncQueryExecutor)("TEST_QUERY", "some-payload");
 
-    expect(result).toBe("some-data-result");
-    expect(handler).toHaveBeenCalledWith("some-data");
-    expect(bus.queryOptionalAsync).toHaveBeenCalledWith("TEST_QUERY", "some-data");
+    expect(result).toBe("some-payload-result");
+    expect(handler).toHaveBeenCalledWith("some-payload");
+    expect(bus.queryOptionalAsync).toHaveBeenCalledWith("TEST_QUERY", "some-payload");
   });
 
   it("should resolve null on unhandled queries", async () => {
@@ -57,17 +57,17 @@ describe("useOptionalAsyncQueryExecutor", () => {
       </ContainerProvider>
     );
 
-    const result: Optional<string> = await (executor as OptionalAsyncQueryExecutor)("NOT_EXISTING", "data");
+    const result: Optional<string> = await (executor as OptionalAsyncQueryExecutor)("NOT_EXISTING", "payload");
 
     expect(result).toBeNull();
-    expect(bus.queryOptionalAsync).toHaveBeenCalledWith("NOT_EXISTING", "data");
+    expect(bus.queryOptionalAsync).toHaveBeenCalledWith("NOT_EXISTING", "payload");
   });
 
   it("should resolve async handler results", async () => {
     const container: Container = createContainer();
     const bus: QueryBus = container.get(QueryBus);
 
-    bus.register("ASYNC_QUERY", async (data: string) => data + "-async");
+    bus.register("ASYNC_QUERY", async (payload: string) => payload + "-async");
 
     let executor: Optional<OptionalAsyncQueryExecutor> = null as Optional<OptionalAsyncQueryExecutor>;
 

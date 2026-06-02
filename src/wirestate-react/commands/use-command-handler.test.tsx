@@ -14,7 +14,7 @@ describe("useCommandHandler", () => {
   it("should register handler and unregister on unmount", async () => {
     const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
-    const handler = jest.fn(() => Promise.resolve("async-data"));
+    const handler = jest.fn(() => Promise.resolve("async-payload"));
 
     function TestComponent() {
       useCommandHandler("HOOK_COMMAND", handler);
@@ -32,14 +32,14 @@ describe("useCommandHandler", () => {
 
     expect(bus.hasHandler("HOOK_COMMAND")).toBe(true);
 
-    const result: string = await bus.executeAsync<string, string>("HOOK_COMMAND", "data");
+    const result: string = await bus.executeAsync<string, string>("HOOK_COMMAND", "payload");
 
-    expect(handler).toHaveBeenCalledWith("data");
+    expect(handler).toHaveBeenCalledWith("payload");
 
     unmount();
 
     expect(bus.hasHandler("HOOK_COMMAND")).toBe(false);
-    expect(result).toBe("async-data");
+    expect(result).toBe("async-payload");
   });
 
   it("should update handler ref when handler changes", () => {

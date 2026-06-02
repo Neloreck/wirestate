@@ -37,12 +37,12 @@ describe("OnQueryController", () => {
     expect(bus.hasHandler("TEST_QUERY")).toBe(false);
   });
 
-  it("should invoke handler with correct data when query is dispatched", () => {
+  it("should invoke handler with correct payload when query is dispatched", () => {
     const { provider, container } = fixture;
 
     const bus: QueryBus = container.get(QueryBus);
     const element: TestConsumerElement = new TestConsumerElement();
-    const handler = jest.fn((data: string) => data + "-result");
+    const handler = jest.fn((payload: string) => payload + "-result");
 
     new OnQueryController(element, "DATA_QUERY", handler);
     provider.appendChild(element);
@@ -56,7 +56,7 @@ describe("OnQueryController", () => {
 
     const bus: QueryBus = container.get(QueryBus);
     const element: TestConsumerElement = new TestConsumerElement();
-    const handler = jest.fn(async (data: number) => data * 3);
+    const handler = jest.fn(async (payload: number) => payload * 3);
 
     new OnQueryController(element, "ASYNC_QUERY", handler);
     provider.appendChild(element);

@@ -14,7 +14,7 @@ describe("useAsyncCommandExecutor", () => {
   it("should return an executor that dispatches sync commands as promises", async () => {
     const container: Container = createContainer();
     const bus: CommandBus = container.get(CommandBus);
-    const handler = jest.fn((data: string) => data + "-result");
+    const handler = jest.fn((payload: string) => payload + "-result");
 
     bus.register("TEST_COMMAND", handler);
     jest.spyOn(bus, "executeAsync");
@@ -33,15 +33,15 @@ describe("useAsyncCommandExecutor", () => {
       </ContainerProvider>
     );
 
-    await expect(executor<string, string>("TEST_COMMAND", "some-data")).resolves.toBe("some-data-result");
-    expect(handler).toHaveBeenCalledWith("some-data");
-    expect(bus.executeAsync).toHaveBeenCalledWith("TEST_COMMAND", "some-data");
+    await expect(executor<string, string>("TEST_COMMAND", "some-payload")).resolves.toBe("some-payload-result");
+    expect(handler).toHaveBeenCalledWith("some-payload");
+    expect(bus.executeAsync).toHaveBeenCalledWith("TEST_COMMAND", "some-payload");
   });
 
   it("should dispatch async command handlers", async () => {
     const container: Container = createContainer();
 
-    container.get(CommandBus).register("ASYNC_COMMAND", async (data: string) => data + "-result");
+    container.get(CommandBus).register("ASYNC_COMMAND", async (payload: string) => payload + "-result");
 
     let executor: AsyncCommandExecutor = null as unknown as AsyncCommandExecutor;
 
@@ -57,7 +57,7 @@ describe("useAsyncCommandExecutor", () => {
       </ContainerProvider>
     );
 
-    await expect(executor<string, string>("ASYNC_COMMAND", "some-data")).resolves.toBe("some-data-result");
+    await expect(executor<string, string>("ASYNC_COMMAND", "some-payload")).resolves.toBe("some-payload-result");
   });
 
   it("should reject on unhandled commands", async () => {

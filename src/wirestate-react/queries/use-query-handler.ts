@@ -15,7 +15,7 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * @group Queries
  *
  * @template R - Result type of the query.
- * @template D - Data/payload type of the query.
+ * @template D - Payload type of the query.
  * @template T - Query identifier type.
  *
  * @param type - Query identifier (string or symbol).
@@ -23,8 +23,8 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  *
  * @example
  * ```tsx
- * useQueryHandler("GET_DATA", (data) => {
- *   return { id: data.id, value: "Resolved" };
+ * useQueryHandler("GET_DATA", (payload) => {
+ *   return { id: payload.id, value: "Resolved" };
  * });
  * ```
  */
@@ -40,6 +40,6 @@ export function useQueryHandler<R = unknown, D = unknown, T extends QueryType = 
   });
 
   useIsomorphicLayoutEffect(() => {
-    return container.get(QueryBus).register<D, R>(type, (data) => handlerRef.current(data));
+    return container.get(QueryBus).register<D, R>(type, (payload) => handlerRef.current(payload));
   }, [container, type]);
 }
