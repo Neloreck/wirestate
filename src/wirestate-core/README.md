@@ -245,7 +245,7 @@ Injected `WireScope` instances expose lifecycle state for async guards:
 | `unregisterQueryHandler(type, handler)`    | Remove a specific query handler by type and reference                                       |
 | `executeCommand(type, data?)`              | Dispatch a command and return the result                                                    |
 | `executeCommandAsync(type, data?)`         | Dispatch a command and return the result as a promise                                       |
-| `executeOptionalCommand(type, data?)`      | Dispatch a command result; returns `null` if no handler is registered                       |
+| `executeOptionalCommand(type, data?)`      | Dispatch a command; returns `null` if no handler is registered                              |
 | `executeOptionalCommandAsync(type, data?)` | Dispatch a command as a promise; returns `null` if no handler is registered                 |
 | `registerCommandHandler(type, handler)`    | Register a command handler; returns unregister function                                     |
 | `unregisterCommandHandler(type, handler)`  | Remove a specific command handler by type and reference                                     |

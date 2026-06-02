@@ -58,7 +58,7 @@ class MyComponent extends LitElement {
 
   render() {
     return html`
-      <button @click="${() => this.counterService.increment()}">
+      <button @click=${() => this.counterService.increment()}>
         count: ${watch(this.counterService.count)} (${watch(this.counterService.parity)})
       </button>
     `;

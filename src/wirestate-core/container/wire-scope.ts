@@ -353,7 +353,7 @@ export class WireScope {
   }
 
   /**
-   * Dispatches a synchronous query and returns the result, or null if no handler is registered.
+   * Dispatches a query and returns the handler result as-is, or null if no handler is registered.
    *
    * @template R - Type of the query result.
    * @template D - Type of the query data (payload).

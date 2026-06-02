@@ -8,7 +8,7 @@ import { useContainer } from "../context/use-container";
 import { AsyncQueryExecutor } from "../types/queries";
 
 /**
- * Returns a stable function to dispatch async-capable queries on the active container.
+ * Returns a stable function to dispatch queries with Promise-normalized results.
  *
  * @remarks
  * The returned executor is memoized using `useMemo` and stays stable

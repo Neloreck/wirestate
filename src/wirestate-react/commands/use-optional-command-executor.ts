@@ -12,7 +12,7 @@ import { OptionalCommandExecutor } from "../types/commands";
  *
  * @remarks
  * Similar to {@link useCommandExecutor}, but returns `null` instead of throwing
- * {WirestateError} if no handler is registered for the command type.
+ * `WirestateError` if no handler is registered for the command type.
  * Uses {@link CommandBus.executeOptional} internally.
  *
  * @group Commands

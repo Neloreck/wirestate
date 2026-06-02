@@ -11,8 +11,8 @@ import { EventEmitter } from "../types/events";
  * Returns a stable function to emit events via the {@link EventBus}.
  *
  * @remarks
- * The returned emitter is memoized using `useMemo` and stays stable
- * for the lifetime of the container.
+ * The returned emitter is memoized using `useMemo` and stays stable while the
+ * active container is unchanged.
  *
  * @group Events
  *

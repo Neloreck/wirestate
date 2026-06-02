@@ -21,7 +21,7 @@ import { AnyObject } from "../types/general";
  *
  * @returns The resolved instance or value.
  *
- * @throws {WirestateError} If the container is not found in context.
+ * @throws `WirestateError` if the container is not found in context.
  * @throws {Error} If Inversify fails to resolve the token.
  *
  * @example

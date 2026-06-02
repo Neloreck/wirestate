@@ -8,8 +8,8 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * Subscribes a component to a specific event type on the {@link EventBus}.
  *
  * @remarks
- * The subscription is active for the component's lifetime and is automatically
- * cleaned up on unmount.
+ * The subscription follows the active container and is cleaned up when the
+ * component unmounts, the container changes, or the event type changes.
  *
  * @group Events
  *

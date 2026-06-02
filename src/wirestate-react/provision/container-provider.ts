@@ -81,7 +81,7 @@ interface ContainerProvisionError {
  *
  * @param props - Provider props.
  * @returns React context provider for the active container.
- * @throws {WirestateError} If props are invalid or provider mode changes.
+ * @throws `WirestateError` if props are invalid or provider mode changes.
  *
  * @example
  * ```tsx

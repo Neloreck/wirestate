@@ -8,11 +8,11 @@ import { useContainer } from "../context/use-container";
 import { OptionalAsyncCommandExecutor } from "../types/commands";
 
 /**
- * Returns a stable function to dispatch optional async commands on the active container.
+ * Returns a stable function to dispatch optional commands with Promise-normalized results.
  *
  * @remarks
  * Similar to {@link useAsyncCommandExecutor}, but resolves to `null` instead of
- * rejecting with {WirestateError} if no handler is registered for the command type.
+ * rejecting with `WirestateError` if no handler is registered for the command type.
  *
  * @group Commands
  *

@@ -148,7 +148,7 @@ useEvents(["RESET", "CLEAR"], (event) => {
 
 ### `useAllEvents(handler)`
 
-Subscribes to all events. The handler receives the event type and payload.
+Subscribes to all events. The handler receives a `WireEvent` object.
 
 ```tsx
 useAllEvents((event) => {

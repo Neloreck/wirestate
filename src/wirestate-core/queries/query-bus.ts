@@ -232,7 +232,7 @@ export class QueryBus {
    *
    * @param type - Unique query identifier.
    * @param data - Optional input data for the handler.
-   * @returns The synchronous query result, or `null` if no handler is found.
+   * @returns The query handler result as-is, or `null` if no handler is found.
    */
   public queryOptional<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, data?: D): Optional<R> {
     const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);

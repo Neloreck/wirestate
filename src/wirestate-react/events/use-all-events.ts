@@ -12,7 +12,8 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * Useful for logging, debugging, or cross-cutting concerns that need to see
  * every event passing through the bus.
  * The handler is synced via `useRef` to avoid stale closures.
- * The subscription is automatically cleaned up on unmount.
+ * The subscription follows the active container and is cleaned up when the
+ * component unmounts or the container changes.
  *
  * @group Events
  *

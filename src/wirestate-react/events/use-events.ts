@@ -10,7 +10,9 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  *
  * @remarks
  * Similar to {@link useEvent}, but allows listening for a collection of event
- * types using a single handler.
+ * types using a single handler. The subscription follows the active container
+ * and is cleaned up when the component unmounts, the container changes, or the
+ * event type list changes.
  *
  * @group Events
  *

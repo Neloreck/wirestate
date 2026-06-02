@@ -8,7 +8,7 @@ import { useContainer } from "../context/use-container";
 import { AsyncCommandExecutor } from "../types/commands";
 
 /**
- * Returns a stable function to dispatch async-capable commands on the active container.
+ * Returns a stable function to dispatch commands with Promise-normalized results.
  *
  * @remarks
  * The returned executor is memoized using `useMemo` and stays stable
