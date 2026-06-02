@@ -326,7 +326,7 @@ describe("bindInstance", () => {
         details: ["AsyncFailService", "onActivated"],
         message: "@OnActivated rejected",
         instanceName: "AsyncFailService",
-        source: "service-activation",
+        source: "instance-activation",
       })
     );
   });
@@ -347,7 +347,7 @@ describe("bindInstance", () => {
         details: ["SyncFailDeactivationService", "onDeactivation"],
         message: "@OnDeactivation failed",
         instanceName: "SyncFailDeactivationService",
-        source: "service-deactivation",
+        source: "instance-deactivation",
       })
     );
   });
@@ -379,7 +379,7 @@ describe("bindInstance", () => {
         event: { type: "FAILING_EVENT" },
         message: "Event handler threw",
         instanceName: "FailingEventService",
-        source: "service-event-handler",
+        source: "instance-event-handler",
       })
     );
   });

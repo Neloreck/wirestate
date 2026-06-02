@@ -7,7 +7,7 @@ import { ERROR_CODE_REFLECT_METADATA_MISSING } from "../../error/error-code";
 import { WirestateError } from "../../error/wirestate-error";
 import { EventBus } from "../../events/event-bus";
 import { QueryBus } from "../../queries/query-bus";
-import { WIRE_SCOPES_BY_SERVICE } from "../../registry";
+import { SCOPES_BY_INSTANCE } from "../../registry";
 import { Maybe, Optional } from "../../types/general";
 
 interface ReflectWithMetadata {
@@ -86,7 +86,7 @@ export function attachScopes<T extends object>(instance: T, Constructor: Newable
   }
 
   if (scopes.length > 0) {
-    WIRE_SCOPES_BY_SERVICE.set(instance, scopes);
+    SCOPES_BY_INSTANCE.set(instance, scopes);
   }
 }
 
@@ -98,7 +98,7 @@ export function attachScopes<T extends object>(instance: T, Constructor: Newable
  * @param instance - Target instance.
  */
 export function detachScopes<T extends object>(instance: T): void {
-  const scopes: Maybe<Array<WireScope>> = WIRE_SCOPES_BY_SERVICE.get(instance);
+  const scopes: Maybe<Array<WireScope>> = SCOPES_BY_INSTANCE.get(instance);
 
   if (!scopes) {
     return;
@@ -113,5 +113,5 @@ export function detachScopes<T extends object>(instance: T): void {
     (scope as unknown as { queryBus: Optional<QueryBus> }).queryBus = null;
   }
 
-  WIRE_SCOPES_BY_SERVICE.delete(instance);
+  SCOPES_BY_INSTANCE.delete(instance);
 }

@@ -11,7 +11,7 @@ import { QueryHandlerMetadata, QueryUnregister } from "./types/queries";
  *
  * @remarks
  * This map is populated by the {@link OnQuery} decorator. Handlers are
- * inherited via the prototype chain at service resolution time.
+ * inherited via the prototype chain at instance resolution time.
  *
  * @group Queries
  * @internal
@@ -23,7 +23,7 @@ export const QUERY_HANDLER_METADATA: WeakMap<object, Array<QueryHandlerMetadata>
  *
  * @remarks
  * This map is populated by the {@link OnCommand} decorator. Handlers are
- * inherited via the prototype chain at service resolution time.
+ * inherited via the prototype chain at instance resolution time.
  *
  * @group Commands
  * @internal
@@ -34,8 +34,7 @@ export const COMMAND_HANDLER_METADATA: WeakMap<object, Array<CommandHandlerMetad
  * Registry of class constructors to their `@OnActivated`-decorated method name.
  *
  * @remarks
- * This map is populated by the {@link OnActivated} decorator. A service class
- * hierarchy may declare one activation hook.
+ * This map is populated by the {@link OnActivated} decorator.
  *
  * @group Service
  * @internal
@@ -46,8 +45,7 @@ export const ACTIVATED_HANDLER_METADATA: WeakMap<object, string | symbol> = new 
  * Registry of class constructors to their `@OnDeactivation`-decorated method name.
  *
  * @remarks
- * This map is populated by the {@link OnDeactivation} decorator. A service class
- * hierarchy may declare one deactivation hook.
+ * This map is populated by the {@link OnDeactivation} decorator.
  *
  * @group Service
  * @internal
@@ -58,8 +56,7 @@ export const DEACTIVATION_HANDLER_METADATA: WeakMap<object, string | symbol> = n
  * Registry of class constructors to their `@OnProvision`-decorated method name.
  *
  * @remarks
- * This map is populated by the {@link OnProvision} decorator. A service class
- * hierarchy may declare one provision hook.
+ * This map is populated by the {@link OnProvision} decorator.
  *
  * @group Service
  * @internal
@@ -70,8 +67,7 @@ export const PROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new 
  * Registry of class constructors to their `@OnDeprovision`-decorated method name.
  *
  * @remarks
- * This map is populated by the {@link OnDeprovision} decorator. A service class
- * hierarchy may declare one deprovision hook.
+ * This map is populated by the {@link OnDeprovision} decorator.
  *
  * @group Service
  * @internal
@@ -83,7 +79,7 @@ export const DEPROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = ne
  *
  * @remarks
  * This map is populated by the {@link OnEvent} decorator. Event handlers are
- * inherited via the prototype chain at service resolution time.
+ * inherited via the prototype chain at instance resolution time.
  *
  * @group Events
  * @internal
@@ -91,64 +87,63 @@ export const DEPROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = ne
 export const EVENT_HANDLER_METADATA: WeakMap<object, Array<EventHandlerMetadata>> = new WeakMap();
 
 /**
- * Internal storage for mapping service instances to their originating Inversify containers.
+ * Internal storage for mapping instances to their originating Inversify containers.
  *
  * @remarks
- * Used during the service lifecycle to ensure that resolution and messaging
+ * Used during the instance lifecycle to ensure that resolution and messaging
  * occur within the correct container context.
  *
  * @group Bind
  * @internal
  */
-export const CONTAINER_REFS_BY_SERVICE: WeakMap<object, Container> = new WeakMap();
+export const CONTAINER_REFS_BY_INSTANCE: WeakMap<object, Container> = new WeakMap();
 
 /**
- * Internal storage for managing injected {@link WireScope} instances per service.
+ * Internal storage for managing injected {@link WireScope} per instance.
  *
  * @remarks
- * Tracks the scopes associated with a service instance for lifecycle management
- * and cleanup.
+ * Tracks the scopes associated with an instance for lifecycle management and cleanup.
  *
  * @group Container
  * @internal
  */
-export const WIRE_SCOPES_BY_SERVICE: WeakMap<object, Array<WireScope>> = new WeakMap();
+export const SCOPES_BY_INSTANCE: WeakMap<object, Array<WireScope>> = new WeakMap();
 
 /**
- * Internal storage for service event unsubscribers.
+ * Internal storage for event unsubscribers.
  *
  * @remarks
- * Stores the unsubscription functions returned when a service automatically
+ * Stores the unsubscription functions returned when an instance automatically
  * subscribes to events via the {@link OnEvent} decorator.
  *
  * @group Events
  * @internal
  */
-export const EVENT_UNSUBSCRIBERS_BY_SERVICE: WeakMap<object, EventUnsubscriber> = new WeakMap();
+export const EVENT_UNSUBSCRIBERS_BY_INSTANCE: WeakMap<object, EventUnsubscriber> = new WeakMap();
 
 /**
- * Internal storage for service query unregisters.
+ * Internal storage for instance query unregisters.
  *
  * @remarks
- * Stores the unregistration functions returned when a service automatically
+ * Stores the unregistration functions returned when an instance automatically
  * registers query handlers via the {@link OnQuery} decorator.
  *
  * @group Queries
  * @internal
  */
-export const QUERY_UNREGISTERS_BY_SERVICE: WeakMap<object, Array<QueryUnregister>> = new WeakMap();
+export const QUERY_UNREGISTERS_BY_INSTANCE: WeakMap<object, Array<QueryUnregister>> = new WeakMap();
 
 /**
- * Internal storage for service command unregisters.
+ * Internal storage for instance command unregisters.
  *
  * @remarks
- * Stores the unregistration functions returned when a service automatically
+ * Stores the unregistration functions returned when an instance automatically
  * registers command handlers via the {@link OnCommand} decorator.
  *
  * @group Commands
  * @internal
  */
-export const COMMAND_UNREGISTERS_BY_SERVICE: WeakMap<object, Array<CommandUnregister>> = new WeakMap();
+export const COMMAND_UNREGISTERS_BY_INSTANCE: WeakMap<object, Array<CommandUnregister>> = new WeakMap();
 
 /**
  * Internal storage for bindings registered on a container through Wirestate helpers.
@@ -167,12 +162,12 @@ export const CONTAINER_BINDINGS: WeakMap<Container, Array<Binding>> = new WeakMa
 export const PROVISION_LIFECYCLES_BY_CONTAINER: WeakMap<Container, Set<Map<Container, Array<object>>>> = new WeakMap();
 
 /**
- * Internal storage for provider lifecycle tokens represented by a service instance.
+ * Internal storage for provider lifecycle tokens represented by an instance.
  *
  * @group Container
  * @internal
  */
-export const PROVISION_TOKENS_BY_SERVICE: WeakMap<object, Set<ServiceIdentifier>> = new WeakMap();
+export const PROVISION_TOKENS_BY_INSTANCE: WeakMap<object, Set<ServiceIdentifier>> = new WeakMap();
 
 /**
  * Internal storage for container error handlers.

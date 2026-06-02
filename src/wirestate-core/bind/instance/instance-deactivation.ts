@@ -3,7 +3,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { Container, Newable } from "../../alias";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
-import { CONTAINER_REFS_BY_SERVICE } from "../../registry";
+import { CONTAINER_REFS_BY_INSTANCE } from "../../registry";
 import { getDeactivationHandlerMetadata } from "../../service/on-deactivation";
 import { Maybe, MaybePromise } from "../../types/general";
 import type { BindInstanceOptions } from "../bind-instance";
@@ -54,7 +54,7 @@ export function createInstanceDeactivationHandler<T extends object>(
     detachScopes(instance);
     unregisterInstanceHandlers(instance);
 
-    CONTAINER_REFS_BY_SERVICE.delete(instance);
+    CONTAINER_REFS_BY_INSTANCE.delete(instance);
   };
 }
 

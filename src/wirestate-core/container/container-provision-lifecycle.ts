@@ -7,10 +7,10 @@ import { getBindingToken } from "../bind/utils/get-binding-token";
 import { getContainerBindings } from "../bind/utils/register-binding";
 import { reportWirestateInternalError } from "../error/internal-error-handler";
 import {
-  CONTAINER_REFS_BY_SERVICE,
+  CONTAINER_REFS_BY_INSTANCE,
   PROVISION_LIFECYCLES_BY_CONTAINER,
-  PROVISION_TOKENS_BY_SERVICE,
-  WIRE_SCOPES_BY_SERVICE,
+  PROVISION_TOKENS_BY_INSTANCE,
+  SCOPES_BY_INSTANCE,
 } from "../registry";
 import { getDeprovisionHandlerMetadata } from "../service/on-deprovision";
 import { getProvisionHandlerMetadata } from "../service/on-provision";
@@ -110,10 +110,10 @@ export function deprovisionContainer(container: Container, lifecycle: ContainerP
       services,
     });
 
-    deprovisionServices(services.filter((service) => CONTAINER_REFS_BY_SERVICE.get(service) === container));
+    deprovisionServices(services.filter((service) => CONTAINER_REFS_BY_INSTANCE.get(service) === container));
 
     for (const service of services) {
-      PROVISION_TOKENS_BY_SERVICE.delete(service);
+      PROVISION_TOKENS_BY_INSTANCE.delete(service);
     }
 
     lifecycle.delete(container);
@@ -160,7 +160,7 @@ export function deprovisionContainerBinding(container: Container, token: Service
       continue;
     }
 
-    deprovisionServices(removed.filter((service) => CONTAINER_REFS_BY_SERVICE.get(service) === container));
+    deprovisionServices(removed.filter((service) => CONTAINER_REFS_BY_INSTANCE.get(service) === container));
     untrackProvisionToken(removed, token);
 
     if (remaining.length > 0) {
@@ -249,7 +249,7 @@ export function provisionServices(container: Container, bindings: Bindings = [])
       const reachedServices: Array<object> = services.slice(0, index + 1);
 
       deprovisionServices(
-        reachedServices.filter((reachedService) => CONTAINER_REFS_BY_SERVICE.get(reachedService) === container)
+        reachedServices.filter((reachedService) => CONTAINER_REFS_BY_INSTANCE.get(reachedService) === container)
       );
 
       for (const [service, token] of trackedTokens) {
@@ -292,8 +292,7 @@ export function deprovisionServices(services: ReadonlyArray<object>): void {
  * @param isDeprovisioned - Whether the service has left provider ownership, or null before provision reaches it.
  */
 function markServiceDeprovisionStatus(service: object, isDeprovisioned: Optional<boolean>): void {
-  const scopes: Maybe<ReadonlyArray<{ readonly isDeprovisioned: Optional<boolean> }>> =
-    WIRE_SCOPES_BY_SERVICE.get(service);
+  const scopes: Maybe<ReadonlyArray<{ readonly isDeprovisioned: Optional<boolean> }>> = SCOPES_BY_INSTANCE.get(service);
 
   if (!scopes) {
     return;
@@ -354,11 +353,11 @@ function untrackProvisionLifecycle(container: Container, lifecycle: ContainerPro
  * @param token - Binding token used to resolve the service.
  */
 function trackProvisionToken(service: object, token: ServiceIdentifier): void {
-  let tokens: Maybe<Set<ServiceIdentifier>> = PROVISION_TOKENS_BY_SERVICE.get(service);
+  let tokens: Maybe<Set<ServiceIdentifier>> = PROVISION_TOKENS_BY_INSTANCE.get(service);
 
   if (!tokens) {
     tokens = new Set();
-    PROVISION_TOKENS_BY_SERVICE.set(service, tokens);
+    PROVISION_TOKENS_BY_INSTANCE.set(service, tokens);
   }
 
   tokens.add(token);
@@ -374,7 +373,7 @@ function trackProvisionToken(service: object, token: ServiceIdentifier): void {
  */
 function untrackProvisionToken(services: ReadonlyArray<object>, token: ServiceIdentifier): void {
   for (const service of services) {
-    const tokens: Maybe<Set<ServiceIdentifier>> = PROVISION_TOKENS_BY_SERVICE.get(service);
+    const tokens: Maybe<Set<ServiceIdentifier>> = PROVISION_TOKENS_BY_INSTANCE.get(service);
 
     if (!tokens) {
       continue;
@@ -383,7 +382,7 @@ function untrackProvisionToken(services: ReadonlyArray<object>, token: ServiceId
     tokens.delete(token);
 
     if (tokens.size === 0) {
-      PROVISION_TOKENS_BY_SERVICE.delete(service);
+      PROVISION_TOKENS_BY_INSTANCE.delete(service);
     }
   }
 }
@@ -398,7 +397,7 @@ function untrackProvisionToken(services: ReadonlyArray<object>, token: ServiceId
  * @returns True when the service was provisioned for the token.
  */
 function isServiceProvisionedForToken(service: object, token: ServiceIdentifier): boolean {
-  return PROVISION_TOKENS_BY_SERVICE.get(service)?.has(token) ?? false;
+  return PROVISION_TOKENS_BY_INSTANCE.get(service)?.has(token) ?? false;
 }
 
 /**
@@ -475,7 +474,7 @@ function callLifecycleHandler(
     if (result && typeof (result as Promise<void>).then === "function") {
       (result as Promise<void>).catch((error) => {
         reportWirestateInternalError({
-          container: CONTAINER_REFS_BY_SERVICE.get(service),
+          container: CONTAINER_REFS_BY_INSTANCE.get(service),
           details: [service.constructor.name, String(methodName)],
           error,
           message: decoratorName + " rejected",
@@ -488,7 +487,7 @@ function callLifecycleHandler(
     }
   } catch (error) {
     reportWirestateInternalError({
-      container: CONTAINER_REFS_BY_SERVICE.get(service),
+      container: CONTAINER_REFS_BY_INSTANCE.get(service),
       details: [service.constructor.name, String(methodName)],
       error,
       message: decoratorName + " failed for",

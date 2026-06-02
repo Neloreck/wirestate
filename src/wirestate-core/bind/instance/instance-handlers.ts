@@ -6,10 +6,10 @@ import { EventBus } from "../../events/event-bus";
 import { getQueryHandlerMetadata } from "../../queries/get-query-handler-metadata";
 import { QueryBus } from "../../queries/query-bus";
 import {
-  COMMAND_UNREGISTERS_BY_SERVICE,
-  CONTAINER_REFS_BY_SERVICE,
-  EVENT_UNSUBSCRIBERS_BY_SERVICE,
-  QUERY_UNREGISTERS_BY_SERVICE,
+  COMMAND_UNREGISTERS_BY_INSTANCE,
+  CONTAINER_REFS_BY_INSTANCE,
+  EVENT_UNSUBSCRIBERS_BY_INSTANCE,
+  QUERY_UNREGISTERS_BY_INSTANCE,
 } from "../../registry";
 import { CommandHandler, CommandUnregister } from "../../types/commands";
 import { EventDispatch, EventUnsubscriber } from "../../types/events";
@@ -83,7 +83,7 @@ export function unregisterInstanceHandlers<T extends object>(instance: T): void 
  * @param dispatches - One subscription descriptor per decorated method.
  */
 function attachEventsSubscription<T extends object>(service: T, dispatches: ReadonlyArray<EventDispatch>): void {
-  const bus: Maybe<EventBus> = CONTAINER_REFS_BY_SERVICE.get(service)?.get(EventBus);
+  const bus: Maybe<EventBus> = CONTAINER_REFS_BY_INSTANCE.get(service)?.get(EventBus);
 
   if (!bus) {
     return;
@@ -93,7 +93,7 @@ function attachEventsSubscription<T extends object>(service: T, dispatches: Read
     bus.subscribe(dispatch.types, dispatch.handler)
   );
 
-  EVENT_UNSUBSCRIBERS_BY_SERVICE.set(service, () => {
+  EVENT_UNSUBSCRIBERS_BY_INSTANCE.set(service, () => {
     for (const unsubscribe of unsubscribers) {
       unsubscribe();
     }
@@ -108,11 +108,11 @@ function attachEventsSubscription<T extends object>(service: T, dispatches: Read
  * @param service - Service instance.
  */
 function detachEventSubscription<T extends object>(service: T): void {
-  const unsubscribe: Maybe<EventUnsubscriber> = EVENT_UNSUBSCRIBERS_BY_SERVICE.get(service);
+  const unsubscribe: Maybe<EventUnsubscriber> = EVENT_UNSUBSCRIBERS_BY_INSTANCE.get(service);
 
   if (unsubscribe) {
     unsubscribe();
-    EVENT_UNSUBSCRIBERS_BY_SERVICE.delete(service);
+    EVENT_UNSUBSCRIBERS_BY_INSTANCE.delete(service);
   }
 }
 
@@ -125,11 +125,11 @@ function detachEventSubscription<T extends object>(service: T): void {
  * @param unregister - Query unregister function.
  */
 function attachQueryUnregister<T extends object>(service: T, unregister: QueryUnregister): void {
-  let list: Maybe<Array<QueryUnregister>> = QUERY_UNREGISTERS_BY_SERVICE.get(service);
+  let list: Maybe<Array<QueryUnregister>> = QUERY_UNREGISTERS_BY_INSTANCE.get(service);
 
   if (!list) {
     list = [];
-    QUERY_UNREGISTERS_BY_SERVICE.set(service, list);
+    QUERY_UNREGISTERS_BY_INSTANCE.set(service, list);
   }
 
   list.push(unregister);
@@ -143,7 +143,7 @@ function attachQueryUnregister<T extends object>(service: T, unregister: QueryUn
  * @param service - Service instance.
  */
 function detachQueryUnregister<T extends object>(service: T): void {
-  const list: Maybe<Array<QueryUnregister>> = QUERY_UNREGISTERS_BY_SERVICE.get(service);
+  const list: Maybe<Array<QueryUnregister>> = QUERY_UNREGISTERS_BY_INSTANCE.get(service);
 
   if (!list) {
     return;
@@ -153,7 +153,7 @@ function detachQueryUnregister<T extends object>(service: T): void {
     unregister();
   }
 
-  QUERY_UNREGISTERS_BY_SERVICE.delete(service);
+  QUERY_UNREGISTERS_BY_INSTANCE.delete(service);
 }
 
 /**
@@ -165,11 +165,11 @@ function detachQueryUnregister<T extends object>(service: T): void {
  * @param unregister - Command unregister function.
  */
 function attachCommandUnregister<T extends object>(service: T, unregister: CommandUnregister): void {
-  let list: Maybe<Array<CommandUnregister>> = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
+  let list: Maybe<Array<CommandUnregister>> = COMMAND_UNREGISTERS_BY_INSTANCE.get(service);
 
   if (!list) {
     list = [];
-    COMMAND_UNREGISTERS_BY_SERVICE.set(service, list);
+    COMMAND_UNREGISTERS_BY_INSTANCE.set(service, list);
   }
 
   list.push(unregister);
@@ -183,7 +183,7 @@ function attachCommandUnregister<T extends object>(service: T, unregister: Comma
  * @param service - Service instance.
  */
 function detachCommandUnregister<T extends object>(service: T): void {
-  const list: Maybe<Array<CommandUnregister>> = COMMAND_UNREGISTERS_BY_SERVICE.get(service);
+  const list: Maybe<Array<CommandUnregister>> = COMMAND_UNREGISTERS_BY_INSTANCE.get(service);
 
   if (!list) {
     return;
@@ -193,5 +193,5 @@ function detachCommandUnregister<T extends object>(service: T): void {
     unregister();
   }
 
-  COMMAND_UNREGISTERS_BY_SERVICE.delete(service);
+  COMMAND_UNREGISTERS_BY_INSTANCE.delete(service);
 }

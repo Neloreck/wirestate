@@ -5,7 +5,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { Container, Newable } from "../../alias";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
-import { CONTAINER_REFS_BY_SERVICE } from "../../registry";
+import { CONTAINER_REFS_BY_INSTANCE } from "../../registry";
 import { getActivatedHandlerMetadata } from "../../service/on-activated";
 import { Maybe, MaybePromise } from "../../types/general";
 import type { BindInstanceOptions } from "../bind-instance";
@@ -13,24 +13,24 @@ import type { BindInstanceOptions } from "../bind-instance";
 import { unregisterInstanceHandlers, registerInstanceHandlers } from "./instance-handlers";
 import { attachScopes, detachScopes } from "./instance-scopes";
 
-interface CreateServiceActivationHandlerOptions<T extends object> {
+interface CreateInstanceActivationHandlerOptions<T extends object> {
   readonly binding: Newable<T>;
   readonly container: Container;
   readonly options?: BindInstanceOptions;
 }
 
 /**
- * Creates the Inversify activation hook for a Wirestate service binding.
+ * Creates the Inversify activation hook for a Wirestate instance binding.
  *
  * @internal
  *
- * @template T - Service instance type.
+ * @template T - Instance type.
  *
  * @param handlerOptions - Activated handler options.
  * @returns Inversify activation handler.
  */
 export function createInstanceActivatedHandler<T extends object>(
-  handlerOptions: CreateServiceActivationHandlerOptions<T>
+  handlerOptions: CreateInstanceActivationHandlerOptions<T>
 ): (context: ResolutionContext, instance: T) => T {
   const { binding, container, options } = handlerOptions;
 
@@ -45,7 +45,7 @@ export function createInstanceActivatedHandler<T extends object>(
     });
 
     try {
-      CONTAINER_REFS_BY_SERVICE.set(instance, container);
+      CONTAINER_REFS_BY_INSTANCE.set(instance, container);
 
       attachScopes(instance, binding);
       registerInstanceHandlers(container, instance);
@@ -68,7 +68,7 @@ export function createInstanceActivatedHandler<T extends object>(
       detachScopes(instance);
       unregisterInstanceHandlers(instance);
 
-      CONTAINER_REFS_BY_SERVICE.delete(instance);
+      CONTAINER_REFS_BY_INSTANCE.delete(instance);
 
       throw error;
     }
