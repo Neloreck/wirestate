@@ -3,7 +3,7 @@ import { BindWhenOnFluentSyntax } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType, Container, Newable, ServiceIdentifier } from "../alias";
+import { BindingType, Container, Newable, Identifier } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { InstanceBindingDescriptor } from "../types/provision";
@@ -120,7 +120,7 @@ export function bindInstance<T extends object>(
  */
 export function bindInstanceWithToken<T extends object>(
   container: Container,
-  token: ServiceIdentifier<T>,
+  token: Identifier<T>,
   binding: Newable<T>,
   registeredBinding: Newable<T> | InstanceBindingDescriptor<T>,
   options?: BindInstanceOptions

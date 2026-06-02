@@ -3,7 +3,7 @@ import type { BindInWhenOnFluentSyntax, MapToResolvedValueInjectOptions } from "
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType, Container, type ServiceIdentifier } from "../alias";
+import { BindingType, Container, type Identifier } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { ResolvedValueBindingDescriptor } from "../types/provision";
@@ -65,14 +65,12 @@ export function bindResolvedValue<T, FA extends Array<unknown> = Array<unknown>>
 
   const binding: BindInWhenOnFluentSyntax<T> = descriptor.injectOptions
     ? container
-        .bind<T>(descriptor.token as ServiceIdentifier<T>)
+        .bind<T>(descriptor.token as Identifier<T>)
         .toResolvedValue(
           descriptor.factory as (...args: Array<unknown>) => T | Promise<T>,
           descriptor.injectOptions as MapToResolvedValueInjectOptions<Array<unknown>>
         )
-    : container
-        .bind<T>(descriptor.token as ServiceIdentifier<T>)
-        .toResolvedValue(descriptor.factory as () => T | Promise<T>);
+    : container.bind<T>(descriptor.token as Identifier<T>).toResolvedValue(descriptor.factory as () => T | Promise<T>);
 
   applyBindingScope(binding, descriptor.scope);
   registerBinding(container, descriptor as ResolvedValueBindingDescriptor);

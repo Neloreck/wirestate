@@ -3,17 +3,17 @@ describe("Library exported API from wirestate-core", () => {
 
   const expectedLibExports: Array<string> = [
     // Aliases.
+    "BindingScope",
     "BindingType",
     "Container",
+    "Identifier",
     "Inject",
     "Injectable",
-    "LazyServiceIdentifier",
+    "LazyIdentifier",
     "MultiInject",
     "Named",
     "Newable",
     "Optional",
-    "BindingScope",
-    "ServiceIdentifier",
     "Tagged",
     "forwardRef",
     // Core.

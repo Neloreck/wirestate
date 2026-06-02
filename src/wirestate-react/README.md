@@ -255,7 +255,7 @@ Returns the nearest `Container` instance. Useful for advanced manual resolution.
 
 Returns the current `WireScope` linked to the nearest container.
 
-Use `scope.isInactive` as the usual async guard in services; it becomes `true` after service disposal or provider
+Use `scope.isInactive` as the usual async guard in services; it becomes `true` after instance disposal or provider
 deprovision.
 
 ## License

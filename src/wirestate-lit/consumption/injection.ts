@@ -1,6 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
-import { ServiceIdentifier } from "@wirestate/core";
+import { Identifier } from "@wirestate/core";
 
 import { ContainerContext } from "../context/container-context";
 import { AnyObject, FieldMustMatchProvidedType, Interface } from "../types/general";
@@ -33,9 +33,9 @@ export interface InjectionDecorator<T> {
  */
 export interface InjectionOptions<T> {
   /**
-   * The service token to inject.
+   * The token to inject.
    */
-  token: ServiceIdentifier<T>;
+  token: Identifier<T>;
   /**
    * Resolve only the first context value.
    *
@@ -81,11 +81,11 @@ export interface InjectionOptions<T> {
  * }
  * ```
  */
-export function injection<T>(optionsOrToken: InjectionOptions<T> | ServiceIdentifier<T>): InjectionDecorator<T> {
+export function injection<T>(optionsOrToken: InjectionOptions<T> | Identifier<T>): InjectionDecorator<T> {
   const options: InjectionOptions<T> =
     typeof optionsOrToken === "object" && optionsOrToken !== null && "token" in optionsOrToken
       ? optionsOrToken
-      : { token: optionsOrToken as ServiceIdentifier<T> };
+      : { token: optionsOrToken as Identifier<T> };
 
   return ((
     protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, T>,

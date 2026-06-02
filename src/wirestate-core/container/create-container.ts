@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Container, ServiceIdentifier } from "../alias";
+import { Container, Identifier } from "../alias";
 import { bind } from "../bind/bind";
 import { getBindingToken } from "../bind/utils/get-binding-token";
 import { CommandBus } from "../commands/command-bus";
@@ -26,7 +26,7 @@ export interface ContainerConfig {
   /**
    * Bindings to resolve immediately after binding.
    */
-  readonly activate?: boolean | ReadonlyArray<ServiceIdentifier>;
+  readonly activate?: boolean | ReadonlyArray<Identifier>;
 
   /**
    * Services or binding descriptors to register.
@@ -131,7 +131,7 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
 
   validateContainerConfig(config);
 
-  const activate: ReadonlyArray<ServiceIdentifier> =
+  const activate: ReadonlyArray<Identifier> =
     (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
 
   const container: Container = new Container({

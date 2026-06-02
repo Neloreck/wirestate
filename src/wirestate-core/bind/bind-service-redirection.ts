@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType, Container, type ServiceIdentifier } from "../alias";
+import { BindingType, Container, type Identifier } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { ServiceRedirectionBindingDescriptor } from "../types/provision";
@@ -65,7 +65,7 @@ export function bindServiceRedirection<T>(
     container,
   });
 
-  container.bind<T>(descriptor.token as ServiceIdentifier<T>).toService(descriptor.service as ServiceIdentifier<T>);
+  container.bind<T>(descriptor.token as Identifier<T>).toService(descriptor.service as Identifier<T>);
 
   registerBinding(container, descriptor);
 

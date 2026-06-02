@@ -1,4 +1,4 @@
-import { BindingType, Container, Newable, ServiceIdentifier } from "../alias";
+import { BindingType, Container, Newable, Identifier } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import {
@@ -117,7 +117,7 @@ export function bind<T extends object = object>(
     case BindingType.Instance:
       return bindInstanceWithToken(
         container,
-        binding.token as ServiceIdentifier<T>,
+        binding.token as Identifier<T>,
         (binding as InstanceBindingDescriptor<T>).value as unknown as Newable<T>,
         binding as InstanceBindingDescriptor<T>,
         options

@@ -1,10 +1,15 @@
-import { LazyServiceIdentifier, ServiceIdentifier } from "inversify";
+import { LazyServiceIdentifier as LazyIdentifier, ServiceIdentifier as Identifier } from "inversify";
 
 /**
  * @group External-inversify
  * @see {@link https://inversify.io/}
  */
-export { Container, LazyServiceIdentifier, Newable, ServiceIdentifier } from "inversify";
+export {
+  Container,
+  LazyServiceIdentifier as LazyIdentifier,
+  Newable,
+  ServiceIdentifier as Identifier,
+} from "inversify";
 
 /**
  * @group External-inversify
@@ -29,17 +34,15 @@ export { bindingTypeValues as BindingType, bindingScopeValues as BindingScope } 
  * Wraps a token for circular constructor dependencies.
  *
  * `forwardRef` delays token lookup. It is a small escape hatch, not a design
- * goal. If two services need each other like two drawers that cannot open
- * together, prefer moving the shared piece into a third service.
+ * goal. If two instances need each other like two drawers that cannot open
+ * together, prefer moving the shared piece into a one.
  *
  * @group External-inversify
  * @see {@link https://inversify.io/}
  *
  * @param forward - Function that returns the token.
- * @returns Lazy service identifier.
+ * @returns Lazy identifier.
  */
-export function forwardRef<TInstance = unknown>(
-  forward: () => ServiceIdentifier<TInstance>
-): LazyServiceIdentifier<TInstance> {
-  return new LazyServiceIdentifier(forward);
+export function forwardRef<TInstance = unknown>(forward: () => Identifier<TInstance>): LazyIdentifier<TInstance> {
+  return new LazyIdentifier(forward);
 }

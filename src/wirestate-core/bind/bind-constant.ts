@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType, Container, BindingScope, ServiceIdentifier } from "../alias";
+import { BindingType, Container, BindingScope, Identifier } from "../alias";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { ConstantValueBindingDescriptor } from "../types/provision";
@@ -71,7 +71,7 @@ export function bindConstant<T>(container: Container, descriptor: ConstantValueB
     container,
   });
 
-  container.bind<T>(descriptor.token as ServiceIdentifier<T>).toConstantValue(descriptor.value as T);
+  container.bind<T>(descriptor.token as Identifier<T>).toConstantValue(descriptor.value as T);
 
   registerBinding(container, descriptor);
 

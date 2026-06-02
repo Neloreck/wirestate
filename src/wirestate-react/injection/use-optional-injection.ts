@@ -1,4 +1,4 @@
-import { Container, ServiceIdentifier } from "@wirestate/core";
+import { Container, Identifier } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -19,7 +19,7 @@ import { AnyObject } from "../types/general";
  * @template T - The type of the value being resolved.
  * @template F - The type returned by the fallback function.
  *
- * @param token - The service token (string, symbol, or constructor).
+ * @param token - The token (string, symbol, or constructor).
  * @param fallback - Optional function called to provide a value if the token is not bound.
  *
  * @returns The resolved value, the result of the fallback function, or `null` when no fallback is provided.
@@ -29,10 +29,7 @@ import { AnyObject } from "../types/general";
  * const logger = useOptionalInjection(FileLogger, (container) => container.get(ConsoleLoggerService));
  * ```
  */
-export function useOptionalInjection<T, F = null>(
-  token: ServiceIdentifier<T>,
-  fallback?: (container: Container) => F
-): T | F {
+export function useOptionalInjection<T, F = null>(token: Identifier<T>, fallback?: (container: Container) => F): T | F {
   const container: Container = useContainer();
 
   // Revision bump forces a container reset; force re-resolution to drop stale instances.

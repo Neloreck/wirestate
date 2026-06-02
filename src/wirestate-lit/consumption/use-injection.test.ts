@@ -22,7 +22,7 @@ describe("useInjection", () => {
     fixture.cleanup();
   });
 
-  it("should inject service using options object", () => {
+  it("should inject using options object", () => {
     @customElement("test-use-injection-options-element")
     class TestOptionsElement extends ReactiveElement {
       public service = useInjection(this, { token: GenericService });
@@ -36,7 +36,7 @@ describe("useInjection", () => {
     expect(element.service.value.getValue()).toBe("test-value");
   });
 
-  it("should inject service using direct token", () => {
+  it("should inject using direct token", () => {
     @customElement("test-use-injection-direct-element")
     class TestDirectElement extends ReactiveElement {
       public service = useInjection(this, GenericService);

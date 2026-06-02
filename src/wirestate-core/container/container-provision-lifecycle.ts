@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType, Container, ServiceIdentifier } from "../alias";
+import { BindingType, Container, Identifier } from "../alias";
 import { hasScopeInjection } from "../bind/instance/instance-scopes";
 import { getDeprovisionHandlerMetadata } from "../bind/instance/on-deprovision";
 import { getProvisionHandlerMetadata } from "../bind/instance/on-provision";
@@ -131,7 +131,7 @@ export function deprovisionContainer(container: Container, lifecycle: ContainerP
  * @param container - Container losing the binding.
  * @param token - Binding token removed from the container.
  */
-export function deprovisionContainerBinding(container: Container, token: ServiceIdentifier): void {
+export function deprovisionContainerBinding(container: Container, token: Identifier): void {
   const lifecycles: Maybe<Set<ContainerProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
 
   if (!lifecycles) {
@@ -213,12 +213,12 @@ export function deprovisionContainerBindings(container: Container): void {
  */
 export function provisionInstances(container: Container, bindings: Bindings = []): Array<object> {
   const instances: Array<object> = [];
-  const trackedTokens: Array<readonly [object, ServiceIdentifier]> = [];
-  const visited: Set<ServiceIdentifier> = new Set();
+  const trackedTokens: Array<readonly [object, Identifier]> = [];
+  const visited: Set<Identifier> = new Set();
 
   for (const binding of bindings) {
-    const token: ServiceIdentifier = getBindingToken(binding);
-    const metadataToken: ServiceIdentifier = getProviderLifecycleMetadataToken(binding);
+    const token: Identifier = getBindingToken(binding);
+    const metadataToken: Identifier = getProviderLifecycleMetadataToken(binding);
 
     if (!visited.has(token) && isProviderLifecycleParticipant(metadataToken)) {
       visited.add(token);
@@ -353,8 +353,8 @@ function untrackProvisionLifecycle(container: Container, lifecycle: ContainerPro
  * @param instance - Provisioned instance.
  * @param token - Binding token used to resolve the instance.
  */
-function trackProvisionToken(instance: object, token: ServiceIdentifier): void {
-  let tokens: Maybe<Set<ServiceIdentifier>> = PROVISION_TOKENS_BY_INSTANCE.get(instance);
+function trackProvisionToken(instance: object, token: Identifier): void {
+  let tokens: Maybe<Set<Identifier>> = PROVISION_TOKENS_BY_INSTANCE.get(instance);
 
   if (!tokens) {
     tokens = new Set();
@@ -372,9 +372,9 @@ function trackProvisionToken(instance: object, token: ServiceIdentifier): void {
  * @param instances - Instances losing a lifecycle token.
  * @param token - Binding token to remove.
  */
-function untrackProvisionToken(instances: ReadonlyArray<object>, token: ServiceIdentifier): void {
+function untrackProvisionToken(instances: ReadonlyArray<object>, token: Identifier): void {
   for (const instance of instances) {
-    const tokens: Maybe<Set<ServiceIdentifier>> = PROVISION_TOKENS_BY_INSTANCE.get(instance);
+    const tokens: Maybe<Set<Identifier>> = PROVISION_TOKENS_BY_INSTANCE.get(instance);
 
     if (!tokens) {
       continue;
@@ -397,7 +397,7 @@ function untrackProvisionToken(instances: ReadonlyArray<object>, token: ServiceI
  * @param token - Binding token to inspect.
  * @returns True when the instance was provisioned for the token.
  */
-function isInstanceProvisionedForToken(instance: object, token: ServiceIdentifier): boolean {
+function isInstanceProvisionedForToken(instance: object, token: Identifier): boolean {
   return PROVISION_TOKENS_BY_INSTANCE.get(instance)?.has(token) ?? false;
 }
 
@@ -409,9 +409,9 @@ function isInstanceProvisionedForToken(instance: object, token: ServiceIdentifie
  * @param binding - Binding registered on the provider container.
  * @returns The constructor for instance descriptors, otherwise the binding token.
  */
-function getProviderLifecycleMetadataToken(binding: Binding): ServiceIdentifier {
+function getProviderLifecycleMetadataToken(binding: Binding): Identifier {
   if (typeof binding !== "function" && binding.type === BindingType.Instance && typeof binding.value === "function") {
-    return binding.value as ServiceIdentifier;
+    return binding.value as Identifier;
   }
 
   return getBindingToken(binding);
@@ -425,7 +425,7 @@ function getProviderLifecycleMetadataToken(binding: Binding): ServiceIdentifier 
  * @param token - Binding token to inspect.
  * @returns True when the token is an instance constructor with provider lifecycle metadata or WireScope injection.
  */
-function isProviderLifecycleParticipant(token: ServiceIdentifier): boolean {
+function isProviderLifecycleParticipant(token: Identifier): boolean {
   if (typeof token !== "function") {
     return false;
   }

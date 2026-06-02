@@ -3,7 +3,7 @@ import type { Factory, ResolutionContext } from "inversify";
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType, Container, type ServiceIdentifier } from "../alias";
+import { BindingType, Container, type Identifier } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { FactoryBindingDescriptor } from "../types/provision";
@@ -55,7 +55,7 @@ export function bindFactory(container: Container, descriptor: FactoryBindingDesc
   });
 
   container
-    .bind(descriptor.token as ServiceIdentifier<Factory<unknown>>)
+    .bind(descriptor.token as Identifier<Factory<unknown>>)
     .toFactory(descriptor.factory as (context: ResolutionContext) => Factory<unknown> | Promise<Factory<unknown>>);
 
   registerBinding(container, descriptor);

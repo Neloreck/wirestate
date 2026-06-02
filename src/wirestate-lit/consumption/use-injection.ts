@@ -1,6 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveControllerHost } from "@lit/reactive-element";
-import { ServiceIdentifier } from "@wirestate/core";
+import { Identifier } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -18,18 +18,20 @@ export interface UseInjectionOptions<T> {
    * Resolve only the first context value.
    *
    * @remarks
-   * If true, the service will not update when the container context changes.
+   * If true, the value will not update when the container context changes.
    * Defaults to `false`.
    */
   once?: boolean;
+
   /**
-   * Initial value before the service is fetched.
+   * Initial value before the instance is fetched.
    */
   value?: Optional<T>;
+
   /**
-   * The service token to inject.
+   * The token to inject.
    */
-  token: ServiceIdentifier<T>;
+  token: Identifier<T>;
 }
 
 /**
@@ -39,17 +41,18 @@ export interface UseInjectionOptions<T> {
  */
 export interface UseInjectionValue<T> {
   /**
-   * The service token used for injection.
+   * The token used for injection.
    */
-  token: ServiceIdentifier<T>;
+  token: Identifier<T>;
+
   /**
-   * The injected service instance.
+   * The injected value.
    */
   value: T;
 }
 
 /**
- * Consumes a service from the nearest Lit container context.
+ * Consumes a value from the nearest Lit container context.
  *
  * @group Consumption
  *
@@ -81,12 +84,12 @@ export interface UseInjectionValue<T> {
  */
 export function useInjection<T>(
   host: ReactiveControllerHost & HTMLElement,
-  optionsOrToken: UseInjectionOptions<T> | ServiceIdentifier<T>
+  optionsOrToken: UseInjectionOptions<T> | Identifier<T>
 ): UseInjectionValue<T> {
   const options: UseInjectionOptions<T> =
     typeof optionsOrToken === "object" && optionsOrToken !== null && "token" in optionsOrToken
       ? optionsOrToken
-      : { token: optionsOrToken as ServiceIdentifier<T> };
+      : { token: optionsOrToken as Identifier<T> };
 
   const { once, token, value } = options;
 

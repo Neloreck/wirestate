@@ -37,7 +37,7 @@ describe("injection", () => {
     expect(element.service.getValue()).toBe("test-value");
   });
 
-  it("should inject service using direct token", () => {
+  it("should inject using direct token", () => {
     @customElement("test-injection-direct-element")
     class TestDirectElement extends ReactiveElement {
       @injection(GenericService)

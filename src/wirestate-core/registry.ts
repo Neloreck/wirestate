@@ -1,4 +1,4 @@
-import { Container, ServiceIdentifier } from "./alias";
+import { Container, Identifier } from "./alias";
 import { WireScope } from "./container/wire-scope";
 import { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
 import { InternalErrorHandler } from "./types/error";
@@ -167,7 +167,7 @@ export const PROVISION_LIFECYCLES_BY_CONTAINER: WeakMap<Container, Set<Map<Conta
  * @group Container
  * @internal
  */
-export const PROVISION_TOKENS_BY_INSTANCE: WeakMap<object, Set<ServiceIdentifier>> = new WeakMap();
+export const PROVISION_TOKENS_BY_INSTANCE: WeakMap<object, Set<Identifier>> = new WeakMap();
 
 /**
  * Internal storage for container error handlers.

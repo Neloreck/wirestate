@@ -15,11 +15,11 @@ import { WireScope } from "../../wirestate-core/container/wire-scope";
 export type ActivationLifecycleEvent = "activated" | "deactivation" | "provision" | "deprovision";
 
 /**
- * Options used to create a lifecycle test service.
+ * Options used to create a lifecycle testing class.
  *
  * @remarks
- * The generated service stores these options on static members so tests can
- * assert lifecycle order without keeping a resolved service instance.
+ * The generated class stores these options on static members so tests can
+ * assert lifecycle order without keeping a resolved instance.
  */
 export interface CreateLifecycleServiceOptions {
   /**
@@ -28,7 +28,7 @@ export interface CreateLifecycleServiceOptions {
    * @remarks
    * Omitted callbacks still exist on the generated class, but they do not write
    * to the event log. This lets tests isolate one lifecycle phase without
-   * changing the binding behavior of the service.
+   * changing the binding behavior of the class.
    *
    * @default ["activated", "deactivation", "provision", "deprovision"]
    */
@@ -40,22 +40,22 @@ export interface CreateLifecycleServiceOptions {
    * @remarks
    * String suffixes are reused for every event. Function suffixes are evaluated
    * each time a lifecycle callback records an event, which is useful for tests
-   * that need to assert interleaved call order across several services.
+   * that need to assert interleaved call order across several classes.
    */
   suffix?: string | (() => string);
 
   /**
-   * Mutable event log used by the generated service.
+   * Mutable event log used by the generated class.
    *
    * @remarks
-   * Pass the same array to several generated services to assert their combined
+   * Pass the same array to several generated classes to assert their combined
    * lifecycle order.
    */
   events?: Array<string>;
 }
 
 /**
- * Creates an injectable service class that records lifecycle events.
+ * Creates an injectable class that records lifecycle events.
  *
  * @remarks
  * Each call returns a fresh injectable class with static `METHODS`, `EVENTS`,
@@ -64,12 +64,12 @@ export interface CreateLifecycleServiceOptions {
  * should write to one shared log.
  *
  * Provision, deprovision, activation, and deactivation hooks come from core
- * service lifecycle decorators.
+ * instance lifecycle decorators.
  *
  * @internal
  *
  * @param options - Event log, enabled callbacks, and optional event suffix.
- * @returns Injectable service class configured for lifecycle-order assertions.
+ * @returns Injectable class configured for lifecycle-order assertions.
  */
 export function createLifecycleService(options: CreateLifecycleServiceOptions = {}) {
   const { methods, suffix, events } = options;

@@ -1,4 +1,4 @@
-import { Newable, ServiceIdentifier } from "../../alias";
+import { Newable, Identifier } from "../../alias";
 import { BindingDescriptor } from "../../types/provision";
 
 /**
@@ -15,6 +15,6 @@ import { BindingDescriptor } from "../../types/provision";
  * @param binding - Service class or descriptor.
  * @returns Token used for container resolution.
  */
-export function getBindingToken<T extends object = object>(binding: Newable<T> | BindingDescriptor): ServiceIdentifier {
+export function getBindingToken<T extends object = object>(binding: Newable<T> | BindingDescriptor): Identifier {
   return typeof binding === "function" ? binding : binding.token;
 }

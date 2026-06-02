@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { bind, Container, ServiceIdentifier, createContainer } from "@wirestate/core";
+import { bind, Container, Identifier, createContainer } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
@@ -18,7 +18,7 @@ describe("optionalInjection", () => {
 
   it("should assign null when token is not bound", () => {
     const container: Container = createContainer();
-    const token: ServiceIdentifier<string> = Symbol("optional-token");
+    const token: Identifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -35,7 +35,7 @@ describe("optionalInjection", () => {
     expect(element.value).toBeNull();
   });
 
-  it("should inject bound service", () => {
+  it("should inject bound instance", () => {
     const container: Container = createContainer();
 
     bind(container, GenericService);
@@ -57,7 +57,7 @@ describe("optionalInjection", () => {
 
   it("should use fallback when token is not bound", () => {
     const container: Container = createContainer();
-    const token: ServiceIdentifier<string> = Symbol("optional-token");
+    const token: Identifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -76,7 +76,7 @@ describe("optionalInjection", () => {
 
   it("should type fallback values separately from injection values", () => {
     const container: Container = createContainer();
-    const token: ServiceIdentifier<string> = Symbol("optional-token");
+    const token: Identifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -95,8 +95,8 @@ describe("optionalInjection", () => {
 
   it("should provide container to fallback", () => {
     const container: Container = createContainer();
-    const unboundToken: ServiceIdentifier<string> = Symbol("unbound-token");
-    const boundToken: ServiceIdentifier<string> = Symbol("bound-token");
+    const unboundToken: Identifier<string> = Symbol("unbound-token");
+    const boundToken: Identifier<string> = Symbol("bound-token");
 
     bind(container, {
       token: boundToken,
@@ -120,7 +120,7 @@ describe("optionalInjection", () => {
 
   it("should use fallback from options object", () => {
     const container: Container = createContainer();
-    const token: ServiceIdentifier<string> = Symbol("optional-token");
+    const token: Identifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -142,7 +142,7 @@ describe("optionalInjection", () => {
 
   it("should use separate fallback parameter with options object", () => {
     const container: Container = createContainer();
-    const token: ServiceIdentifier<string> = Symbol("optional-token");
+    const token: Identifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -161,7 +161,7 @@ describe("optionalInjection", () => {
 
   it("should prefer options fallback over separate fallback parameter", () => {
     const container: Container = createContainer();
-    const token: ServiceIdentifier<string> = Symbol("optional-token");
+    const token: Identifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -186,7 +186,7 @@ describe("optionalInjection", () => {
 
   it("should type fallback values from options object separately from injection values", () => {
     const container: Container = createContainer();
-    const token: ServiceIdentifier<string> = Symbol("optional-token");
+    const token: Identifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -244,7 +244,7 @@ describe("optionalInjection (new standard decorator)", () => {
 
   it("should assign null for standard accessors when token is not bound", () => {
     const container: Container = createContainer();
-    const token: ServiceIdentifier<string> = Symbol("optional-token");
+    const token: Identifier<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -274,7 +274,7 @@ describe("optionalInjection (new standard decorator)", () => {
     expect(element.value).toBeNull();
   });
 
-  it("should inject bound service for standard accessors", () => {
+  it("should inject bound instances for standard accessors", () => {
     const container: Container = createContainer({
       bindings: [GenericService],
     });

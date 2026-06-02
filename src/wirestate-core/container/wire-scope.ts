@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Injectable, Container, ServiceIdentifier } from "../alias";
+import { Injectable, Container, Identifier } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { ERROR_CODE_ACCESS_AFTER_DISPOSAL, ERROR_CODE_ACCESS_BEFORE_ACTIVATION } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
@@ -122,7 +122,7 @@ export class WireScope {
    * const service: MyService = scope.resolve(MyService);
    * ```
    */
-  public resolve<T>(token: ServiceIdentifier<T>): T {
+  public resolve<T>(token: Identifier<T>): T {
     dbg.info(prefix(__filename), "Lazy resolve:", {
       name: (token as AnyObject)?.name ?? token,
       token,
@@ -150,7 +150,7 @@ export class WireScope {
    * logger?.info("Resolved optionally");
    * ```
    */
-  public resolveOptional<T>(token: ServiceIdentifier<T>): Optional<T> {
+  public resolveOptional<T>(token: Identifier<T>): Optional<T> {
     dbg.info(prefix(__filename), "Lazy optional resolve:", {
       name: (token as AnyObject)?.name ?? token,
       token,

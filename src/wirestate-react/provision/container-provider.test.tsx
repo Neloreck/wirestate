@@ -284,7 +284,7 @@ describe("ContainerProvider", () => {
 
 describe("ContainerProvider lifecycle", () => {
   it("should call provider lifecycle for instance descriptors bound behind custom tokens", () => {
-    const TOKEN: unique symbol = Symbol("lifecycle-service");
+    const TOKEN: unique symbol = Symbol("token");
     const { LifecycleService, events } = createLifecycleService({ methods: ["provision", "deprovision"] });
 
     const { unmount } = render(

@@ -1,6 +1,6 @@
 import { DynamicValueBuilder, MapToResolvedValueInjectOptions, ResolutionContext } from "inversify";
 
-import { Newable, ServiceIdentifier } from "../alias";
+import { Newable, Identifier } from "../alias";
 
 /**
  * Inversify binding strategy name.
@@ -44,7 +44,7 @@ export interface ConstantValueBindingDescriptor<T = unknown> {
   /**
    * Token used to resolve the binding.
    */
-  readonly token: ServiceIdentifier<T>;
+  readonly token: Identifier<T>;
 
   /**
    * Constant value to bind.
@@ -76,7 +76,7 @@ export interface DynamicValueBindingDescriptor<T = unknown> {
   /**
    * Token used to resolve the binding.
    */
-  readonly token: ServiceIdentifier<T>;
+  readonly token: Identifier<T>;
 }
 
 /**
@@ -98,7 +98,7 @@ export interface FactoryBindingDescriptor<T = unknown> {
   /**
    * Token used to resolve the factory.
    */
-  readonly token: ServiceIdentifier<T>;
+  readonly token: Identifier<T>;
 }
 
 /**
@@ -115,7 +115,7 @@ export interface InstanceBindingDescriptor<T extends object = object> {
   /**
    * Token used to resolve the instance.
    */
-  readonly token: ServiceIdentifier<T>;
+  readonly token: Identifier<T>;
 
   /**
    * Service constructor to bind.
@@ -152,7 +152,7 @@ export interface ResolvedValueBindingDescriptor<T = unknown, TArgs extends Array
   /**
    * Token used to resolve the binding.
    */
-  readonly token: ServiceIdentifier<T>;
+  readonly token: Identifier<T>;
 }
 
 /**
@@ -169,12 +169,12 @@ export interface ServiceRedirectionBindingDescriptor<T = unknown> {
   /**
    * Existing service token to redirect to.
    */
-  readonly service: ServiceIdentifier<T>;
+  readonly service: Identifier<T>;
 
   /**
    * Token used to resolve the redirected binding.
    */
-  readonly token: ServiceIdentifier<T>;
+  readonly token: Identifier<T>;
 }
 
 /**

@@ -17,7 +17,7 @@ describe("useInjection", () => {
     return <div data-testid={"injectable-name"}>{service.constructor.name || String(service.constructor.name)}</div>;
   }
 
-  it("should crash if service is not resolved", () => {
+  it("should crash if value is not resolved", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     const { getByText } = render(
@@ -33,7 +33,7 @@ describe("useInjection", () => {
     expect(getByText(/No bindings found for service:/)).toBeTruthy();
   });
 
-  it("should resolve bound service from container", () => {
+  it("should resolve bound instance from container", () => {
     const container: Container = createContainer({ bindings: [SimpleService] });
 
     const { getByTestId } = render(
@@ -61,7 +61,7 @@ describe("useInjection", () => {
     ).toBeTruthy();
   });
 
-  it("should memoize service instance", () => {
+  it("should memoize instance", () => {
     const container: Container = createContainer({ bindings: [SimpleService] });
 
     const originalGet = container.get.bind(container);

@@ -1,6 +1,4 @@
-import { ServiceIdentifier } from "inversify";
-
-import { Container, Newable } from "../../alias";
+import { Container, Identifier, Newable } from "../../alias";
 import { CommandBus } from "../../commands/command-bus";
 import { WireScope } from "../../container/wire-scope";
 import { ERROR_CODE_REFLECT_METADATA_MISSING } from "../../error/error-code";
@@ -37,7 +35,7 @@ export interface HasWireScopeInjectionOptions {
  * @param options - Reflection behavior options.
  * @returns True when reflected constructor parameters include WireScope.
  */
-export function hasScopeInjection(token: ServiceIdentifier, options: HasWireScopeInjectionOptions = {}): boolean {
+export function hasScopeInjection(token: Identifier, options: HasWireScopeInjectionOptions = {}): boolean {
   if (typeof token !== "function") {
     return false;
   }

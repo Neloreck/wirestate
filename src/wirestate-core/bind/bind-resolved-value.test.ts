@@ -1,4 +1,4 @@
-import { BindingType, Container, BindingScope, type ServiceIdentifier } from "../alias";
+import { BindingType, Container, BindingScope, type Identifier } from "../alias";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { ResolvedValueBindingDescriptor } from "../types/provision";
 
@@ -30,7 +30,7 @@ describe("bindResolvedValue", () => {
       type: BindingType.ResolvedValue,
       factory: (name: string) => `Hello, ${name}`,
       token: GREETING_TOKEN,
-      injectOptions: [NAME_TOKEN as ServiceIdentifier<string>],
+      injectOptions: [NAME_TOKEN as Identifier<string>],
     };
 
     bindConstant(container, { token: NAME_TOKEN, value: "Ada" });

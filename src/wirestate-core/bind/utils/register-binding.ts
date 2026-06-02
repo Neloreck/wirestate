@@ -1,4 +1,4 @@
-import { Container, ServiceIdentifier } from "../../alias";
+import { Container, Identifier } from "../../alias";
 import { CONTAINER_BINDINGS } from "../../registry";
 import { Maybe } from "../../types/general";
 import { Binding, Bindings } from "../../types/provision";
@@ -49,7 +49,7 @@ export function getContainerBindings(container: Container): Bindings {
  * @param container - Container losing the binding.
  * @param token - Binding token removed from the container.
  */
-export function unregisterBinding(container: Container, token: ServiceIdentifier): void {
+export function unregisterBinding(container: Container, token: Identifier): void {
   const bindings: Maybe<Array<Binding>> = CONTAINER_BINDINGS.get(container);
 
   if (!bindings) {

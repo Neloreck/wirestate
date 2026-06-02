@@ -11,8 +11,7 @@ import { ContainerReactContext } from "./container-context";
  *
  * @remarks
  * Use this hook when you need direct access to the {@link Container} for manual
- * resolution or checking bindings. For typical service usage, prefer
- * {@link useInjection}.
+ * resolution or checking bindings. For typical usage, prefer {@link useInjection}.
  *
  * @group Context
  *

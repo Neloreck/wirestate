@@ -1,4 +1,4 @@
-import { Container, ServiceIdentifier } from "../alias";
+import { Container, Identifier } from "../alias";
 import { deprovisionContainerBinding, deprovisionContainerBindings } from "../container/container-provision-lifecycle";
 
 import { unregisterAllBindings, unregisterBinding } from "./utils/register-binding";
@@ -18,7 +18,7 @@ import { unregisterAllBindings, unregisterBinding } from "./utils/register-bindi
  * @param container - Container losing the binding.
  * @param token - Binding token to remove.
  */
-export function unbind<T = unknown>(container: Container, token: ServiceIdentifier<T>): void {
+export function unbind<T = unknown>(container: Container, token: Identifier<T>): void {
   if (container.isCurrentBound(token)) {
     deprovisionContainerBinding(container, token);
   }
