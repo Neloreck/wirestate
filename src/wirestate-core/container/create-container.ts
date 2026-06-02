@@ -96,8 +96,8 @@ export interface CreateContainerOptions {
  * - Singleton default scope for declared classes.
  *
  * Child containers inherit parent bindings and seed defaults, but get their
- * own buses. Passing `seed` or `seeds`, or calling seed helpers on a child,
- * creates child-local seed state.
+ * own buses. Passing `seed` or `seeds` on a child creates child-local seed
+ * state.
  *
  * @group Container
  *
