@@ -10,12 +10,12 @@ import { EventBus } from "../events/event-bus";
 import { OnEvent } from "../events/on-event";
 import { OnQuery } from "../queries/on-query";
 import { QueryBus } from "../queries/query-bus";
-import { OnActivated } from "../service/on-activated";
-import { OnDeactivation } from "../service/on-deactivation";
 import { Optional } from "../types/general";
 import { InstanceBindingDescriptor } from "../types/provision";
 
 import { bindInstance, bindInstanceWithToken } from "./bind-instance";
+import { OnActivated } from "./instance/on-activated";
+import { OnDeactivation } from "./instance/on-deactivation";
 import { unbindAll } from "./unbind";
 
 interface ReflectMetadata {

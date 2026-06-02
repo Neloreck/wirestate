@@ -2,13 +2,13 @@ import { GenericService } from "@/fixtures/services/generic-service";
 
 import { Container, Inject, Injectable } from "../alias";
 import { bind } from "../bind/bind";
+import { OnActivated } from "../bind/instance/on-activated";
+import { OnDeactivation } from "../bind/instance/on-deactivation";
 import { CommandBus } from "../commands/command-bus";
 import { ERROR_CODE_ACCESS_AFTER_DISPOSAL } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
-import { OnActivated } from "../service/on-activated";
-import { OnDeactivation } from "../service/on-deactivation";
 import { Optional } from "../types/general";
 
 import { createContainer } from "./create-container";

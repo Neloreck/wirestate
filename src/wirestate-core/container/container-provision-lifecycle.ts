@@ -3,6 +3,8 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { BindingType, Container, ServiceIdentifier } from "../alias";
 import { hasScopeInjection } from "../bind/instance/instance-scopes";
+import { getDeprovisionHandlerMetadata } from "../bind/instance/on-deprovision";
+import { getProvisionHandlerMetadata } from "../bind/instance/on-provision";
 import { getBindingToken } from "../bind/utils/get-binding-token";
 import { getContainerBindings } from "../bind/utils/register-binding";
 import { reportWirestateInternalError } from "../error/internal-error-handler";
@@ -12,8 +14,6 @@ import {
   PROVISION_TOKENS_BY_INSTANCE,
   SCOPES_BY_INSTANCE,
 } from "../registry";
-import { getDeprovisionHandlerMetadata } from "../service/on-deprovision";
-import { getProvisionHandlerMetadata } from "../service/on-provision";
 import { Maybe, MaybePromise, Optional } from "../types/general";
 import { Binding, Bindings } from "../types/provision";
 

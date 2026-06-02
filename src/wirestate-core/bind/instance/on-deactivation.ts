@@ -1,10 +1,10 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
-import { WirestateError } from "../error/wirestate-error";
-import { DEACTIVATION_HANDLER_METADATA } from "../registry";
-import { Maybe } from "../types/general";
+import { ERROR_CODE_VALIDATION_ERROR } from "../../error/error-code";
+import { WirestateError } from "../../error/wirestate-error";
+import { DEACTIVATION_HANDLER_METADATA } from "../../registry";
+import { Maybe } from "../../types/general";
 
 /**
  * Runs a service method during container deactivation.
@@ -16,7 +16,7 @@ import { Maybe } from "../types/general";
  * started by provider ownership, such as subscriptions, timers, sockets, and
  * observers. A service hierarchy may have one deactivation hook name.
  *
- * @group Service
+ * @group Lifecycle
  *
  * @returns Method decorator.
  *
@@ -64,7 +64,7 @@ export function OnDeactivation(): MethodDecorator {
  * declaring a different decorated method in the same hierarchy is a validation
  * error.
  *
- * @group Service
+ * @group Lifecycle
  * @internal
  *
  * @param instance - The service instance to scan for deactivation handlers.

@@ -1,10 +1,10 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
-import { WirestateError } from "../error/wirestate-error";
-import { PROVISION_HANDLER_METADATA } from "../registry";
-import { Maybe } from "../types/general";
+import { ERROR_CODE_VALIDATION_ERROR } from "../../error/error-code";
+import { WirestateError } from "../../error/wirestate-error";
+import { PROVISION_HANDLER_METADATA } from "../../registry";
+import { Maybe } from "../../types/general";
 
 /**
  * Runs when a framework provider exposes the container.
@@ -17,7 +17,7 @@ import { Maybe } from "../types/general";
  * work, or any resource that should be cleaned up when the provider releases
  * the container. A service hierarchy may have one provision hook name.
  *
- * @group Service
+ * @group Lifecycle
  *
  * @returns Method decorator.
  *
@@ -66,7 +66,7 @@ export function OnProvision(): MethodDecorator {
  * declaring a different decorated method in the same hierarchy is a validation
  * error.
  *
- * @group Service
+ * @group Lifecycle
  * @internal
  *
  * @param instance - The service instance to scan for provision handlers.

@@ -1,6 +1,6 @@
 import { Container, Injectable } from "../alias";
-import { OnDeprovision } from "../service/on-deprovision";
-import { OnProvision } from "../service/on-provision";
+import { OnDeprovision } from "../bind/instance/on-deprovision";
+import { OnProvision } from "../bind/instance/on-provision";
 
 import { ContainerProvisionLifecycle, provisionContainer } from "./container-provision-lifecycle";
 import { createContainer } from "./create-container";

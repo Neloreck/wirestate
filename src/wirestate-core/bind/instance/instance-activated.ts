@@ -6,12 +6,12 @@ import { prefix } from "@/macroses/prefix.macro";
 import { Container, Newable } from "../../alias";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
 import { CONTAINER_REFS_BY_INSTANCE } from "../../registry";
-import { getActivatedHandlerMetadata } from "../../service/on-activated";
 import { Maybe, MaybePromise } from "../../types/general";
 import type { BindInstanceOptions } from "../bind-instance";
 
 import { unregisterInstanceHandlers, registerInstanceHandlers } from "./instance-handlers";
 import { attachScopes, detachScopes } from "./instance-scopes";
+import { getActivatedHandlerMetadata } from "./on-activated";
 
 interface CreateInstanceActivationHandlerOptions<T extends object> {
   readonly binding: Newable<T>;

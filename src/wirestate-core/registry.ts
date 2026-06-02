@@ -36,7 +36,7 @@ export const COMMAND_HANDLER_METADATA: WeakMap<object, Array<CommandHandlerMetad
  * @remarks
  * This map is populated by the {@link OnActivated} decorator.
  *
- * @group Service
+ * @group Bind
  * @internal
  */
 export const ACTIVATED_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakMap();
@@ -47,7 +47,7 @@ export const ACTIVATED_HANDLER_METADATA: WeakMap<object, string | symbol> = new 
  * @remarks
  * This map is populated by the {@link OnDeactivation} decorator.
  *
- * @group Service
+ * @group Bind
  * @internal
  */
 export const DEACTIVATION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakMap();
@@ -58,7 +58,7 @@ export const DEACTIVATION_HANDLER_METADATA: WeakMap<object, string | symbol> = n
  * @remarks
  * This map is populated by the {@link OnProvision} decorator.
  *
- * @group Service
+ * @group Bind
  * @internal
  */
 export const PROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakMap();
@@ -69,7 +69,7 @@ export const PROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new 
  * @remarks
  * This map is populated by the {@link OnDeprovision} decorator.
  *
- * @group Service
+ * @group Bind
  * @internal
  */
 export const DEPROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = new WeakMap();

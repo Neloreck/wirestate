@@ -1,10 +1,10 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
-import { WirestateError } from "../error/wirestate-error";
-import { DEPROVISION_HANDLER_METADATA } from "../registry";
-import { Maybe } from "../types/general";
+import { ERROR_CODE_VALIDATION_ERROR } from "../../error/error-code";
+import { WirestateError } from "../../error/wirestate-error";
+import { DEPROVISION_HANDLER_METADATA } from "../../registry";
+import { Maybe } from "../../types/general";
 
 /**
  * Runs before a framework provider stops exposing the container.
@@ -16,7 +16,7 @@ import { Maybe } from "../types/general";
  * Use it to clean up work started by `@OnProvision`. A service hierarchy may
  * have one deprovision hook name.
  *
- * @group Service
+ * @group Lifecycle
  *
  * @returns Method decorator.
  *
@@ -65,7 +65,7 @@ export function OnDeprovision(): MethodDecorator {
  * declaring a different decorated method in the same hierarchy is a validation
  * error.
  *
- * @group Service
+ * @group Lifecycle
  * @internal
  *
  * @param instance - The service instance to scan for deprovision handlers.
