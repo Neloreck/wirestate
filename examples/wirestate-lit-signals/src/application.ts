@@ -6,7 +6,7 @@ import "@/components/general-controls";
 import "@/components/events-log";
 import "@/components/queries-data";
 
-import { BindingType, ScopeBindingType } from "@wirestate/core";
+import { BindingType, BindingScope } from "@wirestate/core";
 import { ContainerProvider, provideContainer } from "@wirestate/lit";
 import { LitElement, html, CSSResult, TemplateResult, css } from "lit";
 import { customElement } from "lit/decorators.js";
@@ -41,14 +41,14 @@ export class Application extends LitElement {
         CounterService,
         ThemeService,
         {
-          id: GLOBAL_CONFIG,
+          token: GLOBAL_CONFIG,
           value: { first: 1, second: 2, third: null, random: Math.random() },
         },
         {
-          id: GLOBAL_DYNAMIC_CONFIG,
-          value: { random: Math.random(), another: true },
-          bindingType: BindingType.DynamicValue,
-          scopeBindingType: ScopeBindingType.Singleton,
+          token: GLOBAL_DYNAMIC_CONFIG,
+          factory: () => ({ random: Math.random(), another: true }),
+          type: BindingType.DynamicValue,
+          scope: BindingScope.Singleton,
         },
       ],
     },

@@ -33,7 +33,7 @@ export const Application = observer(() => {
       "[Application] Log all events:",
       event.type,
       event.payload,
-      event.from,
+      event.source,
     );
   });
 

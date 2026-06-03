@@ -1,7 +1,7 @@
 import {
   BindingType,
-  type CreateContainerOptions,
-  ScopeBindingType,
+  BindingScope,
+  type ContainerConfig,
 } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
 import { type PropsWithChildren, useMemo } from "react";
@@ -12,7 +12,7 @@ import { LoggerService } from "@/services/LoggerService";
 import { ThemeService } from "@/services/ThemeService";
 
 export function Provider({ children }: PropsWithChildren) {
-  const config: CreateContainerOptions = useMemo(
+  const config: ContainerConfig = useMemo(
     () => ({
       seed: {
         isShared: true,
@@ -28,16 +28,15 @@ export function Provider({ children }: PropsWithChildren) {
         CounterService,
         ThemeService,
         {
-          id: GLOBAL_CONFIG,
+          token: GLOBAL_CONFIG,
           // eslint-disable-next-line react-hooks/purity
           value: { first: 1, second: 2, third: null, random: Math.random() },
         },
         {
-          id: GLOBAL_DYNAMIC_CONFIG,
-          // eslint-disable-next-line react-hooks/purity
-          value: { random: Math.random(), another: true },
-          bindingType: BindingType.DynamicValue,
-          scopeBindingType: ScopeBindingType.Singleton,
+          token: GLOBAL_DYNAMIC_CONFIG,
+          type: BindingType.DynamicValue,
+          scope: BindingScope.Singleton,
+          factory: () => ({ random: Math.random(), another: true }),
         },
       ],
     }),

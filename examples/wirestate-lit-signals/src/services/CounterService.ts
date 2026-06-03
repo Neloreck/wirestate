@@ -5,7 +5,7 @@ import {
   OnDeactivation,
   OnEvent,
   WireScope,
-  Event,
+  WireEvent,
   OnQuery,
   OnProvision,
   OnDeprovision,
@@ -78,7 +78,7 @@ export class CounterService {
   }
 
   @OnEvent(EGlobalEvent.COUNTER_INCREMENT)
-  public onCounterIncrement(event: Event<number>): void {
+  public onCounterIncrement(event: WireEvent<number>): void {
     this.lastIncrementedAt = Date.now();
     this.count.set(this.count.get() + (event.payload ?? 1));
   }

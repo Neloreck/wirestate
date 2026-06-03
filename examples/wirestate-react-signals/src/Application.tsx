@@ -32,7 +32,7 @@ export function Application() {
       "[Application] Log all events:",
       event.type,
       event.payload,
-      event.from,
+      event.source,
     );
   });
 

@@ -10,7 +10,7 @@ import {
   OnQuery,
   Optional,
   WireScope,
-  type Event,
+  type WireEvent,
 } from "@wirestate/core";
 import {
   Action,
@@ -103,12 +103,11 @@ export class LoggerService {
   }
 
   @Action()
-  private saveEventLogEntry(event: Event): void {
+  private saveEventLogEntry(event: WireEvent): void {
     const next: Array<ILogEntry> = [
       {
         id: this.nextId++,
-        type:
-          typeof event.type === "symbol" ? event.type.toString() : event.type,
+        type: String(event.type),
         payload: event.payload,
         at: Date.now(),
       },

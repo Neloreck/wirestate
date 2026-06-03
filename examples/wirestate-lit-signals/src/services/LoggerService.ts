@@ -5,7 +5,7 @@ import {
   OnDeactivation,
   Optional,
   WireScope,
-  Event,
+  WireEvent,
   OnEvent,
   OnCommand,
   OnQuery,
@@ -87,10 +87,10 @@ export class LoggerService {
     this.nextId = 1;
   }
 
-  private saveEventLogEntry(event: Event): void {
+  private saveEventLogEntry(event: WireEvent): void {
     const entry: ILogEntry = {
       id: this.nextId++,
-      type: typeof event.type === "symbol" ? event.type.toString() : event.type,
+      type: String(event.type),
       payload: event.payload,
       at: Date.now(),
     };

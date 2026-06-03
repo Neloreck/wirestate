@@ -50,7 +50,7 @@ export class EventsLog extends SignalWatcher(LitElement) {
     `,
   ];
 
-  @injection({ injectionId: LoggerService })
+  @injection({ token: LoggerService })
   private readonly loggerService!: LoggerService;
 
   public render() {

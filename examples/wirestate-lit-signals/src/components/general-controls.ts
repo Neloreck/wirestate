@@ -1,5 +1,5 @@
 import { watch } from "@lit-labs/signals";
-import { WireScope, Event } from "@wirestate/core";
+import { WireScope, WireEvent } from "@wirestate/core";
 import { injection, onEvent } from "@wirestate/lit";
 import { Computed, computed } from "@wirestate/lit-signals";
 import { css, CSSResult, html, LitElement } from "lit";
@@ -85,8 +85,8 @@ export class GeneralControls extends LitElement {
   private isOddLabel: Computed<string> = computed(() => (this.counterService.count.get() % 2 === 0 ? "even" : "odd"));
 
   @onEvent()
-  public onAnyEvent(event: Event): void {
-    console.info("[general-controls] Log all events:", event.type, event.payload, event.from);
+  public onAnyEvent(event: WireEvent): void {
+    console.info("[general-controls] Log all events:", event.type, event.payload, event.source);
   }
 
   @onEvent(EGlobalEvent.COUNTER_RESET)
