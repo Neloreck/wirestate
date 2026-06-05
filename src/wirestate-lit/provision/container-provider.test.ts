@@ -322,6 +322,28 @@ describe("ContainerProvider", () => {
     element.remove();
   });
 
+  it("should activate provider lifecycle services when managed activation is false", () => {
+    const element: TestProviderElement = new TestProviderElement();
+    const { LifecycleService, events } = createLifecycleService();
+
+    new ContainerProvider(element, {
+      config: {
+        activate: false,
+        bindings: [LifecycleService],
+      },
+    });
+
+    expect(events).toEqual([]);
+
+    document.body.appendChild(element);
+
+    expect(events).toEqual(["activated", "provision"]);
+
+    element.remove();
+
+    expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
+  });
+
   it("should reject direct container replacement for managed providers", () => {
     const element: TestProviderElement = new TestProviderElement();
     const controller: ContainerProvider = new ContainerProvider(element, { config: { bindings: [GenericService] } });

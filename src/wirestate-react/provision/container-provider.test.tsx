@@ -381,6 +381,29 @@ describe("ContainerProvider lifecycle", () => {
     expect(events).toEqual(["activated", "provision"]);
   });
 
+  it("should activate provider lifecycle services when managed activation is false", async () => {
+    const { LifecycleService, events } = createLifecycleService();
+
+    const { unmount } = render(
+      <ContainerProvider
+        config={{
+          activate: false,
+          bindings: [LifecycleService],
+        }}
+      />
+    );
+
+    expect(events).toEqual(["activated", "provision"]);
+
+    unmount();
+
+    expect(events).toEqual(["activated", "provision", "deprovision"]);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
+  });
+
   it("should provision managed services in binding order and deprovision them in reverse order", () => {
     const events: Array<string> = [];
     const { LifecycleService: FirstService } = createLifecycleService({
