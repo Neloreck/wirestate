@@ -2,9 +2,9 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { Container, Newable } from "../../alias";
-import { reportWirestateInternalError } from "../../error/internal-error-handler";
+import { callLifecycleHandler } from "../../lifecycle/call-lifecycle-handler";
 import { CONTAINER_REFS_BY_INSTANCE } from "../../registry";
-import { Maybe, MaybePromise } from "../../types/general";
+import { Maybe } from "../../types/general";
 import { BindOptions } from "../bind";
 
 import { unregisterInstanceHandlers } from "./instance-handlers";
@@ -65,39 +65,13 @@ function onInstanceDeactivation<T extends object>(container: Container, binding:
     return;
   }
 
-  try {
-    const method: unknown = (instance as unknown as Record<string | symbol, unknown>)[methodName];
-
-    if (typeof method === "function") {
-      const result: MaybePromise<void> = (method as () => MaybePromise<void>).call(instance);
-
-      if (result && typeof (result as Promise<void>).then === "function") {
-        (result as Promise<void>).catch((error) => {
-          reportWirestateInternalError({
-            container,
-            details: [binding.name, String(methodName)],
-            error,
-            message: "@OnDeactivation rejected",
-            methodName,
-            instance: instance,
-            instanceName: binding.name,
-            source: "instance-deactivation",
-          });
-        });
-      }
-    }
-  } catch (error) {
-    reportWirestateInternalError({
-      container,
-      details: [binding.name, String(methodName)],
-      error,
-      message: "@OnDeactivation failed",
-      methodName,
-      instance: instance,
-      instanceName: binding.name,
-      source: "instance-deactivation",
-    });
-
-    // No rethrow on deactivation.
-  }
+  callLifecycleHandler({
+    container,
+    name: "@OnDeactivation",
+    details: [binding.name, String(methodName)],
+    instance,
+    instanceName: binding.name,
+    methodName,
+    source: "instance-deactivation",
+  });
 }

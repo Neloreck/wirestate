@@ -222,6 +222,26 @@ describe("bindInstance", () => {
     consoleSpy.mockRestore();
   });
 
+  it("should report sync @OnActivated errors to container error handler before rethrowing", () => {
+    const onError = jest.fn();
+    const container: Container = createContainer({
+      onError,
+    });
+
+    bindInstance(container, SyncFailActivationService);
+
+    expect(() => container.get(SyncFailActivationService)).toThrow("sync-activation-fail");
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        container,
+        details: ["SyncFailActivationService", "onActivated"],
+        message: "@OnActivated failed",
+        instanceName: "SyncFailActivationService",
+        source: "instance-activation",
+      })
+    );
+  });
+
   it("should clean up handlers and scope when @OnActivated throws synchronously", () => {
     const ACTIVATION_FAILURE_EVENT: string = "ACTIVATION_FAILURE_EVENT";
     const ACTIVATION_FAILURE_COMMAND: string = "ACTIVATION_FAILURE_COMMAND";
@@ -261,11 +281,13 @@ describe("bindInstance", () => {
       }
     }
 
-    const container: Container = createContainer();
+    const onError = jest.fn();
+    const container: Container = createContainer({ onError });
 
     bindInstance(container, SyncFailActivationWithHandlersService);
 
     expect(() => container.get(SyncFailActivationWithHandlersService)).toThrow("sync-activation-handlers-fail");
+    expect(onError).toHaveBeenCalledTimes(1);
     expect(container.get(CommandBus).hasHandler(ACTIVATION_FAILURE_COMMAND)).toBe(false);
     expect(container.get(QueryBus).hasHandler(ACTIVATION_FAILURE_QUERY)).toBe(false);
     expect(container.get(EventBus).hasSubscribers()).toBe(false);

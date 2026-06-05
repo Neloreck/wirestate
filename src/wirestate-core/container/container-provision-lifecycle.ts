@@ -7,14 +7,14 @@ import { getDeprovisionHandlerMetadata } from "../bind/instance/on-deprovision";
 import { getProvisionHandlerMetadata } from "../bind/instance/on-provision";
 import { getBindingToken } from "../bind/utils/get-binding-token";
 import { getContainerBindings } from "../bind/utils/register-binding";
-import { reportWirestateInternalError } from "../error/internal-error-handler";
+import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
 import {
   CONTAINER_REFS_BY_INSTANCE,
   PROVISION_LIFECYCLES_BY_CONTAINER,
   PROVISION_TOKENS_BY_INSTANCE,
   SCOPES_BY_INSTANCE,
 } from "../registry";
-import { Maybe, MaybePromise, Optional } from "../types/general";
+import { Maybe, Optional } from "../types/general";
 import { Binding, Bindings } from "../types/provision";
 
 /**
@@ -243,7 +243,17 @@ export function provisionInstances(container: Container, bindings: Bindings = []
 
     try {
       if (methodName) {
-        callLifecycleHandler(instance, methodName, "@OnProvision", { rethrowSync: true });
+        callLifecycleHandler({
+          container: CONTAINER_REFS_BY_INSTANCE.get(instance),
+          name: "@OnProvision",
+          details: [instance.constructor.name, String(methodName)],
+          instance,
+          instanceName: instance.constructor.name,
+          methodName,
+          rethrowSync: true,
+          source: "provider-provision",
+          syncFailureMessage: "@OnProvision failed for",
+        });
       }
     } catch (error) {
       const reachedInstances: Array<object> = instances.slice(0, index + 1);
@@ -276,7 +286,16 @@ export function deprovisionInstances(instances: ReadonlyArray<object>): void {
     const methodName: Maybe<string | symbol> = getDeprovisionHandlerMetadata(instances[index]);
 
     if (methodName) {
-      callLifecycleHandler(instances[index], methodName, "@OnDeprovision");
+      callLifecycleHandler({
+        container: CONTAINER_REFS_BY_INSTANCE.get(instances[index]),
+        name: "@OnDeprovision",
+        details: [instances[index].constructor.name, String(methodName)],
+        instance: instances[index],
+        instanceName: instances[index].constructor.name,
+        methodName,
+        source: "provider-deprovision",
+        syncFailureMessage: "@OnDeprovision failed for",
+      });
     }
 
     markInstanceDeprovisionStatus(instances[index], true);
@@ -436,70 +455,4 @@ function isProviderLifecycleParticipant(token: Identifier): boolean {
     ? Boolean(getProvisionHandlerMetadata(prototype) || getDeprovisionHandlerMetadata(prototype)) ||
         hasScopeInjection(token)
     : false;
-}
-
-/**
- * Calls a provider lifecycle handler and reports synchronous or asynchronous failures.
- *
- * @internal
- *
- * @param instance - The instance that owns the handler.
- * @param methodName - Handler method name.
- * @param decoratorName - Decorator name used in diagnostics.
- * @param options - Handler call behavior.
- * @param options.rethrowSync - Whether synchronous failures should be rethrown after reporting.
- */
-function callLifecycleHandler(
-  instance: object,
-  methodName: string | symbol,
-  decoratorName: string,
-  options: { readonly rethrowSync?: boolean } = {}
-): void {
-  const method: unknown = (instance as Record<string | symbol, unknown>)[methodName];
-  const source = decoratorName === "@OnProvision" ? "provider-provision" : "provider-deprovision";
-
-  if (typeof method !== "function") {
-    return;
-  }
-
-  dbg.info(prefix(__filename), "Calling provider lifecycle handler:", {
-    name: instance.constructor.name,
-    instance,
-    methodName,
-    decoratorName,
-  });
-
-  try {
-    const result: MaybePromise<void> = (method as () => MaybePromise<void>).call(instance);
-
-    if (result && typeof (result as Promise<void>).then === "function") {
-      (result as Promise<void>).catch((error) => {
-        reportWirestateInternalError({
-          container: CONTAINER_REFS_BY_INSTANCE.get(instance),
-          details: [instance.constructor.name, String(methodName)],
-          error,
-          message: decoratorName + " rejected",
-          methodName,
-          instance: instance,
-          instanceName: instance.constructor.name,
-          source,
-        });
-      });
-    }
-  } catch (error) {
-    reportWirestateInternalError({
-      container: CONTAINER_REFS_BY_INSTANCE.get(instance),
-      details: [instance.constructor.name, String(methodName)],
-      error,
-      message: decoratorName + " failed for",
-      methodName,
-      instance: instance,
-      instanceName: instance.constructor.name,
-      source,
-    });
-
-    if (options.rethrowSync) {
-      throw error;
-    }
-  }
 }
