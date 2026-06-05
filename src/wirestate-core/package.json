@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/core",
-  "version": "1.0.0-experimental.1",
+  "version": "1.0.0-experimental.2",
   "description": "State management core with InversifyJS dependency injection",
   "sideEffects": false,
   "author": "Syrotenko Igor",

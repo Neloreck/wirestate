@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/lit-signals",
-  "version": "1.0.0-experimental.1",
+  "version": "1.0.0-experimental.2",
   "description": "Lit Signals re-exports for Wirestate Lit services",
   "sideEffects": false,
   "author": "Syrotenko Igor",

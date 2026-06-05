@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/react-mobx",
-  "version": "1.0.0-experimental.1",
+  "version": "1.0.0-experimental.2",
   "description": "MobX and mobx-react-lite re-exports for Wirestate React services",
   "sideEffects": false,
   "author": "Syrotenko Igor",

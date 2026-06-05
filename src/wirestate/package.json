@@ -1,6 +1,6 @@
 {
   "name": "wirestate",
-  "version": "1.0.0-experimental.1",
+  "version": "1.0.0-experimental.2",
   "description": "Compatibility package for Wirestate core, React, MobX, and Signals APIs",
   "sideEffects": false,
   "author": "Syrotenko Igor",
@@ -69,10 +69,10 @@
     "typescript"
   ],
   "dependencies": {
-    "@wirestate/core": "1.0.0-experimental.1",
-    "@wirestate/react": "1.0.0-experimental.1",
-    "@wirestate/react-mobx": "1.0.0-experimental.1",
-    "@wirestate/react-signals": "1.0.0-experimental.1",
+    "@wirestate/core": "1.0.0-experimental.2",
+    "@wirestate/react": "1.0.0-experimental.2",
+    "@wirestate/react-mobx": "1.0.0-experimental.2",
+    "@wirestate/react-signals": "1.0.0-experimental.2",
     "inversify": "^8.1.0"
   },
   "peerDependencies": {
