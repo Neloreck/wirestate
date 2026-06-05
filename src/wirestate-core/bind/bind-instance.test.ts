@@ -202,6 +202,11 @@ describe("bindInstance", () => {
 
     expect(consoleSpy).toHaveBeenCalledWith(
       "[wirestate] @OnActivated rejected:",
+      {
+        source: "instance-activation",
+        instanceName: "AsyncFailService",
+        methodName: "onActivated",
+      },
       "AsyncFailService",
       "onActivated",
       expect.any(Error)
@@ -337,6 +342,11 @@ describe("bindInstance", () => {
     expect(container.get(QueryBus).hasHandler("SYNC_FAIL_DEACTIVATION_QUERY")).toBe(false);
     expect(consoleSpy).toHaveBeenCalledWith(
       "[wirestate] @OnDeactivation failed:",
+      {
+        source: "instance-deactivation",
+        instanceName: "SyncFailDeactivationService",
+        methodName: "onDeactivation",
+      },
       "SyncFailDeactivationService",
       "onDeactivation",
       expect.any(Error)

@@ -127,7 +127,16 @@ describe("buildEventDispatcher", () => {
     const dispatch: Optional<EventDispatch> = dispatches[0] ?? null;
 
     expect(() => dispatch?.handler({ type: "TEST" })).not.toThrow();
-    expect(errorSpy).toHaveBeenCalledWith("[wirestate] Event handler threw:", error);
+    expect(errorSpy).toHaveBeenCalledWith(
+      "[wirestate] Event handler threw:",
+      {
+        source: "instance-event-handler",
+        instanceName: "TestService",
+        methodName: "onEvent",
+        event: { type: "TEST" },
+      },
+      error
+    );
 
     errorSpy.mockRestore();
   });

@@ -15,6 +15,7 @@ import { getEventHandlerMetadata } from "./get-event-handler-metadata";
  */
 interface DispatcherPlan {
   readonly invoke: EventHandler;
+  readonly methodName: string | symbol;
   readonly types: Set<EventType>;
   catchAll: boolean;
 }
@@ -70,7 +71,12 @@ export function buildEventDispatchers<T extends object>(
     let plan: Maybe<DispatcherPlan> = plans.get(meta.methodName);
 
     if (!plan) {
-      plan = { invoke: (method as EventHandler).bind(instance), types: new Set(), catchAll: false };
+      plan = {
+        invoke: (method as EventHandler).bind(instance),
+        methodName: meta.methodName,
+        types: new Set(),
+        catchAll: false,
+      };
       plans.set(meta.methodName, plan);
     }
 
@@ -98,6 +104,7 @@ export function buildEventDispatchers<T extends object>(
             error,
             event,
             message: "Event handler threw",
+            methodName: plan.methodName,
             instance: instance,
             instanceName: instance.constructor.name,
             source: "instance-event-handler",

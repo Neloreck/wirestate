@@ -105,7 +105,11 @@ describe("EventBus", () => {
     expect(errorHandler).toHaveBeenCalled();
     expect(secondHandler).toHaveBeenCalled();
 
-    expect(errorSpy).toHaveBeenCalledWith("[wirestate] Event handler threw:", expect.any(Error));
+    expect(errorSpy).toHaveBeenCalledWith(
+      "[wirestate] Event handler threw:",
+      { source: "event-handler", event: { type: "TEST" } },
+      expect.any(Error)
+    );
 
     errorSpy.mockRestore();
   });
@@ -329,7 +333,11 @@ describe("EventBus", () => {
 
       expect(failing).toHaveBeenCalledTimes(1);
       expect(survivor).toHaveBeenCalledTimes(1);
-      expect(errorSpy).toHaveBeenCalledWith("[wirestate] Event handler threw:", expect.any(Error));
+      expect(errorSpy).toHaveBeenCalledWith(
+        "[wirestate] Event handler threw:",
+        { source: "event-handler", event: { type: "THROW" } },
+        expect.any(Error)
+      );
 
       errorSpy.mockRestore();
     });

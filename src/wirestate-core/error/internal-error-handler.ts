@@ -11,7 +11,17 @@ import { Maybe } from "../types/general";
  * @param descriptor - Internal error descriptor.
  */
 export function defaultInternalErrorHandler(descriptor: InternalErrorDescriptor): void {
-  console.error(`[wirestate] ${descriptor.message}:`, ...(descriptor.details ?? []), descriptor.error);
+  console.error(
+    `[wirestate] ${descriptor.message}:`,
+    {
+      source: descriptor.source,
+      ...(descriptor.instanceName ? { instanceName: descriptor.instanceName } : {}),
+      ...(descriptor.methodName !== undefined ? { methodName: descriptor.methodName } : {}),
+      ...(descriptor.event ? { event: descriptor.event } : {}),
+    },
+    ...(descriptor.details ?? []),
+    descriptor.error
+  );
 }
 
 /**
