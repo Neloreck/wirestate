@@ -3,6 +3,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_VALIDATION_ERROR } from "../../error/error-code";
 import { WirestateError } from "../../error/wirestate-error";
+import { getPrototypeChainMetadata } from "../../metadata/prototype-chain";
 import { ACTIVATED_HANDLER_METADATA } from "../../registry";
 import { Maybe } from "../../types/general";
 
@@ -80,37 +81,18 @@ export function OnActivated(): MethodDecorator {
 export function getActivatedHandlerMetadata(instance: object): Maybe<string | symbol> {
   dbg.info(prefix(__filename), "Resolving OnActivated metadata:", { name: instance.constructor.name, instance });
 
-  let constructor: unknown = instance.constructor;
-
   let handler: Maybe<string | symbol> = null;
-  let ownerName: Maybe<string> = null;
 
-  // Traverse prototype chain up to Object/Function.
-  while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
-    const own: Maybe<string | symbol> = ACTIVATED_HANDLER_METADATA.get(constructor as object) ?? null;
-
-    if (own) {
-      if (handler && handler !== own) {
-        throw new WirestateError(
-          `Only one @OnActivated method can be declared across class hierarchy for '${instance.constructor.name}'. ` +
-            `Found '${String(handler)}' on '${ownerName ?? "unknown"}' and '${String(own)}' on '${constructor.name}'.`,
-          ERROR_CODE_VALIDATION_ERROR
-        );
-      }
-
-      handler = own;
-      ownerName = constructor.name;
+  for (const metadata of getPrototypeChainMetadata(instance, ACTIVATED_HANDLER_METADATA)) {
+    if (handler && handler !== metadata) {
+      throw new WirestateError(
+        `Only one @OnActivated method can be declared across class hierarchy for '${instance.constructor.name}'.`,
+        ERROR_CODE_VALIDATION_ERROR
+      );
     }
 
-    constructor = Object.getPrototypeOf(constructor);
+    handler = metadata;
   }
-
-  dbg.info(prefix(__filename), "Resolved OnActivated metadata:", {
-    name: instance.constructor.name,
-    handler,
-    ownerName,
-    instance,
-  });
 
   return handler;
 }

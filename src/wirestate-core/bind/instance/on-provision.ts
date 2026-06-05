@@ -3,6 +3,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_VALIDATION_ERROR } from "../../error/error-code";
 import { WirestateError } from "../../error/wirestate-error";
+import { getPrototypeChainMetadata } from "../../metadata/prototype-chain";
 import { PROVISION_HANDLER_METADATA } from "../../registry";
 import { Maybe } from "../../types/general";
 
@@ -75,35 +76,18 @@ export function OnProvision(): MethodDecorator {
 export function getProvisionHandlerMetadata(instance: object): Maybe<string | symbol> {
   dbg.info(prefix(__filename), "Resolving OnProvision metadata:", { name: instance.constructor.name, instance });
 
-  let constructor: unknown = instance.constructor;
   let handler: Maybe<string | symbol> = null;
-  let ownerName: Maybe<string> = null;
 
-  while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
-    const own: Maybe<string | symbol> = PROVISION_HANDLER_METADATA.get(constructor as object) ?? null;
-
-    if (own) {
-      if (handler && handler !== own) {
-        throw new WirestateError(
-          `Only one @OnProvision method can be declared across provider hierarchy '${instance.constructor.name}'. ` +
-            `Found '${String(handler)}' on '${ownerName ?? "unknown"}' and '${String(own)}' on '${constructor.name}'.`,
-          ERROR_CODE_VALIDATION_ERROR
-        );
-      }
-
-      handler = own;
-      ownerName = constructor.name;
+  for (const metadata of getPrototypeChainMetadata(instance, PROVISION_HANDLER_METADATA)) {
+    if (handler && handler !== metadata) {
+      throw new WirestateError(
+        `Only one @OnProvision method can be declared across provider hierarchy '${instance.constructor.name}'.`,
+        ERROR_CODE_VALIDATION_ERROR
+      );
     }
 
-    constructor = Object.getPrototypeOf(constructor);
+    handler = metadata;
   }
-
-  dbg.info(prefix(__filename), "Resolved OnProvision metadata:", {
-    name: instance.constructor.name,
-    handler,
-    ownerName,
-    instance,
-  });
 
   return handler;
 }
