@@ -1,4 +1,10 @@
-import { DynamicValueBuilder, MapToResolvedValueInjectOptions, ResolutionContext } from "inversify";
+import type {
+  DynamicValueBuilder,
+  MapToResolvedValueInjectOptions,
+  ResolutionContext,
+  bindingScopeValues,
+  bindingTypeValues,
+} from "inversify";
 
 import { Newable, Identifier } from "../alias";
 
@@ -7,20 +13,14 @@ import { Newable, Identifier } from "../alias";
  *
  * @group Bind
  */
-export type BindingType =
-  | "ConstantValue"
-  | "DynamicValue"
-  | "Factory"
-  | "Instance"
-  | "ResolvedValue"
-  | "ServiceRedirection";
+export type BindingType = keyof typeof bindingTypeValues;
 
 /**
  * Inversify lifetime scope name.
  *
  * @group Bind
  */
-export type BindingScope = "Request" | "Singleton" | "Transient";
+export type BindingScope = keyof typeof bindingScopeValues;
 
 /**
  * Describes a constant value binding.

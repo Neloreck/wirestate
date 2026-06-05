@@ -5,7 +5,7 @@ import { Container, Newable } from "../../alias";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
 import { CONTAINER_REFS_BY_INSTANCE } from "../../registry";
 import { Maybe, MaybePromise } from "../../types/general";
-import type { BindInstanceOptions } from "../bind-instance";
+import { BindOptions } from "../bind";
 
 import { unregisterInstanceHandlers } from "./instance-handlers";
 import { detachScopes } from "./instance-scopes";
@@ -14,7 +14,7 @@ import { getDeactivationHandlerMetadata } from "./on-deactivation";
 interface CreateInstanceDeactivationHandlerOptions<T extends object> {
   readonly binding: Newable<T>;
   readonly container: Container;
-  readonly options?: BindInstanceOptions;
+  readonly options?: BindOptions;
 }
 
 /**

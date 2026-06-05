@@ -14,7 +14,7 @@ import {
 import { bindConstant } from "./bind-constant";
 import { bindDynamicValue } from "./bind-dynamic-value";
 import { bindFactory } from "./bind-factory";
-import { bindInstance, bindInstanceWithToken, type BindInstanceOptions } from "./bind-instance";
+import { bindInstance, bindInstanceWithToken } from "./bind-instance";
 import { bindResolvedValue } from "./bind-resolved-value";
 import { bindServiceRedirection } from "./bind-service-redirection";
 
@@ -23,7 +23,7 @@ import { bindServiceRedirection } from "./bind-service-redirection";
  *
  * @group Bind
  */
-export interface BindOptions extends BindInstanceOptions {
+export interface BindOptions {
   /**
    * Skip `@OnActivated` and `@OnDeactivation` hooks for class bindings.
    *

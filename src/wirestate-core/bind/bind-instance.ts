@@ -8,6 +8,7 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { InstanceBindingDescriptor } from "../types/provision";
 
+import { BindOptions } from "./bind";
 import { createInstanceActivatedHandler } from "./instance/instance-activated";
 import { createInstanceDeactivationHandler } from "./instance/instance-deactivation";
 import { registerBinding } from "./utils/register-binding";
@@ -30,22 +31,6 @@ function validateInstanceDescriptor(descriptor: InstanceBindingDescriptor): void
   if (descriptor.type === BindingType.Instance && typeof descriptor.value !== "function") {
     throw new WirestateError("Instance descriptor 'value' must be a constructor.", ERROR_CODE_INVALID_ARGUMENTS);
   }
-}
-
-/**
- * Describes options for {@link bindInstance}.
- *
- * @group Bind
- */
-export interface BindInstanceOptions {
-  /**
-   * Skip `@OnActivated` and `@OnDeactivation`.
-   *
-   * Command, query, and event handlers are still wired.
-   *
-   * @default false
-   */
-  readonly skipActivationHooks?: boolean;
 }
 
 /**
@@ -98,7 +83,7 @@ export interface BindInstanceOptions {
 export function bindInstance<T extends object>(
   container: Container,
   binding: Newable<T>,
-  options?: BindInstanceOptions
+  options?: BindOptions
 ): Container {
   return bindInstanceWithToken(container, binding, binding, binding, options);
 }
@@ -123,7 +108,7 @@ export function bindInstanceWithToken<T extends object>(
   token: Identifier<T>,
   binding: Newable<T>,
   registeredBinding: Newable<T> | InstanceBindingDescriptor<T>,
-  options?: BindInstanceOptions
+  options?: BindOptions
 ): Container {
   if (typeof registeredBinding !== "function") {
     validateInstanceDescriptor(registeredBinding);
