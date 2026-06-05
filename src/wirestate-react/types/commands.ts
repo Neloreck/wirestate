@@ -13,7 +13,7 @@ import { Optional } from "./general";
  * @group Commands
  *
  * @template R - The expected result type of the command.
- * @template D - The type of the command payload.
+ * @template P - The type of the command payload.
  * @template T - The command identifier type.
  *
  * @param type - The command identifier.
@@ -21,9 +21,9 @@ import { Optional } from "./general";
  *
  * @returns The command result.
  */
-export type CommandExecutor = <R = unknown, D = unknown, T extends CommandType = CommandType>(
+export type CommandExecutor = <R = unknown, P = unknown, T extends CommandType = CommandType>(
   type: T,
-  payload?: D
+  payload?: P
 ) => R;
 
 /**
@@ -36,7 +36,7 @@ export type CommandExecutor = <R = unknown, D = unknown, T extends CommandType =
  * @group Commands
  *
  * @template R - The expected result type of the command.
- * @template D - The type of the command payload.
+ * @template P - The type of the command payload.
  * @template T - The command identifier type.
  *
  * @param type - The command identifier.
@@ -44,9 +44,9 @@ export type CommandExecutor = <R = unknown, D = unknown, T extends CommandType =
  *
  * @returns A Promise resolving to the command result.
  */
-export type AsyncCommandExecutor = <R = unknown, D = unknown, T extends CommandType = CommandType>(
+export type AsyncCommandExecutor = <R = unknown, P = unknown, T extends CommandType = CommandType>(
   type: T,
-  payload?: D
+  payload?: P
 ) => Promise<R>;
 
 /**
@@ -59,7 +59,7 @@ export type AsyncCommandExecutor = <R = unknown, D = unknown, T extends CommandT
  * @group Commands
  *
  * @template R - The expected result type of the command.
- * @template D - The type of the command payload.
+ * @template P - The type of the command payload.
  * @template T - The command identifier type.
  *
  * @param type - The command identifier.
@@ -67,9 +67,9 @@ export type AsyncCommandExecutor = <R = unknown, D = unknown, T extends CommandT
  *
  * @returns The command result if a handler was found, or `null` otherwise.
  */
-export type OptionalCommandExecutor = <R = unknown, D = unknown, T extends CommandType = CommandType>(
+export type OptionalCommandExecutor = <R = unknown, P = unknown, T extends CommandType = CommandType>(
   type: T,
-  payload?: D
+  payload?: P
 ) => Optional<R>;
 
 /**
@@ -82,7 +82,7 @@ export type OptionalCommandExecutor = <R = unknown, D = unknown, T extends Comma
  * @group Commands
  *
  * @template R - The expected result type of the command.
- * @template D - The type of the command payload.
+ * @template P - The type of the command payload.
  * @template T - The command identifier type.
  *
  * @param type - The command identifier.
@@ -90,7 +90,7 @@ export type OptionalCommandExecutor = <R = unknown, D = unknown, T extends Comma
  *
  * @returns A Promise resolving to the command result, or `null` if no handler was found.
  */
-export type OptionalAsyncCommandExecutor = <R = unknown, D = unknown, T extends CommandType = CommandType>(
+export type OptionalAsyncCommandExecutor = <R = unknown, P = unknown, T extends CommandType = CommandType>(
   type: T,
-  payload?: D
+  payload?: P
 ) => Promise<Optional<R>>;

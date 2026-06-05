@@ -13,10 +13,11 @@ import { OnCommandController } from "./on-command-controller";
  *
  * @group Commands
  */
-export interface OnCommandDecorator<D = unknown, R = unknown> {
+export interface OnCommandDecorator<R = unknown, P = unknown, T extends CommandType = CommandType> {
+  readonly type?: T;
   // Standard (TC39):
   <This extends Interface<Omit<ReactiveElement, "renderRoot">>>(
-    value: (this: This, payload: D) => MaybePromise<R>,
+    value: (this: This, payload: P) => MaybePromise<R>,
     context: ClassMethodDecoratorContext<This>
   ): void;
   // Legacy/experimental:
@@ -44,26 +45,28 @@ export interface OnCommandDecorator<D = unknown, R = unknown> {
  * }
  * ```
  */
-export function onCommand<D = unknown, R = unknown>(type: CommandType): OnCommandDecorator<D, R> {
+export function onCommand<R = unknown, P = unknown, T extends CommandType = CommandType>(
+  type: T
+): OnCommandDecorator<R, P, T> {
   return ((protoOrTarget: object, nameOrContext: PropertyKey | ClassMethodDecoratorContext) => {
     if (typeof nameOrContext === "object") {
       // Standard decorators:
       nameOrContext.addInitializer(function () {
-        new OnCommandController<D, R>(
+        new OnCommandController<R, P, T>(
           this as ReactiveElement,
           type,
-          (payload: D) => (this as AnyObject)[nameOrContext.name](payload) as MaybePromise<R>
+          (payload: P) => (this as AnyObject)[nameOrContext.name](payload) as MaybePromise<R>
         );
       });
     } else {
       // Experimental legacy decorators:
       (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement) => {
-        new OnCommandController<D, R>(
+        new OnCommandController<R, P, T>(
           element,
           type,
-          (payload: D) => (element as AnyObject)[nameOrContext](payload) as MaybePromise<R>
+          (payload: P) => (element as AnyObject)[nameOrContext](payload) as MaybePromise<R>
         );
       });
     }
-  }) as OnCommandDecorator<D, R>;
+  }) as OnCommandDecorator<R, P, T>;
 }

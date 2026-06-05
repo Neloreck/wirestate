@@ -25,15 +25,22 @@ export type QueryType = string | symbol | number;
  *
  * @group Queries
  *
- * @template D - Type of the query payload.
  * @template R - Type of the returned result.
+ * @template P - Type of the query payload.
+ * @template T - Type of the query identifier.
  *
  * @example
  * ```typescript
- * const handler: QueryHandler<string, User> = (userId) => userRepository.find(userId);
+ * const handler: QueryHandler<User, string> = (userId) => userRepository.find(userId);
  * ```
  */
-export type QueryHandler<D = unknown, R = unknown> = (payload: D) => MaybePromise<R>;
+export type QueryHandler<
+  R = unknown,
+  P = unknown,
+  T extends QueryType = QueryType
+> = ((payload: P) => MaybePromise<R>) & {
+  readonly type?: T;
+};
 
 /**
  * Represents the function returned by query registration.

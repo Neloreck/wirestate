@@ -11,7 +11,7 @@ import { Optional } from "./general";
  * @group Queries
  *
  * @template R - The result type of the query.
- * @template D - The type of the query payload.
+ * @template P - The type of the query payload.
  * @template T - The query identifier type.
  *
  * @param type - The query identifier.
@@ -19,7 +19,7 @@ import { Optional } from "./general";
  *
  * @returns The query handler result as-is.
  */
-export type QueryExecutor = <R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, payload?: D) => R;
+export type QueryExecutor = <R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P) => R;
 
 /**
  * Represents the function returned by {@link useAsyncQueryExecutor}.
@@ -30,7 +30,7 @@ export type QueryExecutor = <R = unknown, D = unknown, T extends QueryType = Que
  * @group Queries
  *
  * @template R - The result type of the query.
- * @template D - The type of the query payload.
+ * @template P - The type of the query payload.
  * @template T - The query identifier type.
  *
  * @param type - The query identifier.
@@ -38,9 +38,9 @@ export type QueryExecutor = <R = unknown, D = unknown, T extends QueryType = Que
  *
  * @returns A Promise resolving to the query result.
  */
-export type AsyncQueryExecutor = <R = unknown, D = unknown, T extends QueryType = QueryType>(
+export type AsyncQueryExecutor = <R = unknown, P = unknown, T extends QueryType = QueryType>(
   type: T,
-  payload?: D
+  payload?: P
 ) => Promise<R>;
 
 /**
@@ -53,7 +53,7 @@ export type AsyncQueryExecutor = <R = unknown, D = unknown, T extends QueryType 
  * @group Queries
  *
  * @template R - The result type of the query.
- * @template D - The type of the query payload.
+ * @template P - The type of the query payload.
  * @template T - The query identifier type.
  *
  * @param type - The query identifier.
@@ -61,9 +61,9 @@ export type AsyncQueryExecutor = <R = unknown, D = unknown, T extends QueryType 
  *
  * @returns The query handler result as-is, or `null` if no handler was found.
  */
-export type OptionalQueryExecutor = <R = unknown, D = unknown, T extends QueryType = QueryType>(
+export type OptionalQueryExecutor = <R = unknown, P = unknown, T extends QueryType = QueryType>(
   type: T,
-  payload?: D
+  payload?: P
 ) => Optional<R>;
 
 /**
@@ -76,7 +76,7 @@ export type OptionalQueryExecutor = <R = unknown, D = unknown, T extends QueryTy
  * @group Queries
  *
  * @template R - The result type of the query.
- * @template D - The type of the query payload.
+ * @template P - The type of the query payload.
  * @template T - The query identifier type.
  *
  * @param type - The query identifier.
@@ -84,7 +84,7 @@ export type OptionalQueryExecutor = <R = unknown, D = unknown, T extends QueryTy
  *
  * @returns A Promise resolving to the query result, or `null` if no handler was found.
  */
-export type OptionalAsyncQueryExecutor = <R = unknown, D = unknown, T extends QueryType = QueryType>(
+export type OptionalAsyncQueryExecutor = <R = unknown, P = unknown, T extends QueryType = QueryType>(
   type: T,
-  payload?: D
+  payload?: P
 ) => Promise<Optional<R>>;

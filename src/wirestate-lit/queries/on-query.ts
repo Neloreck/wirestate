@@ -13,10 +13,11 @@ import { OnQueryController } from "./on-query-controller";
  *
  * @group Queries
  */
-export interface OnQueryDecorator<D = unknown, R = unknown> {
+export interface OnQueryDecorator<R = unknown, P = unknown, T extends QueryType = QueryType> {
+  readonly type?: T;
   // Standard (TC39):
   <This extends Interface<Omit<ReactiveElement, "renderRoot">>>(
-    value: (this: This, payload: D) => MaybePromise<R>,
+    value: (this: This, payload: P) => MaybePromise<R>,
     context: ClassMethodDecoratorContext<This>
   ): void;
   // Legacy/experimental:
@@ -44,26 +45,28 @@ export interface OnQueryDecorator<D = unknown, R = unknown> {
  * }
  * ```
  */
-export function onQuery<D = unknown, R = unknown>(type: QueryType): OnQueryDecorator<D, R> {
+export function onQuery<R = unknown, P = unknown, T extends QueryType = QueryType>(
+  type: T
+): OnQueryDecorator<R, P, T> {
   return ((protoOrTarget: object, nameOrContext: PropertyKey | ClassMethodDecoratorContext) => {
     if (typeof nameOrContext === "object") {
       // Standard decorators:
       nameOrContext.addInitializer(function () {
-        new OnQueryController<D, R>(
+        new OnQueryController<R, P, T>(
           this as ReactiveElement,
           type,
-          (payload: D) => (this as AnyObject)[nameOrContext.name](payload) as MaybePromise<R>
+          (payload: P) => (this as AnyObject)[nameOrContext.name](payload) as MaybePromise<R>
         );
       });
     } else {
       // Experimental legacy decorators:
       (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement) => {
-        new OnQueryController<D, R>(
+        new OnQueryController<R, P, T>(
           element,
           type,
-          (payload: D) => (element as AnyObject)[nameOrContext](payload) as MaybePromise<R>
+          (payload: P) => (element as AnyObject)[nameOrContext](payload) as MaybePromise<R>
         );
       });
     }
-  }) as OnQueryDecorator<D, R>;
+  }) as OnQueryDecorator<R, P, T>;
 }

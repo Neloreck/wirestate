@@ -29,19 +29,21 @@ import { Optional } from "../types/general";
  * }
  * ```
  */
-export class OnCommandController<D = unknown, R = unknown> implements ReactiveController {
+export class OnCommandController<R = unknown, P = unknown, T extends CommandType = CommandType>
+  implements ReactiveController
+{
   private bus: Optional<CommandBus> = null;
   private unregister: Optional<CommandUnregister> = null;
 
-  private readonly type: CommandType;
-  private readonly handler: CommandHandler<D, R>;
+  private readonly type: T;
+  private readonly handler: CommandHandler<R, P, T>;
 
   /**
    * @param host - The host element.
    * @param type - Unique identifier of the command to handle.
    * @param handler - The command handler function.
    */
-  public constructor(host: ReactiveElement, type: CommandType, handler: CommandHandler<D, R>) {
+  public constructor(host: ReactiveElement, type: T, handler: CommandHandler<R, P, T>) {
     dbg.info(prefix(__filename), "Constructing:", { host, type });
 
     host.addController(this);

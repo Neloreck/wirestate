@@ -33,13 +33,13 @@ export function useCommandExecutor(): CommandExecutor {
   return useMemo(() => {
     const bus: CommandBus = container.get(CommandBus);
 
-    return <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, payload?: D): R => {
+    return <R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R => {
       dbg.info(prefix(__filename), "Command:", {
         type,
         payload,
       });
 
-      return bus.execute<R, D>(type, payload);
+      return bus.execute<R, P, T>(type, payload);
     };
   }, [container]);
 }

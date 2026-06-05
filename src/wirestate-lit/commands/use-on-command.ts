@@ -8,15 +8,15 @@ import { OnCommandController } from "./on-command-controller";
  *
  * @group Commands
  */
-export interface UseOnCommandOptions<D = unknown, R = unknown> {
+export interface UseOnCommandOptions<R = unknown, P = unknown, T extends CommandType = CommandType> {
   /**
    * The command type to listen for.
    */
-  type: CommandType;
+  type: T;
   /**
    * The command handler function.
    */
-  handler: CommandHandler<D, R>;
+  handler: CommandHandler<R, P, T>;
 }
 
 /**
@@ -40,9 +40,9 @@ export interface UseOnCommandOptions<D = unknown, R = unknown> {
  * }
  * ```
  */
-export function useOnCommand<D = unknown, R = unknown>(
+export function useOnCommand<R = unknown, P = unknown, T extends CommandType = CommandType>(
   host: ReactiveElement,
-  { type, handler }: UseOnCommandOptions<D, R>
-): OnCommandController<D, R> {
-  return new OnCommandController<D, R>(host, type, handler);
+  { type, handler }: UseOnCommandOptions<R, P, T>
+): OnCommandController<R, P, T> {
+  return new OnCommandController<R, P, T>(host, type, handler);
 }

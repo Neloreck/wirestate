@@ -30,19 +30,19 @@ import { Optional } from "../types/general";
  * }
  * ```
  */
-export class OnQueryController<D = unknown, R = unknown> implements ReactiveController {
+export class OnQueryController<R = unknown, P = unknown, T extends QueryType = QueryType> implements ReactiveController {
   private bus: Optional<QueryBus> = null;
   private unregister: Optional<QueryUnregister> = null;
 
-  private readonly type: QueryType;
-  private readonly handler: QueryHandler<D, R>;
+  private readonly type: T;
+  private readonly handler: QueryHandler<R, P, T>;
 
   /**
    * @param host - The host element.
    * @param type - Unique identifier of the query to handle.
    * @param handler - The query handler function.
    */
-  public constructor(host: ReactiveElement, type: QueryType, handler: QueryHandler<D, R>) {
+  public constructor(host: ReactiveElement, type: T, handler: QueryHandler<R, P, T>) {
     host.addController(this);
 
     this.type = type;

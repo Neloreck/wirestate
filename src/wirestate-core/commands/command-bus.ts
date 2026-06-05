@@ -55,7 +55,8 @@ export class CommandBus {
    * {@link executeAsync} when the caller should always receive a Promise.
    *
    * @template R - Type of the command result.
-   * @template D - Type of the command payload.
+   * @template P - Type of the command payload.
+   * @template T - Type of the command identifier.
    *
    * @param type - Command token.
    * @param payload - Command payload.
@@ -68,19 +69,17 @@ export class CommandBus {
    * const user: User = commandBus.execute<User, string>("GET_USER", "id-123");
    * ```
    */
-  public execute<R = unknown, D = unknown>(type: CommandType, payload?: D): R {
+  public execute<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R {
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
-    if (!stack?.length) {
-      throw new WirestateError(
-        `No command handler registered in container for type: '${String(type)}'.`,
-        ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER
-      );
+    if (stack?.length) {
+      return (stack[stack.length - 1].handler as CommandHandler<R, P, T>)(payload as P) as R;
     }
 
-    const handler = stack[stack.length - 1].handler as CommandHandler<D, R>;
-
-    return handler(payload as D) as R;
+    throw new WirestateError(
+      `No command handler registered in container for type: '${String(type)}'.`,
+      ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER
+    );
   }
 
   /**
@@ -90,7 +89,8 @@ export class CommandBus {
    * Sync values are wrapped. Async values are passed through.
    *
    * @template R - Type of the command result.
-   * @template D - Type of the command payload.
+   * @template P - Type of the command payload.
+   * @template T - Type of the command identifier.
    *
    * @param type - Command token.
    * @param payload - Command payload.
@@ -98,11 +98,14 @@ export class CommandBus {
    *
    * @throws {@link WirestateError} If no handler is registered.
    */
-  public async executeAsync<R = unknown, D = unknown>(type: CommandType, payload?: D): Promise<R> {
+  public async executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
+    type: T,
+    payload?: P
+  ): Promise<R> {
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
-      return (stack[stack.length - 1].handler as CommandHandler<D, R>)(payload as D);
+      return (stack[stack.length - 1].handler as CommandHandler<R, P, T>)(payload as P);
     }
 
     throw new WirestateError(
@@ -115,31 +118,45 @@ export class CommandBus {
    * Dispatches a command if a handler exists.
    *
    * @template R - Type of the command result.
-   * @template D - Type of the command payload.
+   * @template P - Type of the command payload.
+   * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
    * @param payload - Optional payload for the handler.
    * @returns The command result, or `null` when no handler exists.
    */
-  public executeOptional<R = unknown, D = unknown>(type: CommandType, payload?: D): Optional<R> {
-    return this.handlers.get(type)?.length ? this.execute<R, D>(type, payload) : null;
+  public executeOptional<R = unknown, P = unknown, T extends CommandType = CommandType>(
+    type: T,
+    payload?: P
+  ): Optional<R> {
+    const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
+
+    if (stack?.length) {
+      return (stack[stack.length - 1].handler as CommandHandler<R, P, T>)(payload as P) as R;
+    }
+
+    return null;
   }
 
   /**
    * Dispatches an optional command and Promise-wraps the result.
    *
    * @template R - Type of the command result.
-   * @template D - Type of the command payload.
+   * @template P - Type of the command payload.
+   * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
    * @param payload - Optional payload for the handler.
    * @returns A Promise resolving to the command result, or `null` if no handler is found.
    */
-  public async executeOptionalAsync<R = unknown, D = unknown>(type: CommandType, payload?: D): Promise<Optional<R>> {
+  public async executeOptionalAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
+    type: T,
+    payload?: P
+  ): Promise<Optional<R>> {
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
-      return (stack[stack.length - 1].handler as CommandHandler<D, R>)(payload as D);
+      return (stack[stack.length - 1].handler as CommandHandler<R, P, T>)(payload as P);
     }
 
     return null;
@@ -161,8 +178,9 @@ export class CommandBus {
    * @remarks
    * Multiple handlers for one type form a stack. The newest handler is active.
    *
-   * @template D - Type of the command payload.
    * @template R - Type of the command execution result.
+   * @template P - Type of the command payload.
+   * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
    * @param handler - Function to execute when the command is dispatched.
@@ -175,7 +193,10 @@ export class CommandBus {
    * });
    * ```
    */
-  public register<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): CommandUnregister {
+  public register<R = unknown, P = unknown, T extends CommandType = CommandType>(
+    type: T,
+    handler: CommandHandler<R, P, T>
+  ): CommandUnregister {
     dbg.info(prefix(__filename), "Registering command handler:", {
       type,
       handler,
@@ -234,13 +255,17 @@ export class CommandBus {
    * @remarks
    * If the handler was not registered for the given type, this operation does nothing.
    *
-   * @template D - Type of the command payload.
    * @template R - Type of the command execution result.
+   * @template P - Type of the command payload.
+   * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
    * @param handler - The handler function instance to remove.
    */
-  public unregister<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): void {
+  public unregister<R = unknown, P = unknown, T extends CommandType = CommandType>(
+    type: T,
+    handler: CommandHandler<R, P, T>
+  ): void {
     dbg.info(prefix(__filename), "Unregistering command handler:", {
       type,
       handler,

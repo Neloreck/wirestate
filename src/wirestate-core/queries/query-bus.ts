@@ -40,13 +40,146 @@ export class QueryBus {
   private readonly handlers: Map<QueryType, Array<QueryHandlerDescriptor>> = new Map();
 
   /**
+   * Removes all registered query handlers from the bus.
+   *
+   * @internal
+   */
+  public clear(): void {
+    this.handlers.clear();
+  }
+
+  /**
+   * Dispatches a query and returns the handler result as-is.
+   *
+   * @remarks
+   * If a handler returns a Promise, this method returns that Promise. Use
+   * {@link queryAsync} when the caller should always receive a Promise.
+   *
+   * @template R - Type of the expected query result.
+   * @template P - Type of the query payload.
+   * @template T - Type of the query identifier.
+   *
+   * @param type - Unique query identifier.
+   * @param payload - Optional payload for the handler.
+   * @returns The result of the query execution.
+   *
+   * @throws {@link WirestateError} If no handler is registered for the given type.
+   *
+   * @example
+   * ```typescript
+   * const user: User = queryBus.query<User, string>("FIND_USER", "user-id-123");
+   * ```
+   */
+  public query<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): R {
+    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
+
+    if (stack?.length) {
+      return (stack[stack.length - 1].handler as QueryHandler<R, P, T>)(payload as P) as R;
+    }
+
+    throw new WirestateError(
+      `No query handler registered in container for type: '${String(type)}'.`,
+      ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER
+    );
+  }
+
+  /**
+   * Dispatches a query and Promise-wraps the result.
+   *
+   * @remarks
+   * Sync values are wrapped. Async values are passed through.
+   *
+   * @template R - Type of the expected query result.
+   * @template P - Type of the query payload.
+   * @template T - Type of the query identifier.
+   *
+   * @param type - Unique query identifier.
+   * @param payload - Optional payload for the handler.
+   * @returns A Promise resolving to the query result.
+   *
+   * @throws {@link WirestateError} If no handler is registered for the given type.
+   */
+  public async queryAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): Promise<R> {
+    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
+
+    if (stack?.length) {
+      return (stack[stack.length - 1].handler as QueryHandler<R, P, T>)(payload as P);
+    }
+
+    throw new WirestateError(
+      `No query handler registered in container for type: '${String(type)}'.`,
+      ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER
+    );
+  }
+
+  /**
+   * Dispatches a query if a handler exists.
+   *
+   * @remarks
+   * Returns the handler result as-is. Use {@link queryOptionalAsync} when the
+   * caller should always receive a Promise.
+   *
+   * @template R - Type of the expected query result.
+   * @template P - Type of the query payload.
+   * @template T - Type of the query identifier.
+   *
+   * @param type - Unique query identifier.
+   * @param payload - Optional payload for the handler.
+   * @returns The query handler result as-is, or `null` if no handler is found.
+   */
+  public queryOptional<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): Optional<R> {
+    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
+
+    if (stack?.length) {
+      return (stack[stack.length - 1].handler as QueryHandler<R, P, T>)(payload as P) as R;
+    }
+
+    return null;
+  }
+
+  /**
+   * Dispatches an optional query and Promise-wraps the result.
+   *
+   * @template R - Type of the expected query result.
+   * @template P - Type of the query payload.
+   * @template T - Type of the query identifier.
+   *
+   * @param type - Unique query identifier.
+   * @param payload - Optional payload for the handler.
+   * @returns A Promise resolving to the query result, or `null` if no handler is found.
+   */
+  public async queryOptionalAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(
+    type: T,
+    payload?: P
+  ): Promise<Optional<R>> {
+    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
+
+    if (stack?.length) {
+      return (stack[stack.length - 1].handler as QueryHandler<R, P, T>)(payload as P);
+    }
+
+    return null;
+  }
+
+  /**
+   * Checks if at least one handler is registered for the given query type.
+   *
+   * @param type - Unique query identifier.
+   * @returns `true` if a handler is available, `false` otherwise.
+   */
+  public hasHandler(type: QueryType): boolean {
+    return Boolean(this.handlers.get(type)?.length);
+  }
+
+  /**
    * Registers a query handler.
    *
    * @remarks
    * Multiple handlers for one type form a stack. The newest handler answers.
    *
-   * @template D - Type of the query payload.
    * @template R - Type of the query result.
+   * @template P - Type of the query payload.
+   * @template T - Type of the query identifier.
    *
    * @param type - Query token.
    * @param handler - Query handler.
@@ -57,7 +190,10 @@ export class QueryBus {
    * const unregister: QueryUnregister = queryBus.register("GET_NOW", () => Date.now());
    * ```
    */
-  public register<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): QueryUnregister {
+  public register<R = unknown, P = unknown, T extends QueryType = QueryType>(
+    type: T,
+    handler: QueryHandler<R, P, T>
+  ): QueryUnregister {
     dbg.info(prefix(__filename), "Registering query handler:", {
       type,
       handler,
@@ -92,9 +228,9 @@ export class QueryBus {
 
       let index: number = -1;
 
-      for (let i: number = 0; i < current.length; i += 1) {
-        if (current[i] === registration) {
-          index = i;
+      for (let it: number = 0; it < current.length; it += 1) {
+        if (current[it] === registration) {
+          index = it;
           break;
         }
       }
@@ -116,13 +252,17 @@ export class QueryBus {
    * @remarks
    * If the handler was not registered for the given type, this operation does nothing.
    *
-   * @template D - Type of the query payload.
    * @template R - Type of the query result.
+   * @template P - Type of the query payload.
+   * @template T - Type of the query identifier.
    *
    * @param type - Unique query identifier.
    * @param handler - The handler function instance to remove.
    */
-  public unregister<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): void {
+  public unregister<R = unknown, P = unknown, T extends QueryType = QueryType>(
+    type: T,
+    handler: QueryHandler<R, P, T>
+  ): void {
     dbg.info(prefix(__filename), "Unregistering query handler:", {
       type,
       handler,
@@ -152,140 +292,5 @@ export class QueryBus {
     if (current.length === 0) {
       this.handlers.delete(type);
     }
-  }
-
-  /**
-   * Dispatches a query and returns the handler result as-is.
-   *
-   * @remarks
-   * If a handler returns a Promise, this method returns that Promise. Use
-   * {@link queryAsync} when the caller should always receive a Promise.
-   *
-   * @template R - Type of the expected query result.
-   * @template D - Type of the query payload.
-   * @template T - Type of the query identifier.
-   *
-   * @param type - Unique query identifier.
-   * @param payload - Optional payload for the handler.
-   * @returns The result of the query execution.
-   *
-   * @throws {@link WirestateError} If no handler is registered for the given type.
-   *
-   * @example
-   * ```typescript
-   * const user: User = queryBus.query<User, string>("FIND_USER", "user-id-123");
-   * ```
-   */
-  public query<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, payload?: D): R {
-    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
-
-    // Always use the top of the stack (most recent registration) if handlers are available.
-    if (stack?.length) {
-      return (stack[stack.length - 1].handler as QueryHandler<D, R>)(payload as D) as R;
-    }
-
-    throw new WirestateError(
-      `No query handler registered in container for type: '${String(type)}'.`,
-      ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER
-    );
-  }
-
-  /**
-   * Dispatches a query and Promise-wraps the result.
-   *
-   * @remarks
-   * Sync values are wrapped. Async values are passed through.
-   *
-   * @template R - Type of the expected query result.
-   * @template D - Type of the query payload.
-   * @template T - Type of the query identifier.
-   *
-   * @param type - Unique query identifier.
-   * @param payload - Optional payload for the handler.
-   * @returns A Promise resolving to the query result.
-   *
-   * @throws {@link WirestateError} If no handler is registered for the given type.
-   */
-  public async queryAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, payload?: D): Promise<R> {
-    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
-
-    if (stack?.length) {
-      return (stack[stack.length - 1].handler as QueryHandler<D, R>)(payload as D);
-    }
-
-    throw new WirestateError(
-      `No query handler registered in container for type: '${String(type)}'.`,
-      ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER
-    );
-  }
-
-  /**
-   * Dispatches a query if a handler exists.
-   *
-   * @remarks
-   * Returns the handler result as-is. Use {@link queryOptionalAsync} when the
-   * caller should always receive a Promise.
-   *
-   * @template R - Type of the expected query result.
-   * @template D - Type of the query payload.
-   * @template T - Type of the query identifier.
-   *
-   * @param type - Unique query identifier.
-   * @param payload - Optional payload for the handler.
-   * @returns The query handler result as-is, or `null` if no handler is found.
-   */
-  public queryOptional<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, payload?: D): Optional<R> {
-    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
-
-    if (stack?.length) {
-      return (stack[stack.length - 1].handler as QueryHandler<D, R>)(payload as D) as R;
-    }
-
-    return null;
-  }
-
-  /**
-   * Dispatches an optional query and Promise-wraps the result.
-   *
-   * @template R - Type of the expected query result.
-   * @template D - Type of the query payload.
-   * @template T - Type of the query identifier.
-   *
-   * @param type - Unique query identifier.
-   * @param payload - Optional payload for the handler.
-   * @returns A Promise resolving to the query result, or `null` if no handler is found.
-   */
-  public async queryOptionalAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(
-    type: T,
-    payload?: D
-  ): Promise<Optional<R>> {
-    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
-
-    if (stack?.length) {
-      return (stack[stack.length - 1].handler as QueryHandler<D, R>)(payload as D);
-    }
-
-    return null;
-  }
-
-  /**
-   * Checks if at least one handler is registered for the given query type.
-   *
-   * @param type - Unique query identifier.
-   * @returns `true` if a handler is available, `false` otherwise.
-   */
-  public hasHandler(type: QueryType): boolean {
-    const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
-
-    return Boolean(stack && stack.length);
-  }
-
-  /**
-   * Removes all registered query handlers from the bus.
-   *
-   * @internal
-   */
-  public clear(): void {
-    this.handlers.clear();
   }
 }

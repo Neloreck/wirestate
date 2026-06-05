@@ -27,17 +27,24 @@ export type CommandType = string | symbol | number;
  *
  * @group Commands
  *
- * @template D - Type of the command payload.
  * @template R - Type of the result returned by the handler (can be wrapped in a Promise).
+ * @template P - Type of the command payload.
+ * @template T - Type of the command identifier.
  *
  * @example
  * ```typescript
- * const loginHandler: CommandHandler<Credentials, Session> = (payload) => {
+ * const loginHandler: CommandHandler<Session, Credentials> = (payload) => {
  *   return auth.login(payload);
  * };
  * ```
  */
-export type CommandHandler<D = unknown, R = unknown> = (payload: D) => MaybePromise<R>;
+export type CommandHandler<
+  R = unknown,
+  P = unknown,
+  T extends CommandType = CommandType
+> = ((payload: P) => MaybePromise<R>) & {
+  readonly type?: T;
+};
 
 /**
  * Represents the function returned by command registration.

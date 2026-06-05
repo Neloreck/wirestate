@@ -303,7 +303,7 @@ export class WireScope {
    * Dispatches a query and returns the handler result as-is.
    *
    * @template R - Type of the query result.
-   * @template D - Type of the query payload.
+   * @template P - Type of the query payload.
    * @template T - Type of the query identifier.
    *
    * @param type - Query identifier.
@@ -318,19 +318,19 @@ export class WireScope {
    * const user: User = scope.query("GET_USER", { id: 1 });
    * ```
    */
-  public query<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, payload?: D): R {
+  public query<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): R {
     dbg.info(prefix(__filename), "Query:", { type, payload });
 
     this.assertActive();
 
-    return this.queryBus.query<R, D>(type, payload);
+    return this.queryBus.query<R, P, T>(type, payload);
   }
 
   /**
    * Dispatches a query and returns the result as a Promise.
    *
    * @template R - Type of the query result.
-   * @template D - Type of the query payload.
+   * @template P - Type of the query payload.
    * @template T - Type of the query identifier.
    *
    * @param type - Query identifier.
@@ -345,19 +345,19 @@ export class WireScope {
    * const user: User = await scope.queryAsync("GET_USER", { id: 1 });
    * ```
    */
-  public queryAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, payload?: D): Promise<R> {
+  public queryAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): Promise<R> {
     dbg.info(prefix(__filename), "Async query:", { type, payload });
 
     this.assertActive();
 
-    return this.queryBus.queryAsync<R, D>(type, payload);
+    return this.queryBus.queryAsync<R, P, T>(type, payload);
   }
 
   /**
    * Dispatches a query and returns the handler result as-is, or null if no handler is registered.
    *
    * @template R - Type of the query result.
-   * @template D - Type of the query payload.
+   * @template P - Type of the query payload.
    * @template T - Type of the query identifier.
    *
    * @param type - Query identifier.
@@ -371,19 +371,19 @@ export class WireScope {
    * const config: Config | null = scope.queryOptional("GET_CONFIG");
    * ```
    */
-  public queryOptional<R = unknown, D = unknown, T extends QueryType = QueryType>(type: T, payload?: D): Optional<R> {
+  public queryOptional<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): Optional<R> {
     dbg.info(prefix(__filename), "Query optional:", { type, payload });
 
     this.assertActive();
 
-    return this.queryBus.queryOptional<R, D>(type, payload);
+    return this.queryBus.queryOptional<R, P, T>(type, payload);
   }
 
   /**
    * Dispatches a query and returns the result as a Promise, or null if no handler is registered.
    *
    * @template R - Type of the query result.
-   * @template D - Type of the query payload.
+   * @template P - Type of the query payload.
    * @template T - Type of the query identifier.
    *
    * @param type - Query identifier.
@@ -397,22 +397,23 @@ export class WireScope {
    * const config: Config | null = await scope.queryOptionalAsync("GET_CONFIG");
    * ```
    */
-  public queryOptionalAsync<R = unknown, D = unknown, T extends QueryType = QueryType>(
+  public queryOptionalAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(
     type: T,
-    payload?: D
+    payload?: P
   ): Promise<Optional<R>> {
     dbg.info(prefix(__filename), "Optional async query:", { type, payload });
 
     this.assertActive();
 
-    return this.queryBus.queryOptionalAsync<R, D>(type, payload);
+    return this.queryBus.queryOptionalAsync<R, P, T>(type, payload);
   }
 
   /**
    * Registers a handler for a specific query type.
    *
-   * @template D - Type of the query payload.
    * @template R - Type of the query result.
+   * @template P - Type of the query payload.
+   * @template T - Type of the query identifier.
    *
    * @param type - Query identifier.
    * @param handler - The handler function.
@@ -425,19 +426,23 @@ export class WireScope {
    * scope.registerQueryHandler("GET_DATE_NOW", () => new Date());
    * ```
    */
-  public registerQueryHandler<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): QueryUnregister {
+  public registerQueryHandler<R = unknown, P = unknown, T extends QueryType = QueryType>(
+    type: T,
+    handler: QueryHandler<R, P, T>
+  ): QueryUnregister {
     dbg.info(prefix(__filename), "Register query handler:", { type });
 
     this.assertActive();
 
-    return this.queryBus.register(type, handler);
+    return this.queryBus.register<R, P, T>(type, handler);
   }
 
   /**
    * Removes a specific query handler registration.
    *
-   * @template D - Type of the query payload.
    * @template R - Type of the query result.
+   * @template P - Type of the query payload.
+   * @template T - Type of the query identifier.
    *
    * @param type - Query identifier.
    * @param handler - The handler instance to remove.
@@ -449,19 +454,22 @@ export class WireScope {
    * scope.unregisterQueryHandler("GET_DATE_NOW", this.onGetDateNow);
    * ```
    */
-  public unregisterQueryHandler<D = unknown, R = unknown>(type: QueryType, handler: QueryHandler<D, R>): void {
+  public unregisterQueryHandler<R = unknown, P = unknown, T extends QueryType = QueryType>(
+    type: T,
+    handler: QueryHandler<R, P, T>
+  ): void {
     dbg.info(prefix(__filename), "Unregister query:", { type });
 
     this.assertActive();
 
-    this.queryBus.unregister(type, handler);
+    this.queryBus.unregister<R, P, T>(type, handler);
   }
 
   /**
    * Dispatches a command and returns the handler result as-is.
    *
    * @template R - Type of the command result.
-   * @template D - Type of the command payload.
+   * @template P - Type of the command payload.
    * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
@@ -476,19 +484,19 @@ export class WireScope {
    * scope.executeCommand("LOGOUT");
    * ```
    */
-  public executeCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, payload?: D): R {
+  public executeCommand<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R {
     dbg.info(prefix(__filename), "Execute command:", { type, payload });
 
     this.assertActive();
 
-    return this.commandBus.execute<R, D>(type, payload);
+    return this.commandBus.execute<R, P, T>(type, payload);
   }
 
   /**
    * Dispatches a command and returns the result as a Promise.
    *
    * @template R - Type of the command result.
-   * @template D - Type of the command payload.
+   * @template P - Type of the command payload.
    * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
@@ -503,22 +511,22 @@ export class WireScope {
    * await scope.executeCommandAsync("LOGOUT");
    * ```
    */
-  public executeCommandAsync<R = unknown, D = unknown, T extends CommandType = CommandType>(
+  public executeCommandAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,
-    payload?: D
+    payload?: P
   ): Promise<R> {
     dbg.info(prefix(__filename), "Execute async command:", { type, payload });
 
     this.assertActive();
 
-    return this.commandBus.executeAsync<R, D>(type, payload);
+    return this.commandBus.executeAsync<R, P, T>(type, payload);
   }
 
   /**
    * Dispatches a command if a handler is registered, otherwise returns null.
    *
    * @template R - Type of the command result.
-   * @template D - Type of the command payload.
+   * @template P - Type of the command payload.
    * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
@@ -532,22 +540,22 @@ export class WireScope {
    * scope.executeOptionalCommand("CLEANUP_CACHE");
    * ```
    */
-  public executeOptionalCommand<R = unknown, D = unknown, T extends CommandType = CommandType>(
+  public executeOptionalCommand<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,
-    payload?: D
+    payload?: P
   ): Optional<R> {
     dbg.info(prefix(__filename), "Execute command:", { type, payload });
 
     this.assertActive();
 
-    return this.commandBus.executeOptional<R, D>(type, payload);
+    return this.commandBus.executeOptional<R, P, T>(type, payload);
   }
 
   /**
    * Dispatches an optional command and returns the result as a Promise.
    *
    * @template R - Type of the command result.
-   * @template D - Type of the command payload.
+   * @template P - Type of the command payload.
    * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
@@ -561,22 +569,23 @@ export class WireScope {
    * const result: string | null = await scope.executeOptionalCommandAsync("CLEANUP_CACHE");
    * ```
    */
-  public executeOptionalCommandAsync<R = unknown, D = unknown, T extends CommandType = CommandType>(
+  public executeOptionalCommandAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,
-    payload?: D
+    payload?: P
   ): Promise<Optional<R>> {
     dbg.info(prefix(__filename), "Execute optional async command:", { type, payload });
 
     this.assertActive();
 
-    return this.commandBus.executeOptionalAsync<R, D>(type, payload);
+    return this.commandBus.executeOptionalAsync<R, P, T>(type, payload);
   }
 
   /**
    * Registers a handler for a specific command type.
    *
-   * @template D - Type of the command payload.
    * @template R - Type of the command result.
+   * @template P - Type of the command payload.
+   * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
    * @param handler - The handler function.
@@ -591,22 +600,23 @@ export class WireScope {
    * });
    * ```
    */
-  public registerCommandHandler<D = unknown, R = unknown>(
-    type: CommandType,
-    handler: CommandHandler<D, R>
+  public registerCommandHandler<R = unknown, P = unknown, T extends CommandType = CommandType>(
+    type: T,
+    handler: CommandHandler<R, P, T>
   ): CommandUnregister {
     dbg.info(prefix(__filename), "Register command handler:", { type });
 
     this.assertActive();
 
-    return this.commandBus.register(type, handler);
+    return this.commandBus.register<R, P, T>(type, handler);
   }
 
   /**
    * Removes a specific command handler registration.
    *
-   * @template D - Type of the command payload.
    * @template R - Type of the command result.
+   * @template P - Type of the command payload.
+   * @template T - Type of the command identifier.
    *
    * @param type - Command identifier.
    * @param handler - The handler instance to remove.
@@ -618,12 +628,15 @@ export class WireScope {
    * scope.unregisterCommandHandler("LOG_ERROR", this.handleLogError);
    * ```
    */
-  public unregisterCommandHandler<D = unknown, R = unknown>(type: CommandType, handler: CommandHandler<D, R>): void {
+  public unregisterCommandHandler<R = unknown, P = unknown, T extends CommandType = CommandType>(
+    type: T,
+    handler: CommandHandler<R, P, T>
+  ): void {
     dbg.info(prefix(__filename), "Unregister command:", { type });
 
     this.assertActive();
 
-    this.commandBus.unregister(type, handler);
+    this.commandBus.unregister<R, P, T>(type, handler);
   }
 
   /**

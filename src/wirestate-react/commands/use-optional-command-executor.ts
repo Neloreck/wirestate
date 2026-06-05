@@ -34,13 +34,13 @@ export function useOptionalCommandExecutor(): OptionalCommandExecutor {
   return useMemo(() => {
     const bus: CommandBus = container.get(CommandBus);
 
-    return <R = unknown, D = unknown, T extends CommandType = CommandType>(type: T, payload?: D): R | null => {
+    return <R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R | null => {
       dbg.info(prefix(__filename), "Optional command:", {
         type,
         payload,
       });
 
-      return bus.executeOptional<R, D>(type, payload);
+      return bus.executeOptional<R, P, T>(type, payload);
     };
   }, [container]);
 }

@@ -16,7 +16,8 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * @group Commands
  *
  * @template R - Result type of the command.
- * @template D - Payload type of the command.
+ * @template P - Payload type of the command.
+ * @template T - Command identifier type.
  *
  * @param type - Command type (string or symbol).
  * @param handler - Command handler function.
@@ -28,9 +29,12 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * });
  * ```
  */
-export function useCommandHandler<R = unknown, D = unknown>(type: CommandType, handler: CommandHandler<D, R>): void {
+export function useCommandHandler<R = unknown, P = unknown, T extends CommandType = CommandType>(
+  type: T,
+  handler: CommandHandler<R, P, T>
+): void {
   const container: Container = useContainer();
-  const handlerRef = useRef<CommandHandler<D, R>>(handler);
+  const handlerRef = useRef<CommandHandler<R, P, T>>(handler);
 
   // Sync ref with the latest closure on every render.
   useIsomorphicLayoutEffect(() => {
@@ -38,6 +42,6 @@ export function useCommandHandler<R = unknown, D = unknown>(type: CommandType, h
   });
 
   useIsomorphicLayoutEffect(() => {
-    return container.get(CommandBus).register<D, R>(type, (payload) => handlerRef.current(payload));
+    return container.get(CommandBus).register<R, P, T>(type, (payload) => handlerRef.current(payload));
   }, [container, type]);
 }

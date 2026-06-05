@@ -8,15 +8,15 @@ import { OnQueryController } from "./on-query-controller";
  *
  * @group Queries
  */
-export interface UseOnQueryOptions<D = unknown, R = unknown> {
+export interface UseOnQueryOptions<R = unknown, P = unknown, T extends QueryType = QueryType> {
   /**
    * The query type to handle.
    */
-  type: QueryType;
+  type: T;
   /**
    * The query handler function.
    */
-  handler: QueryHandler<D, R>;
+  handler: QueryHandler<R, P, T>;
 }
 
 /**
@@ -40,9 +40,9 @@ export interface UseOnQueryOptions<D = unknown, R = unknown> {
  * }
  * ```
  */
-export function useOnQuery<D = unknown, R = unknown>(
+export function useOnQuery<R = unknown, P = unknown, T extends QueryType = QueryType>(
   host: ReactiveElement,
-  { type, handler }: UseOnQueryOptions<D, R>
-): OnQueryController<D, R> {
-  return new OnQueryController<D, R>(host, type, handler);
+  { type, handler }: UseOnQueryOptions<R, P, T>
+): OnQueryController<R, P, T> {
+  return new OnQueryController<R, P, T>(host, type, handler);
 }
