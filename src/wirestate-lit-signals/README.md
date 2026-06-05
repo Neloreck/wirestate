@@ -3,37 +3,31 @@
 [![npm](https://img.shields.io/npm/v/@wirestate/lit-signals.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/lit-signals)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
 
-Re-exports `@lit-labs/signals` for use with Wirestate services in Lit elements.
+Lit Signals exports for Wirestate Lit services.
 
-Create signals in services or stable element state. Use `watch()` in templates to subscribe rendering to signal updates.
+Use this package when Lit services should expose signal state and Lit templates should re-render with `watch()`.
 
-For Lit Signals behavior, use the official [Lit Signals docs](https://lit.dev/docs/data/signals/) and
-[`@lit-labs/signals` package](https://www.npmjs.com/package/@lit-labs/signals).
-
-## Installation
+## Install
 
 ```bash
 npm install @wirestate/lit-signals @lit-labs/signals signal-polyfill
 ```
 
-## Usage
+For a full Wirestate Lit app:
 
-```ts
-import { signal, computed, watch, Signal, State, Computed } from "@wirestate/lit-signals";
+```bash
+npm install @wirestate/core @wirestate/lit @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/signals signal-polyfill reflect-metadata
 ```
 
-Example service:
+## Start
 
 ```ts
-import { Injectable, Inject, WireScope } from "@wirestate/core";
-import { signal, computed, State, Computed } from "@wirestate/lit-signals";
+import { Injectable } from "@wirestate/core";
+import { State, signal } from "@wirestate/lit-signals";
 
 @Injectable()
-export class CounterService {
+class CounterService {
   public readonly count: State<number> = signal(0);
-  public readonly parity: Computed<"even" | "odd"> = computed(() => (this.count.get() % 2 === 0 ? "even" : "odd"));
-
-  public constructor(@Inject(WireScope) private scope: WireScope) {}
 
   public increment(): void {
     this.count.set(this.count.get() + 1);
@@ -41,30 +35,24 @@ export class CounterService {
 }
 ```
 
-Example Lit element:
+In a Lit template:
 
 ```ts
-import { LitElement, html } from "lit";
-import { customElement } from "lit/decorators.js";
-import { injection } from "@wirestate/lit";
 import { watch } from "@wirestate/lit-signals";
 
-import { CounterService } from "./services";
-
-@customElement("my-component")
-class MyComponent extends LitElement {
-  @injection({ token: CounterService })
-  private readonly counterService!: CounterService;
-
-  render() {
-    return html`
-      <button @click=${() => this.counterService.increment()}>
-        count: ${watch(this.counterService.count)} (${watch(this.counterService.parity)})
-      </button>
-    `;
-  }
-}
+html`<span>${watch(counter.count)}</span>`;
 ```
+
+## What Is Included
+
+- Re-exports from `@lit-labs/signals`.
+- `State<T>` and `Computed<T>` aliases from `signal-polyfill`.
+
+## Learn More
+
+- [Lit Signals guide](https://neloreck.github.io/wirestate/lit-signals/overview)
+- [API reference](https://neloreck.github.io/wirestate/api/wirestate-lit-signals/)
+- [Lit Signals docs](https://lit.dev/docs/data/signals/)
 
 ## License
 

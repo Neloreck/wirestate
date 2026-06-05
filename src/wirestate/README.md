@@ -1,31 +1,47 @@
-# wirestate
+# wirestate [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://neloreck.github.io/wirestate/)]
 
-For new projects prefer direct usage of [@wirestate/core](https://www.npmjs.com/package/@wirestate/core)
-
-### About
+[![npm](https://img.shields.io/npm/v/wirestate.svg?style=flat-square)](https://www.npmjs.com/package/wirestate)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
 
 Compatibility package for the unscoped `wirestate` name.
 
-This package builds the current core and React adapter into one distributable package:
+New projects should prefer the scoped packages:
+[`@wirestate/core`](https://www.npmjs.com/package/@wirestate/core),
+[`@wirestate/react`](https://www.npmjs.com/package/@wirestate/react),
+[`@wirestate/react-mobx`](https://www.npmjs.com/package/@wirestate/react-mobx), and
+[`@wirestate/react-signals`](https://www.npmjs.com/package/@wirestate/react-signals).
 
-- `wirestate` includes `@wirestate/core` and `@wirestate/react` APIs.
-- `wirestate/mobx` includes the `@wirestate/react-mobx` APIs.
-- `wirestate/signals` includes the `@wirestate/react-signals` APIs.
+## Install
 
-New focused work lives in the scoped packages, but this package keeps the unscoped name. Lit APIs are available from the
-scoped `@wirestate/lit` and `@wirestate/lit-signals` packages.
+```bash
+npm install wirestate react reflect-metadata
+```
 
-### Monorepo
+Install MobX or Preact Signals peers when you use the matching exports.
 
-https://github.com/Neloreck/wirestate
+## Exports
 
-### Docs
+- `wirestate` re-exports `@wirestate/core` and `@wirestate/react`.
+- `wirestate/mobx` re-exports `@wirestate/react-mobx`.
+- `wirestate/signals` re-exports `@wirestate/react-signals`.
 
-https://neloreck.github.io/wirestate/
+Lit APIs are available from the scoped
+[`@wirestate/lit`](https://www.npmjs.com/package/@wirestate/lit) and
+[`@wirestate/lit-signals`](https://www.npmjs.com/package/@wirestate/lit-signals) packages.
 
-### See
+## Start
 
-- https://www.npmjs.com/package/@wirestate/core
-- https://www.npmjs.com/package/@wirestate/react
-- https://www.npmjs.com/package/@wirestate/react-mobx
-- https://www.npmjs.com/package/@wirestate/react-signals
+```ts
+import { Injectable, createContainer } from "wirestate";
+import { observer } from "wirestate/mobx";
+import { signal } from "wirestate/signals";
+```
+
+## Learn More
+
+- [Docs](https://neloreck.github.io/wirestate/)
+- [Scoped package overview](https://neloreck.github.io/wirestate/introduction/installation)
+
+## License
+
+MIT

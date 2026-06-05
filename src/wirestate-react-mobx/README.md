@@ -3,57 +3,35 @@
 [![npm](https://img.shields.io/npm/v/@wirestate/react-mobx.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react-mobx)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
 
-Re-exports MobX and `mobx-react-lite`, plus class decorator wrappers compatible with TypeScript's legacy decorators.
+MobX exports for Wirestate React services.
 
-For MobX behavior and React integration details, use the official [MobX docs](https://mobx.js.org/README.html),
-[React integration docs](https://mobx.js.org/react-integration.html), and
-[`mobx`](https://www.npmjs.com/package/mobx) and
-[`mobx-react-lite`](https://www.npmjs.com/package/mobx-react-lite) packages.
+Use this package when service state should be observable with MobX and React components should render through
+`mobx-react-lite`.
 
-## Installation
+## Install
 
 ```bash
 npm install @wirestate/react-mobx mobx mobx-react-lite
 ```
 
-## Usage
+For a full Wirestate React app:
 
-```ts
-import {
-  Action,
-  BoundAction,
-  Computed,
-  Observable,
-  ShallowObservable,
-  makeObservable,
-  observer,
-} from "@wirestate/react-mobx";
+```bash
+npm install @wirestate/core @wirestate/react @wirestate/react-mobx react mobx mobx-react-lite reflect-metadata
 ```
 
-## Decorator wrappers
-
-| Export                | Wraps                |
-| --------------------- | -------------------- |
-| `Observable()`        | `observable`         |
-| `ShallowObservable()` | `observable.shallow` |
-| `RefObservable()`     | `observable.ref`     |
-| `DeepObservable()`    | `observable.deep`    |
-| `Action()`            | `action`             |
-| `BoundAction()`       | `action.bound`       |
-| `Computed()`          | `computed`           |
-
-Example:
+## Start
 
 ```ts
-import { Injectable, Inject, WireScope } from "@wirestate/core";
-import { makeObservable, Observable, Action } from "@wirestate/react-mobx";
+import { Injectable } from "@wirestate/core";
+import { Action, Observable, makeObservable, observer } from "@wirestate/react-mobx";
 
 @Injectable()
-export class CounterService {
+class CounterService {
   @Observable()
   public count = 0;
 
-  public constructor(@Inject(WireScope) private scope: WireScope) {
+  public constructor() {
     makeObservable(this);
   }
 
@@ -63,6 +41,19 @@ export class CounterService {
   }
 }
 ```
+
+## What Is Included
+
+- Re-exports from `mobx`.
+- Re-exports from `mobx-react-lite`.
+- Decorator aliases: `Observable`, `ShallowObservable`, `RefObservable`, `DeepObservable`, `Action`, `BoundAction`, and
+  `Computed`.
+
+## Learn More
+
+- [React MobX guide](https://neloreck.github.io/wirestate/react-mobx/overview)
+- [API reference](https://neloreck.github.io/wirestate/api/wirestate-react-mobx/)
+- [MobX docs](https://mobx.js.org/README.html)
 
 ## License
 
