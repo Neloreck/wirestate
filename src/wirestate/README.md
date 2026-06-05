@@ -1,5 +1,9 @@
 # wirestate
 
+For new projects prefer direct usage of [@wirestate/core](https://www.npmjs.com/package/@wirestate/core)
+
+### About
+
 Compatibility package for the unscoped `wirestate` name.
 
 This package builds the current core and React adapter into one distributable package:
