@@ -1,190 +1,129 @@
 # Wirestate
 
 [![docs](https://img.shields.io/badge/docs-github_pages-blue)](https://neloreck.github.io/wirestate)
+[![npm](https://img.shields.io/npm/v/@wirestate/core.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/core)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
 
-Wirestate is a set of TypeScript packages for building application state around dependency-injected services.
+Wirestate is a TypeScript state-management toolkit built around dependency-injected services.
 
-The core package provides the container model. React and Lit packages connect that model to component trees.
-Reactivity is optional and lives in adapter packages or in your own service code.
+Application logic lives in `@Injectable` classes. React and Lit adapters provide those services to UI trees. Reactivity
+is separate: use MobX, Preact Signals, Lit Signals, plain values, or another state bridge inside your
+services.
 
-Use Wirestate when application logic should live outside UI components and service lifetime should follow an app,
-subtree, test, tenant, or feature scope.
+Use Wirestate when you want service-owned state and workflows that can be scoped to an app, subtree, feature, modal,
+tenant, or test.
 
-What the core gives you:
+## Core Ideas
 
-- Scoped containers for root apps and child branches.
-- `@Injectable` services that own state, workflows, and coordination logic.
-- Activation, deactivation, provision, and deprovision hooks.
-- Container-local events, commands, and queries.
-- Shared and targeted seeds for hydration, tests, and startup data.
+- Services own state, workflows, and cross-component coordination.
+- Containers define scope and lifetime.
+- Events broadcast notifications inside a container.
+- Commands run one active write handler.
+- Queries run one active read handler.
+- Seeds pass startup, hydration, and test data into services.
+- Provider lifecycle hooks connect service work to React or Lit ownership.
 
 ## Packages
 
-| NPM                                                                                                                                                   | Package                                                               | Description                                       |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------- |
-| [![npm version](https://img.shields.io/npm/v/@wirestate/core.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/core)                   | [`@wirestate/core`](./src/wirestate-core/README.md)                   | Containers, services, lifecycle, messaging, seeds |
-| [![npm version](https://img.shields.io/npm/v/@wirestate/react.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react)                 | [`@wirestate/react`](./src/wirestate-react/README.md)                 | React providers, hooks, and messaging             |
-| [![npm version](https://img.shields.io/npm/v/@wirestate/react-mobx.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react-mobx)       | [`@wirestate/react-mobx`](./src/wirestate-react-mobx/README.md)       | MobX and MobX React re-exports                    |
-| [![npm version](https://img.shields.io/npm/v/@wirestate/react-signals.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react-signals) | [`@wirestate/react-signals`](./src/wirestate-react-signals/README.md) | Preact Signals for React re-exports               |
-| [![npm version](https://img.shields.io/npm/v/@wirestate/lit.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/lit)                     | [`@wirestate/lit`](./src/wirestate-lit/README.md)                     | Lit decorators, controllers, and providers        |
-| [![npm version](https://img.shields.io/npm/v/@wirestate/lit-signals.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/lit-signals)     | [`@wirestate/lit-signals`](./src/wirestate-lit-signals/README.md)     | Lit Signals re-exports                            |
+| Package                                                               | Purpose                                                        |
+| --------------------------------------------------------------------- | -------------------------------------------------------------- |
+| [`@wirestate/core`](./src/wirestate-core/README.md)                   | Containers, injectable services, lifecycle, seeds, messaging.  |
+| [`@wirestate/react`](./src/wirestate-react/README.md)                 | React provider, injection hooks, and component-owned handlers. |
+| [`@wirestate/lit`](./src/wirestate-lit/README.md)                     | Lit providers, decorators, controllers, and element handlers.  |
+| [`@wirestate/react-mobx`](./src/wirestate-react-mobx/README.md)       | MobX and `mobx-react-lite` exports for React services.         |
+| [`@wirestate/react-signals`](./src/wirestate-react-signals/README.md) | Preact Signals exports for React services.                     |
+| [`@wirestate/lit-signals`](./src/wirestate-lit-signals/README.md)     | Lit Signals exports for Lit services.                          |
+| [`wirestate`](./src/wirestate/README.md)                              | Compatibility package for the unscoped package name.           |
 
 ## Install
 
+Install the core package, one UI adapter, and the reactivity package you actually use.
+
+```bash
+# React + Signals
+npm install @wirestate/core @wirestate/react @wirestate/react-signals react @preact/signals-react reflect-metadata
+
+# React + MobX
+npm install @wirestate/core @wirestate/react @wirestate/react-mobx react mobx mobx-react-lite reflect-metadata
+
+# Lit + Signals
+npm install @wirestate/core @wirestate/lit @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/signals signal-polyfill reflect-metadata
+```
+
 Import `reflect-metadata` once before decorated services are loaded.
 
-### For React
-
-```bash
-# Core + React integration
-npm install @wirestate/core @wirestate/react reflect-metadata
-npm install react react-dom
-
-# With MobX reactivity
-npm install @wirestate/react-mobx mobx mobx-react-lite
-
-# With Preact Signals reactivity
-npm install @wirestate/react-signals @preact/signals-react
+```ts
+import "reflect-metadata";
 ```
 
-### For Lit
+Enable decorator metadata in TypeScript.
 
-```bash
-# Core + Lit integration
-npm install @wirestate/core @wirestate/lit reflect-metadata
-npm install lit @lit/context @lit/reactive-element
-
-# With Signals reactivity
-npm install @wirestate/lit-signals @lit-labs/signals signal-polyfill
+```json
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  }
+}
 ```
 
-## Examples
-
-### React + Signals
-
-This example stores state in a service and renders it from React with Preact Signals. Reading `.value` during render is
-the React subscription point.
+## Example
 
 ```tsx
 import { Injectable } from "@wirestate/core";
 import { ContainerProvider, useInjection } from "@wirestate/react";
-import { signal, Signal } from "@wirestate/react-signals";
-import { useMemo } from "react";
+import { Signal, signal, useSignals } from "@wirestate/react-signals";
 
 @Injectable()
 class CounterService {
   public readonly count: Signal<number> = signal(0);
 
   public increment(): void {
-    this.count.value += 1;
+    this.count.value++;
   }
-}
-
-export function Application() {
-  const config = useMemo(() => ({ bindings: [CounterService] }), []);
-
-  return (
-    <ContainerProvider config={config}>
-      <Counter />
-    </ContainerProvider>
-  );
 }
 
 function Counter() {
-  const counterService = useInjection(CounterService);
+  useSignals();
 
-  return <button onClick={() => counterService.increment()}>Count: {counterService.count.value}</button>;
-}
-```
+  const counter = useInjection(CounterService);
 
-### React + MobX
-
-```tsx
-import { Injectable } from "@wirestate/core";
-import { ContainerProvider, useInjection } from "@wirestate/react";
-import { Action, Observable, makeObservable, observer } from "@wirestate/react-mobx";
-import { useMemo } from "react";
-
-@Injectable()
-class CounterService {
-  @Observable()
-  public count: number = 0;
-
-  public constructor() {
-    makeObservable(this);
-  }
-
-  @Action()
-  public increment(): void {
-    this.count += 1;
-  }
+  return <button onClick={() => counter.increment()}>Count: {counter.count.value}</button>;
 }
 
-export function Application() {
-  const config = useMemo(() => ({ bindings: [CounterService] }), []);
-
+export function App() {
   return (
-    <ContainerProvider config={config}>
+    <ContainerProvider config={{ bindings: [CounterService] }}>
       <Counter />
     </ContainerProvider>
   );
 }
-
-const Counter = observer(function Counter() {
-  const counterService = useInjection(CounterService);
-
-  return <button onClick={() => counterService.increment()}>Count: {counterService.count}</button>;
-});
 ```
 
-### Lit + Signals
+`@wirestate/react` connects the component to the service. `useSignals()` subscribes this component to signal reads
+during render. The same service pattern can use MobX in React or Lit Signals in Lit.
 
-This example provides the same service from a Lit root element. `watch()` subscribes the template to signal updates.
+## Documentation
 
-```ts
-import { Injectable } from "@wirestate/core";
-import { ContainerProvider, provideContainer, injection } from "@wirestate/lit";
-import { signal, State, watch } from "@wirestate/lit-signals";
-import { html, LitElement } from "lit";
-import { customElement } from "lit/decorators.js";
+- [Docs home](https://neloreck.github.io/wirestate/)
+- [Installation](https://neloreck.github.io/wirestate/introduction/installation)
+- [Core guide](https://neloreck.github.io/wirestate/core/overview)
+- [React guide](https://neloreck.github.io/wirestate/react/overview)
+- [Lit guide](https://neloreck.github.io/wirestate/lit/overview)
+- [API reference](https://neloreck.github.io/wirestate/api/)
 
-@Injectable()
-class CounterService {
-  public readonly count: State<number> = signal(0);
+## Development
 
-  public increment(): void {
-    this.count.set(this.count.get() + 1);
-  }
-}
-
-@customElement("counter-application")
-class CounterApplication extends LitElement {
-  @provideContainer({ config: { bindings: [CounterService] } })
-  private containerProvider!: ContainerProvider;
-
-  protected render() {
-    return html`<counter-button></counter-button>`;
-  }
-}
-
-@customElement("counter-button")
-class CounterButton extends LitElement {
-  @injection(CounterService)
-  private counterService!: CounterService;
-
-  protected render() {
-    return html`
-      <button @click=${() => this.counterService.increment()}>Count: ${watch(this.counterService.count)}</button>
-    `;
-  }
-}
+```bash
+pnpm install
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+pnpm docs:build
 ```
 
-## Docs
-
-- [General](https://neloreck.github.io/wirestate/)
-- [API](https://neloreck.github.io/wirestate/api/)
+Build output goes to `target/`.
 
 ## License
 
