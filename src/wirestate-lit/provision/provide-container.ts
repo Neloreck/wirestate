@@ -46,6 +46,7 @@ export interface ProvideContainerDecorator<E extends ReactiveElement = ReactiveE
  * @param options - Provisioning options.
  * @param options.container - External container instance to provide.
  * @param options.config - Managed container creation config.
+ * @param options.scope - Managed container messaging scope.
  * @returns An instance of {@link ProvideContainerDecorator}.
  *
  * @example

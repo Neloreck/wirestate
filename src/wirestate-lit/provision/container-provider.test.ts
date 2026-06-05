@@ -1,6 +1,14 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
-import { BindingType, Container, Injectable, OnActivated, OnDeactivation, createContainer } from "@wirestate/core";
+import {
+  BindingType,
+  Container,
+  EventBus,
+  Injectable,
+  OnActivated,
+  OnDeactivation,
+  createContainer,
+} from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { GenericService } from "@/fixtures/services/generic-service";
@@ -10,7 +18,7 @@ import { useInjection } from "../consumption/use-injection";
 import { ContainerContext } from "../context/container-context";
 import { Maybe } from "../types/general";
 
-import { ContainerProvider } from "./container-provider";
+import { ContainerProvider, ContainerProviderScope } from "./container-provider";
 
 describe("ContainerProvider", () => {
   @customElement("ws-container-provider-host")
@@ -259,6 +267,52 @@ describe("ContainerProvider", () => {
     element.remove();
 
     expect(controller.value).toBeUndefined();
+  });
+
+  it("should create a managed messaging scope by default", () => {
+    const parent: Container = createContainer();
+    const element: TestProviderElement = new TestProviderElement();
+    const controller: ContainerProvider = new ContainerProvider(element, {
+      config: { parent },
+    });
+
+    document.body.appendChild(element);
+
+    expect(controller.value.get(EventBus)).toBeInstanceOf(EventBus);
+    expect(controller.value.get(EventBus)).not.toBe(parent.get(EventBus));
+
+    element.remove();
+  });
+
+  it("should inherit parent messaging scope when scope is parent", () => {
+    const parent: Container = createContainer();
+    const element: TestProviderElement = new TestProviderElement();
+    const controller: ContainerProvider = new ContainerProvider(element, {
+      config: { parent },
+      scope: "parent",
+    });
+
+    document.body.appendChild(element);
+
+    expect(controller.value.get(EventBus)).toBeInstanceOf(EventBus);
+    expect(controller.value.get(EventBus)).toBe(parent.get(EventBus));
+
+    element.remove();
+  });
+
+  it("should accept enum messaging scope values", () => {
+    const parent: Container = createContainer();
+    const element: TestProviderElement = new TestProviderElement();
+    const controller: ContainerProvider = new ContainerProvider(element, {
+      config: { parent },
+      scope: ContainerProviderScope.Parent,
+    });
+
+    document.body.appendChild(element);
+
+    expect(controller.value.get(EventBus)).toBe(parent.get(EventBus));
+
+    element.remove();
   });
 
   it("should not publish undefined to subscribed injection consumers on disconnect", () => {

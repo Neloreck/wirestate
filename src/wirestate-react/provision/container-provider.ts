@@ -16,6 +16,30 @@ import { shallowEqualActivation, shallowEqualArrays, shallowEqualObjects } from 
 import { ReactContainerProvisionLifecycle, retainContainer, scheduleContainerDestruction } from "./provision-lifecycle";
 
 /**
+ * Provider messaging scope modes.
+ *
+ * @group Provision
+ */
+export enum ContainerProviderScope {
+  /**
+   * Create container-local message buses for managed containers.
+   */
+  Container = "container",
+
+  /**
+   * Inherit message buses from the managed container's parent.
+   */
+  Parent = "parent",
+}
+
+/**
+ * String value accepted by {@link ContainerProviderProps.scope}.
+ *
+ * @group Provision
+ */
+export type ContainerProviderScopeValue = `${ContainerProviderScope}`;
+
+/**
  * Describes props for {@link ContainerProvider}.
  *
  * @remarks
@@ -45,6 +69,16 @@ export interface ContainerProviderProps {
   readonly config?: ContainerConfig;
 
   /**
+   * Managed container messaging scope.
+   *
+   * @remarks
+   * Defaults to `"container"`. Pass `"parent"` with a parent container in
+   * `config.parent` to inherit the parent's `EventBus`, `CommandBus`, and
+   * `QueryBus`.
+   */
+  readonly scope?: Maybe<ContainerProviderScopeValue>;
+
+  /**
    * React subtree that receives the active container.
    */
   readonly children?: ReactNode;
@@ -55,6 +89,7 @@ export interface ContainerProviderProps {
  */
 interface ContainerProviderState {
   readonly container: Container;
+  readonly scope: Maybe<ContainerProviderScopeValue>;
   readonly source: ContainerConfig;
 }
 
@@ -106,6 +141,7 @@ interface ContainerProvisionError {
 export function ContainerProvider(props: ContainerProviderProps) {
   const configValue: unknown = props.config;
   const hasConfig: boolean = configValue !== undefined;
+  const scope: Maybe<ContainerProviderScopeValue> = props.scope;
 
   if (hasConfig && (configValue === null || typeof configValue !== "object" || Array.isArray(configValue))) {
     throw new WirestateError(
@@ -143,7 +179,8 @@ export function ContainerProvider(props: ContainerProviderProps) {
   const [state, setState] = useState<Optional<ContainerProviderState>>(() =>
     normalizedSource
       ? {
-          container: createContainer(normalizedSource),
+          container: createContainer(normalizedSource, { skipMessaging: scope === ContainerProviderScope.Parent }),
+          scope,
           source: normalizedSource,
         }
       : null
@@ -159,7 +196,8 @@ export function ContainerProvider(props: ContainerProviderProps) {
   const needsReplacement: boolean = Boolean(
     state &&
     normalizedSource &&
-    (state.source.parent !== normalizedSource.parent ||
+    (state.scope !== scope ||
+      state.source.parent !== normalizedSource.parent ||
       state.source.onError !== normalizedSource.onError ||
       !shallowEqualObjects(state.source.seed, normalizedSource.seed) ||
       !shallowEqualObjects(state.source.seeds as Maybe<AnyObject>, normalizedSource.seeds as Maybe<AnyObject>) ||
@@ -171,7 +209,8 @@ export function ContainerProvider(props: ContainerProviderProps) {
 
   if (needsReplacement && normalizedSource) {
     activeState = {
-      container: createContainer(normalizedSource),
+      container: createContainer(normalizedSource, { skipMessaging: scope === ContainerProviderScope.Parent }),
+      scope,
       source: normalizedSource,
     };
 

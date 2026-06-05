@@ -21,7 +21,12 @@ export { useEventEmitter } from "./events/use-event-emitter";
 export { useInjection } from "./injection/use-injection";
 export { useOptionalInjection } from "./injection/use-optional-injection";
 
-export { ContainerProvider, ContainerProviderProps } from "./provision/container-provider";
+export {
+  ContainerProvider,
+  ContainerProviderProps,
+  ContainerProviderScope,
+  ContainerProviderScopeValue,
+} from "./provision/container-provider";
 
 export { useQueryExecutor } from "./queries/use-query-executor";
 export { useAsyncQueryExecutor } from "./queries/use-async-query-executor";
