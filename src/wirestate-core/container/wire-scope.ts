@@ -685,13 +685,11 @@ export class WireScope {
       key: (seed as AnyObject)?.name ?? seed,
     });
 
-    if (seed === undefined) {
-      this.assertActive();
+    this.assertActive();
 
+    if (seed === undefined) {
       return this.container.get<T>(SEED_TOKEN);
     } else {
-      this.assertActive();
-
       const seeds: SeedsMap = this.container.get<SeedsMap>(SEEDS_TOKEN);
 
       return seeds.has(seed) ? (seeds.get(seed) as T) : null;
