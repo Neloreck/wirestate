@@ -24,7 +24,7 @@ import { EventHandlerMetadata } from "../types/events";
  * const metadata = getEventHandlerMetadata(myService);
  *
  * metadata.forEach(meta => {
- *   console.log(`Method ${String(meta.propertyKey)} handles event ${String(meta.type)}`);
+ *   console.log(`Method ${String(meta.methodName)} handles events ${String(meta.types)}`);
  * });
  * ```
  */

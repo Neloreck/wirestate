@@ -138,6 +138,7 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
     defaultScope: "Singleton",
     parent: config.parent,
   });
+
   const errorHandler: Maybe<InternalErrorHandler> = config.onError ?? getConfiguredInternalErrorHandler(config.parent);
 
   container.bind(CONTAINER_PARENT_TOKEN).toConstantValue(config.parent);

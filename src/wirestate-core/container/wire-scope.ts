@@ -675,7 +675,7 @@ export class WireScope {
    *
    * @example
    * ```typescript
-   * const apiUrl: string = scope.getSeed("API_URL");
+   * const apiUrl = scope.getSeed<string>("API_URL");
    * ```
    */
   public getSeed<T>(seed: SeedKey): Optional<T>;
