@@ -14,10 +14,8 @@ interface QueryHandlerDescriptor {
  * Dispatches named queries to one active handler.
  *
  * @remarks
- * Queries are reads: get current user, ask for a label, fetch cached state.
- *
- * Handlers are stacked by type. The newest handler wins. That lets a subtree
- * temporarily answer a query, then unregister and reveal the older answer.
+ * Queries represent reads such as current user, labels, or cached state.
+ * Handlers are stacked by type: the newest handler wins until it unregisters.
  *
  * @group Queries
  *

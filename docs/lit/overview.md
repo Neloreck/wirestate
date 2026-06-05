@@ -2,7 +2,7 @@
 
 `@wirestate/lit` connects Wirestate containers to Lit elements.
 
-Use it when Lit elements need access to a Wirestate container. It provides
+Use it when Lit elements need access to a Wirestate container:
 [container providers](/api/wirestate-lit/functions/provideContainer), injection helpers, and element handlers for local
 events, commands, and queries.
 

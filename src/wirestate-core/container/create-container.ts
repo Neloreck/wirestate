@@ -24,7 +24,7 @@ import { WireScope } from "./wire-scope";
  */
 export interface ContainerConfig {
   /**
-   * Bindings to resolve immediately after binding.
+   * Bindings to resolve immediately.
    */
   readonly activate?: boolean | ReadonlyArray<Identifier>;
 
@@ -65,12 +65,9 @@ export interface CreateContainerOptions {
    * Skip binding container-scoped event, query, and command buses.
    *
    * @remarks
-   * Use this for tests or integration points that only need dependency
-   * injection, seeds, and scope support.
-   *
-   * A container created with this option can inherit messaging buses from a
-   * parent container. If it has no inherited buses, resolving `WireScope` will
-   * fail because `WireScope` depends on `EventBus`, `QueryBus`, and `CommandBus`.
+   * A child container can still inherit buses from its parent. Without inherited
+   * buses, resolving `WireScope` fails because it depends on `EventBus`,
+   * `QueryBus`, and `CommandBus`.
    *
    * @default `false`
    */
@@ -88,16 +85,15 @@ export interface CreateContainerOptions {
  * Creates a Wirestate container.
  *
  * @remarks
- * This is an Inversify container with Wirestate pieces already installed:
+ * Returns an Inversify container with Wirestate pieces installed:
  *
  * - Shared seed and targeted seed tokens.
  * - Container-scoped `EventBus`, `CommandBus`, and `QueryBus`.
  * - Transient `WireScope`, so each instance gets its own scope handle.
  * - Singleton default scope for declared classes.
  *
- * Child containers inherit parent bindings and seed defaults, but get their
- * own buses. Passing `seed` or `seeds` on a child creates child-local seed
- * state.
+ * Child containers inherit parent bindings and seed defaults, but get their own
+ * buses. Passing `seed` or `seeds` creates child-local seed state.
  *
  * @group Container
  *

@@ -34,8 +34,7 @@ interface EventSubscription {
  * Broadcasts events to every subscriber in one container.
  *
  * @remarks
- * Events are fire-and-forget. No handler owns the result because there is no
- * result. Use them for "this happened" notifications.
+ * Events are fire-and-forget "this happened" notifications.
  *
  * @group Events
  *
@@ -129,11 +128,9 @@ export class EventBus {
    * Subscribes to one or more event types.
    *
    * @remarks
-   * The handler is indexed by type, so it is only invoked for matching events.
-   * Pass `null` to subscribe to every event.
-   * Each call is an independent subscription: subscribing the same function twice
-   * delivers the event to it twice, and each returned unsubscriber removes only
-   * its own subscription.
+   * Pass `null` to subscribe to every event. Each call is independent: subscribing
+   * the same function twice delivers the event twice, and each returned
+   * unsubscriber removes only its own subscription.
    *
    * @param types - Event type, list of event types, or `null` for every event.
    * @param handler - Event handler invoked for matching events.
@@ -193,9 +190,7 @@ export class EventBus {
    *
    * @remarks
    * Prefer the unsubscriber returned by {@link subscribe}. This by-reference form
-   * removes the most recently added catch-all subscription that uses the handler
-   * (one per call, like the command and query buses). If none match, it does
-   * nothing.
+   * removes the newest catch-all subscription that uses the handler.
    *
    * @param handler - The handler function instance to remove.
    */
@@ -205,9 +200,8 @@ export class EventBus {
    * Removes one of a handler's subscriptions for one or more event types.
    *
    * @remarks
-   * For each given type, removes the most recently added subscription that uses
-   * the handler (one per type per call). Pass `null` to target catch-all
-   * subscriptions. If none match, it does nothing.
+   * For each given type, removes the newest subscription that uses the handler.
+   * Pass `null` to target catch-all subscriptions.
    *
    * @param types - Event type, list of event types, or `null` for catch-all.
    * @param handler - The handler function instance to remove.
@@ -286,7 +280,7 @@ export class EventBus {
 
   /**
    * Removes a single subscription that uses a handler from a bucket and drops the bucket once it is empty.
-   
+   *
    * @param key - Event type, or the {@link ALL_EVENTS_TYPE} key, whose bucket to update.
    * @param handler - Handler whose subscription to remove.
    */

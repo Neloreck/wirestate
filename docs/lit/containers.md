@@ -26,9 +26,9 @@ export class ApplicationRoot extends LitElement {
 Managed containers are created when the host connects and disposed when it disconnects. They activate all bindings by
 default unless `activate` is provided.
 
-Use `@OnProvision` for resource work that belongs to the connected provider lifetime. Use `@OnDeprovision` to clean it
-up. Keep `@OnActivated` for cheap setup that does not open timers, subscriptions, or external handles. See
-[Core Lifecycle](/core/lifecycle) for the cross-framework lifecycle map.
+Use `@OnProvision` for resource work tied to the connected provider lifetime. Use `@OnDeprovision` to clean it up. Keep
+`@OnActivated` for cheap setup that does not open timers, subscriptions, or external handles. See
+[Core Lifecycle](/core/lifecycle).
 
 ## Controller Root Provider
 

@@ -14,10 +14,8 @@ interface CommandHandlerDescriptor {
  * Dispatches named commands to one active handler.
  *
  * @remarks
- * Commands are writes: save, login, reset, send.
- *
- * Handlers are stacked by type. The newest handler wins. Unregister it and the
- * previous handler takes over again.
+ * Commands represent writes such as save, login, reset, or send. Handlers are
+ * stacked by type: the newest handler wins until it unregisters.
  *
  * @group Commands
  *

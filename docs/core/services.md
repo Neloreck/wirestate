@@ -91,17 +91,16 @@ parent container. Without inherited messaging, use direct container injection in
 
 ## Lifecycle
 
-Wirestate has two lifecycle layers. See [Core Lifecycle](/core/lifecycle) for the full table that maps constructor
-resolution, container activation, provider mount/connect, provider unmount/disconnect, and container disposal.
+Wirestate has service lifecycle and provider lifecycle:
 
 - `@OnActivated` runs when the service is first resolved.
 - `@OnDeactivation` runs when the service is unbound or the container is disposed.
 - `@OnProvision` runs when a provider takes ownership of the container.
 - `@OnDeprovision` runs before that provider releases or replaces the container.
 
-Use provider lifecycle for work that needs cleanup: timers, subscriptions, sockets, observers, provider-scoped fetch
-loops, and external resource handles. Activation happens when a service is resolved. It can run before a provider
-boundary is committed, so it should stay cheap and avoid resources that depend on provider ownership.
+Use provider lifecycle for work that needs cleanup: timers, subscriptions, sockets, observers, fetch loops, and external
+handles. Keep activation cheap; it can run before a provider boundary is committed. See
+[Core Lifecycle](/core/lifecycle) for the full map.
 
 ```ts
 import { Injectable, OnDeprovision, OnProvision } from "@wirestate/core";
@@ -127,18 +126,6 @@ export class PollingService {
     // fetch current data
   }
 }
-```
-
-When you use core directly, call `provisionContainer` and `deprovisionContainer` at the boundary that owns provider
-lifecycle work.
-
-```ts
-import { deprovisionContainer, provisionContainer } from "@wirestate/core";
-
-const lifecycle = new Map();
-
-provisionContainer(container, lifecycle, [PollingService]);
-deprovisionContainer(container, lifecycle);
 ```
 
 ## Lazy Resolution

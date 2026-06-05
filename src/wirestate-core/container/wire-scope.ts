@@ -18,11 +18,8 @@ import { SeedKey, SeedsMap } from "../types/seeds";
  * Per-instance handle for container work.
  *
  * @remarks
- * Inject `WireScope` when an instance needs buses, seeds, or lazy resolution.
- *
- * Each bound instance gets its own transient scope. The scope is valid after
- * instance activation and before deactivation. After disposal it throws instead
- * of letting dead services keep talking to the container.
+ * Inject `WireScope` when a service needs buses, seeds, or lazy resolution.
+ * Each bound instance gets its own transient scope.
  *
  * @group Container
  *
@@ -95,7 +92,7 @@ export class WireScope {
    * Use this as the default async-work guard. It is `true` when either
    * {@link isDisposed} is `true` or {@link isDeprovisioned} is `true`.
    *
-   * @returns True when the scope was disposed or fully deprovisioned.
+   * @returns True after disposal or provider deprovision.
    */
   public get isInactive(): boolean {
     return this.isDisposed || this.isDeprovisioned === true;
@@ -646,6 +643,7 @@ export class WireScope {
    * Call without a key to get the one shared seed for this container.
    *
    * @template T - Expected type of the shared seed object.
+   *
    * @returns The shared seed object.
    *
    * @throws {@link WirestateError} If accessed before activation or after disposal.
@@ -668,6 +666,7 @@ export class WireScope {
    * Targeted seeds are keyed by class, string, or symbol.
    *
    * @template T - Expected type of the seed value.
+   *
    * @param seed - Lookup token for the seed.
    * @returns The seed value or `null` if not found.
    *
