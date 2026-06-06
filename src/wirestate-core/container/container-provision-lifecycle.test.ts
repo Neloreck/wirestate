@@ -2,8 +2,11 @@ import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { BindingType, Container, Inject, Injectable } from "../alias";
 import { OnActivated } from "../bind/instance/on-activated";
+import { OnDeprovision } from "../bind/instance/on-deprovision";
+import { OnProvision } from "../bind/instance/on-provision";
 import { unbindAll } from "../bind/unbind";
 import { Optional } from "../types/general";
+import { ProvisionId } from "../types/provision";
 
 import { ContainerProvisionLifecycle, deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
 import { createContainer } from "./create-container";
@@ -229,6 +232,142 @@ describe("provision lifecycle", () => {
       "deprovision-first-false-true",
       "provision-first-false-null",
       "provision-second-false-false",
+    ]);
+  });
+
+  it("should pass provision IDs to provision and deprovision handlers", () => {
+    const events: Array<string> = [];
+
+    @Injectable()
+    class ScopedLifecycleService {
+      public constructor(
+        @Inject(WireScope)
+        public readonly scope: WireScope
+      ) {}
+
+      @OnProvision()
+      public onProvision(provisionId: ProvisionId): void {
+        events.push("provision-" + provisionId + "-" + this.scope.provisionId);
+      }
+
+      @OnDeprovision()
+      public onDeprovision(provisionId: ProvisionId): void {
+        events.push("deprovision-" + provisionId + "-" + this.scope.provisionId);
+      }
+    }
+
+    const container: Container = createContainer({ bindings: [ScopedLifecycleService] });
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+    const service: ScopedLifecycleService = container.get(ScopedLifecycleService);
+
+    expect(service.scope.provisionId).toBeNull();
+
+    provisionContainer(container, lifecycle, [ScopedLifecycleService]);
+
+    expect(service.scope.provisionId).toBe(1);
+    expect(service.scope.isDeprovisioned).toBe(false);
+    expect(events).toEqual(["provision-1-1"]);
+
+    deprovisionContainer(container, lifecycle);
+
+    expect(service.scope.provisionId).toBe(1);
+    expect(service.scope.isDeprovisioned).toBe(true);
+    expect(events).toEqual(["provision-1-1", "deprovision-1-1"]);
+
+    provisionContainer(container, lifecycle, [ScopedLifecycleService]);
+
+    expect(service.scope.provisionId).toBe(2);
+    expect(service.scope.isDeprovisioned).toBe(false);
+    expect(events).toEqual(["provision-1-1", "deprovision-1-1", "provision-2-2"]);
+
+    deprovisionContainer(container, lifecycle);
+
+    expect(service.scope.provisionId).toBe(2);
+    expect(service.scope.isDeprovisioned).toBe(true);
+    expect(events).toEqual(["provision-1-1", "deprovision-1-1", "provision-2-2", "deprovision-2-2"]);
+  });
+
+  it("should increment provision IDs when the same instance is reprovisioned", () => {
+    const events: Array<string> = [];
+
+    @Injectable()
+    class ScopedLifecycleService {
+      public constructor(
+        @Inject(WireScope)
+        public readonly scope: WireScope
+      ) {}
+
+      @OnProvision()
+      public onProvision(provisionId: ProvisionId): void {
+        events.push("provision-" + provisionId);
+      }
+
+      @OnDeprovision()
+      public onDeprovision(provisionId: ProvisionId): void {
+        events.push("deprovision-" + provisionId);
+      }
+    }
+
+    const container: Container = createContainer({ bindings: [ScopedLifecycleService] });
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+    const service: ScopedLifecycleService = container.get(ScopedLifecycleService);
+
+    for (let it = 0; it < 10; it++) {
+      provisionContainer(container, lifecycle, [ScopedLifecycleService]);
+      deprovisionContainer(container, lifecycle);
+    }
+
+    provisionContainer(container, lifecycle, [ScopedLifecycleService]);
+
+    expect(service.scope.provisionId).toBe(11);
+    expect(service.scope.isDeprovisioned).toBe(false);
+    expect(events).toHaveLength(21);
+  });
+
+  it("should reset provision IDs before reprovision reaches each scope", () => {
+    interface ScopedFixture {
+      readonly scope: {
+        readonly isDeprovisioned: Optional<boolean>;
+        readonly provisionId: Optional<ProvisionId>;
+      };
+    }
+
+    const state: { first: Optional<ScopedFixture>; second: Optional<ScopedFixture> } = {
+      first: null,
+      second: null,
+    };
+
+    const events: Array<string> = [];
+    const { LifecycleService: FirstService } = createLifecycleService({
+      events,
+      methods: ["provision", "deprovision"],
+      suffix: () => "first-" + String(state.first?.scope.provisionId) + "-" + String(state.second?.scope.provisionId),
+    });
+    const { LifecycleService: SecondService } = createLifecycleService({
+      events,
+      methods: ["provision", "deprovision"],
+      suffix: () => "second-" + String(state.first?.scope.provisionId) + "-" + String(state.second?.scope.provisionId),
+    });
+
+    const container: Container = createContainer({ bindings: [FirstService, SecondService] });
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+
+    state.first = container.get(FirstService);
+    state.second = container.get(SecondService);
+
+    provisionContainer(container, lifecycle, [FirstService, SecondService]);
+    deprovisionContainer(container, lifecycle);
+    provisionContainer(container, lifecycle, [FirstService, SecondService]);
+
+    expect(state.first.scope.provisionId).toBe(2);
+    expect(state.second.scope.provisionId).toBe(2);
+    expect(events).toEqual([
+      "provision-first-1-null",
+      "provision-second-1-1",
+      "deprovision-second-1-1",
+      "deprovision-first-1-1",
+      "provision-first-2-null",
+      "provision-second-2-2",
     ]);
   });
 });

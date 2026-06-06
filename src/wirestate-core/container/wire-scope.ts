@@ -11,6 +11,7 @@ import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 import { CommandHandler, CommandUnregister, CommandType } from "../types/commands";
 import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 import { Optional, AnyObject } from "../types/general";
+import { ProvisionId } from "../types/provision";
 import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 import { SeedKey, SeedsMap } from "../types/seeds";
 
@@ -57,6 +58,16 @@ export class WireScope {
    * provider deprovisioned it.
    */
   public readonly isDeprovisioned: Optional<boolean> = null;
+
+  /**
+   * Current provider provision cycle ID for the owning instance.
+   *
+   * @remarks
+   * `null` means the scope has not reached a provider provision cycle.
+   * The value changes when the owning instance enters a new provider provision
+   * cycle and remains available after provider deprovision.
+   */
+  public readonly provisionId: Optional<ProvisionId> = null;
 
   /**
    * Container-scoped command bus used by command helper methods.

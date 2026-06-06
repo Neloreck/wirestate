@@ -1,3 +1,6 @@
+import { dbg } from "@/macroses/dbg.macro";
+import { prefix } from "@/macroses/prefix.macro";
+
 import { Container, Identifier, Newable } from "../../alias";
 import { CommandBus } from "../../commands/command-bus";
 import { WireScope } from "../../container/wire-scope";
@@ -70,6 +73,11 @@ export function hasScopeInjection(token: Identifier, options: HasWireScopeInject
  */
 export function attachScopes<T extends object>(instance: T, Constructor: Newable<T>): void {
   if (!hasScopeInjection(Constructor, { isRequired: true })) {
+    dbg.info(prefix(__filename), "No scopes attached, skip attachment:", {
+      instance,
+      Constructor,
+    });
+
     return;
   }
 
@@ -86,6 +94,13 @@ export function attachScopes<T extends object>(instance: T, Constructor: Newable
   if (scopes.length > 0) {
     SCOPES_BY_INSTANCE.set(instance, scopes);
   }
+
+  dbg.info(prefix(__filename), "Scopes attached:", {
+    instance,
+    Constructor,
+    scopes,
+    todoDelete: Object.getOwnPropertyNames(instance),
+  });
 }
 
 /**

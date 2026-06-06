@@ -47,6 +47,7 @@ describe("Library exported API from wirestate-core", () => {
     "OnEvent",
     "OnProvision",
     "OnQuery",
+    "ProvisionId",
     "QueryBus",
     "QueryHandler",
     "QueryType",

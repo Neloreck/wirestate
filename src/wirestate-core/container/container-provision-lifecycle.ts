@@ -10,12 +10,13 @@ import { getContainerBindings } from "../bind/utils/register-binding";
 import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
 import {
   CONTAINER_REFS_BY_INSTANCE,
+  PROVISION_IDS_BY_INSTANCE,
   PROVISION_LIFECYCLES_BY_CONTAINER,
   PROVISION_TOKENS_BY_INSTANCE,
   SCOPES_BY_INSTANCE,
 } from "../registry";
 import { Maybe, Optional } from "../types/general";
-import { Binding, Bindings } from "../types/provision";
+import { Binding, Bindings, ProvisionId } from "../types/provision";
 
 /**
  * Represents provider lifecycle state keyed by container.
@@ -232,18 +233,22 @@ export function provisionInstances(container: Container, bindings: Bindings = []
   }
 
   for (const instance of instances) {
-    markInstanceDeprovisionStatus(instance, null);
+    markInstanceProvisionStatus(instance, null, null);
   }
 
   for (let index: number = 0; index < instances.length; index += 1) {
     const instance: object = instances[index];
     const methodName: Maybe<string | symbol> = getProvisionHandlerMetadata(instance);
+    const provisionId: ProvisionId = (PROVISION_IDS_BY_INSTANCE.get(instance) ?? 0) + 1;
 
-    markInstanceDeprovisionStatus(instance, false);
+    PROVISION_IDS_BY_INSTANCE.set(instance, provisionId);
+
+    markInstanceProvisionStatus(instance, false, provisionId);
 
     try {
       if (methodName) {
         callLifecycleHandler({
+          args: [provisionId],
           container: CONTAINER_REFS_BY_INSTANCE.get(instance),
           name: "@OnProvision",
           details: [instance.constructor.name, String(methodName)],
@@ -283,43 +288,73 @@ export function provisionInstances(container: Container, bindings: Bindings = []
  */
 export function deprovisionInstances(instances: ReadonlyArray<object>): void {
   for (let index: number = instances.length - 1; index >= 0; index -= 1) {
-    const methodName: Maybe<string | symbol> = getDeprovisionHandlerMetadata(instances[index]);
+    const instance: object = instances[index];
+    const methodName: Maybe<string | symbol> = getDeprovisionHandlerMetadata(instance);
+    const provisionId: Maybe<ProvisionId> = PROVISION_IDS_BY_INSTANCE.get(instance);
 
     if (methodName) {
       callLifecycleHandler({
-        container: CONTAINER_REFS_BY_INSTANCE.get(instances[index]),
+        args: provisionId === undefined ? [] : [provisionId],
+        container: CONTAINER_REFS_BY_INSTANCE.get(instance),
         name: "@OnDeprovision",
-        details: [instances[index].constructor.name, String(methodName)],
-        instance: instances[index],
-        instanceName: instances[index].constructor.name,
+        details: [instance.constructor.name, String(methodName)],
+        instance,
+        instanceName: instance.constructor.name,
         methodName,
         source: "provider-deprovision",
         syncFailureMessage: "@OnDeprovision failed for",
       });
     }
 
-    markInstanceDeprovisionStatus(instances[index], true);
+    markInstanceProvisionStatus(instance, true, provisionId);
   }
 }
 
 /**
- * Marks all scopes injected into a provider lifecycle instance with deprovision status.
+ * Marks all scopes injected into a provider lifecycle instance with provision state.
  *
  * @internal
  *
  * @param instance - The instance resolved for provider lifecycle.
  * @param isDeprovisioned - Whether the instance has left provider ownership, or null before provision reaches it.
+ * @param provisionId - Current provider provision cycle ID for this instance.
  */
-function markInstanceDeprovisionStatus(instance: object, isDeprovisioned: Optional<boolean>): void {
-  const scopes: Maybe<ReadonlyArray<{ readonly isDeprovisioned: Optional<boolean> }>> =
-    SCOPES_BY_INSTANCE.get(instance);
+function markInstanceProvisionStatus(
+  instance: object,
+  isDeprovisioned: Optional<boolean>,
+  provisionId?: Optional<ProvisionId>
+): void {
+  const scopes: Maybe<
+    ReadonlyArray<{
+      readonly isDeprovisioned: Optional<boolean>;
+      readonly provisionId: Optional<ProvisionId>;
+    }>
+  > = SCOPES_BY_INSTANCE.get(instance);
 
   if (!scopes) {
+    dbg.info(prefix(__filename), "Skip marking instance provision status:", {
+      instance,
+      isDeprovisioned,
+      provisionId,
+      scopes,
+    });
+
     return;
   }
 
+  dbg.info(prefix(__filename), "Mark instance provision status:", {
+    instance,
+    isDeprovisioned,
+    provisionId,
+    scopes,
+  });
+
   for (const scope of scopes) {
     (scope as { isDeprovisioned: Optional<boolean> }).isDeprovisioned = isDeprovisioned;
+
+    if (provisionId !== undefined) {
+      (scope as { provisionId: Optional<ProvisionId> }).provisionId = provisionId;
+    }
   }
 }
 

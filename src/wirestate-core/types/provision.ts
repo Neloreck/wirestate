@@ -9,6 +9,18 @@ import type {
 import { Newable, Identifier } from "../alias";
 
 /**
+ * Identifier for one provider provision cycle of a service instance.
+ *
+ * @remarks
+ * IDs are unique only within a single service instance. Use the value passed to
+ * `@OnProvision` and `@OnDeprovision` with `WireScope.provisionId` to ignore
+ * async work from an older provision cycle.
+ *
+ * @group Container
+ */
+export type ProvisionId = number;
+
+/**
  * Inversify binding strategy name.
  *
  * @group Bind

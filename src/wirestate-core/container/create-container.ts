@@ -123,7 +123,7 @@ export interface CreateContainerOptions {
  * ```
  */
 export function createContainer(config: ContainerConfig = {}, options: CreateContainerOptions = {}): Container {
-  dbg.info(prefix(__filename), "Creating IOC container:", { config, options });
+  dbg.info(prefix(__filename), "Creating container:", { config, options });
 
   validateContainerConfig(config);
 

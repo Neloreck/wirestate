@@ -8,6 +8,11 @@ import { MaybePromise } from "../types/general";
 
 export interface CallLifecycleHandlerOptions {
   /**
+   * Arguments passed to the lifecycle method.
+   */
+  readonly args?: ReadonlyArray<unknown>;
+
+  /**
    * Container that owns the lifecycle handler.
    */
   readonly container?: Container;
@@ -67,7 +72,7 @@ export interface CallLifecycleHandlerOptions {
  * @param options - Lifecycle handler call options.
  */
 export function callLifecycleHandler(options: CallLifecycleHandlerOptions): void {
-  const { container, name, instance, methodName, rethrowSync, source } = options;
+  const { args, container, name, instance, methodName, rethrowSync, source } = options;
   const details: ReadonlyArray<unknown> = options.details ?? [instance.constructor.name, String(methodName)];
   const instanceName: string = options.instanceName ?? instance.constructor.name;
   const method: unknown = (instance as Record<string | symbol, unknown>)[methodName];
@@ -86,7 +91,10 @@ export function callLifecycleHandler(options: CallLifecycleHandlerOptions): void
   });
 
   try {
-    const result: MaybePromise<void> = (method as () => MaybePromise<void>).call(instance);
+    const result: MaybePromise<void> = (method as (...args: Array<unknown>) => MaybePromise<void>).call(
+      instance,
+      ...(args ?? [])
+    );
 
     if (result && typeof (result as Promise<void>).then === "function") {
       (result as Promise<void>).catch((error) => {

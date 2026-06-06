@@ -3,7 +3,7 @@ import { WireScope } from "./container/wire-scope";
 import { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
 import { InternalErrorHandler } from "./types/error";
 import { EventHandlerMetadata, EventUnsubscriber } from "./types/events";
-import { Binding } from "./types/provision";
+import { Binding, ProvisionId } from "./types/provision";
 import { QueryHandlerMetadata, QueryUnregister } from "./types/queries";
 
 /**
@@ -168,6 +168,14 @@ export const PROVISION_LIFECYCLES_BY_CONTAINER: WeakMap<Container, Set<Map<Conta
  * @internal
  */
 export const PROVISION_TOKENS_BY_INSTANCE: WeakMap<object, Set<Identifier>> = new WeakMap();
+
+/**
+ * Internal storage for the latest provider provision cycle ID per instance.
+ *
+ * @group Container
+ * @internal
+ */
+export const PROVISION_IDS_BY_INSTANCE: WeakMap<object, ProvisionId> = new WeakMap();
 
 /**
  * Internal storage for container error handlers.

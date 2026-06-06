@@ -47,6 +47,7 @@ export {
   DynamicValueBindingDescriptor,
   FactoryBindingDescriptor,
   InstanceBindingDescriptor,
+  ProvisionId,
   ResolvedValueBindingDescriptor,
   ServiceRedirectionBindingDescriptor,
 } from "./types/provision";
