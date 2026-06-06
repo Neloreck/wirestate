@@ -68,6 +68,8 @@ export class CommandBus {
    * ```
    */
   public execute<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R {
+    dbg.info(prefix(__filename), "Execute command:", { type, payload });
+
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
@@ -100,6 +102,8 @@ export class CommandBus {
     type: T,
     payload?: P
   ): Promise<R> {
+    dbg.info(prefix(__filename), "Execute async command:", { type, payload });
+
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
@@ -127,6 +131,8 @@ export class CommandBus {
     type: T,
     payload?: P
   ): Optional<R> {
+    dbg.info(prefix(__filename), "Execute optional command:", { type, payload });
+
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
@@ -151,6 +157,8 @@ export class CommandBus {
     type: T,
     payload?: P
   ): Promise<Optional<R>> {
+    dbg.info(prefix(__filename), "Execute optional async command:", { type, payload });
+
     const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {

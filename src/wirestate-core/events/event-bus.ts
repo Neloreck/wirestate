@@ -94,6 +94,8 @@ export class EventBus {
       (event as { source: S }).source = options.source;
     }
 
+    dbg.info(prefix(__filename), "Emit event:", { event });
+
     // Snapshot each bucket so subscriptions may change during emit.
     // Catch-all subscriptions run before type-specific ones.
     const allEventsSubscriptions: Maybe<Set<EventSubscription>> = this.handlers.get(ALL_EVENTS_TYPE);

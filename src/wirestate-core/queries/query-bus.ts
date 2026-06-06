@@ -69,6 +69,8 @@ export class QueryBus {
    * ```
    */
   public query<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): R {
+    dbg.info(prefix(__filename), "Query:", { type, payload });
+
     const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
@@ -98,6 +100,8 @@ export class QueryBus {
    * @throws {@link WirestateError} If no handler is registered for the given type.
    */
   public async queryAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): Promise<R> {
+    dbg.info(prefix(__filename), "Async query:", { type, payload });
+
     const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
@@ -126,6 +130,8 @@ export class QueryBus {
    * @returns The query handler result as-is, or `null` if no handler is found.
    */
   public queryOptional<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): Optional<R> {
+    dbg.info(prefix(__filename), "Query optional:", { type, payload });
+
     const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
@@ -150,6 +156,8 @@ export class QueryBus {
     type: T,
     payload?: P
   ): Promise<Optional<R>> {
+    dbg.info(prefix(__filename), "Optional async query:", { type, payload });
+
     const stack: Maybe<Array<QueryHandlerDescriptor>> = this.handlers.get(type);
 
     if (stack?.length) {
