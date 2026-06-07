@@ -1,12 +1,11 @@
 import "./Application.css";
 
 import {
-  useInjection,
-  useEvent,
   useAllEvents,
+  useEvent,
   useEvents,
+  useInjection,
 } from "@wirestate/react";
-import { observer } from "@wirestate/react-mobx";
 import { useEffect } from "react";
 
 import { EventsLog } from "@/components/EventsLog";
@@ -16,7 +15,7 @@ import { EGlobalEvent } from "@/constants/events";
 import { GLOBAL_CONFIG } from "@/constants/id";
 import { ThemeService } from "@/services/ThemeService";
 
-export const Application = observer(() => {
+export const Application = () => {
   const themeService: ThemeService = useInjection(ThemeService);
   const globalConfig: object = useInjection(GLOBAL_CONFIG);
 
@@ -66,4 +65,4 @@ export const Application = observer(() => {
       </section>
     </>
   );
-});
+};

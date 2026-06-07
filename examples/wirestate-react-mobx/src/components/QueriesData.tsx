@@ -9,7 +9,6 @@ import {
   useQueryExecutor,
   useQueryHandler,
 } from "@wirestate/react";
-import { observer } from "@wirestate/react-mobx";
 import { useCallback, useState } from "react";
 
 import { EGlobalQuery } from "@/constants/queries";
@@ -22,7 +21,7 @@ import { LoggerService } from "@/services/LoggerService";
 import { ThemeService } from "@/services/ThemeService";
 import type { Optional, Theme } from "@/types";
 
-export const QueriesData = observer(() => {
+export const QueriesData = () => {
   const [snapshot, setSnapshot] = useState<Optional<ICounterSnapshot>>(null);
   const [summary, setSummary] = useState<Optional<ICounterSummary>>(null);
 
@@ -88,4 +87,4 @@ export const QueriesData = observer(() => {
       <br />
     </section>
   );
-});
+};

@@ -1,11 +1,10 @@
 import "./EventsLog.css";
 
 import { useInjection } from "@wirestate/react";
-import { observer } from "@wirestate/react-mobx";
 
 import { LoggerService } from "@/services/LoggerService";
 
-export const EventsLog = observer(() => {
+export const EventsLog = () => {
   const loggerService: LoggerService = useInjection(LoggerService);
 
   return (
@@ -37,4 +36,4 @@ export const EventsLog = observer(() => {
       </button>
     </div>
   );
-});
+};

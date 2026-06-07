@@ -12,9 +12,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@wirestate/core": "^1.0.0-experimental.0",
-    "@wirestate/react": "^1.0.0-experimental.0",
-    "@wirestate/react-mobx": "^1.0.0-experimental.0",
+    "@wirestate/core": "^1.0.0-experimental.3",
+    "@wirestate/react": "^1.0.0-experimental.3",
+    "@wirestate/react-mobx": "^1.0.0-experimental.3",
     "mobx": "^6.15.0",
     "mobx-react-lite": "^4.1.1",
     "react": "^19.2.4",
@@ -41,6 +41,7 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "eslint-plugin-import": "^2.32.0",
     "globals": "^17.4.0",
+    "mobx-react-observer": "^2.0.0",
     "prettier": "^3.8.3",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.0",

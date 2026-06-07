@@ -1,13 +1,12 @@
 import "./GeneralControls.css";
 
 import {
-  type EventEmitter,
-  useInjection,
-  useEventEmitter,
   type CommandExecutor,
+  type EventEmitter,
   useCommandExecutor,
+  useEventEmitter,
+  useInjection,
 } from "@wirestate/react";
-import { observer } from "@wirestate/react-mobx";
 import { useCallback } from "react";
 
 import { EGlobalCommand } from "@/constants/commands";
@@ -15,7 +14,7 @@ import { EGlobalEvent } from "@/constants/events";
 import { CounterService } from "@/services/CounterService";
 import { ThemeService } from "@/services/ThemeService";
 
-export const GeneralControls = observer(() => {
+export const GeneralControls = () => {
   const counterService: CounterService = useInjection(CounterService);
   const themeService: ThemeService = useInjection(ThemeService);
 
@@ -76,4 +75,4 @@ export const GeneralControls = observer(() => {
       </div>
     </div>
   );
-});
+};
