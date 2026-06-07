@@ -1,6 +1,6 @@
 {
   "name": "wirestate-project",
-  "version": "1.0.0-experimental.3",
+  "version": "1.0.0-experimental.4",
   "description": "Dependency-injected service state for React and Lit applications",
   "private": true,
   "author": "Syrotenko Igor",
