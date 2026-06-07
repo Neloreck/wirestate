@@ -205,12 +205,6 @@ export function deprovisionContainerBindings(container: Container): void {
 /**
  * Resolves provider lifecycle participants and calls provision hooks.
  *
- * @remarks
- * Provisioning runs in two passes:
- *
- * - Resolve instances first, so `@OnActivated` completes before provider hooks.
- * - Call `@OnProvision` in binding order.
- *
  * @group Container
  *
  * @param container - Container that owns the bindings.
@@ -224,6 +218,7 @@ export function provisionInstances(container: Container, bindings: Bindings = []
   const trackedTokens: Array<readonly [object, Identifier]> = [];
   const visited: Set<Identifier> = new Set();
 
+  // Phase 1: resolve each distinct participant so @OnActivated runs before hooks.
   for (const binding of bindings) {
     const token: Identifier = getBindingToken(binding);
     const metadataToken: Identifier = getProviderLifecycleMetadataToken(binding);
@@ -239,6 +234,7 @@ export function provisionInstances(container: Container, bindings: Bindings = []
     }
   }
 
+  // Phase 2: reset active instances to in-flight markers before any hook runs.
   for (const instance of ACTIVE_INSTANCES_BY_CONTAINER.get(container) ?? []) {
     const status: WireStatus = WireStatus.for(instance);
 
@@ -248,6 +244,7 @@ export function provisionInstances(container: Container, bindings: Bindings = []
     }
   }
 
+  // Phase 3: provision each participant and run its @OnProvision hook.
   for (let index: number = 0; index < instances.length; index += 1) {
     const instance: object = instances[index];
     const methodName: Maybe<string | symbol> = getProvisionHandlerMetadata(instance);
@@ -297,7 +294,7 @@ export function provisionInstances(container: Container, bindings: Bindings = []
     }
   }
 
-  // Update instances not participating in lifecycle directly.
+  // Phase 4: mark remaining active non-participants as provisioned.
   for (const instance of ACTIVE_INSTANCES_BY_CONTAINER.get(container) ?? []) {
     const status: WireStatus = WireStatus.for(instance);
 
