@@ -69,5 +69,5 @@ counter.increment();
 ## API Reference
 
 [`createContainer`](/api/wirestate-core/functions/createContainer), [`WireScope`](/api/wirestate-core/classes/WireScope),
-[`EventBus`](/api/wirestate-core/classes/EventBus), [`CommandBus`](/api/wirestate-core/classes/CommandBus),
-[`QueryBus`](/api/wirestate-core/classes/QueryBus).
+[`WireStatus`](/api/wirestate-core/classes/WireStatus), [`EventBus`](/api/wirestate-core/classes/EventBus),
+[`CommandBus`](/api/wirestate-core/classes/CommandBus), [`QueryBus`](/api/wirestate-core/classes/QueryBus).

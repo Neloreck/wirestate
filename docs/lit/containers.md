@@ -30,6 +30,30 @@ Use `@OnProvision` for resource work tied to the connected provider lifetime. Us
 `@OnActivated` for cheap setup that does not open timers, subscriptions, or external handles. See
 [Core Lifecycle](/core/lifecycle).
 
+## Messaging Scope
+
+Managed providers create container-local event, command, and query buses by default. Pass `scope: "parent"` when a child
+container should inherit those buses from `config.parent`.
+
+```ts
+import { Container, createContainer } from "@wirestate/core";
+import { ContainerProvider, provideContainer } from "@wirestate/lit";
+import { LitElement } from "lit";
+import { CheckoutService, RootService } from "./services";
+
+const rootContainer: Container = createContainer({ bindings: [RootService] });
+
+class CheckoutRoot extends LitElement {
+  @provideContainer({
+    config: { parent: rootContainer, bindings: [CheckoutService] },
+    scope: "parent",
+  })
+  private checkoutProvider!: ContainerProvider;
+}
+```
+
+`scope: "parent"` affects only managed containers. External containers keep the buses they were created with.
+
 ## Controller Root Provider
 
 Use `useContainerProvider` when a controller-style field fits the element better than a decorator.
@@ -66,4 +90,5 @@ class ApplicationRoot extends LitElement {
 
 [`provideContainer`](/api/wirestate-lit/functions/provideContainer),
 [`ContainerProvider`](/api/wirestate-lit/classes/ContainerProvider),
+[`ContainerProviderScope`](/api/wirestate-lit/enumerations/ContainerProviderScope),
 [`useContainerProvider`](/api/wirestate-lit/functions/useContainerProvider).

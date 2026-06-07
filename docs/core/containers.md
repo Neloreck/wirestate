@@ -70,6 +70,24 @@ Child containers inherit parent bindings. Their buses and targeted seeds stay lo
 Use child containers for modal state, checkout flows, tenant scope, tests, or any branch that needs its own services or
 local messaging.
 
+## Inherited Messaging
+
+Pass `{ skipMessaging: true }` as the second `createContainer` argument when a child should use the parent's message
+buses instead of creating its own.
+
+```ts
+const child = createContainer(
+  {
+    parent: container,
+    bindings: [CartService],
+  },
+  { skipMessaging: true }
+);
+```
+
+With `skipMessaging`, `WireScope`, `EventBus`, `CommandBus`, and `QueryBus` resolve from the parent. Use this only when
+the child should share event, command, and query handlers with the parent scope.
+
 ## Direct Container Work
 
 `createContainer` returns an Inversify `Container`. You can still use normal container methods when a lower-level
@@ -105,6 +123,7 @@ Wirestate's registered binding list.
 ## API Reference
 
 [`createContainer`](/api/wirestate-core/functions/createContainer), [`ContainerConfig`](/api/wirestate-core/interfaces/ContainerConfig),
+[`CreateContainerOptions`](/api/wirestate-core/interfaces/CreateContainerOptions),
 [`Container`](/api/wirestate-core/classes/Container), [`provisionContainer`](/api/wirestate-core/functions/provisionContainer),
 [`deprovisionContainer`](/api/wirestate-core/functions/deprovisionContainer),
 [`unbind`](/api/wirestate-core/functions/unbind), [`unbindAll`](/api/wirestate-core/functions/unbindAll).

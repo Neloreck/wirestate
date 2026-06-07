@@ -85,10 +85,6 @@ export class CartService {
 `createContainer(config, { skipMessaging: true })` can only resolve `WireScope` when those buses are inherited from a
 parent container. Without inherited messaging, use direct container injection instead of `WireScope`.
 
-- `scope.isDisposed` becomes `true` after service deactivation.
-- `scope.isDeprovisioned` tracks provider ownership: `null`, then `false`, then `true`.
-- `scope.isInactive` is the normal guard for async work that may finish late.
-
 ## Lifecycle
 
 Wirestate has service lifecycle and provider lifecycle:
@@ -124,6 +120,31 @@ export class PollingService {
 
   private poll(): void {
     // fetch current data
+  }
+}
+```
+
+Use `WireStatus.for(this)` when async work needs a lifecycle guard.
+
+```ts
+import { Injectable, OnProvision, ProvisionId, WireStatus } from "@wirestate/core";
+
+@Injectable()
+export class ProfileService {
+  @OnProvision()
+  public async onProvision(provisionId: ProvisionId): Promise<void> {
+    const profile = await fetch("/api/profile").then((response) => response.json());
+    const status = WireStatus.for(this);
+
+    if (status.isInactive || status.provisionId !== provisionId) {
+      return;
+    }
+
+    this.setProfile(profile);
+  }
+
+  private setProfile(profile: unknown): void {
+    // update service state
   }
 }
 ```
@@ -187,6 +208,7 @@ container and create a new one for future work.
 ## API Reference
 
 [`Injectable`](/api/wirestate-core/functions/Injectable), [`Inject`](/api/wirestate-core/functions/Inject),
-[`WireScope`](/api/wirestate-core/classes/WireScope), [`OnProvision`](/api/wirestate-core/functions/OnProvision),
-[`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision), [`BindingDescriptor`](/api/wirestate-core/type-aliases/BindingDescriptor),
+[`WireScope`](/api/wirestate-core/classes/WireScope), [`WireStatus`](/api/wirestate-core/classes/WireStatus),
+[`OnProvision`](/api/wirestate-core/functions/OnProvision), [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision),
+[`BindingDescriptor`](/api/wirestate-core/type-aliases/BindingDescriptor),
 [`unbind`](/api/wirestate-core/functions/unbind), [`unbindAll`](/api/wirestate-core/functions/unbindAll).

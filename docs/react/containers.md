@@ -32,6 +32,31 @@ work in `@OnProvision`; clean them up in `@OnDeprovision`. See [Core Lifecycle](
 Managed providers recreate the container when `parent`, `onError`, `seed`, `seeds`, `bindings`, or `activate` changes by
 shallow comparison. Keep config objects and arrays stable with `useMemo` when the container should not be replaced.
 
+## Messaging Scope
+
+Managed providers create container-local event, command, and query buses by default. Pass `scope="parent"` when a child
+container should inherit those buses from `config.parent`.
+
+```tsx
+import { Container, ContainerConfig } from "@wirestate/core";
+import { ContainerProvider, useContainer } from "@wirestate/react";
+import { useMemo } from "react";
+import { CheckoutService } from "./services";
+
+function CheckoutFlow() {
+  const parent: Container = useContainer();
+  const config: ContainerConfig = useMemo(() => ({ parent, bindings: [CheckoutService] }), [parent]);
+
+  return (
+    <ContainerProvider config={config} scope={"parent"}>
+      <Checkout />
+    </ContainerProvider>
+  );
+}
+```
+
+`scope="parent"` affects only managed containers. External containers keep the buses they were created with.
+
 ## External Root Container
 
 Pass `container` when your code creates and owns the container.
@@ -77,5 +102,6 @@ function DevTools() {
 
 [`ContainerProvider`](/api/wirestate-react/functions/ContainerProvider),
 [`ContainerProviderProps`](/api/wirestate-react/interfaces/ContainerProviderProps),
+[`ContainerProviderScope`](/api/wirestate-react/enumerations/ContainerProviderScope),
 [`useContainer`](/api/wirestate-react/functions/useContainer),
 [`useScope`](/api/wirestate-react/functions/useScope).

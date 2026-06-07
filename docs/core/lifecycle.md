@@ -35,8 +35,8 @@ Provision and deprovision belong to the owner that exposes a container to an app
 lifecycle participants before calling provision hooks, calls provision hooks in binding order, and calls deprovision
 hooks in reverse order.
 
-Services that inject `WireScope` also participate in provider lifecycle state tracking. This lets async work check
-`scope.isInactive` even when the service has no provider hook.
+Wirestate tracks lifecycle state for each resolved service instance. Use `WireStatus.for(this)` inside a service when
+async work needs to know whether the instance is still active.
 
 ## Ownership
 
@@ -47,13 +47,37 @@ External providers publish a container passed through `container`. They provisio
 boundary, but they never dispose it. The code that created the external container remains responsible for `unbind` or
 `unbindAll`.
 
-Injected [`WireScope`](/api/wirestate-core/classes/WireScope) instances expose lifecycle state for late async guards:
+[`WireStatus`](/api/wirestate-core/classes/WireStatus) exposes lifecycle state for late async guards:
 
 | Field             | Meaning                                                                                                                       |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | `isDisposed`      | `true` after service deactivation.                                                                                            |
 | `isDeprovisioned` | `null` before provider provisioning reaches the service, `false` while provider-owned, and `true` after provider deprovision. |
 | `isInactive`      | `true` when the service has been disposed or deprovisioned.                                                                   |
+| `provisionId`     | Current provider provision cycle ID, or `null` before provider lifecycle reaches the service.                                 |
+
+```ts
+import { Injectable, OnProvision, ProvisionId, WireStatus } from "@wirestate/core";
+
+@Injectable()
+export class SearchService {
+  @OnProvision()
+  public async onProvision(provisionId: ProvisionId): Promise<void> {
+    const result = await fetch("/api/search").then((response) => response.json());
+    const status = WireStatus.for(this);
+
+    if (status.isInactive || status.provisionId !== provisionId) {
+      return;
+    }
+
+    this.applyResult(result);
+  }
+
+  private applyResult(result: unknown): void {
+    // update service state
+  }
+}
+```
 
 ## API Reference
 
@@ -61,6 +85,8 @@ Injected [`WireScope`](/api/wirestate-core/classes/WireScope) instances expose l
 [`OnDeactivation`](/api/wirestate-core/functions/OnDeactivation),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision),
+[`WireStatus`](/api/wirestate-core/classes/WireStatus),
+[`ProvisionId`](/api/wirestate-core/type-aliases/ProvisionId),
 [`provisionContainer`](/api/wirestate-core/functions/provisionContainer),
 [`deprovisionContainer`](/api/wirestate-core/functions/deprovisionContainer),
 [`unbind`](/api/wirestate-core/functions/unbind), [`unbindAll`](/api/wirestate-core/functions/unbindAll).
