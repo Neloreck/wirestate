@@ -99,6 +99,31 @@ describe("unbind", () => {
     expect(events).toEqual(["provision-a", "provision-b", "deprovision-a", "deactivation-a", "deprovision-b"]);
   });
 
+  it("should deprovision and deactivate every provisioned service on unbindAll", () => {
+    const events: Array<string> = [];
+    const { LifecycleService: ServiceA } = createLifecycleService({ events, suffix: "a" });
+    const { LifecycleService: ServiceB } = createLifecycleService({ events, suffix: "b" });
+    const container: Container = createContainer({ bindings: [ServiceA, ServiceB] });
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+
+    provisionContainer(container, lifecycle);
+
+    expect(events).toEqual(["activated-a", "activated-b", "provision-a", "provision-b"]);
+
+    unbindAll(container);
+
+    expect(events).toEqual([
+      "activated-a",
+      "activated-b",
+      "provision-a",
+      "provision-b",
+      "deprovision-b",
+      "deprovision-a",
+      "deactivation-a",
+      "deactivation-b",
+    ]);
+  });
+
   it("should deprovision a provisioned instance on raw unbind and not re-deprovision afterwards", () => {
     const { LifecycleService, events } = createLifecycleService();
 
