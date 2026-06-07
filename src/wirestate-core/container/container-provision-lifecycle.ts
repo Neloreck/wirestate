@@ -2,21 +2,23 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { BindingType, Container, Identifier } from "../alias";
-import { hasScopeInjection } from "../bind/instance/instance-scopes";
 import { getDeprovisionHandlerMetadata } from "../bind/instance/on-deprovision";
 import { getProvisionHandlerMetadata } from "../bind/instance/on-provision";
 import { getBindingToken } from "../bind/utils/get-binding-token";
 import { getContainerBindings } from "../bind/utils/register-binding";
 import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
 import {
+  ACTIVE_INSTANCES_BY_CONTAINER,
   CONTAINER_REFS_BY_INSTANCE,
   PROVISION_IDS_BY_INSTANCE,
   PROVISION_LIFECYCLES_BY_CONTAINER,
+  PROVISION_STATUS_BY_CONTAINER,
   PROVISION_TOKENS_BY_INSTANCE,
-  SCOPES_BY_INSTANCE,
 } from "../registry";
-import { Maybe, Optional } from "../types/general";
+import { Maybe } from "../types/general";
 import { Binding, Bindings, ProvisionId } from "../types/provision";
+
+import { WireStatus } from "./wire-status";
 
 /**
  * Represents provider lifecycle state keyed by container.
@@ -32,8 +34,8 @@ export type ContainerProvisionLifecycle = Map<Container, Array<object>>;
  *
  * @remarks
  * Resolves lifecycle participants and calls `@OnProvision` once for this
- * provision cycle. It also tracks injected `WireScope` instances so
- * `scope.isDeprovisioned` matches provider ownership.
+ * provision cycle. It also updates instance lifecycle status so
+ * {@link WireStatus} reflects provider ownership.
  *
  * @group Container
  *
@@ -66,15 +68,14 @@ export function provisionContainer(
     return;
   }
 
-  const instances: Array<object> = provisionInstances(container, bindings);
+  dbg.info(prefix(__filename), "Provisioning container:", { container });
 
-  dbg.info(prefix(__filename), "Provisioning container:", {
-    container,
-    instances: instances,
-  });
+  PROVISION_STATUS_BY_CONTAINER.delete(container);
 
-  lifecycle.set(container, instances);
+  lifecycle.set(container, provisionInstances(container, bindings));
   trackProvisionLifecycle(container, lifecycle);
+
+  PROVISION_STATUS_BY_CONTAINER.set(container, true);
 }
 
 /**
@@ -103,6 +104,8 @@ export function provisionContainer(
  * ```
  */
 export function deprovisionContainer(container: Container, lifecycle: ContainerProvisionLifecycle): void {
+  PROVISION_STATUS_BY_CONTAINER.set(container, false);
+
   const instances: Maybe<Array<object>> = lifecycle.get(container);
 
   if (instances) {
@@ -112,6 +115,12 @@ export function deprovisionContainer(container: Container, lifecycle: ContainerP
     });
 
     deprovisionInstances(instances.filter((instance) => CONTAINER_REFS_BY_INSTANCE.get(instance) === container));
+
+    for (const instance of ACTIVE_INSTANCES_BY_CONTAINER.get(container) ?? []) {
+      const status: WireStatus = WireStatus.for(instance);
+
+      status.isDeprovisioned = true;
+    }
 
     for (const instance of instances) {
       PROVISION_TOKENS_BY_INSTANCE.delete(instance);
@@ -202,8 +211,6 @@ export function deprovisionContainerBindings(container: Container): void {
  * - Resolve instances first, so `@OnActivated` completes before provider hooks.
  * - Call `@OnProvision` in binding order.
  *
- * Instances that inject `WireScope` participate even without provider hooks.
- *
  * @group Container
  *
  * @param container - Container that owns the bindings.
@@ -232,18 +239,25 @@ export function provisionInstances(container: Container, bindings: Bindings = []
     }
   }
 
-  for (const instance of instances) {
-    markInstanceProvisionStatus(instance, null, null);
+  for (const instance of ACTIVE_INSTANCES_BY_CONTAINER.get(container) ?? []) {
+    const status: WireStatus = WireStatus.for(instance);
+
+    if (!status.isDisposed) {
+      status.isDeprovisioned = null;
+      status.provisionId = null;
+    }
   }
 
   for (let index: number = 0; index < instances.length; index += 1) {
     const instance: object = instances[index];
     const methodName: Maybe<string | symbol> = getProvisionHandlerMetadata(instance);
     const provisionId: ProvisionId = (PROVISION_IDS_BY_INSTANCE.get(instance) ?? 0) + 1;
+    const status: WireStatus = WireStatus.for(instance);
 
     PROVISION_IDS_BY_INSTANCE.set(instance, provisionId);
 
-    markInstanceProvisionStatus(instance, false, provisionId);
+    status.isDeprovisioned = false;
+    status.provisionId = provisionId;
 
     try {
       if (methodName) {
@@ -263,15 +277,32 @@ export function provisionInstances(container: Container, bindings: Bindings = []
     } catch (error) {
       const reachedInstances: Array<object> = instances.slice(0, index + 1);
 
+      PROVISION_STATUS_BY_CONTAINER.set(container, false);
+
       deprovisionInstances(
         reachedInstances.filter((reachedInstance) => CONTAINER_REFS_BY_INSTANCE.get(reachedInstance) === container)
       );
+
+      for (const activeInstance of ACTIVE_INSTANCES_BY_CONTAINER.get(container) ?? []) {
+        const activeStatus: WireStatus = WireStatus.for(activeInstance);
+
+        activeStatus.isDeprovisioned = true;
+      }
 
       for (const [instance, token] of trackedTokens) {
         untrackProvisionToken([instance], token);
       }
 
       throw error;
+    }
+  }
+
+  // Update instances not participating in lifecycle directly.
+  for (const instance of ACTIVE_INSTANCES_BY_CONTAINER.get(container) ?? []) {
+    const status: WireStatus = WireStatus.for(instance);
+
+    if (!status.isDisposed) {
+      status.isDeprovisioned = false;
     }
   }
 
@@ -291,6 +322,7 @@ export function deprovisionInstances(instances: ReadonlyArray<object>): void {
     const instance: object = instances[index];
     const methodName: Maybe<string | symbol> = getDeprovisionHandlerMetadata(instance);
     const provisionId: Maybe<ProvisionId> = PROVISION_IDS_BY_INSTANCE.get(instance);
+    const status: WireStatus = WireStatus.for(instance);
 
     if (methodName) {
       callLifecycleHandler({
@@ -306,54 +338,10 @@ export function deprovisionInstances(instances: ReadonlyArray<object>): void {
       });
     }
 
-    markInstanceProvisionStatus(instance, true, provisionId);
-  }
-}
-
-/**
- * Marks all scopes injected into a provider lifecycle instance with provision state.
- *
- * @internal
- *
- * @param instance - The instance resolved for provider lifecycle.
- * @param isDeprovisioned - Whether the instance has left provider ownership, or null before provision reaches it.
- * @param provisionId - Current provider provision cycle ID for this instance.
- */
-function markInstanceProvisionStatus(
-  instance: object,
-  isDeprovisioned: Optional<boolean>,
-  provisionId?: Optional<ProvisionId>
-): void {
-  const scopes: Maybe<
-    ReadonlyArray<{
-      readonly isDeprovisioned: Optional<boolean>;
-      readonly provisionId: Optional<ProvisionId>;
-    }>
-  > = SCOPES_BY_INSTANCE.get(instance);
-
-  if (!scopes) {
-    dbg.info(prefix(__filename), "Skip marking instance provision status:", {
-      instance,
-      isDeprovisioned,
-      provisionId,
-      scopes,
-    });
-
-    return;
-  }
-
-  dbg.info(prefix(__filename), "Mark instance provision status:", {
-    instance,
-    isDeprovisioned,
-    provisionId,
-    scopes,
-  });
-
-  for (const scope of scopes) {
-    (scope as { isDeprovisioned: Optional<boolean> }).isDeprovisioned = isDeprovisioned;
+    status.isDeprovisioned = true;
 
     if (provisionId !== undefined) {
-      (scope as { provisionId: Optional<ProvisionId> }).provisionId = provisionId;
+      status.provisionId = provisionId;
     }
   }
 }
@@ -477,7 +465,7 @@ function getProviderLifecycleMetadataToken(binding: Binding): Identifier {
  * @internal
  *
  * @param token - Binding token to inspect.
- * @returns True when the token is an instance constructor with provider lifecycle metadata or WireScope injection.
+ * @returns True when the token is an instance constructor with provider lifecycle metadata.
  */
 function isProviderLifecycleParticipant(token: Identifier): boolean {
   if (typeof token !== "function") {
@@ -487,7 +475,6 @@ function isProviderLifecycleParticipant(token: Identifier): boolean {
   const prototype: Maybe<object> = token.prototype as Maybe<object>;
 
   return prototype
-    ? Boolean(getProvisionHandlerMetadata(prototype) || getDeprovisionHandlerMetadata(prototype)) ||
-        hasScopeInjection(token)
+    ? Boolean(getProvisionHandlerMetadata(prototype) || getDeprovisionHandlerMetadata(prototype))
     : false;
 }

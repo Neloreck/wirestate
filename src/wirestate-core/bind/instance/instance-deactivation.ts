@@ -3,12 +3,12 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { Container, Newable } from "../../alias";
 import { callLifecycleHandler } from "../../lifecycle/call-lifecycle-handler";
-import { CONTAINER_REFS_BY_INSTANCE } from "../../registry";
+import { ACTIVE_INSTANCES_BY_CONTAINER, CONTAINER_REFS_BY_INSTANCE } from "../../registry";
 import { Maybe } from "../../types/general";
 import { BindOptions } from "../bind";
 
 import { unregisterInstanceHandlers } from "./instance-handlers";
-import { detachScopes } from "./instance-scopes";
+import { unregisterInstanceStatus } from "./instance-status";
 import { getDeactivationHandlerMetadata } from "./on-deactivation";
 
 interface CreateInstanceDeactivationHandlerOptions<T extends object> {
@@ -51,8 +51,16 @@ export function createInstanceDeactivationHandler<T extends object>(
       onInstanceDeactivation(container, binding, instance);
     }
 
-    detachScopes(instance);
+    unregisterInstanceStatus(instance);
     unregisterInstanceHandlers(instance);
+
+    const instances: Maybe<Set<object>> = ACTIVE_INSTANCES_BY_CONTAINER.get(container);
+
+    instances?.delete(instance);
+
+    if (instances?.size === 0) {
+      ACTIVE_INSTANCES_BY_CONTAINER.delete(container);
+    }
 
     CONTAINER_REFS_BY_INSTANCE.delete(instance);
   };

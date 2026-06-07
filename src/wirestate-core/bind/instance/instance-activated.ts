@@ -1,16 +1,16 @@
-import type { ResolutionContext } from "inversify";
+import { ResolutionContext } from "inversify";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { Container, Newable } from "../../alias";
 import { callLifecycleHandler } from "../../lifecycle/call-lifecycle-handler";
-import { CONTAINER_REFS_BY_INSTANCE } from "../../registry";
+import { ACTIVE_INSTANCES_BY_CONTAINER, CONTAINER_REFS_BY_INSTANCE } from "../../registry";
 import { Maybe } from "../../types/general";
 import { BindOptions } from "../bind";
 
 import { unregisterInstanceHandlers, registerInstanceHandlers } from "./instance-handlers";
-import { attachScopes, detachScopes } from "./instance-scopes";
+import { unregisterInstanceStatus, initializeInstanceStatus } from "./instance-status";
 import { getActivatedHandlerMetadata } from "./on-activated";
 
 interface CreateInstanceActivationHandlerOptions<T extends object> {
@@ -45,9 +45,18 @@ export function createInstanceActivatedHandler<T extends object>(
     });
 
     try {
+      let instances: Maybe<Set<object>> = ACTIVE_INSTANCES_BY_CONTAINER.get(container);
+
+      if (!instances) {
+        instances = new Set();
+        ACTIVE_INSTANCES_BY_CONTAINER.set(container, instances);
+      }
+
+      instances.add(instance);
+
       CONTAINER_REFS_BY_INSTANCE.set(instance, container);
 
-      attachScopes(instance, binding);
+      initializeInstanceStatus(container, instance);
       registerInstanceHandlers(container, instance);
 
       if (options?.skipActivationHooks) {
@@ -65,8 +74,18 @@ export function createInstanceActivatedHandler<T extends object>(
 
       return instance;
     } catch (error) {
-      detachScopes(instance);
+      unregisterInstanceStatus(instance);
       unregisterInstanceHandlers(instance);
+
+      const instances: Maybe<Set<object>> = ACTIVE_INSTANCES_BY_CONTAINER.get(container);
+
+      if (instances) {
+        instances?.delete(instance);
+
+        if (instances.size === 0) {
+          ACTIVE_INSTANCES_BY_CONTAINER.delete(container);
+        }
+      }
 
       CONTAINER_REFS_BY_INSTANCE.delete(instance);
 

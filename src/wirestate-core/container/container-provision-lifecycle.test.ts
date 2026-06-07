@@ -11,6 +11,7 @@ import { ProvisionId } from "../types/provision";
 import { ContainerProvisionLifecycle, deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
 import { createContainer } from "./create-container";
 import { WireScope } from "./wire-scope";
+import { WireStatus } from "./wire-status";
 
 describe("provision lifecycle", () => {
   function createProvisionLifecycle(): ContainerProvisionLifecycle {
@@ -101,16 +102,11 @@ describe("provision lifecycle", () => {
     expect(events).toEqual([]);
   });
 
-  it("should track deprovision status for scoped services without provider lifecycle hooks", () => {
+  it("should track deprovision status for already resolved services without provider lifecycle hooks", () => {
     const events: Array<string> = [];
 
     @Injectable()
-    class ScopedPlainService {
-      public constructor(
-        @Inject(WireScope)
-        public readonly scope: WireScope
-      ) {}
-
+    class PlainService {
       @OnActivated()
       public onActivated(): void {
         events.push("activated");
@@ -118,23 +114,148 @@ describe("provision lifecycle", () => {
     }
 
     const container: Container = createContainer({
-      bindings: [ScopedPlainService],
+      bindings: [PlainService],
     });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+    const service: PlainService = container.get(PlainService);
+    const status: WireStatus = WireStatus.for(service);
 
-    provisionContainer(container, lifecycle, [ScopedPlainService]);
-
-    const service: ScopedPlainService = container.get(ScopedPlainService);
+    provisionContainer(container, lifecycle, [PlainService]);
 
     expect(events).toEqual(["activated"]);
-    expect(service.scope.isDeprovisioned).toBe(false);
-    expect(service.scope.isInactive).toBe(false);
+    expect(status).toEqual({
+      isDisposed: false,
+      isDeprovisioned: false,
+      isInactive: false,
+      provisionId: null,
+    });
 
     deprovisionContainer(container, lifecycle);
 
     expect(events).toEqual(["activated"]);
-    expect(service.scope.isDeprovisioned).toBe(true);
-    expect(service.scope.isInactive).toBe(true);
+    expect(status).toEqual({
+      isDisposed: false,
+      isDeprovisioned: true,
+      isInactive: true,
+      provisionId: null,
+    });
+  });
+
+  it("should track services resolved after provider provisioning without provider hooks", () => {
+    @Injectable()
+    class PlainService {}
+
+    const container: Container = createContainer({
+      bindings: [PlainService],
+    });
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+
+    provisionContainer(container, lifecycle, [PlainService]);
+
+    const service: PlainService = container.get(PlainService);
+    const status: WireStatus = WireStatus.for(service);
+
+    expect(status).toEqual({
+      isDisposed: false,
+      isDeprovisioned: false,
+      isInactive: false,
+      provisionId: null,
+    });
+
+    deprovisionContainer(container, lifecycle);
+
+    expect(status).toEqual({
+      isDisposed: false,
+      isDeprovisioned: true,
+      isInactive: true,
+      provisionId: null,
+    });
+  });
+
+  it("should track services bound behind custom tokens after provider provisioning", () => {
+    const TOKEN: unique symbol = Symbol("plain-token");
+
+    @Injectable()
+    class PlainService {}
+
+    const container: Container = createContainer({
+      bindings: [
+        {
+          type: BindingType.Instance,
+          token: TOKEN,
+          value: PlainService,
+        },
+      ],
+    });
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+
+    provisionContainer(container, lifecycle);
+
+    const service: PlainService = container.get(TOKEN);
+    const status: WireStatus = WireStatus.for(service);
+
+    expect(status).toEqual({
+      isDisposed: false,
+      isDeprovisioned: false,
+      isInactive: false,
+      provisionId: null,
+    });
+
+    deprovisionContainer(container, lifecycle);
+
+    expect(status).toEqual({
+      isDisposed: false,
+      isDeprovisioned: true,
+      isInactive: true,
+      provisionId: null,
+    });
+  });
+
+  it("should track services resolved while resolving lifecycle participants", () => {
+    @Injectable()
+    class PlainService {}
+
+    @Injectable()
+    class ResolvingLifecycleService {
+      public constructor(
+        @Inject(WireScope)
+        private readonly scope: WireScope
+      ) {}
+
+      @OnActivated()
+      public onActivated(): void {
+        this.scope.resolve(PlainService);
+      }
+
+      @OnProvision()
+      public onProvision(): void {}
+    }
+
+    const container: Container = createContainer({
+      bindings: [PlainService, ResolvingLifecycleService],
+    });
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+
+    provisionContainer(container, lifecycle, [PlainService, ResolvingLifecycleService]);
+
+    const service: PlainService = container.get(PlainService);
+    const status: WireStatus = WireStatus.for(service);
+
+    expect(status).toEqual({
+      isDisposed: false,
+      isDeprovisioned: false,
+      isInactive: false,
+      provisionId: null,
+    });
+
+    deprovisionContainer(container, lifecycle);
+
+    expect(status).toEqual({
+      isDisposed: false,
+      isDeprovisioned: true,
+      isInactive: true,
+      provisionId: null,
+    });
   });
 
   it("should provision and deprovision each container once per lifecycle state", () => {
@@ -159,22 +280,16 @@ describe("provision lifecycle", () => {
     expect(events).toEqual(["provision", "deprovision", "deactivation"]);
   });
 
-  it("should reset deprovision markers before reprovision and mark active scopes one by one", () => {
-    type ScopedFixture = {
-      readonly scope: {
-        readonly isDeprovisioned: Optional<boolean>;
-        readonly isInactive: boolean;
-      };
-    };
-
+  it("should reset deprovision markers before reprovision and mark active instances one by one", () => {
     const events: Array<string> = [];
-    const state: { first: Optional<ScopedFixture>; second: Optional<ScopedFixture> } = {
-      first: null,
-      second: null,
-    };
+
+    let first: Optional<object> = null as Optional<object>;
+    let second: Optional<object> = null as Optional<object>;
 
     const getScopeStates = (): string =>
-      String(state.first?.scope.isDeprovisioned) + "-" + String(state.second?.scope.isDeprovisioned);
+      String(first ? WireStatus.for(first).isDeprovisioned : undefined) +
+      "-" +
+      String(second ? WireStatus.for(second).isDeprovisioned : undefined);
 
     const { LifecycleService: FirstService } = createLifecycleService({
       events,
@@ -190,28 +305,31 @@ describe("provision lifecycle", () => {
     const container: Container = createContainer({ bindings: [FirstService, SecondService] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
-    state.first = container.get(FirstService);
-    state.second = container.get(SecondService);
+    first = container.get(FirstService);
+    second = container.get(SecondService);
 
-    expect(state.first.scope.isDeprovisioned).toBeNull();
-    expect(state.second.scope.isDeprovisioned).toBeNull();
-    expect(state.first.scope.isInactive).toBe(false);
-    expect(state.second.scope.isInactive).toBe(false);
+    const firstStatus: WireStatus = WireStatus.for(first);
+    const secondStatus: WireStatus = WireStatus.for(second);
+
+    expect(firstStatus.isDeprovisioned).toBeNull();
+    expect(secondStatus.isDeprovisioned).toBeNull();
+    expect(firstStatus.isInactive).toBe(false);
+    expect(secondStatus.isInactive).toBe(false);
 
     provisionContainer(container, lifecycle, [FirstService, SecondService]);
 
-    expect(state.first.scope.isDeprovisioned).toBe(false);
-    expect(state.second.scope.isDeprovisioned).toBe(false);
-    expect(state.first.scope.isInactive).toBe(false);
-    expect(state.second.scope.isInactive).toBe(false);
+    expect(firstStatus.isDeprovisioned).toBe(false);
+    expect(secondStatus.isDeprovisioned).toBe(false);
+    expect(firstStatus.isInactive).toBe(false);
+    expect(secondStatus.isInactive).toBe(false);
     expect(events).toEqual(["provision-first-false-null", "provision-second-false-false"]);
 
     deprovisionContainer(container, lifecycle);
 
-    expect(state.first.scope.isDeprovisioned).toBe(true);
-    expect(state.second.scope.isDeprovisioned).toBe(true);
-    expect(state.first.scope.isInactive).toBe(true);
-    expect(state.second.scope.isInactive).toBe(true);
+    expect(firstStatus.isDeprovisioned).toBe(true);
+    expect(secondStatus.isDeprovisioned).toBe(true);
+    expect(firstStatus.isInactive).toBe(true);
+    expect(secondStatus.isInactive).toBe(true);
     expect(events).toEqual([
       "provision-first-false-null",
       "provision-second-false-false",
@@ -221,10 +339,10 @@ describe("provision lifecycle", () => {
 
     provisionContainer(container, lifecycle, [FirstService, SecondService]);
 
-    expect(state.first.scope.isDeprovisioned).toBe(false);
-    expect(state.second.scope.isDeprovisioned).toBe(false);
-    expect(state.first.scope.isInactive).toBe(false);
-    expect(state.second.scope.isInactive).toBe(false);
+    expect(firstStatus.isDeprovisioned).toBe(false);
+    expect(secondStatus.isDeprovisioned).toBe(false);
+    expect(firstStatus.isInactive).toBe(false);
+    expect(secondStatus.isInactive).toBe(false);
     expect(events).toEqual([
       "provision-first-false-null",
       "provision-second-false-false",
@@ -247,43 +365,44 @@ describe("provision lifecycle", () => {
 
       @OnProvision()
       public onProvision(provisionId: ProvisionId): void {
-        events.push("provision-" + provisionId + "-" + this.scope.provisionId);
+        events.push("provision-" + provisionId + "-" + String(WireStatus.for(this).provisionId));
       }
 
       @OnDeprovision()
       public onDeprovision(provisionId: ProvisionId): void {
-        events.push("deprovision-" + provisionId + "-" + this.scope.provisionId);
+        events.push("deprovision-" + provisionId + "-" + String(WireStatus.for(this).provisionId));
       }
     }
 
     const container: Container = createContainer({ bindings: [ScopedLifecycleService] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
     const service: ScopedLifecycleService = container.get(ScopedLifecycleService);
+    const status: WireStatus = WireStatus.for(service);
 
-    expect(service.scope.provisionId).toBeNull();
+    expect(status.provisionId).toBeNull();
 
     provisionContainer(container, lifecycle, [ScopedLifecycleService]);
 
-    expect(service.scope.provisionId).toBe(1);
-    expect(service.scope.isDeprovisioned).toBe(false);
+    expect(status.provisionId).toBe(1);
+    expect(status.isDeprovisioned).toBe(false);
     expect(events).toEqual(["provision-1-1"]);
 
     deprovisionContainer(container, lifecycle);
 
-    expect(service.scope.provisionId).toBe(1);
-    expect(service.scope.isDeprovisioned).toBe(true);
+    expect(status.provisionId).toBe(1);
+    expect(status.isDeprovisioned).toBe(true);
     expect(events).toEqual(["provision-1-1", "deprovision-1-1"]);
 
     provisionContainer(container, lifecycle, [ScopedLifecycleService]);
 
-    expect(service.scope.provisionId).toBe(2);
-    expect(service.scope.isDeprovisioned).toBe(false);
+    expect(status.provisionId).toBe(2);
+    expect(status.isDeprovisioned).toBe(false);
     expect(events).toEqual(["provision-1-1", "deprovision-1-1", "provision-2-2"]);
 
     deprovisionContainer(container, lifecycle);
 
-    expect(service.scope.provisionId).toBe(2);
-    expect(service.scope.isDeprovisioned).toBe(true);
+    expect(status.provisionId).toBe(2);
+    expect(status.isDeprovisioned).toBe(true);
     expect(events).toEqual(["provision-1-1", "deprovision-1-1", "provision-2-2", "deprovision-2-2"]);
   });
 
@@ -311,6 +430,7 @@ describe("provision lifecycle", () => {
     const container: Container = createContainer({ bindings: [ScopedLifecycleService] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
     const service: ScopedLifecycleService = container.get(ScopedLifecycleService);
+    const status: WireStatus = WireStatus.for(service);
 
     for (let it = 0; it < 10; it++) {
       provisionContainer(container, lifecycle, [ScopedLifecycleService]);
@@ -319,48 +439,50 @@ describe("provision lifecycle", () => {
 
     provisionContainer(container, lifecycle, [ScopedLifecycleService]);
 
-    expect(service.scope.provisionId).toBe(11);
-    expect(service.scope.isDeprovisioned).toBe(false);
+    expect(status.provisionId).toBe(11);
+    expect(status.isDeprovisioned).toBe(false);
     expect(events).toHaveLength(21);
   });
 
-  it("should reset provision IDs before reprovision reaches each scope", () => {
-    interface ScopedFixture {
-      readonly scope: {
-        readonly isDeprovisioned: Optional<boolean>;
-        readonly provisionId: Optional<ProvisionId>;
-      };
-    }
-
-    const state: { first: Optional<ScopedFixture>; second: Optional<ScopedFixture> } = {
-      first: null,
-      second: null,
-    };
+  it("should reset provision IDs before reprovision reaches each instance", () => {
+    let first: Optional<object> = null as Optional<object>;
+    let second: Optional<object> = null as Optional<object>;
 
     const events: Array<string> = [];
     const { LifecycleService: FirstService } = createLifecycleService({
       events,
       methods: ["provision", "deprovision"],
-      suffix: () => "first-" + String(state.first?.scope.provisionId) + "-" + String(state.second?.scope.provisionId),
+      suffix: () =>
+        "first-" +
+        String(first ? WireStatus.for(first).provisionId : undefined) +
+        "-" +
+        String(second ? WireStatus.for(second).provisionId : undefined),
     });
     const { LifecycleService: SecondService } = createLifecycleService({
       events,
       methods: ["provision", "deprovision"],
-      suffix: () => "second-" + String(state.first?.scope.provisionId) + "-" + String(state.second?.scope.provisionId),
+      suffix: () =>
+        "second-" +
+        String(first ? WireStatus.for(first).provisionId : undefined) +
+        "-" +
+        String(second ? WireStatus.for(second).provisionId : undefined),
     });
 
     const container: Container = createContainer({ bindings: [FirstService, SecondService] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
-    state.first = container.get(FirstService);
-    state.second = container.get(SecondService);
+    first = container.get(FirstService);
+    second = container.get(SecondService);
+
+    const firstStatus: WireStatus = WireStatus.for(first);
+    const secondStatus: WireStatus = WireStatus.for(second);
 
     provisionContainer(container, lifecycle, [FirstService, SecondService]);
     deprovisionContainer(container, lifecycle);
     provisionContainer(container, lifecycle, [FirstService, SecondService]);
 
-    expect(state.first.scope.provisionId).toBe(2);
-    expect(state.second.scope.provisionId).toBe(2);
+    expect(firstStatus.provisionId).toBe(2);
+    expect(secondStatus.provisionId).toBe(2);
     expect(events).toEqual([
       "provision-first-1-null",
       "provision-second-1-1",

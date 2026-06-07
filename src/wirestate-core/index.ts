@@ -22,6 +22,7 @@ export {
   deprovisionContainer,
   provisionContainer,
 } from "./container/container-provision-lifecycle";
+export { WireStatus } from "./container/wire-status";
 export { validateContainerConfig } from "./container/validate-container-config";
 export { WireScope } from "./container/wire-scope";
 

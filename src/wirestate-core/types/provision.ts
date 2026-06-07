@@ -13,8 +13,9 @@ import { Newable, Identifier } from "../alias";
  *
  * @remarks
  * IDs are unique only within a single service instance. Use the value passed to
- * `@OnProvision` and `@OnDeprovision` with `WireScope.provisionId` to ignore
- * async work from an older provision cycle.
+ * `@OnProvision` and `@OnDeprovision` with
+ * `WireStatus.for(instance).provisionId` to ignore async work from an older
+ * provision cycle.
  *
  * @group Container
  */

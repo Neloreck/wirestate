@@ -44,7 +44,7 @@ function validateInstanceDescriptor(descriptor: InstanceBindingDescriptor): void
  * - Resolves one instance per container.
  * - Runs `@OnActivated` and `@OnDeactivation`.
  * - Registers `@OnEvent`, `@OnCommand`, and `@OnQuery` handlers.
- * - Tracks injected `WireScope` instances so stale async work can stop.
+ * - Tracks instance lifecycle state for {@link WireStatus}.
  *
  * @group Bind
  *

@@ -108,7 +108,6 @@ describe("createContainer", () => {
     expect(container.get(WireScope)).not.toBe(container.get(WireScope));
     expect(container.get(WireScope)["container"]).toBe(container);
     expect(container.get(WireScope)["container"]).toBe(container);
-    expect(container.get(WireScope).isDisposed).toBe(false);
   });
 
   it("should respect parent container", () => {

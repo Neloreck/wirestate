@@ -11,16 +11,16 @@
 - Add `OnProvision` and `OnDeprovision` to `@wirestate/core`, plus provider lifecycle helpers used by React and Lit
   adapters.
 - Add explicit handler cleanup APIs: `EventBus.unsubscribe`, `CommandBus.unregister`, and `QueryBus.unregister`.
-- Add `WireScope` event, command, and query registration helpers, async query/command helpers, `isDeprovisioned`, and
-  `isInactive`.
-- Add React and Lit `ContainerProviderScope`, `ContainerProviderScopeValue`, and `scope` options so managed child
-  containers can either use container-local messaging buses or inherit parent buses.
+- Add `WireScope` event, command, and query registration helpers and async query/command helpers.
+- Add `WireStatus` and `ProvisionId` for service lifecycle guards across provider provision cycles.
+- Add React and Lit provider `scope` options so managed child containers can use local messaging buses or inherit parent
+  buses.
 - Add React `useContainer`, `useScope`, `useAsyncCommandExecutor`, `useOptionalAsyncCommandExecutor`,
   `useAsyncQueryExecutor`, and `useOptionalAsyncQueryExecutor`.
 - Add expanded MobX, React Signals, Lit Signals, and Inversify alias exports.
 - Add number support for event, command, and query identifiers.
-- Add scoped-bus, seed, service shadowing, lifecycle, event subscription, controller cleanup, SSR, package-consumption, and
-  provider replacement regression tests.
+- Add regression tests for scoped buses, seeds, service shadowing, lifecycle, event subscriptions, controller cleanup,
+  SSR, package consumption, and provider replacement.
 
 ### Changed
 
@@ -30,8 +30,8 @@
   longer coupled to service activation.
 - Move provider lifecycle decorators and lifecycle execution helpers from framework packages into `@wirestate/core`.
 - Give each container its own `EventBus`, `CommandBus`, `QueryBus`, seeds, and `WireScope` essentials while preserving
-  inherited parent bindings; child containers can opt into inherited messaging with `skipMessaging` or provider
-  `scope: "parent"`.
+  inherited parent bindings. Child containers can inherit parent messaging with `skipMessaging` or provider
+  `scope="parent"`.
 - Keep command and query handlers stack-based so unregistering a handler restores the previous handler for that type.
 - Make `QueryBus.query` and `QueryBus.queryOptional` synchronous by default, with async variants for Promise-normalized
   consumers.
@@ -42,8 +42,8 @@
 - Rename public Inversify aliases from `ServiceIdentifier` and `LazyServiceIdentifier` to `Identifier` and
   `LazyIdentifier`.
 - Rename `skipLifecycle` container/bind options to `skipActivationHooks`.
-- Reorder `CommandHandler` and `QueryHandler` generics to result, payload, and type, and update React/Lit command/query
-  types to use payload terminology consistently.
+- Reorder `CommandHandler` and `QueryHandler` generics to result, payload, and type. Update React and Lit command/query
+  types to use payload terminology.
 - Split React `ContainerProvider` props into external `container` mode and managed `config` mode; managed providers
   activate bindings by default, recreate containers on config changes, and dispose only owned containers.
 - Update Lit provider APIs around `config`, plain `Container` context values, connection-scoped publication, and managed
@@ -52,8 +52,7 @@
   instance, resolved value, and service redirection bindings.
 - Rework seed storage around shared seeds and targeted per-token seeds, including public `SEED` and `SEEDS` aliases.
 - Rename initial-state APIs and docs to seed/seeds terminology.
-- Rename binding lifecycle internals, JSDoc, and internal error descriptors from service terminology to instance
-  terminology.
+- Rename binding lifecycle internals, JSDoc, and internal error descriptors from service to instance terminology.
 - Rework `wirestate` compatibility package entry points to re-export the published `@wirestate/*` packages directly.
 - Update package metadata, peer dependencies, workspace configuration, and package-manager metadata for the expanded
   package set.
@@ -65,8 +64,7 @@
   `reflect-metadata` as a peer dependency where needed.
 - Recreate managed React containers when normalized `seed`, `seeds`, `bindings`, `parent`, or `activate` values change.
 - Recreate containers synchronously with rendering where required so consumers do not see stale container state.
-- Track provider deprovision state for services that inject `WireScope`, even when they do not declare provider
-  lifecycle hooks.
+- Track provider deprovision state for resolved services, even when they do not declare provider lifecycle hooks.
 - Correct React `useContainer` subscription behavior.
 - Correct React optional injection fallback behavior and dependency resolution rules.
 - Correct Lit `useInjection` typing and optional injection behavior for fallbacks, missing bindings, dependency changes,
@@ -84,7 +82,7 @@
 - Keep Lit consumers from receiving undefined context notifications on disconnection.
 - Correct Lit `ContainerProvider` managed-container replacement so connected hosts do not share stale closure state.
 - Correct missing public exports and export-list tests for core, React, React MobX, React Signals, and Lit packages.
-- Correct package structure, package-consumption checks, and ESM export paths for compatibility packages and portable
+- Correct package structure, package consumption checks, and ESM export paths for compatibility packages and portable
   bundles.
 
 ### Removed
@@ -102,14 +100,16 @@
 
 ### Documentation and Tooling
 
-- Add the VitePress docs site, Typedoc generation, API docs source-link plugin, docs workflows, and guide pages for containers, services, lifecycle, seeds, messaging, testing, React MobX, React Signals, and Lit Signals.
-- Add and update README files for core, React, Lit, React MobX, React Signals, Lit Signals, portable bundles, and the root project.
-- Document WireScope lifecycle state, provider deprovision tracking, and `scope.isInactive` async guard usage.
+- Add the VitePress docs site, Typedoc generation, API docs source-link plugin, docs workflows, and guide pages for
+  containers, services, lifecycle, seeds, messaging, testing, React MobX, React Signals, and Lit Signals.
+- Add and update README files for core, React, Lit, React MobX, React Signals, Lit Signals, portable bundles, and the
+  root project.
+- Document `WireStatus`, provider deprovision tracking, and async lifecycle guards.
 - Document provider messaging scope, `options.source` event metadata, and direct `@wirestate/core` usage in examples.
 - Add installation guidance for `signal-polyfill` in Lit Signals setup.
 - Add a standalone Lit Signals example app and update React MobX / React Signals examples for the new provider and
   messaging APIs.
-- Add package version bump scripts, publish safeguards, docs deployment workflow, package-consumption tests, and run
+- Add package version bump scripts, publish safeguards, docs deployment workflow, package consumption tests, and run
   configurations for docs and package workflows.
 - Bump packages and examples to `1.0.0-experimental.1`.
 - Update Jest, ESLint, Prettier, Rollup, pnpm workspace, lockfile, and package export configuration for the current

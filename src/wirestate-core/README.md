@@ -48,6 +48,7 @@ counterService.increment();
 - Inversify aliases such as `Injectable`, `Inject`, `Container`, and `Identifier`.
 - `createContainer`, `bind`, `unbind`, and `unbindAll`.
 - `WireScope` for scoped resolution, seeds, events, commands, and queries.
+- `WireStatus` and `ProvisionId` for lifecycle guards on resolved service instances.
 - `EventBus`, `CommandBus`, `QueryBus`, and their decorators.
 - `OnActivated`, `OnDeactivation`, `OnProvision`, and `OnDeprovision`.
 

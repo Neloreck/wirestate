@@ -5,6 +5,7 @@ import { CommandBus } from "../commands/command-bus";
 import { OnCommand } from "../commands/on-command";
 import { createContainer } from "../container/create-container";
 import { WireScope } from "../container/wire-scope";
+import { WireStatus } from "../container/wire-status";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { EventBus } from "../events/event-bus";
 import { OnEvent } from "../events/on-event";
@@ -17,10 +18,6 @@ import { bindInstance, bindInstanceWithToken } from "./bind-instance";
 import { OnActivated } from "./instance/on-activated";
 import { OnDeactivation } from "./instance/on-deactivation";
 import { unbindAll } from "./unbind";
-
-interface ReflectMetadata {
-  getMetadata?: (metadataKey: string, target: object) => unknown;
-}
 
 describe("bindInstance", () => {
   @Injectable()
@@ -83,9 +80,12 @@ describe("bindInstance", () => {
     const instance: GenericService = container.get(GenericService);
 
     expect(instance.isActivated).toBe(true);
-    expect(instance.scope.isDisposed).toBe(false);
-    expect(instance.scope.isDeprovisioned).toBeNull();
-    expect(instance.scope.isInactive).toBe(false);
+    expect(WireStatus.for(instance)).toEqual({
+      isDisposed: false,
+      isDeprovisioned: null,
+      isInactive: false,
+      provisionId: null,
+    });
 
     // Test event from external source.
     container.get(EventBus).emit("TEST_STRING_EVENT", "string-event-data");
@@ -99,16 +99,15 @@ describe("bindInstance", () => {
     expect(container.get(CommandBus).execute("TEST_SYNC_COMMAND", 800)).toBe(1800);
 
     // Test deactivation.
-    (instance.scope as { isDeprovisioned: boolean }).isDeprovisioned = false;
     container.unbind(GenericService);
     expect(instance.isActivated).toBe(false);
-    expect(instance.scope.isDisposed).toBe(true);
-    expect(instance.scope.isDeprovisioned).toBe(true);
-    expect(instance.scope.isInactive).toBe(true);
-    expect(instance.scope["commandBus"]).toBeNull();
-    expect(instance.scope["container"]).toBeNull();
-    expect(instance.scope["eventBus"]).toBeNull();
-    expect(instance.scope["queryBus"]).toBeNull();
+    expect(instance.scope.resolve(Container)).toBe(container);
+    expect(WireStatus.for(instance)).toEqual({
+      isDisposed: true,
+      isDeprovisioned: true,
+      isInactive: true,
+      provisionId: null,
+    });
 
     // Verify query handler is removed
     expect(() => container.get(QueryBus).query("TEST_QUERY")).toThrow();
@@ -122,8 +121,12 @@ describe("bindInstance", () => {
     const instance: GenericService = container.get(GenericService);
 
     expect(instance.isActivated).toBe(false);
-    expect(instance.scope.isDisposed).toBe(false);
-    expect(instance.scope.isInactive).toBe(false);
+    expect(WireStatus.for(instance)).toEqual({
+      isDisposed: false,
+      isDeprovisioned: null,
+      isInactive: false,
+      provisionId: null,
+    });
 
     container.get(EventBus).emit("TEST_STRING_EVENT", "string-event-data");
 
@@ -136,8 +139,12 @@ describe("bindInstance", () => {
 
     expect(container.get(QueryBus).hasHandler("TEST_STRING_QUERY")).toBe(false);
     expect(container.get(CommandBus).hasHandler("TEST_SYNC_COMMAND")).toBe(false);
-    expect(instance.scope.isDisposed).toBe(true);
-    expect(instance.scope.isInactive).toBe(true);
+    expect(WireStatus.for(instance)).toEqual({
+      isDisposed: true,
+      isDeprovisioned: true,
+      isInactive: true,
+      provisionId: null,
+    });
   });
 
   it("should throw for instance descriptor without constructor value", () => {
@@ -254,15 +261,17 @@ describe("bindInstance", () => {
 
     let eventCalls: number = 0;
 
+    const instanceRef: { current: Optional<object> } = { current: null };
     const scopeRef: { current: Optional<WireScope> } = { current: null };
 
     @Injectable()
     class SyncFailActivationWithHandlersService {
       public constructor(
         @Inject(WireScope)
-        public readonly injectedScope: WireScope
+        public readonly scope: WireScope
       ) {
-        scopeRef.current = injectedScope;
+        instanceRef.current = this;
+        scopeRef.current = scope;
       }
 
       @OnActivated()
@@ -296,17 +305,16 @@ describe("bindInstance", () => {
     expect(container.get(CommandBus).hasHandler(ACTIVATION_FAILURE_COMMAND)).toBe(false);
     expect(container.get(QueryBus).hasHandler(ACTIVATION_FAILURE_QUERY)).toBe(false);
     expect(container.get(EventBus).hasSubscribers()).toBe(false);
+    expect(instanceRef.current).not.toBeNull();
     expect(scopeRef.current).not.toBeNull();
 
-    const activatedScope: WireScope = scopeRef.current as WireScope;
-
-    expect(activatedScope.isDisposed).toBe(true);
-    expect(activatedScope.isDeprovisioned).toBe(true);
-    expect(activatedScope.isInactive).toBe(true);
-    expect(activatedScope["commandBus"]).toBeNull();
-    expect(activatedScope["container"]).toBeNull();
-    expect(activatedScope["eventBus"]).toBeNull();
-    expect(activatedScope["queryBus"]).toBeNull();
+    expect((scopeRef.current as WireScope).resolve(Container)).toBe(container);
+    expect(WireStatus.for(instanceRef.current as object)).toEqual({
+      isDisposed: true,
+      isDeprovisioned: true,
+      isInactive: true,
+      provisionId: null,
+    });
 
     expect(() => container.get(QueryBus).query(ACTIVATION_FAILURE_QUERY)).toThrow(
       "No query handler registered in container for type: 'ACTIVATION_FAILURE_QUERY'."
@@ -332,12 +340,13 @@ describe("bindInstance", () => {
     expect(container.get(QueryBus).query("SYNC_FAIL_DEACTIVATION_QUERY")).toBe("query-response");
     expect(() => container.unbind(SyncFailDeactivationService)).not.toThrow();
 
-    expect(instance.scope.isDisposed).toBe(true);
-    expect(instance.scope.isInactive).toBe(true);
-    expect(instance.scope["commandBus"]).toBeNull();
-    expect(instance.scope["container"]).toBeNull();
-    expect(instance.scope["eventBus"]).toBeNull();
-    expect(instance.scope["queryBus"]).toBeNull();
+    expect(instance.scope.resolve(Container)).toBe(container);
+    expect(WireStatus.for(instance)).toEqual({
+      isDisposed: true,
+      isDeprovisioned: true,
+      isInactive: true,
+      provisionId: null,
+    });
 
     expect(container.get(QueryBus).hasHandler("SYNC_FAIL_DEACTIVATION_QUERY")).toBe(false);
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -472,26 +481,5 @@ describe("bindInstance", () => {
     expect(() => container.get(QueryBus).query("CORRUPTED_QUERY")).toThrow(
       "No query handler registered in container for type: 'CORRUPTED_QUERY'."
     );
-  });
-
-  it("should throw a readable error when reflect-metadata is not installed", () => {
-    @Injectable()
-    class ServiceWithoutMetadataPolyfill {}
-
-    const reflectMetadata: ReflectMetadata = Reflect as ReflectMetadata;
-    const originalGetMetadata = reflectMetadata.getMetadata;
-    const container: Container = createContainer();
-
-    try {
-      delete reflectMetadata.getMetadata;
-
-      bindInstance(container, ServiceWithoutMetadataPolyfill);
-
-      expect(() => container.get(ServiceWithoutMetadataPolyfill)).toThrow(
-        'reflect-metadata is required for Wirestate activation. Import "reflect-metadata" once at your application entry point before creating Wirestate containers.'
-      );
-    } finally {
-      reflectMetadata.getMetadata = originalGetMetadata;
-    }
   });
 });

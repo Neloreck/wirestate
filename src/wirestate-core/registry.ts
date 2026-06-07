@@ -1,5 +1,5 @@
 import { Container, Identifier } from "./alias";
-import { WireScope } from "./container/wire-scope";
+import { WireStatus } from "./container/wire-status";
 import { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
 import { InternalErrorHandler } from "./types/error";
 import { EventHandlerMetadata, EventUnsubscriber } from "./types/events";
@@ -99,15 +99,37 @@ export const EVENT_HANDLER_METADATA: WeakMap<object, Array<EventHandlerMetadata>
 export const CONTAINER_REFS_BY_INSTANCE: WeakMap<object, Container> = new WeakMap();
 
 /**
- * Internal storage for managing injected {@link WireScope} per instance.
+ * Internal storage for service lifecycle status keyed by instance.
  *
  * @remarks
- * Tracks the scopes associated with an instance for lifecycle management and cleanup.
+ * Status survives deactivation while the instance object is still reachable,
+ * which lets callers inspect lifecycle state by instance reference.
  *
  * @group Container
  * @internal
  */
-export const SCOPES_BY_INSTANCE: WeakMap<object, Array<WireScope>> = new WeakMap();
+export const INSTANCE_STATUSES_BY_INSTANCE: WeakMap<object, WireStatus> = new WeakMap();
+
+/**
+ * Internal storage for active service instances keyed by container.
+ *
+ * @remarks
+ * Tracks which resolved instances currently belong to each container so
+ * provider lifecycle can eagerly update their stable {@link WireStatus}
+ * handles.
+ *
+ * @group Container
+ * @internal
+ */
+export const ACTIVE_INSTANCES_BY_CONTAINER: WeakMap<Container, Set<object>> = new WeakMap();
+
+/**
+ * Internal storage for current provider ownership state keyed by container.
+ *
+ * @group Container
+ * @internal
+ */
+export const PROVISION_STATUS_BY_CONTAINER: WeakMap<Container, boolean> = new WeakMap();
 
 /**
  * Internal storage for event unsubscribers.

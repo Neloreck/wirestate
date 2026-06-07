@@ -3,15 +3,12 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { Injectable, Container, Identifier } from "../alias";
 import { CommandBus } from "../commands/command-bus";
-import { ERROR_CODE_ACCESS_AFTER_DISPOSAL, ERROR_CODE_ACCESS_BEFORE_ACTIVATION } from "../error/error-code";
-import { WirestateError } from "../error/wirestate-error";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 import { CommandHandler, CommandUnregister, CommandType } from "../types/commands";
 import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 import { Optional, AnyObject } from "../types/general";
-import { ProvisionId } from "../types/provision";
 import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 import { SeedKey, SeedsMap } from "../types/seeds";
 
@@ -41,35 +38,6 @@ import { SeedKey, SeedsMap } from "../types/seeds";
 @Injectable()
 export class WireScope {
   /**
-   * Whether the scope was deactivated and disposed from the container.
-   *
-   * @remarks
-   * This becomes `true` after instance deactivation, usually when an owned
-   * container is disposed. It remains `false` when only provider ownership ends.
-   */
-  public readonly isDisposed: boolean = false;
-
-  /**
-   * Whether the scope has been removed from provider ownership.
-   *
-   * @remarks
-   * `null` means the scope has not reached a provider provision cycle yet.
-   * `false` means the scope is currently owned by a provider. `true` means the
-   * provider deprovisioned it.
-   */
-  public readonly isDeprovisioned: Optional<boolean> = null;
-
-  /**
-   * Current provider provision cycle ID for the owning instance.
-   *
-   * @remarks
-   * `null` means the scope has not reached a provider provision cycle.
-   * The value changes when the owning instance enters a new provider provision
-   * cycle and remains available after provider deprovision.
-   */
-  public readonly provisionId: Optional<ProvisionId> = null;
-
-  /**
    * Container-scoped command bus used by command helper methods.
    */
   private readonly commandBus: CommandBus;
@@ -97,19 +65,6 @@ export class WireScope {
   }
 
   /**
-   * Whether this scope should stop user work because its instance or provider lifecycle ended.
-   *
-   * @remarks
-   * Use this as the default async-work guard. It is `true` when either
-   * {@link isDisposed} is `true` or {@link isDeprovisioned} is `true`.
-   *
-   * @returns True after disposal or provider deprovision.
-   */
-  public get isInactive(): boolean {
-    return this.isDisposed || this.isDeprovisioned === true;
-  }
-
-  /**
    * Resolves an instance or value from the container.
    *
    * @remarks
@@ -122,7 +77,6 @@ export class WireScope {
    * @param token - The token (class constructor, symbol, or string).
    * @returns The resolved instance or value.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
    * @throws {Error} If the token cannot be resolved from the container.
    *
    * @example
@@ -136,8 +90,6 @@ export class WireScope {
       token,
     });
 
-    this.assertActive();
-
     return this.container.get<T>(token);
   }
 
@@ -148,8 +100,6 @@ export class WireScope {
    *
    * @param token - Service token (class constructor, symbol, or string).
    * @returns The resolved instance, value, or `null` if not bound.
-   *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
    *
    * @example
    * ```typescript
@@ -163,8 +113,6 @@ export class WireScope {
       name: (token as AnyObject)?.name ?? token,
       token,
     });
-
-    this.assertActive();
 
     return this.container.isBound(token) ? this.container.get<T>(token) : null;
   }
@@ -180,8 +128,6 @@ export class WireScope {
    * @param payload - Optional event payload.
    * @param options - Event emission options.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
    * @example
    * ```typescript
    * scope.emitEvent("VALUE_CHANGED", { value: "abcd" });
@@ -192,14 +138,6 @@ export class WireScope {
     payload?: P,
     options?: EventEmitOptions<S>
   ): void {
-    dbg.info(prefix(__filename), "Emit event:", {
-      type,
-      payload,
-      options,
-    });
-
-    this.assertActive();
-
     this.eventBus.emit(type, payload, options);
   }
 
@@ -208,8 +146,6 @@ export class WireScope {
    *
    * @param handler - Function called for every emitted event.
    * @returns A function to unsubscribe.
-   *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
    *
    * @example
    * ```typescript
@@ -231,8 +167,6 @@ export class WireScope {
    * @param handler - Function called for matching events.
    * @returns A function to unsubscribe.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
    * @example
    * ```typescript
    * const unsubscribe: EventUnsubscriber = scope.subscribeToEvent("USER_LOGGED_IN", (event) => {
@@ -249,10 +183,6 @@ export class WireScope {
     typesOrHandler: EventHandler | Optional<EventType | ReadonlyArray<EventType>>,
     handler?: EventHandler
   ): EventUnsubscriber {
-    dbg.info(prefix(__filename), "Subscribe to event:", { typesOrHandler, handler });
-
-    this.assertActive();
-
     return handler
       ? this.eventBus.subscribe(typesOrHandler as Optional<EventType | ReadonlyArray<EventType>>, handler)
       : this.eventBus.subscribe(typesOrHandler as EventHandler);
@@ -268,8 +198,6 @@ export class WireScope {
    *
    * @param handler - The handler instance to remove.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
    * @example
    * ```typescript
    * scope.unsubscribeFromEvent(this.onEvent);
@@ -283,8 +211,6 @@ export class WireScope {
    * @param types - Event type, list of event types, or `null` for catch-all.
    * @param handler - The handler instance to remove.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
    * @example
    * ```typescript
    * scope.unsubscribeFromEvent("USER_LOGGED_IN", this.onEvent);
@@ -296,10 +222,6 @@ export class WireScope {
     typesOrHandler: EventHandler | Optional<EventType | ReadonlyArray<EventType>>,
     handler?: EventHandler
   ): void {
-    dbg.info(prefix(__filename), "Unsubscribe event:", { typesOrHandler, handler });
-
-    this.assertActive();
-
     if (handler) {
       this.eventBus.unsubscribe(typesOrHandler as Optional<EventType | ReadonlyArray<EventType>>, handler);
     } else {
@@ -318,7 +240,6 @@ export class WireScope {
    * @param payload - Payload for the query handler.
    * @returns The query result.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
    * @throws {@link WirestateError} If no query handler is registered.
    *
    * @example
@@ -327,10 +248,6 @@ export class WireScope {
    * ```
    */
   public query<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): R {
-    dbg.info(prefix(__filename), "Query:", { type, payload });
-
-    this.assertActive();
-
     return this.queryBus.query<R, P, T>(type, payload);
   }
 
@@ -345,7 +262,6 @@ export class WireScope {
    * @param payload - Payload for the query handler.
    * @returns A Promise resolving to the query result.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
    * @throws {@link WirestateError} If no query handler is registered.
    *
    * @example
@@ -354,10 +270,6 @@ export class WireScope {
    * ```
    */
   public queryAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): Promise<R> {
-    dbg.info(prefix(__filename), "Async query:", { type, payload });
-
-    this.assertActive();
-
     return this.queryBus.queryAsync<R, P, T>(type, payload);
   }
 
@@ -372,18 +284,12 @@ export class WireScope {
    * @param payload - Payload for the query handler.
    * @returns The query result or `null`.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
    * @example
    * ```typescript
    * const config: Config | null = scope.queryOptional("GET_CONFIG");
    * ```
    */
   public queryOptional<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): Optional<R> {
-    dbg.info(prefix(__filename), "Query optional:", { type, payload });
-
-    this.assertActive();
-
     return this.queryBus.queryOptional<R, P, T>(type, payload);
   }
 
@@ -398,8 +304,6 @@ export class WireScope {
    * @param payload - Payload for the query handler.
    * @returns A Promise resolving to the query result or `null`.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
    * @example
    * ```typescript
    * const config: Config | null = await scope.queryOptionalAsync("GET_CONFIG");
@@ -409,10 +313,6 @@ export class WireScope {
     type: T,
     payload?: P
   ): Promise<Optional<R>> {
-    dbg.info(prefix(__filename), "Optional async query:", { type, payload });
-
-    this.assertActive();
-
     return this.queryBus.queryOptionalAsync<R, P, T>(type, payload);
   }
 
@@ -427,8 +327,6 @@ export class WireScope {
    * @param handler - The handler function.
    * @returns A function to unregister the handler.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
    * @example
    * ```typescript
    * scope.registerQueryHandler("GET_DATE_NOW", () => new Date());
@@ -438,10 +336,6 @@ export class WireScope {
     type: T,
     handler: QueryHandler<R, P, T>
   ): QueryUnregister {
-    dbg.info(prefix(__filename), "Register query handler:", { type });
-
-    this.assertActive();
-
     return this.queryBus.register<R, P, T>(type, handler);
   }
 
@@ -455,8 +349,6 @@ export class WireScope {
    * @param type - Query identifier.
    * @param handler - The handler instance to remove.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
    * @example
    * ```typescript
    * scope.unregisterQueryHandler("GET_DATE_NOW", this.onGetDateNow);
@@ -466,10 +358,6 @@ export class WireScope {
     type: T,
     handler: QueryHandler<R, P, T>
   ): void {
-    dbg.info(prefix(__filename), "Unregister query:", { type });
-
-    this.assertActive();
-
     this.queryBus.unregister<R, P, T>(type, handler);
   }
 
@@ -484,7 +372,6 @@ export class WireScope {
    * @param payload - Payload for the command.
    * @returns The command result.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
    * @throws {@link WirestateError} If no command handler is registered.
    *
    * @example
@@ -493,10 +380,6 @@ export class WireScope {
    * ```
    */
   public executeCommand<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R {
-    dbg.info(prefix(__filename), "Execute command:", { type, payload });
-
-    this.assertActive();
-
     return this.commandBus.execute<R, P, T>(type, payload);
   }
 
@@ -511,7 +394,6 @@ export class WireScope {
    * @param payload - Payload for the command.
    * @returns A Promise resolving to the command result.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
    * @throws {@link WirestateError} If no command handler is registered.
    *
    * @example
@@ -523,10 +405,6 @@ export class WireScope {
     type: T,
     payload?: P
   ): Promise<R> {
-    dbg.info(prefix(__filename), "Execute async command:", { type, payload });
-
-    this.assertActive();
-
     return this.commandBus.executeAsync<R, P, T>(type, payload);
   }
 
@@ -541,8 +419,6 @@ export class WireScope {
    * @param payload - Payload for the command.
    * @returns The command result or `null`.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
    * @example
    * ```typescript
    * scope.executeOptionalCommand("CLEANUP_CACHE");
@@ -552,10 +428,6 @@ export class WireScope {
     type: T,
     payload?: P
   ): Optional<R> {
-    dbg.info(prefix(__filename), "Execute command:", { type, payload });
-
-    this.assertActive();
-
     return this.commandBus.executeOptional<R, P, T>(type, payload);
   }
 
@@ -570,8 +442,6 @@ export class WireScope {
    * @param payload - Payload for the command.
    * @returns A Promise resolving to the command result or `null`.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
    * @example
    * ```typescript
    * const result: string | null = await scope.executeOptionalCommandAsync("CLEANUP_CACHE");
@@ -581,10 +451,6 @@ export class WireScope {
     type: T,
     payload?: P
   ): Promise<Optional<R>> {
-    dbg.info(prefix(__filename), "Execute optional async command:", { type, payload });
-
-    this.assertActive();
-
     return this.commandBus.executeOptionalAsync<R, P, T>(type, payload);
   }
 
@@ -599,8 +465,6 @@ export class WireScope {
    * @param handler - The handler function.
    * @returns A function to unregister the handler.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
    * @example
    * ```typescript
    * scope.registerCommandHandler("LOG_ERROR", (error) => {
@@ -612,10 +476,6 @@ export class WireScope {
     type: T,
     handler: CommandHandler<R, P, T>
   ): CommandUnregister {
-    dbg.info(prefix(__filename), "Register command handler:", { type });
-
-    this.assertActive();
-
     return this.commandBus.register<R, P, T>(type, handler);
   }
 
@@ -629,8 +489,6 @@ export class WireScope {
    * @param type - Command identifier.
    * @param handler - The handler instance to remove.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
    * @example
    * ```typescript
    * scope.unregisterCommandHandler("LOG_ERROR", this.handleLogError);
@@ -640,10 +498,6 @@ export class WireScope {
     type: T,
     handler: CommandHandler<R, P, T>
   ): void {
-    dbg.info(prefix(__filename), "Unregister command:", { type });
-
-    this.assertActive();
-
     this.commandBus.unregister<R, P, T>(type, handler);
   }
 
@@ -656,8 +510,6 @@ export class WireScope {
    * @template T - Expected type of the shared seed object.
    *
    * @returns The shared seed object.
-   *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
    *
    * @example
    * ```typescript
@@ -681,8 +533,6 @@ export class WireScope {
    * @param seed - Lookup token for the seed.
    * @returns The seed value or `null` if not found.
    *
-   * @throws {@link WirestateError} If accessed before activation or after disposal.
-   *
    * @example
    * ```typescript
    * const apiUrl = scope.getSeed<string>("API_URL");
@@ -695,39 +545,12 @@ export class WireScope {
       key: (seed as AnyObject)?.name ?? seed,
     });
 
-    this.assertActive();
-
     if (seed === undefined) {
       return this.container.get<T>(SEED_TOKEN);
     } else {
       const seeds: SeedsMap = this.container.get<SeedsMap>(SEEDS_TOKEN);
 
       return seeds.has(seed) ? (seeds.get(seed) as T) : null;
-    }
-  }
-
-  /**
-   * Verifies that this scope still belongs to an active instance.
-   *
-   * @throws {@link WirestateError} If the scope is accessed before activation
-   * or after disposal.
-   */
-  private assertActive(): void {
-    if (this.container) {
-      return;
-    }
-
-    if (this.isDisposed) {
-      throw new WirestateError(
-        "WireScope::container accessed after deactivation. Ensure instance is properly disposed.",
-        ERROR_CODE_ACCESS_AFTER_DISPOSAL
-      );
-    } else {
-      throw new WirestateError(
-        "WireScope::container accessed before activation. " +
-          "Ensure instance is bound to container and is properly resolved.",
-        ERROR_CODE_ACCESS_BEFORE_ACTIVATION
-      );
     }
   }
 }

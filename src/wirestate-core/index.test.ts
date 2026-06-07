@@ -62,6 +62,7 @@ describe("Library exported API from wirestate-core", () => {
     "ServiceRedirectionBindingDescriptor",
     "WireEvent",
     "WireScope",
+    "WireStatus",
     "WirestateError",
     "bind",
     "createContainer",
