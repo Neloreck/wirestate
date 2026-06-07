@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { getPrototypeChainMetadata } from "../metadata/prototype-chain";
+import { collectHandlerMetadata } from "../metadata/handler-metadata";
 import { QUERY_HANDLER_METADATA } from "../registry";
 import { QueryHandlerMetadata } from "../types/queries";
 
@@ -32,9 +32,5 @@ import { QueryHandlerMetadata } from "../types/queries";
 export function getQueryHandlerMetadata(instance: object): ReadonlyArray<QueryHandlerMetadata> {
   dbg.info(prefix(__filename), "Resolving instance query metadata:", { name: instance.constructor.name, instance });
 
-  // Reverse to ensure parent-first execution order.
-  return getPrototypeChainMetadata(instance, QUERY_HANDLER_METADATA)
-    .filter((metadata) => metadata.length > 0)
-    .reverse()
-    .flat();
+  return collectHandlerMetadata(instance, QUERY_HANDLER_METADATA);
 }

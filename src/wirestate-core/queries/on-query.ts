@@ -1,9 +1,9 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { appendHandlerMetadata } from "../metadata/handler-metadata";
 import { QUERY_HANDLER_METADATA } from "../registry";
-import { Maybe } from "../types/general";
-import { QueryHandlerMetadata, QueryType } from "../types/queries";
+import { QueryType } from "../types/queries";
 
 /**
  * Marks a method as a query handler.
@@ -45,16 +45,6 @@ export function OnQuery(type: QueryType): MethodDecorator {
       constructor: target.constructor,
     });
 
-    const constructor = target.constructor;
-
-    let list: Maybe<Array<QueryHandlerMetadata>> = QUERY_HANDLER_METADATA.get(constructor);
-
-    if (!list) {
-      list = [];
-      QUERY_HANDLER_METADATA.set(constructor, list);
-    }
-
-    // Register handler metadata for prototype-based retrieval.
-    list.push({ methodName: propertyKey, type });
+    appendHandlerMetadata(QUERY_HANDLER_METADATA, target.constructor, { methodName: propertyKey, type });
   };
 }

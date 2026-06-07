@@ -1,9 +1,10 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { appendHandlerMetadata } from "../metadata/handler-metadata";
 import { EVENT_HANDLER_METADATA } from "../registry";
-import { EventHandlerMetadata, EventType } from "../types/events";
-import { Maybe, Optional } from "../types/general";
+import { EventType } from "../types/events";
+import { Optional } from "../types/general";
 
 /**
  * Marks a method as an event handler.
@@ -50,16 +51,6 @@ export function OnEvent(types?: EventType | ReadonlyArray<EventType>): MethodDec
       constructor: target.constructor,
     });
 
-    const constructor = target.constructor;
-
-    let list: Maybe<Array<EventHandlerMetadata>> = EVENT_HANDLER_METADATA.get(constructor);
-
-    if (!list) {
-      list = [];
-      EVENT_HANDLER_METADATA.set(constructor, list);
-    }
-
-    // Register handler metadata for prototype-based retrieval.
-    list.push({ methodName: propertyKey, types: normalized });
+    appendHandlerMetadata(EVENT_HANDLER_METADATA, target.constructor, { methodName: propertyKey, types: normalized });
   };
 }

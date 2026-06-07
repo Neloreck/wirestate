@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { getPrototypeChainMetadata } from "../metadata/prototype-chain";
+import { collectHandlerMetadata } from "../metadata/handler-metadata";
 import { COMMAND_HANDLER_METADATA } from "../registry";
 import { CommandHandlerMetadata } from "../types/commands";
 
@@ -24,9 +24,5 @@ export function getCommandHandlerMetadata(instance: object): ReadonlyArray<Comma
     instance,
   });
 
-  // Reverse to ensure parent-first execution order.
-  return getPrototypeChainMetadata(instance, COMMAND_HANDLER_METADATA)
-    .filter((metadata) => metadata.length > 0)
-    .reverse()
-    .flat();
+  return collectHandlerMetadata(instance, COMMAND_HANDLER_METADATA);
 }

@@ -1,9 +1,9 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { appendHandlerMetadata } from "../metadata/handler-metadata";
 import { COMMAND_HANDLER_METADATA } from "../registry";
-import { CommandHandlerMetadata, CommandType } from "../types/commands";
-import { Maybe } from "../types/general";
+import { CommandType } from "../types/commands";
 
 /**
  * Marks a method as a command handler.
@@ -41,16 +41,6 @@ export function OnCommand(type: CommandType): MethodDecorator {
       constructor: target.constructor,
     });
 
-    const constructor = target.constructor;
-
-    let list: Maybe<Array<CommandHandlerMetadata>> = COMMAND_HANDLER_METADATA.get(constructor);
-
-    if (!list) {
-      list = [];
-      COMMAND_HANDLER_METADATA.set(constructor, list);
-    }
-
-    // Register handler metadata for prototype-based retrieval.
-    list.push({ methodName: propertyKey, type });
+    appendHandlerMetadata(COMMAND_HANDLER_METADATA, target.constructor, { methodName: propertyKey, type });
   };
 }

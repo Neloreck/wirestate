@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { getPrototypeChainMetadata } from "../metadata/prototype-chain";
+import { collectHandlerMetadata } from "../metadata/handler-metadata";
 import { EVENT_HANDLER_METADATA } from "../registry";
 import { EventHandlerMetadata } from "../types/events";
 
@@ -31,9 +31,5 @@ import { EventHandlerMetadata } from "../types/events";
 export function getEventHandlerMetadata(instance: object): ReadonlyArray<EventHandlerMetadata> {
   dbg.info(prefix(__filename), "Retrieving event handler metadata:", { name: instance.constructor.name, instance });
 
-  // Reverse to ensure parent-first execution order
-  return getPrototypeChainMetadata(instance, EVENT_HANDLER_METADATA)
-    .filter((metadata) => metadata.length > 0)
-    .reverse()
-    .flat();
+  return collectHandlerMetadata(instance, EVENT_HANDLER_METADATA);
 }
