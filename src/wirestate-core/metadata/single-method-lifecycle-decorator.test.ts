@@ -3,7 +3,7 @@ import {
   SingleMethodDecoratorDescriptor,
 } from "./single-method-lifecycle-decorator";
 
-describe("createSingleMethodLifecycleDecorator", () => {
+describe("createSingleMethodDecoratorDescriptor", () => {
   const buildLifecycle = (): {
     lifecycle: SingleMethodDecoratorDescriptor;
     registry: WeakMap<object, string | symbol>;

@@ -62,7 +62,7 @@ export interface SingleMethodDecoratorDescriptor {
 
 /**
  * Builds a lifecycle hook that allows at most one decorated method per class hierarchy.
-
+ *
  * @group Lifecycle
  * @internal
  *
