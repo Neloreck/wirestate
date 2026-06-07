@@ -70,26 +70,55 @@ describe("unbind", () => {
     expect(events).toEqual(["provision", "deprovision", "deactivation"]);
   });
 
-  it("should not deprovision stale provider lifecycle entries after raw container unbind", () => {
-    const { LifecycleService, events } = createLifecycleService({
+  it("should deprovision only the unbound service and keep the rest provisioned", () => {
+    const events: Array<string> = [];
+    const { LifecycleService: ServiceA } = createLifecycleService({
+      events,
       methods: ["provision", "deprovision", "deactivation"],
+      suffix: "a",
     });
-    const container: Container = createContainer({
-      bindings: [LifecycleService],
+    const { LifecycleService: ServiceB } = createLifecycleService({
+      events,
+      methods: ["provision", "deprovision", "deactivation"],
+      suffix: "b",
     });
+    const container: Container = createContainer({ bindings: [ServiceA, ServiceB] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle);
 
-    expect(events).toEqual(["provision"]);
+    expect(events).toEqual(["provision-a", "provision-b"]);
 
-    container.unbind(LifecycleService);
+    unbind(container, ServiceA);
 
-    expect(events).toEqual(["provision", "deactivation"]);
+    expect(events).toEqual(["provision-a", "provision-b", "deprovision-a", "deactivation-a"]);
+    expect(lifecycle.has(container)).toBe(true);
 
     deprovisionContainer(container, lifecycle);
 
-    expect(events).toEqual(["provision", "deactivation"]);
+    expect(events).toEqual(["provision-a", "provision-b", "deprovision-a", "deactivation-a", "deprovision-b"]);
+  });
+
+  it("should deprovision a provisioned instance on raw unbind and not re-deprovision afterwards", () => {
+    const { LifecycleService, events } = createLifecycleService();
+
+    const container: Container = createContainer({ bindings: [LifecycleService] });
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+
+    provisionContainer(container, lifecycle);
+
+    expect(events).toEqual(["activated", "provision"]);
+
+    // A raw unbind destroys a still-provisioned instance: @OnDeprovision runs
+    // before @OnDeactivation so provider resources are released.
+    container.unbind(LifecycleService);
+
+    expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
+
+    // A later container deprovision must not re-fire teardown for the stale entry.
+    deprovisionContainer(container, lifecycle);
+
+    expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
     expect(lifecycle.has(container)).toBe(false);
   });
 });
