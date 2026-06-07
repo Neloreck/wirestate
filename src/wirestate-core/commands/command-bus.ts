@@ -1,14 +1,11 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { HandlerStackBus } from "../bus/handler-stack-bus";
 import { ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { CommandHandler, CommandType, CommandUnregister } from "../types/commands";
-import { Maybe, Optional } from "../types/general";
-
-interface CommandHandlerDescriptor {
-  handler: CommandHandler;
-}
+import { Optional } from "../types/general";
 
 /**
  * Dispatches named commands to one active handler.
@@ -29,20 +26,18 @@ interface CommandHandlerDescriptor {
  * await bus.executeAsync<void, User>("SAVE_USER", user);
  * ```
  */
-export class CommandBus {
+export class CommandBus extends HandlerStackBus<CommandType> {
   /**
-   * Internal handler storage.
-   * Uses a stack for each command type to support shadowing.
-   */
-  private readonly handlers: Map<CommandType, Array<CommandHandlerDescriptor>> = new Map();
-
-  /**
-   * Removes all registered command handlers from the bus.
+   * Builds the error thrown when a required command dispatch finds no handler.
    *
-   * @internal
+   * @param type - Command identifier that failed to resolve.
+   * @returns The error to throw.
    */
-  public clear(): void {
-    this.handlers.clear();
+  protected createMissingHandlerError(type: CommandType): WirestateError {
+    return new WirestateError(
+      `No command handler registered in container for type: '${String(type)}'.`,
+      ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER
+    );
   }
 
   /**
@@ -70,16 +65,7 @@ export class CommandBus {
   public execute<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R {
     dbg.info(prefix(__filename), "Execute command:", { type, payload });
 
-    const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
-
-    if (stack?.length) {
-      return (stack[stack.length - 1].handler as CommandHandler<R, P, T>)(payload as P) as R;
-    }
-
-    throw new WirestateError(
-      `No command handler registered in container for type: '${String(type)}'.`,
-      ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER
-    );
+    return this.dispatch<R, P>(type, payload);
   }
 
   /**
@@ -98,22 +84,13 @@ export class CommandBus {
    *
    * @throws {@link WirestateError} If no handler is registered.
    */
-  public async executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
+  public executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,
     payload?: P
   ): Promise<R> {
     dbg.info(prefix(__filename), "Execute async command:", { type, payload });
 
-    const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
-
-    if (stack?.length) {
-      return (stack[stack.length - 1].handler as CommandHandler<R, P, T>)(payload as P);
-    }
-
-    throw new WirestateError(
-      `No command handler registered in container for type: '${String(type)}'.`,
-      ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER
-    );
+    return this.dispatchAsync<R, P>(type, payload);
   }
 
   /**
@@ -133,13 +110,7 @@ export class CommandBus {
   ): Optional<R> {
     dbg.info(prefix(__filename), "Execute optional command:", { type, payload });
 
-    const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
-
-    if (stack?.length) {
-      return (stack[stack.length - 1].handler as CommandHandler<R, P, T>)(payload as P) as R;
-    }
-
-    return null;
+    return this.dispatchOptional<R, P>(type, payload);
   }
 
   /**
@@ -153,29 +124,13 @@ export class CommandBus {
    * @param payload - Optional payload for the handler.
    * @returns A Promise resolving to the command result, or `null` if no handler is found.
    */
-  public async executeOptionalAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
+  public executeOptionalAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,
     payload?: P
   ): Promise<Optional<R>> {
     dbg.info(prefix(__filename), "Execute optional async command:", { type, payload });
 
-    const stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
-
-    if (stack?.length) {
-      return (stack[stack.length - 1].handler as CommandHandler<R, P, T>)(payload as P);
-    }
-
-    return null;
-  }
-
-  /**
-   * Checks if at least one handler is registered for the given command type.
-   *
-   * @param type - Command identifier.
-   * @returns `true` if a handler is available, `false` otherwise.
-   */
-  public hasHandler(type: CommandType): boolean {
-    return Boolean(this.handlers.get(type)?.length);
+    return this.dispatchOptionalAsync<R, P>(type, payload);
   }
 
   /**
@@ -209,50 +164,7 @@ export class CommandBus {
       bus: this,
     });
 
-    let stack: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
-
-    if (!stack) {
-      stack = [];
-      this.handlers.set(type, stack);
-    }
-
-    const registration: CommandHandlerDescriptor = {
-      handler: handler as CommandHandler,
-    };
-
-    stack.push(registration);
-
-    return () => {
-      dbg.info(prefix(__filename), "Unregistering command handler with callback:", {
-        type,
-        handler: registration.handler,
-        bus: this,
-      });
-
-      const current: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
-
-      if (!current) {
-        return;
-      }
-
-      let index: number = -1;
-
-      for (let it: number = 0; it < current.length; it += 1) {
-        if (current[it] === registration) {
-          index = it;
-          break;
-        }
-      }
-
-      if (index >= 0) {
-        current.splice(index, 1);
-      }
-
-      // Clean empty stacks.
-      if (current.length === 0) {
-        this.handlers.delete(type);
-      }
-    };
+    return this.registerHandler<R, P>(type, handler);
   }
 
   /**
@@ -278,28 +190,6 @@ export class CommandBus {
       bus: this,
     });
 
-    const current: Maybe<Array<CommandHandlerDescriptor>> = this.handlers.get(type);
-
-    if (!current) {
-      return;
-    }
-
-    let index: number = -1;
-
-    for (let it: number = current.length - 1; it >= 0; it -= 1) {
-      if (current[it].handler === (handler as CommandHandler)) {
-        index = it;
-        break;
-      }
-    }
-
-    if (index >= 0) {
-      current.splice(index, 1);
-    }
-
-    // Clean empty stacks.
-    if (current.length === 0) {
-      this.handlers.delete(type);
-    }
+    this.unregisterHandler<R, P>(type, handler);
   }
 }
