@@ -3,7 +3,6 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { Container, Newable } from "../../alias";
 import { deprovisionInstances } from "../../container/container-provision-lifecycle";
-import { WireStatus } from "../../container/wire-status";
 import { callLifecycleHandler } from "../../lifecycle/call-lifecycle-handler";
 import { ACTIVE_INSTANCES_BY_CONTAINER, CONTAINER_REFS_BY_INSTANCE } from "../../registry";
 import { Maybe } from "../../types/general";
@@ -41,10 +40,7 @@ export function createInstanceDeactivationHandler<T extends object>(
       instance,
     });
 
-    // Release provider resources before destroying the instance: if it is still provisioned.
-    if (WireStatus.for(instance).isDeprovisioned === false) {
-      deprovisionInstances([instance]);
-    }
+    deprovisionInstances([instance]);
 
     if (options?.skipActivationHooks) {
       dbg.info(prefix(__filename), "Skip @OnDeactivation method:", {

@@ -6,6 +6,8 @@ import { getDeprovisionHandlerMetadata } from "../bind/instance/on-deprovision";
 import { getProvisionHandlerMetadata } from "../bind/instance/on-provision";
 import { getBindingToken } from "../bind/utils/get-binding-token";
 import { getContainerBindings } from "../bind/utils/register-binding";
+import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
 import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
 import {
   ACTIVE_INSTANCES_BY_CONTAINER,
@@ -114,7 +116,7 @@ export function deprovisionContainer(container: Container, lifecycle: ContainerP
       instances,
     });
 
-    deprovisionInstances(instances.filter((instance) => CONTAINER_REFS_BY_INSTANCE.get(instance) === container));
+    deprovisionInstances(instances);
 
     for (const instance of ACTIVE_INSTANCES_BY_CONTAINER.get(container) ?? []) {
       const status: WireStatus = WireStatus.for(instance);
@@ -170,7 +172,7 @@ export function deprovisionContainerBinding(container: Container, token: Identif
       continue;
     }
 
-    deprovisionInstances(removed.filter((instance) => CONTAINER_REFS_BY_INSTANCE.get(instance) === container));
+    deprovisionInstances(removed);
     untrackProvisionToken(removed, token);
 
     if (remaining.length > 0) {
@@ -217,6 +219,22 @@ export function provisionInstances(container: Container, bindings: Bindings = []
   const instances: Array<object> = [];
   const trackedTokens: Array<readonly [object, Identifier]> = [];
   const visited: Set<Identifier> = new Set();
+
+  // A container owns provider lifecycle only for the bindings it declares.
+  for (const binding of bindings) {
+    const token: Identifier = getBindingToken(binding);
+
+    if (
+      isProviderLifecycleParticipant(getProviderLifecycleMetadataToken(binding)) &&
+      !container.isCurrentBound(token)
+    ) {
+      throw new WirestateError(
+        `Cannot provision binding '${typeof token === "function" ? token.name : String(token)}' that is not bound on ` +
+          `this container. Provider lifecycle is owned by the container that declares the binding.`,
+        ERROR_CODE_VALIDATION_ERROR
+      );
+    }
+  }
 
   // Phase 1: resolve each distinct participant so @OnActivated runs before hooks.
   for (const binding of bindings) {
@@ -276,9 +294,7 @@ export function provisionInstances(container: Container, bindings: Bindings = []
 
       PROVISION_STATUS_BY_CONTAINER.set(container, false);
 
-      deprovisionInstances(
-        reachedInstances.filter((reachedInstance) => CONTAINER_REFS_BY_INSTANCE.get(reachedInstance) === container)
-      );
+      deprovisionInstances(reachedInstances);
 
       for (const activeInstance of ACTIVE_INSTANCES_BY_CONTAINER.get(container) ?? []) {
         const activeStatus: WireStatus = WireStatus.for(activeInstance);
@@ -317,9 +333,15 @@ export function provisionInstances(container: Container, bindings: Bindings = []
 export function deprovisionInstances(instances: ReadonlyArray<object>): void {
   for (let index: number = instances.length - 1; index >= 0; index -= 1) {
     const instance: object = instances[index];
+    const status: WireStatus = WireStatus.for(instance);
+
+    // Only deprovision instances that are currently provisioned.
+    if (status.isDeprovisioned !== false) {
+      continue;
+    }
+
     const methodName: Maybe<string | symbol> = getDeprovisionHandlerMetadata(instance);
     const provisionId: Maybe<ProvisionId> = PROVISION_IDS_BY_INSTANCE.get(instance);
-    const status: WireStatus = WireStatus.for(instance);
 
     if (methodName) {
       callLifecycleHandler({
