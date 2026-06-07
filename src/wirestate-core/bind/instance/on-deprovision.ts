@@ -1,11 +1,14 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
-import { ERROR_CODE_VALIDATION_ERROR } from "../../error/error-code";
-import { WirestateError } from "../../error/wirestate-error";
-import { getPrototypeChainMetadata } from "../../metadata/prototype-chain";
+import { createSingleMethodDecoratorDescriptor } from "../../metadata/single-method-lifecycle-decorator";
 import { DEPROVISION_HANDLER_METADATA } from "../../registry";
 import { Maybe } from "../../types/general";
+
+const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
+  registry: DEPROVISION_HANDLER_METADATA,
+  name: "OnDeprovision",
+  duplicateMessage: (className) => `Only one @OnDeprovision method can be declared on provider '${className}'.`,
+  hierarchyMessage: (className) =>
+    `Only one @OnDeprovision method can be declared across provider hierarchy '${className}'.`,
+});
 
 /**
  * Runs before a framework provider stops exposing the container.
@@ -36,25 +39,7 @@ import { Maybe } from "../../types/general";
  * ```
  */
 export function OnDeprovision(): MethodDecorator {
-  return (target, propertyKey) => {
-    dbg.info(prefix(__filename), "Attaching OnDeprovision metadata:", {
-      name: (target as object).constructor.name,
-      propertyKey,
-      target,
-      constructor: (target as object).constructor,
-    });
-
-    const constructor = (target as object).constructor;
-
-    if (DEPROVISION_HANDLER_METADATA.has(constructor)) {
-      throw new WirestateError(
-        `Only one @OnDeprovision method can be declared on provider '${constructor.name}'.`,
-        ERROR_CODE_VALIDATION_ERROR
-      );
-    }
-
-    DEPROVISION_HANDLER_METADATA.set(constructor, propertyKey);
-  };
+  return decorator();
 }
 
 /**
@@ -73,20 +58,5 @@ export function OnDeprovision(): MethodDecorator {
  * @returns The method name, or `null` when no hook exists.
  */
 export function getDeprovisionHandlerMetadata(instance: object): Maybe<string | symbol> {
-  dbg.info(prefix(__filename), "Resolving OnDeprovision metadata:", { name: instance.constructor.name, instance });
-
-  let handler: Maybe<string | symbol> = null;
-
-  for (const metadata of getPrototypeChainMetadata(instance, DEPROVISION_HANDLER_METADATA)) {
-    if (handler && handler !== metadata) {
-      throw new WirestateError(
-        `Only one @OnDeprovision method can be declared across provider hierarchy '${instance.constructor.name}'.`,
-        ERROR_CODE_VALIDATION_ERROR
-      );
-    }
-
-    handler = metadata;
-  }
-
-  return handler;
+  return getMetadata(instance);
 }

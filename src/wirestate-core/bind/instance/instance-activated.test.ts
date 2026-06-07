@@ -32,7 +32,9 @@ describe("createInstanceActivatedHandler", () => {
       }
     }
 
-    const container: Container = createContainer();
+    const onError = jest.fn();
+
+    const container: Container = createContainer({ onError });
     const instance: TestService = new TestService();
 
     const activate = createInstanceActivatedHandler({
@@ -41,6 +43,7 @@ describe("createInstanceActivatedHandler", () => {
     });
 
     expect(() => activate({} as ResolutionContext, instance)).toThrow("activation-fail");
+    expect(onError).toHaveBeenCalledTimes(1);
     expect(ACTIVE_INSTANCES_BY_CONTAINER.get(container)).toBeUndefined();
   });
 });

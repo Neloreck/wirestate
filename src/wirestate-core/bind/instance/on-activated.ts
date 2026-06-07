@@ -1,11 +1,14 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
-import { ERROR_CODE_VALIDATION_ERROR } from "../../error/error-code";
-import { WirestateError } from "../../error/wirestate-error";
-import { getPrototypeChainMetadata } from "../../metadata/prototype-chain";
+import { createSingleMethodDecoratorDescriptor } from "../../metadata/single-method-lifecycle-decorator";
 import { ACTIVATED_HANDLER_METADATA } from "../../registry";
 import { Maybe } from "../../types/general";
+
+const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
+  registry: ACTIVATED_HANDLER_METADATA,
+  name: "OnActivated",
+  duplicateMessage: (className) => `Only one @OnActivated method can be declared on '${className}'.`,
+  hierarchyMessage: (className) =>
+    `Only one @OnActivated method can be declared across class hierarchy for '${className}'.`,
+});
 
 /**
  * Runs an instance method after container activation.
@@ -36,25 +39,7 @@ import { Maybe } from "../../types/general";
  * ```
  */
 export function OnActivated(): MethodDecorator {
-  return (target, propertyKey) => {
-    dbg.info(prefix(__filename), "Attaching OnActivated metadata:", {
-      name: (target as object).constructor.name,
-      propertyKey,
-      target,
-      constructor: (target as object).constructor,
-    });
-
-    const constructor = (target as object).constructor;
-
-    if (ACTIVATED_HANDLER_METADATA.has(constructor)) {
-      throw new WirestateError(
-        `Only one @OnActivated method can be declared on '${constructor.name}'.`,
-        ERROR_CODE_VALIDATION_ERROR
-      );
-    }
-
-    ACTIVATED_HANDLER_METADATA.set(constructor, propertyKey);
-  };
+  return decorator();
 }
 
 /**
@@ -79,20 +64,5 @@ export function OnActivated(): MethodDecorator {
  * ```
  */
 export function getActivatedHandlerMetadata(instance: object): Maybe<string | symbol> {
-  dbg.info(prefix(__filename), "Resolving OnActivated metadata:", { name: instance.constructor.name, instance });
-
-  let handler: Maybe<string | symbol> = null;
-
-  for (const metadata of getPrototypeChainMetadata(instance, ACTIVATED_HANDLER_METADATA)) {
-    if (handler && handler !== metadata) {
-      throw new WirestateError(
-        `Only one @OnActivated method can be declared across class hierarchy for '${instance.constructor.name}'.`,
-        ERROR_CODE_VALIDATION_ERROR
-      );
-    }
-
-    handler = metadata;
-  }
-
-  return handler;
+  return getMetadata(instance);
 }
