@@ -1,7 +1,7 @@
 import { action, computed, IActionFactory, IComputedFactory, IObservableFactory, observable } from "mobx";
 
 /**
- * @group Mobx
+ * @group MobX
  * @see {@link https://mobx.js.org/README.html}
  */
 export {
@@ -106,7 +106,7 @@ export {
 } from "mobx";
 
 /**
- * @group Mobx-react
+ * @group MobX React
  * @see {@link https://mobx.js.org/react-integration.html}
  */
 export {
@@ -126,7 +126,7 @@ export {
 /**
  * MobX `action` decorator alias.
  *
- * @group Mobx-alias
+ * @group MobX aliases
  * @see {@link https://mobx.js.org/README.html}
  *
  * @returns Action decorator.
@@ -138,7 +138,7 @@ export function Action(): IActionFactory {
 /**
  * MobX bound action decorator alias.
  *
- * @group Mobx-alias
+ * @group MobX aliases
  * @see {@link https://mobx.js.org/README.html}
  *
  * @returns Action decorator.
@@ -150,7 +150,7 @@ export function BoundAction() {
 /**
  * MobX `computed` decorator alias.
  *
- * @group Mobx-alias
+ * @group MobX aliases
  * @see {@link https://mobx.js.org/README.html}
  *
  * @returns Computed decorator.
@@ -162,7 +162,7 @@ export function Computed(): IComputedFactory {
 /**
  * MobX `observable` decorator alias.
  *
- * @group Mobx-alias
+ * @group MobX aliases
  * @see {@link https://mobx.js.org/README.html}
  *
  * @returns Observable decorator.
@@ -174,10 +174,10 @@ export function Observable(): IObservableFactory {
 /**
  * MobX shallow observable decorator alias.
  *
- * @group Mobx-alias
+ * @group MobX aliases
  * @see {@link https://mobx.js.org/README.html}
  *
- * @returns Observable.shallow decorator.
+ * @returns `observable.shallow` decorator.
  */
 export function ShallowObservable() {
   return observable.shallow;
@@ -186,10 +186,10 @@ export function ShallowObservable() {
 /**
  * MobX ref observable decorator alias.
  *
- * @group Mobx-alias
+ * @group MobX aliases
  * @see {@link https://mobx.js.org/README.html}
  *
- * @returns Observable.ref decorator.
+ * @returns `observable.ref` decorator.
  */
 export function RefObservable() {
   return observable.ref;
@@ -198,10 +198,10 @@ export function RefObservable() {
 /**
  * MobX deep observable decorator alias.
  *
- * @group Mobx-alias
+ * @group MobX aliases
  * @see {@link https://mobx.js.org/README.html}
  *
- * @returns Observable.deep decorator.
+ * @returns `observable.deep` decorator.
  */
 export function DeepObservable() {
   return observable.deep;

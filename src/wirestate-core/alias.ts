@@ -33,9 +33,9 @@ export { bindingTypeValues as BindingType, bindingScopeValues as BindingScope } 
 /**
  * Wraps a token for circular constructor dependencies.
  *
- * `forwardRef` delays token lookup. It is a small escape hatch, not a design
- * goal. If two instances need each other like two drawers that cannot open
- * together, prefer moving the shared piece into a one.
+ * `forwardRef` delays token lookup when two constructor dependencies refer to
+ * each other. Prefer breaking the cycle when possible, for example by moving
+ * shared state or coordination into another service.
  *
  * @group External-inversify
  * @see {@link https://inversify.io/}

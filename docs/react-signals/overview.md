@@ -11,7 +11,7 @@ For signal API details, use the official [Preact Signals guide](https://preactjs
 ## Install
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-signals @preact/signals-react reflect-metadata
+npm install @wirestate/core @wirestate/react @wirestate/react-signals react @preact/signals-react reflect-metadata
 npm install --save-dev @preact/signals-react-transform
 ```
 

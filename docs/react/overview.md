@@ -9,10 +9,10 @@ Choose a separate reactivity package for service state.
 
 ## Install
 
-Install the React bridge with core and MobX-backed service state:
+Install the React bridge with core, React, and MobX-backed service state:
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-mobx mobx mobx-react-lite reflect-metadata
+npm install @wirestate/core @wirestate/react @wirestate/react-mobx react mobx mobx-react-lite reflect-metadata
 ```
 
 For React APIs and runtime behavior, use the official [React reference](https://react.dev/reference/react) and

@@ -122,4 +122,5 @@ If several handlers use the same command type, the newest one handles the comman
 ## API Reference
 
 [`onCommand`](/api/wirestate-lit/functions/onCommand),
-[`useOnCommand`](/api/wirestate-lit/functions/useOnCommand), [`OnCommandController`](/api/wirestate-lit/classes/OnCommandController).
+[`useOnCommand`](/api/wirestate-lit/functions/useOnCommand),
+[`OnCommandController`](/api/wirestate-lit/classes/OnCommandController).

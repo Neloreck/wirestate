@@ -1,21 +1,11 @@
 # Portable Bundle Entries [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://neloreck.github.io/wirestate/)]
 
-This directory contains entry points for building "portable" bundles of Wirestate. These entries combine core functionality with framework bindings and reactivity integrations into single entry points, suitable for specific target environments or simplified distribution.
+This directory contains build entry points for portable Wirestate bundles. They are not separate published packages.
+`pnpm build:ptb` uses them to emit combined ESM bundles under `target/dist/wirestate-portable`.
 
-## Available Entries
+## Entries
 
-- **Core (`wirestate.ts`)**
-  - Bundles `@wirestate/core`.
-  - Provides the base DI container, services, events, commands, and queries.
-
-- **Lit Signals (`wirestate-lit-signals.ts`)**
-  - Bundles `@wirestate/core`, `@wirestate/lit`, and `@wirestate/lit-signals`.
-  - Full Wirestate stack for Lit components using Signals for reactivity.
-
-- **React MobX (`wirestate-react-mobx.ts`)**
-  - Bundles `@wirestate/core`, `@wirestate/react`, and `@wirestate/react-mobx`.
-  - Full Wirestate stack for React components using MobX for reactivity.
-
-- **React Signals (`wirestate-react-signals.ts`)**
-  - Bundles `@wirestate/core`, `@wirestate/react`, and `@wirestate/react-signals`.
-  - Full Wirestate stack for React components using Preact Signals for reactivity.
+- `wirestate.ts`: core containers, services, lifecycle, seeds, events, commands, and queries.
+- `wirestate-react-mobx.ts`: core, React bindings, and MobX re-exports.
+- `wirestate-react-signals.ts`: core, React bindings, and Preact Signals re-exports.
+- `wirestate-lit-signals.ts`: core, Lit bindings, and Lit Signals re-exports.

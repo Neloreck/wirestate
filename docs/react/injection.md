@@ -71,5 +71,6 @@ function DebugButton() {
 ## API Reference
 
 [`useInjection`](/api/wirestate-react/functions/useInjection),
-[`useOptionalInjection`](/api/wirestate-react/functions/useOptionalInjection), [`useContainer`](/api/wirestate-react/functions/useContainer),
+[`useOptionalInjection`](/api/wirestate-react/functions/useOptionalInjection),
+[`useContainer`](/api/wirestate-react/functions/useContainer),
 [`useScope`](/api/wirestate-react/functions/useScope).

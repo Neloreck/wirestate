@@ -7,10 +7,10 @@ Use the official [MobX docs](https://mobx.js.org/README.html),
 [`mobx`](https://www.npmjs.com/package/mobx) and
 [`mobx-react-lite`](https://www.npmjs.com/package/mobx-react-lite) packages for MobX API details.
 
-Install:
+## Install
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-mobx mobx mobx-react-lite reflect-metadata
+npm install @wirestate/core @wirestate/react @wirestate/react-mobx react mobx mobx-react-lite reflect-metadata
 ```
 
 ## Minimal Example

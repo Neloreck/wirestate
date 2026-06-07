@@ -13,7 +13,7 @@ For MobX behavior and React integration details, use the official [MobX docs](ht
 ## Install
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-mobx mobx mobx-react-lite reflect-metadata
+npm install @wirestate/core @wirestate/react @wirestate/react-mobx react mobx mobx-react-lite reflect-metadata
 ```
 
 ## Service

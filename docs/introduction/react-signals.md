@@ -7,10 +7,10 @@ Use the official [Preact Signals guide](https://preactjs.com/guide/v10/signals),
 [`@preact/signals-react-transform` package](https://www.npmjs.com/package/@preact/signals-react-transform) for the
 signal APIs and transform setup.
 
-Install:
+## Install
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-signals @preact/signals-react reflect-metadata
+npm install @wirestate/core @wirestate/react @wirestate/react-signals react @preact/signals-react reflect-metadata
 npm install --save-dev @preact/signals-react-transform
 ```
 

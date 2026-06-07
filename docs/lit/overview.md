@@ -56,7 +56,7 @@ class CounterButton extends LitElement {
   private counter!: CounterService;
 
   protected render() {
-    return html` <button @click=${() => this.counter.increment()}>Count: ${watch(this.counter.count)}</button> `;
+    return html`<button @click=${() => this.counter.increment()}>Count: ${watch(this.counter.count)}</button>`;
   }
 }
 ```

@@ -5,7 +5,7 @@ Use this stack when Lit elements should render service state stored in Lit Signa
 Use the official [Lit docs](https://lit.dev/docs/), [Lit Signals docs](https://lit.dev/docs/data/signals/), and
 [`@lit-labs/signals` package](https://www.npmjs.com/package/@lit-labs/signals) for external Lit and signal API details.
 
-Install:
+## Install
 
 ```bash
 npm install @wirestate/core @wirestate/lit @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/signals signal-polyfill reflect-metadata
@@ -47,7 +47,7 @@ class CounterButton extends LitElement {
   private counter!: CounterService;
 
   protected render() {
-    return html` <button @click=${() => this.counter.increment()}>Count: ${watch(this.counter.count)}</button> `;
+    return html`<button @click=${() => this.counter.increment()}>Count: ${watch(this.counter.count)}</button>`;
   }
 }
 ```

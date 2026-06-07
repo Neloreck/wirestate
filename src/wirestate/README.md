@@ -5,11 +5,13 @@
 
 Compatibility package for the unscoped `wirestate` name.
 
-New projects should prefer the scoped packages:
+New projects should prefer the scoped packages for the stack they use:
 [`@wirestate/core`](https://www.npmjs.com/package/@wirestate/core),
 [`@wirestate/react`](https://www.npmjs.com/package/@wirestate/react),
-[`@wirestate/react-mobx`](https://www.npmjs.com/package/@wirestate/react-mobx), and
-[`@wirestate/react-signals`](https://www.npmjs.com/package/@wirestate/react-signals).
+[`@wirestate/lit`](https://www.npmjs.com/package/@wirestate/lit),
+[`@wirestate/react-mobx`](https://www.npmjs.com/package/@wirestate/react-mobx),
+[`@wirestate/react-signals`](https://www.npmjs.com/package/@wirestate/react-signals),
+[`@wirestate/lit-signals`](https://www.npmjs.com/package/@wirestate/lit-signals).
 
 ## Install
 

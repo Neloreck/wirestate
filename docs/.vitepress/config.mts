@@ -36,9 +36,9 @@ export default defineConfig({
         items: [
           { text: "About", link: "/introduction/about" },
           { text: "Installation", link: "/introduction/installation" },
-          { text: "React/Signals", link: "/introduction/react-signals" },
-          { text: "React/MobX", link: "/introduction/react-mobx" },
-          { text: "Lit/Signals", link: "/introduction/lit-signals" },
+          { text: "React Signals", link: "/introduction/react-signals" },
+          { text: "React MobX", link: "/introduction/react-mobx" },
+          { text: "Lit Signals", link: "/introduction/lit-signals" },
         ],
       },
       {
