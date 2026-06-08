@@ -1,8 +1,7 @@
-import { watch } from "@lit-labs/signals";
+import { MobxLitElement } from "@adobe/lit-mobx";
 import { WireScope, WireEvent } from "@wirestate/core";
 import { injection, onEvent } from "@wirestate/lit";
-import { Computed, computed } from "@wirestate/lit-signals";
-import { css, CSSResult, html, LitElement } from "lit";
+import { css, CSSResult, html } from "lit";
 import { customElement } from "lit/decorators.js";
 
 import { EGlobalCommand } from "@/constants/commands";
@@ -13,7 +12,7 @@ import { ThemeService } from "@/services/ThemeService";
 import { resetStyles } from "@/styles/reset";
 
 @customElement("w-general-controls")
-export class GeneralControls extends LitElement {
+export class GeneralControls extends MobxLitElement {
   public static styles: Array<CSSResult> = [
     resetStyles,
     css`
@@ -82,8 +81,6 @@ export class GeneralControls extends LitElement {
   @injection(LoggerService)
   private readonly loggerService!: LoggerService;
 
-  private isOddLabel: Computed<string> = computed(() => (this.counterService.count.get() % 2 === 0 ? "even" : "odd"));
-
   @onEvent()
   public onAnyEvent(event: WireEvent): void {
     console.info("[general-controls] Log all events:", event.type, event.payload, event.source);
@@ -113,12 +110,12 @@ export class GeneralControls extends LitElement {
     return html`
       <div class="heading">
         <h2>Wirestate Playground</h2>
-        <p>lit signals + inversify container + custom events/queries/commands</p>
+        <p>lit mobx + inversify container + custom events/queries/commands</p>
       </div>
 
       <div class="controls-row">
         <button class="control" @click="${() => this.counterService.increment()}">
-          count: ${watch(this.counterService.count)} (${watch(this.isOddLabel)})
+          count: ${this.counterService.count} (${this.counterService.isEven ? "even" : "odd"})
         </button>
 
         <button class="control ghost" @click="${() => this.scope.emitEvent(EGlobalEvent.COUNTER_INCREMENT, 3)}">
@@ -128,7 +125,7 @@ export class GeneralControls extends LitElement {
         <button class="control ghost" @click="${() => this.counterService.reset()}">reset</button>
 
         <button class="control ghost" @click="${() => this.themeService.toggleTheme()}">
-          theme ${watch(this.themeService.theme)}
+          theme ${this.themeService.theme}
         </button>
 
         <button class="control ghost" @click="${() => this.onDumpData()}">Dump data (command)</button>
