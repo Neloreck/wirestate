@@ -1,7 +1,7 @@
 {
   "name": "@wirestate/lit-signals",
   "version": "1.0.0-experimental.4",
-  "description": "Lit Signals re-exports for Wirestate Lit services",
+  "description": "Preact Signals Lit reactivity binding (@lit-labs/preact-signals) for Wirestate Lit services",
   "sideEffects": false,
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/Neloreck/wirestate#readme",
@@ -47,8 +47,8 @@
   ],
   "dependencies": {},
   "peerDependencies": {
-    "@lit-labs/signals": ">=0.2.0",
-    "signal-polyfill": ">=0.2.0"
+    "@lit-labs/preact-signals": ">=1.0.0",
+    "@preact/signals-core": ">=1.3.0"
   },
   "optionalDependencies": {}
 }

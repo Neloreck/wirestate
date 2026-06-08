@@ -1,7 +1,20 @@
 /**
- * React Signals re-exports for reactive Wirestate services in React applications.
+ * Preact Signals React reactivity binding (`@preact/signals-react`) for Wirestate React services.
+ *
+ * Signal state is authored with `@wirestate/signals`; this package wires those signals into
+ * React rendering through `@preact/signals-react`.
  *
  * @packageDocumentation
  */
 
-export * from "./alias";
+/**
+ * @group Signals React
+ * @see {@link https://www.npmjs.com/package/@preact/signals-react}
+ */
+export { useComputed, useModel, useSignal, useSignalEffect } from "@preact/signals-react";
+
+/**
+ * @group Signals React
+ * @see {@link https://www.npmjs.com/package/@preact/signals-react}
+ */
+export { EffectStore, wrapJsx, useSignals, ensureFinalCleanup } from "@preact/signals-react/runtime";

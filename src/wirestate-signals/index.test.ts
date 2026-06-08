@@ -1,7 +1,19 @@
-describe("Library exported API from wirestate/lit-signals", () => {
+describe("Library exported API from wirestate/signals", () => {
   const libRoot = require("./index");
 
-  const expectedLibExports: Array<string> = ["SignalWatcher", "watch", "withWatch", "html", "svg"];
+  const expectedLibExports: Array<string> = [
+    "Model",
+    "ModelConstructor",
+    "ReadonlySignal",
+    "Signal",
+    "action",
+    "batch",
+    "computed",
+    "createModel",
+    "effect",
+    "signal",
+    "untracked",
+  ];
 
   const assertListIntersection = (first: Array<string>, second: Array<string>) => {
     first.forEach((it: string) => {

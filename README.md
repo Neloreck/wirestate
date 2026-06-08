@@ -25,15 +25,18 @@ tenant, or test.
 
 ## Packages
 
-| Package                                                               | Purpose                                                        |
-| --------------------------------------------------------------------- | -------------------------------------------------------------- |
-| [`@wirestate/core`](./src/wirestate-core/README.md)                   | Containers, injectable services, lifecycle, seeds, messaging.  |
-| [`@wirestate/react`](./src/wirestate-react/README.md)                 | React provider, injection hooks, and component-owned handlers. |
-| [`@wirestate/lit`](./src/wirestate-lit/README.md)                     | Lit providers, decorators, controllers, and element handlers.  |
-| [`@wirestate/react-mobx`](./src/wirestate-react-mobx/README.md)       | MobX and `mobx-react-lite` exports for React services.         |
-| [`@wirestate/react-signals`](./src/wirestate-react-signals/README.md) | Preact Signals exports for React services.                     |
-| [`@wirestate/lit-signals`](./src/wirestate-lit-signals/README.md)     | Lit Signals exports for Lit services.                          |
-| [`wirestate`](./src/wirestate/README.md)                              | Compatibility package for the unscoped package name.           |
+| Package                                                               | Purpose                                                             |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| [`@wirestate/core`](./src/wirestate-core/README.md)                   | Containers, injectable services, lifecycle, seeds, messaging.       |
+| [`@wirestate/react`](./src/wirestate-react/README.md)                 | React provider, injection hooks, and component-owned handlers.      |
+| [`@wirestate/lit`](./src/wirestate-lit/README.md)                     | Lit providers, decorators, controllers, and element handlers.       |
+| [`@wirestate/mobx`](./src/wirestate-mobx/README.md)                   | Framework-agnostic MobX exports for shared services.                |
+| [`@wirestate/react-mobx`](./src/wirestate-react-mobx/README.md)       | MobX React reactivity binding (`mobx-react-lite`).                  |
+| [`@wirestate/lit-mobx`](./src/wirestate-lit-mobx/README.md)           | MobX Lit reactivity binding (`@adobe/lit-mobx`).                    |
+| [`@wirestate/signals`](./src/wirestate-signals/README.md)             | Framework-agnostic Preact Signals exports for shared services.      |
+| [`@wirestate/react-signals`](./src/wirestate-react-signals/README.md) | Preact Signals React reactivity binding.                            |
+| [`@wirestate/lit-signals`](./src/wirestate-lit-signals/README.md)     | Preact Signals Lit reactivity binding (`@lit-labs/preact-signals`). |
+| [`wirestate`](./src/wirestate/README.md)                              | Compatibility package for the unscoped package name.                |
 
 ## Install
 
@@ -41,13 +44,16 @@ Install the core package, one UI adapter, and the reactivity package you actuall
 
 ```bash
 # React + Signals
-npm install @wirestate/core @wirestate/react @wirestate/react-signals react @preact/signals-react reflect-metadata
+npm install @wirestate/core @wirestate/react @wirestate/signals @wirestate/react-signals react @preact/signals-react @preact/signals-core reflect-metadata
 
 # React + MobX
-npm install @wirestate/core @wirestate/react @wirestate/react-mobx react mobx mobx-react-lite reflect-metadata
+npm install @wirestate/core @wirestate/react @wirestate/mobx @wirestate/react-mobx react mobx reflect-metadata
 
 # Lit + Signals
-npm install @wirestate/core @wirestate/lit @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/signals signal-polyfill reflect-metadata
+npm install @wirestate/core @wirestate/lit @wirestate/signals @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/preact-signals @preact/signals-core reflect-metadata
+
+# Lit + MobX
+npm install @wirestate/core @wirestate/lit @wirestate/mobx @wirestate/lit-mobx lit @lit/context @lit/reactive-element mobx reflect-metadata
 ```
 
 Import `reflect-metadata` once before decorated services are loaded.
@@ -72,7 +78,8 @@ Enable decorator metadata in TypeScript.
 ```tsx
 import { Injectable } from "@wirestate/core";
 import { ContainerProvider, useInjection } from "@wirestate/react";
-import { Signal, signal, useSignals } from "@wirestate/react-signals";
+import { useSignals } from "@wirestate/react-signals";
+import { Signal, signal } from "@wirestate/signals";
 
 @Injectable()
 class CounterService {

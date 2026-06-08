@@ -21,7 +21,8 @@
       "@wirestate/mobx": ["./src/wirestate-mobx"],
       "@wirestate/react": ["./src/wirestate-react"],
       "@wirestate/react-mobx": ["./src/wirestate-react-mobx"],
-      "@wirestate/react-signals": ["./src/wirestate-react-signals"]
+      "@wirestate/react-signals": ["./src/wirestate-react-signals"],
+      "@wirestate/signals": ["./src/wirestate-signals"]
     },
     "resolveJsonModule": true,
     "rootDir": "./",

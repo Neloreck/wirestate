@@ -3,18 +3,7 @@ describe("Library exported API from wirestate/react-signals", () => {
 
   const expectedLibExports: Array<string> = [
     "EffectStore",
-    "Model",
-    "ModelConstructor",
-    "ReadonlySignal",
-    "Signal",
-    "action",
-    "batch",
-    "computed",
-    "createModel",
-    "effect",
     "ensureFinalCleanup",
-    "signal",
-    "untracked",
     "useComputed",
     "useModel",
     "useSignal",

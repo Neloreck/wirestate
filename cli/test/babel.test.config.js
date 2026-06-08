@@ -35,6 +35,7 @@ module.exports = {
           "@wirestate/react": "./src/wirestate-react",
           "@wirestate/react-mobx": "./src/wirestate-react-mobx",
           "@wirestate/react-signals": "./src/wirestate-react-signals",
+          "@wirestate/signals": "./src/wirestate-signals",
         },
       },
     ],

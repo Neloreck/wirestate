@@ -73,6 +73,7 @@
     "@wirestate/react": "1.0.0-experimental.4",
     "@wirestate/mobx": "1.0.0-experimental.4",
     "@wirestate/react-mobx": "1.0.0-experimental.4",
+    "@wirestate/signals": "1.0.0-experimental.4",
     "@wirestate/react-signals": "1.0.0-experimental.4",
     "inversify": "^8.1.0"
   },
@@ -82,6 +83,7 @@
     "tslib": ">=2.5.0"
   },
   "optionalDependencies": {
+    "@preact/signals-core": ">=1.3.0",
     "@preact/signals-react": ">=3.0.0",
     "mobx": ">=6.0.0"
   }

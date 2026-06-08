@@ -9,6 +9,7 @@ packages:
   - 'src/wirestate-react'
   - 'src/wirestate-react-mobx'
   - 'src/wirestate-react-signals'
+  - 'src/wirestate-signals'
 autoInstallPeers: false
 allowBuilds:
   core-js: true
@@ -29,3 +30,4 @@ minimumReleaseAgeExclude:
   - '@wirestate/react'
   - '@wirestate/react-mobx'
   - '@wirestate/react-signals'
+  - '@wirestate/signals'

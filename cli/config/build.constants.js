@@ -12,15 +12,15 @@ export const EXTERNAL_DEPENDENCIES = [
   "inversify",
   "mobx",
   "mobx-react-lite",
+  "@preact/signals-core",
   "@preact/signals-react",
   "@preact/signals-react/runtime",
   "tslib",
   "lit",
   "@lit/reactive-element",
   "@lit/context",
-  "@lit-labs/signals",
+  "@lit-labs/preact-signals",
   "@adobe/lit-mobx",
-  "signal-polyfill",
 ];
 
 export const PROJECT_ROOT = path.resolve(__dirname, "../..");

@@ -21,10 +21,13 @@ describe("Library exported API from wirestate", () => {
     );
   });
 
-  it("should export current React signals adapter APIs from wirestate/signals", () => {
+  it("should export current signals adapter APIs from wirestate/signals", () => {
     const signalsRoot = require("./signals") as Record<string, unknown>;
+    const wirestateSignalsRoot = require("../wirestate-signals") as Record<string, unknown>;
     const reactSignalsRoot = require("../wirestate-react-signals") as Record<string, unknown>;
 
-    expect(Object.keys(signalsRoot).sort()).toEqual(exportedKeys(reactSignalsRoot));
+    expect(Object.keys(signalsRoot).sort()).toEqual(
+      [...exportedKeys(wirestateSignalsRoot), ...exportedKeys(reactSignalsRoot)].sort()
+    );
   });
 });

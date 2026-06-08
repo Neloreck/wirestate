@@ -3,27 +3,28 @@
 [![npm](https://img.shields.io/npm/v/@wirestate/react-signals.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react-signals)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
 
-Preact Signals exports for Wirestate React services.
+Preact Signals React reactivity binding for Wirestate React services.
 
-Use this package when React services should hold signal state and React components should update from signal reads.
+Use this package together with [`@wirestate/signals`](https://www.npmjs.com/package/@wirestate/signals): create signal
+state with `@wirestate/signals`, then read and subscribe to it from React components.
 
 ## Install
 
 ```bash
-npm install @wirestate/react-signals @preact/signals-react
+npm install @wirestate/signals @wirestate/react-signals @preact/signals-react @preact/signals-core
 ```
 
 For a full Wirestate React app:
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-signals react @preact/signals-react reflect-metadata
+npm install @wirestate/core @wirestate/react @wirestate/signals @wirestate/react-signals react @preact/signals-react @preact/signals-core reflect-metadata
 ```
 
 ## Start
 
 ```ts
 import { Injectable } from "@wirestate/core";
-import { Signal, computed, signal } from "@wirestate/react-signals";
+import { Signal, computed, signal } from "@wirestate/signals";
 
 @Injectable()
 class CounterService {
@@ -36,10 +37,26 @@ class CounterService {
 }
 ```
 
+```tsx
+import { useInjection } from "@wirestate/react";
+import { useSignals } from "@wirestate/react-signals";
+
+export const Counter = () => {
+  useSignals();
+
+  const counter = useInjection(CounterService);
+
+  return <button onClick={() => counter.increment()}>{counter.count.value}</button>;
+};
+```
+
 ## What Is Included
 
-- Re-exports from `@preact/signals-react`.
-- `useSignals` and related runtime exports from `@preact/signals-react/runtime`.
+- React hooks from `@preact/signals-react` (`useSignal`, `useComputed`, `useSignalEffect`, `useModel`).
+- Runtime exports from `@preact/signals-react/runtime` (`useSignals`, `EffectStore`, `wrapJsx`, `ensureFinalCleanup`).
+
+Signal definitions (`signal`, `computed`, `effect`, …) live in
+[`@wirestate/signals`](https://www.npmjs.com/package/@wirestate/signals).
 
 For automatic subscriptions when components read `.value` during render, configure the
 [`@preact/signals-react-transform`](https://www.npmjs.com/package/@preact/signals-react-transform). Without the

@@ -1,7 +1,13 @@
 /**
- * Lit Signals re-exports for reactive Wirestate services in Lit applications.
+ * Preact Signals Lit reactivity binding (`@lit-labs/preact-signals`) for Wirestate Lit services.
+ *
+ * Signal state is authored with `@wirestate/signals`.
  *
  * @packageDocumentation
  */
 
-export * from "./alias";
+/**
+ * @group Signals Lit
+ * @see {@link https://www.npmjs.com/package/@lit-labs/preact-signals}
+ */
+export { SignalWatcher, watch, withWatch, html, svg } from "@lit-labs/preact-signals";

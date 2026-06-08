@@ -9,7 +9,8 @@
     "src/wirestate-mobx/index.ts",
     "src/wirestate-react/index.ts",
     "src/wirestate-react-mobx/index.ts",
-    "src/wirestate-react-signals/index.ts"
+    "src/wirestate-react-signals/index.ts",
+    "src/wirestate-signals/index.ts"
   ],
   "out": "docs/api",
   "plugin": ["typedoc-plugin-markdown", "./docs/plugins/typedoc-npm-sources.mjs"],

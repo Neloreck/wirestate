@@ -4,9 +4,14 @@
 
 - Add `@wirestate/lit` with Lit context provisioning, `ContainerProvider`, `provideContainer`,
   `useContainerProvider`, injection decorators/controllers, event/command/query decorators, and controllers.
-- Add `@wirestate/lit-signals` with `@lit-labs/signals` and `signal-polyfill` re-exports.
-- Add the compatibility `wirestate` package with core, React, React MobX, and React Signals entry points.
-- Add portable ESM bundle entry points for core, React MobX, React Signals, and Lit Signals targets.
+- Add framework-agnostic `@wirestate/mobx` (`mobx` re-exports and decorator aliases) and `@wirestate/signals`
+  (`@preact/signals-core` re-exports) so observable and signal services can be shared across React and Lit.
+- Add `@wirestate/lit-mobx` (MobX Lit reactivity binding via `@adobe/lit-mobx`) and `@wirestate/lit-signals`
+  (Preact Signals Lit reactivity binding via `@lit-labs/preact-signals`).
+- Scope `@wirestate/react-mobx` and `@wirestate/react-signals` to their React reactivity bindings; observable and
+  signal definitions now live in `@wirestate/mobx` and `@wirestate/signals`.
+- Add the compatibility `wirestate` package with core, React, MobX, and Signals entry points.
+- Add portable ESM bundle entry points for core, React MobX, Lit MobX, React Signals, and Lit Signals targets.
 - Add `createContainer`, `ContainerConfig`, and `CreateContainerOptions` as the current container creation API.
 - Add `OnProvision` and `OnDeprovision` to `@wirestate/core`, plus provider lifecycle helpers used by React and Lit
   adapters.
@@ -106,7 +111,7 @@
   root project.
 - Document `WireStatus`, provider deprovision tracking, and async lifecycle guards.
 - Document provider messaging scope, `options.source` event metadata, and direct `@wirestate/core` usage in examples.
-- Add installation guidance for `signal-polyfill` in Lit Signals setup.
+- Add installation guidance for `@preact/signals-core` in Lit Signals setup.
 - Add a standalone Lit Signals example app and update React MobX / React Signals examples for the new provider and
   messaging APIs.
 - Add package version bump scripts, publish safeguards, docs deployment workflow, package consumption tests, and run

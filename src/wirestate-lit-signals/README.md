@@ -3,56 +3,73 @@
 [![npm](https://img.shields.io/npm/v/@wirestate/lit-signals.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/lit-signals)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
 
-Lit Signals exports for Wirestate Lit services.
+Preact Signals Lit reactivity binding for Wirestate Lit services.
 
-Use this package when Lit services should expose signal state and Lit templates should re-render with `watch()`.
+Use this package together with [`@wirestate/signals`](https://www.npmjs.com/package/@wirestate/signals): create signal
+state with `@wirestate/signals`, then re-render Lit elements with `SignalWatcher` or the `watch()` directive.
 
 ## Install
 
 ```bash
-npm install @wirestate/lit-signals @lit-labs/signals signal-polyfill
+npm install @wirestate/signals @wirestate/lit-signals @lit-labs/preact-signals @preact/signals-core
 ```
 
 For a full Wirestate Lit app:
 
 ```bash
-npm install @wirestate/core @wirestate/lit @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/signals signal-polyfill reflect-metadata
+npm install @wirestate/core @wirestate/lit @wirestate/signals @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/preact-signals @preact/signals-core reflect-metadata
 ```
 
 ## Start
 
 ```ts
 import { Injectable } from "@wirestate/core";
-import { State, signal } from "@wirestate/lit-signals";
+import { Signal, signal } from "@wirestate/signals";
 
 @Injectable()
 class CounterService {
-  public readonly count: State<number> = signal(0);
+  public readonly count: Signal<number> = signal(0);
 
   public increment(): void {
-    this.count.set(this.count.get() + 1);
+    this.count.value += 1;
   }
 }
 ```
 
-In a Lit template:
+In a Lit element:
 
 ```ts
-import { watch } from "@wirestate/lit-signals";
+import { injection } from "@wirestate/lit";
+import { SignalWatcher } from "@wirestate/lit-signals";
+import { LitElement, html } from "lit";
+import { customElement } from "lit/decorators.js";
 
-html`<span>${watch(counter.count)}</span>`;
+@customElement("w-counter")
+export class Counter extends SignalWatcher(LitElement) {
+  @injection({ token: CounterService })
+  private readonly counter!: CounterService;
+
+  public render() {
+    return html`<button @click=${() => this.counter.increment()}>${this.counter.count.value}</button>`;
+  }
+}
 ```
+
+The same `CounterService` definition powers React components through
+[`@wirestate/react-signals`](https://www.npmjs.com/package/@wirestate/react-signals).
 
 ## What Is Included
 
-- Re-exports from `@lit-labs/signals`.
-- `State<T>` and `Computed<T>` aliases from `signal-polyfill`.
+- Re-exports from `@lit-labs/preact-signals` (`SignalWatcher`, `watch`, `withWatch`, `html`, `svg`).
+
+Signal definitions (`signal`, `computed`, `effect`, …) live in
+[`@wirestate/signals`](https://www.npmjs.com/package/@wirestate/signals).
 
 ## Learn More
 
 - [Lit Signals guide](https://neloreck.github.io/wirestate/lit-signals/overview)
 - [API reference](https://neloreck.github.io/wirestate/api/wirestate-lit-signals/)
-- [Lit Signals docs](https://lit.dev/docs/data/signals/)
+- [lit-labs/preact-signals docs](https://www.npmjs.com/package/@lit-labs/preact-signals)
 
 ## License
 
