@@ -3,10 +3,11 @@
 Use `@wirestate/lit-mobx` when Lit elements should render MobX state held by services.
 
 Observable state is defined with `@wirestate/mobx`, which re-exports MobX and provides decorator aliases such as
-`Observable`, `Action`, `BoundAction`, and `Computed`. Lit rendering is wired through `@wirestate/lit-mobx`.
+`Observable`, `Action`, `BoundAction`, and `Computed`. Lit rendering is wired through `@wirestate/lit-mobx`, which
+re-exports Adobe's [`@adobe/lit-mobx`](https://www.npmjs.com/package/@adobe/lit-mobx) adapter.
 
 For MobX and Lit behavior, use the official [MobX docs](https://mobx.js.org/README.html) and
-[`@adobe/lit-mobx` docs](https://github.com/adobe/lit-mobx).
+[`@adobe/lit-mobx` package](https://www.npmjs.com/package/@adobe/lit-mobx).
 
 ## Install
 

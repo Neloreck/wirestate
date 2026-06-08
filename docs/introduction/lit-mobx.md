@@ -2,8 +2,11 @@
 
 Use this stack when Lit elements should render service state stored in MobX observables.
 
-Use `@wirestate/mobx` for observable service state and `@wirestate/lit-mobx` for Lit rendering. For MobX and Lit
-behavior, use the official [MobX docs](https://mobx.js.org/README.html) and [Lit docs](https://lit.dev/docs/).
+Use `@wirestate/mobx` for observable service state and `@wirestate/lit-mobx` for Lit rendering.
+`@wirestate/lit-mobx` re-exports Adobe's [`@adobe/lit-mobx`](https://www.npmjs.com/package/@adobe/lit-mobx) adapter.
+
+For MobX and Lit behavior, use the official [MobX docs](https://mobx.js.org/README.html) and
+[Lit docs](https://lit.dev/docs/).
 
 ## Install
 

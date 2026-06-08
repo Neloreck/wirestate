@@ -6,7 +6,8 @@
 MobX Lit reactivity binding for Wirestate Lit services.
 
 Use this package together with [`@wirestate/mobx`](https://www.npmjs.com/package/@wirestate/mobx): create observable
-service state with `@wirestate/mobx`, then render Lit elements through `@adobe/lit-mobx`.
+service state with `@wirestate/mobx`, then render Lit elements through Adobe's
+[`@adobe/lit-mobx`](https://www.npmjs.com/package/@adobe/lit-mobx) adapter.
 
 ## Install
 
@@ -58,8 +59,8 @@ The same `CounterService` definition powers React components through
 
 ## What Is Included
 
-- Re-exports from `@adobe/lit-mobx` (`MobxLitElement`, `MobxReactionUpdate`). `@adobe/lit-mobx` ships as a bundled
-  dependency, so you do not install it directly.
+- Re-exports from Adobe's [`@adobe/lit-mobx`](https://www.npmjs.com/package/@adobe/lit-mobx) adapter
+  (`MobxLitElement`, `MobxReactionUpdate`). It ships as a bundled dependency, so you do not install it directly.
 
 Observable definitions and decorator aliases (`Observable`, `Action`, `Computed`, and others) live in
 [`@wirestate/mobx`](https://www.npmjs.com/package/@wirestate/mobx).
@@ -67,7 +68,7 @@ Observable definitions and decorator aliases (`Observable`, `Action`, `Computed`
 ## Learn More
 
 - [API reference](https://neloreck.github.io/wirestate/api/wirestate-lit-mobx/)
-- [lit-mobx docs](https://github.com/adobe/lit-mobx)
+- [`@adobe/lit-mobx` package](https://www.npmjs.com/package/@adobe/lit-mobx)
 
 ## License
 
