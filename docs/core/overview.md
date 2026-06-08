@@ -11,7 +11,7 @@ or reactive objects created by another package.
 ## Install
 
 ```bash
-npm install @wirestate/core reflect-metadata
+npm install @wirestate/core
 ```
 
 Import `reflect-metadata` once before decorated services are loaded.

@@ -1,19 +1,17 @@
 # React MobX
 
-Use `@wirestate/react-mobx` when React services should store MobX state.
+Use `@wirestate/react-mobx` when React components should render MobX state held by services.
 
-The package re-exports MobX and `mobx-react-lite`, plus decorator aliases such as `Observable`, `Action`,
-`BoundAction`, and `Computed`.
+Observable state is defined with `@wirestate/mobx`, which re-exports MobX and provides decorator aliases such as
+`Observable`, `Action`, `BoundAction`, and `Computed`. React rendering is wired through `@wirestate/react-mobx`.
 
-For MobX behavior and React integration details, use the official [MobX docs](https://mobx.js.org/README.html),
-[React integration docs](https://mobx.js.org/react-integration.html), and
-[`mobx`](https://www.npmjs.com/package/mobx) and
-[`mobx-react-lite`](https://www.npmjs.com/package/mobx-react-lite) packages.
+For MobX behavior and React integration details, use the official [MobX docs](https://mobx.js.org/README.html) and
+[React integration docs](https://mobx.js.org/react-integration.html).
 
 ## Install
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-mobx react mobx mobx-react-lite reflect-metadata
+npm install @wirestate/core @wirestate/mobx @wirestate/react @wirestate/react-mobx
 ```
 
 ## Service
@@ -22,7 +20,7 @@ MobX decorators need `makeObservable(this)`.
 
 ```ts
 import { Injectable } from "@wirestate/core";
-import { Action, Observable, makeObservable } from "@wirestate/react-mobx";
+import { Action, Observable, makeObservable } from "@wirestate/mobx";
 
 @Injectable()
 export class CounterService {
@@ -60,7 +58,7 @@ export const Counter = observer(function Counter() {
 
 ```ts
 import { Injectable } from "@wirestate/core";
-import { Computed, Observable, makeObservable } from "@wirestate/react-mobx";
+import { Computed, Observable, makeObservable } from "@wirestate/mobx";
 
 @Injectable()
 export class CounterService {
@@ -80,7 +78,7 @@ export class CounterService {
 
 ## API Reference
 
-[`Observable`](/api/wirestate-react-mobx/functions/Observable), [`Action`](/api/wirestate-react-mobx/functions/Action),
-[`BoundAction`](/api/wirestate-react-mobx/functions/BoundAction), [`Computed`](/api/wirestate-react-mobx/functions/Computed),
-[`makeObservable`](/api/wirestate-react-mobx/functions/makeObservable),
+[`Observable`](/api/wirestate-mobx/functions/Observable), [`Action`](/api/wirestate-mobx/functions/Action),
+[`BoundAction`](/api/wirestate-mobx/functions/BoundAction), [`Computed`](/api/wirestate-mobx/functions/Computed),
+[`makeObservable`](/api/wirestate-mobx/functions/makeObservable),
 [`observer`](/api/wirestate-react-mobx/functions/observer).

@@ -26,6 +26,7 @@ export default defineConfig({
           { text: "React Signals", link: "/react-signals/overview" },
           { text: "React MobX", link: "/react-mobx/overview" },
           { text: "Lit Signals", link: "/lit-signals/overview" },
+          { text: "Lit MobX", link: "/lit-mobx/overview" },
         ],
       },
       { text: "API", link: "/api/" },
@@ -39,6 +40,7 @@ export default defineConfig({
           { text: "React Signals", link: "/introduction/react-signals" },
           { text: "React MobX", link: "/introduction/react-mobx" },
           { text: "Lit Signals", link: "/introduction/lit-signals" },
+          { text: "Lit MobX", link: "/introduction/lit-mobx" },
         ],
       },
       {
@@ -94,6 +96,10 @@ export default defineConfig({
         items: [{ text: "Overview", link: "/lit-signals/overview" }],
       },
       {
+        text: "Lit MobX",
+        items: [{ text: "Overview", link: "/lit-mobx/overview" }],
+      },
+      {
         text: "API Reference",
         items: [
           { text: "Overview", link: "/api/" },
@@ -102,7 +108,10 @@ export default defineConfig({
             text: "Packages",
             items: [
               { text: "@wirestate/core", link: "/api/wirestate-core/" },
+              { text: "@wirestate/mobx", link: "/api/wirestate-mobx/" },
+              { text: "@wirestate/signals", link: "/api/wirestate-signals/" },
               { text: "@wirestate/lit", link: "/api/wirestate-lit/" },
+              { text: "@wirestate/lit-mobx", link: "/api/wirestate-lit-mobx/" },
               { text: "@wirestate/lit-signals", link: "/api/wirestate-lit-signals/" },
               { text: "@wirestate/react", link: "/api/wirestate-react/" },
               { text: "@wirestate/react-mobx", link: "/api/wirestate-react-mobx/" },

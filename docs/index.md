@@ -18,5 +18,5 @@ features:
   - title: Scoped Messaging
     details: Events broadcast. Commands write. Queries read. Containers keep their own buses.
   - title: Bring Reactivity
-    details: Use MobX, Preact Signals, Lit Signals, or other solutions.
+    details: Use MobX, Preact Signals, or another state bridge.
 ---

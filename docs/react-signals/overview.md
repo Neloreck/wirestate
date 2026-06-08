@@ -1,9 +1,9 @@
 # React Signals
 
-Use `@wirestate/react-signals` when React services should store signal state.
+Use `@wirestate/react-signals` when React components should render Preact Signal state held by services.
 
-The package exposes the React Signals APIs through the Wirestate adapter. Wirestate does not wrap or change signal
-behavior.
+Signal state is defined with `@wirestate/signals`. React rendering is wired through `@wirestate/react-signals`, which
+re-exports `useSignal`, `useSignals`, and related hooks. Wirestate does not wrap or change signal behavior.
 
 For signal API details, use the official [Preact Signals guide](https://preactjs.com/guide/v10/signals) and
 [`@preact/signals-react` package](https://www.npmjs.com/package/@preact/signals-react).
@@ -11,15 +11,14 @@ For signal API details, use the official [Preact Signals guide](https://preactjs
 ## Install
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-signals react @preact/signals-react reflect-metadata
-npm install --save-dev @preact/signals-react-transform
+npm install @wirestate/core @wirestate/react @wirestate/signals @wirestate/react-signals
 ```
 
 See the [`@preact/signals-react-transform` package](https://www.npmjs.com/package/@preact/signals-react-transform) for
 transform setup details.
 
-Add the Preact Signals React transform to your Babel config so components that read signal values during render are
-subscribed automatically.
+Install and add the Preact Signals React transform to your Babel config if components should subscribe when they read
+signal values during render.
 
 ```json
 {
@@ -34,7 +33,7 @@ signal `.value` during render.
 
 ```ts
 import { Injectable } from "@wirestate/core";
-import { Signal, signal } from "@wirestate/react-signals";
+import { Signal, signal } from "@wirestate/signals";
 
 @Injectable()
 export class CounterService {
@@ -67,7 +66,7 @@ export function Counter() {
 Use the signal APIs directly.
 
 ```ts
-import { Signal, computed, signal } from "@wirestate/react-signals";
+import { Signal, computed, signal } from "@wirestate/signals";
 
 export class CounterState {
   public readonly count: Signal<number> = signal(0);
@@ -77,5 +76,5 @@ export class CounterState {
 
 ## API Reference
 
-[`signal`](/api/wirestate-react-signals/functions/signal), [`Signal`](/api/wirestate-react-signals/classes/Signal),
-[`computed`](/api/wirestate-react-signals/functions/computed), [`useSignal`](/api/wirestate-react-signals/functions/useSignal).
+[`signal`](/api/wirestate-signals/functions/signal), [`Signal`](/api/wirestate-signals/classes/Signal),
+[`computed`](/api/wirestate-signals/functions/computed), [`useSignal`](/api/wirestate-react-signals/functions/useSignal).

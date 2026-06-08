@@ -2,20 +2,18 @@
 
 Use this stack when React components should render signal state stored in services.
 
-Use the official [Preact Signals guide](https://preactjs.com/guide/v10/signals),
-[`@preact/signals-react` package](https://www.npmjs.com/package/@preact/signals-react), and
-[`@preact/signals-react-transform` package](https://www.npmjs.com/package/@preact/signals-react-transform) for the
-signal APIs and transform setup.
+Use `@wirestate/signals` for service state and `@wirestate/react-signals` for React rendering. For signal behavior and
+React transform setup, use the official [Preact Signals guide](https://preactjs.com/guide/v10/signals) and
+[`@preact/signals-react-transform` package](https://www.npmjs.com/package/@preact/signals-react-transform).
 
 ## Install
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-signals react @preact/signals-react reflect-metadata
-npm install --save-dev @preact/signals-react-transform
+npm install @wirestate/core @wirestate/signals @wirestate/react @wirestate/react-signals
 ```
 
-Configure the Preact Signals React transform so React components that read signal values during render subscribe to
-updates automatically.
+Install and configure the Preact Signals React transform if components should subscribe when they read signal values
+during render.
 
 ```json
 {
@@ -34,7 +32,7 @@ subscribes the component to updates.
 ```tsx
 import { Injectable } from "@wirestate/core";
 import { ContainerProvider, useInjection } from "@wirestate/react";
-import { Signal, signal } from "@wirestate/react-signals";
+import { Signal, signal } from "@wirestate/signals";
 import { useMemo } from "react";
 
 @Injectable()

@@ -11,7 +11,7 @@ and communicate through container-local events, commands, and queries.
 ## Install
 
 ```bash
-npm install @wirestate/core reflect-metadata
+npm install @wirestate/core
 ```
 
 Import `reflect-metadata` once before Wirestate decorators are used:

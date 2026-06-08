@@ -11,7 +11,7 @@ component-scoped event, command, and query handlers.
 ## Install
 
 ```bash
-npm install @wirestate/core @wirestate/react react reflect-metadata
+npm install @wirestate/core @wirestate/react
 ```
 
 ## Start

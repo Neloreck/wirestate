@@ -8,4 +8,4 @@ This directory contains build entry points for portable Wirestate bundles. They 
 - `wirestate.ts`: core containers, services, lifecycle, seeds, events, commands, and queries.
 - `wirestate-react-mobx.ts`: core, React bindings, and MobX re-exports.
 - `wirestate-react-signals.ts`: core, React bindings, and Preact Signals re-exports.
-- `wirestate-lit-signals.ts`: core, Lit bindings, and Lit Signals re-exports.
+- `wirestate-lit-signals.ts`: core, Lit bindings, Preact Signals, and Lit signal rendering helpers.

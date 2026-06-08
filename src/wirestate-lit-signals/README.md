@@ -11,13 +11,7 @@ state with `@wirestate/signals`, then re-render Lit elements with `SignalWatcher
 ## Install
 
 ```bash
-npm install @wirestate/signals @wirestate/lit-signals @lit-labs/preact-signals @preact/signals-core
-```
-
-For a full Wirestate Lit app:
-
-```bash
-npm install @wirestate/core @wirestate/lit @wirestate/signals @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/preact-signals @preact/signals-core reflect-metadata
+npm install @wirestate/core @wirestate/lit @wirestate/signals @wirestate/lit-signals
 ```
 
 ## Start
@@ -62,7 +56,7 @@ The same `CounterService` definition powers React components through
 
 - Re-exports from `@lit-labs/preact-signals` (`SignalWatcher`, `watch`, `withWatch`, `html`, `svg`).
 
-Signal definitions (`signal`, `computed`, `effect`, …) live in
+Signal definitions (`signal`, `computed`, `effect`, and others) live in
 [`@wirestate/signals`](https://www.npmjs.com/package/@wirestate/signals).
 
 ## Learn More

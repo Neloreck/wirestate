@@ -5,13 +5,13 @@
 
 Framework-agnostic MobX exports for Wirestate services.
 
-Use this package to author observable services once and share them across React and Lit applications. Pair it with
+Use this package to create observable services once and share them across React and Lit applications. Pair it with
 `@wirestate/react-mobx` to render React components or `@wirestate/lit-mobx` to render Lit elements.
 
 ## Install
 
 ```bash
-npm install @wirestate/mobx mobx
+npm install @wirestate/core @wirestate/mobx
 ```
 
 ## Start

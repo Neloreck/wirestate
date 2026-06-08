@@ -5,19 +5,13 @@
 
 MobX React reactivity binding for Wirestate React services.
 
-Use this package together with [`@wirestate/mobx`](https://www.npmjs.com/package/@wirestate/mobx): author observable
+Use this package together with [`@wirestate/mobx`](https://www.npmjs.com/package/@wirestate/mobx): create observable
 service state with `@wirestate/mobx`, then render React components through `mobx-react-lite`.
 
 ## Install
 
 ```bash
-npm install @wirestate/mobx @wirestate/react-mobx mobx
-```
-
-For a full Wirestate React app:
-
-```bash
-npm install @wirestate/core @wirestate/react @wirestate/mobx @wirestate/react-mobx react mobx reflect-metadata
+npm install @wirestate/core @wirestate/react @wirestate/mobx @wirestate/react-mobx
 ```
 
 ## Start
@@ -58,7 +52,7 @@ export const Counter = observer(() => {
 - Re-exports from `mobx-react-lite` (`observer`, `Observer`, `useObserver`, `useLocalObservable`, and related helpers).
   `mobx-react-lite` ships as a bundled dependency, so you do not install it directly.
 
-Observable definitions and decorator aliases (`Observable`, `Action`, `Computed`, …) live in
+Observable definitions and decorator aliases (`Observable`, `Action`, `Computed`, and others) live in
 [`@wirestate/mobx`](https://www.npmjs.com/package/@wirestate/mobx).
 
 ## Learn More

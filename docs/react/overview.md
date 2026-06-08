@@ -9,10 +9,10 @@ Choose a separate reactivity package for service state.
 
 ## Install
 
-Install the React bridge with core, React, and MobX-backed service state:
+Install the React bridge with core and MobX-backed service state:
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-mobx react mobx mobx-react-lite reflect-metadata
+npm install @wirestate/core @wirestate/mobx @wirestate/react @wirestate/react-mobx
 ```
 
 For React APIs and runtime behavior, use the official [React reference](https://react.dev/reference/react) and
@@ -29,7 +29,8 @@ in a reactive package such as MobX, then wrap components that read observable st
 ```tsx
 import { Injectable } from "@wirestate/core";
 import { ContainerProvider, useInjection } from "@wirestate/react";
-import { Action, Observable, makeObservable, observer } from "@wirestate/react-mobx";
+import { Action, Observable, makeObservable } from "@wirestate/mobx";
+import { observer } from "@wirestate/react-mobx";
 import { useMemo } from "react";
 
 @Injectable()

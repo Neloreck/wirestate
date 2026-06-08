@@ -2,15 +2,14 @@
 
 Use this stack when React components should render service state stored in MobX observables.
 
-Use the official [MobX docs](https://mobx.js.org/README.html),
-[React integration docs](https://mobx.js.org/react-integration.html), and
-[`mobx`](https://www.npmjs.com/package/mobx) and
-[`mobx-react-lite`](https://www.npmjs.com/package/mobx-react-lite) packages for MobX API details.
+Use `@wirestate/mobx` for observable service state and `@wirestate/react-mobx` for React rendering. For MobX behavior
+and React integration details, use the official [MobX docs](https://mobx.js.org/README.html) and
+[React integration docs](https://mobx.js.org/react-integration.html).
 
 ## Install
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-mobx react mobx mobx-react-lite reflect-metadata
+npm install @wirestate/core @wirestate/mobx @wirestate/react @wirestate/react-mobx
 ```
 
 ## Minimal Example
@@ -18,7 +17,8 @@ npm install @wirestate/core @wirestate/react @wirestate/react-mobx react mobx mo
 ```tsx
 import { Injectable } from "@wirestate/core";
 import { ContainerProvider, useInjection } from "@wirestate/react";
-import { Action, Observable, makeObservable, observer } from "@wirestate/react-mobx";
+import { Action, Observable, makeObservable } from "@wirestate/mobx";
+import { observer } from "@wirestate/react-mobx";
 import { useMemo } from "react";
 
 @Injectable()

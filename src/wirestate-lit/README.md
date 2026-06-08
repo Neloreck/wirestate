@@ -11,7 +11,7 @@ element-scoped event, command, and query handlers.
 ## Install
 
 ```bash
-npm install @wirestate/core @wirestate/lit lit @lit/context @lit/reactive-element reflect-metadata
+npm install @wirestate/core @wirestate/lit
 ```
 
 ## Start
@@ -55,8 +55,9 @@ class CounterView extends LitElement {
 - Element-scoped event, command, and query decorators/controllers.
 - `useContainer` and `useScope` helpers.
 
-This package connects services to Lit. For signal-based rendering, use
-[`@wirestate/lit-signals`](https://www.npmjs.com/package/@wirestate/lit-signals).
+This package connects services to Lit. For reactive rendering, use
+[`@wirestate/lit-signals`](https://www.npmjs.com/package/@wirestate/lit-signals) or
+[`@wirestate/lit-mobx`](https://www.npmjs.com/package/@wirestate/lit-mobx).
 
 ## Learn More
 

@@ -2,7 +2,7 @@
  * Framework-agnostic MobX re-exports with Wirestate-friendly decorator aliases.
  *
  * Shared by `@wirestate/react-mobx` and `@wirestate/lit-mobx` so that observable
- * services can be authored once and consumed from either React or Lit applications.
+ * services can be defined once and consumed from either React or Lit applications.
  *
  * @packageDocumentation
  */

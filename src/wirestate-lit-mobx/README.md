@@ -5,19 +5,13 @@
 
 MobX Lit reactivity binding for Wirestate Lit services.
 
-Use this package together with [`@wirestate/mobx`](https://www.npmjs.com/package/@wirestate/mobx): author observable
+Use this package together with [`@wirestate/mobx`](https://www.npmjs.com/package/@wirestate/mobx): create observable
 service state with `@wirestate/mobx`, then render Lit elements through `@adobe/lit-mobx`.
 
 ## Install
 
 ```bash
-npm install @wirestate/mobx @wirestate/lit-mobx lit mobx
-```
-
-For a full Wirestate Lit app:
-
-```bash
-npm install @wirestate/core @wirestate/lit @wirestate/mobx @wirestate/lit-mobx lit @lit/context @lit/reactive-element mobx reflect-metadata
+npm install @wirestate/core @wirestate/lit @wirestate/mobx @wirestate/lit-mobx
 ```
 
 ## Start
@@ -67,7 +61,7 @@ The same `CounterService` definition powers React components through
 - Re-exports from `@adobe/lit-mobx` (`MobxLitElement`, `MobxReactionUpdate`). `@adobe/lit-mobx` ships as a bundled
   dependency, so you do not install it directly.
 
-Observable definitions and decorator aliases (`Observable`, `Action`, `Computed`, …) live in
+Observable definitions and decorator aliases (`Observable`, `Action`, `Computed`, and others) live in
 [`@wirestate/mobx`](https://www.npmjs.com/package/@wirestate/mobx).
 
 ## Learn More

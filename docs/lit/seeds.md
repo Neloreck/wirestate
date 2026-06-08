@@ -34,11 +34,11 @@ does not need cleanup. Keep `@OnProvision` for provider-owned resources such as 
 
 ```ts
 import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
-import { State, signal } from "@wirestate/lit-signals";
+import { Signal, signal } from "@wirestate/signals";
 
 @Injectable()
 export class CounterService {
-  public readonly count: State<number> = signal(0);
+  public readonly count: Signal<number> = signal(0);
 
   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
 
@@ -47,7 +47,7 @@ export class CounterService {
     const seed = this.scope.getSeed<{ count?: number }>(CounterService);
 
     if (typeof seed?.count === "number") {
-      this.count.set(seed.count);
+      this.count.value = seed.count;
     }
   }
 }

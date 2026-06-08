@@ -2,7 +2,7 @@
  * Framework-agnostic Preact Signals re-exports for Wirestate services.
  *
  * Shared by `@wirestate/react-signals` and `@wirestate/lit-signals` so that signal-based
- * services can be authored once and consumed from either React or Lit applications.
+ * services can be defined once and consumed from either React or Lit applications.
  *
  * @packageDocumentation
  */

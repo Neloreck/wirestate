@@ -1,69 +1,77 @@
 # Lit Signals
 
-Use `@wirestate/lit-signals` when Lit services should expose Lit Signals.
+Use `@wirestate/lit-signals` when Lit elements should render Preact Signal state held by services.
 
-The package re-exports `@lit-labs/signals` and the `State<T>` and `Computed<T>` types from `signal-polyfill`.
-
-For Lit Signals behavior, use the official [Lit Signals docs](https://lit.dev/docs/data/signals/) and
-[`@lit-labs/signals` package](https://www.npmjs.com/package/@lit-labs/signals).
+Signal state is defined with `@wirestate/signals`, so the same services work in React via `@wirestate/react-signals`.
+Lit rendering is wired through `@wirestate/lit-signals`, which re-exports `SignalWatcher`, `watch`, `withWatch`, `html`,
+and `svg`.
 
 ## Install
 
 ```bash
-npm install @wirestate/core @wirestate/lit @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/signals signal-polyfill reflect-metadata
+npm install @wirestate/core @wirestate/signals @wirestate/lit @wirestate/lit-signals
 ```
 
 ## Service
 
 ```ts
 import { Injectable } from "@wirestate/core";
-import { State, signal } from "@wirestate/lit-signals";
+import { Signal, signal } from "@wirestate/signals";
 
 @Injectable()
 export class CounterService {
-  public readonly count: State<number> = signal(0);
+  public readonly count: Signal<number> = signal(0);
 
   public increment(): void {
-    this.count.set(this.count.get() + 1);
+    this.count.value += 1;
   }
 }
 ```
 
 ## Template
 
-Create signals in services or stable element state. Use `watch()` in templates to subscribe the element to signal
-updates.
+Create signals in services or stable element state. Either mix `SignalWatcher` into the element to auto-track signals
+read during `render()`, or use the `watch()` directive to subscribe a single binding.
 
 ```ts
 import { injection } from "@wirestate/lit";
-import { watch } from "@wirestate/lit-signals";
+import { SignalWatcher } from "@wirestate/lit-signals";
 import { LitElement, html } from "lit";
 import { customElement } from "lit/decorators.js";
 
 @customElement("my-counter")
-export class MyCounter extends LitElement {
+export class MyCounter extends SignalWatcher(LitElement) {
   @injection(CounterService)
   private counter!: CounterService;
 
   protected render() {
-    return html`<button @click=${() => this.counter.increment()}>Count: ${watch(this.counter.count)}</button>`;
+    return html`<button @click=${() => this.counter.increment()}>Count: ${this.counter.count.value}</button>`;
   }
 }
+```
+
+To subscribe a single binding without the mixin, use `watch()`:
+
+```ts
+import { watch } from "@wirestate/lit-signals";
+
+html`<span>${watch(this.counter.count)}</span>`;
 ```
 
 ## Computed Signals
 
 ```ts
-import { Computed, State, computed, signal } from "@wirestate/lit-signals";
+import { ReadonlySignal, Signal, computed, signal } from "@wirestate/signals";
 
 export class CounterState {
-  public readonly count: State<number> = signal(0);
-  public readonly isEven: Computed<boolean> = computed(() => this.count.get() % 2 === 0);
+  public readonly count: Signal<number> = signal(0);
+  public readonly isEven: ReadonlySignal<boolean> = computed(() => this.count.value % 2 === 0);
 }
 ```
 
 ## API Reference
 
-[`signal`](/api/wirestate-lit-signals/variables/signal), [`State`](/api/wirestate-lit-signals/type-aliases/State),
-[`Computed`](/api/wirestate-lit-signals/type-aliases/Computed), [`watch`](/api/wirestate-lit-signals/variables/watch),
-[`computed`](/api/wirestate-lit-signals/variables/computed).
+[`SignalWatcher`](/api/wirestate-lit-signals/functions/SignalWatcher),
+[`watch`](/api/wirestate-lit-signals/variables/watch),
+[`withWatch`](/api/wirestate-lit-signals/variables/withWatch), [`signal`](/api/wirestate-signals/functions/signal),
+[`computed`](/api/wirestate-signals/functions/computed).

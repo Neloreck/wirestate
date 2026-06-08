@@ -1,35 +1,51 @@
 # Installation
 
-Install the core package, your UI framework, one UI adapter, and the reactivity package you use.
+Install the Wirestate packages for the stack you use.
+
+The commands below list Wirestate packages only. Modern package managers resolve React, Lit, MobX, Signals, and
+decorator metadata peers. If your package manager reports a missing peer, install that package directly.
 
 ## Packages
 
-| Stack           | Packages                                                                                                                                                          |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| React + Signals | `@wirestate/core` `@wirestate/react` `@wirestate/react-signals` `react` `@preact/signals-react` `reflect-metadata`                                                |
-| React + MobX    | `@wirestate/core` `@wirestate/react` `@wirestate/react-mobx` `react` `mobx` `mobx-react-lite` `reflect-metadata`                                                  |
-| Lit + Signals   | `@wirestate/core` `@wirestate/lit` `@wirestate/lit-signals` `lit` `@lit/context` `@lit/reactive-element` `@lit-labs/signals` `signal-polyfill` `reflect-metadata` |
+| Stack           | Packages                                                                             |
+| --------------- | ------------------------------------------------------------------------------------ |
+| Core only       | `@wirestate/core`                                                                    |
+| React           | `@wirestate/core` `@wirestate/react`                                                 |
+| Lit             | `@wirestate/core` `@wirestate/lit`                                                   |
+| React + Signals | `@wirestate/core` `@wirestate/react` `@wirestate/signals` `@wirestate/react-signals` |
+| React + MobX    | `@wirestate/core` `@wirestate/react` `@wirestate/mobx` `@wirestate/react-mobx`       |
+| Lit + Signals   | `@wirestate/core` `@wirestate/lit` `@wirestate/signals` `@wirestate/lit-signals`     |
+| Lit + MobX      | `@wirestate/core` `@wirestate/lit` `@wirestate/mobx` `@wirestate/lit-mobx`           |
 
-External framework and reactivity details live in the official docs for [React](https://react.dev/reference/react),
-[Lit](https://lit.dev/docs/), [Preact Signals](https://preactjs.com/guide/v10/signals),
-[MobX](https://mobx.js.org/README.html), and [Lit Signals](https://lit.dev/docs/data/signals/).
+Signal services use the framework-agnostic `@wirestate/signals` package. MobX services use `@wirestate/mobx`. The same
+service definitions can be shared across React and Lit.
+
+For external API details, use the official docs for [React](https://react.dev/reference/react),
+[Lit](https://lit.dev/docs/), [Preact Signals](https://preactjs.com/guide/v10/signals), and
+[MobX](https://mobx.js.org/README.html).
 
 ### React + Signals
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-signals react @preact/signals-react reflect-metadata
+npm install @wirestate/core @wirestate/signals @wirestate/react @wirestate/react-signals
 ```
 
 ### React + MobX
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-mobx react mobx mobx-react-lite reflect-metadata
+npm install @wirestate/core @wirestate/mobx @wirestate/react @wirestate/react-mobx
 ```
 
 ### Lit + Signals
 
 ```bash
-npm install @wirestate/core @wirestate/lit @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/signals signal-polyfill reflect-metadata
+npm install @wirestate/core @wirestate/signals @wirestate/lit @wirestate/lit-signals
+```
+
+### Lit + MobX
+
+```bash
+npm install @wirestate/core @wirestate/mobx @wirestate/lit @wirestate/lit-mobx
 ```
 
 ## Runtime Import
@@ -61,5 +77,5 @@ Enable decorator metadata.
 - Start with [Core overview](/core/overview) for services and containers.
 - Use [React overview](/react/overview) for React applications.
 - Use [Lit overview](/lit/overview) for Lit applications.
-- Use [React Signals](/react-signals/overview), [React MobX](/react-mobx/overview), or
-  [Lit Signals](/lit-signals/overview) for framework-specific reactivity packages.
+- Use [React Signals](/react-signals/overview), [React MobX](/react-mobx/overview),
+  [Lit Signals](/lit-signals/overview), or [Lit MobX](/lit-mobx/overview) for framework reactivity packages.

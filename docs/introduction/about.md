@@ -5,7 +5,7 @@ Wirestate is a DI-backed architecture layer for TypeScript apps.
 Application logic lives in injectable services. React and Lit adapters provide those services to UI trees. Services
 communicate through container-local events, commands, and queries.
 
-Reactivity stays outside the core. Use MobX, Preact Signals, Lit Signals, or other solutions.
+Reactivity stays outside the core. Use MobX, Preact Signals, or your own state bridge.
 
 ## Core Ideas
 
@@ -29,5 +29,5 @@ Use Wirestate when feature logic, state, or workflows should live outside UI com
 - [Core](/core/overview) covers framework-agnostic services, containers, lifecycle, messaging, seeds, and tests.
 - [React](/react/overview) covers React providers, hooks, messaging, seeds, and tests.
 - [Lit](/lit/overview) covers Lit providers, decorators, controllers, messaging, seeds, and tests.
-- [React Signals](/react-signals/overview), [React MobX](/react-mobx/overview), and
-  [Lit Signals](/lit-signals/overview) cover framework-specific reactivity packages.
+- [React Signals](/react-signals/overview), [React MobX](/react-mobx/overview),
+  [Lit Signals](/lit-signals/overview), and [Lit MobX](/lit-mobx/overview) cover framework reactivity packages.

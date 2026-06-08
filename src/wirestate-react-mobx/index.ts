@@ -1,7 +1,7 @@
 /**
  * MobX React reactivity binding (`mobx-react-lite`) for Wirestate React services.
  *
- * Observable service state is authored with `@wirestate/mobx`; this package wires those
+ * Observable service state is defined with `@wirestate/mobx`; this package wires those
  * observables into React rendering through `mobx-react-lite`.
  *
  * @packageDocumentation

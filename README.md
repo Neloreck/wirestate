@@ -7,8 +7,7 @@
 Wirestate is a TypeScript state-management toolkit built around dependency-injected services.
 
 Application logic lives in `@Injectable` classes. React and Lit adapters provide those services to UI trees. Reactivity
-is separate: use MobX, Preact Signals, Lit Signals, plain values, or another state bridge inside your
-services.
+is separate: use MobX, Signals, plain values, or another state bridge inside your services.
 
 Use Wirestate when you want service-owned state and workflows that can be scoped to an app, subtree, feature, modal,
 tenant, or test.
@@ -40,20 +39,20 @@ tenant, or test.
 
 ## Install
 
-Install the core package, one UI adapter, and the reactivity package you actually use.
+Install the Wirestate packages for the stack you use.
 
 ```bash
 # React + Signals
-npm install @wirestate/core @wirestate/react @wirestate/signals @wirestate/react-signals react @preact/signals-react @preact/signals-core reflect-metadata
+npm install @wirestate/core @wirestate/signals @wirestate/react @wirestate/react-signals
 
 # React + MobX
-npm install @wirestate/core @wirestate/react @wirestate/mobx @wirestate/react-mobx react mobx reflect-metadata
+npm install @wirestate/core @wirestate/mobx @wirestate/react @wirestate/react-mobx
 
 # Lit + Signals
-npm install @wirestate/core @wirestate/lit @wirestate/signals @wirestate/lit-signals lit @lit/context @lit/reactive-element @lit-labs/preact-signals @preact/signals-core reflect-metadata
+npm install @wirestate/core @wirestate/signals @wirestate/lit @wirestate/lit-signals
 
 # Lit + MobX
-npm install @wirestate/core @wirestate/lit @wirestate/mobx @wirestate/lit-mobx lit @lit/context @lit/reactive-element mobx reflect-metadata
+npm install @wirestate/core @wirestate/mobx @wirestate/lit @wirestate/lit-mobx
 ```
 
 Import `reflect-metadata` once before decorated services are loaded.
@@ -108,7 +107,7 @@ export function App() {
 ```
 
 `@wirestate/react` connects the component to the service. `useSignals()` subscribes this component to signal reads
-during render. The same service pattern can use MobX in React or Lit Signals in Lit.
+during render. The same service pattern can use MobX or Signals in React or Lit.
 
 ## Documentation
 

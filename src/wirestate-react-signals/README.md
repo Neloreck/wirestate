@@ -11,13 +11,7 @@ state with `@wirestate/signals`, then read and subscribe to it from React compon
 ## Install
 
 ```bash
-npm install @wirestate/signals @wirestate/react-signals @preact/signals-react @preact/signals-core
-```
-
-For a full Wirestate React app:
-
-```bash
-npm install @wirestate/core @wirestate/react @wirestate/signals @wirestate/react-signals react @preact/signals-react @preact/signals-core reflect-metadata
+npm install @wirestate/core @wirestate/react @wirestate/signals @wirestate/react-signals
 ```
 
 ## Start
@@ -55,7 +49,7 @@ export const Counter = () => {
 - React hooks from `@preact/signals-react` (`useSignal`, `useComputed`, `useSignalEffect`, `useModel`).
 - Runtime exports from `@preact/signals-react/runtime` (`useSignals`, `EffectStore`, `wrapJsx`, `ensureFinalCleanup`).
 
-Signal definitions (`signal`, `computed`, `effect`, …) live in
+Signal definitions (`signal`, `computed`, `effect`, and others) live in
 [`@wirestate/signals`](https://www.npmjs.com/package/@wirestate/signals).
 
 For automatic subscriptions when components read `.value` during render, configure the

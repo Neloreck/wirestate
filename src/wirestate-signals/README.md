@@ -5,13 +5,13 @@
 
 Framework-agnostic Preact Signals exports for Wirestate services.
 
-Use this package to author signal-based services once and share them across React and Lit applications. Pair it with
+Use this package to create signal-based services once and share them across React and Lit applications. Pair it with
 `@wirestate/react-signals` to render React components or `@wirestate/lit-signals` to render Lit elements.
 
 ## Install
 
 ```bash
-npm install @wirestate/signals @preact/signals-core
+npm install @wirestate/core @wirestate/signals
 ```
 
 ## Start
