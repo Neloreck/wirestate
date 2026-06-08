@@ -1,19 +1,7 @@
-describe("Library exported API from wirestate/react-mobx", () => {
+describe("Library exported API from wirestate/lit-mobx", () => {
   const libRoot = require("./index");
 
-  const expectedLibExports: Array<string> = [
-    "Observer",
-    "clearTimers",
-    "enableStaticRendering",
-    "isObserverBatched",
-    "isUsingStaticRendering",
-    "observer",
-    "observerBatching",
-    "useAsObservableSource",
-    "useLocalObservable",
-    "useLocalStore",
-    "useObserver",
-  ];
+  const expectedLibExports: Array<string> = ["MobxLitElement", "MobxReactionUpdate", "ReactiveElementConstructor"];
 
   const assertListIntersection = (first: Array<string>, second: Array<string>) => {
     first.forEach((it: string) => {

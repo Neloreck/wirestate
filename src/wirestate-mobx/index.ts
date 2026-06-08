@@ -1,3 +1,12 @@
+/**
+ * Framework-agnostic MobX re-exports with Wirestate-friendly decorator aliases.
+ *
+ * Shared by `@wirestate/react-mobx` and `@wirestate/lit-mobx` so that observable
+ * services can be authored once and consumed from either React or Lit applications.
+ *
+ * @packageDocumentation
+ */
+
 import { action, computed, IActionFactory, IComputedFactory, IObservableFactory, observable } from "mobx";
 
 /**
@@ -104,24 +113,6 @@ export {
   values,
   when,
 } from "mobx";
-
-/**
- * @group MobX React
- * @see {@link https://mobx.js.org/react-integration.html}
- */
-export {
-  Observer,
-  clearTimers,
-  enableStaticRendering,
-  isObserverBatched,
-  isUsingStaticRendering,
-  observer,
-  observerBatching,
-  useAsObservableSource,
-  useLocalObservable,
-  useLocalStore,
-  useObserver,
-} from "mobx-react-lite";
 
 /**
  * MobX `action` decorator alias.

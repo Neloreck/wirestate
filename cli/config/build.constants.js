@@ -19,6 +19,7 @@ export const EXTERNAL_DEPENDENCIES = [
   "@lit/reactive-element",
   "@lit/context",
   "@lit-labs/signals",
+  "@adobe/lit-mobx",
   "signal-polyfill",
 ];
 
@@ -37,6 +38,7 @@ export const TS_PORTABLE_CONFIG = path.resolve(__dirname, "./tsconfig.portable.j
 export const SRC_PATH = path.resolve(PROJECT_ROOT, "./src");
 
 export const PORTABLE_CORE_ENTRY = path.resolve(SRC_PATH, "./portable/wirestate.ts");
+export const PORTABLE_CORE_LIT_MOBX_ENTRY = path.resolve(SRC_PATH, "./portable/wirestate-lit-mobx.ts");
 export const PORTABLE_CORE_LIT_SIGNALS_ENTRY = path.resolve(SRC_PATH, "./portable/wirestate-lit-signals.ts");
 export const PORTABLE_CORE_REACT_MOBX_ENTRY = path.resolve(SRC_PATH, "./portable/wirestate-react-mobx.ts");
 export const PORTABLE_CORE_REACT_SIGNALS_ENTRY = path.resolve(SRC_PATH, "./portable/wirestate-react-signals.ts");

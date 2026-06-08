@@ -3,28 +3,28 @@
 [![npm](https://img.shields.io/npm/v/@wirestate/react-mobx.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react-mobx)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
 
-MobX exports for Wirestate React services.
+MobX React reactivity binding for Wirestate React services.
 
-Use this package when service state should be observable with MobX and React components should render through
-`mobx-react-lite`.
+Use this package together with [`@wirestate/mobx`](https://www.npmjs.com/package/@wirestate/mobx): author observable
+service state with `@wirestate/mobx`, then render React components through `mobx-react-lite`.
 
 ## Install
 
 ```bash
-npm install @wirestate/react-mobx mobx mobx-react-lite
+npm install @wirestate/mobx @wirestate/react-mobx mobx
 ```
 
 For a full Wirestate React app:
 
 ```bash
-npm install @wirestate/core @wirestate/react @wirestate/react-mobx react mobx mobx-react-lite reflect-metadata
+npm install @wirestate/core @wirestate/react @wirestate/mobx @wirestate/react-mobx react mobx reflect-metadata
 ```
 
 ## Start
 
 ```ts
 import { Injectable } from "@wirestate/core";
-import { Action, Observable, makeObservable, observer } from "@wirestate/react-mobx";
+import { Action, Observable, makeObservable } from "@wirestate/mobx";
 
 @Injectable()
 class CounterService {
@@ -42,18 +42,30 @@ class CounterService {
 }
 ```
 
+```tsx
+import { useInjection } from "@wirestate/react";
+import { observer } from "@wirestate/react-mobx";
+
+export const Counter = observer(() => {
+  const counter = useInjection(CounterService);
+
+  return <button onClick={() => counter.increment()}>{counter.count}</button>;
+});
+```
+
 ## What Is Included
 
-- Re-exports from `mobx`.
-- Re-exports from `mobx-react-lite`.
-- Decorator aliases: `Observable`, `ShallowObservable`, `RefObservable`, `DeepObservable`, `Action`, `BoundAction`, and
-  `Computed`.
+- Re-exports from `mobx-react-lite` (`observer`, `Observer`, `useObserver`, `useLocalObservable`, and related helpers).
+  `mobx-react-lite` ships as a bundled dependency, so you do not install it directly.
+
+Observable definitions and decorator aliases (`Observable`, `Action`, `Computed`, …) live in
+[`@wirestate/mobx`](https://www.npmjs.com/package/@wirestate/mobx).
 
 ## Learn More
 
 - [React MobX guide](https://neloreck.github.io/wirestate/react-mobx/overview)
 - [API reference](https://neloreck.github.io/wirestate/api/wirestate-react-mobx/)
-- [MobX docs](https://mobx.js.org/README.html)
+- [MobX React docs](https://mobx.js.org/react-integration.html)
 
 ## License
 

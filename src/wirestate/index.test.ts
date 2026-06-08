@@ -13,9 +13,12 @@ describe("Library exported API from wirestate", () => {
 
   it("should export current MobX adapter APIs from wirestate/mobx", () => {
     const mobxRoot = require("./mobx") as Record<string, unknown>;
-    const reactMobxRoot = require("../wirestate-react-mobx") as Record<string, unknown>;
+    const wirestateMobxRoot = require("../wirestate-mobx") as Record<string, unknown>;
+    const wirestateReactMobxRoot = require("../wirestate-react-mobx") as Record<string, unknown>;
 
-    expect(Object.keys(mobxRoot).sort()).toEqual(exportedKeys(reactMobxRoot));
+    expect(Object.keys(mobxRoot).sort()).toEqual(
+      [...exportedKeys(wirestateMobxRoot), ...exportedKeys(wirestateReactMobxRoot)].sort()
+    );
   });
 
   it("should export current React signals adapter APIs from wirestate/signals", () => {

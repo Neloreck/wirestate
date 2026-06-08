@@ -33,6 +33,7 @@
     "version:packages": "ts-node cli/deploy/bump-version.ts"
   },
   "devDependencies": {
+    "@adobe/lit-mobx": "^2.2.2",
     "@babel/cli": "^7.29.7",
     "@babel/core": "^7.29.7",
     "@babel/node": "^7.29.7",

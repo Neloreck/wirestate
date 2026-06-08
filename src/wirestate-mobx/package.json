@@ -1,7 +1,7 @@
 {
-  "name": "@wirestate/react-mobx",
+  "name": "@wirestate/mobx",
   "version": "1.0.0-experimental.4",
-  "description": "MobX React reactivity binding (mobx-react-lite) for Wirestate React services",
+  "description": "Framework-agnostic MobX re-exports and decorator aliases for Wirestate services",
   "sideEffects": false,
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/Neloreck/wirestate#readme",
@@ -36,7 +36,6 @@
     "management",
     "manager",
     "mobx",
-    "react",
     "ioc",
     "di",
     "dependency-injection",
@@ -44,12 +43,9 @@
     "store",
     "typescript"
   ],
-  "dependencies": {
-    "mobx-react-lite": "^4.0.0"
-  },
+  "dependencies": {},
   "peerDependencies": {
-    "mobx": ">=6.0.0",
-    "react": ">=16.8.0 <20.0.0"
+    "mobx": ">=6.0.0"
   },
   "optionalDependencies": {}
 }

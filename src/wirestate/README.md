@@ -9,7 +9,9 @@ New projects should prefer the scoped packages for the stack they use:
 [`@wirestate/core`](https://www.npmjs.com/package/@wirestate/core),
 [`@wirestate/react`](https://www.npmjs.com/package/@wirestate/react),
 [`@wirestate/lit`](https://www.npmjs.com/package/@wirestate/lit),
+[`@wirestate/mobx`](https://www.npmjs.com/package/@wirestate/mobx),
 [`@wirestate/react-mobx`](https://www.npmjs.com/package/@wirestate/react-mobx),
+[`@wirestate/lit-mobx`](https://www.npmjs.com/package/@wirestate/lit-mobx),
 [`@wirestate/react-signals`](https://www.npmjs.com/package/@wirestate/react-signals),
 [`@wirestate/lit-signals`](https://www.npmjs.com/package/@wirestate/lit-signals).
 
@@ -24,18 +26,20 @@ Install MobX or Preact Signals peers when you use the matching exports.
 ## Exports
 
 - `wirestate` re-exports `@wirestate/core` and `@wirestate/react`.
-- `wirestate/mobx` re-exports `@wirestate/react-mobx`.
+- `wirestate/mobx` re-exports `@wirestate/mobx` (framework-agnostic observable state and decorator aliases).
 - `wirestate/signals` re-exports `@wirestate/react-signals`.
 
-Lit APIs are available from the scoped
-[`@wirestate/lit`](https://www.npmjs.com/package/@wirestate/lit) and
+The React MobX rendering binding (`observer`) lives in
+[`@wirestate/react-mobx`](https://www.npmjs.com/package/@wirestate/react-mobx). Lit APIs are available from the scoped
+[`@wirestate/lit`](https://www.npmjs.com/package/@wirestate/lit),
+[`@wirestate/lit-mobx`](https://www.npmjs.com/package/@wirestate/lit-mobx), and
 [`@wirestate/lit-signals`](https://www.npmjs.com/package/@wirestate/lit-signals) packages.
 
 ## Start
 
 ```ts
 import { Injectable, createContainer } from "wirestate";
-import { observer } from "wirestate/mobx";
+import { Action, Observable, makeObservable } from "wirestate/mobx";
 import { signal } from "wirestate/signals";
 ```
 

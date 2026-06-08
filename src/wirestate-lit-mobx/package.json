@@ -1,7 +1,7 @@
 {
-  "name": "@wirestate/react-mobx",
+  "name": "@wirestate/lit-mobx",
   "version": "1.0.0-experimental.4",
-  "description": "MobX React reactivity binding (mobx-react-lite) for Wirestate React services",
+  "description": "MobX Lit reactivity binding (@adobe/lit-mobx) for Wirestate Lit services",
   "sideEffects": false,
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/Neloreck/wirestate#readme",
@@ -36,7 +36,9 @@
     "management",
     "manager",
     "mobx",
-    "react",
+    "lit",
+    "lit-element",
+    "web-components",
     "ioc",
     "di",
     "dependency-injection",
@@ -45,11 +47,11 @@
     "typescript"
   ],
   "dependencies": {
-    "mobx-react-lite": "^4.0.0"
+    "@adobe/lit-mobx": "^2.0.0"
   },
   "peerDependencies": {
-    "mobx": ">=6.0.0",
-    "react": ">=16.8.0 <20.0.0"
+    "lit": ">=2.0.0",
+    "mobx": ">=6.0.0"
   },
   "optionalDependencies": {}
 }

@@ -14,6 +14,9 @@ importers:
 
   .:
     devDependencies:
+      '@adobe/lit-mobx':
+        specifier: ^2.2.2
+        version: 2.2.2(lit@3.3.3)(mobx@6.15.4)
       '@babel/cli':
         specifier: ^7.29.7
         version: 7.29.7(@babel/core@7.29.7)
@@ -244,11 +247,23 @@ importers:
 
   src/wirestate-lit: {}
 
+  src/wirestate-lit-mobx:
+    dependencies:
+      '@adobe/lit-mobx':
+        specifier: ^2.0.0
+        version: 2.2.2(lit@3.3.3)(mobx@6.15.4)
+
   src/wirestate-lit-signals: {}
+
+  src/wirestate-mobx: {}
 
   src/wirestate-react: {}
 
-  src/wirestate-react-mobx: {}
+  src/wirestate-react-mobx:
+    dependencies:
+      mobx-react-lite:
+        specifier: ^4.0.0
+        version: 4.1.1(mobx@6.15.4)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
 
   src/wirestate-react-signals: {}
 
@@ -256,6 +271,12 @@ packages:
 
   '@adobe/css-tools@4.4.4':
     resolution: {integrity: sha512-Elp+iwUx5rN5+Y8xLt5/GRoG20WGoDCQ/1Fb+1LiGtvwbDavuSk0jhD/eZdckHAuzcDzccnkv+rEjyWfRx18gg==}
+
+  '@adobe/lit-mobx@2.2.2':
+    resolution: {integrity: sha512-TKmaEgu0m8dxydo0cAhJ5qaNoa/moQr8I3E9DtxVb0OSu/huXps+gUg/6oz7sYllcSl4KFZtzfyfx7EstbQ9tw==}
+    peerDependencies:
+      lit: ^2.0.0 || ^3.0.0
+      mobx: ^5.0.0 || ^6.0.0
 
   '@algolia/abtesting@1.18.1':
     resolution: {integrity: sha512-aehCadlWOGvrT91KUIZpC0MbB8KBW9yUuvTJFd2xesR7le/IsT4nJUnjCCZ4ZqZCeTcPHPV5mo//fZ5oxcSVYw==}
@@ -4664,6 +4685,11 @@ packages:
 snapshots:
 
   '@adobe/css-tools@4.4.4': {}
+
+  '@adobe/lit-mobx@2.2.2(lit@3.3.3)(mobx@6.15.4)':
+    dependencies:
+      lit: 3.3.3
+      mobx: 6.15.4
 
   '@algolia/abtesting@1.18.1':
     dependencies:
