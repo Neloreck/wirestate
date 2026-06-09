@@ -1,5 +1,5 @@
-import { SignalWatcher } from "@lit-labs/signals";
 import { injection } from "@wirestate/lit";
+import { SignalWatcher } from "@wirestate/lit-signals";
 import { css, CSSResult, html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 
@@ -58,8 +58,8 @@ export class EventsLog extends SignalWatcher(LitElement) {
       <h3>Events log</h3>
 
       <div class="events-log">
-        ${this.loggerService.logs.get().length
-          ? this.loggerService.logs.get().map(
+        ${this.loggerService.logs.value.length
+          ? this.loggerService.logs.value.map(
               (it) =>
                 html`<div class="events-log-entry">
                   <span>${JSON.stringify(it.type)}</span>

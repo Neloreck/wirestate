@@ -12,7 +12,7 @@ import {
   OnProvision,
   OnDeprovision,
 } from "@wirestate/core";
-import { signal, State } from "@wirestate/lit-signals";
+import { Signal, signal } from "@wirestate/signals";
 
 import { EGlobalCommand } from "@/constants/commands";
 import { EGlobalEvent } from "@/constants/events";
@@ -31,7 +31,7 @@ export interface ILogEntry {
 export class LoggerService {
   public static readonly MAX_ENTRIES: number = 25;
 
-  public logs: State<Array<ILogEntry>> = signal<Array<ILogEntry>>([]);
+  public logs: Signal<Array<ILogEntry>> = signal<Array<ILogEntry>>([]);
 
   private nextId: number = 1;
 
@@ -83,7 +83,7 @@ export class LoggerService {
   }
 
   public clear(): void {
-    this.logs.set([]);
+    this.logs.value = [];
     this.nextId = 1;
   }
 
@@ -95,13 +95,13 @@ export class LoggerService {
       at: Date.now(),
     };
 
-    const next: Array<ILogEntry> = [entry, ...this.logs.get()];
+    const next: Array<ILogEntry> = [entry, ...this.logs.value];
 
     if (next.length > LoggerService.MAX_ENTRIES) {
       next.length = LoggerService.MAX_ENTRIES;
     }
 
-    this.logs.set(next);
+    this.logs.value = next;
   }
 
   public log(...args: Array<unknown>): void {
@@ -135,6 +135,6 @@ export class LoggerService {
 
   @OnQuery(EGlobalQuery.GET_RECENT_LOGS)
   public onQueryRecentLogs(data?: { limit?: number }): Array<ILogEntry> {
-    return this.logs.get().slice(0, data?.limit ?? 5);
+    return this.logs.value.slice(0, data?.limit ?? 5);
   }
 }

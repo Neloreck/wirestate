@@ -10,7 +10,7 @@ import {
   OnProvision,
   OnDeprovision,
 } from "@wirestate/core";
-import { signal, State, computed } from "@wirestate/lit-signals";
+import { Signal, computed, signal } from "@wirestate/signals";
 
 import { EGlobalEvent } from "@/constants/events";
 import { ECounterServiceQuery, ICounterSnapshot, ICounterSummary } from "@/services/CounterService.query";
@@ -22,10 +22,10 @@ interface CounterServiceSeed {
 
 @Injectable()
 export class CounterService {
-  public count: State<number> = signal(0);
+  public count: Signal<number> = signal(0);
   public lastIncrementedAt: number = -1;
 
-  public isEven = computed(() => this.count.get() % 2 === 0);
+  public isEven = computed(() => this.count.value % 2 === 0);
 
   public constructor(
     @Inject(WireScope)
@@ -42,7 +42,7 @@ export class CounterService {
 
     if (typeof seed?.count === "number") {
       console.log(`[${this.constructor.name}] Apply seed count:`, seed.count);
-      this.count.set(seed.count);
+      this.count.value = seed.count;
     }
   }
 
@@ -68,19 +68,19 @@ export class CounterService {
   public reset(): void {
     console.info(`[${this.constructor.name}] Reset counter`);
 
-    this.count.set(0);
+    this.count.value = 0;
     this.scope.emitEvent(EGlobalEvent.COUNTER_RESET);
   }
 
   public increment(): void {
     this.lastIncrementedAt = Date.now();
-    this.count.set(this.count.get() + 1);
+    this.count.value += 1;
   }
 
   @OnEvent(EGlobalEvent.COUNTER_INCREMENT)
   public onCounterIncrement(event: WireEvent<number>): void {
     this.lastIncrementedAt = Date.now();
-    this.count.set(this.count.get() + (event.payload ?? 1));
+    this.count.value = this.count.value + (event.payload ?? 1);
   }
 
   /**
@@ -93,7 +93,7 @@ export class CounterService {
     this.scope.resolve(LoggerService).log(`[${this.constructor.name}][query] Fetching sync snapshot:`, data);
 
     return {
-      count: this.count.get(),
+      count: this.count.value,
       lastIncrementedAt: this.lastIncrementedAt,
     };
   }
@@ -110,7 +110,7 @@ export class CounterService {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     return {
-      count: this.count.get(),
+      count: this.count.value,
       lastIncrementedAt: this.lastIncrementedAt,
       fetchedAt: Date.now(),
     };

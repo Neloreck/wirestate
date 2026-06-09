@@ -1,5 +1,5 @@
-import { MobxLitElement } from "@adobe/lit-mobx";
 import { injection } from "@wirestate/lit";
+import { MobxLitElement } from "@wirestate/lit-mobx";
 import { css, CSSResult, html } from "lit";
 import { customElement } from "lit/decorators.js";
 

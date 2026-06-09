@@ -10,7 +10,7 @@ import {
   OnProvision,
   OnDeprovision,
 } from "@wirestate/core";
-import { observable, computed, action, runInAction, makeObservable } from "mobx";
+import { Observable, Computed, Action, runInAction, makeObservable } from "@wirestate/mobx";
 
 import { EGlobalEvent } from "@/constants/events";
 import { ECounterServiceQuery, ICounterSnapshot, ICounterSummary } from "@/services/CounterService.query";
@@ -22,12 +22,12 @@ interface CounterServiceSeed {
 
 @Injectable()
 export class CounterService {
-  @observable
+  @Observable()
   public count: number = 0;
 
   public lastIncrementedAt: number = -1;
 
-  @computed
+  @Computed()
   public get isEven(): boolean {
     return this.count % 2 === 0;
   }
@@ -72,7 +72,7 @@ export class CounterService {
     this.scope.emitEvent(`deprovision/${this.constructor.name}`);
   }
 
-  @action
+  @Action()
   public reset(): void {
     console.info(`[${this.constructor.name}] Reset counter`);
 
@@ -80,14 +80,14 @@ export class CounterService {
     this.scope.emitEvent(EGlobalEvent.COUNTER_RESET);
   }
 
-  @action
+  @Action()
   public increment(): void {
     this.lastIncrementedAt = Date.now();
     this.count += 1;
   }
 
+  @Action()
   @OnEvent(EGlobalEvent.COUNTER_INCREMENT)
-  @action
   public onCounterIncrement(event: WireEvent<number>): void {
     this.lastIncrementedAt = Date.now();
     this.count = this.count + (event.payload ?? 1);

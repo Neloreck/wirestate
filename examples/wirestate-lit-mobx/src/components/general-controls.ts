@@ -1,6 +1,6 @@
-import { MobxLitElement } from "@adobe/lit-mobx";
 import { WireScope, WireEvent } from "@wirestate/core";
 import { injection, onEvent } from "@wirestate/lit";
+import { MobxLitElement } from "@wirestate/lit-mobx";
 import { css, CSSResult, html } from "lit";
 import { customElement } from "lit/decorators.js";
 

@@ -1,7 +1,7 @@
-import { watch } from "@lit-labs/signals";
 import { WireScope, WireEvent } from "@wirestate/core";
 import { injection, onEvent } from "@wirestate/lit";
-import { Computed, computed } from "@wirestate/lit-signals";
+import { watch } from "@wirestate/lit-signals";
+import { ReadonlySignal, computed } from "@wirestate/signals";
 import { css, CSSResult, html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
 
@@ -82,7 +82,9 @@ export class GeneralControls extends LitElement {
   @injection(LoggerService)
   private readonly loggerService!: LoggerService;
 
-  private isOddLabel: Computed<string> = computed(() => (this.counterService.count.get() % 2 === 0 ? "even" : "odd"));
+  private isOddLabel: ReadonlySignal<string> = computed(() =>
+    this.counterService.count.value % 2 === 0 ? "even" : "odd"
+  );
 
   @onEvent()
   public onAnyEvent(event: WireEvent): void {

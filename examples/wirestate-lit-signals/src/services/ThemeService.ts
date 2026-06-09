@@ -8,14 +8,14 @@ import {
   SEED,
   WireScope,
 } from "@wirestate/core";
-import { signal, State } from "@wirestate/lit-signals";
+import { Signal, signal } from "@wirestate/signals";
 
 import { EGlobalEvent } from "@/constants/events";
 import { Theme } from "@/types";
 
 @Injectable()
 export class ThemeService {
-  public theme: State<Theme> = signal("light");
+  public theme: Signal<Theme> = signal("light");
 
   public constructor(
     @Inject(WireScope)
@@ -24,7 +24,7 @@ export class ThemeService {
     protected readonly seed: object
   ) {
     console.info(`[${this.constructor.name}] Shared seed on construction:`, seed);
-    document.documentElement.dataset.theme = this.theme.get();
+    document.documentElement.dataset.theme = this.theme.value;
   }
 
   @OnActivated()
@@ -39,7 +39,7 @@ export class ThemeService {
 
   @OnProvision()
   public onProvision(): void {
-    console.info(`[${this.constructor.name}] Provision with theme:`, this.theme.get());
+    console.info(`[${this.constructor.name}] Provision with theme:`, this.theme.value);
 
     this.scope.emitEvent(`provision/${this.constructor.name}`);
   }
@@ -52,12 +52,12 @@ export class ThemeService {
   }
 
   public toggleTheme(): void {
-    this.theme.set(this.theme.get() === "light" ? "dark" : "light");
+    this.theme.value = this.theme.value === "light" ? "dark" : "light";
 
-    document.documentElement.dataset.theme = this.theme.get();
+    document.documentElement.dataset.theme = this.theme.value;
 
     this.scope.emitEvent(EGlobalEvent.THEME_TOGGLED, {
-      theme: this.theme.get(),
+      theme: this.theme.value,
     });
   }
 }

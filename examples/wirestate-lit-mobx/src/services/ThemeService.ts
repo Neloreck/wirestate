@@ -8,14 +8,14 @@ import {
   SEED,
   WireScope,
 } from "@wirestate/core";
-import { action, makeObservable, observable } from "mobx";
+import { Action, makeObservable, Observable } from "@wirestate/mobx";
 
 import { EGlobalEvent } from "@/constants/events";
 import { Theme } from "@/types";
 
 @Injectable()
 export class ThemeService {
-  @observable
+  @Observable()
   public theme: Theme = "light";
 
   public constructor(
@@ -54,7 +54,7 @@ export class ThemeService {
     this.scope.emitEvent(`deprovision/${this.constructor.name}`);
   }
 
-  @action
+  @Action()
   public toggleTheme(): void {
     this.theme = this.theme === "light" ? "dark" : "light";
 

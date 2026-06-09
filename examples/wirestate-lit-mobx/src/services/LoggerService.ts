@@ -12,7 +12,7 @@ import {
   OnProvision,
   OnDeprovision,
 } from "@wirestate/core";
-import { action, makeObservable, observable } from "mobx";
+import { Action, makeObservable, ShallowObservable } from "@wirestate/mobx";
 
 import { EGlobalCommand } from "@/constants/commands";
 import { EGlobalEvent } from "@/constants/events";
@@ -31,7 +31,7 @@ export interface ILogEntry {
 export class LoggerService {
   public static readonly MAX_ENTRIES: number = 25;
 
-  @observable.shallow
+  @ShallowObservable()
   public logs: Array<ILogEntry> = [];
 
   private nextId: number = 1;
@@ -85,13 +85,13 @@ export class LoggerService {
     this.clear();
   }
 
-  @action
+  @Action()
   public clear(): void {
     this.logs = [];
     this.nextId = 1;
   }
 
-  @action
+  @Action()
   private saveEventLogEntry(event: WireEvent): void {
     const entry: ILogEntry = {
       id: this.nextId++,
