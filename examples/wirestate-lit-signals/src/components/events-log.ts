@@ -55,8 +55,6 @@ export class EventsLog extends SignalWatcher(LitElement) {
 
   public render() {
     return html`
-      <h3>Events log</h3>
-
       <div class="events-log">
         ${this.loggerService.logs.value.length
           ? this.loggerService.logs.value.map(

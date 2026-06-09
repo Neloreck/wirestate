@@ -25,23 +25,15 @@ export class GeneralControls extends LitElement {
         padding: var(--space-2);
         gap: var(--space-2);
 
-        .heading {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-
-          h2 {
-            color: var(--accent);
-          }
-        }
-
         .controls-row {
           display: flex;
+          flex-wrap: wrap;
           gap: var(--space-2);
         }
 
         .control {
           font-size: 16px;
+          white-space: nowrap;
           padding: 5px 10px;
           border-radius: 5px;
           color: var(--accent);
@@ -113,29 +105,24 @@ export class GeneralControls extends LitElement {
 
   public render() {
     return html`
-      <div class="heading">
-        <h2>Wirestate Playground</h2>
-        <p>lit signals + inversify container + custom events/queries/commands</p>
-      </div>
-
       <div class="controls-row">
         <button class="control" @click="${() => this.counterService.increment()}">
-          count: ${watch(this.counterService.count)} (${watch(this.isOddLabel)})
+          Increment — count: ${watch(this.counterService.count)} (${watch(this.isOddLabel)})
         </button>
 
         <button class="control ghost" @click="${() => this.scope.emitEvent(EGlobalEvent.COUNTER_INCREMENT, 3)}">
-          increment+3 (event)
+          Increment +3 (emit event)
         </button>
 
-        <button class="control ghost" @click="${() => this.counterService.reset()}">reset</button>
+        <button class="control ghost" @click="${() => this.counterService.reset()}">Reset counter</button>
 
         <button class="control ghost" @click="${() => this.themeService.toggleTheme()}">
-          theme ${watch(this.themeService.theme)}
+          Toggle theme (${watch(this.themeService.theme)})
         </button>
 
-        <button class="control ghost" @click="${() => this.onDumpData()}">Dump data (command)</button>
+        <button class="control ghost" @click="${() => this.onDumpData()}">Dump services (run command)</button>
 
-        <button class="control ghost" @click="${() => this.loggerService.clear()}">Clear log</button>
+        <button class="control ghost" @click="${() => this.loggerService.clear()}">Clear events</button>
       </div>
     `;
   }

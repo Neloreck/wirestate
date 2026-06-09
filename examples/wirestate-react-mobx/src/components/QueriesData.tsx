@@ -59,7 +59,7 @@ export const QueriesData = () => {
   );
 
   return (
-    <section>
+    <div className={"queries"}>
       <div className={"query-controls"}>
         <button className={"counter ghost"} onClick={onPullSummary}>
           Query summary (sync)
@@ -83,8 +83,6 @@ export const QueriesData = () => {
           <strong>{new Date(snapshot.fetchedAt).toLocaleTimeString()}</strong>
         </p>
       ) : null}
-
-      <br />
-    </section>
+    </div>
   );
 };

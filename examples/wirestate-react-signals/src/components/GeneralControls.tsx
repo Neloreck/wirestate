@@ -37,41 +37,34 @@ export function GeneralControls() {
 
   return (
     <div className={"general-controls"}>
-      <div>
-        <h2>Wirestate Playground</h2>
-        <p>
-          preact signals + inversify container + custom events/queries/commands
-        </p>
-      </div>
-
       <div className={"counter-row"}>
         <button
           className={"counter"}
           onClick={() => counterService.increment()}
         >
-          Count is {counterService.count} (
+          Increment — count: {counterService.count} (
           {counterService.isEven.value ? "even" : "odd"})
         </button>
         <button
           className={"counter ghost"}
           onClick={() => counterService.reset()}
         >
-          Reset
+          Reset counter
         </button>
 
         <button
           className={"counter ghost"}
           onClick={() => themeService.toggle()}
         >
-          Theme: {themeService.theme}
+          Toggle theme ({themeService.theme})
         </button>
 
         <button className={"counter ghost"} onClick={() => onUserPinged()}>
-          Ping (event)
+          Ping (emit event)
         </button>
 
         <button className={"counter ghost"} onClick={() => onDumpData()}>
-          Dump services (command)
+          Dump services (run command)
         </button>
       </div>
     </div>

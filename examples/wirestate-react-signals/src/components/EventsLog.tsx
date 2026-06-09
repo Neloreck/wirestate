@@ -9,7 +9,6 @@ export function EventsLog() {
 
   return (
     <div id={"logs"}>
-      <h2>Events log</h2>
       <div className={"event-log"}>
         {loggerService.logs.value.length === 0 ? (
           <div className={"event-log__empty"}>
@@ -32,7 +31,7 @@ export function EventsLog() {
       </div>
 
       <button className={"counter ghost"} onClick={() => loggerService.clear()}>
-        Clear log
+        Clear events
       </button>
     </div>
   );

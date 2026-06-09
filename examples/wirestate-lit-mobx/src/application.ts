@@ -24,8 +24,64 @@ export class Application extends LitElement {
         display: flex;
         flex-direction: column;
         width: 1126px;
+        max-width: 100%;
         margin: 0 auto;
+        padding: var(--space-4);
         gap: var(--space-4);
+        box-sizing: border-box;
+      }
+
+      .app-header {
+        text-align: center;
+        padding: var(--space-2) 0;
+      }
+
+      .app-header h1 {
+        margin-bottom: var(--space-2);
+        font-family: var(--heading);
+        font-weight: 500;
+        font-size: 48px;
+        color: var(--text-h);
+      }
+
+      .app-header__stack {
+        display: inline-block;
+        margin-top: var(--space-3);
+        font-family: var(--mono);
+        font-size: var(--text-sm);
+        color: var(--accent);
+        background: var(--accent-bg);
+        border: 1px solid var(--accent-border);
+        border-radius: 999px;
+        padding: 2px 14px;
+      }
+
+      .app-header__lead {
+        margin: 0 auto;
+        max-width: 60ch;
+        color: var(--text);
+      }
+
+      .panel {
+        border: 1px solid var(--border);
+        border-radius: var(--border-radius-lg);
+        padding: var(--space-4);
+        background: var(--social-bg);
+        text-align: left;
+      }
+
+      .panel > h2 {
+        margin: 0 0 var(--space-1);
+        font-family: var(--heading);
+        font-weight: 500;
+        font-size: 22px;
+        color: var(--text-h);
+      }
+
+      .panel__desc {
+        margin: 0 0 var(--space-3);
+        font-size: 14px;
+        color: var(--text);
       }
     `,
   ];
@@ -57,9 +113,33 @@ export class Application extends LitElement {
 
   public render(): TemplateResult {
     return html`
-      <w-general-controls></w-general-controls>
-      <w-events-log></w-events-log>
-      <w-queries-data></w-queries-data>
+      <header class="app-header">
+        <h1>Wirestate</h1>
+        <p class="app-header__stack">Lit + MobX</p>
+        <p class="app-header__lead">
+          Dependency-injected services with events, commands, queries, and reactive MobX state.
+        </p>
+      </header>
+
+      <section class="panel">
+        <h2>Counter &amp; controls</h2>
+        <p class="panel__desc">
+          State lives in injected services. Buttons call service methods, emit events, and run a command.
+        </p>
+        <w-general-controls></w-general-controls>
+      </section>
+
+      <section class="panel">
+        <h2>Events log</h2>
+        <p class="panel__desc">LoggerService records every event emitted inside the container.</p>
+        <w-events-log></w-events-log>
+      </section>
+
+      <section class="panel">
+        <h2>Queries</h2>
+        <p class="panel__desc">Pull data from service query handlers — synchronously or async.</p>
+        <w-queries-data></w-queries-data>
+      </section>
     `;
   }
 }

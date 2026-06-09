@@ -14,8 +14,6 @@ export class QueriesData extends LitElement {
     resetStyles,
     css`
       :host {
-        padding: var(--space-2);
-
         h3 {
           color: var(--accent);
         }
@@ -80,11 +78,9 @@ export class QueriesData extends LitElement {
 
   public render() {
     return html`
-      <h3>Queries</h3>
-
       <div class="query-controls">
-        <button class="control" @click="${() => this.onQuerySummary()}">Query summary</button>
-        <button class="control" @click="${() => this.onQuerySnapshot()}">Query snapshot</button>
+        <button class="control" @click="${() => this.onQuerySummary()}">Query summary (sync)</button>
+        <button class="control" @click="${() => this.onQuerySnapshot()}">Fetch snapshot (async)</button>
       </div>
 
       <div class="summaries">

@@ -55,8 +55,6 @@ export class EventsLog extends MobxLitElement {
 
   public render() {
     return html`
-      <h3>Events log</h3>
-
       <div class="events-log">
         ${this.loggerService.logs.length
           ? this.loggerService.logs.map(

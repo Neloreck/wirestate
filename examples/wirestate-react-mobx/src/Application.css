@@ -1,3 +1,52 @@
-.application-section {
-  padding: 0 24px;
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  text-align: left;
+}
+
+.app-header {
+  text-align: center;
+  padding: 8px 0 4px;
+}
+
+.app-header__stack {
+  display: inline-block;
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 999px;
+  padding: 2px 14px;
+}
+
+.app-header__lead {
+  margin: 12px auto 0;
+  max-width: 60ch;
+  color: var(--text);
+}
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  background: var(--social-bg);
+}
+
+.panel > h2 {
+  margin: 0 0 4px;
+}
+
+.panel__desc {
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.config {
+  display: inline-block;
+  word-break: break-all;
 }

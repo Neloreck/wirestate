@@ -41,28 +41,48 @@ export const Application = () => {
   }, [themeService.theme]);
 
   return (
-    <>
-      <section id={"controls"} className={"application-section"}>
+    <div className={"app"}>
+      <header className={"app-header"}>
+        <h1>Wirestate</h1>
+        <p className={"app-header__stack"}>React + MobX</p>
+        <p className={"app-header__lead"}>
+          Dependency-injected services with events, commands, queries, and
+          reactive MobX state.
+        </p>
+      </header>
+
+      <section id={"controls"} className={"panel"}>
+        <h2>Counter &amp; controls</h2>
+        <p className={"panel__desc"}>
+          State lives in injected services. Buttons call service methods, emit
+          an event, and run a command.
+        </p>
         <GeneralControls />
       </section>
 
-      <br />
-
-      <section id={"events-log"} className={"application-section"}>
+      <section id={"events-log"} className={"panel"}>
+        <h2>Events log</h2>
+        <p className={"panel__desc"}>
+          LoggerService records every event emitted inside the container.
+        </p>
         <EventsLog />
       </section>
 
-      <br />
-
-      <section id={"queries-data"} className={"application-section"}>
+      <section id={"queries-data"} className={"panel"}>
+        <h2>Queries</h2>
+        <p className={"panel__desc"}>
+          Pull data from service query handlers — synchronously or async.
+        </p>
         <QueriesData />
       </section>
 
-      <br />
-
-      <section id={"global-config"} className={"application-section"}>
-        <b>GlobalConfig: {JSON.stringify(globalConfig)}</b>
+      <section id={"global-config"} className={"panel"}>
+        <h2>Container config</h2>
+        <p className={"panel__desc"}>
+          A constant value bound in the dependency-injection container.
+        </p>
+        <code className={"config"}>{JSON.stringify(globalConfig)}</code>
       </section>
-    </>
+    </div>
   );
 };
