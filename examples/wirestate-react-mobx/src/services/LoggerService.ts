@@ -12,11 +12,7 @@ import {
   WireScope,
   type WireEvent,
 } from "@wirestate/core";
-import {
-  Action,
-  ShallowObservable,
-  makeObservable,
-} from "@wirestate/react-mobx";
+import { Action, ShallowObservable, makeObservable } from "@wirestate/mobx";
 
 import { EGlobalCommand } from "@/constants/commands";
 import { EGlobalEvent } from "@/constants/events";

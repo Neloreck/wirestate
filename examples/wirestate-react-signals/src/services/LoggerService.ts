@@ -12,7 +12,7 @@ import {
   WireScope,
   type WireEvent,
 } from "@wirestate/core";
-import { signal, Signal } from "@wirestate/react-signals";
+import { Signal, signal } from "@wirestate/signals";
 
 import { EGlobalCommand } from "@/constants/commands";
 import { EGlobalEvent } from "@/constants/events";

@@ -10,12 +10,7 @@ import {
   SEED,
   WireScope,
 } from "@wirestate/core";
-import {
-  Action,
-  Computed,
-  Observable,
-  makeObservable,
-} from "@wirestate/react-mobx";
+import { Action, Computed, Observable, makeObservable } from "@wirestate/mobx";
 
 import { EGlobalEvent } from "@/constants/events";
 import {

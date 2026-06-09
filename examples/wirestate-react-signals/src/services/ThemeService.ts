@@ -8,7 +8,7 @@ import {
   SEED,
   WireScope,
 } from "@wirestate/core";
-import { signal, Signal } from "@wirestate/react-signals";
+import { Signal, signal } from "@wirestate/signals";
 
 import { EGlobalEvent } from "@/constants/events";
 import type { Theme } from "@/types";

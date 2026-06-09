@@ -8,7 +8,7 @@ import {
   SEED,
   WireScope,
 } from "@wirestate/core";
-import { Action, Observable, makeObservable } from "@wirestate/react-mobx";
+import { Action, Observable, makeObservable } from "@wirestate/mobx";
 
 import { EGlobalEvent } from "@/constants/events";
 import type { Theme } from "@/types";
