@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { ERROR_CODE_INVALID_CONTEXT } from "../error/error-code";
 import { Optional } from "../types/general";
 
-import { ContainerReactContext } from "./container-context";
+import { ContainerContext } from "./container-context";
 
 /**
  * Returns the active container from the context.
@@ -24,7 +24,7 @@ import { ContainerReactContext } from "./container-context";
  * ```
  */
 export function useContainer(): Container {
-  const value: Optional<Container> = useContext(ContainerReactContext);
+  const value: Optional<Container> = useContext(ContainerContext);
 
   if (!value) {
     throw new WirestateError(

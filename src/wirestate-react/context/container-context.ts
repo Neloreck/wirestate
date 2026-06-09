@@ -12,6 +12,6 @@ import { Optional } from "../types/general";
  *
  * @group Context
  */
-export const ContainerReactContext: Context<Optional<Container>> = createContext<Optional<Container>>(null);
+export const ContainerContext: Context<Optional<Container>> = createContext<Optional<Container>>(null);
 
-ContainerReactContext.displayName = "ContainerContext";
+ContainerContext.displayName = "ContainerContext";

@@ -8,7 +8,7 @@ import {
 } from "@wirestate/core";
 import { createElement, ReactNode, useEffect, useRef, useState } from "react";
 
-import { ContainerReactContext } from "../context/container-context";
+import { ContainerContext } from "../context/container-context";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { AnyObject, Maybe, Optional } from "../types/general";
 import { shallowEqualActivation, shallowEqualArrays, shallowEqualObjects } from "../utils/shallow-equal";
@@ -255,5 +255,5 @@ export function ContainerProvider(props: ContainerProviderProps) {
     throw error.error;
   }
 
-  return createElement(ContainerReactContext.Provider, { value: activeContainer }, props.children ?? null);
+  return createElement(ContainerContext.Provider, { value: activeContainer }, props.children ?? null);
 }

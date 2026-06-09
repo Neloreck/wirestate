@@ -10,6 +10,7 @@ export { useOptionalCommandExecutor } from "./commands/use-optional-command-exec
 export { useOptionalAsyncCommandExecutor } from "./commands/use-optional-async-command-executor";
 export { useCommandHandler } from "./commands/use-command-handler";
 
+export { ContainerContext } from "./context/container-context";
 export { useContainer } from "./context/use-container";
 export { useScope } from "./context/use-scope";
 
