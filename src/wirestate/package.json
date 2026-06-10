@@ -60,7 +60,6 @@
     "react",
     "mobx",
     "signals",
-    "inversify",
     "ioc",
     "di",
     "dependency-injection",
@@ -74,12 +73,10 @@
     "@wirestate/mobx": "1.0.0-experimental.4",
     "@wirestate/react-mobx": "1.0.0-experimental.4",
     "@wirestate/signals": "1.0.0-experimental.4",
-    "@wirestate/react-signals": "1.0.0-experimental.4",
-    "inversify": "^8.1.0"
+    "@wirestate/react-signals": "1.0.0-experimental.4"
   },
   "peerDependencies": {
     "react": ">=16.8.0 <20.0.0",
-    "reflect-metadata": ">=0.2.0",
     "tslib": ">=2.5.0"
   },
   "optionalDependencies": {

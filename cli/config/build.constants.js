@@ -9,7 +9,6 @@ export const ENV = process.env.NODE_ENV || "development";
 
 export const EXTERNAL_DEPENDENCIES = [
   "react",
-  "inversify",
   "mobx",
   "mobx-react-lite",
   "@preact/signals-core",

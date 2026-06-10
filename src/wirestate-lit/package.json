@@ -49,7 +49,6 @@
     "@wirestate/core": "1.0.0-experimental.4",
     "@lit/reactive-element": ">=2.0.0",
     "@lit/context": ">=1.0.0",
-    "reflect-metadata": ">=0.2.0",
     "tslib": ">=2.5.0"
   }
 }

@@ -12,7 +12,7 @@ module.exports = {
     "^.+\\.[t|j]sx?$": ["babel-jest", { configFile: path.resolve(__dirname, "babel.test.config.js") }],
   },
   transformIgnorePatterns: [
-    "node_modules/.pnpm/(?!inversify|@inversifyjs|@preact|@lit-labs|@adobe|lit|lit-html|@lit)",
+    "node_modules/.pnpm/(?!@preact|@lit-labs|@adobe|lit|lit-html|@lit)",
   ],
   testEnvironment: "jsdom",
   globals: {},
