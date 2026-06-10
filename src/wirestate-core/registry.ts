@@ -1,7 +1,7 @@
 // Install the Symbol.metadata polyfill before any consumer class definition.
 import "./metadata/symbol-metadata";
 
-import { Container, Identifier } from "./alias";
+import { Container, Identifier } from "./base";
 import { WireStatus } from "./container/wire-status";
 import { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
 import { InternalErrorHandler } from "./types/error";

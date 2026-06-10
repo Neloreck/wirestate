@@ -1,6 +1,6 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Container, inject, Injectable } from "../alias";
+import { Container, inject, Injectable } from "../base";
 import { bind } from "../bind/bind";
 import { OnActivated } from "../bind/instance/on-activated";
 import { OnDeactivation } from "../bind/instance/on-deactivation";

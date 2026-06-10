@@ -1,6 +1,6 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { BindingType, Container, inject, Injectable } from "../alias";
+import { BindingType, Container, inject, Injectable } from "../base";
 import { OnActivated } from "../bind/instance/on-activated";
 import { OnDeprovision } from "../bind/instance/on-deprovision";
 import { OnProvision } from "../bind/instance/on-provision";

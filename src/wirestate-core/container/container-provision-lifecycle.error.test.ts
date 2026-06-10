@@ -1,4 +1,4 @@
-import { Container, Injectable } from "../alias";
+import { Container, Injectable } from "../base";
 import { OnDeprovision } from "../bind/instance/on-deprovision";
 import { OnProvision } from "../bind/instance/on-provision";
 

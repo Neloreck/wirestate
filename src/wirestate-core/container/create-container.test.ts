@@ -1,6 +1,6 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { BindingType, Container, inject, Injectable } from "../alias";
+import { BindingType, Container, inject, Injectable } from "../base";
 import { bind } from "../bind/bind";
 import { unbindAll } from "../bind/unbind";
 import { CommandBus } from "../commands/command-bus";

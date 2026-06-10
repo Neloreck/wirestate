@@ -25,7 +25,7 @@ describe("Binding scopes", () => {
       }
     }
 
-    container.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient" });
+    container.bind({ token: MyService, scope: "Transient", factory: () => new MyService() });
 
     const first = container.get(MyService);
     const second = container.get(MyService);
@@ -66,7 +66,7 @@ describe("Binding scopes", () => {
     @Injectable()
     class MyService {}
 
-    parent.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient" });
+    parent.bind({ token: MyService, scope: "Transient", factory: () => new MyService() });
 
     expect(child.get(MyService)).not.toBe(child.get(MyService));
   });

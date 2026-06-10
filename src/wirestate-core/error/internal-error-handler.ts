@@ -1,4 +1,4 @@
-import { Container } from "../alias";
+import { Container } from "../base";
 import { WIRESTATE_INTERNAL_ERROR_HANDLERS } from "../registry";
 import { InternalErrorDescriptor, InternalErrorHandler } from "../types/error";
 import { Maybe } from "../types/general";

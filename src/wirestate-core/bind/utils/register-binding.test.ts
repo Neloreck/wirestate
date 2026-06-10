@@ -1,6 +1,6 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Container } from "../../alias";
+import { Container } from "../../base";
 import { BindingDescriptor } from "../../types/provision";
 
 import { getContainerBindings, registerBinding, unregisterAllBindings, unregisterBinding } from "./register-binding";

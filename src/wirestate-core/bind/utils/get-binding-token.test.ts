@@ -1,6 +1,6 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { BindingType } from "../../alias";
+import { BindingType } from "../../base";
 
 import { getBindingToken } from "./get-binding-token";
 

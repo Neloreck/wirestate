@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Container } from "../alias";
+import { Container } from "../base";
 import { reportWirestateInternalError } from "../error/internal-error-handler";
 import { EventDispatch, EventHandler, EventType } from "../types/events";
 import { Maybe } from "../types/general";

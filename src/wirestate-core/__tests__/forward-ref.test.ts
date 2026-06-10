@@ -1,4 +1,4 @@
-import { Container, Injectable, inject } from "../alias";
+import { Container, Injectable, inject } from "../base";
 import { createContainer } from "../container/create-container";
 
 describe("forward references with inject()", () => {

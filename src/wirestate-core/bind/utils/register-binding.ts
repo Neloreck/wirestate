@@ -1,4 +1,4 @@
-import { Container, Identifier } from "../../alias";
+import { Container, Identifier } from "../../base";
 import { CONTAINER_BINDINGS } from "../../registry";
 import { Maybe } from "../../types/general";
 import { Binding, Bindings } from "../../types/provision";

@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Container, Newable } from "../../alias";
+import { Container, Newable } from "../../base";
 import { deprovisionInstances } from "../../container/container-provision-lifecycle";
 import { callLifecycleHandler } from "../../lifecycle/call-lifecycle-handler";
 import { ACTIVE_INSTANCES_BY_CONTAINER, CONTAINER_REFS_BY_INSTANCE } from "../../registry";

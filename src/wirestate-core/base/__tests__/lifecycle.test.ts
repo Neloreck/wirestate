@@ -29,7 +29,7 @@ describe("Binding lifecycle hooks", () => {
       @Injectable()
       class MyService {}
 
-      container.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient", onActivated });
+      container.bind({ token: MyService, scope: "Transient", factory: () => new MyService(), onActivated });
 
       container.get(MyService);
       container.get(MyService);
@@ -106,7 +106,7 @@ describe("Binding lifecycle hooks", () => {
       @Injectable()
       class MyService {}
 
-      container.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient", onDeactivated });
+      container.bind({ token: MyService, scope: "Transient", factory: () => new MyService(), onDeactivated });
 
       container.get(MyService);
       container.unbind(MyService);

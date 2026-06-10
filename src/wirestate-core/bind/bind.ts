@@ -1,19 +1,13 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import {
-  BindingType as BindingTypeValues,
-  BindingScope as BindingScopeValues,
-  Container,
-  Newable,
-  Identifier,
-} from "../alias";
+import { Container, Identifier, isFactoryDescriptor, BindingScope, BindingType, Newable } from "../base";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import {
   Binding,
-  BindingType,
-  BindingScope,
+  TBindingType,
+  TBindingScope,
   ValueBindingDescriptor,
   FactoryBindingDescriptor,
   InstanceBindingDescriptor,
@@ -68,14 +62,14 @@ function validateDescriptor(binding: UnsafeBindingDescriptor): void {
     throw new WirestateError("Binding descriptor must provide a 'token' property.", ERROR_CODE_INVALID_ARGUMENTS);
   }
 
-  if (binding.type !== undefined && !Object.values(BindingTypeValues).includes(binding.type as BindingType)) {
+  if (binding.type !== undefined && !Object.values(BindingType).includes(binding.type as TBindingType)) {
     throw new WirestateError(
       `Binding descriptor has unknown type '${String(binding.type)}'.`,
       ERROR_CODE_INVALID_ARGUMENTS
     );
   }
 
-  if (binding.scope !== undefined && !Object.values(BindingScopeValues).includes(binding.scope as BindingScope)) {
+  if (binding.scope !== undefined && !Object.values(BindingScope).includes(binding.scope as TBindingScope)) {
     throw new WirestateError(
       `Binding descriptor has unknown scope '${String(binding.scope)}'.`,
       ERROR_CODE_INVALID_BINDING_SCOPE
@@ -95,7 +89,7 @@ function validateDescriptor(binding: UnsafeBindingDescriptor): void {
  * @throws {@link WirestateError} If the descriptor omits `value` or uses a non-singleton scope.
  */
 function bindValueDescriptor<T>(container: Container, descriptor: ValueBindingDescriptor<T>): void {
-  if (descriptor.scope && descriptor.scope !== BindingScopeValues.Singleton) {
+  if ("scope" in descriptor && descriptor.scope !== undefined && descriptor.scope !== BindingScope.Singleton) {
     throw new WirestateError("Provided unexpected binding scope for value.", ERROR_CODE_INVALID_BINDING_SCOPE);
   }
 
@@ -105,7 +99,12 @@ function bindValueDescriptor<T>(container: Container, descriptor: ValueBindingDe
 
   dbg.info(prefix(__filename), "Binding value:", { token: descriptor.token, descriptor, container });
 
-  container.bind({ token: descriptor.token as Identifier<T>, value: descriptor.value as T });
+  container.bind({
+    token: descriptor.token as Identifier<T>,
+    value: descriptor.value as T,
+    onActivated: descriptor.onActivated,
+    onDeactivated: descriptor.onDeactivated,
+  });
 }
 
 /**
@@ -136,6 +135,8 @@ function bindFactoryDescriptor<T>(container: Container, descriptor: FactoryBindi
     type: "Factory",
     scope: descriptor.scope,
     factory: (current) => descriptor.factory(current),
+    onActivated: descriptor.onActivated,
+    onDeactivated: descriptor.onDeactivated,
   });
 }
 
@@ -150,6 +151,10 @@ function bindFactoryDescriptor<T>(container: Container, descriptor: FactoryBindi
  * - Registers `@OnEvent`, `@OnCommand`, and `@OnQuery` handlers.
  * - Tracks instance lifecycle state for {@link WireStatus}.
  *
+ * Descriptor-level `onActivated`/`onDeactivated` hooks compose with the
+ * Wirestate lifecycle: activation hooks run after Wirestate activation,
+ * deactivation hooks run before Wirestate cleanup.
+ *
  * @group Bind
  * @internal
  *
@@ -158,6 +163,7 @@ function bindFactoryDescriptor<T>(container: Container, descriptor: FactoryBindi
  * @param container - Target {@link Container}.
  * @param token - Token used to resolve the binding.
  * @param binding - Class constructor.
+ * @param descriptor - Original instance descriptor carrying user hooks, if any.
  * @param options - Configuration options for the binding.
  *
  * @throws {@link WirestateError} If the descriptor value is not a constructor.
@@ -166,6 +172,7 @@ function bindInstanceDescriptor<T extends object>(
   container: Container,
   token: Identifier<T>,
   binding: Newable<T>,
+  descriptor: Partial<InstanceBindingDescriptor<T>>,
   options?: BindOptions
 ): void {
   if (typeof binding !== "function") {
@@ -180,12 +187,24 @@ function bindInstanceDescriptor<T extends object>(
     container,
   });
 
+  const onActivated = createInstanceActivatedHandler({ binding, container, options });
+  const onDeactivated = createInstanceDeactivationHandler({ binding, container, options });
+  const userActivated = descriptor.onActivated;
+  const userDeactivated = descriptor.onDeactivated;
+
   container.bind<T>({
     token,
     type: "Instance",
     value: binding,
-    onActivated: createInstanceActivatedHandler({ binding, container, options }),
-    onDeactivated: createInstanceDeactivationHandler({ binding, container, options }),
+    onActivated: (instance, current) => {
+      const activated = onActivated(instance);
+
+      return userActivated ? ((userActivated(activated, current) as T | undefined) ?? activated) : activated;
+    },
+    onDeactivated: (instance, current) => {
+      userDeactivated?.(instance, current);
+      onDeactivated(instance);
+    },
   });
 }
 
@@ -197,7 +216,8 @@ function bindInstanceDescriptor<T extends object>(
  * Pass a class constructor directly, or pass a descriptor when the binding needs a
  * custom token, static value, or factory.
  *
- * Descriptors without `type` are treated as `Value` bindings.
+ * Descriptors without `type` are treated as `Value` bindings unless they carry
+ * a `factory` field.
  *
  * - Class constructor: singleton instance binding.
  * - `Value`: static value binding.
@@ -247,7 +267,7 @@ export function bind<T extends object = object>(
   options: BindOptions = {}
 ): Container {
   if (typeof binding === "function") {
-    bindInstanceDescriptor(container, binding, binding, options);
+    bindInstanceDescriptor(container, binding, binding, {}, options);
     registerBinding(container, binding);
 
     return container;
@@ -255,29 +275,20 @@ export function bind<T extends object = object>(
 
   validateDescriptor(binding);
 
-  switch (binding.type ?? BindingTypeValues.Value) {
-    case BindingTypeValues.Value:
-      bindValueDescriptor(container, binding as ValueBindingDescriptor);
-      break;
+  const type: TBindingType = binding.type ?? (isFactoryDescriptor(binding) ? "Factory" : "Value");
 
-    case BindingTypeValues.Factory:
-      bindFactoryDescriptor(container, binding as FactoryBindingDescriptor);
-      break;
-
-    case BindingTypeValues.Instance:
-      bindInstanceDescriptor(
-        container,
-        binding.token as Identifier<T>,
-        (binding as InstanceBindingDescriptor<T>).value as unknown as Newable<T>,
-        options
-      );
-      break;
-
-    default:
-      throw new WirestateError(
-        `Binding descriptor has unknown type '${String(binding.type)}'.`,
-        ERROR_CODE_INVALID_ARGUMENTS
-      );
+  if (type === BindingType.Instance) {
+    bindInstanceDescriptor(
+      container,
+      binding.token as Identifier<T>,
+      (binding as InstanceBindingDescriptor<T>).value as unknown as Newable<T>,
+      binding as InstanceBindingDescriptor<T>,
+      options
+    );
+  } else if (type === BindingType.Factory) {
+    bindFactoryDescriptor(container, binding as FactoryBindingDescriptor);
+  } else {
+    bindValueDescriptor(container, binding as ValueBindingDescriptor);
   }
 
   registerBinding(container, binding);

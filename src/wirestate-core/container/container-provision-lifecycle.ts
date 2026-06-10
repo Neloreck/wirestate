@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType, Container, Identifier } from "../alias";
+import { BindingType, Container, Identifier } from "../base";
 import { getDeprovisionHandlerMetadata } from "../bind/instance/on-deprovision";
 import { getProvisionHandlerMetadata } from "../bind/instance/on-provision";
 import { getBindingToken } from "../bind/utils/get-binding-token";

@@ -1,4 +1,4 @@
-import { Container } from "../../alias";
+import { Container } from "../../base";
 import { CommandBus } from "../../commands/command-bus";
 import { getCommandHandlerMetadata } from "../../commands/get-command-handler-metadata";
 import { buildEventDispatchers } from "../../events/build-event-dispatchers";

@@ -1,12 +1,15 @@
-export { BindingScope } from "./binding/binding";
+export { TBindingType, TBindingScope } from "./binding/binding";
 export {
-  BindingDescriptor,
   BindingActivationHandler,
   BindingDeactivationHandler,
-  ValueBindingDescriptor,
-  InstanceBindingDescriptor,
+  BindingDescriptor,
+  BindingScope,
+  BindingType,
   FactoryBindingDescriptor,
+  InstanceBindingDescriptor,
+  ValueBindingDescriptor,
 } from "./binding/binding";
+export { isValueDescriptor, isInstanceDescriptor, isFactoryDescriptor } from "./binding/binding-guards";
 export { Container } from "./container/container";
 export { inject } from "./context";
 export { NoBindingFoundError, CircularDependencyError } from "./errors";

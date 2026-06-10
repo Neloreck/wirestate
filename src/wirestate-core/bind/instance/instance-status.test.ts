@@ -1,4 +1,4 @@
-import { Container } from "../../alias";
+import { Container } from "../../base";
 import { createContainer } from "../../container/create-container";
 import { WireStatus } from "../../container/wire-status";
 import { PROVISION_STATUS_BY_CONTAINER } from "../../registry";

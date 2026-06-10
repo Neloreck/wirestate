@@ -1,4 +1,4 @@
-import { Newable, Identifier } from "../../alias";
+import { Newable, Identifier } from "../../base";
 import { BindingDescriptor } from "../../types/provision";
 
 /**

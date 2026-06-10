@@ -1,4 +1,4 @@
-import { BindingType, Injectable } from "../alias";
+import { BindingType, Injectable } from "../base";
 
 import { validateContainerConfig } from "./validate-container-config";
 

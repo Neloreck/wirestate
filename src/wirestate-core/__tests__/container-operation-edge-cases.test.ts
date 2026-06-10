@@ -1,6 +1,6 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { Container, Injectable } from "../alias";
+import { Container, Injectable } from "../base";
 import { OnProvision } from "../bind/instance/on-provision";
 import { unbind, unbindAll } from "../bind/unbind";
 import { getContainerBindings } from "../bind/utils/register-binding";

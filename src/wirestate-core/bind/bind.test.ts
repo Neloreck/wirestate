@@ -1,6 +1,6 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { BindingType, Container, BindingScope, Injectable, inject } from "../alias";
+import { BindingType, Container, BindingScope, Injectable, inject } from "../base";
 import { CommandBus } from "../commands/command-bus";
 import { OnCommand } from "../commands/on-command";
 import { createContainer } from "../container/create-container";

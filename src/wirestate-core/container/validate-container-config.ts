@@ -1,4 +1,4 @@
-import { Identifier } from "../alias";
+import { Identifier } from "../base";
 import { getBindingToken } from "../bind/utils/get-binding-token";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";

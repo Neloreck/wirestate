@@ -1,4 +1,4 @@
-import { Container, Identifier } from "../alias";
+import { Container, Identifier } from "../base";
 import { deprovisionContainerBinding, deprovisionContainerBindings } from "../container/container-provision-lifecycle";
 
 import { unregisterAllBindings, unregisterBinding } from "./utils/register-binding";

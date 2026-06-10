@@ -10,6 +10,9 @@
   with `optional` and `lazy` options. `inject()` works identically under legacy decorators, TC39 standard
   decorators, and no decorators at all.
 - Add `InjectionToken` for type-safe non-class tokens and `isInjectable` for `@Injectable` checks.
+- Add `onActivated`/`onDeactivated` lifecycle hooks on all binding descriptors. For instance bindings the hooks
+  compose with the Wirestate lifecycle: activation hooks run after `@OnActivated`, deactivation hooks run before
+  `@OnDeactivation` cleanup.
 - Add TC39 standard decorator support for every Wirestate decorator: `@Injectable`, `@OnActivated`,
   `@OnDeactivation`, `@OnProvision`, `@OnDeprovision`, `@OnEvent`, `@OnCommand`, and `@OnQuery` are dual-mode —
   the same source compiles under legacy `experimentalDecorators` and standard (`2023-11`) decorators. Standard-mode
@@ -129,8 +132,11 @@
   (absorbing `DynamicValue`). `ResolvedValue` is removed — factories run inside the injection context, so
   `inject()` works directly in factory bodies. `ServiceRedirection` is removed — alias tokens with a factory
   delegating to `container.get`.
-- `@Injectable()` moved into the DI base and is enforced there for instance bindings; the decorator and
-  `isInjectable` keep their public exports.
+- Move `@Injectable()` into the DI base, enforced there for instance bindings; the decorator and `isInjectable`
+  keep their public exports.
+- Limit `Transient` scope to factory bindings — transient class instances would bypass deactivation tracking, so
+  instance bindings are always singletons. Binding descriptor types are now declared once in the DI base and
+  re-exported.
 - Trim the internal DI container to the surface Wirestate actually uses: `bindAll`, `createChild`, bare-class
   bindings, unbind-by-descriptor, implicit inheritance aliasing, multi-bindings, and service redirections are removed.
 

@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Container, Identifier } from "../alias";
+import { Container, Identifier } from "../base";
 import { bind } from "../bind/bind";
 import { getBindingToken } from "../bind/utils/get-binding-token";
 import { CommandBus } from "../commands/command-bus";

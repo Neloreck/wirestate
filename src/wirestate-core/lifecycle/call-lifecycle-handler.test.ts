@@ -1,4 +1,4 @@
-import { Container, Injectable } from "../alias";
+import { Container, Injectable } from "../base";
 import { createContainer } from "../container/create-container";
 
 import { callLifecycleHandler } from "./call-lifecycle-handler";

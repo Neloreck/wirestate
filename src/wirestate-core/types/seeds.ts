@@ -1,4 +1,4 @@
-import { Newable } from "../alias";
+import { Newable } from "../base";
 
 /**
  * Represents a lookup key for targeted seed values.

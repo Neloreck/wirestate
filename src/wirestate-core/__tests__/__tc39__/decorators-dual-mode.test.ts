@@ -1,4 +1,4 @@
-import { inject, Injectable, Container } from "../../alias";
+import { inject, Injectable, Container } from "../../base";
 import { getActivatedHandlerMetadata, OnActivated } from "../../bind/instance/on-activated";
 import { OnDeactivation } from "../../bind/instance/on-deactivation";
 import { OnDeprovision } from "../../bind/instance/on-deprovision";

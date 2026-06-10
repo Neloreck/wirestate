@@ -1,4 +1,4 @@
-import { inject, Injectable, Container } from "../../wirestate-core/alias";
+import { inject, Injectable, Container } from "../../wirestate-core/base";
 import { OnActivated } from "../../wirestate-core/bind/instance/on-activated";
 import { OnDeactivation } from "../../wirestate-core/bind/instance/on-deactivation";
 import { OnCommand } from "../../wirestate-core/commands/on-command";

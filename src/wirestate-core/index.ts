@@ -4,7 +4,19 @@
  * @packageDocumentation
  */
 
-export * from "./alias";
+export {
+  BindingScope,
+  BindingType,
+  CircularDependencyError,
+  Container,
+  Identifier,
+  Injectable,
+  InjectionToken,
+  Newable,
+  NoBindingFoundError,
+  inject,
+  isInjectable,
+} from "./base";
 
 export { bind, BindOptions } from "./bind/bind";
 export { unbind, unbindAll } from "./bind/unbind";
