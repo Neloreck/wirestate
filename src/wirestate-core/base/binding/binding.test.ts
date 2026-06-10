@@ -1,9 +1,10 @@
 import { Container } from "../container/container";
 import { inject } from "../context";
-import { InjectionToken } from "../tokens";
+import { Injectable } from "../injectable";
 
 const myServiceConstructorSpy = jest.fn();
 
+@Injectable()
 class MyService {
   public constructor(public name = "MyService") {
     myServiceConstructorSpy();
@@ -101,101 +102,6 @@ describe("Bindings", () => {
     expect(container.get(MyService)).toBe(myService);
     expect(container.get(MyService, { optional: true })).toBe(myService);
     expect(myServiceConstructorSpy).toHaveBeenCalledTimes(1);
-  });
-
-  it("Service redirections should be provided once", () => {
-    const container = new Container();
-
-    expect(() => container.get(MyService)).toThrow("No binding(s) found");
-    expect(container.get(MyService, { optional: true })).toBeUndefined();
-
-    const OTHER_TOKEN = new InjectionToken<MyService>("MyService");
-
-    container.bind({ token: MyService, type: "Instance", value: MyService });
-    container.bind({
-      token: OTHER_TOKEN,
-      service: MyService,
-    });
-
-    expect(myServiceConstructorSpy).not.toHaveBeenCalled();
-
-    const myService = container.get(OTHER_TOKEN);
-
-    expect(myService).toBeInstanceOf(MyService);
-    expect(container.get(OTHER_TOKEN)).toBe(myService);
-    expect(container.get(OTHER_TOKEN, { optional: true })).toBe(myService);
-    expect(myServiceConstructorSpy).toHaveBeenCalledTimes(1);
-  });
-
-  describe("abstract classes and inheritance", () => {
-    it("should support binding subclasses", () => {
-      abstract class AbstractService {
-        protected constructor(public name = "AbstractService") {}
-      }
-
-      class FooService extends AbstractService {
-        public constructor(public fooProp = "foo") {
-          super("FooService");
-        }
-      }
-
-      class BarService extends AbstractService {
-        public constructor(public fooProp = "bar") {
-          super("BarService");
-        }
-      }
-
-      const container = new Container();
-
-      container
-        .bind({ token: FooService, type: "Instance", value: FooService })
-        .bind({ token: BarService, type: "Instance", value: BarService })
-        .bind({
-          token: AbstractService,
-          service: FooService,
-        });
-
-      expect(container.get(FooService)).toBeInstanceOf(FooService);
-      expect(container.get(FooService)).toBeInstanceOf(AbstractService);
-      expect(container.get(BarService)).toBeInstanceOf(BarService);
-      expect(container.get(BarService)).toBeInstanceOf(AbstractService);
-
-      // resolving the parent class token works only because of the explicit service redirection above
-      expect(container.get(AbstractService)).toBeInstanceOf(FooService);
-    });
-  });
-
-  describe("Multi-binding injection", () => {
-    it("should support multi-value bindings", () => {
-      const container = new Container();
-
-      const TOKEN = new InjectionToken<number>("TOKEN");
-      const OTHER_TOKEN = new InjectionToken<number>("OTHER_TOKEN");
-
-      container
-        .bind({
-          token: TOKEN,
-          multi: true,
-          value: 1,
-        })
-        .bind({
-          token: TOKEN,
-          multi: true,
-          value: 2,
-        });
-
-      expect(container.get(TOKEN, { multi: true })).toEqual([1, 2]);
-      expect(() => container.get(OTHER_TOKEN, { multi: true })).toThrow("No binding(s) found");
-      expect(container.get(OTHER_TOKEN, { multi: true, optional: true })).toBeUndefined();
-
-      expect(() => {
-        container.bind({
-          token: TOKEN,
-          multi: true,
-          value: 1,
-        });
-      }).toThrow("already constructed");
-    });
   });
 
   it("should pass the container to the factory", () => {
@@ -319,22 +225,6 @@ describe("Bindings", () => {
       expect(child.get("tokenA")).toEqual(["a2"]);
       expect(grandChild.get("tokenA")).toEqual(["a2"]);
     });
-
-    it("should not merge multi-providers with their parents", () => {
-      const parent = new Container();
-      const child = new Container(parent);
-
-      parent
-        .bind({ token: "tokenA", factory: () => "a1", multi: true })
-        .bind({ token: "tokenA", factory: () => "a2", multi: true });
-
-      child
-        .bind({ token: "tokenA", factory: () => "a3", multi: true })
-        .bind({ token: "tokenA", factory: () => "a4", multi: true });
-
-      expect(parent.get("tokenA", { multi: true })).toEqual(["a1", "a2"]);
-      expect(child.get("tokenA", { multi: true })).toEqual(["a3", "a4"]);
-    });
   });
 
   describe("Lazy injection", () => {
@@ -342,12 +232,14 @@ describe("Bindings", () => {
       const barConstructed = jest.fn();
       const otherConstructed = jest.fn();
 
+      @Injectable()
       class OtherService {
         public constructor() {
           otherConstructed();
         }
       }
 
+      @Injectable()
       class BarService {
         public constructor(private readonly otherService = inject(OtherService)) {
           barConstructed();
@@ -358,6 +250,7 @@ describe("Bindings", () => {
         }
       }
 
+      @Injectable()
       class FooService {
         public constructor(private readonly barService = inject(BarService, { lazy: true })) {}
 
@@ -398,6 +291,7 @@ describe("Bindings", () => {
         }
       }
 
+      @Injectable()
       class FooService {
         public constructor(private readonly barService = inject(BarService, { lazy: true, optional: true })) {}
 

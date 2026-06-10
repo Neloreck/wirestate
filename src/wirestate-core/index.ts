@@ -44,13 +44,10 @@ export {
   BindingDescriptor,
   Binding,
   Bindings,
-  ConstantValueBindingDescriptor,
-  DynamicValueBindingDescriptor,
+  ValueBindingDescriptor,
   FactoryBindingDescriptor,
   InstanceBindingDescriptor,
   ProvisionId,
-  ResolvedValueBindingDescriptor,
-  ServiceRedirectionBindingDescriptor,
 } from "./types/provision";
 export { QueryHandler, QueryType, QueryUnregister } from "./types/queries";
 export { SeedsMap, SeedBindings, SeedBinding, SeedKey } from "./types/seeds";

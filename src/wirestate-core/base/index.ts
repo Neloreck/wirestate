@@ -3,14 +3,14 @@ export {
   BindingDescriptor,
   BindingActivationHandler,
   BindingDeactivationHandler,
-  ConstantValueBindingDescriptor,
+  ValueBindingDescriptor,
   InstanceBindingDescriptor,
-  DynamicValueBindingDescriptor,
-  ServiceRedirectionBindingDescriptor,
+  FactoryBindingDescriptor,
 } from "./binding/binding";
 export { Container } from "./container/container";
 export { inject } from "./context";
 export { NoBindingFoundError, CircularDependencyError } from "./errors";
+export { Injectable, isInjectable, InjectableDecorator } from "./injectable";
 export { InjectionToken } from "./tokens";
 export { Identifier } from "./tokens";
 export { Class, AbstractClass } from "./utils/class-like";

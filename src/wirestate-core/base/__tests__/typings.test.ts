@@ -1,14 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // noinspection JSUnusedLocalSymbols
 
-import type {
-  ConstantValueBindingDescriptor,
-  DynamicValueBindingDescriptor,
-  InstanceBindingDescriptor,
-  ServiceRedirectionBindingDescriptor,
-} from "../binding/binding";
+import type { FactoryBindingDescriptor, InstanceBindingDescriptor, ValueBindingDescriptor } from "../binding/binding";
 import { Container } from "../container/container";
 import { inject } from "../context";
+import { Injectable } from "../injectable";
 import { InjectionToken } from "../tokens";
 
 describe("Type-safety", () => {
@@ -45,72 +41,52 @@ describe("Type-safety", () => {
       const g: InstanceBindingDescriptor<string> = { token: String, type: "Instance", value: String };
     });
 
-    it("constant value binding descriptor", () => {
-      const a: ConstantValueBindingDescriptor<FooService> = { token: FooService, value: new FooService() };
-      const b: ConstantValueBindingDescriptor<FooService> = { token: FooService, value: new FooChildService() };
+    it("value binding descriptor", () => {
+      const a: ValueBindingDescriptor<FooService> = { token: FooService, value: new FooService() };
+      const b: ValueBindingDescriptor<FooService> = { token: FooService, value: new FooChildService() };
 
       // @ts-expect-error
-      const c: ConstantValueBindingDescriptor<FooService> = { token: FooService, value: new OtherService() };
+      const c: ValueBindingDescriptor<FooService> = { token: FooService, value: new OtherService() };
       // @ts-expect-error
-      const d: ConstantValueBindingDescriptor<FooChildService> = { token: FooChildService, value: new FooService() };
+      const d: ValueBindingDescriptor<FooChildService> = { token: FooChildService, value: new FooService() };
       // @ts-expect-error
-      const e: ConstantValueBindingDescriptor<FooService> = { token: FooService, value: 3 };
+      const e: ValueBindingDescriptor<FooService> = { token: FooService, value: 3 };
       // @ts-expect-error
-      const f: ConstantValueBindingDescriptor<FooService> = { token: 3, value: 3 };
+      const f: ValueBindingDescriptor<FooService> = { token: 3, value: 3 };
     });
 
-    it("dynamic value binding descriptor", () => {
-      const a: DynamicValueBindingDescriptor<FooService> = { token: FooService, factory: () => new FooService() };
-      const b: DynamicValueBindingDescriptor<FooService> = { token: FooService, factory: () => new FooChildService() };
+    it("factory binding descriptor", () => {
+      const a: FactoryBindingDescriptor<FooService> = { token: FooService, factory: () => new FooService() };
+      const b: FactoryBindingDescriptor<FooService> = { token: FooService, factory: () => new FooChildService() };
 
-      const a2: DynamicValueBindingDescriptor<FooService> = {
+      const a2: FactoryBindingDescriptor<FooService> = {
         token: FooService,
         // @ts-expect-error
         factory: async () => new FooService(),
       };
 
       // @ts-expect-error
-      const c: DynamicValueBindingDescriptor<FooService> = { token: FooService, factory: () => new OtherService() };
-      const d: DynamicValueBindingDescriptor<FooChildService> = {
+      const c: FactoryBindingDescriptor<FooService> = { token: FooService, factory: () => new OtherService() };
+      const d: FactoryBindingDescriptor<FooChildService> = {
         token: FooChildService,
         // @ts-expect-error
         factory: () => new FooService(),
       };
       // @ts-expect-error
-      const e: DynamicValueBindingDescriptor<FooService> = { token: FooService, factory: () => 3 };
+      const e: FactoryBindingDescriptor<FooService> = { token: FooService, factory: () => 3 };
       // @ts-expect-error
-      const f: DynamicValueBindingDescriptor<FooService> = { token: 3, factory: () => 3 };
+      const f: FactoryBindingDescriptor<FooService> = { token: 3, factory: () => 3 };
       // @ts-expect-error
-      const g: DynamicValueBindingDescriptor<string> = { token: String, factory: () => "foo" };
-    });
-
-    it("service redirection binding descriptor", () => {
-      const a: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: FooService };
-      const b: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: FooChildService };
-
-      const token1 = new InjectionToken<FooService>("token1");
-      const token2 = new InjectionToken<FooChildService>("token2");
-      const token3 = new InjectionToken<OtherService>("token3");
-
-      const a2: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: token1 };
-      const b2: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: token2 };
-      const b3: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: "unknown" };
-
-      // @ts-expect-error
-      const c: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: OtherService };
-      // @ts-expect-error
-      const c2: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: token3 };
-      // @ts-expect-error
-      const d: ServiceRedirectionBindingDescriptor<FooChildService> = { token: FooChildService, service: FooService };
-      // @ts-expect-error
-      const e: ServiceRedirectionBindingDescriptor<FooService> = { token: 3, service: 3 };
+      const g: FactoryBindingDescriptor<string> = { token: String, factory: () => "foo" };
     });
   });
   describe("Binding", () => {
+    @Injectable()
     class FooService {
       private x = Math.random();
     }
 
+    @Injectable()
     class FooChildService extends FooService {
       private y = Math.random();
     }
@@ -171,19 +147,6 @@ describe("Type-safety", () => {
       }
     });
 
-    it("inject() with multi", () => {
-      class Foo {
-        private a = inject(FooService, { multi: true }) satisfies Array<FooService>;
-        private b = inject(FooChildService, { multi: true }) satisfies Array<FooService>;
-        // @ts-expect-error
-        private c = inject(FooService, { multi: true }) satisfies Array<FooChildService>;
-        // @ts-expect-error
-        private d = inject(FooService, { multi: true }) satisfies Promise<Array<FooService>>;
-        // @ts-expect-error
-        private e = inject(FooChildService, { multi: true }) satisfies Promise<Array<FooService>>;
-      }
-    });
-
     it("inject() with optional", () => {
       class Foo {
         private a = inject(FooService, { optional: true }) satisfies FooService | undefined;
@@ -194,24 +157,6 @@ describe("Type-safety", () => {
         private d = inject(FooService, { optional: true }) satisfies Promise<FooService | undefined>;
         // @ts-expect-error
         private e = inject(FooChildService, { optional: true }) satisfies Promise<FooService | undefined>;
-      }
-    });
-
-    it("inject() with optional and multi", () => {
-      class Foo {
-        private a = inject(FooService, { optional: true, multi: true }) satisfies Array<FooService> | undefined;
-        private b = inject(FooChildService, { optional: true, multi: true }) satisfies Array<FooService> | undefined;
-        // @ts-expect-error
-        private c = inject(FooService, { optional: true, multi: true }) satisfies Array<FooChildService> | undefined;
-        // @ts-expect-error
-        private d = inject(FooService, { optional: true, multi: true }) satisfies Promise<
-          Array<FooService> | undefined
-        >;
-        private e = inject(FooChildService, {
-          optional: true,
-          multi: true,
-          // @ts-expect-error
-        }) satisfies Promise<Array<FooService> | undefined>;
       }
     });
   });

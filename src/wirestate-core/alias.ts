@@ -22,7 +22,7 @@ export { BindingScope } from "./base";
 /**
  * @group Bind
  */
-export { Injectable, isInjectable } from "./metadata/injectable";
+export { Injectable, isInjectable } from "./base";
 
 /**
  * Constructable class reference.
@@ -37,10 +37,7 @@ export type Newable<TInstance = unknown> = Class<TInstance>;
  * @group Bind
  */
 export const BindingType = {
-  ConstantValue: "ConstantValue",
-  DynamicValue: "DynamicValue",
-  Factory: "Factory",
+  Value: "Value",
   Instance: "Instance",
-  ResolvedValue: "ResolvedValue",
-  ServiceRedirection: "ServiceRedirection",
+  Factory: "Factory",
 } as const;

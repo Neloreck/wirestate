@@ -22,10 +22,9 @@ export type BindingScope = keyof typeof BindingScope;
  * A binding descriptor declares a token together with a construction strategy.
  */
 export type BindingDescriptor<T> =
-  | ConstantValueBindingDescriptor<T>
+  | ValueBindingDescriptor<T>
   | InstanceBindingDescriptor<T>
-  | DynamicValueBindingDescriptor<T>
-  | ServiceRedirectionBindingDescriptor<T>;
+  | FactoryBindingDescriptor<T>;
 
 /**
  * A handler invoked right after a binding constructs a value.
@@ -39,13 +38,12 @@ export type BindingActivationHandler<T> = (instance: T, container: Container) =>
 export type BindingDeactivationHandler<T> = (instance: T, container: Container) => void;
 
 /**
- * Binds a static value to a token. Constant values are always singletons.
+ * Binds a static value to a token. Values are always singletons.
  */
-export interface ConstantValueBindingDescriptor<T> {
+export interface ValueBindingDescriptor<T> {
   token: Identifier<T>;
-  type?: "ConstantValue";
+  type?: "Value";
   value: T;
-  multi?: true;
   onActivated?: BindingActivationHandler<NoInfer<T>>;
   onDeactivated?: BindingDeactivationHandler<NoInfer<T>>;
 }
@@ -58,7 +56,6 @@ export interface InstanceBindingDescriptor<T> {
   token: Identifier<T>;
   type: "Instance";
   value: Class<NoInfer<T>>;
-  multi?: true;
   scope?: BindingScope;
   onActivated?: BindingActivationHandler<NoInfer<T>>;
   onDeactivated?: BindingDeactivationHandler<NoInfer<T>>;
@@ -67,22 +64,11 @@ export interface InstanceBindingDescriptor<T> {
 /**
  * Binds a value which is lazily produced by a factory function.
  */
-export interface DynamicValueBindingDescriptor<T> {
+export interface FactoryBindingDescriptor<T> {
   token: Identifier<T>;
-  type?: "DynamicValue";
+  type?: "Factory";
   factory: (container: Container) => NoInfer<T>;
-  multi?: true;
   scope?: BindingScope;
   onActivated?: BindingActivationHandler<NoInfer<T>>;
   onDeactivated?: BindingDeactivationHandler<NoInfer<T>>;
-}
-
-/**
- * Redirects a token to another service token.
- */
-export interface ServiceRedirectionBindingDescriptor<T> {
-  token: Identifier<T>;
-  type?: "ServiceRedirection";
-  service: Identifier<T>;
-  multi?: boolean;
 }

@@ -1,10 +1,12 @@
 import { Container } from "../container/container";
+import { Injectable } from "../injectable";
 import { InjectionToken } from "../tokens";
 
 describe("Binding scopes", () => {
   it("should default to singleton scope for instance bindings", () => {
     const container = new Container();
 
+    @Injectable()
     class MyService {}
 
     container.bind({ token: MyService, type: "Instance", value: MyService });
@@ -16,6 +18,7 @@ describe("Binding scopes", () => {
     const container = new Container();
     const constructed = jest.fn();
 
+    @Injectable()
     class MyService {
       public constructor() {
         constructed();
@@ -60,8 +63,7 @@ describe("Binding scopes", () => {
     const parent = new Container();
     const child = new Container(parent);
 
-    // note: intentionally not @injectable() — auto-binding would shadow
-    // the parent binding with a child-local singleton provider
+    @Injectable()
     class MyService {}
 
     parent.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient" });

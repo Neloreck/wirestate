@@ -3,7 +3,7 @@ import { GenericService } from "@/fixtures/services/generic-service";
 import { BindingType, Container, BindingScope } from "../alias";
 import { createContainer } from "../container/create-container";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
-import { BindingDescriptor, DynamicValueBindingDescriptor, InstanceBindingDescriptor } from "../types/provision";
+import { BindingDescriptor, FactoryBindingDescriptor, InstanceBindingDescriptor } from "../types/provision";
 
 import { bind } from "./bind";
 import { getContainerBindings } from "./utils/register-binding";
@@ -17,21 +17,21 @@ describe("bind", () => {
     expect(container.has(GenericService)).toBe(true);
   });
 
-  it("should bind a constant value descriptor", () => {
+  it("should bind a value descriptor", () => {
     const TOKEN: unique symbol = Symbol("config");
 
     const container: Container = createContainer();
     const result: Container = bind(container, {
       token: TOKEN,
       value: { key: "value" },
-      type: BindingType.ConstantValue,
+      type: BindingType.Value,
     });
 
     expect(result).toBe(container);
     expect(container.get(TOKEN)).toEqual({ key: "value" });
   });
 
-  it("should bind a constant value when type is undefined", () => {
+  it("should bind a value when type is undefined", () => {
     const container: Container = createContainer();
     const TOKEN: unique symbol = Symbol("config");
 
@@ -40,7 +40,7 @@ describe("bind", () => {
     expect(container.get(TOKEN)).toBe(42);
   });
 
-  it("should bind a dynamic value descriptor", () => {
+  it("should bind a factory descriptor", () => {
     const container: Container = createContainer();
     const TOKEN: unique symbol = Symbol("dynamic");
 
@@ -48,7 +48,7 @@ describe("bind", () => {
 
     bind(container, {
       token: TOKEN,
-      type: BindingType.DynamicValue,
+      type: BindingType.Factory,
       scope: BindingScope.Transient,
       factory: () => {
         callCount++;
@@ -64,11 +64,11 @@ describe("bind", () => {
 
   it("should bind descriptors with string literal type and scope", () => {
     const container: Container = createContainer();
-    const TOKEN: unique symbol = Symbol("literal-dynamic");
+    const TOKEN: unique symbol = Symbol("literal-factory");
 
-    const descriptor: DynamicValueBindingDescriptor = {
+    const descriptor: FactoryBindingDescriptor = {
       token: TOKEN,
-      type: "DynamicValue",
+      type: "Factory",
       scope: "Singleton",
       factory: () => ({ value: "created" }),
     };
@@ -145,6 +145,18 @@ describe("bind", () => {
     expect(() => bind(container, binding)).toThrow("Binding descriptor has unknown type 'UNKNOWN'.");
   });
 
+  it("should throw for removed ServiceRedirection type", () => {
+    const container: Container = createContainer();
+    const binding = {
+      type: "ServiceRedirection",
+      token: "redirected",
+      service: GenericService,
+    } as unknown as BindingDescriptor;
+
+    expect(() => bind(container, binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
+    expect(() => bind(container, binding)).toThrow("Binding descriptor has unknown type 'ServiceRedirection'.");
+  });
+
   it("should throw for missing descriptor token", () => {
     const container: Container = createContainer();
     const binding = { value: "my-value" } as unknown as BindingDescriptor;
@@ -179,32 +191,32 @@ describe("bind", () => {
       bind(container, {
         token: "missing-value",
       } as BindingDescriptor)
-    ).toThrow("Constant value descriptor must provide a 'value' property.");
+    ).toThrow("Value descriptor must provide a 'value' property.");
 
     expect(() =>
       bind(container, {
-        type: BindingType.DynamicValue,
-        token: "missing-dynamic",
-      } as DynamicValueBindingDescriptor)
-    ).toThrow("Dynamic value descriptor 'factory' must be a function.");
+        type: BindingType.Factory,
+        token: "missing-factory",
+      } as FactoryBindingDescriptor)
+    ).toThrow("Factory descriptor 'factory' must be a function.");
   });
 
-  it("should throw for dynamic descriptor with invalid factory", () => {
+  it("should throw for factory descriptor with invalid factory", () => {
     const container: Container = createContainer();
 
     expect(() =>
       bind(container, {
-        type: BindingType.DynamicValue,
+        type: BindingType.Factory,
         factory: "not-a-function",
         token: "bad-factory",
-      } as unknown as DynamicValueBindingDescriptor)
+      } as unknown as FactoryBindingDescriptor)
     ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
     expect(() =>
       bind(container, {
-        type: BindingType.DynamicValue,
+        type: BindingType.Factory,
         factory: "not-a-function",
         token: "bad-factory",
-      } as unknown as DynamicValueBindingDescriptor)
-    ).toThrow("Dynamic value descriptor 'factory' must be a function.");
+      } as unknown as FactoryBindingDescriptor)
+    ).toThrow("Factory descriptor 'factory' must be a function.");
   });
 });

@@ -1,8 +1,8 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType, Container, Newable, Identifier, isInjectable } from "../alias";
-import { ERROR_CODE_INVALID_ARGUMENTS, ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
+import { BindingType, Container, Newable, Identifier } from "../alias";
+import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { InstanceBindingDescriptor } from "../types/provision";
 
@@ -110,13 +110,6 @@ export function bindInstanceWithToken<T extends object>(
 ): Container {
   if (typeof registeredBinding !== "function") {
     validateInstanceDescriptor(registeredBinding);
-  }
-
-  if (!isInjectable(binding)) {
-    throw new WirestateError(
-      `Class '${binding.name}' must be decorated with @Injectable() to be bound.`,
-      ERROR_CODE_VALIDATION_ERROR
-    );
   }
 
   dbg.info(prefix(__filename), "Binding instance:", {

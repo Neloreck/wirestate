@@ -1,5 +1,6 @@
 import { Container } from "../container/container";
 import { NoBindingFoundError } from "../errors";
+import { Injectable } from "../injectable";
 import { InjectionToken } from "../tokens";
 
 describe("Container hierarchy", () => {
@@ -7,6 +8,7 @@ describe("Container hierarchy", () => {
     const parent = new Container();
     const child = new Container(parent);
 
+    @Injectable()
     class MyService {}
 
     parent.bind({ token: MyService, type: "Instance", value: MyService });
@@ -58,6 +60,7 @@ describe("Container hierarchy", () => {
     const child = new Container(parent);
     const onDeactivated = jest.fn();
 
+    @Injectable()
     class MyService {}
 
     parent.bind({ token: MyService, type: "Instance", value: MyService, onDeactivated });
@@ -83,6 +86,7 @@ describe("Explicit bindings", () => {
   it("should resolve explicit bindings", () => {
     const container = new Container();
 
+    @Injectable()
     class MyService {}
 
     container.bind({ token: MyService, type: "Instance", value: MyService });

@@ -1,10 +1,12 @@
 import { inject } from "../context";
+import { Injectable } from "../injectable";
 import { InjectionToken } from "../tokens";
 
 import { Container } from "./container";
 
 const myServiceConstructorSpy = jest.fn();
 
+@Injectable()
 class MyService {
   public constructor(public name = "MyService") {
     myServiceConstructorSpy();
@@ -74,6 +76,31 @@ describe("Container API", () => {
     expect(() => container.bind({ value: 1 } as any)).toThrow(
       'expected a binding descriptor object with a "token" field'
     );
+  });
+
+  it("should reject instance bindings for classes without @Injectable", () => {
+    const container = new Container();
+
+    class UndecoratedService {}
+
+    expect(() => container.bind({ token: UndecoratedService, type: "Instance", value: UndecoratedService })).toThrow(
+      "Class 'UndecoratedService' must be decorated with @Injectable() to be bound."
+    );
+  });
+
+  it("should accept instance bindings once the class is decorated with @Injectable", () => {
+    const container = new Container();
+
+    class DecoratedService {}
+
+    expect(() => container.bind({ token: DecoratedService, type: "Instance", value: DecoratedService })).toThrow(
+      "Class 'DecoratedService' must be decorated with @Injectable() to be bound."
+    );
+
+    Injectable()(DecoratedService);
+
+    expect(() => container.bind({ token: DecoratedService, type: "Instance", value: DecoratedService })).not.toThrow();
+    expect(container.get(DecoratedService)).toBeInstanceOf(DecoratedService);
   });
 
   describe("contexts", () => {

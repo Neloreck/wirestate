@@ -8,20 +8,13 @@ import type { Identifier } from "./tokens";
  * @returns The resolved value, values, thunk, or `undefined` for optional misses.
  */
 export function inject<T>(token: Identifier<T>): T;
-export function inject<T>(token: Identifier<T>, options: { multi: true }): Array<T>;
 export function inject<T>(token: Identifier<T>, options: { optional: true }): T | undefined;
-export function inject<T>(token: Identifier<T>, options: { multi: true; optional: true }): Array<T> | undefined;
 export function inject<T>(token: Identifier<T>, options: { lazy: true }): () => T;
-export function inject<T>(token: Identifier<T>, options: { lazy: true; multi: true }): () => Array<T>;
 export function inject<T>(token: Identifier<T>, options: { lazy: true; optional: true }): () => T | undefined;
 export function inject<T>(
   token: Identifier<T>,
-  options: { lazy: true; multi: true; optional: true }
-): () => Array<T> | undefined;
-export function inject<T>(
-  token: Identifier<T>,
-  options?: { optional?: boolean; multi?: boolean; lazy?: boolean }
-): T | Array<T> | undefined | (() => T | Array<T> | undefined) {
+  options?: { optional?: boolean; lazy?: boolean }
+): T | undefined | (() => T | undefined) {
   try {
     return _currentContext.run((container) => container.get(token, options));
   } catch (error) {

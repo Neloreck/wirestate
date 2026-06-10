@@ -17,7 +17,8 @@ import { validateBindingDescriptor } from "./utils/validate-binding-descriptor";
  *
  * @param descriptor - Descriptor to validate.
  *
- * @throws {@link WirestateError} If the descriptor is invalid.
+ * @throws {@link WirestateError} If the descriptor is missing a token, uses a non-factory type,
+ * omits `factory`, or provides a non-function `factory`.
  */
 function validateFactoryDescriptor(descriptor: FactoryBindingDescriptor): void {
   validateBindingDescriptor(descriptor);
@@ -32,28 +33,37 @@ function validateFactoryDescriptor(descriptor: FactoryBindingDescriptor): void {
 }
 
 /**
- * Binds a factory creator to a token.
+ * Binds a factory-backed value to a token.
+ *
+ * @remarks
+ * The factory runs inside the injection context, so `inject()` works in its body
+ * to resolve dependencies. With the default `Singleton` scope the factory runs once
+ * and its value is cached; with `Transient` scope it runs on every resolution.
  *
  * @group Bind
  *
- * @template T - Factory function type.
+ * @template T - Value type.
  *
  * @param container - Container to bind into.
- * @param descriptor - Descriptor with `token`, `type`, and `factory`.
+ * @param descriptor - Descriptor with `token`, `factory`, and optional scope.
  * @returns The same container for chaining or immediate resolution.
  *
  * @throws {@link WirestateError} If the descriptor is invalid.
+ *
+ * @internal
  */
-export function bindFactory(container: Container, descriptor: FactoryBindingDescriptor): Container {
+export function bindFactory<T>(container: Container, descriptor: FactoryBindingDescriptor<T>): Container {
   validateFactoryDescriptor(descriptor);
 
-  dbg.info(prefix(__filename), "Binding factory descriptor:", {
+  dbg.info(prefix(__filename), "Binding factory:", {
     descriptor,
     container,
   });
 
   container.bind({
     token: descriptor.token,
+    type: "Factory",
+    scope: descriptor.scope,
     factory: (current) => descriptor.factory(current),
   });
 

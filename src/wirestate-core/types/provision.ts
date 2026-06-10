@@ -29,50 +29,21 @@ export type BindingType = keyof typeof BindingTypeValues;
 export type BindingScope = keyof typeof BindingScopeValues;
 
 /**
- * Injection option for one resolved value factory argument: a plain token, or
- * a token with resolution options.
+ * Describes a static value binding.
  *
  * @group Bind
  */
-export type ResolvedValueInjectOption<T = unknown> =
-  | Identifier<T>
-  | {
-      /**
-       * Token used to resolve the argument.
-       */
-      readonly token: Identifier<T>;
-
-      /**
-       * Resolve to `undefined` instead of throwing when the token is not bound.
-       */
-      readonly optional?: boolean;
-    };
-
-/**
- * Maps a factory argument tuple to injection options.
- *
- * @group Bind
- */
-export type MapToResolvedValueInjectOptions<TArgs extends Array<unknown>> = {
-  [K in keyof TArgs]: ResolvedValueInjectOption<TArgs[K]>;
-};
-
-/**
- * Describes a constant value binding.
- *
- * @group Bind
- */
-export interface ConstantValueBindingDescriptor<T = unknown> {
+export interface ValueBindingDescriptor<T = unknown> {
   /**
    * Binding strategy.
    */
-  readonly type?: "ConstantValue";
+  readonly type?: "Value";
 
   /**
-   * Lifetime scope for the constant value.
+   * Lifetime scope for the value.
    *
    * @remarks
-   * Constant values can only be singleton-scoped.
+   * Values can only be singleton-scoped.
    */
   readonly scope?: "Singleton";
 
@@ -82,36 +53,9 @@ export interface ConstantValueBindingDescriptor<T = unknown> {
   readonly token: Identifier<T>;
 
   /**
-   * Constant value to bind.
+   * Value to bind.
    */
   readonly value: T;
-}
-
-/**
- * Describes a dynamic value binding.
- *
- * @group Bind
- */
-export interface DynamicValueBindingDescriptor<T = unknown> {
-  /**
-   * Binding strategy.
-   */
-  readonly type: "DynamicValue";
-
-  /**
-   * Factory used to produce the value at resolution time.
-   */
-  readonly factory: (container: Container) => T;
-
-  /**
-   * Lifetime scope for created values.
-   */
-  readonly scope?: BindingScope;
-
-  /**
-   * Token used to resolve the binding.
-   */
-  readonly token: Identifier<T>;
 }
 
 /**
@@ -126,12 +70,17 @@ export interface FactoryBindingDescriptor<T = unknown> {
   readonly type: "Factory";
 
   /**
-   * Factory creator invoked once with the container to produce the bound factory.
+   * Factory used to produce the value at resolution time.
    */
   readonly factory: (container: Container) => T;
 
   /**
-   * Token used to resolve the factory.
+   * Lifetime scope for created values.
+   */
+  readonly scope?: BindingScope;
+
+  /**
+   * Token used to resolve the binding.
    */
   readonly token: Identifier<T>;
 }
@@ -159,72 +108,16 @@ export interface InstanceBindingDescriptor<T extends object = object> {
 }
 
 /**
- * Describes a resolved value binding.
- *
- * @group Bind
- */
-export interface ResolvedValueBindingDescriptor<T = unknown, TArgs extends Array<unknown> = Array<unknown>> {
-  /**
-   * Binding strategy.
-   */
-  readonly type: "ResolvedValue";
-
-  /**
-   * Factory called with arguments resolved from {@link injectOptions}.
-   */
-  readonly factory: (...args: TArgs) => T;
-
-  /**
-   * Injection options for factory arguments.
-   */
-  readonly injectOptions?: MapToResolvedValueInjectOptions<TArgs>;
-
-  /**
-   * Lifetime scope for created values.
-   */
-  readonly scope?: BindingScope;
-
-  /**
-   * Token used to resolve the binding.
-   */
-  readonly token: Identifier<T>;
-}
-
-/**
- * Describes a binding that redirects one token to another service token.
- *
- * @group Bind
- */
-export interface ServiceRedirectionBindingDescriptor<T = unknown> {
-  /**
-   * Binding strategy.
-   */
-  readonly type: "ServiceRedirection";
-
-  /**
-   * Existing service token to redirect to.
-   */
-  readonly service: Identifier<T>;
-
-  /**
-   * Token used to resolve the redirected binding.
-   */
-  readonly token: Identifier<T>;
-}
-
-/**
  * Describes one binding descriptor.
  *
  * @remarks
  * `BindingDescriptor` is a union of the specific descriptor shapes accepted by
- * {@link bind}. Use descriptors when a class token is not enough: constants,
- * factories, resolved values, service redirection, or a class behind a custom
- * token.
+ * {@link bind}. Use descriptors when a class token is not enough: values,
+ * factories, or a class behind a custom token.
  *
  * @group Bind
  *
  * @template T - Resolved value type.
- * @template FA - Resolved value factory argument tuple.
  *
  * @example
  * ```typescript
@@ -234,25 +127,22 @@ export interface ServiceRedirectionBindingDescriptor<T = unknown> {
  *
  * const descriptor: BindingDescriptor<string> = {
  *   token: API_URL,
- *   type: BindingType.ConstantValue,
+ *   type: BindingType.Value,
  *   value: "https://api.example.com",
  * };
  * ```
  */
-export type BindingDescriptor<T = unknown, FA extends Array<unknown> = Array<unknown>> =
-  | ConstantValueBindingDescriptor<T>
-  | DynamicValueBindingDescriptor<T>
+export type BindingDescriptor<T = unknown> =
+  | ValueBindingDescriptor<T>
   | FactoryBindingDescriptor<T>
-  | (T extends object ? InstanceBindingDescriptor<T> : InstanceBindingDescriptor)
-  | ResolvedValueBindingDescriptor<T, FA>
-  | ServiceRedirectionBindingDescriptor<T>;
+  | (T extends object ? InstanceBindingDescriptor<T> : InstanceBindingDescriptor);
 
 /**
  * Represents a single binding accepted by Wirestate registration APIs.
  *
  * @remarks
  * A binding is either a class {@link Newable} constructor or a {@link BindingDescriptor}
- * for constants, factories, resolved values, service redirection, or custom-token class bindings.
+ * for values, factories, or custom-token class bindings.
  *
  * @group Bind
  */

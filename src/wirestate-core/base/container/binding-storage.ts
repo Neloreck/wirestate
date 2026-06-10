@@ -15,10 +15,9 @@ export type AnyBinding = BindingDescriptor<any>;
  *
  * @internal
  */
-export interface BindingMap extends Map<Identifier<unknown>, Array<BindingDescriptor<unknown>>> {
-  get<T>(key: Identifier<T>): Array<BindingDescriptor<T>> | undefined;
-
-  set<T>(key: Identifier<T>, value: Array<BindingDescriptor<T>>): this;
+export interface BindingMap extends Map<Identifier<unknown>, BindingDescriptor<unknown>> {
+  get<T>(key: Identifier<T>): BindingDescriptor<T> | undefined;
+  set<T>(key: Identifier<T>, value: BindingDescriptor<T>): this;
 }
 
 /**
@@ -26,10 +25,9 @@ export interface BindingMap extends Map<Identifier<unknown>, Array<BindingDescri
  *
  * @internal
  */
-export interface InstanceMap extends Map<AnyBinding, Array<unknown>> {
-  get<T>(key: BindingDescriptor<T>): Array<T> | undefined;
-
-  set<T>(key: BindingDescriptor<T>, value: Array<T>): this;
+export interface InstanceMap extends Map<AnyBinding, unknown> {
+  get<T>(key: BindingDescriptor<T>): T | undefined;
+  set<T>(key: BindingDescriptor<T>, value: T): this;
 }
 
 /**

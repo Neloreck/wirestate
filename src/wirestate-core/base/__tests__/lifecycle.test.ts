@@ -1,5 +1,6 @@
 import { Container } from "../container/container";
 import { inject } from "../context";
+import { Injectable } from "../injectable";
 import { InjectionToken } from "../tokens";
 
 describe("Binding lifecycle hooks", () => {
@@ -8,6 +9,7 @@ describe("Binding lifecycle hooks", () => {
       const container = new Container();
       const onActivated = jest.fn();
 
+      @Injectable()
       class MyService {}
 
       container.bind({ token: MyService, type: "Instance", value: MyService, onActivated });
@@ -24,6 +26,7 @@ describe("Binding lifecycle hooks", () => {
       const container = new Container();
       const onActivated = jest.fn();
 
+      @Injectable()
       class MyService {}
 
       container.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient", onActivated });
@@ -70,6 +73,7 @@ describe("Binding lifecycle hooks", () => {
       const container = new Container();
       const onDeactivated = jest.fn();
 
+      @Injectable()
       class MyService {}
 
       container.bind({ token: MyService, type: "Instance", value: MyService, onDeactivated });
@@ -86,6 +90,7 @@ describe("Binding lifecycle hooks", () => {
       const container = new Container();
       const onDeactivated = jest.fn();
 
+      @Injectable()
       class MyService {}
 
       container.bind({ token: MyService, type: "Instance", value: MyService, onDeactivated });
@@ -98,6 +103,7 @@ describe("Binding lifecycle hooks", () => {
       const container = new Container();
       const onDeactivated = jest.fn();
 
+      @Injectable()
       class MyService {}
 
       container.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient", onDeactivated });
@@ -126,8 +132,10 @@ describe("Binding lifecycle hooks", () => {
       const container = new Container();
       const deactivations: Array<string> = [];
 
+      @Injectable()
       class FooService {}
 
+      @Injectable()
       class BarService {}
 
       container.bind({
@@ -154,8 +162,10 @@ describe("Binding lifecycle hooks", () => {
       const container = new Container();
       const deactivations: Array<string> = [];
 
+      @Injectable()
       class BarService {}
 
+      @Injectable()
       class FooService {
         public constructor(public readonly bar: BarService = inject(BarService)) {}
       }
@@ -184,8 +194,10 @@ describe("Binding lifecycle hooks", () => {
       const container = new Container();
       const resolved: Array<unknown> = [];
 
+      @Injectable()
       class FooService {}
 
+      @Injectable()
       class BarService {}
 
       container.bind({
@@ -203,26 +215,6 @@ describe("Binding lifecycle hooks", () => {
       container.unbindAll();
 
       expect(resolved).toEqual([bar]);
-    });
-
-    it("should not deactivate values resolved through service redirections twice", () => {
-      const container = new Container();
-      const onDeactivated = jest.fn();
-      const alias = new InjectionToken<MyService>("alias");
-
-      class MyService {}
-
-      container.bind({ token: MyService, type: "Instance", value: MyService, onDeactivated });
-      container.bind({ token: alias, service: MyService });
-
-      container.get(alias);
-      container.unbind(alias);
-
-      expect(onDeactivated).not.toHaveBeenCalled();
-
-      container.unbindAll();
-
-      expect(onDeactivated).toHaveBeenCalledTimes(1);
     });
   });
 });

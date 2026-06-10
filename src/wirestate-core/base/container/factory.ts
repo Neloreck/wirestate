@@ -1,10 +1,5 @@
 import type { BindingDescriptor } from "../binding/binding";
-import {
-  isConstantValueDescriptor,
-  isDynamicValueDescriptor,
-  isInstanceDescriptor,
-  isServiceRedirectionDescriptor,
-} from "../binding/binding-guards";
+import { isFactoryDescriptor, isInstanceDescriptor, isValueDescriptor } from "../binding/binding-guards";
 import { CircularDependencyError } from "../errors";
 import { toString } from "../tokens";
 import { assertNever } from "../utils/asserts";
@@ -24,14 +19,14 @@ export class Factory {
   public constructor(private readonly container: Container) {}
 
   /**
-   * Constructs values for a binding descriptor.
+   * Constructs the value for a binding descriptor.
    *
-   * @param binding - Binding descriptor to construct values for.
-   * @returns Constructed values.
+   * @param binding - Binding descriptor to construct the value for.
+   * @returns Constructed value.
    *
    * @throws {@link CircularDependencyError} When the descriptor is already under construction.
    */
-  public construct<T>(binding: BindingDescriptor<T>): Array<T> {
+  public construct<T>(binding: BindingDescriptor<T>): T {
     try {
       if (this.underConstruction.includes(binding)) {
         const dependencyGraph = [...this.underConstruction, binding].map((it) => toString(it.token));
@@ -47,15 +42,13 @@ export class Factory {
     }
   }
 
-  private doConstruct<T>(binding: BindingDescriptor<T>): Array<T> {
+  private doConstruct<T>(binding: BindingDescriptor<T>): T {
     if (isInstanceDescriptor(binding)) {
-      return [new binding.value()];
-    } else if (isDynamicValueDescriptor(binding)) {
-      return [binding.factory(this.container)];
-    } else if (isServiceRedirectionDescriptor(binding)) {
-      return this.container.get(binding.service, { multi: true });
-    } else if (isConstantValueDescriptor(binding)) {
-      return [binding.value];
+      return new binding.value();
+    } else if (isFactoryDescriptor(binding)) {
+      return binding.factory(this.container);
+    } else if (isValueDescriptor(binding)) {
+      return binding.value;
     }
 
     return assertNever(binding);

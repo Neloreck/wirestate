@@ -1,10 +1,8 @@
 import type { BindingDescriptor } from "../binding/binding";
-import { isMultiBinding, isServiceRedirectionDescriptor } from "../binding/binding-guards";
 import { getBindingLifecycle, getBindingScope } from "../binding/binding-lifecycle";
 import { injectionContext } from "../context";
 import { NoBindingFoundError } from "../errors";
-import { type Identifier, toString } from "../tokens";
-import { assertPresent, assertSingle } from "../utils/asserts";
+import type { Identifier } from "../tokens";
 
 import type { ActivationRecord, BindingMap, InstanceMap } from "./binding-storage";
 import { Factory } from "./factory";
@@ -39,20 +37,21 @@ export class Container {
   }
 
   /**
-   * Binds a binding descriptor to this container.
+   * Binds a binding descriptor to this container, replacing any binding
+   * previously registered for the same token.
    *
    * @param binding - Binding descriptor to register.
    * @returns The same container for chaining.
    *
-   * @throws {@link Error} If the descriptor is invalid for the token's existing bindings.
+   * @throws {@link Error} If the descriptor is invalid or the token's existing
+   * binding already constructed values.
    */
   public bind<T>(binding: BindingDescriptor<T>): this {
-    const token = binding.token;
-    const existing = this.bindings.get(token) ?? [];
+    const token = binding?.token;
 
-    validateBinding(token, binding, existing, this.hasConstructedBinding(token));
+    validateBinding(token, binding, this.hasConstructedBinding(token));
 
-    this.bindings.set(token, isMultiBinding(binding) ? [...existing, binding] : [binding]);
+    this.bindings.set(token, binding);
 
     return this;
   }
@@ -66,7 +65,12 @@ export class Container {
   public unbind<T>(token: Identifier<T>): this {
     this.deactivate(token);
 
-    this.bindings.get(token)?.forEach((binding) => this.instances.delete(binding));
+    const binding = this.bindings.get(token);
+
+    if (binding) {
+      this.instances.delete(binding);
+    }
+
     this.bindings.delete(token);
 
     return this;
@@ -96,70 +100,49 @@ export class Container {
    *
    * @param token - Token to resolve.
    * @param options - Resolution options: `optional` resolves `undefined` instead of throwing,
-   * `multi` returns every bound value, `lazy` returns a thunk resolving on first call.
-   * @returns The resolved value, values, thunk, or `undefined` for optional misses.
+   * `lazy` returns a thunk resolving on first call.
+   * @returns The resolved value, thunk, or `undefined` for optional misses.
    *
    * @throws {@link NoBindingFoundError} If the token is not bound and not optional.
    */
   public get<T>(token: Identifier<T>): T;
-  public get<T>(token: Identifier<T>, options: { multi: true }): Array<T>;
   public get<T>(token: Identifier<T>, options: { optional: true }): T | undefined;
-  public get<T>(token: Identifier<T>, options: { multi: true; optional: true }): Array<T> | undefined;
   public get<T>(token: Identifier<T>, options: { lazy: true }): () => T;
-  public get<T>(token: Identifier<T>, options: { lazy: true; multi: true }): () => Array<T>;
   public get<T>(token: Identifier<T>, options: { lazy: true; optional: true }): () => T | undefined;
-  public get<T>(token: Identifier<T>, options: { lazy: true; multi: true; optional: true }): () => Array<T> | undefined;
+  public get<T>(token: Identifier<T>, options?: { optional?: boolean; lazy?: false }): T | undefined;
   public get<T>(
     token: Identifier<T>,
-    options?: { optional?: boolean; multi?: boolean; lazy?: false }
-  ): T | Array<T> | undefined;
+    options?: { optional?: boolean; lazy?: boolean }
+  ): T | undefined | (() => T | undefined);
   public get<T>(
     token: Identifier<T>,
-    options?: { optional?: boolean; multi?: boolean; lazy?: boolean }
-  ): T | Array<T> | undefined | (() => T | Array<T> | undefined);
-  public get<T>(
-    token: Identifier<T>,
-    options?: { optional?: boolean; multi?: boolean; lazy?: boolean }
-  ): T | Array<T> | undefined | (() => T | Array<T> | undefined) {
+    options?: { optional?: boolean; lazy?: boolean }
+  ): T | undefined | (() => T | undefined) {
     const lazy = options?.lazy ?? false;
 
     if (lazy) {
       return () => this.get(token, { ...options, lazy: false });
     }
 
-    const optional = options?.optional ?? false;
+    const binding = this.bindings.get(token);
 
-    if (!this.bindings.has(token)) {
+    if (!binding) {
       if (this.parent) {
         return this.parent.get(token, { ...options, lazy: false });
       }
 
-      if (optional) {
+      if (options?.optional) {
         return undefined;
       }
 
       throw new NoBindingFoundError(token);
     }
 
-    const bindings = assertPresent(this.bindings.get(token));
-    const values = injectionContext(this).run(() => bindings.flatMap((binding) => this.resolveBinding(binding)));
-
-    const multi = options?.multi ?? false;
-
-    if (multi) {
-      return values;
-    } else {
-      return assertSingle(values, () =>
-        Error(
-          `Requesting a single value for ${toString(token)}, but multiple values were provided. ` +
-            `Consider passing "{ multi: true }" to inject all values, or adjust your bindings accordingly.`
-        )
-      );
-    }
+    return injectionContext(this).run(() => this.resolveBinding(binding));
   }
 
   /**
-   * Returns whether this container or one of its parents has one or more bindings for this token.
+   * Returns whether this container or one of its parents has a binding for this token.
    *
    * @param token - Token to check.
    * @returns Whether the token can be resolved from this container.
@@ -169,7 +152,7 @@ export class Container {
   }
 
   /**
-   * Returns whether this container itself has one or more bindings for this token,
+   * Returns whether this container itself has a binding for this token,
    * ignoring parent containers.
    *
    * @param token - Token to check.
@@ -180,32 +163,25 @@ export class Container {
   }
 
   /**
-   * Resolves values for a single binding descriptor, applying scope caching and activation hooks.
+   * Resolves the value for a binding descriptor, applying scope caching and activation hooks.
    *
    * @param binding - Binding descriptor to resolve.
-   * @returns The resolved values.
+   * @returns The resolved value.
    */
-  private resolveBinding<T>(binding: BindingDescriptor<T>): Array<T> {
-    // Service redirections delegate to their target token and never own the produced values.
-    if (isServiceRedirectionDescriptor(binding)) {
-      return this.factory.construct(binding);
-    }
-
+  private resolveBinding<T>(binding: BindingDescriptor<T>): T {
     if (getBindingScope(binding) === "Transient") {
-      return this.factory.construct(binding).map((value) => this.activate(binding, value));
+      return this.activate(binding, this.factory.construct(binding));
     }
 
-    const constructed = this.instances.get(binding);
-
-    if (constructed) {
-      return constructed;
+    if (this.instances.has(binding)) {
+      return this.instances.get(binding) as T;
     }
 
-    const values = this.factory.construct(binding).map((value) => this.activate(binding, value));
+    const value = this.activate(binding, this.factory.construct(binding));
 
-    this.commit(binding, values);
+    this.commit(binding, value);
 
-    return values;
+    return value;
   }
 
   /**
@@ -228,14 +204,14 @@ export class Container {
   }
 
   /**
-   * Caches singleton values of a binding descriptor and records them for later deactivation.
+   * Caches the singleton value of a binding descriptor and records it for later deactivation.
    *
-   * @param binding - Binding descriptor that constructed the values.
-   * @param values - Constructed values.
+   * @param binding - Binding descriptor that constructed the value.
+   * @param value - Constructed value.
    */
-  private commit<T>(binding: BindingDescriptor<T>, values: Array<T>): void {
-    this.instances.set(binding, values);
-    values.forEach((instance) => this.activated.push({ token: binding.token, binding, instance }));
+  private commit<T>(binding: BindingDescriptor<T>, value: T): void {
+    this.instances.set(binding, value);
+    this.activated.push({ token: binding.token, binding, instance: value });
   }
 
   /**
@@ -254,12 +230,14 @@ export class Container {
   }
 
   /**
-   * Checks whether any binding registered for the token has already constructed values.
+   * Checks whether the binding registered for the token has already constructed values.
    *
    * @param token - Token to check.
-   * @returns Whether constructed values exist for the token.
+   * @returns Whether a constructed value exists for the token.
    */
   private hasConstructedBinding<T>(token: Identifier<T>): boolean {
-    return (this.bindings.get(token) ?? []).some((binding) => this.instances.has(binding));
+    const binding = this.bindings.get(token);
+
+    return binding !== undefined && this.instances.has(binding);
   }
 }
