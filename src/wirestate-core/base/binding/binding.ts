@@ -1,6 +1,6 @@
 import type { Container } from "../container/container";
 import type { Identifier } from "../tokens";
-import type { Class } from "../utils/class-like";
+import type { Newable } from "../utils/class-like";
 
 /**
  * Lifetime scope names accepted by binding descriptors:
@@ -55,7 +55,7 @@ export interface ValueBindingDescriptor<T> {
 export interface InstanceBindingDescriptor<T> {
   token: Identifier<T>;
   type: "Instance";
-  value: Class<NoInfer<T>>;
+  value: Newable<NoInfer<T>>;
   scope?: BindingScope;
   onActivated?: BindingActivationHandler<NoInfer<T>>;
   onDeactivated?: BindingDeactivationHandler<NoInfer<T>>;

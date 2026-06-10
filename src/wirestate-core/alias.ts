@@ -1,5 +1,3 @@
-import type { Class } from "./base";
-
 /**
  * Wirestate DI container and injection primitives.
  *
@@ -29,7 +27,7 @@ export { Injectable, isInjectable } from "./base";
  *
  * @group Container
  */
-export type Newable<TInstance = unknown> = Class<TInstance>;
+export { Newable } from "./base";
 
 /**
  * Binding strategy names accepted by binding descriptors.

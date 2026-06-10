@@ -1,9 +1,4 @@
-import type {
-  BindingActivationHandler,
-  BindingDeactivationHandler,
-  BindingDescriptor,
-  BindingScope,
-} from "./binding";
+import type { BindingActivationHandler, BindingDeactivationHandler, BindingDescriptor, BindingScope } from "./binding";
 import { isFactoryDescriptor, isInstanceDescriptor } from "./binding-guards";
 
 /**

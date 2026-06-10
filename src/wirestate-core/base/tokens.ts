@@ -1,11 +1,11 @@
-import { type AbstractClass, type Class, isClassLike } from "./utils/class-like";
+import { type AbstractClass, type Newable, isClassLike } from "./utils/class-like";
 
 /**
  * An identifier is a reference to a service in the dependency injection (DI) container:
  * class constructor, abstract class, string, symbol, or {@link InjectionToken}.
  * When obtaining a service from the container, you should use its identifier.
  */
-export type Identifier<T = unknown> = Class<T> | AbstractClass<T> | string | symbol | InjectionToken<T>;
+export type Identifier<T = unknown> = Newable<T> | AbstractClass<T> | string | symbol | InjectionToken<T>;
 
 /**
  * A unique injection token object, that is used by reference. Can hold a generic type.

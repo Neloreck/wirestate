@@ -13,4 +13,4 @@ export { NoBindingFoundError, CircularDependencyError } from "./errors";
 export { Injectable, isInjectable, InjectableDecorator } from "./injectable";
 export { InjectionToken } from "./tokens";
 export { Identifier } from "./tokens";
-export { Class, AbstractClass } from "./utils/class-like";
+export { Newable, AbstractClass } from "./utils/class-like";

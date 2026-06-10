@@ -10,6 +10,7 @@ describe("Library exported API from wirestate-core", () => {
     "Identifier",
     "Injectable",
     "InjectionToken",
+    "Newable",
     "NoBindingFoundError",
     "inject",
     "isInjectable",

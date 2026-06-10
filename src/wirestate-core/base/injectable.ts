@@ -1,9 +1,9 @@
-import type { Class } from "./utils/class-like";
+import type { Newable } from "./utils/class-like";
 
 /**
  * Classes marked with `@Injectable()`, eligible for container instance bindings.
  */
-const INJECTABLE_CLASSES: WeakSet<Class<object>> = new WeakSet();
+const INJECTABLE_CLASSES: WeakSet<Newable<object>> = new WeakSet();
 
 /**
  * Describes the decorator returned by {@link Injectable}.
@@ -13,9 +13,9 @@ const INJECTABLE_CLASSES: WeakSet<Class<object>> = new WeakSet();
  */
 export interface InjectableDecorator {
   // Standard (TC39):
-  <T extends Class<object>>(value: T, context: ClassDecoratorContext): void;
+  <T extends Newable<object>>(value: T, context: ClassDecoratorContext): void;
   // Legacy/experimental:
-  <T extends Class<object>>(value: T): void;
+  <T extends Newable<object>>(value: T): void;
 }
 
 /**
@@ -31,7 +31,7 @@ export interface InjectableDecorator {
  * @returns A class decorator registering the class as injectable.
  */
 export function Injectable(): InjectableDecorator {
-  return (<T extends Class<object>>(value: T, context?: ClassDecoratorContext): void => {
+  return (<T extends Newable<object>>(value: T, context?: ClassDecoratorContext): void => {
     if (context && context.kind !== "class") {
       throw Error("@Injectable() can only decorate classes.");
     }
@@ -46,6 +46,6 @@ export function Injectable(): InjectableDecorator {
  * @param target - Class to check.
  * @returns Whether the class is marked as injectable.
  */
-export function isInjectable(target: Class<object>): boolean {
+export function isInjectable(target: Newable<object>): boolean {
   return INJECTABLE_CLASSES.has(target);
 }

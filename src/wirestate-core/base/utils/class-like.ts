@@ -2,7 +2,7 @@
  * Constructable class reference.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Class<T> = new (...args: Array<any>) => T;
+export type Newable<T = unknown> = new (...args: Array<any>) => T;
 
 /**
  * Abstract class reference that cannot be constructed directly,
@@ -20,6 +20,6 @@ export interface AbstractClass<T> {
  * @returns Whether the value is a class-like function.
  * @internal
  */
-export function isClassLike(target: unknown): target is Class<unknown> | AbstractClass<unknown> {
+export function isClassLike(target: unknown): target is Newable<unknown> | AbstractClass<unknown> {
   return typeof target === "function";
 }

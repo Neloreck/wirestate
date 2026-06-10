@@ -2,7 +2,7 @@ import type { BindingDescriptor } from "../binding/binding";
 import { isInstanceDescriptor } from "../binding/binding-guards";
 import { isInjectable } from "../injectable";
 import { type Identifier, toString } from "../tokens";
-import type { Class } from "../utils/class-like";
+import type { Newable } from "../utils/class-like";
 
 /**
  * Validates a binding descriptor before registration.
@@ -28,7 +28,7 @@ export function validateBinding<T>(
     );
   }
 
-  if (isInstanceDescriptor(binding) && !isInjectable(binding.value as Class<object>)) {
+  if (isInstanceDescriptor(binding) && !isInjectable(binding.value as Newable<object>)) {
     throw Error(`Class '${binding.value.name}' must be decorated with @Injectable() to be bound.`);
   }
 
