@@ -30,7 +30,7 @@ export function Provider({ children }: PropsWithChildren) {
         },
         {
           token: GLOBAL_DYNAMIC_CONFIG,
-          type: BindingType.DynamicValue,
+          type: BindingType.Factory,
           scope: BindingScope.Singleton,
           factory: () => ({ random: Math.random(), another: true }),
         },

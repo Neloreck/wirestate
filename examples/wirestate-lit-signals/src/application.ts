@@ -101,7 +101,7 @@ export class Application extends LitElement {
         {
           token: GLOBAL_DYNAMIC_CONFIG,
           factory: () => ({ random: Math.random(), another: true }),
-          type: BindingType.DynamicValue,
+          type: BindingType.Factory,
           scope: BindingScope.Singleton,
         },
       ],

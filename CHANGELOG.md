@@ -7,7 +7,7 @@
   deactivation hooks, lifecycle-aware `unbind`/`unbindAll`, `hasOwn`, public `container.parent`, and named
   `NoBindingFoundError`/`CircularDependencyError` errors.
 - Add `inject(token, options?)` as the single injection style (constructor parameter defaults and field initializers),
-  with `optional`, `multi`, and `lazy` options. `inject()` works identically under legacy decorators, TC39 standard
+  with `optional` and `lazy` options. `inject()` works identically under legacy decorators, TC39 standard
   decorators, and no decorators at all.
 - Add `InjectionToken` for type-safe non-class tokens and `isInjectable` for `@Injectable` checks.
 - Add TC39 standard decorator support for every Wirestate decorator: `@Injectable`, `@OnActivated`,
@@ -125,9 +125,14 @@
 - Remove `forwardRef` and `LazyIdentifier` — `inject()` evaluates tokens at construction time, so late declarations
   need no wrapper; use `inject(token, { lazy: true })` for circular dependencies.
 - Remove the `Request` binding scope.
+- Reduce binding descriptors to three kinds: `Value` (renamed from `ConstantValue`), `Instance`, and `Factory`
+  (absorbing `DynamicValue`). `ResolvedValue` is removed — factories run inside the injection context, so
+  `inject()` works directly in factory bodies. `ServiceRedirection` is removed — alias tokens with a factory
+  delegating to `container.get`.
+- `@Injectable()` moved into the DI base and is enforced there for instance bindings; the decorator and
+  `isInjectable` keep their public exports.
 - Trim the internal DI container to the surface Wirestate actually uses: `bindAll`, `createChild`, bare-class
-  bindings, unbind-by-descriptor, and implicit inheritance aliasing (auto parent-class redirections) are removed.
-  Parent-class resolution now requires an explicit `ServiceRedirection` binding.
+  bindings, unbind-by-descriptor, implicit inheritance aliasing, multi-bindings, and service redirections are removed.
 
 - Remove `createIocContainer`; use `createContainer`.
 - Remove `@wirestate/core/test-utils`.
