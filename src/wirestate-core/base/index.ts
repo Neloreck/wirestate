@@ -1,17 +1,16 @@
-export { Container } from "./container";
-export { inject } from "./context";
-export { NoBindingFoundError, CircularDependencyError } from "./errors";
-export type {
-  Binding,
+export { BindingScope } from "./binding/binding";
+export {
   BindingDescriptor,
-  BindingScope,
   BindingActivationHandler,
   BindingDeactivationHandler,
-  ConstructorBinding,
   ConstantValueBindingDescriptor,
   InstanceBindingDescriptor,
   DynamicValueBindingDescriptor,
   ServiceRedirectionBindingDescriptor,
-} from "./bindings";
+} from "./binding/binding";
+export { Container } from "./container/container";
+export { inject } from "./context";
+export { NoBindingFoundError, CircularDependencyError } from "./errors";
 export { InjectionToken } from "./tokens";
-export type { Identifier } from "./tokens";
+export { Identifier } from "./tokens";
+export { Class, AbstractClass } from "./utils/class-like";

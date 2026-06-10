@@ -1,10 +1,14 @@
-import { createSingleMethodDecoratorDescriptor } from "../../metadata/single-method-lifecycle-decorator";
-import { PROVISION_HANDLER_METADATA } from "../../registry";
+import {
+  createSingleMethodDecoratorDescriptor,
+  SingleMethodLifecycleDecorator,
+} from "../../metadata/single-method-lifecycle-decorator";
+import { PROVISION_HANDLER_METADATA, PROVISION_METADATA_KEY } from "../../registry";
 import { Maybe } from "../../types/general";
 
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
   name: "OnProvision",
   registry: PROVISION_HANDLER_METADATA,
+  metadataKey: PROVISION_METADATA_KEY,
   duplicateMessage: (className) => `Only one @OnProvision method can be declared on provider '${className}'.`,
   hierarchyMessage: (className) =>
     `Only one @OnProvision method can be declared across provider hierarchy '${className}'.`,
@@ -39,7 +43,7 @@ const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
  * }
  * ```
  */
-export function OnProvision(): MethodDecorator {
+export function OnProvision(): SingleMethodLifecycleDecorator {
   return decorator();
 }
 

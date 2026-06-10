@@ -1,6 +1,7 @@
+import { inject } from "../context";
+import { InjectionToken } from "../tokens";
+
 import { Container } from "./container";
-import { inject } from "./context";
-import { InjectionToken } from "./tokens";
 
 const myServiceConstructorSpy = jest.fn();
 
@@ -23,7 +24,7 @@ describe("Container API", () => {
 
     expect(() => container.get(token)).toThrow("No binding(s) found");
 
-    container.bind(MyService);
+    container.bind({ token: MyService, type: "Instance", value: MyService });
     container.bind({
       token: token,
       factory: () => inject(MyService),
@@ -34,7 +35,7 @@ describe("Container API", () => {
 
   it("has", () => {
     const container = new Container();
-    const childContainer = container.createChild();
+    const childContainer = new Container(container);
     const token = new InjectionToken<MyService>("some-token");
 
     expect(container.has(token)).toBe(false);
@@ -60,6 +61,19 @@ describe("Container API", () => {
     expect(spy).toHaveBeenCalledTimes(0);
     container.get(factoryToken);
     expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it("should reject bindings that are not descriptor objects", () => {
+    const container = new Container();
+
+    class MyService {}
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(() => container.bind(MyService as any)).toThrow('expected a binding descriptor object with a "token" field');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect(() => container.bind({ value: 1 } as any)).toThrow(
+      'expected a binding descriptor object with a "token" field'
+    );
   });
 
   describe("contexts", () => {

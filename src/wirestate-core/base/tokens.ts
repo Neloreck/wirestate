@@ -1,5 +1,4 @@
-import type { Binding } from "./bindings";
-import { type AbstractClass, type Class, isClassLike } from "./utils";
+import { type AbstractClass, type Class, isClassLike } from "./utils/class-like";
 
 /**
  * An identifier is a reference to a service in the dependency injection (DI) container:
@@ -26,29 +25,10 @@ export class InjectionToken<T> {
 }
 
 /**
- * Type-guard to check if an identifier is a class reference.
- *
- * @param token
- * @internal
- */
-export function isClassToken<T>(token: Identifier<T>): token is Class<T> {
-  return isClassLike(token);
-}
-
-/**
- * Type-guard to check if an identifier is an InjectionToken.
- *
- * @param token
- * @internal
- */
-export function isInjectionToken<T>(token: Identifier<T>): token is InjectionToken<T> {
-  return token instanceof InjectionToken;
-}
-
-/**
  * Describes an identifier, useful for error messages.
  *
- * @param token
+ * @param token - Identifier to describe.
+ * @returns Human-readable identifier description.
  * @internal
  */
 export function toString<T>(token: Identifier<T>): string {
@@ -61,14 +41,4 @@ export function toString<T>(token: Identifier<T>): string {
   } else {
     return token;
   }
-}
-
-/**
- * Returns the token a binding is registered under.
- *
- * @param binding
- * @internal
- */
-export function getBindingToken<T>(binding: Binding<T>): Identifier<T> {
-  return isClassLike(binding) ? (binding as Identifier<T>) : binding.token;
 }

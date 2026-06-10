@@ -1,9 +1,13 @@
-import { createSingleMethodDecoratorDescriptor } from "../../metadata/single-method-lifecycle-decorator";
-import { ACTIVATED_HANDLER_METADATA } from "../../registry";
+import {
+  createSingleMethodDecoratorDescriptor,
+  SingleMethodLifecycleDecorator,
+} from "../../metadata/single-method-lifecycle-decorator";
+import { ACTIVATED_HANDLER_METADATA, ACTIVATED_METADATA_KEY } from "../../registry";
 import { Maybe } from "../../types/general";
 
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
   registry: ACTIVATED_HANDLER_METADATA,
+  metadataKey: ACTIVATED_METADATA_KEY,
   name: "OnActivated",
   duplicateMessage: (className) => `Only one @OnActivated method can be declared on '${className}'.`,
   hierarchyMessage: (className) =>
@@ -38,7 +42,7 @@ const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
  * }
  * ```
  */
-export function OnActivated(): MethodDecorator {
+export function OnActivated(): SingleMethodLifecycleDecorator {
   return decorator();
 }
 

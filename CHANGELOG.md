@@ -10,6 +10,11 @@
   with `optional`, `multi`, and `lazy` options. `inject()` works identically under legacy decorators, TC39 standard
   decorators, and no decorators at all.
 - Add `InjectionToken` for type-safe non-class tokens and `isInjectable` for `@Injectable` checks.
+- Add TC39 standard decorator support for every Wirestate decorator: `@Injectable`, `@OnActivated`,
+  `@OnDeactivation`, `@OnProvision`, `@OnDeprovision`, `@OnEvent`, `@OnCommand`, and `@OnQuery` are dual-mode —
+  the same source compiles under legacy `experimentalDecorators` and standard (`2023-11`) decorators. Standard-mode
+  metadata is stored via decorator metadata (`Symbol.metadata`); a one-line polyfill ships with the package and loads
+  automatically. The decorator behavior suite runs in CI under both compilation modes.
 
 - Add `@wirestate/lit` with Lit context provisioning, `ContainerProvider`, `provideContainer`,
   `useContainerProvider`, injection decorators/controllers, event/command/query decorators, and controllers.
@@ -120,6 +125,9 @@
 - Remove `forwardRef` and `LazyIdentifier` — `inject()` evaluates tokens at construction time, so late declarations
   need no wrapper; use `inject(token, { lazy: true })` for circular dependencies.
 - Remove the `Request` binding scope.
+- Trim the internal DI container to the surface Wirestate actually uses: `bindAll`, `createChild`, bare-class
+  bindings, unbind-by-descriptor, and implicit inheritance aliasing (auto parent-class redirections) are removed.
+  Parent-class resolution now requires an explicit `ServiceRedirection` binding.
 
 - Remove `createIocContainer`; use `createContainer`.
 - Remove `@wirestate/core/test-utils`.

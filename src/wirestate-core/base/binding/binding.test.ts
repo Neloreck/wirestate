@@ -1,6 +1,6 @@
-import { Container } from "./container";
-import { inject } from "./context";
-import { InjectionToken } from "./tokens";
+import { Container } from "../container/container";
+import { inject } from "../context";
+import { InjectionToken } from "../tokens";
 
 const myServiceConstructorSpy = jest.fn();
 
@@ -15,13 +15,17 @@ describe("Bindings", () => {
     myServiceConstructorSpy.mockReset();
   });
 
-  it("Constructor bindings should be provided once", () => {
+  it("Instance bindings should reject re-binding once constructed", () => {
     const container = new Container();
 
     expect(() => container.get(MyService)).toThrow("No binding(s) found");
     expect(container.get(MyService, { optional: true })).toBeUndefined();
 
-    container.bind(MyService);
+    container.bind({
+      token: MyService,
+      type: "Instance",
+      value: MyService,
+    });
 
     expect(myServiceConstructorSpy).not.toHaveBeenCalled();
 
@@ -32,7 +36,9 @@ describe("Bindings", () => {
     expect(container.get(MyService, { optional: true })).toBe(myService);
     expect(myServiceConstructorSpy).toHaveBeenCalledTimes(1);
 
-    expect(() => container.bind(MyService)).toThrow("existing binding was already constructed");
+    expect(() => container.bind({ token: MyService, type: "Instance", value: MyService })).toThrow(
+      "existing binding was already constructed"
+    );
   });
 
   it("Instance bindings should be provided once", () => {
@@ -105,7 +111,7 @@ describe("Bindings", () => {
 
     const OTHER_TOKEN = new InjectionToken<MyService>("MyService");
 
-    container.bind(MyService);
+    container.bind({ token: MyService, type: "Instance", value: MyService });
     container.bind({
       token: OTHER_TOKEN,
       service: MyService,
@@ -122,27 +128,6 @@ describe("Bindings", () => {
   });
 
   describe("abstract classes and inheritance", () => {
-    it("should resolve bound subclasses through their parent class token", () => {
-      abstract class AbstractService {
-        protected constructor(public name = "AbstractService") {}
-      }
-
-      class FooService extends AbstractService {
-        public constructor(public fooProp = "foo") {
-          super("FooService");
-        }
-      }
-
-      const container = new Container();
-
-      container.bind(FooService);
-
-      expect(container.get(AbstractService)).toBeInstanceOf(FooService);
-      expect(container.get(FooService)).toBeInstanceOf(FooService);
-      expect(container.get(FooService)).toBe(container.get(AbstractService));
-      expect(container.get(FooService)).toBeInstanceOf(AbstractService);
-    });
-
     it("should support binding subclasses", () => {
       abstract class AbstractService {
         protected constructor(public name = "AbstractService") {}
@@ -162,16 +147,20 @@ describe("Bindings", () => {
 
       const container = new Container();
 
-      container.bind(FooService).bind(BarService).bind({
-        token: AbstractService,
-        service: FooService,
-      });
+      container
+        .bind({ token: FooService, type: "Instance", value: FooService })
+        .bind({ token: BarService, type: "Instance", value: BarService })
+        .bind({
+          token: AbstractService,
+          service: FooService,
+        });
 
       expect(container.get(FooService)).toBeInstanceOf(FooService);
       expect(container.get(FooService)).toBeInstanceOf(AbstractService);
       expect(container.get(BarService)).toBeInstanceOf(BarService);
       expect(container.get(BarService)).toBeInstanceOf(AbstractService);
 
+      // resolving the parent class token works only because of the explicit service redirection above
       expect(container.get(AbstractService)).toBeInstanceOf(FooService);
     });
   });
@@ -214,22 +203,21 @@ describe("Bindings", () => {
     const fooFactory = jest.fn(() => "Foo");
     const barFactory = jest.fn(() => "Bar");
 
-    container.bindAll(
-      {
+    container
+      .bind({
         token: "foo",
         factory: fooFactory,
-      },
-      {
+      })
+      .bind({
         token: "bar",
         factory: barFactory,
-      },
-      {
+      })
+      .bind({
         token: "message",
         factory: (c) => {
           return `${c.get("foo")} ${c.get("bar")}`;
         },
-      }
-    );
+      });
 
     expect(container.get("message")).toBe("Foo Bar");
     expect(fooFactory).toHaveBeenCalledTimes(1);
@@ -242,24 +230,23 @@ describe("Bindings", () => {
     const fooFactory = jest.fn(() => "Foo");
     const barFactory = jest.fn(() => "Bar");
 
-    container.bindAll(
-      {
+    container
+      .bind({
         token: "foo",
         factory: fooFactory,
-      },
-      {
+      })
+      .bind({
         token: "bar",
         factory: barFactory,
-      },
-      {
+      })
+      .bind({
         token: "message",
         factory: () => {
           const c = inject(Container);
 
           return `${c.get("foo")} ${c.get("bar")}`;
         },
-      }
-    );
+      });
 
     expect(container.get("message")).toBe("Foo Bar");
     expect(fooFactory).toHaveBeenCalledTimes(1);
@@ -269,8 +256,8 @@ describe("Bindings", () => {
   describe("Child containers", () => {
     it("should be able to provide services provided on one of their ancestors", () => {
       const parent = new Container();
-      const child = parent.createChild();
-      const grandChild = child.createChild();
+      const child = new Container(parent);
+      const grandChild = new Container(child);
 
       parent.bind({ token: "tokenA", factory: () => ["a"] });
       child.bind({ token: "tokenB", factory: () => ["b"] });
@@ -291,8 +278,8 @@ describe("Bindings", () => {
 
     it("should reuse singletons from their parent", () => {
       const parent = new Container();
-      const child = parent.createChild();
-      const grandChild = child.createChild();
+      const child = new Container(parent);
+      const grandChild = new Container(child);
 
       parent.bind({ token: "tokenA", factory: () => ["a"] });
       child.bind({ token: "tokenB", factory: () => ["b"] });
@@ -312,7 +299,7 @@ describe("Bindings", () => {
 
     it("should not share their services with their parent", () => {
       const parent = new Container();
-      const child = parent.createChild();
+      const child = new Container(parent);
 
       child.bind({ token: "tokenA", factory: () => ["a"] });
 
@@ -322,8 +309,8 @@ describe("Bindings", () => {
 
     it("should keep track of their own singletons if provider was overridden", () => {
       const parent = new Container();
-      const child = parent.createChild();
-      const grandChild = child.createChild();
+      const child = new Container(parent);
+      const grandChild = new Container(child);
 
       parent.bind({ token: "tokenA", factory: () => ["a1"] });
       child.bind({ token: "tokenA", factory: () => ["a2"] });
@@ -335,7 +322,7 @@ describe("Bindings", () => {
 
     it("should not merge multi-providers with their parents", () => {
       const parent = new Container();
-      const child = parent.createChild();
+      const child = new Container(parent);
 
       parent
         .bind({ token: "tokenA", factory: () => "a1", multi: true })
@@ -381,7 +368,10 @@ describe("Bindings", () => {
 
       const container = new Container();
 
-      container.bindAll(OtherService, BarService, FooService);
+      container
+        .bind({ token: OtherService, type: "Instance", value: OtherService })
+        .bind({ token: BarService, type: "Instance", value: BarService })
+        .bind({ token: FooService, type: "Instance", value: FooService });
 
       const fooService = container.get(FooService);
 
@@ -418,7 +408,7 @@ describe("Bindings", () => {
 
       const container = new Container();
 
-      container.bind(FooService);
+      container.bind({ token: FooService, type: "Instance", value: FooService });
 
       const fooService = container.get(FooService);
 

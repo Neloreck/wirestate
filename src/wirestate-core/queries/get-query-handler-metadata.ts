@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { collectHandlerMetadata } from "../metadata/handler-metadata";
-import { QUERY_HANDLER_METADATA } from "../registry";
+import { QUERY_HANDLER_METADATA, QUERY_METADATA_KEY } from "../registry";
 import { QueryHandlerMetadata } from "../types/queries";
 
 /**
@@ -32,5 +32,5 @@ import { QueryHandlerMetadata } from "../types/queries";
 export function getQueryHandlerMetadata(instance: object): ReadonlyArray<QueryHandlerMetadata> {
   dbg.info(prefix(__filename), "Resolving instance query metadata:", { name: instance.constructor.name, instance });
 
-  return collectHandlerMetadata(instance, QUERY_HANDLER_METADATA);
+  return collectHandlerMetadata(instance, QUERY_HANDLER_METADATA, QUERY_METADATA_KEY);
 }

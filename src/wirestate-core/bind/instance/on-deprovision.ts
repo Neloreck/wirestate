@@ -1,9 +1,13 @@
-import { createSingleMethodDecoratorDescriptor } from "../../metadata/single-method-lifecycle-decorator";
-import { DEPROVISION_HANDLER_METADATA } from "../../registry";
+import {
+  createSingleMethodDecoratorDescriptor,
+  SingleMethodLifecycleDecorator,
+} from "../../metadata/single-method-lifecycle-decorator";
+import { DEPROVISION_HANDLER_METADATA, DEPROVISION_METADATA_KEY } from "../../registry";
 import { Maybe } from "../../types/general";
 
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
   registry: DEPROVISION_HANDLER_METADATA,
+  metadataKey: DEPROVISION_METADATA_KEY,
   name: "OnDeprovision",
   duplicateMessage: (className) => `Only one @OnDeprovision method can be declared on provider '${className}'.`,
   hierarchyMessage: (className) =>
@@ -38,7 +42,7 @@ const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
  * }
  * ```
  */
-export function OnDeprovision(): MethodDecorator {
+export function OnDeprovision(): SingleMethodLifecycleDecorator {
   return decorator();
 }
 

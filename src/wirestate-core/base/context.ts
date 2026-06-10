@@ -1,10 +1,11 @@
-import { Container } from "./container";
+import type { Container } from "./container/container";
 import type { Identifier } from "./tokens";
 
 /**
  * Injects a service within the current injection context, using the token provided.
  *
- * @param token
+ * @param token - Token to resolve from the current container.
+ * @returns The resolved value, values, thunk, or `undefined` for optional misses.
  */
 export function inject<T>(token: Identifier<T>): T;
 export function inject<T>(token: Identifier<T>, options: { multi: true }): Array<T>;
@@ -79,7 +80,8 @@ let _currentContext: GlobalContext | InjectionContext = new GlobalContext();
 /**
  * Creates a new injection context.
  *
- * @param container
+ * @param container - Container the context resolves against.
+ * @returns Injection context bound to the container.
  * @internal
  */
 export function injectionContext(container: Container): Context {

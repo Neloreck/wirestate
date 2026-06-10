@@ -1,6 +1,6 @@
-import { Container } from "./container";
-import { inject } from "./context";
-import { InjectionToken } from "./tokens";
+import { Container } from "../container/container";
+import { inject } from "../context";
+import { InjectionToken } from "../tokens";
 
 class OtherService {
   public getMessage(): string {
@@ -54,7 +54,9 @@ describe("Container", () => {
   it("should allow initializer injection", () => {
     const container = new Container();
 
-    container.bindAll(MyService, OtherService);
+    container
+      .bind({ token: MyService, type: "Instance", value: MyService })
+      .bind({ token: OtherService, type: "Instance", value: OtherService });
 
     const service = container.get(MyService);
 
@@ -64,7 +66,9 @@ describe("Container", () => {
   it("should not allow injection outside injection context", () => {
     const container = new Container();
 
-    container.bindAll(MyService, OtherService);
+    container
+      .bind({ token: MyService, type: "Instance", value: MyService })
+      .bind({ token: OtherService, type: "Instance", value: OtherService });
 
     const service = container.get(MyService);
 
@@ -80,24 +84,23 @@ describe("Container", () => {
     const fooToken3 = new InjectionToken<Foo>("foo-token3");
     const tokenWithoutProvider = new InjectionToken<Foo>("not-provided");
 
-    container.bindAll(
-      {
+    container
+      .bind({
         token: "by-value-with-token-as-string",
         value: { foo: "value" },
-      },
-      {
+      })
+      .bind({
         token: fooToken1,
         factory: factoryFn,
-      },
-      {
+      })
+      .bind({
         token: fooToken2,
         factory: () => ({ foo: `${inject<Foo>(fooToken1).foo}-with-inject` }),
-      },
-      {
+      })
+      .bind({
         token: fooToken3,
         service: fooToken1,
-      }
-    );
+      });
 
     expect(container.get<Foo>("by-value-with-token-as-string")).toEqual({ foo: "value" });
     expect(container.get(fooToken1)).toEqual({ foo: "factory" });
@@ -191,59 +194,57 @@ describe("Container", () => {
     it("first parent class, then child class ", () => {
       const container = new Container();
 
-      container.bindAll(
-        {
+      container
+        .bind({
           token: FooService,
           type: "Instance",
           value: FooService,
           multi: true,
-        },
-        {
+        })
+        .bind({
           token: BarService,
           type: "Instance",
           value: BarService,
           multi: true,
-        },
-        {
+        })
+        .bind({
           token: SpecialBarService,
           type: "Instance",
           value: SpecialBarService,
           multi: true,
-        },
-        {
+        })
+        .bind({
           token: SpecialBazService,
           type: "Instance",
           value: SpecialBazService,
           multi: true,
-        },
-
-        // not needed, but should not interfere with auto-binding of parent classes:
-        {
+        })
+        // required: parent class tokens resolve only through explicit service redirections
+        .bind({
           token: BarService,
           service: SpecialBarService,
           multi: true,
-        },
-        {
+        })
+        .bind({
           token: BazService,
           service: SpecialBazService,
           multi: true,
-        },
-        {
+        })
+        .bind({
           token: AbstractService,
           service: FooService,
           multi: true,
-        },
-        {
+        })
+        .bind({
           token: AbstractService,
           service: BarService,
           multi: true,
-        },
-        {
+        })
+        .bind({
           token: AbstractService,
           service: BazService,
           multi: true,
-        }
-      );
+        });
 
       const abstractServices = container.get(AbstractService, { multi: true });
 
@@ -284,54 +285,57 @@ describe("Container", () => {
     it("first child class, then parent class ", () => {
       const container = new Container();
 
-      container.bindAll(
-        {
+      container
+        .bind({
           token: FooService,
           type: "Instance",
           value: FooService,
           multi: true,
-        },
-        {
+        })
+        .bind({
           token: BarService,
           type: "Instance",
           value: BarService,
           multi: true,
-        },
-        {
+        })
+        .bind({
           token: SpecialBarService,
           type: "Instance",
           value: SpecialBarService,
           multi: true,
-        },
-        {
+        })
+        .bind({
           token: SpecialBazService,
           type: "Instance",
           value: SpecialBazService,
           multi: true,
-        },
-
-        // not needed, but should not interfere with auto-binding of parent classes:
-        {
+        })
+        // required: parent class tokens resolve only through explicit service redirections
+        .bind({
           token: AbstractService,
           service: FooService,
           multi: true,
-        },
-        {
+        })
+        .bind({
           token: AbstractService,
           service: BarService,
           multi: true,
-        },
-        {
+        })
+        .bind({
           token: AbstractService,
           service: BazService,
           multi: true,
-        },
-        {
+        })
+        .bind({
           token: BarService,
           service: SpecialBarService,
           multi: true,
-        }
-      );
+        })
+        .bind({
+          token: BazService,
+          service: SpecialBazService,
+          multi: true,
+        });
 
       const bazServices = container.get(BazService, { multi: true });
 
@@ -373,12 +377,12 @@ describe("Container", () => {
   it("should not allow combination of multi=false and multi=true", () => {
     const container = new Container();
 
-    expect(() => container.bindAll({ token: "key", value: 1 }, { token: "key", multi: true, value: 2 })).toThrow(
+    expect(() => container.bind({ token: "key", value: 1 }).bind({ token: "key", multi: true, value: 2 })).toThrow(
       "Cannot bind key as multi-binding, since there is already a binding which is not a multi-binding."
     );
 
     expect(() =>
-      container.bindAll({ token: "otherKey", multi: true, value: 2 }, { token: "otherKey", value: 1 })
+      container.bind({ token: "otherKey", multi: true, value: 2 }).bind({ token: "otherKey", value: 1 })
     ).toThrow("Cannot bind otherKey as binding, since there are already binding(s) that are multi-bindings.");
   });
 
@@ -393,7 +397,7 @@ describe("Container", () => {
   it("requesting single value for multiple providers throws error", () => {
     const container = new Container();
 
-    container.bindAll({ token: "key", multi: true, value: 1 }, { token: "key", multi: true, value: 2 });
+    container.bind({ token: "key", multi: true, value: 1 }).bind({ token: "key", multi: true, value: 2 });
 
     expect(() => container.get("key")).toThrow("Requesting a single value for key, but multiple values were provided.");
   });
@@ -401,75 +405,74 @@ describe("Container", () => {
   it("should support flattening multi-providers (combination of multi and use-existing)", () => {
     const container = new Container();
 
-    container.bindAll(
-      {
+    container
+      .bind({
         token: "myNumbers",
         value: 1,
         multi: true,
-      },
-      {
+      })
+      .bind({
         token: "myNumbers",
         value: 2,
         multi: true,
-      },
-      {
+      })
+      .bind({
         token: "otherNumber",
         value: 3,
-      },
-      {
+      })
+      .bind({
         token: "anotherNumber",
         value: 4,
-      },
-      {
+      })
+      .bind({
         token: "otherNumbers",
         value: 5,
         multi: true,
-      },
-      {
+      })
+      .bind({
         token: "a",
         service: "myNumbers",
-      },
-      {
+      })
+      .bind({
         token: "b",
         service: "myNumbers",
         multi: true,
-      },
-      {
+      })
+      .bind({
         token: "b",
         service: "otherNumber",
         multi: true,
-      },
-      {
+      })
+      .bind({
         token: "c",
         service: "anotherNumber",
         multi: true,
-      },
-      {
+      })
+      .bind({
         token: "d",
         service: "myNumbers",
         multi: true,
-      },
-      {
+      })
+      .bind({
         token: "d",
         service: "otherNumbers",
         multi: true,
-      },
-      {
+      })
+      .bind({
         token: "d",
         service: "otherNumber",
         multi: true,
-      },
-      {
+      })
+      .bind({
         token: "e",
         service: "otherNumber",
         multi: true,
-      },
-      {
+      })
+      .bind({
         token: "f",
         service: "otherNumbers",
         multi: true,
-      }
-    );
+      });
 
     // my numbers
     expect(() => container.get("myNumbers")).toThrow("multiple values were provided");
@@ -517,7 +520,7 @@ describe("Container", () => {
 
     const container = new Container();
 
-    container.bindAll(Foo, Bar);
+    container.bind({ token: Foo, type: "Instance", value: Foo }).bind({ token: Bar, type: "Instance", value: Bar });
 
     const bar = container.get(Bar);
 
@@ -528,16 +531,15 @@ describe("Container", () => {
     const container = new Container();
     const OTHER_TOKEN = Symbol("other-token");
 
-    container.bindAll(
-      {
+    container
+      .bind({
         token: Symbol.for("my-token"),
         value: 42,
-      },
-      {
+      })
+      .bind({
         token: OTHER_TOKEN,
         value: 2,
-      }
-    );
+      });
 
     expect(container.get(Symbol.for("my-token"))).toBe(42);
     expect(() => container.get(Symbol.for("other-token"))).toThrow("No binding(s) found for other-token");
@@ -587,7 +589,11 @@ describe("Container", () => {
 
     const container = new Container();
 
-    container.bindAll(App, Foo, Bar, Baz);
+    container
+      .bind({ token: App, type: "Instance", value: App })
+      .bind({ token: Foo, type: "Instance", value: Foo })
+      .bind({ token: Bar, type: "Instance", value: Bar })
+      .bind({ token: Baz, type: "Instance", value: Baz });
 
     expect(() => container.get(App)).toThrow("Detected circular dependency: App -> Foo -> Bar -> Baz -> Foo");
   });
@@ -631,7 +637,10 @@ describe("Container", () => {
 
     const container = new Container();
 
-    container.bindAll(Foo, Bar, Baz);
+    container
+      .bind({ token: Foo, type: "Instance", value: Foo })
+      .bind({ token: Bar, type: "Instance", value: Bar })
+      .bind({ token: Baz, type: "Instance", value: Baz });
 
     const foo = container.get(Foo);
     const baz = container.get(Baz);

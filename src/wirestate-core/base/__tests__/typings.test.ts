@@ -3,14 +3,13 @@
 
 import type {
   ConstantValueBindingDescriptor,
-  ConstructorBinding,
   DynamicValueBindingDescriptor,
   InstanceBindingDescriptor,
   ServiceRedirectionBindingDescriptor,
-} from "./bindings";
-import { Container } from "./container";
-import { inject } from "./context";
-import { InjectionToken } from "./tokens";
+} from "../binding/binding";
+import { Container } from "../container/container";
+import { inject } from "../context";
+import { InjectionToken } from "../tokens";
 
 describe("Type-safety", () => {
   describe("Bindings API", () => {
@@ -25,16 +24,6 @@ describe("Type-safety", () => {
     class OtherService {
       private z = Math.random();
     }
-
-    it("constructor binding", () => {
-      const a: ConstructorBinding<FooService> = FooService;
-      const b: ConstructorBinding<FooService> = FooChildService;
-
-      // @ts-expect-error
-      const c: ConstructorBinding<FooService> = OtherService;
-      // @ts-expect-error
-      const d: ConstructorBinding<FooService> = 3;
-    });
 
     it("instance binding descriptor", () => {
       const a: InstanceBindingDescriptor<FooService> = { token: FooService, type: "Instance", value: FooService };
@@ -145,118 +134,6 @@ describe("Type-safety", () => {
       container.bind({ token: TOKEN1, value: 42 });
       // @ts-expect-error
       container.bind({ token: TOKEN2, value: "Foo" });
-    });
-
-    it("bindAll()", () => {
-      const container = new Container();
-
-      container.bindAll(
-        { token: FooService, type: "Instance", value: FooChildService },
-        { token: FooChildService, type: "Instance", value: FooChildService }
-      );
-
-      // @ts-expect-error
-      container.bindAll({ token: FooChildService, type: "Instance", value: FooService });
-
-      // 2 params
-      container.bindAll({ token: TOKEN1, value: "Foo" }, { token: TOKEN2, value: 42 });
-      container.bindAll(
-        { token: TOKEN1, value: "Foo" },
-        // @ts-expect-error
-        { token: TOKEN2, value: "Foo" }
-      );
-
-      // 3 params
-      container.bindAll({ token: TOKEN1, value: "Foo" }, { token: TOKEN2, value: 42 }, { token: TOKEN1, value: "Foo" });
-      container.bindAll(
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN1, value: "Foo" },
-        // @ts-expect-error
-        { token: TOKEN2, value: "Foo" }
-      );
-
-      // 4 params
-      container.bindAll(
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 }
-      );
-      container.bindAll(
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN1, value: "Foo" },
-        // @ts-expect-error
-        { token: TOKEN2, value: "Foo" },
-        { token: TOKEN2, value: 42 }
-      );
-
-      // 5 params
-      container.bindAll(
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" }
-      );
-      container.bindAll(
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN1, value: "Foo" },
-        // @ts-expect-error
-        { token: TOKEN2, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" }
-      );
-
-      // 6 params
-      container.bindAll(
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 }
-      );
-      container.bindAll(
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN1, value: "Foo" },
-        // @ts-expect-error
-        { token: TOKEN2, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 }
-      );
-
-      // 10 params
-      container.bindAll(
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 }
-      );
-      container.bindAll(
-        { token: TOKEN1, value: "Foo" },
-        // @ts-expect-error
-        { token: TOKEN2, value: "Foo" },
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: 42 },
-        { token: TOKEN1, value: "Foo" },
-        { token: TOKEN2, value: "Foo" } // not type-checking (10th params)
-      );
-
-      // @ts-expect-error
-      container.bindAll({ token: TOKEN1, value: 42 });
-      // @ts-expect-error
-      container.bindAll({ token: TOKEN2, value: "Foo" });
     });
   });
   it("Injection tokens", () => {

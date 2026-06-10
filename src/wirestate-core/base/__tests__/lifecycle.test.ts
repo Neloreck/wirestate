@@ -1,6 +1,6 @@
-import { Container } from "./container";
-import { inject } from "./context";
-import { InjectionToken } from "./tokens";
+import { Container } from "../container/container";
+import { inject } from "../context";
+import { InjectionToken } from "../tokens";
 
 describe("Binding lifecycle hooks", () => {
   describe("onActivated", () => {

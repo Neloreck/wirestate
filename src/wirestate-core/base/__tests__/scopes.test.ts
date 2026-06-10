@@ -1,5 +1,5 @@
-import { Container } from "./container";
-import { InjectionToken } from "./tokens";
+import { Container } from "../container/container";
+import { InjectionToken } from "../tokens";
 
 describe("Binding scopes", () => {
   it("should default to singleton scope for instance bindings", () => {
@@ -58,7 +58,7 @@ describe("Binding scopes", () => {
 
   it("should resolve transient parent bindings through child containers", () => {
     const parent = new Container();
-    const child = parent.createChild();
+    const child = new Container(parent);
 
     // note: intentionally not @injectable() — auto-binding would shadow
     // the parent binding with a child-local singleton provider

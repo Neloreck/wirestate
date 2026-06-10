@@ -1,9 +1,25 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { appendHandlerMetadata } from "../metadata/handler-metadata";
-import { QUERY_HANDLER_METADATA } from "../registry";
+import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../metadata/handler-metadata";
+import { validateStandardMethodContext } from "../metadata/standard-decorator-context";
+import { QUERY_HANDLER_METADATA, QUERY_METADATA_KEY } from "../registry";
 import { QueryType } from "../types/queries";
+
+/**
+ * Describes the decorator returned by {@link OnQuery}.
+ *
+ * @remarks
+ * Supports both TC39 and legacy experimental decorators.
+ *
+ * @group Queries
+ */
+export interface OnQueryHandlerDecorator {
+  // Standard (TC39):
+  <This>(value: (this: This, ...args: Array<never>) => unknown, context: ClassMethodDecoratorContext<This>): void;
+  // Legacy/experimental:
+  (target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor): void;
+}
 
 /**
  * Marks a method as a query handler.
@@ -35,16 +51,30 @@ import { QueryType } from "../types/queries";
  * }
  * ```
  */
-export function OnQuery(type: QueryType): MethodDecorator {
-  return (target, propertyKey) => {
-    dbg.info(prefix(__filename), "Attaching OnQuery metadata:", {
-      name: target.constructor.name,
-      type,
-      propertyKey,
-      target,
-      constructor: target.constructor,
-    });
+export function OnQuery(type: QueryType): OnQueryHandlerDecorator {
+  return ((target: object, nameOrContext: string | symbol | ClassMethodDecoratorContext): void => {
+    if (typeof nameOrContext === "object") {
+      // Standard decorators:
+      const metadata: DecoratorMetadataObject = validateStandardMethodContext("OnQuery", nameOrContext);
 
-    appendHandlerMetadata(QUERY_HANDLER_METADATA, target.constructor, { methodName: propertyKey, type });
-  };
+      dbg.info(prefix(__filename), "Attaching OnQuery metadata (TC39):", {
+        type,
+        propertyKey: nameOrContext.name,
+        context: nameOrContext,
+      });
+
+      appendStandardHandlerMetadata(metadata, QUERY_METADATA_KEY, { methodName: nameOrContext.name, type });
+    } else {
+      // Experimental legacy decorators:
+      dbg.info(prefix(__filename), "Attaching OnQuery metadata:", {
+        name: target.constructor.name,
+        type,
+        propertyKey: nameOrContext,
+        target,
+        constructor: target.constructor,
+      });
+
+      appendHandlerMetadata(QUERY_HANDLER_METADATA, target.constructor, { methodName: nameOrContext, type });
+    }
+  }) as OnQueryHandlerDecorator;
 }

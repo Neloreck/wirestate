@@ -1,9 +1,13 @@
-import { createSingleMethodDecoratorDescriptor } from "../../metadata/single-method-lifecycle-decorator";
-import { DEACTIVATION_HANDLER_METADATA } from "../../registry";
+import {
+  createSingleMethodDecoratorDescriptor,
+  SingleMethodLifecycleDecorator,
+} from "../../metadata/single-method-lifecycle-decorator";
+import { DEACTIVATION_HANDLER_METADATA, DEACTIVATION_METADATA_KEY } from "../../registry";
 import { Maybe } from "../../types/general";
 
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
   registry: DEACTIVATION_HANDLER_METADATA,
+  metadataKey: DEACTIVATION_METADATA_KEY,
   name: "OnDeactivation",
   duplicateMessage: (className) => `Only one @OnDeactivation method can be declared on '${className}'.`,
   hierarchyMessage: (className) =>
@@ -37,7 +41,7 @@ const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
  * }
  * ```
  */
-export function OnDeactivation(): MethodDecorator {
+export function OnDeactivation(): SingleMethodLifecycleDecorator {
   return decorator();
 }
 

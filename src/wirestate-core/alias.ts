@@ -1,3 +1,5 @@
+import type { Class } from "./base";
+
 /**
  * Wirestate DI container and injection primitives.
  *
@@ -5,6 +7,17 @@
  */
 export { Container, InjectionToken, inject, NoBindingFoundError, CircularDependencyError } from "./base";
 export { Identifier } from "./base";
+
+/**
+ * Lifetime scope names accepted by binding descriptors.
+ *
+ * @remarks
+ * `Singleton` caches one value per container, `Transient` constructs a new
+ * value on every resolution.
+ *
+ * @group Bind
+ */
+export { BindingScope } from "./base";
 
 /**
  * @group Bind
@@ -16,8 +29,7 @@ export { Injectable, isInjectable } from "./metadata/injectable";
  *
  * @group Container
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Newable<TInstance = unknown> = new (...args: Array<any>) => TInstance;
+export type Newable<TInstance = unknown> = Class<TInstance>;
 
 /**
  * Binding strategy names accepted by binding descriptors.
@@ -31,18 +43,4 @@ export const BindingType = {
   Instance: "Instance",
   ResolvedValue: "ResolvedValue",
   ServiceRedirection: "ServiceRedirection",
-} as const;
-
-/**
- * Lifetime scope names accepted by binding descriptors.
- *
- * @remarks
- * `Singleton` caches one value per container, `Transient` constructs a new
- * value on every resolution.
- *
- * @group Bind
- */
-export const BindingScope = {
-  Singleton: "Singleton",
-  Transient: "Transient",
 } as const;
