@@ -1,16 +1,32 @@
-import type { BindInWhenOnFluentSyntax, MapToResolvedValueInjectOptions } from "inversify";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { BindingType, Container, type Identifier } from "../alias";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { ResolvedValueBindingDescriptor } from "../types/provision";
+import { ResolvedValueBindingDescriptor, ResolvedValueInjectOption } from "../types/provision";
 
-import { applyBindingScope } from "./utils/apply-binding-scope";
+import { toProviderScope } from "./utils/apply-binding-scope";
 import { registerBinding } from "./utils/register-binding";
 import { validateBindingDescriptor } from "./utils/validate-binding-descriptor";
+
+/**
+ * Resolves a single factory argument from its injection option.
+ *
+ * @group Bind
+ * @internal
+ *
+ * @param container - Container resolving the binding.
+ * @param option - Injection option: a token or a token with options.
+ * @returns The resolved argument value.
+ */
+function resolveInjectOption(container: Container, option: ResolvedValueInjectOption): unknown {
+  if (typeof option === "object" && option !== null && "token" in option) {
+    return container.get(option.token, { optional: option.optional === true });
+  }
+
+  return container.get(option as Identifier);
+}
 
 /**
  * Validates that a descriptor can be bound by {@link bindResolvedValue}.
@@ -63,16 +79,19 @@ export function bindResolvedValue<T, FA extends Array<unknown> = Array<unknown>>
     container,
   });
 
-  const binding: BindInWhenOnFluentSyntax<T> = descriptor.injectOptions
-    ? container
-        .bind<T>(descriptor.token as Identifier<T>)
-        .toResolvedValue(
-          descriptor.factory as (...args: Array<unknown>) => T | Promise<T>,
-          descriptor.injectOptions as MapToResolvedValueInjectOptions<Array<unknown>>
-        )
-    : container.bind<T>(descriptor.token as Identifier<T>).toResolvedValue(descriptor.factory as () => T | Promise<T>);
+  const injectOptions: ReadonlyArray<ResolvedValueInjectOption> = (descriptor.injectOptions ??
+    []) as ReadonlyArray<ResolvedValueInjectOption>;
 
-  applyBindingScope(binding, descriptor.scope);
+  container.bind<T>({
+    provide: descriptor.token as Identifier<T>,
+    scope: toProviderScope(descriptor.scope),
+    useFactory: (current) => {
+      const args: Array<unknown> = injectOptions.map((option) => resolveInjectOption(current, option));
+
+      return (descriptor.factory as (...resolved: Array<unknown>) => T)(...args);
+    },
+  });
+
   registerBinding(container, descriptor as ResolvedValueBindingDescriptor);
 
   return container;

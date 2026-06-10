@@ -1,10 +1,8 @@
-import { BindWhenOnFluentSyntax } from "inversify";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType, Container, Newable, Identifier } from "../alias";
-import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
+import { BindingType, Container, Newable, Identifier, isInjectable } from "../alias";
+import { ERROR_CODE_INVALID_ARGUMENTS, ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { InstanceBindingDescriptor } from "../types/provision";
 
@@ -114,6 +112,13 @@ export function bindInstanceWithToken<T extends object>(
     validateInstanceDescriptor(registeredBinding);
   }
 
+  if (!isInjectable(binding)) {
+    throw new WirestateError(
+      `Class '${binding.name}' must be decorated with @Injectable() to be bound.`,
+      ERROR_CODE_VALIDATION_ERROR
+    );
+  }
+
   dbg.info(prefix(__filename), "Binding instance:", {
     name: binding.name,
     token,
@@ -122,14 +127,12 @@ export function bindInstanceWithToken<T extends object>(
     container,
   });
 
-  // Inversify's fluent binding API only allows a single `.onActivation` /
-  // `.onDeactivation` call per chain, so we register them on the container
-  // itself instead - this also works correctly if a later call rebinds the
-  // same token.
-  const whenBind: BindWhenOnFluentSyntax<T> = container.bind<T>(token).to(binding).inSingletonScope();
-
-  whenBind.onActivation(createInstanceActivatedHandler({ binding, container, options }));
-  whenBind.onDeactivation(createInstanceDeactivationHandler({ binding, container, options }));
+  container.bind<T>({
+    provide: token,
+    useClass: binding,
+    onActivated: createInstanceActivatedHandler({ binding, container, options }),
+    onDeactivated: createInstanceDeactivationHandler({ binding, container, options }),
+  });
 
   registerBinding(container, registeredBinding);
 

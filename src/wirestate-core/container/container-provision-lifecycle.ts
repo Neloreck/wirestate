@@ -224,10 +224,7 @@ export function provisionInstances(container: Container, bindings: Bindings = []
   for (const binding of bindings) {
     const token: Identifier = getBindingToken(binding);
 
-    if (
-      isProviderLifecycleParticipant(getProviderLifecycleMetadataToken(binding)) &&
-      !container.isCurrentBound(token)
-    ) {
+    if (isProviderLifecycleParticipant(getProviderLifecycleMetadataToken(binding)) && !container.hasOwn(token)) {
       throw new WirestateError(
         `Cannot provision binding '${typeof token === "function" ? token.name : String(token)}' that is not bound on ` +
           `this container. Provider lifecycle is owned by the container that declares the binding.`,

@@ -1,12 +1,6 @@
-import type {
-  DynamicValueBuilder,
-  MapToResolvedValueInjectOptions,
-  ResolutionContext,
-  bindingScopeValues,
-  bindingTypeValues,
-} from "inversify";
+import { BindingType as BindingTypeValues, BindingScope as BindingScopeValues, Newable, Identifier } from "../alias";
+import type { Container } from "../base";
 
-import { Newable, Identifier } from "../alias";
 
 /**
  * Identifier for one provider provision cycle of a service instance.
@@ -22,18 +16,47 @@ import { Newable, Identifier } from "../alias";
 export type ProvisionId = number;
 
 /**
- * Inversify binding strategy name.
+ * Binding strategy name.
  *
  * @group Bind
  */
-export type BindingType = keyof typeof bindingTypeValues;
+export type BindingType = keyof typeof BindingTypeValues;
 
 /**
- * Inversify lifetime scope name.
+ * Binding lifetime scope name.
  *
  * @group Bind
  */
-export type BindingScope = keyof typeof bindingScopeValues;
+export type BindingScope = keyof typeof BindingScopeValues;
+
+/**
+ * Injection option for one resolved value factory argument: a plain token, or
+ * a token with resolution options.
+ *
+ * @group Bind
+ */
+export type ResolvedValueInjectOption<T = unknown> =
+  | Identifier<T>
+  | {
+      /**
+       * Token used to resolve the argument.
+       */
+      readonly token: Identifier<T>;
+
+      /**
+       * Resolve to `undefined` instead of throwing when the token is not bound.
+       */
+      readonly optional?: boolean;
+    };
+
+/**
+ * Maps a factory argument tuple to injection options.
+ *
+ * @group Bind
+ */
+export type MapToResolvedValueInjectOptions<TArgs extends Array<unknown>> = {
+  [K in keyof TArgs]: ResolvedValueInjectOption<TArgs[K]>;
+};
 
 /**
  * Describes a constant value binding.
@@ -79,7 +102,7 @@ export interface DynamicValueBindingDescriptor<T = unknown> {
   /**
    * Factory used to produce the value at resolution time.
    */
-  readonly factory: DynamicValueBuilder<T>;
+  readonly factory: (container: Container) => T;
 
   /**
    * Lifetime scope for created values.
@@ -104,9 +127,9 @@ export interface FactoryBindingDescriptor<T = unknown> {
   readonly type: "Factory";
 
   /**
-   * Factory creator passed to Inversify.
+   * Factory creator invoked once with the container to produce the bound factory.
    */
-  readonly factory: (context: ResolutionContext) => T | Promise<T>;
+  readonly factory: (container: Container) => T;
 
   /**
    * Token used to resolve the factory.
@@ -148,9 +171,9 @@ export interface ResolvedValueBindingDescriptor<T = unknown, TArgs extends Array
   readonly type: "ResolvedValue";
 
   /**
-   * Factory called by Inversify with injected arguments.
+   * Factory called with arguments resolved from {@link injectOptions}.
    */
-  readonly factory: (...args: TArgs) => T | Promise<T>;
+  readonly factory: (...args: TArgs) => T;
 
   /**
    * Injection options for factory arguments.

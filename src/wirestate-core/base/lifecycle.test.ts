@@ -148,7 +148,7 @@ describe("Provider lifecycle hooks", () => {
       expect(deactivations).toEqual(["foo"]);
     });
 
-    it("should deactivate dependents before dependencies on unbindAll", () => {
+    it("should deactivate in creation order on unbindAll", () => {
       const container = new Container();
       const deactivations: Array<string> = [];
 
@@ -173,7 +173,31 @@ describe("Provider lifecycle hooks", () => {
       container.get(FooService);
       container.unbindAll();
 
-      expect(deactivations).toEqual(["foo", "bar"]);
+      expect(deactivations).toEqual(["bar", "foo"]);
+    });
+
+    it("should keep bindings resolvable while unbindAll deactivation handlers run", () => {
+      const container = new Container();
+      const resolved: Array<unknown> = [];
+
+      class FooService {}
+
+      class BarService {}
+
+      container.bind({
+        provide: FooService,
+        useClass: FooService,
+        onDeactivated: (instance, current) => resolved.push(current.get(BarService)),
+      });
+      container.bind({ provide: BarService, useClass: BarService });
+
+      container.get(FooService);
+
+      const bar = container.get(BarService);
+
+      container.unbindAll();
+
+      expect(resolved).toEqual([bar]);
     });
 
     it("should not deactivate values resolved through alias providers twice", () => {

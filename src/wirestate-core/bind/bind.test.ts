@@ -14,7 +14,7 @@ describe("bind", () => {
     const result: Container = bind(container, GenericService);
 
     expect(result).toBe(container);
-    expect(container.isBound(GenericService)).toBe(true);
+    expect(container.has(GenericService)).toBe(true);
   });
 
   it("should bind a constant value descriptor", () => {
@@ -90,7 +90,7 @@ describe("bind", () => {
       value: GenericService,
     });
 
-    expect(container.isBound(GenericService)).toBe(true);
+    expect(container.has(GenericService)).toBe(true);
   });
 
   it("should bind an instance descriptor to its descriptor token", () => {
@@ -104,7 +104,7 @@ describe("bind", () => {
 
     bind(container, binding);
 
-    expect(container.isBound(TOKEN)).toBe(true);
+    expect(container.has(TOKEN)).toBe(true);
     expect(container.get(TOKEN)).toBeInstanceOf(GenericService);
     expect(getContainerBindings(container)).toEqual([binding]);
   });

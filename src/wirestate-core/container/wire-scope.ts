@@ -23,11 +23,11 @@ import { SeedKey, SeedsMap } from "../types/seeds";
  *
  * @example
  * ```typescript
- * import { Inject, Injectable, WireScope } from "@wirestate/core";
+ * import { Injectable, WireScope, inject } from "@wirestate/core";
  *
  * @Injectable()
  * class CartService {
- *   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+ *   public constructor(private readonly scope: WireScope = inject(WireScope)) {}
  *
  *   public addItem(item: CartItem): void {
  *     this.scope.emitEvent("CART_ITEM_ADDED", item);
@@ -114,7 +114,7 @@ export class WireScope {
       token,
     });
 
-    return this.container.isBound(token) ? this.container.get<T>(token) : null;
+    return this.container.has(token) ? this.container.get<T>(token) : null;
   }
 
   /**

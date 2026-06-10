@@ -1,48 +1,57 @@
-import { LazyServiceIdentifier as LazyIdentifier, ServiceIdentifier as Identifier } from "inversify";
+import type { Token } from "./base";
 
 /**
- * @group External-inversify
- * @see {@link https://inversify.io/}
- */
-export {
-  Container,
-  LazyServiceIdentifier as LazyIdentifier,
-  Newable,
-  ServiceIdentifier as Identifier,
-} from "inversify";
-
-/**
- * @group External-inversify
- * @see {@link https://inversify.io/}
- */
-export {
-  inject as Inject,
-  injectable as Injectable,
-  multiInject as MultiInject,
-  named as Named,
-  optional as Optional,
-  tagged as Tagged,
-} from "inversify";
-
-/**
- * @group External-inversify-binding
- * @see {@link https://inversify.io/}
- */
-export { bindingTypeValues as BindingType, bindingScopeValues as BindingScope } from "inversify";
-
-/**
- * Wraps a token for circular constructor dependencies.
+ * Wirestate DI container and injection primitives.
  *
- * `forwardRef` delays token lookup when two constructor dependencies refer to
- * each other. Prefer breaking the cycle when possible, for example by moving
- * shared state or coordination into another service.
- *
- * @group External-inversify
- * @see {@link https://inversify.io/}
- *
- * @param forward - Function that returns the token.
- * @returns Lazy identifier.
+ * @group Container
  */
-export function forwardRef<TInstance = unknown>(forward: () => Identifier<TInstance>): LazyIdentifier<TInstance> {
-  return new LazyIdentifier(forward);
-}
+export { Container, InjectionToken, inject, NoProviderFoundError, CircularDependencyError } from "./base";
+
+/**
+ * @group Bind
+ */
+export { Injectable, isInjectable } from "./metadata/injectable";
+
+/**
+ * Token used to register and resolve a service: class constructor, abstract
+ * class, string, symbol, or {@link InjectionToken}.
+ *
+ * @group Container
+ */
+export type Identifier<TInstance = unknown> = Token<TInstance>;
+
+/**
+ * Constructable class reference.
+ *
+ * @group Container
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Newable<TInstance = unknown> = new (...args: Array<any>) => TInstance;
+
+/**
+ * Binding strategy names accepted by binding descriptors.
+ *
+ * @group Bind
+ */
+export const BindingType = {
+  ConstantValue: "ConstantValue",
+  DynamicValue: "DynamicValue",
+  Factory: "Factory",
+  Instance: "Instance",
+  ResolvedValue: "ResolvedValue",
+  ServiceRedirection: "ServiceRedirection",
+} as const;
+
+/**
+ * Lifetime scope names accepted by binding descriptors.
+ *
+ * @remarks
+ * `Singleton` caches one value per container, `Transient` constructs a new
+ * value on every resolution.
+ *
+ * @group Bind
+ */
+export const BindingScope = {
+  Singleton: "Singleton",
+  Transient: "Transient",
+} as const;

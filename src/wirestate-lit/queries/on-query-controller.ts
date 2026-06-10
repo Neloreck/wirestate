@@ -30,7 +30,11 @@ import { Optional } from "../types/general";
  * }
  * ```
  */
-export class OnQueryController<R = unknown, P = unknown, T extends QueryType = QueryType> implements ReactiveController {
+export class OnQueryController<
+  R = unknown,
+  P = unknown,
+  T extends QueryType = QueryType,
+> implements ReactiveController {
   private bus: Optional<QueryBus> = null;
   private unregister: Optional<QueryUnregister> = null;
 

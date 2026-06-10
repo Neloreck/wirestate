@@ -38,11 +38,9 @@ export type CommandType = string | symbol | number;
  * };
  * ```
  */
-export type CommandHandler<
-  R = unknown,
-  P = unknown,
-  T extends CommandType = CommandType
-> = ((payload: P) => MaybePromise<R>) & {
+export type CommandHandler<R = unknown, P = unknown, T extends CommandType = CommandType> = ((
+  payload: P
+) => MaybePromise<R>) & {
   readonly type?: T;
 };
 

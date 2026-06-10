@@ -180,7 +180,7 @@ describe("ContainerProvider", () => {
 
     expect(events).toEqual(["activated", "provision", "deprovision"]);
     expect(unbindAllSpy).not.toHaveBeenCalled();
-    expect(container.isBound(LifecycleService)).toBe(true);
+    expect(container.has(LifecycleService)).toBe(true);
   });
 
   it("should deprovision previous external containers and provision replacement values", () => {

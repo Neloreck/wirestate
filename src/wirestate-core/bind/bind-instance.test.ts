@@ -1,6 +1,6 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { BindingType, Container, Inject, Injectable } from "../alias";
+import { BindingType, Container, inject, Injectable } from "../alias";
 import { CommandBus } from "../commands/command-bus";
 import { OnCommand } from "../commands/on-command";
 import { createContainer } from "../container/create-container";
@@ -42,10 +42,7 @@ describe("bindInstance", () => {
 
   @Injectable()
   class SyncFailDeactivationService {
-    public constructor(
-      @Inject(WireScope)
-      public readonly scope: WireScope
-    ) {}
+    public constructor(public readonly scope: WireScope = inject(WireScope)) {}
 
     @OnDeactivation()
     public onDeactivation(): void {
@@ -75,7 +72,7 @@ describe("bindInstance", () => {
     const result: Container = bindInstance(container, GenericService);
 
     expect(result).toBe(container);
-    expect(container.isBound(GenericService)).toBe(true);
+    expect(container.has(GenericService)).toBe(true);
 
     const instance: GenericService = container.get(GenericService);
 
@@ -266,10 +263,7 @@ describe("bindInstance", () => {
 
     @Injectable()
     class SyncFailActivationWithHandlersService {
-      public constructor(
-        @Inject(WireScope)
-        public readonly scope: WireScope
-      ) {
+      public constructor(public readonly scope: WireScope = inject(WireScope)) {
         instanceRef.current = this;
         scopeRef.current = scope;
       }

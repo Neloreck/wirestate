@@ -197,15 +197,14 @@ export class Container {
   }
 
   /**
-   * Unbinds all providers, deactivating container-owned values in reverse creation order,
-   * so dependent services deactivate before their dependencies.
+   * Unbinds all providers, deactivating container-owned values in creation order.
+   * Bindings stay resolvable until every deactivation handler has run, so
+   * deactivating services can still talk to each other.
    *
    * {@link https://needle-di.io/concepts/binding.html#binding}.
    */
   public unbindAll(): this {
-    for (let index = this.activated.length - 1; index >= 0; index--) {
-      const { provider, instance } = this.activated[index];
-
+    for (const { provider, instance } of [...this.activated]) {
       Guards.getLifecycle(provider).onDeactivated?.(instance, this);
     }
 
@@ -369,18 +368,17 @@ export class Container {
   }
 
   /**
-   * Deactivates all container-owned values of a token in reverse creation order.
+   * Deactivates all container-owned values of a token in creation order.
    *
    * @param token - Token to deactivate.
    */
   private deactivate<T>(token: Token<T>): void {
-    for (let index = this.activated.length - 1; index >= 0; index--) {
-      const record = this.activated[index];
+    const records = this.activated.filter((record) => record.token === token);
 
-      if (record.token === token) {
-        Guards.getLifecycle(record.provider).onDeactivated?.(record.instance, this);
-        this.activated.splice(index, 1);
-      }
+    for (const record of records) {
+      Guards.getLifecycle(record.provider).onDeactivated?.(record.instance, this);
+
+      this.activated.splice(this.activated.indexOf(record), 1);
     }
   }
 

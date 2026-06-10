@@ -32,9 +32,9 @@ describe("bindConstant", () => {
       bindConstant(container, {
         token: "my-token",
         value: "my-value",
-        scope: BindingScope.Request,
+        scope: "Request",
       } as unknown as ConstantValueBindingDescriptor)
-    ).toThrow("Provided unexpected binding scope for constant value.");
+    ).toThrow("Binding descriptor has unknown scope 'Request'.");
     expect(() =>
       bindConstant(container, {
         token: "my-token",

@@ -1,5 +1,3 @@
-import { ResolutionContext } from "inversify";
-
 import { Container } from "../../alias";
 import { createContainer } from "../../container/create-container";
 import { ACTIVE_INSTANCES_BY_CONTAINER } from "../../registry";
@@ -24,7 +22,7 @@ describe("createInstanceDeactivationHandler", () => {
       container,
     });
 
-    activate({} as ResolutionContext, instance);
+    activate(instance);
 
     expect(ACTIVE_INSTANCES_BY_CONTAINER.get(container)?.has(instance)).toBe(true);
 

@@ -1,5 +1,4 @@
-import { Container } from "inversify";
-
+import { Container } from "../../alias";
 import { WireStatus } from "../../container/wire-status";
 import { PROVISION_STATUS_BY_CONTAINER } from "../../registry";
 

@@ -1,5 +1,3 @@
-import { ResolutionContext } from "inversify";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
@@ -20,24 +18,23 @@ interface CreateInstanceActivationHandlerOptions<T extends object> {
 }
 
 /**
- * Creates the Inversify activation hook for a Wirestate instance binding.
+ * Creates the container activation hook for a Wirestate instance binding.
  *
  * @internal
  *
  * @template T - Instance type.
  *
  * @param handlerOptions - Activated handler options.
- * @returns Inversify activation handler.
+ * @returns Provider activation handler.
  */
 export function createInstanceActivatedHandler<T extends object>(
   handlerOptions: CreateInstanceActivationHandlerOptions<T>
-): (context: ResolutionContext, instance: T) => T {
+): (instance: T) => T {
   const { binding, container, options } = handlerOptions;
 
-  return (context: ResolutionContext, instance: T): T => {
+  return (instance: T): T => {
     dbg.info(prefix(__filename), "Activating instance:", {
       name: binding.name,
-      context,
       container,
       binding,
       instance,
@@ -62,7 +59,6 @@ export function createInstanceActivatedHandler<T extends object>(
       if (options?.skipActivationHooks) {
         dbg.info(prefix(__filename), "Skip @OnActivated method:", {
           name: binding.name,
-          context,
           container,
           binding,
           instance,

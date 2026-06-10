@@ -75,7 +75,7 @@ describe("container operation edge cases", () => {
     const container: Container = createContainer();
 
     expect(() => unbind(container, "NEVER_BOUND")).not.toThrow();
-    expect(container.isCurrentBound("NEVER_BOUND")).toBe(false);
+    expect(container.hasOwn("NEVER_BOUND")).toBe(false);
     expect(getContainerBindings(container)).toEqual([]);
   });
 

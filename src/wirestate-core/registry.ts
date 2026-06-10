@@ -208,13 +208,6 @@ export const PROVISION_IDS_BY_INSTANCE: WeakMap<object, ProvisionId> = new WeakM
 export const WIRESTATE_INTERNAL_ERROR_HANDLERS: WeakMap<Container, InternalErrorHandler> = new WeakMap();
 
 /**
- * Token used to expose a container's parent container through dependency injection.
- *
- * @group Container
- */
-export const CONTAINER_PARENT_TOKEN: unique symbol = Symbol.for("@wirestate/core/container-parent");
-
-/**
  * Unique symbol used as a token for the container-scoped seeds map.
  *
  * @remarks

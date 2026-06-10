@@ -1,6 +1,6 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Container, Inject, Injectable } from "../alias";
+import { Container, inject, Injectable } from "../alias";
 import { bind } from "../bind/bind";
 import { OnActivated } from "../bind/instance/on-activated";
 import { OnDeactivation } from "../bind/instance/on-deactivation";
@@ -24,7 +24,7 @@ describe("WireScope", () => {
     const container: Container = createContainer();
     const scope: WireScope = new WireScope(container);
 
-    container.bind("TEST").toConstantValue("VALUE");
+    container.bind({ provide: "TEST", useValue: "VALUE" });
 
     expect(scope.resolve("TEST")).toBe("VALUE");
     expect(() => scope.resolve("NOT_EXISTING")).toThrow(Error);
@@ -34,7 +34,7 @@ describe("WireScope", () => {
     const container: Container = createContainer();
     const scope: WireScope = new WireScope(container);
 
-    container.bind("TEST").toConstantValue("VALUE");
+    container.bind({ provide: "TEST", useValue: "VALUE" });
 
     expect(scope.resolveOptional("TEST")).toBe("VALUE");
     expect(scope.resolveOptional("NON_EXISTENT")).toBeNull();
@@ -363,10 +363,7 @@ describe("WireScope", () => {
   it("should support full handler lifecycle: register on activation and unregister on deactivation without throwing", async () => {
     @Injectable()
     class ServiceWithManualSubs {
-      public constructor(
-        @Inject(WireScope)
-        private readonly scope: WireScope
-      ) {}
+      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
       @OnActivated()
       public onActivated(): void {

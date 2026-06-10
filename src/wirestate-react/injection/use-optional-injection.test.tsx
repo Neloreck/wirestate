@@ -88,7 +88,7 @@ describe("useOptionalInjection", () => {
     const unboundToken: unique symbol = Symbol("unbound-token");
     const boundToken: unique symbol = Symbol("bound-token");
 
-    container.bind(boundToken).toConstantValue("bound-value");
+    container.bind({ provide: boundToken, useValue: "bound-value" });
 
     function FallbackComponent() {
       const data: Optional<string> = useOptionalInjection(unboundToken, (container) => container.get(boundToken));
@@ -138,7 +138,7 @@ describe("useOptionalInjection", () => {
     const originalGet = container.get.bind(container);
     let resolveCount = 0;
 
-    container.bind(token).toConstantValue("bound-value");
+    container.bind({ provide: token, useValue: "bound-value" });
 
     jest.spyOn(container, "get").mockImplementation((requestedToken) => {
       if (requestedToken === token) {

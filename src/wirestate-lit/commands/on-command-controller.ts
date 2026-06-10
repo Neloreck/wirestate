@@ -29,9 +29,11 @@ import { Optional } from "../types/general";
  * }
  * ```
  */
-export class OnCommandController<R = unknown, P = unknown, T extends CommandType = CommandType>
-  implements ReactiveController
-{
+export class OnCommandController<
+  R = unknown,
+  P = unknown,
+  T extends CommandType = CommandType,
+> implements ReactiveController {
   private bus: Optional<CommandBus> = null;
   private unregister: Optional<CommandUnregister> = null;
 

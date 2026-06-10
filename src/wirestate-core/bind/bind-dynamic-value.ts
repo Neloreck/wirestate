@@ -1,5 +1,3 @@
-import { BindInWhenOnFluentSyntax, DynamicValueBuilder } from "inversify";
-
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
@@ -8,7 +6,7 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { DynamicValueBindingDescriptor } from "../types/provision";
 
-import { applyBindingScope } from "./utils/apply-binding-scope";
+import { toProviderScope } from "./utils/apply-binding-scope";
 import { registerBinding } from "./utils/register-binding";
 import { validateBindingDescriptor } from "./utils/validate-binding-descriptor";
 
@@ -66,13 +64,11 @@ export function bindDynamicValue<T>(container: Container, descriptor: DynamicVal
     container,
   });
 
-  const binding: BindInWhenOnFluentSyntax<T> = container
-    .bind(descriptor.token)
-    .toDynamicValue((context) =>
-      (descriptor.factory as DynamicValueBuilder<T>)(context)
-    ) as BindInWhenOnFluentSyntax<T>;
-
-  applyBindingScope(binding, descriptor.scope);
+  container.bind({
+    provide: descriptor.token,
+    scope: toProviderScope(descriptor.scope),
+    useFactory: (current) => descriptor.factory(current),
+  });
 
   registerBinding(container, descriptor);
 

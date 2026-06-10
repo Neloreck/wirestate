@@ -1,5 +1,3 @@
-import { ResolutionContext } from "inversify";
-
 import { Container } from "../../alias";
 import { createContainer } from "../../container/create-container";
 import { ACTIVE_INSTANCES_BY_CONTAINER } from "../../registry";
@@ -20,7 +18,7 @@ describe("createInstanceActivatedHandler", () => {
     });
 
     expect(ACTIVE_INSTANCES_BY_CONTAINER.get(container)).toBeUndefined();
-    expect(activate({} as ResolutionContext, instance)).toBe(instance);
+    expect(activate(instance)).toBe(instance);
     expect(ACTIVE_INSTANCES_BY_CONTAINER.get(container)?.has(instance)).toBe(true);
   });
 
@@ -42,7 +40,7 @@ describe("createInstanceActivatedHandler", () => {
       container,
     });
 
-    expect(() => activate({} as ResolutionContext, instance)).toThrow("activation-fail");
+    expect(() => activate(instance)).toThrow("activation-fail");
     expect(onError).toHaveBeenCalledTimes(1);
     expect(ACTIVE_INSTANCES_BY_CONTAINER.get(container)).toBeUndefined();
   });

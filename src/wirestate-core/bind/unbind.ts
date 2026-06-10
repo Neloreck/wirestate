@@ -19,7 +19,7 @@ import { unregisterAllBindings, unregisterBinding } from "./utils/register-bindi
  * @param token - Binding token to remove.
  */
 export function unbind<T = unknown>(container: Container, token: Identifier<T>): void {
-  if (container.isCurrentBound(token)) {
+  if (container.hasOwn(token)) {
     deprovisionContainerBinding(container, token);
   }
 

@@ -1,5 +1,3 @@
-import { ResolutionContext } from "inversify";
-
 import { Container, BindingType, BindingScope } from "../alias";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { AnyObject } from "../types/general";
@@ -23,16 +21,16 @@ describe("bindDynamicValue", () => {
     expect(container.get("factory-value")).toEqual({ c: 3, d: 4 });
     expect(container.get("factory-value")).toBe(value);
 
-    expect(factory).toHaveBeenCalledTimes(2);
+    expect(factory).toHaveBeenCalledTimes(1);
   });
 
-  it("should pass resolution context to factory", () => {
+  it("should pass container to factory", () => {
     const container: Container = new Container();
     const NAME_TOKEN: unique symbol = Symbol("name");
     const GREETING_TOKEN: unique symbol = Symbol("greeting");
-    const factory = jest.fn((context: ResolutionContext) => `Hello, ${context.get(NAME_TOKEN)}`);
+    const factory = jest.fn((current: Container) => `Hello, ${current.get<string>(NAME_TOKEN)}`);
 
-    container.bind(NAME_TOKEN).toConstantValue("Ada");
+    container.bind({ provide: NAME_TOKEN, useValue: "Ada" });
 
     bindDynamicValue(container, {
       type: BindingType.DynamicValue,
@@ -79,21 +77,17 @@ describe("bindDynamicValue", () => {
     expect(container.get("factory-transient")).toBe(2);
   });
 
-  it("should respect Request scope", () => {
+  it("should reject removed Request scope", () => {
     const container: Container = new Container();
-    let count: number = 0;
 
-    bindDynamicValue(container, {
-      type: BindingType.DynamicValue,
-      token: "factory-request",
-      factory: () => count++,
-      scope: BindingScope.Request,
-    });
-
-    // In inversify Request scope is per .get() if not in same request context
-    expect(container.get("factory-request")).toBe(0);
-    expect(container.get("factory-request")).toBe(1);
-    expect(container.get("factory-request")).toBe(2);
+    expect(() =>
+      bindDynamicValue(container, {
+        type: BindingType.DynamicValue,
+        token: "factory-request",
+        factory: () => 0,
+        scope: "Request",
+      } as unknown as DynamicValueBindingDescriptor)
+    ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_BINDING_SCOPE }));
   });
 
   it("should throw if token is missing", () => {

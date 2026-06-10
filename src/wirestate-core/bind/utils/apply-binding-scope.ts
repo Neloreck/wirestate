@@ -1,27 +1,20 @@
-import type { BindInWhenOnFluentSyntax } from "inversify";
-
 import { BindingScope as BindingScopeValues } from "../../alias";
+import type { ProviderScope } from "../../base";
 import { BindingScope } from "../../types/provision";
 
 /**
- * Applies an optional Inversify binding scope.
+ * Maps a Wirestate binding scope to the base container provider scope.
  *
  * @group Bind
  * @internal
  *
- * @param binding - Fluent binding syntax returned by Inversify.
- * @param scope - Optional scope value from a Wirestate binding descriptor.
+ * @param scope - Wirestate binding scope, if declared.
+ * @returns Matching provider scope, or `undefined` when not declared.
  */
-export function applyBindingScope<T>(binding: BindInWhenOnFluentSyntax<T>, scope?: BindingScope): void {
+export function toProviderScope(scope?: BindingScope): ProviderScope | undefined {
   if (!scope) {
-    return;
+    return undefined;
   }
 
-  if (scope === BindingScopeValues.Transient) {
-    binding.inTransientScope();
-  } else if (scope === BindingScopeValues.Request) {
-    binding.inRequestScope();
-  } else {
-    binding.inSingletonScope();
-  }
+  return scope === BindingScopeValues.Transient ? "transient" : "singleton";
 }

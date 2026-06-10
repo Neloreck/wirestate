@@ -8,7 +8,7 @@ import { CommandBus } from "../commands/command-bus";
 import { getConfiguredInternalErrorHandler, setInternalErrorHandler } from "../error/internal-error-handler";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
-import { CONTAINER_PARENT_TOKEN, SEED_TOKEN, SEEDS_TOKEN } from "../registry";
+import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 import { InternalErrorHandler } from "../types/error";
 import { AnyObject, Maybe } from "../types/general";
 import { Bindings } from "../types/provision";
@@ -130,19 +130,13 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
   const activate: ReadonlyArray<Identifier> =
     (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
 
-  const container: Container = new Container({
-    defaultScope: "Singleton",
-    parent: config.parent,
-  });
+  const container: Container = new Container(config.parent);
 
   const errorHandler: Maybe<InternalErrorHandler> = config.onError ?? getConfiguredInternalErrorHandler(config.parent);
 
-  container.bind(CONTAINER_PARENT_TOKEN).toConstantValue(config.parent);
-  container.bind(Container).toConstantValue(container);
-
   // Merge with parent seeds map.
   const seeds = new Map(
-    config.parent?.isBound(SEEDS_TOKEN) ? (config.parent.get<SeedsMap>(SEEDS_TOKEN) ?? []) : []
+    config.parent?.has(SEEDS_TOKEN) ? (config.parent.get<SeedsMap>(SEEDS_TOKEN) ?? []) : []
   ) as SeedsMap;
 
   if (config.seeds) {
@@ -151,28 +145,28 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
     }
   }
 
-  container.bind(SEEDS_TOKEN).toConstantValue(seeds);
+  container.bind({ provide: SEEDS_TOKEN, useValue: seeds });
 
   // Fallback to parent config as default value.
-  container
-    .bind(SEED_TOKEN)
-    .toConstantValue(
-      config.seed ?? (config.parent?.isBound(SEED_TOKEN) ? (config.parent.get<AnyObject>(SEED_TOKEN) ?? {}) : {})
-    );
+  container.bind({
+    provide: SEED_TOKEN,
+    useValue: config.seed ?? (config.parent?.has(SEED_TOKEN) ? (config.parent.get<AnyObject>(SEED_TOKEN) ?? {}) : {}),
+  });
 
-  container
-    .bind(WireScope)
-    .toResolvedValue((): WireScope => new WireScope(container))
-    .inTransientScope();
+  container.bind({
+    provide: WireScope,
+    scope: "transient",
+    useFactory: (): WireScope => new WireScope(container),
+  });
 
   if (errorHandler) {
     setInternalErrorHandler(container, errorHandler);
   }
 
   if (!options.skipMessaging) {
-    container.bind(EventBus).toConstantValue(new EventBus(container));
-    container.bind(QueryBus).toConstantValue(new QueryBus());
-    container.bind(CommandBus).toConstantValue(new CommandBus());
+    container.bind({ provide: EventBus, useValue: new EventBus(container) });
+    container.bind({ provide: QueryBus, useValue: new QueryBus() });
+    container.bind({ provide: CommandBus, useValue: new CommandBus() });
   }
 
   dbg.info(prefix(__filename), "Injecting bindings on creation:", { container, config, options });

@@ -1,6 +1,6 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { BindingType, Container, Inject, Injectable } from "../alias";
+import { BindingType, Container, inject, Injectable } from "../alias";
 import { OnActivated } from "../bind/instance/on-activated";
 import { OnDeprovision } from "../bind/instance/on-deprovision";
 import { OnProvision } from "../bind/instance/on-provision";
@@ -217,10 +217,7 @@ describe("provision lifecycle", () => {
 
     @Injectable()
     class ResolvingLifecycleService {
-      public constructor(
-        @Inject(WireScope)
-        private readonly scope: WireScope
-      ) {}
+      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
       @OnActivated()
       public onActivated(): void {
@@ -358,10 +355,7 @@ describe("provision lifecycle", () => {
 
     @Injectable()
     class ScopedLifecycleService {
-      public constructor(
-        @Inject(WireScope)
-        public readonly scope: WireScope
-      ) {}
+      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
 
       @OnProvision()
       public onProvision(provisionId: ProvisionId): void {
@@ -411,10 +405,7 @@ describe("provision lifecycle", () => {
 
     @Injectable()
     class ScopedLifecycleService {
-      public constructor(
-        @Inject(WireScope)
-        public readonly scope: WireScope
-      ) {}
+      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
 
       @OnProvision()
       public onProvision(provisionId: ProvisionId): void {

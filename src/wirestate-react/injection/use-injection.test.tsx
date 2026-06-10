@@ -30,7 +30,7 @@ describe("useInjection", () => {
 
     consoleSpy.mockRestore();
 
-    expect(getByText(/No bindings found for service:/)).toBeTruthy();
+    expect(getByText("No provider(s) found for SimpleService", { exact: false })).toBeTruthy();
   });
 
   it("should resolve bound instance from container", () => {
@@ -96,6 +96,7 @@ describe("useInjection", () => {
   });
 
   it("should re-resolve when token changes", () => {
+    @Injectable()
     class AnotherService {}
 
     const container: Container = createContainer({

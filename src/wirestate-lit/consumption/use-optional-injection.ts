@@ -117,7 +117,7 @@ export function useOptionalInjection<T, F = null>(
     context: ContainerContext,
     subscribe: !once,
     callback: (container) => {
-      if (container.isBound(token)) {
+      if (container.has(token)) {
         dbg.info(prefix(__filename), "Resolving injection:", {
           token,
           name: (token as AnyObject)?.name ?? token,

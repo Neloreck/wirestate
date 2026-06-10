@@ -71,7 +71,7 @@ export function bindConstant<T>(container: Container, descriptor: ConstantValueB
     container,
   });
 
-  container.bind<T>(descriptor.token as Identifier<T>).toConstantValue(descriptor.value as T);
+  container.bind({ provide: descriptor.token as Identifier<T>, useValue: descriptor.value as T });
 
   registerBinding(container, descriptor);
 

@@ -132,8 +132,8 @@ describe("ContainerProvider", () => {
     const secondParent: Container = new Container();
     const containers: Array<Container> = [];
 
-    firstParent.bind(PARENT_TOKEN).toConstantValue("first-parent");
-    secondParent.bind(PARENT_TOKEN).toConstantValue("second-parent");
+    firstParent.bind({ provide: PARENT_TOKEN, useValue: "first-parent" });
+    secondParent.bind({ provide: PARENT_TOKEN, useValue: "second-parent" });
 
     function TrackingConsumer() {
       const container: Container = useContainer();
@@ -320,7 +320,7 @@ describe("ContainerProvider", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(containers[0].isCurrentBound(CONFIG_TOKEN)).toBe(false);
+    expect(containers[0].hasOwn(CONFIG_TOKEN)).toBe(false);
     expect(containers).toHaveLength(2);
   });
 
@@ -421,7 +421,7 @@ describe("ContainerProvider lifecycle", () => {
 
     expect(events).toEqual(["activated", "provision", "deprovision"]);
     expect(unbindAllSpy).not.toHaveBeenCalled();
-    expect(container.isBound(LifecycleService)).toBe(true);
+    expect(container.has(LifecycleService)).toBe(true);
   });
 
   it("should not provision the same external container twice on stable rerender", () => {

@@ -27,7 +27,7 @@ describe("unbind", () => {
 
     unbind(container, LifecycleService);
 
-    expect(container.isCurrentBound(LifecycleService)).toBe(false);
+    expect(container.hasOwn(LifecycleService)).toBe(false);
     expect(getContainerBindings(container)).toEqual([]);
   });
 
@@ -42,8 +42,8 @@ describe("unbind", () => {
 
     unbindAll(container);
 
-    expect(container.isCurrentBound(LifecycleService)).toBe(false);
-    expect(container.isCurrentBound("CONFIG")).toBe(false);
+    expect(container.hasOwn(LifecycleService)).toBe(false);
+    expect(container.hasOwn("CONFIG")).toBe(false);
     expect(getContainerBindings(container)).toEqual([]);
   });
 

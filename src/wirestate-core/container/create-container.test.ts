@@ -1,13 +1,13 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { BindingType, Container, Inject, Injectable } from "../alias";
+import { BindingType, Container, inject, Injectable } from "../alias";
 import { bind } from "../bind/bind";
 import { unbindAll } from "../bind/unbind";
 import { CommandBus } from "../commands/command-bus";
 import { getConfiguredInternalErrorHandler } from "../error/internal-error-handler";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
-import { CONTAINER_PARENT_TOKEN, SEED_TOKEN, SEEDS_TOKEN } from "../registry";
+import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 
 import { createContainer } from "./create-container";
 import { WireScope } from "./wire-scope";
@@ -24,12 +24,12 @@ describe("createContainer", () => {
     expect(container.get(SEEDS_TOKEN)).toBeInstanceOf(Map);
     expect(container.get(SEED_TOKEN)).toEqual({});
     expect(container.get(WireScope)).toBeInstanceOf(WireScope);
-    expect(container.isCurrentBound(EventBus)).toBe(true);
-    expect(container.isCurrentBound(QueryBus)).toBe(true);
-    expect(container.isCurrentBound(CommandBus)).toBe(true);
-    expect(container.isCurrentBound(SEEDS_TOKEN)).toBe(true);
-    expect(container.isCurrentBound(SEED_TOKEN)).toBe(true);
-    expect(container.isCurrentBound(WireScope)).toBe(true);
+    expect(container.hasOwn(EventBus)).toBe(true);
+    expect(container.hasOwn(QueryBus)).toBe(true);
+    expect(container.hasOwn(CommandBus)).toBe(true);
+    expect(container.hasOwn(SEEDS_TOKEN)).toBe(true);
+    expect(container.hasOwn(SEED_TOKEN)).toBe(true);
+    expect(container.hasOwn(WireScope)).toBe(true);
     expect(getConfiguredInternalErrorHandler(container)).toBeUndefined();
   });
 
@@ -47,13 +47,13 @@ describe("createContainer", () => {
   it("should skip core buses when skipMessaging is true", () => {
     const container: Container = createContainer({}, { skipMessaging: true });
 
-    expect(container.isCurrentBound(EventBus)).toBe(false);
-    expect(container.isCurrentBound(QueryBus)).toBe(false);
-    expect(container.isCurrentBound(CommandBus)).toBe(false);
-    expect(container.isCurrentBound(Container)).toBe(true);
-    expect(container.isCurrentBound(SEEDS_TOKEN)).toBe(true);
-    expect(container.isCurrentBound(SEED_TOKEN)).toBe(true);
-    expect(container.isCurrentBound(WireScope)).toBe(true);
+    expect(container.hasOwn(EventBus)).toBe(false);
+    expect(container.hasOwn(QueryBus)).toBe(false);
+    expect(container.hasOwn(CommandBus)).toBe(false);
+    expect(container.hasOwn(Container)).toBe(true);
+    expect(container.hasOwn(SEEDS_TOKEN)).toBe(true);
+    expect(container.hasOwn(SEED_TOKEN)).toBe(true);
+    expect(container.hasOwn(WireScope)).toBe(true);
   });
 
   it("should let a skipMessaging child use parent messaging bindings", () => {
@@ -61,14 +61,14 @@ describe("createContainer", () => {
 
     @Injectable()
     class ParentMessagingService {
-      public constructor(@Inject(EventBus) eventBus: EventBus) {
+      public constructor(eventBus: EventBus = inject(EventBus)) {
         eventBus.subscribe((event) => receivedEvents.push(String(event.payload)));
       }
     }
 
     @Injectable()
     class ChildMessagingService {
-      public constructor(@Inject(EventBus) private readonly eventBus: EventBus) {}
+      public constructor(private readonly eventBus: EventBus = inject(EventBus)) {}
 
       public emit(message: string): void {
         this.eventBus.emit("child-message", message);
@@ -81,12 +81,12 @@ describe("createContainer", () => {
     });
     const child: Container = createContainer({ parent, bindings: [ChildMessagingService] }, { skipMessaging: true });
 
-    expect(child.isCurrentBound(EventBus)).toBe(false);
-    expect(child.isBound(EventBus)).toBe(true);
-    expect(child.isCurrentBound(QueryBus)).toBe(false);
-    expect(child.isBound(QueryBus)).toBe(true);
-    expect(child.isCurrentBound(CommandBus)).toBe(false);
-    expect(child.isBound(CommandBus)).toBe(true);
+    expect(child.hasOwn(EventBus)).toBe(false);
+    expect(child.has(EventBus)).toBe(true);
+    expect(child.hasOwn(QueryBus)).toBe(false);
+    expect(child.has(QueryBus)).toBe(true);
+    expect(child.hasOwn(CommandBus)).toBe(false);
+    expect(child.has(CommandBus)).toBe(true);
     expect(child.get(EventBus)).toBe(parent.get(EventBus));
 
     child.get(ChildMessagingService).emit("from-child");
@@ -114,11 +114,11 @@ describe("createContainer", () => {
     const parent: Container = new Container();
     const PARENT_TOKEN: unique symbol = Symbol.for("PARENT_TOKEN");
 
-    parent.bind(PARENT_TOKEN).toConstantValue("parent-value");
+    parent.bind({ provide: PARENT_TOKEN, useValue: "parent-value" });
 
     const container: Container = createContainer({ parent });
 
-    expect(container.get(CONTAINER_PARENT_TOKEN)).toBe(parent);
+    expect(container.parent).toBe(parent);
     expect(container.get(PARENT_TOKEN)).toBe("parent-value");
   });
 
@@ -151,11 +151,11 @@ describe("createContainer", () => {
     expect(container.get(QueryBus)).not.toBe(parent.get(QueryBus));
     expect(container.get(CommandBus)).not.toBe(parent.get(CommandBus));
 
-    expect(container.isCurrentBound(SEEDS_TOKEN)).toBe(true);
+    expect(container.hasOwn(SEEDS_TOKEN)).toBe(true);
     expect(container.get(SEEDS_TOKEN)).not.toBe(parent.get(SEEDS_TOKEN));
     expect(container.get<Map<unknown, unknown>>(SEEDS_TOKEN).get(PARENT_TOKEN)).toBe(PARENT_VALUE);
 
-    expect(container.isCurrentBound(SEED_TOKEN)).toBe(true);
+    expect(container.hasOwn(SEED_TOKEN)).toBe(true);
     expect(container.get(SEED_TOKEN)).toBe(parent.get(SEED_TOKEN));
   });
 
@@ -178,8 +178,8 @@ describe("createContainer", () => {
     expect(parent.get<Map<unknown, unknown>>(SEEDS_TOKEN).size).toBe(1);
     expect(parent.get<Map<unknown, unknown>>(SEEDS_TOKEN).get(PARENT_TOKEN)).toEqual({ source: "parent-token" });
 
-    expect(container.isCurrentBound(SEED_TOKEN)).toBe(true);
-    expect(container.isCurrentBound(SEEDS_TOKEN)).toBe(true);
+    expect(container.hasOwn(SEED_TOKEN)).toBe(true);
+    expect(container.hasOwn(SEEDS_TOKEN)).toBe(true);
     expect(container.get(SEED_TOKEN)).toEqual({ source: "child" });
     expect(container.get<Map<unknown, unknown>>(SEEDS_TOKEN).size).toBe(2);
     expect(container.get<Map<unknown, unknown>>(SEEDS_TOKEN).get(PARENT_TOKEN)).toEqual({ source: "parent-token" });
@@ -204,6 +204,7 @@ describe("createContainer", () => {
   it("should use Singleton as default scope for new bindings", () => {
     const container: Container = createContainer();
 
+    @Injectable()
     class TestService {}
 
     bind(container, TestService);
@@ -248,6 +249,7 @@ describe("createContainer", () => {
   });
 
   it("should bind provided bindings", () => {
+    @Injectable()
     class TestService {}
     const container: Container = createContainer({
       bindings: [TestService],
@@ -259,6 +261,7 @@ describe("createContainer", () => {
   it("should activate provided services", () => {
     let activated: boolean = false;
 
+    @Injectable()
     @Injectable()
     class TestService {
       public constructor() {
@@ -278,6 +281,7 @@ describe("createContainer", () => {
     const TOKEN: unique symbol = Symbol("token");
     let activated: boolean = false;
 
+    @Injectable()
     @Injectable()
     class TestService {
       public constructor() {
@@ -328,6 +332,7 @@ describe("createContainer", () => {
   it("should not activate provided bindings when activate is false", () => {
     let activated: boolean = false;
 
+    @Injectable()
     @Injectable()
     class TestService {
       public constructor() {
@@ -387,6 +392,7 @@ describe("createContainer", () => {
   });
 
   it("should throw error if activated instance is not in bindings", () => {
+    @Injectable()
     @Injectable()
     class TestService {}
 

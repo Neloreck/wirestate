@@ -34,11 +34,9 @@ export type QueryType = string | symbol | number;
  * const handler: QueryHandler<User, string> = (userId) => userRepository.find(userId);
  * ```
  */
-export type QueryHandler<
-  R = unknown,
-  P = unknown,
-  T extends QueryType = QueryType
-> = ((payload: P) => MaybePromise<R>) & {
+export type QueryHandler<R = unknown, P = unknown, T extends QueryType = QueryType> = ((
+  payload: P
+) => MaybePromise<R>) & {
   readonly type?: T;
 };
 

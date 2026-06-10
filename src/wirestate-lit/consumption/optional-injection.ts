@@ -94,7 +94,7 @@ export function optionalInjection<T, F = null>(
     const resolvedFallback: Optional<OptionalInjectionFallback<F>> = options.fallback ?? fallback ?? null;
 
     const resolve = (container: Container): T | F => {
-      if (container.isBound(token)) {
+      if (container.has(token)) {
         return container.get(token);
       }
 

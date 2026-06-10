@@ -1,10 +1,11 @@
-import { Container } from "../alias";
+import { Container, Injectable } from "../alias";
 import { createContainer } from "../container/create-container";
 
 import { callLifecycleHandler } from "./call-lifecycle-handler";
 
 describe("callLifecycleHandler", () => {
   it("should call lifecycle handler with the instance as this", () => {
+    @Injectable()
     class TestService {
       public value: string = "initial";
 
@@ -30,6 +31,7 @@ describe("callLifecycleHandler", () => {
   });
 
   it("should ignore non-function lifecycle properties", () => {
+    @Injectable()
     class TestService {
       public onLifecycle: string = "not-a-function";
     }
@@ -51,6 +53,7 @@ describe("callLifecycleHandler", () => {
   it("should report synchronous failures without rethrowing by default", () => {
     const error = new Error("sync-fail");
 
+    @Injectable()
     class TestService {
       public onLifecycle(): void {
         throw error;
@@ -90,6 +93,7 @@ describe("callLifecycleHandler", () => {
   it("should report and rethrow synchronous failures when rethrowSync is true", () => {
     const error = new Error("sync-rethrow");
 
+    @Injectable()
     class TestService {
       public onLifecycle(): void {
         throw error;
@@ -126,6 +130,7 @@ describe("callLifecycleHandler", () => {
   it("should report asynchronous rejections", async () => {
     const error = new Error("async-fail");
 
+    @Injectable()
     class TestService {
       public async onLifecycle(): Promise<void> {
         throw error;
@@ -167,6 +172,7 @@ describe("callLifecycleHandler", () => {
   it("should use instance constructor details when diagnostics are not provided", () => {
     const error = new Error("default-details");
 
+    @Injectable()
     class TestService {
       public onLifecycle(): void {
         throw error;

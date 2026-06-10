@@ -178,7 +178,7 @@ describe("ContainerProvider provision errors", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(unbindAllSpy).not.toHaveBeenCalled();
-    expect(container.isBound(FirstProvisionService)).toBe(true);
-    expect(container.isBound(FailingProvisionService)).toBe(true);
+    expect(container.has(FirstProvisionService)).toBe(true);
+    expect(container.has(FailingProvisionService)).toBe(true);
   });
 });

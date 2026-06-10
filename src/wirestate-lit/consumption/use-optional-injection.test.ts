@@ -98,7 +98,7 @@ describe("useOptionalInjection", () => {
     const unboundToken: unique symbol = Symbol("unbound-token");
     const boundToken: unique symbol = Symbol("bound-token");
 
-    container.bind(boundToken).toConstantValue("bound-value");
+    container.bind({ provide: boundToken, useValue: "bound-value" });
 
     fixture = createLitProvision(container);
 
