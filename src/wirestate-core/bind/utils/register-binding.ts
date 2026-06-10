@@ -28,7 +28,7 @@ export function registerBinding(container: Container, binding: Binding): void {
  * Returns bindings Wirestate bound into a container.
  *
  * Framework providers use this list to run provider lifecycle hooks for
- * external containers. Raw Inversify bindings are invisible here.
+ * external containers. Bindings registered directly on the container are invisible here.
  *
  * @group Container
  * @internal

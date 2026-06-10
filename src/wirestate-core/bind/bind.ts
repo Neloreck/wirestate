@@ -42,7 +42,7 @@ export interface BindOptions {
  *
  * Descriptors without `type` are treated as `ConstantValue` bindings.
  * Descriptors with `Factory`, `ResolvedValue`, and `ServiceRedirection` are
- * delegated to their dedicated Inversify binding helpers.
+ * delegated to their dedicated binding helpers.
  *
  * - Class constructor: singleton instance binding.
  * - `ConstantValue`: constant value binding.

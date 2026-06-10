@@ -94,7 +94,7 @@ export function bindInstance<T extends object>(
  *
  * @template T - Type of the instance.
  *
- * @param container - Target Inversify {@link Container}.
+ * @param container - Target {@link Container}.
  * @param token - Token used to resolve the binding.
  * @param binding - Class constructor.
  * @param registeredBinding - Binding recorded as container-owned.

@@ -87,7 +87,7 @@ export const DEPROVISION_HANDLER_METADATA: WeakMap<object, string | symbol> = ne
 export const EVENT_HANDLER_METADATA: WeakMap<object, Array<EventHandlerMetadata>> = new WeakMap();
 
 /**
- * Internal storage for mapping instances to their originating Inversify containers.
+ * Internal storage for mapping instances to their originating containers.
  *
  * @remarks
  * Used during the instance lifecycle to ensure that resolution and messaging
@@ -211,7 +211,7 @@ export const WIRESTATE_INTERNAL_ERROR_HANDLERS: WeakMap<Container, InternalError
  * Unique symbol used as a token for the container-scoped seeds map.
  *
  * @remarks
- * This token is used to bind and resolve the {@link SeedsMap} in the Inversify {@link Container}.
+ * This token is used to bind and resolve the {@link SeedsMap} in the {@link Container}.
  *
  * @group Seeds
  *
@@ -222,13 +222,13 @@ export const WIRESTATE_INTERNAL_ERROR_HANDLERS: WeakMap<Container, InternalError
  * const seedsMap: SeedsMap = container.get(SEEDS);
  * ```
  */
-
 export const SEEDS_TOKEN: unique symbol = Symbol("@wirestate/core/seeds");
+
 /**
  * Unique symbol used as a token for the container-scoped shared seed object.
  *
  * @remarks
- * This token is used to bind and resolve the shared seed object in the Inversify {@link Container}.
+ * This token is used to bind and resolve the shared seed object in the {@link Container}.
  *
  * @group Seeds
  *

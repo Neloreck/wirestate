@@ -85,7 +85,7 @@ export interface CreateContainerOptions {
  * Creates a Wirestate container.
  *
  * @remarks
- * Returns an Inversify container with Wirestate pieces installed:
+ * Returns a Wirestate container with these pieces installed:
  *
  * - Shared seed and targeted seed tokens.
  * - Container-scoped `EventBus`, `CommandBus`, and `QueryBus`.

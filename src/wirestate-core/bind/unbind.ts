@@ -7,9 +7,9 @@ import { unregisterAllBindings, unregisterBinding } from "./utils/register-bindi
  * Unbinds a token through Wirestate-owned lifecycle cleanup.
  *
  * @remarks
- * This wraps Inversify's `container.unbind(token)` and also removes the
+ * This wraps the container's `unbind(token)` and also removes the
  * matching Wirestate binding registry entries. If a provider has provisioned an
- * instance for the token, `@OnDeprovision` runs before Inversify deactivation.
+ * instance for the token, `@OnDeprovision` runs before binding deactivation.
  *
  * @group Bind
  *
@@ -31,9 +31,9 @@ export function unbind<T = unknown>(container: Container, token: Identifier<T>):
  * Unbinds every token through Wirestate-owned lifecycle cleanup.
  *
  * @remarks
- * This uses Inversify's batch `container.unbindAll()` so services can still
+ * This uses the container's batch `unbindAll()` so services can still
  * resolve each other while deactivation is running. Any provider lifecycle
- * services still owned by the container are deprovisioned before Inversify
+ * services still owned by the container are deprovisioned before binding
  * deactivation. After this call, the container is disposed and should be
  * discarded.
  *

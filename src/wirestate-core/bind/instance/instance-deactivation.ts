@@ -19,14 +19,14 @@ interface CreateInstanceDeactivationHandlerOptions<T extends object> {
 }
 
 /**
- * Creates the Inversify deactivation hook for a Wirestate instance binding.
+ * Creates the container deactivation hook for a Wirestate instance binding.
  *
  * @internal
  *
  * @template T - Instance type.
  *
  * @param handlerOptions - Deactivation handler options.
- * @returns Inversify deactivation handler.
+ * @returns Binding deactivation handler.
  */
 export function createInstanceDeactivationHandler<T extends object>(
   handlerOptions: CreateInstanceDeactivationHandlerOptions<T>
