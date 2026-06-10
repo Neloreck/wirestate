@@ -14,7 +14,7 @@ hero:
 
 features:
   - title: Dependency Injection
-    details: Inversify containers with Wirestate services, scoped buses, and seed data.
+    details: Built-in DI containers with Wirestate services, scoped buses, and seed data.
   - title: Scoped Messaging
     details: Events broadcast. Commands write. Queries read. Containers keep their own buses.
   - title: Bring Reactivity

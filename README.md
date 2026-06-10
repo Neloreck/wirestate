@@ -55,19 +55,12 @@ npm install @wirestate/core @wirestate/signals @wirestate/lit @wirestate/lit-sig
 npm install @wirestate/core @wirestate/mobx @wirestate/lit @wirestate/lit-mobx
 ```
 
-Import `reflect-metadata` once before decorated services are loaded.
-
-```ts
-import "reflect-metadata";
-```
-
-Enable decorator metadata in TypeScript.
+Enable decorators in TypeScript when using `@Injectable`, `@OnEvent`, and other Wirestate decorators.
 
 ```json
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "experimentalDecorators": true
   }
 }
 ```

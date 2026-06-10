@@ -90,7 +90,7 @@ the child should share event, command, and query handlers with the parent scope.
 
 ## Direct Container Work
 
-`createContainer` returns an Inversify `Container`. You can still use normal container methods when a lower-level
+`createContainer` returns a Wirestate `Container`. You can still use normal container methods when a lower-level
 operation needs them.
 
 ```ts
@@ -114,10 +114,10 @@ unbind(container, UserService);
 unbindAll(child);
 ```
 
-These wrappers call the Inversify unbind operation and clean Wirestate-owned bookkeeping. If a provider owns the
+These wrappers call the container unbind operation and clean Wirestate-owned bookkeeping. If a provider owns the
 service, `@OnDeprovision` runs before service deactivation. After `unbindAll`, discard the container.
 
-Raw `container.unbind(...)` and `container.unbindAll()` remain available as Inversify escape hatches, but they do not clean
+Raw `container.unbind(...)` and `container.unbindAll()` remain available as low-level escape hatches, but they do not clean
 Wirestate's registered binding list.
 
 ## API Reference

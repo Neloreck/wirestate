@@ -38,13 +38,13 @@ cheap initialization that does not need cleanup. Keep `@OnProvision` for provide
 timers, sockets, or async resources.
 
 ```ts
-import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
+import { Injectable, OnActivated, WireScope, inject } from "@wirestate/core";
 
 @Injectable()
 export class CounterService {
   public count: number = 0;
 
-  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   @OnActivated()
   public onActivated(): void {

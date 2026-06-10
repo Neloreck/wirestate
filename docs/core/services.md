@@ -45,18 +45,19 @@ bind(container, UserService);
 
 ## Constructor Injection
 
-Use `@Inject(Token)` for constructor dependencies. A token can be a class, string, or symbol.
+Use `inject(token)` in constructor parameter defaults or field initializers. A token can be a class, string, symbol,
+or `InjectionToken`. Pass `{ optional: true }` to resolve `undefined` instead of throwing when the token is not
+bound. Because `inject()` is a plain function call, the same service compiles under legacy decorators, TC39 standard
+decorators, or no decorators at all.
 
 ```ts
-import { Inject, Injectable } from "@wirestate/core";
+import { Injectable, inject } from "@wirestate/core";
 
 @Injectable()
 export class OrderService {
   public constructor(
-    @Inject(UserService)
-    private readonly users: UserService,
-    @Inject(LoggerService)
-    private readonly logger: LoggerService
+    private readonly users: UserService = inject(UserService),
+    private readonly logger: LoggerService = inject(LoggerService)
   ) {}
 }
 ```
@@ -67,11 +68,11 @@ Inject [`WireScope`](/api/wirestate-core/classes/WireScope) when a service needs
 queries, or seeds from its container.
 
 ```ts
-import { Inject, Injectable, WireScope } from "@wirestate/core";
+import { Injectable, WireScope, inject } from "@wirestate/core";
 
 @Injectable()
 export class CartService {
-  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   public checkout(): void {
     this.scope.emitEvent("CHECKOUT_STARTED");
@@ -155,11 +156,11 @@ Use `scope.resolve(Token)` when the dependency is only needed later. `scope.reso
 the token is not bound.
 
 ```ts
-import { Inject, Injectable, WireScope } from "@wirestate/core";
+import { Injectable, WireScope, inject } from "@wirestate/core";
 
 @Injectable()
 export class NotificationService {
-  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   public notify(message: string): void {
     const logger = this.scope.resolve(LoggerService);
@@ -201,13 +202,13 @@ unbind(container, UserService);
 unbindAll(container);
 ```
 
-The wrappers keep Wirestate's registered binding list and provider lifecycle state in sync with Inversify. If a provider
+The wrappers keep Wirestate's registered binding list and provider lifecycle state in sync with the container. If a provider
 owns a service when it is removed, `@OnDeprovision` runs before `@OnDeactivation`. After `unbindAll`, discard the
 container and create a new one for future work.
 
 ## API Reference
 
-[`Injectable`](/api/wirestate-core/functions/Injectable), [`Inject`](/api/wirestate-core/functions/Inject),
+[`Injectable`](/api/wirestate-core/functions/Injectable), [`inject`](/api/wirestate-core/functions/inject),
 [`WireScope`](/api/wirestate-core/classes/WireScope), [`WireStatus`](/api/wirestate-core/classes/WireStatus),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision), [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision),
 [`BindingDescriptor`](/api/wirestate-core/type-aliases/BindingDescriptor),

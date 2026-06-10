@@ -33,14 +33,14 @@ Read static targeted seeds in `@OnActivated`. Seeds exist from container creatio
 does not need cleanup. Keep `@OnProvision` for provider-owned resources such as timers, subscriptions, or sockets.
 
 ```ts
-import { Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
+import { Injectable, OnActivated, WireScope, inject } from "@wirestate/core";
 import { Signal, signal } from "@wirestate/signals";
 
 @Injectable()
 export class CounterService {
   public readonly count: Signal<number> = signal(0);
 
-  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   @OnActivated()
   public onActivated(): void {

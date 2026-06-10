@@ -5,19 +5,13 @@
 
 Framework-agnostic Wirestate runtime.
 
-Use this package to define injectable services, create scoped Inversify containers, pass seed data, run lifecycle hooks,
+Use this package to define injectable services, create scoped containers, pass seed data, run lifecycle hooks,
 and communicate through container-local events, commands, and queries.
 
 ## Install
 
 ```bash
 npm install @wirestate/core
-```
-
-Import `reflect-metadata` once before Wirestate decorators are used:
-
-```ts
-import "reflect-metadata";
 ```
 
 ## Start
@@ -45,7 +39,7 @@ counterService.increment();
 
 ## What Is Included
 
-- Inversify aliases such as `Injectable`, `Inject`, `Container`, and `Identifier`.
+- DI primitives such as `Injectable`, `inject`, `Container`, and `Identifier`.
 - `createContainer`, `bind`, `unbind`, and `unbindAll`.
 - `WireScope` for scoped resolution, seeds, events, commands, and queries.
 - `WireStatus` and `ProvisionId` for lifecycle guards on resolved service instances.

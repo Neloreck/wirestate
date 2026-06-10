@@ -50,24 +50,19 @@ npm install @wirestate/core @wirestate/mobx @wirestate/lit @wirestate/lit-mobx
 
 ## Runtime Import
 
-Import `reflect-metadata` once, before decorated services are loaded.
-
-```ts
-import "reflect-metadata";
-```
+No runtime polyfills are required — Wirestate ships with its own dependency injection container.
 
 React Signals users should also configure the Preact Signals React transform or call `useSignals()` in components that
 read signal values during render. See [React Signals](/react-signals/overview) for that setup.
 
 ## TypeScript
 
-Enable decorator metadata.
+Enable decorators in TypeScript when using `@Injectable`, `@OnEvent`, and other Wirestate decorators.
 
 ```json
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "experimentalDecorators": true
   }
 }
 ```
