@@ -1,11 +1,9 @@
-import { bootstrap, bootstrapAsync, Container } from "./container";
-import { inject, injectAsync } from "./context";
-import { injectable } from "./decorators";
+import { Container } from "./container";
+import { inject } from "./context";
 import { InjectionToken } from "./tokens";
 
 const myServiceConstructorSpy = jest.fn();
 
-@injectable()
 class MyService {
   public constructor(public name = "MyService") {
     myServiceConstructorSpy();
@@ -18,15 +16,14 @@ describe("Container API", () => {
   });
 
   it("inject", () => {
-    expect(() => inject(MyService)).toThrow(
-      "You can only invoke inject() or injectAsync() within an injection context"
-    );
+    expect(() => inject(MyService)).toThrow("You can only invoke inject() within an injection context");
 
     const container = new Container();
     const token = new InjectionToken<MyService>("some-token");
 
     expect(() => container.get(token)).toThrow("No provider(s) found");
 
+    container.bind(MyService);
     container.bind({
       provide: token,
       useFactory: () => inject(MyService),
@@ -35,37 +32,7 @@ describe("Container API", () => {
     expect(container.get(token)).toBeInstanceOf(MyService);
   });
 
-  it("injectAsync", async () => {
-    await expect(injectAsync(MyService)).rejects.toThrow(
-      "You can only invoke inject() or injectAsync() within an injection context"
-    );
-
-    const container = new Container();
-    const token = new InjectionToken<string>("some-token");
-    const otherToken = new InjectionToken<string>("other-token");
-    const aliasToken = new InjectionToken<string>("alias-token");
-
-    container
-      .bind({
-        provide: otherToken,
-        async: true,
-        useFactory: () => Promise.resolve("foo"),
-      })
-      .bind({
-        provide: token,
-        async: true,
-        useFactory: () => injectAsync(otherToken),
-      })
-      .bind({
-        provide: aliasToken,
-        useExisting: token,
-      });
-
-    expect(await container.getAsync(token)).toBe("foo");
-    expect(await container.getAsync(aliasToken)).toBe("foo");
-  });
-
-  it("has", async () => {
+  it("has", () => {
     const container = new Container();
     const childContainer = container.createChild();
     const token = new InjectionToken<MyService>("some-token");
@@ -77,40 +44,22 @@ describe("Container API", () => {
     expect(container.has(token)).toBe(true);
     expect(childContainer.has(token)).toBe(true);
 
-    // has shall not create a provider, even if it is async
-    const asyncToken = new InjectionToken<MyService>("some-async-token");
-
-    expect(container.has(asyncToken)).toBe(false);
-
+    // has shall not construct the provider
+    const factoryToken = new InjectionToken<MyService>("some-factory-token");
     const spy = jest.fn();
 
     container.bind({
-      provide: asyncToken,
-      async: true,
-      useFactory: async () => {
+      provide: factoryToken,
+      useFactory: () => {
         spy();
 
         return new MyService();
       },
     });
-    expect(container.has(asyncToken)).toBe(true);
+    expect(container.has(factoryToken)).toBe(true);
     expect(spy).toHaveBeenCalledTimes(0);
-    await container.getAsync(asyncToken);
+    container.get(factoryToken);
     expect(spy).toHaveBeenCalledTimes(1);
-  });
-
-  it("bootstrap", () => {
-    expect(bootstrap(MyService)).toBeInstanceOf(MyService);
-    expect(bootstrap(MyService)).toBeInstanceOf(MyService);
-
-    expect(myServiceConstructorSpy).toHaveBeenCalledTimes(2);
-  });
-
-  it("bootstrapAsync", async () => {
-    expect(await bootstrapAsync(MyService)).toBeInstanceOf(MyService);
-    expect(await bootstrapAsync(MyService)).toBeInstanceOf(MyService);
-
-    expect(myServiceConstructorSpy).toHaveBeenCalledTimes(2);
   });
 
   describe("contexts", () => {
@@ -146,10 +95,37 @@ describe("Container API", () => {
 
     container.unbind(MyService);
 
+    expect(() => container.get(MyService)).toThrow("No provider(s) found");
+
+    container.bind({ provide: MyService, useClass: MyService });
+
     const myService3 = container.get(MyService);
 
     expect(myServiceConstructorSpy).toHaveBeenCalledTimes(2);
     expect(myService3).not.toBe(myService1);
     expect(myService3).not.toBe(myService2);
+  });
+
+  it("should unbind all services", () => {
+    const container = new Container();
+    const token = new InjectionToken<string>("value");
+
+    container.bind({ provide: token, useValue: "first" });
+
+    expect(container.get(token)).toBe("first");
+
+    container.unbindAll();
+
+    expect(() => container.get(token)).toThrow("No provider(s) found");
+
+    container.bind({ provide: token, useValue: "second" });
+
+    expect(container.get(token)).toBe("second");
+  });
+
+  it("should resolve the container itself", () => {
+    const container = new Container();
+
+    expect(container.get(Container)).toBe(container);
   });
 });

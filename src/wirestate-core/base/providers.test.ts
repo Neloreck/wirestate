@@ -1,8 +1,6 @@
-import { bootstrap, bootstrapAsync, Container } from "./container";
-import { inject, injectAsync } from "./context";
-import { injectable } from "./decorators";
+import { Container } from "./container";
+import { inject } from "./context";
 import { InjectionToken } from "./tokens";
-import { delay } from "./utils";
 
 const myServiceConstructorSpy = jest.fn();
 
@@ -98,31 +96,6 @@ describe("Providers", () => {
     expect(myServiceConstructorSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("Async providers should be provided once", async () => {
-    const container = new Container();
-
-    expect(() => container.get(MyService)).toThrow("No provider(s) found");
-    expect(container.get(MyService, { optional: true })).toBeUndefined();
-    await expect(container.getAsync(MyService)).rejects.toThrow("No provider(s) found");
-    expect(await container.getAsync(MyService, { optional: true })).toBeUndefined();
-
-    container.bind({
-      provide: MyService,
-      async: true,
-      useFactory: () => Promise.resolve(new MyService()),
-    });
-
-    expect(myServiceConstructorSpy).not.toHaveBeenCalled();
-    expect(() => container.get(MyService)).toThrow("use injectAsync() or container.getAsync() instead");
-
-    const myService = await container.getAsync(MyService);
-
-    expect(myService).toBeInstanceOf(MyService);
-    expect(await container.getAsync(MyService)).toBe(myService);
-    expect(await container.getAsync(MyService, { optional: true })).toBe(myService);
-    expect(myServiceConstructorSpy).toHaveBeenCalledTimes(1);
-  });
-
   it("Existing providers should be provided once", () => {
     const container = new Container();
 
@@ -147,48 +120,12 @@ describe("Providers", () => {
     expect(myServiceConstructorSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("Token factories should be provided once", () => {
-    const container = new Container();
-
-    const TOKEN = new InjectionToken<MyService>("MyService", {
-      factory: () => new MyService(),
-    });
-
-    expect(myServiceConstructorSpy).not.toHaveBeenCalled();
-
-    const myService = container.get(TOKEN);
-
-    expect(myService).toBeInstanceOf(MyService);
-    expect(container.get(TOKEN)).toBe(myService);
-    expect(container.get(TOKEN, { optional: true })).toBe(myService);
-    expect(myServiceConstructorSpy).toHaveBeenCalledTimes(1);
-  });
-
-  it("Token async factories should be provided once", async () => {
-    const container = new Container();
-
-    const TOKEN = new InjectionToken<MyService>("MyService", {
-      async: true,
-      factory: () => Promise.resolve(new MyService()),
-    });
-
-    expect(myServiceConstructorSpy).not.toHaveBeenCalled();
-
-    const myService = await container.getAsync(TOKEN);
-
-    expect(myService).toBeInstanceOf(MyService);
-    expect(await container.getAsync(TOKEN)).toBe(myService);
-    expect(await container.getAsync(TOKEN, { optional: true })).toBe(myService);
-    expect(myServiceConstructorSpy).toHaveBeenCalledTimes(1);
-  });
-
   describe("abstract classes and inheritance", () => {
-    it("should support annotated subclasses", () => {
+    it("should resolve bound subclasses through their parent class token", () => {
       abstract class AbstractService {
         protected constructor(public name = "AbstractService") {}
       }
 
-      @injectable()
       class FooService extends AbstractService {
         public constructor(public fooProp = "foo") {
           super("FooService");
@@ -197,12 +134,12 @@ describe("Providers", () => {
 
       const container = new Container();
 
+      container.bind(FooService);
+
       expect(container.get(AbstractService)).toBeInstanceOf(FooService);
       expect(container.get(FooService)).toBeInstanceOf(FooService);
       expect(container.get(FooService)).toBe(container.get(AbstractService));
       expect(container.get(FooService)).toBeInstanceOf(AbstractService);
-
-      expect(container.get(AbstractService)).toBeInstanceOf(FooService);
     });
 
     it("should support binding subclasses", () => {
@@ -269,62 +206,6 @@ describe("Providers", () => {
         });
       }).toThrow("already constructed");
     });
-
-    it("should support multi-value async providers", async () => {
-      const container = new Container();
-
-      const TOKEN = new InjectionToken<number>("TOKEN");
-      const OTHER_TOKEN = new InjectionToken<number>("OTHER_TOKEN");
-
-      container
-        .bind({
-          provide: TOKEN,
-          multi: true,
-          async: true,
-          useFactory: () => Promise.resolve(1),
-        })
-        .bind({
-          provide: TOKEN,
-          multi: true,
-          async: true,
-          useFactory: () => Promise.resolve(2),
-        });
-
-      expect(await container.getAsync(TOKEN, { multi: true })).toEqual([1, 2]);
-      await expect(container.getAsync(OTHER_TOKEN, { multi: true })).rejects.toThrow("No provider(s) found");
-      expect(await container.getAsync(OTHER_TOKEN, { multi: true, optional: true })).toBeUndefined();
-
-      expect(() => {
-        container.bind({
-          provide: TOKEN,
-          multi: true,
-          async: true,
-          useFactory: () => Promise.resolve(1),
-        });
-      }).toThrow("already constructed");
-    });
-  });
-
-  it("should throw an error when requesting a single async one", () => {
-    const container = new Container();
-    const MY_TOKEN = Symbol.for("my-token");
-
-    container.bindAll(
-      {
-        provide: MY_TOKEN,
-        useFactory: () => Promise.resolve(1),
-        async: true,
-        multi: true,
-      },
-      {
-        provide: MY_TOKEN,
-        useFactory: () => Promise.resolve(2),
-        async: true,
-        multi: true,
-      }
-    );
-
-    expect(() => container.get(MY_TOKEN)).toThrow("use injectAsync() or container.getAsync() instead");
   });
 
   it("should pass the container to the factory", () => {
@@ -354,7 +235,7 @@ describe("Providers", () => {
     expect(barFactory).toHaveBeenCalledTimes(1);
   });
 
-  it("should auto-bind the container itself", () => {
+  it("should bind the container itself", () => {
     const container = new Container();
 
     const fooFactory = jest.fn(() => "Foo");
@@ -466,241 +347,89 @@ describe("Providers", () => {
       expect(parent.get("tokenA", { multi: true })).toEqual(["a1", "a2"]);
       expect(child.get("tokenA", { multi: true })).toEqual(["a3", "a4"]);
     });
-
-    it("should resolve async providers from parent via getAsync()", async () => {
-      const parent = new Container();
-      const child = parent.createChild();
-      const grandChild = child.createChild();
-
-      parent.bind({ provide: "tokenA", async: true, useFactory: async () => ["a"] });
-      child.bind({ provide: "tokenB", async: true, useFactory: async () => ["b"] });
-      grandChild.bind({ provide: "tokenC", async: true, useFactory: async () => ["c"] });
-
-      expect(await grandChild.getAsync("tokenA")).toEqual(["a"]);
-      expect(await grandChild.getAsync("tokenB")).toEqual(["b"]);
-      expect(await grandChild.getAsync("tokenC")).toEqual(["c"]);
-
-      expect(await child.getAsync("tokenA")).toEqual(["a"]);
-      expect(await child.getAsync("tokenB")).toEqual(["b"]);
-      await expect(child.getAsync("tokenC")).rejects.toThrow("No provider(s) found for tokenC");
-
-      expect(await parent.getAsync("tokenA")).toEqual(["a"]);
-      await expect(parent.getAsync("tokenB")).rejects.toThrow("No provider(s) found for tokenB");
-    });
-
-    it("should reuse async singletons from their parent via getAsync()", async () => {
-      const parent = new Container();
-      const child = parent.createChild();
-      const grandChild = child.createChild();
-
-      parent.bind({ provide: "tokenA", async: true, useFactory: async () => ["a"] });
-      child.bind({ provide: "tokenB", async: true, useFactory: async () => ["b"] });
-
-      const a1 = await parent.getAsync("tokenA");
-      const a2 = await grandChild.getAsync("tokenA");
-      const a3 = await child.getAsync("tokenA");
-
-      const b1 = await child.getAsync("tokenB");
-      const b2 = await grandChild.getAsync("tokenB");
-
-      expect(a1).toBe(a2);
-      expect(a2).toBe(a3);
-
-      expect(b1).toBe(b2);
-    });
-
-    it("should return undefined for optional async tokens not found in parent", async () => {
-      const parent = new Container();
-      const child = parent.createChild();
-
-      expect(await child.getAsync("missing", { optional: true })).toBeUndefined();
-    });
   });
 
   describe("Lazy injection", () => {
-    describe("sync", () => {
-      it("should construct lazily and once", () => {
-        const barConstructed = jest.fn();
-        const otherConstructed = jest.fn();
+    it("should construct lazily and once", () => {
+      const barConstructed = jest.fn();
+      const otherConstructed = jest.fn();
 
-        @injectable()
-        class FooService {
-          public constructor(private readonly barService = inject(BarService, { lazy: true })) {}
+      class OtherService {
+        public constructor() {
+          otherConstructed();
+        }
+      }
 
-          public doSomething() {
-            return this.barService().getBar();
-          }
+      class BarService {
+        public constructor(private readonly otherService = inject(OtherService)) {
+          barConstructed();
         }
 
-        @injectable()
-        class BarService {
-          public constructor(private readonly otherService = inject(OtherService)) {
-            barConstructed();
-          }
-
-          public getBar(): string {
-            return "Bar!";
-          }
+        public getBar(): string {
+          return "Bar!";
         }
+      }
 
-        @injectable()
-        class OtherService {
-          public constructor() {
-            otherConstructed();
-          }
+      class FooService {
+        public constructor(private readonly barService = inject(BarService, { lazy: true })) {}
+
+        public doSomething(): string {
+          return this.barService().getBar();
         }
+      }
 
-        const fooService = bootstrap(FooService);
+      const container = new Container();
 
-        expect(barConstructed).not.toHaveBeenCalled();
-        expect(otherConstructed).not.toHaveBeenCalled();
+      container.bindAll(OtherService, BarService, FooService);
 
-        const result = fooService.doSomething();
+      const fooService = container.get(FooService);
 
-        expect(barConstructed).toHaveBeenCalled();
-        expect(otherConstructed).toHaveBeenCalled();
+      expect(barConstructed).not.toHaveBeenCalled();
+      expect(otherConstructed).not.toHaveBeenCalled();
 
-        expect(result).toBe("Bar!");
+      const result = fooService.doSomething();
 
-        fooService.doSomething();
+      expect(barConstructed).toHaveBeenCalled();
+      expect(otherConstructed).toHaveBeenCalled();
 
-        expect(barConstructed).toHaveBeenCalledTimes(1);
-        expect(otherConstructed).toHaveBeenCalledTimes(1);
-      });
+      expect(result).toBe("Bar!");
 
-      it("should work with optionals", () => {
-        @injectable()
-        class FooService {
-          public constructor(private readonly barService = inject(BarService, { lazy: true, optional: true })) {}
+      fooService.doSomething();
 
-          public doSomething(): string | undefined {
-            return this.barService()?.getBar();
-          }
-        }
-
-        class BarService {
-          public getBar(): string {
-            return "Bar!";
-          }
-        }
-
-        const fooService = bootstrap(FooService);
-
-        expect(fooService.doSomething()).toBeUndefined();
-      });
-
-      it("inject() should fail outside injection context", () => {
-        @injectable()
-        class FooService {}
-
-        expect(() => inject(FooService, { lazy: true })).toThrow(
-          "You can only invoke inject() or injectAsync() within an injection context"
-        );
-      });
+      expect(barConstructed).toHaveBeenCalledTimes(1);
+      expect(otherConstructed).toHaveBeenCalledTimes(1);
     });
 
-    describe("async", () => {
-      it("should construct lazily and once", async () => {
-        const barConstructed = jest.fn();
-        const otherConstructed = jest.fn();
-
-        @injectable()
-        class FooService {
-          public constructor(private readonly barService = injectAsync(BarService)) {}
-
-          public async doSomething(): Promise<string> {
-            return (await this.barService).getBar();
-          }
+    it("should work with optionals", () => {
+      class BarService {
+        public getBar(): string {
+          return "Bar!";
         }
+      }
 
-        class BarService {
-          public constructor(private readonly otherService = injectAsync(OtherService)) {
-            barConstructed();
-          }
+      class FooService {
+        public constructor(private readonly barService = inject(BarService, { lazy: true, optional: true })) {}
 
-          public async getBar(): Promise<string> {
-            await this.otherService;
-
-            return "Bar!";
-          }
+        public doSomething(): string | undefined {
+          return this.barService()?.getBar();
         }
+      }
 
-        class OtherService {
-          public constructor() {
-            otherConstructed();
-          }
-        }
+      const container = new Container();
 
-        const container = new Container().bindAll(
-          {
-            provide: BarService,
-            useFactory: async (c) => {
-              await delay(50);
+      container.bind(FooService);
 
-              return new BarService(c.getAsync(OtherService));
-            },
-            async: true,
-          },
-          {
-            provide: OtherService,
-            useFactory: async () => {
-              await delay(50);
+      const fooService = container.get(FooService);
 
-              return new OtherService();
-            },
-            async: true,
-          }
-        );
+      expect(fooService.doSomething()).toBeUndefined();
+    });
 
-        const fooService = await container.getAsync(FooService);
+    it("inject() should fail outside injection context", () => {
+      class FooService {}
 
-        expect(barConstructed).not.toHaveBeenCalled();
-        expect(otherConstructed).not.toHaveBeenCalled();
-
-        const result = await fooService.doSomething();
-
-        expect(barConstructed).toHaveBeenCalled();
-        expect(otherConstructed).toHaveBeenCalled();
-
-        expect(result).toBe("Bar!");
-
-        await fooService.doSomething();
-
-        expect(barConstructed).toHaveBeenCalledTimes(1);
-        expect(otherConstructed).toHaveBeenCalledTimes(1);
-      });
-
-      it("should work with optionals", async () => {
-        @injectable()
-        class FooService {
-          public constructor(private readonly barService = injectAsync(BarService, { lazy: true, optional: true })) {}
-
-          public async doSomething(): Promise<string | undefined> {
-            const barService = await this.barService();
-
-            return barService?.getBar();
-          }
-        }
-
-        class BarService {
-          public getBar(): string {
-            return "Bar!";
-          }
-        }
-
-        const fooService = await bootstrapAsync(FooService);
-
-        expect(await fooService.doSomething()).toBeUndefined();
-      });
-
-      it("injectAsync() should fail outside injection context", async () => {
-        @injectable()
-        class FooService {}
-
-        await expect(injectAsync(FooService, { lazy: true })).rejects.toThrow(
-          "You can only invoke inject() or injectAsync() within an injection context"
-        );
-      });
+      expect(() => inject(FooService, { lazy: true })).toThrow(
+        "You can only invoke inject() within an injection context"
+      );
     });
   });
 });

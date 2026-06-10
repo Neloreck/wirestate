@@ -2,15 +2,8 @@
 // noinspection JSUnusedLocalSymbols
 
 import { Container } from "./container";
-import { inject, injectAsync } from "./context";
-import type {
-  AsyncFactoryProvider,
-  ClassProvider,
-  ConstructorProvider,
-  ExistingProvider,
-  FactoryProvider,
-  ValueProvider,
-} from "./providers";
+import { inject } from "./context";
+import type { ClassProvider, ConstructorProvider, ExistingProvider, FactoryProvider, ValueProvider } from "./providers";
 import { InjectionToken } from "./tokens";
 
 describe("Type-safety", () => {
@@ -88,51 +81,6 @@ describe("Type-safety", () => {
       const f: FactoryProvider<FooService> = { provide: 3, useFactory: () => 3 };
       // @ts-expect-error
       const g: FactoryProvider<string> = { provide: String, useFactory: () => "foo" };
-    });
-
-    it("async factory provider", () => {
-      const a: AsyncFactoryProvider<FooService> = {
-        provide: FooService,
-        async: true,
-        useFactory: async () => new FooService(),
-      };
-      const b: AsyncFactoryProvider<FooService> = {
-        provide: FooService,
-        async: true,
-        useFactory: async () => new FooChildService(),
-      };
-
-      const a2: AsyncFactoryProvider<FooService> = {
-        provide: FooService,
-        async: true,
-        // @ts-expect-error
-        useFactory: () => new FooService(),
-      };
-      const b2: AsyncFactoryProvider<FooService> = {
-        provide: FooService,
-        async: true,
-        // @ts-expect-error
-        useFactory: () => new FooChildService(),
-      };
-
-      const c: AsyncFactoryProvider<FooService> = {
-        provide: FooService,
-        async: true,
-        // @ts-expect-error
-        useFactory: async () => new OtherService(),
-      };
-      const d: AsyncFactoryProvider<FooChildService> = {
-        provide: FooChildService,
-        async: true,
-        // @ts-expect-error
-        useFactory: async () => new FooService(),
-      };
-      // @ts-expect-error
-      const e: AsyncFactoryProvider<FooService> = { provide: FooService, async: true, useFactory: async () => 3 };
-      // @ts-expect-error
-      const f: AsyncFactoryProvider<FooService> = { provide: 3, async: true, useFactory: async () => 3 };
-      // @ts-expect-error
-      const g: AsyncFactoryProvider<string> = { provide: String, async: true, useFactory: async () => "foo" };
     });
 
     it("existing factory provider", () => {
@@ -304,45 +252,17 @@ describe("Type-safety", () => {
     });
   });
   it("Injection tokens", () => {
-    const UNKNOWN_TYPE = new InjectionToken("UNKNOWN_TYPE");
     const SOME_NUMBER = new InjectionToken<number>("SOME_NUMBER");
-    const SOME_STRING = new InjectionToken<number>("SOME_STRING");
-    const SOME_NUMBER_FACTORY = new InjectionToken<number>("SOME_NUMBER_FACTORY", {
-      factory: () => 3,
-    });
-    const SOME_STRING_FACTORY = new InjectionToken<string>("SOME_STRING_FACTORY", {
-      factory: () => "foo",
-    });
-    const NUMBER_INFERRED = new InjectionToken("NUMBER_INFERRED", {
-      factory: () => 3,
-    });
-    const STRING_INFERRED = new InjectionToken("STRING_INFERRED", {
-      factory: () => "foo",
-    });
-
-    const INVALID_NUMBER_FACTORY = new InjectionToken<number>("INVALID_NUMBER_FACTORY", {
-      // @ts-expect-error
-      factory: () => "invalid",
-    });
-    const INVALID_STRING_FACTORY = new InjectionToken<string>("INVALID_STRING_FACTORY", {
-      // @ts-expect-error
-      factory: () => 3,
-    });
+    const SOME_STRING = new InjectionToken<string>("SOME_STRING");
 
     const container = new Container();
 
-    container.bind({ provide: NUMBER_INFERRED, useValue: 3 });
+    container.bind({ provide: SOME_NUMBER, useValue: 3 });
     // @ts-expect-error
-    container.bind({ provide: NUMBER_INFERRED, useValue: "foo" });
-    container.bind({ provide: STRING_INFERRED, useValue: "foo" });
+    container.bind({ provide: SOME_NUMBER, useValue: "foo" });
+    container.bind({ provide: SOME_STRING, useValue: "foo" });
     // @ts-expect-error
-    container.bind({ provide: STRING_INFERRED, useValue: 3 });
-
-    // type inference for injection tokens with factories
-    const ASYNC_FACTORY = new InjectionToken("SOME_NUMBER_FACTORY", {
-      async: true,
-      factory: async () => 3,
-    });
+    container.bind({ provide: SOME_STRING, useValue: 3 });
   });
   describe("Injecting", () => {
     class FooService {
@@ -366,19 +286,6 @@ describe("Type-safety", () => {
       }
     });
 
-    it("injectAsync()", () => {
-      class Foo {
-        private a = injectAsync(FooService) satisfies Promise<FooService>;
-        private b = injectAsync(FooChildService) satisfies Promise<FooService>;
-        // @ts-expect-error
-        private c = injectAsync(FooService) satisfies Promise<FooChildService>;
-        // @ts-expect-error
-        private d = injectAsync(FooService) satisfies FooService;
-        // @ts-expect-error
-        private e = injectAsync(FooChildService) satisfies FooService;
-      }
-    });
-
     it("inject() with multi", () => {
       class Foo {
         private a = inject(FooService, { multi: true }) satisfies Array<FooService>;
@@ -392,19 +299,6 @@ describe("Type-safety", () => {
       }
     });
 
-    it("injectAsync() with multi", () => {
-      class Foo {
-        private a = injectAsync(FooService, { multi: true }) satisfies Promise<Array<FooService>>;
-        private b = injectAsync(FooChildService, { multi: true }) satisfies Promise<Array<FooService>>;
-        // @ts-expect-error
-        private c = injectAsync(FooService, { multi: true }) satisfies Promise<Array<FooChildService>>;
-        // @ts-expect-error
-        private d = injectAsync(FooService, { multi: true }) satisfies Array<FooService>;
-        // @ts-expect-error
-        private e = injectAsync(FooChildService, { multi: true }) satisfies Array<FooService>;
-      }
-    });
-
     it("inject() with optional", () => {
       class Foo {
         private a = inject(FooService, { optional: true }) satisfies FooService | undefined;
@@ -415,19 +309,6 @@ describe("Type-safety", () => {
         private d = inject(FooService, { optional: true }) satisfies Promise<FooService | undefined>;
         // @ts-expect-error
         private e = inject(FooChildService, { optional: true }) satisfies Promise<FooService | undefined>;
-      }
-    });
-
-    it("injectAsync() with optional", () => {
-      class Foo {
-        private a = injectAsync(FooService, { optional: true }) satisfies Promise<FooService | undefined>;
-        private b = injectAsync(FooChildService, { optional: true }) satisfies Promise<FooService | undefined>;
-        // @ts-expect-error
-        private c = injectAsync(FooService, { optional: true }) satisfies Promise<FooChildService | undefined>;
-        // @ts-expect-error
-        private d = injectAsync(FooService, { optional: true }) satisfies FooService | undefined;
-        // @ts-expect-error
-        private e = injectAsync(FooChildService, { optional: true }) satisfies FooService | undefined;
       }
     });
 
@@ -446,30 +327,6 @@ describe("Type-safety", () => {
           multi: true,
           // @ts-expect-error
         }) satisfies Promise<Array<FooService> | undefined>;
-      }
-    });
-
-    it("injectAsync() with optional and multi", () => {
-      class Foo {
-        private a = injectAsync(FooService, {
-          optional: true,
-          multi: true,
-        }) satisfies Promise<Array<FooService> | undefined>;
-        private b = injectAsync(FooChildService, {
-          optional: true,
-          multi: true,
-        }) satisfies Promise<Array<FooService> | undefined>;
-        private c = injectAsync(FooService, {
-          optional: true,
-          multi: true,
-          // @ts-expect-error
-        }) satisfies Promise<Array<FooChildService> | undefined>;
-        // @ts-expect-error
-        private d = injectAsync(FooService, { optional: true, multi: true }) satisfies Array<FooService> | undefined;
-        // @ts-expect-error
-        private e = injectAsync(FooChildService, { optional: true, multi: true }) satisfies
-          | Array<FooService>
-          | undefined;
       }
     });
   });

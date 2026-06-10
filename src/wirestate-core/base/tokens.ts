@@ -1,4 +1,3 @@
-import type { Container } from "./container";
 import { type Provider } from "./providers";
 import * as Guards from "./providers";
 import { type AbstractClass, type Class, isClassLike } from "./utils";
@@ -11,28 +10,20 @@ export type Token<T> = Class<T> | AbstractClass<T> | string | symbol | Injection
 
 /**
  * A unique injection token object, that is used by reference. Can hold a generic type.
- * Can optionally hold an (async) factory.
  */
 export class InjectionToken<T> {
-  public constructor(
-    private description: string | symbol,
-    public options?: InjectionTokenOptions<T>
-  ) {}
+  /**
+   * Phantom field that ties the token to its value type.
+   * Never assigned at runtime — exists purely so `InjectionToken<A>` is not assignable to `InjectionToken<B>`.
+   */
+  protected readonly _type?: T;
+
+  public constructor(private readonly description: string | symbol) {}
 
   public toString(): string {
     return `InjectionToken "${String(this.description)}"`;
   }
 }
-
-type InjectionTokenOptions<T> =
-  | {
-      async: true;
-      factory: (container: Container) => Promise<T>;
-    }
-  | {
-      async?: false;
-      factory: (container: Container) => T;
-    };
 
 /**
  * Type-guard to check if a token is a class reference.

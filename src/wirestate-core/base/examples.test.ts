@@ -1,16 +1,13 @@
-import { bootstrap, bootstrapAsync, Container } from "./container";
-import { inject, injectAsync } from "./context";
-import { injectable } from "./decorators";
+import { Container } from "./container";
+import { inject } from "./context";
 import { InjectionToken } from "./tokens";
 
-@injectable()
 class OtherService {
   public getMessage(): string {
     return "test";
   }
 }
 
-@injectable()
 class MyService {
   private readonly otherService2 = inject(OtherService);
 
@@ -33,36 +30,6 @@ interface Foo {
   foo: string;
 }
 
-interface Bar {
-  bar: string;
-}
-
-const fooToken1 = new InjectionToken<Foo>("foo-token1");
-const fooToken2 = new InjectionToken<Foo>("foo-token2");
-const fooToken3 = new InjectionToken<Foo>("foo-token3");
-
-const tokenProvidedAsync = new InjectionToken<Foo>("provided-async");
-const tokenWithoutProvider = new InjectionToken<Foo>("not-provided");
-
-const barToken = new InjectionToken<Bar>("bar", {
-  factory: () => ({
-    bar: "bar1",
-  }),
-});
-
-@injectable()
-class ProviderService {
-  public constructor(
-    public providedByValue = inject<Foo>("by-value-with-token-as-string"),
-    public providedByFactory = inject(fooToken1),
-    public providedByFactoryTwice = inject(fooToken1),
-    public providedByFactoryWithInject = inject(fooToken2),
-    public providedByExisting = inject(fooToken3),
-    public providedAsync = injectAsync(tokenProvidedAsync),
-    public notProvided = inject(tokenWithoutProvider, { optional: true })
-  ) {}
-}
-
 describe("Container", () => {
   it("should bind classes", () => {
     const container = new Container();
@@ -82,15 +49,11 @@ describe("Container", () => {
     expect(service.sayHello()).toBe("Constructor injection test");
   });
 
-  it("should auto-bind classes", () => {
-    const container = new Container();
-    const service = container.get(MyService);
-
-    expect(service.sayHello()).toBe("Constructor injection test");
-  });
-
   it("should allow initializer injection", () => {
     const container = new Container();
+
+    container.bindAll(MyService, OtherService);
+
     const service = container.get(MyService);
 
     expect(service.sayHello2()).toBe("Initializer injection test");
@@ -98,75 +61,53 @@ describe("Container", () => {
 
   it("should not allow injection outside injection context", () => {
     const container = new Container();
+
+    container.bindAll(MyService, OtherService);
+
     const service = container.get(MyService);
 
-    expect(() => service.triggerInject()).toThrow(
-      "You can only invoke inject() or injectAsync() within an injection context"
-    );
+    expect(() => service.triggerInject()).toThrow("You can only invoke inject() within an injection context");
   });
 
-  it("should support all kinds of providers", async () => {
+  it("should support all kinds of providers", () => {
     const container = new Container();
-    const factoryFn = jest.fn(() => ({
-      foo: "foo2",
-    }));
+    const factoryFn = jest.fn(() => ({ foo: "factory" }));
 
-    container
-      .bind({
+    const fooToken1 = new InjectionToken<Foo>("foo-token1");
+    const fooToken2 = new InjectionToken<Foo>("foo-token2");
+    const fooToken3 = new InjectionToken<Foo>("foo-token3");
+    const tokenWithoutProvider = new InjectionToken<Foo>("not-provided");
+
+    container.bindAll(
+      {
         provide: "by-value-with-token-as-string",
-        useValue: {
-          foo: "foo1",
-        },
-      })
-      .bind({
+        useValue: { foo: "value" },
+      },
+      {
         provide: fooToken1,
         useFactory: factoryFn,
-      })
-      .bind({
+      },
+      {
         provide: fooToken2,
-        useFactory: () => ({
-          foo: inject(barToken).bar,
-        }),
-      })
-      .bind({
+        useFactory: () => ({ foo: `${inject<Foo>(fooToken1).foo}-with-inject` }),
+      },
+      {
         provide: fooToken3,
         useExisting: fooToken1,
-      })
-      .bind({
-        provide: tokenProvidedAsync,
-        async: true,
-        useFactory: () => Promise.resolve({ foo: "async" }),
-      });
+      }
+    );
 
-    expect(factoryFn).not.toHaveBeenCalled();
-
-    const service = container.get(ProviderService);
-
-    expect(service.providedByValue.foo).toBe("foo1");
-    expect(service.providedByFactory.foo).toBe("foo2");
-    expect(service.providedByFactoryTwice.foo).toBe("foo2");
-    expect(service.providedByFactoryWithInject.foo).toBe("bar1");
-    expect(service.providedByExisting.foo).toBe("foo2");
-    expect(service.providedAsync).toBeInstanceOf(Promise);
-    expect(service.notProvided).toBeUndefined();
-
+    expect(container.get<Foo>("by-value-with-token-as-string")).toEqual({ foo: "value" });
+    expect(container.get(fooToken1)).toEqual({ foo: "factory" });
+    expect(container.get(fooToken1)).toBe(container.get(fooToken1));
     expect(factoryFn).toHaveBeenCalledTimes(1);
-
+    expect(container.get(fooToken2)).toEqual({ foo: "factory-with-inject" });
+    expect(container.get(fooToken3)).toBe(container.get(fooToken1));
+    expect(container.get(tokenWithoutProvider, { optional: true })).toBeUndefined();
     expect(() => container.get(tokenWithoutProvider)).toThrow("No provider(s) found");
-    expect(() => container.get(tokenWithoutProvider, { optional: false })).toThrow("No provider(s) found");
-
-    expect(() => container.get(tokenProvidedAsync)).toThrow("use injectAsync() or container.getAsync() instead");
-
-    await container.getAsync(tokenProvidedAsync);
-
-    expect(() => container.get(tokenProvidedAsync)).not.toThrow();
-
-    const fooAsync = await container.getAsync(tokenProvidedAsync);
-
-    expect(fooAsync).toEqual({ foo: "async" });
   });
 
-  it("should support multi-providers (example without auto-binding)", () => {
+  it("should support multi-providers", () => {
     abstract class AbstractService {
       protected constructor(private name: string) {}
     }
@@ -208,39 +149,7 @@ describe("Container", () => {
     expect(serviceB).toBeInstanceOf(BarService);
   });
 
-  it("should support multi-providers (example with auto-binding)", () => {
-    abstract class AbstractService {
-      protected constructor(private name: string) {}
-    }
-
-    @injectable()
-    class FooService extends AbstractService {
-      public constructor() {
-        super("Foo");
-      }
-    }
-
-    @injectable()
-    class BarService extends AbstractService {
-      public constructor() {
-        super("Bar");
-      }
-    }
-
-    const container = new Container();
-
-    const services = container.get(AbstractService, { multi: true });
-
-    expect(services).toBeDefined();
-    expect(services).toHaveLength(2);
-
-    const [serviceA, serviceB] = services;
-
-    expect(serviceA).toBeInstanceOf(FooService);
-    expect(serviceB).toBeInstanceOf(BarService);
-  });
-
-  describe("should support multi-providers with multi-inheritance (example without auto-binding)", () => {
+  describe("should support multi-providers with multi-inheritance", () => {
     abstract class AbstractService {
       protected constructor(private name: string) {}
     }
@@ -449,124 +358,6 @@ describe("Container", () => {
     });
   });
 
-  describe("should support multi-providers with multi-inheritance (example with auto-binding)", () => {
-    abstract class AbstractService {
-      protected constructor(private name: string) {}
-    }
-
-    @injectable()
-    class FooService extends AbstractService {
-      public constructor() {
-        super("Foo");
-      }
-    }
-
-    @injectable()
-    class BarService extends AbstractService {
-      public constructor() {
-        super("Bar");
-      }
-    }
-
-    @injectable()
-    class SpecialBarService extends BarService {
-      public constructor(public age = 6) {
-        super();
-      }
-    }
-
-    class BazService extends AbstractService {
-      public constructor() {
-        super("Bar");
-      }
-    }
-
-    @injectable()
-    class SpecialBazService extends BazService {
-      public constructor(public age = 8) {
-        super();
-      }
-    }
-
-    it("first parent class, then child class ", () => {
-      const container = new Container();
-
-      const abstractServices = container.get(AbstractService, { multi: true });
-
-      expect(abstractServices).toBeDefined();
-      expect(abstractServices).toHaveLength(4);
-
-      const [abstractServiceFoo, abstractServiceBar, abstractServiceSpecialBar, abstractServiceSpecialBaz] =
-        abstractServices;
-
-      expect(abstractServiceFoo).toBeInstanceOf(FooService);
-      expect(abstractServiceBar).toBeInstanceOf(BarService);
-      expect(abstractServiceSpecialBar).toBeInstanceOf(SpecialBarService);
-      expect(abstractServiceSpecialBaz).toBeInstanceOf(SpecialBazService);
-
-      const barServices = container.get(BarService, { multi: true });
-
-      expect(barServices).toBeDefined();
-      expect(barServices).toHaveLength(2);
-
-      const [barServicesBar, barServicesSpecialBar] = barServices;
-
-      expect(barServicesBar).toBeInstanceOf(BarService);
-      expect(barServicesBar).toBe(abstractServiceBar);
-      expect(barServicesSpecialBar).toBeInstanceOf(SpecialBarService);
-      expect(barServicesSpecialBar).toBe(abstractServiceSpecialBar);
-
-      const bazServices = container.get(BazService, { multi: true });
-
-      expect(bazServices).toBeDefined();
-      expect(bazServices).toHaveLength(1);
-
-      const [barServiceSpecialBaz] = bazServices;
-
-      expect(barServiceSpecialBaz).toBeInstanceOf(SpecialBazService);
-      expect(barServiceSpecialBaz).toBe(abstractServiceSpecialBaz);
-    });
-
-    it("first child class, then parent class ", () => {
-      const container = new Container();
-
-      const bazServices = container.get(BazService, { multi: true });
-
-      expect(bazServices).toBeDefined();
-      expect(bazServices).toHaveLength(1);
-
-      const [barServiceSpecialBaz] = bazServices;
-
-      expect(barServiceSpecialBaz).toBeInstanceOf(SpecialBazService);
-
-      const barServices = container.get(BarService, { multi: true });
-
-      expect(barServices).toBeDefined();
-      expect(barServices).toHaveLength(2);
-
-      const [barServicesBar, barServicesSpecialBar] = barServices;
-
-      expect(barServicesBar).toBeInstanceOf(BarService);
-      expect(barServicesSpecialBar).toBeInstanceOf(SpecialBarService);
-
-      const abstractServices = container.get(AbstractService, { multi: true });
-
-      expect(abstractServices).toBeDefined();
-      expect(abstractServices).toHaveLength(4);
-
-      const [abstractServiceSpecialBaz, abstractServiceBar, abstractServiceSpecialBar, abstractServiceFoo] =
-        abstractServices;
-
-      expect(abstractServiceFoo).toBeInstanceOf(FooService);
-      expect(abstractServiceBar).toBeInstanceOf(BarService);
-      expect(abstractServiceBar).toBe(barServicesBar);
-      expect(abstractServiceSpecialBar).toBeInstanceOf(SpecialBarService);
-      expect(abstractServiceSpecialBar).toBe(barServicesSpecialBar);
-      expect(abstractServiceSpecialBaz).toBeInstanceOf(SpecialBazService);
-      expect(abstractServiceSpecialBaz).toBe(barServiceSpecialBaz);
-    });
-  });
-
   it("should not allow combination of multi=false and multi=true", () => {
     const container = new Container();
 
@@ -587,29 +378,12 @@ describe("Container", () => {
     );
   });
 
-  it("requesting single value for multiple providers throws error", async () => {
+  it("requesting single value for multiple providers throws error", () => {
     const container = new Container();
 
-    container.bindAll(
-      { provide: "key", multi: true, useValue: 1 },
-      { provide: "key", multi: true, useValue: 2 },
-      { provide: "asyncKey", multi: true, async: true, useFactory: async () => 1 },
-      { provide: "asyncKey", multi: true, async: true, useFactory: async () => 2 }
-    );
+    container.bindAll({ provide: "key", multi: true, useValue: 1 }, { provide: "key", multi: true, useValue: 2 });
 
     expect(() => container.get("key")).toThrow("Requesting a single value for key, but multiple values were provided.");
-
-    await expect(container.getAsync("asyncKey")).rejects.toThrow(
-      "Requesting a single value for asyncKey, but multiple values were provided."
-    );
-  });
-
-  it("existing provider may not refer to itself", () => {
-    const container = new Container();
-
-    expect(() => container.bind({ provide: "key", useExisting: "key" })).toThrow(
-      `The provider for token key with "useExisting" cannot refer to itself.`
-    );
   });
 
   it("should support flattening multi-providers (combination of multi and use-existing)", () => {
@@ -715,23 +489,25 @@ describe("Container", () => {
   });
 
   it("should support initialization injection", () => {
-    @injectable()
     class Foo {
-      public sayHi() {
+      public sayHi(): string {
         return "Hi!";
       }
     }
 
-    @injectable()
     class Bar {
       private foo = inject(Foo);
 
-      public letFooSayHi() {
+      public letFooSayHi(): string {
         return this.foo.sayHi();
       }
     }
 
-    const bar = bootstrap(Bar);
+    const container = new Container();
+
+    container.bindAll(Foo, Bar);
+
+    const bar = container.get(Bar);
 
     expect(bar.letFooSayHi()).toBe("Hi!");
   });
@@ -756,290 +532,97 @@ describe("Container", () => {
     expect(container.get(OTHER_TOKEN)).toBe(2);
   });
 
-  it("should support sync injection of async providers in async flow", async () => {
-    const constructed = jest.fn();
-
-    @injectable()
-    class OtherService {
-      public foo = inject(FOO_TOKEN);
-      public bar = inject(BAR_TOKEN);
-    }
-
-    @injectable()
-    class MyService {
-      private otherService = inject(OtherService);
-
-      public constructor() {
-        constructed();
-      }
-
-      public printTokens(): string {
-        return `${this.otherService.foo} and ${this.otherService.bar}`;
-      }
-    }
-
-    const FOO_TOKEN = new InjectionToken<string>("FOO_TOKEN", {
-      async: true,
-      factory: () =>
-        new Promise<string>((resolve) => {
-          setTimeout(() => resolve("Foo"), 100);
-        }),
-    });
-    const BAR_TOKEN = new InjectionToken<string>("BAR_TOKEN", {
-      async: true,
-      factory: () =>
-        new Promise<string>((resolve) => {
-          setTimeout(() => resolve("Bar"), 100);
-        }),
-    });
-
-    const myService = await bootstrapAsync(MyService);
-
-    expect(myService.printTokens()).toBe("Foo and Bar");
-    expect(constructed).toHaveBeenCalledTimes(1);
-  });
-
-  it("should support sync injection of async providers in async flow (2)", async () => {
-    @injectable()
-    class MyService {
-      public constructor(
-        private foo = inject(FOO_TOKEN),
-        private bar = inject(BAR_TOKEN_ALIAS)
-      ) {}
-
-      public printTokens(): string {
-        return `${this.foo} and ${this.bar}`;
-      }
-    }
-
-    class ServiceThatThrowsErrorInInit {
-      public constructor(
-        private foo = inject(FOO_TOKEN),
-        private bar = inject(BAR_TOKEN_ALIAS)
-      ) {
-        throw Error("foo");
-      }
-    }
-
-    const FOO_TOKEN = new InjectionToken<string>("FOO_TOKEN");
-    const BAR_TOKEN = new InjectionToken<string>("BAR_TOKEN");
-    const BAR_TOKEN_ALIAS = new InjectionToken<string>("BAR_TOKEN_ALIAS");
-
-    const container = new Container();
-
-    container.bindAll(
-      {
-        provide: FOO_TOKEN,
-        async: true,
-        useFactory: () =>
-          new Promise<string>((resolve) => {
-            setTimeout(() => resolve("Foo"), 100);
-          }),
-      },
-      {
-        provide: BAR_TOKEN,
-        async: true,
-        useFactory: () =>
-          new Promise<string>((resolve) => {
-            setTimeout(() => resolve("Bar"), 100);
-          }),
-      },
-      {
-        provide: BAR_TOKEN_ALIAS,
-        useExisting: BAR_TOKEN,
-      },
-      ServiceThatThrowsErrorInInit
-    );
-
-    const myService = await container.getAsync(MyService);
-
-    expect(myService.printTokens()).toBe("Foo and Bar");
-
-    await expect(container.getAsync(ServiceThatThrowsErrorInInit)).rejects.toThrow("foo");
-  });
-
-  it("should not support sync injection of async providers outside constructors", async () => {
-    class MyService {
-      public constructor(
-        private foo: string,
-        private bar: string
-      ) {}
-
-      public printTokens(): string {
-        return `${this.foo} and ${this.bar}`;
-      }
-    }
-
-    const FOO_TOKEN = new InjectionToken<string>("FOO_TOKEN");
-    const BAR_TOKEN = new InjectionToken<string>("BAR_TOKEN");
-
-    const container = new Container();
-
-    container.bindAll(
-      {
-        provide: FOO_TOKEN,
-        async: true,
-        useFactory: () =>
-          new Promise<string>((resolve) => {
-            setTimeout(() => resolve("Foo"), 100);
-          }),
-      },
-      {
-        provide: BAR_TOKEN,
-        async: true,
-        useFactory: () =>
-          new Promise<string>((resolve) => {
-            setTimeout(() => resolve("Bar"), 100);
-          }),
-      },
-      {
-        provide: MyService,
-        useFactory: () => {
-          const foo = inject(FOO_TOKEN);
-          const bar = inject(BAR_TOKEN);
-
-          return new MyService(foo, bar);
-        },
-      }
-    );
-
-    await expect(() => container.getAsync(MyService)).rejects.toThrow(
-      "use injectAsync() or container.getAsync() instead"
-    );
-  });
-
-  it("should auto-bind parent classes (without decorators)", () => {
-    abstract class ExampleService {
-      private x = Math.random();
-    }
-
-    class FooService extends ExampleService {
-      private foo = Math.random();
-    }
-
-    class BarService extends ExampleService {
-      private bar = Math.random();
-    }
-
-    const container = new Container();
-
-    container.bindAll(FooService, BarService);
-
-    expect(container.get(ExampleService, { multi: true })).toHaveLength(2);
-  });
-
-  it("should auto-bind parent classes (with decorators)", () => {
-    abstract class ExampleService {
-      private x = Math.random();
-    }
-
-    @injectable()
-    class FooService extends ExampleService {
-      private foo = Math.random();
-    }
-
-    @injectable()
-    class BarService extends ExampleService {
-      private bar = Math.random();
-    }
-
-    const container = new Container();
-
-    container.bindAll(FooService, BarService);
-
-    expect(container.get(ExampleService, { multi: true })).toHaveLength(2);
-  });
-
   it("should throw user-friendly error for circular dependencies", () => {
-    @injectable()
     class App {
       private foo = inject(Foo);
     }
 
-    @injectable()
     class Foo {
       private bar = inject(Bar);
 
-      public lorem() {
+      public lorem(): string {
         return this.bar.lorem();
       }
 
-      public ipsum() {
+      public ipsum(): string {
         return this.bar.ipsum();
       }
     }
 
-    @injectable()
     class Bar {
       private baz = inject(Baz);
 
-      public lorem() {
+      public lorem(): string {
         return "lorem";
       }
 
-      public ipsum() {
+      public ipsum(): string {
         return this.baz.ipsum();
       }
     }
 
-    @injectable()
     class Baz {
       private foo = inject(Foo);
 
-      public lorem() {
+      public lorem(): string {
         return this.foo.lorem();
       }
 
-      public ipsum() {
+      public ipsum(): string {
         return "ipsum";
       }
     }
 
-    expect(() => bootstrap(App)).toThrow("Detected circular dependency: App -> Foo -> Bar -> Baz -> Foo");
+    const container = new Container();
+
+    container.bindAll(App, Foo, Bar, Baz);
+
+    expect(() => container.get(App)).toThrow("Detected circular dependency: App -> Foo -> Bar -> Baz -> Foo");
   });
 
   it("should support circular dependencies with lazy providers", () => {
-    @injectable()
     class Foo {
       private bar = inject(Bar);
 
-      public lorem() {
+      public lorem(): string {
         return this.bar.lorem();
       }
 
-      public ipsum() {
+      public ipsum(): string {
         return this.bar.ipsum();
       }
     }
 
-    @injectable()
     class Bar {
       private baz = inject(Baz);
 
-      public lorem() {
+      public lorem(): string {
         return "lorem";
       }
 
-      public ipsum() {
+      public ipsum(): string {
         return this.baz.ipsum();
       }
     }
 
-    @injectable()
     class Baz {
       private foo = inject(Foo, { lazy: true });
 
-      public lorem() {
+      public lorem(): string {
         return this.foo().lorem();
       }
 
-      public ipsum() {
+      public ipsum(): string {
         return "ipsum";
       }
     }
 
-    const foo = bootstrap(Foo);
-    const baz = bootstrap(Baz);
+    const container = new Container();
+
+    container.bindAll(Foo, Bar, Baz);
+
+    const foo = container.get(Foo);
+    const baz = container.get(Baz);
 
     expect(foo).toBeTruthy();
     expect(baz).toBeTruthy();
@@ -1050,25 +633,4 @@ describe("Container", () => {
     expect(baz.lorem()).toBe("lorem");
     expect(baz.ipsum()).toBe("ipsum");
   });
-});
-
-it("should support reusing async providers with `ExistingProvider`", async () => {
-  const container = new Container();
-
-  container.bindAll(
-    { provide: "1", async: true, useFactory: async () => "one" },
-    { provide: "2", async: true, useFactory: async () => "two" },
-
-    { provide: "alias1", useExisting: "1" },
-    { provide: "alias2", useExisting: "2" },
-
-    { provide: "other1", useExisting: "1" },
-    { provide: "other2", useExisting: "alias2" }
-  );
-
-  expect(await container.getAsync("alias1")).toBe("one");
-  expect(await container.getAsync("alias2")).toBe("two");
-
-  expect(await container.getAsync("other1")).toBe("one");
-  expect(await container.getAsync("other2")).toBe("two");
 });

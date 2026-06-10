@@ -33,55 +33,12 @@ export function inject<T>(
 }
 
 /**
- * Injects a service asynchronously within the current injection context, using the token provided.
- *
- * @param token
- */
-export function injectAsync<T>(token: Token<T>): Promise<T>;
-export function injectAsync<T>(token: Token<T>, options: { multi: true }): Promise<Array<T>>;
-export function injectAsync<T>(token: Token<T>, options: { optional: true }): Promise<T | undefined>;
-export function injectAsync<T>(
-  token: Token<T>,
-  options: { multi: true; optional: true }
-): Promise<Array<T> | undefined>;
-export function injectAsync<T>(token: Token<T>, options: { lazy: true }): () => Promise<T>;
-export function injectAsync<T>(token: Token<T>, options: { lazy: true; multi: true }): () => Promise<Array<T>>;
-export function injectAsync<T>(token: Token<T>, options: { lazy: true; optional: true }): () => Promise<T | undefined>;
-export function injectAsync<T>(
-  token: Token<T>,
-  options: { lazy: true; multi: true; optional: true }
-): () => Promise<Array<T> | undefined>;
-export function injectAsync<T>(
-  token: Token<T>,
-  options?: {
-    optional?: boolean;
-    multi?: boolean;
-    lazy?: boolean;
-  }
-): Promise<T | Array<T> | undefined> | (() => Promise<T | Array<T> | undefined>) {
-  try {
-    if (options?.lazy) {
-      return _currentContext.run((container) => container.getAsync(token, { ...options, lazy: true }));
-    }
-
-    return _currentContext.runAsync((container) => container.getAsync(token, { ...options, lazy: false }));
-  } catch (error) {
-    if (error instanceof NeedsInjectionContextError && options?.optional === true) {
-      return Promise.resolve(undefined);
-    }
-
-    return Promise.reject(error);
-  }
-}
-
-/**
- * A context has a specific container associated to it and allows you to run sync or async code.
+ * A context has a specific container associated to it and allows you to run code against it.
  *
  * @internal
  */
 interface Context {
   run<T>(block: (container: Container) => T): T;
-  runAsync<T>(block: (container: Container) => Promise<T>): Promise<T>;
 }
 
 /**
@@ -93,14 +50,10 @@ class GlobalContext implements Context {
   public run<T>(): T {
     throw new NeedsInjectionContextError();
   }
-
-  public runAsync<T>(): Promise<T> {
-    throw new NeedsInjectionContextError();
-  }
 }
 
 /**
- * An injection context allows to perform dependency injection with `inject()` and `injectAsync()`.
+ * An injection context allows to perform dependency injection with `inject()`.
  *
  * @internal
  */
@@ -115,19 +68,6 @@ class InjectionContext implements Context {
       _currentContext = this;
 
       return block(this.container);
-    } finally {
-      _currentContext = originalContext;
-    }
-  }
-
-  public async runAsync<T>(block: (container: Container) => Promise<T> | T): Promise<T> {
-    const originalContext = _currentContext;
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-this-alias
-      _currentContext = this;
-
-      return await block(this.container);
     } finally {
       _currentContext = originalContext;
     }
@@ -147,12 +87,12 @@ export function injectionContext(container: Container): Context {
 }
 
 /**
- * An error that occurs when `inject()` or `injectAsync()` is used outside an injection context.
+ * An error that occurs when `inject()` is used outside an injection context.
  *
  * @internal
  */
 class NeedsInjectionContextError extends Error {
   public constructor() {
-    super(`You can only invoke inject() or injectAsync() within an injection context`);
+    super(`You can only invoke inject() within an injection context`);
   }
 }

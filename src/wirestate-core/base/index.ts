@@ -1,17 +1,16 @@
-export { Container, bootstrap, bootstrapAsync } from "./container";
-export { inject, injectAsync } from "./context";
-export { injectable } from "./decorators";
+export { Container } from "./container";
+export { inject } from "./context";
+export { NoProviderFoundError, CircularDependencyError } from "./errors";
 export type {
   Provider,
-  SyncProvider,
-  AsyncProvider,
   ExistingProvider,
   ConstructorProvider,
   ClassProvider,
   ValueProvider,
   FactoryProvider,
-  AsyncFactoryProvider,
-  SyncFactoryProvider,
+  ProviderScope,
+  ProviderActivationHandler,
+  ProviderDeactivationHandler,
 } from "./providers";
 export { InjectionToken } from "./tokens";
 export type { Token } from "./tokens";

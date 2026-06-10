@@ -72,33 +72,6 @@ export function windowedSlice<T>(array: Array<T>, step = 2): Array<Array<T>> {
 }
 
 /**
- * Retries as long as it encounters any error that is instance of `errorClass`.
- * Awaits the result of the `onError` callback before retrying.
- *
- * @param errorClass
- * @param block
- * @param onError
- * @internal
- */
-export async function retryOn<TError, TReturn>(
-  errorClass: Class<TError>,
-  block: () => Promise<TReturn>,
-  onError: (error: TError) => Promise<void>
-): Promise<TReturn> {
-  while (true) {
-    try {
-      return await block();
-    } catch (error) {
-      if (!(error instanceof errorClass)) {
-        throw error;
-      }
-
-      await onError(error);
-    }
-  }
-}
-
-/**
  * Assert that there is a single element in an array. Throws the error from error provider if not.
  *
  * @param array
@@ -128,26 +101,4 @@ export function assertSingle<T>(array: Array<T>, errorProvider: () => unknown): 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function assertNever(_: never): never {
   throw new Error("invalid state");
-}
-
-/**
- * Executes a callback, wrapping its result in a Promise.
- * Static version of `Promise.try()` (currently stage 3).
- *
- * @param block
- * @internal
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/try
- */
-export async function promiseTry<T>(block: () => T | PromiseLike<T>): Promise<Awaited<T>> {
-  return await new Promise<T>((resolve) => resolve(block()));
-}
-
-/**
- * Simple function that returns a Promise with a certain delay.
- *
- * @param delayInMs
- * @internal
- */
-export function delay(delayInMs: number): Promise<void> {
-  return new Promise<void>((resolve) => setTimeout(resolve, delayInMs));
 }
