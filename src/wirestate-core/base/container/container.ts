@@ -1,10 +1,10 @@
-import type { BindingDescriptor } from "../binding/binding";
+import { BindingDescriptor } from "../binding/binding";
 import { getBindingLifecycle, getBindingScope } from "../binding/binding-lifecycle";
 import { injectionContext } from "../context";
 import { NoBindingFoundError } from "../errors";
-import type { Identifier } from "../tokens";
+import { Identifier } from "../tokens";
 
-import type { ActivationRecord, BindingMap, InstanceMap } from "./binding-storage";
+import { ActivationRecord, BindingMap, InstanceMap } from "./binding-storage";
 import { Factory } from "./factory";
 import { validateBinding } from "./validate-binding";
 
@@ -138,7 +138,7 @@ export class Container {
       throw new NoBindingFoundError(token);
     }
 
-    return injectionContext(this).run(() => this.resolveBinding(binding));
+    return injectionContext(this).run(() => this.resolve(binding));
   }
 
   /**
@@ -168,7 +168,7 @@ export class Container {
    * @param binding - Binding descriptor to resolve.
    * @returns The resolved value.
    */
-  private resolveBinding<T>(binding: BindingDescriptor<T>): T {
+  private resolve<T>(binding: BindingDescriptor<T>): T {
     if (getBindingScope(binding) === "Transient") {
       return this.activate(binding, this.factory.construct(binding));
     }
