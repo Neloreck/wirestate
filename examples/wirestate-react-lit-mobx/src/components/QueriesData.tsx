@@ -12,11 +12,7 @@ import {
 import { useCallback, useState } from "react";
 
 import { EGlobalQuery } from "@/constants/queries";
-import {
-  ECounterServiceQuery,
-  type ICounterSnapshot,
-  type ICounterSummary,
-} from "@/services/CounterService.query";
+import { ECounterServiceQuery, type ICounterSnapshot, type ICounterSummary } from "@/services/CounterService.query";
 import { LoggerService } from "@/services/LoggerService";
 import { ThemeService } from "@/services/ThemeService";
 import type { Optional, Theme } from "@/types";
@@ -26,25 +22,21 @@ export function QueriesData() {
   const [summary, setSummary] = useState<Optional<ICounterSummary>>(null);
 
   const themeService: ThemeService = useInjection(ThemeService);
-  const loggerService: Optional<LoggerService> =
-    useOptionalInjection(LoggerService);
+  const loggerService: Optional<LoggerService> = useOptionalInjection(LoggerService);
 
   const query: QueryExecutor = useQueryExecutor();
   const queryAsync: AsyncQueryExecutor = useAsyncQueryExecutor();
 
   const onPullSummary = useCallback(() => {
-    const value: ICounterSummary = query<ICounterSummary>(
-      ECounterServiceQuery.GET_COUNTER_SUMMARY,
-      { value: "some-data" },
-    );
+    const value: ICounterSummary = query<ICounterSummary>(ECounterServiceQuery.GET_COUNTER_SUMMARY, {
+      value: "some-data",
+    });
 
     setSummary(value);
   }, [query]);
 
   const onFetchSnapshot = useCallback(async () => {
-    const value: ICounterSnapshot = await queryAsync<ICounterSnapshot>(
-      ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT,
-    );
+    const value: ICounterSnapshot = await queryAsync<ICounterSnapshot>(ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT);
 
     setSnapshot(value);
 
@@ -53,10 +45,7 @@ export function QueriesData() {
     }
   }, [queryAsync, loggerService]);
 
-  useQueryHandler<Theme>(
-    EGlobalQuery.GET_ACTIVE_THEME,
-    () => themeService.theme,
-  );
+  useQueryHandler<Theme>(EGlobalQuery.GET_ACTIVE_THEME, () => themeService.theme);
 
   return (
     <div className={"queries"}>
@@ -72,8 +61,7 @@ export function QueriesData() {
 
       {summary ? (
         <p className={"query-result"}>
-          Summary — count: <strong>{summary.count}</strong>, parity:{" "}
-          <strong>{summary.isEven ? "even" : "odd"}</strong>
+          Summary — count: <strong>{summary.count}</strong>, parity: <strong>{summary.isEven ? "even" : "odd"}</strong>
         </p>
       ) : null}
 

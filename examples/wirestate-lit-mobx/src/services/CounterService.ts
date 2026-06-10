@@ -1,5 +1,4 @@
 import {
-  Inject,
   Injectable,
   OnActivated,
   OnDeactivation,
@@ -9,6 +8,7 @@ import {
   OnQuery,
   OnProvision,
   OnDeprovision,
+  inject,
 } from "@wirestate/core";
 import { Observable, Computed, Action, runInAction, makeObservable } from "@wirestate/mobx";
 
@@ -33,10 +33,8 @@ export class CounterService {
   }
 
   public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope,
-    @Inject(LoggerService)
-    private readonly loggerService: LoggerService
+    private readonly scope: WireScope = inject(WireScope),
+    private readonly loggerService: LoggerService = inject(LoggerService)
   ) {
     makeObservable(this);
   }

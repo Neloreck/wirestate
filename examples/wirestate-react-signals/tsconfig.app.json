@@ -15,9 +15,8 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Decorators for inversify */
+    /* Decorators for wirestate */
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "useDefineForClassFields": false,
 
     /* Path aliases */

@@ -1,7 +1,5 @@
 import "@/styles/index.css";
 
-import "reflect-metadata";
-
 import "@/components/general-controls";
 import "@/components/events-log";
 import "@/components/queries-data";

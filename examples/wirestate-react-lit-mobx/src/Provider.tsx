@@ -1,8 +1,4 @@
-import {
-  BindingType,
-  BindingScope,
-  type ContainerConfig,
-} from "@wirestate/core";
+import { BindingType, BindingScope, type ContainerConfig } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
 import { type PropsWithChildren, useMemo } from "react";
 

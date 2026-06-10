@@ -1,4 +1,3 @@
-import "reflect-metadata";
 import "./styles/index.css";
 
 import { StrictMode } from "react";

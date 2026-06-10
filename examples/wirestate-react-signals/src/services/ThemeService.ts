@@ -1,5 +1,4 @@
 import {
-  Inject,
   Injectable,
   OnActivated,
   OnDeactivation,
@@ -7,6 +6,7 @@ import {
   OnProvision,
   SEED,
   WireScope,
+  inject,
 } from "@wirestate/core";
 import { Signal, signal } from "@wirestate/signals";
 
@@ -18,23 +18,15 @@ export class ThemeService {
   public theme: Signal<Theme> = signal("light");
 
   public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope,
-    @Inject(SEED)
-    protected readonly seed: object,
+    private readonly scope: WireScope = inject(WireScope),
+    protected readonly seed: object = inject(SEED),
   ) {
-    console.info(
-      `[${this.constructor.name}] Shared seed on construction:`,
-      seed,
-    );
+    console.info(`[${this.constructor.name}] Shared seed on construction:`, seed);
   }
 
   @OnActivated()
   public onActivated(): void {
-    console.info(
-      `[${this.constructor.name}] Activated with theme:`,
-      this.theme,
-    );
+    console.info(`[${this.constructor.name}] Activated with theme:`, this.theme);
   }
 
   @OnDeactivation()
@@ -44,10 +36,7 @@ export class ThemeService {
 
   @OnProvision()
   public onProvision(): void {
-    console.info(
-      `[${this.constructor.name}] Provision with theme:`,
-      this.theme,
-    );
+    console.info(`[${this.constructor.name}] Provision with theme:`, this.theme);
 
     this.scope.emitEvent(`provision/${this.constructor.name}`, {
       at: new Date(),

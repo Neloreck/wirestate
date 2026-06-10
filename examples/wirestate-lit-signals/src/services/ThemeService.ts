@@ -1,5 +1,4 @@
 import {
-  Inject,
   Injectable,
   OnActivated,
   OnDeactivation,
@@ -7,6 +6,7 @@ import {
   OnProvision,
   SEED,
   WireScope,
+  inject,
 } from "@wirestate/core";
 import { Signal, signal } from "@wirestate/signals";
 
@@ -18,10 +18,8 @@ export class ThemeService {
   public theme: Signal<Theme> = signal("light");
 
   public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope,
-    @Inject(SEED)
-    protected readonly seed: object
+    private readonly scope: WireScope = inject(WireScope),
+    protected readonly seed: object = inject(SEED)
   ) {
     console.info(`[${this.constructor.name}] Shared seed on construction:`, seed);
     document.documentElement.dataset.theme = this.theme.value;
