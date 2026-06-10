@@ -24,7 +24,7 @@ describe("WireScope", () => {
     const container: Container = createContainer();
     const scope: WireScope = new WireScope(container);
 
-    container.bind({ provide: "TEST", useValue: "VALUE" });
+    container.bind({ token: "TEST", value: "VALUE" });
 
     expect(scope.resolve("TEST")).toBe("VALUE");
     expect(() => scope.resolve("NOT_EXISTING")).toThrow(Error);
@@ -34,7 +34,7 @@ describe("WireScope", () => {
     const container: Container = createContainer();
     const scope: WireScope = new WireScope(container);
 
-    container.bind({ provide: "TEST", useValue: "VALUE" });
+    container.bind({ token: "TEST", value: "VALUE" });
 
     expect(scope.resolveOptional("TEST")).toBe("VALUE");
     expect(scope.resolveOptional("NON_EXISTENT")).toBeNull();

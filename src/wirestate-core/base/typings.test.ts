@@ -1,13 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // noinspection JSUnusedLocalSymbols
 
+import type {
+  ConstantValueBindingDescriptor,
+  ConstructorBinding,
+  DynamicValueBindingDescriptor,
+  InstanceBindingDescriptor,
+  ServiceRedirectionBindingDescriptor,
+} from "./bindings";
 import { Container } from "./container";
 import { inject } from "./context";
-import type { ClassProvider, ConstructorProvider, ExistingProvider, FactoryProvider, ValueProvider } from "./providers";
 import { InjectionToken } from "./tokens";
 
 describe("Type-safety", () => {
-  describe("Providers API", () => {
+  describe("Bindings API", () => {
     class FooService {
       private x = Math.random();
     }
@@ -20,89 +26,95 @@ describe("Type-safety", () => {
       private z = Math.random();
     }
 
-    it("constructor provider", () => {
-      const a: ConstructorProvider<FooService> = FooService;
-      const b: ConstructorProvider<FooService> = FooChildService;
+    it("constructor binding", () => {
+      const a: ConstructorBinding<FooService> = FooService;
+      const b: ConstructorBinding<FooService> = FooChildService;
 
       // @ts-expect-error
-      const c: ConstructorProvider<FooService> = OtherService;
+      const c: ConstructorBinding<FooService> = OtherService;
       // @ts-expect-error
-      const d: ConstructorProvider<FooService> = 3;
+      const d: ConstructorBinding<FooService> = 3;
     });
 
-    it("class provider", () => {
-      const a: ClassProvider<FooService> = { provide: FooService, useClass: FooService };
-      const b: ClassProvider<FooService> = { provide: FooService, useClass: FooChildService };
+    it("instance binding descriptor", () => {
+      const a: InstanceBindingDescriptor<FooService> = { token: FooService, type: "Instance", value: FooService };
+      const b: InstanceBindingDescriptor<FooService> = { token: FooService, type: "Instance", value: FooChildService };
 
       // @ts-expect-error
-      const c: ClassProvider<FooService> = { provide: FooService, useClass: OtherService };
+      const c: InstanceBindingDescriptor<FooService> = { token: FooService, type: "Instance", value: OtherService };
+      const d: InstanceBindingDescriptor<FooChildService> = {
+        token: FooChildService,
+        type: "Instance",
+        // @ts-expect-error
+        value: FooService,
+      };
       // @ts-expect-error
-      const d: ClassProvider<FooChildService> = { provide: FooChildService, useClass: FooService };
+      const e: InstanceBindingDescriptor<FooService> = { token: FooService, type: "Instance", value: 3 };
       // @ts-expect-error
-      const e: ClassProvider<FooService> = { provide: FooService, useClass: 3 };
+      const f: InstanceBindingDescriptor<FooService> = { token: 3, type: "Instance", value: 3 };
       // @ts-expect-error
-      const f: ClassProvider<FooService> = { provide: 3, useClass: 3 };
-      // @ts-expect-error
-      const g: ClassProvider<string> = { provide: String, useClass: String };
+      const g: InstanceBindingDescriptor<string> = { token: String, type: "Instance", value: String };
     });
 
-    it("value provider", () => {
-      const a: ValueProvider<FooService> = { provide: FooService, useValue: new FooService() };
-      const b: ValueProvider<FooService> = { provide: FooService, useValue: new FooChildService() };
+    it("constant value binding descriptor", () => {
+      const a: ConstantValueBindingDescriptor<FooService> = { token: FooService, value: new FooService() };
+      const b: ConstantValueBindingDescriptor<FooService> = { token: FooService, value: new FooChildService() };
 
       // @ts-expect-error
-      const c: ValueProvider<FooService> = { provide: FooService, useValue: new OtherService() };
+      const c: ConstantValueBindingDescriptor<FooService> = { token: FooService, value: new OtherService() };
       // @ts-expect-error
-      const d: ValueProvider<FooChildService> = { provide: FooChildService, useValue: new FooService() };
+      const d: ConstantValueBindingDescriptor<FooChildService> = { token: FooChildService, value: new FooService() };
       // @ts-expect-error
-      const e: ValueProvider<FooService> = { provide: FooService, useValue: 3 };
+      const e: ConstantValueBindingDescriptor<FooService> = { token: FooService, value: 3 };
       // @ts-expect-error
-      const f: ValueProvider<FooService> = { provide: 3, useValue: 3 };
-      // @ts-expect-error
-      const g: ValueProvider<string> = { provide: String, useValue: "foo" };
+      const f: ConstantValueBindingDescriptor<FooService> = { token: 3, value: 3 };
     });
 
-    it("factory provider", () => {
-      const a: FactoryProvider<FooService> = { provide: FooService, useFactory: () => new FooService() };
-      const b: FactoryProvider<FooService> = { provide: FooService, useFactory: () => new FooChildService() };
+    it("dynamic value binding descriptor", () => {
+      const a: DynamicValueBindingDescriptor<FooService> = { token: FooService, factory: () => new FooService() };
+      const b: DynamicValueBindingDescriptor<FooService> = { token: FooService, factory: () => new FooChildService() };
+
+      const a2: DynamicValueBindingDescriptor<FooService> = {
+        token: FooService,
+        // @ts-expect-error
+        factory: async () => new FooService(),
+      };
 
       // @ts-expect-error
-      const a2: FactoryProvider<FooService> = { provide: FooService, useFactory: async () => new FooService() };
+      const c: DynamicValueBindingDescriptor<FooService> = { token: FooService, factory: () => new OtherService() };
+      const d: DynamicValueBindingDescriptor<FooChildService> = {
+        token: FooChildService,
+        // @ts-expect-error
+        factory: () => new FooService(),
+      };
       // @ts-expect-error
-      const b2: FactoryProvider<FooService> = { provide: FooService, useFactory: async () => new FooChildService() };
-
+      const e: DynamicValueBindingDescriptor<FooService> = { token: FooService, factory: () => 3 };
       // @ts-expect-error
-      const c: FactoryProvider<FooService> = { provide: FooService, useFactory: () => new OtherService() };
+      const f: DynamicValueBindingDescriptor<FooService> = { token: 3, factory: () => 3 };
       // @ts-expect-error
-      const d: FactoryProvider<FooChildService> = { provide: FooChildService, useFactory: () => new FooService() };
-      // @ts-expect-error
-      const e: FactoryProvider<FooService> = { provide: FooService, useFactory: () => 3 };
-      // @ts-expect-error
-      const f: FactoryProvider<FooService> = { provide: 3, useFactory: () => 3 };
-      // @ts-expect-error
-      const g: FactoryProvider<string> = { provide: String, useFactory: () => "foo" };
+      const g: DynamicValueBindingDescriptor<string> = { token: String, factory: () => "foo" };
     });
 
-    it("existing factory provider", () => {
-      const a: ExistingProvider<FooService> = { provide: FooService, useExisting: FooService };
-      const b: ExistingProvider<FooService> = { provide: FooService, useExisting: FooChildService };
+    it("service redirection binding descriptor", () => {
+      const a: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: FooService };
+      const b: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: FooChildService };
 
       const token1 = new InjectionToken<FooService>("token1");
       const token2 = new InjectionToken<FooChildService>("token2");
       const token3 = new InjectionToken<OtherService>("token3");
 
-      const a2: ExistingProvider<FooService> = { provide: FooService, useExisting: token1 };
-      const b2: ExistingProvider<FooService> = { provide: FooService, useExisting: token2 };
-      const b3: ExistingProvider<FooService> = { provide: FooService, useExisting: "unknown" };
+      const a2: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: token1 };
+      const b2: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: token2 };
+      const b3: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: "unknown" };
 
       // @ts-expect-error
-      const c: ExistingProvider<FooService> = { provide: FooService, useExisting: OtherService };
+      const c: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: OtherService };
       // @ts-expect-error
-      const c2: ExistingProvider<FooService> = { provide: FooService, useExisting: token3 };
+      const c2: ServiceRedirectionBindingDescriptor<FooService> = { token: FooService, service: token3 };
       // @ts-expect-error
-      const d: ExistingProvider<FooChildService> = { provide: FooChildService, useExisting: FooService };
+      const d: ServiceRedirectionBindingDescriptor<FooChildService> = { token: FooChildService, service: FooService };
       // @ts-expect-error
-      const e: ExistingProvider<FooService> = { provide: 3, useExisting: 3 };
+      const e: ServiceRedirectionBindingDescriptor<FooService> = { token: 3, service: 3 };
     });
   });
   describe("Binding", () => {
@@ -120,135 +132,131 @@ describe("Type-safety", () => {
     it("bind()", () => {
       const container = new Container();
 
-      container.bind({ provide: FooService, useClass: FooChildService });
-      container.bind({ provide: FooChildService, useClass: FooChildService });
+      container.bind({ token: FooService, type: "Instance", value: FooChildService });
+      container.bind({ token: FooChildService, type: "Instance", value: FooChildService });
 
       // @ts-expect-error
-      container.bind({ provide: FooChildService, useClass: FooService });
+      container.bind({ token: FooChildService, type: "Instance", value: FooService });
 
-      container.bind({ provide: TOKEN1, useValue: "Foo" });
-      container.bind({ provide: TOKEN2, useValue: 42 });
+      container.bind({ token: TOKEN1, value: "Foo" });
+      container.bind({ token: TOKEN2, value: 42 });
 
       // @ts-expect-error
-      container.bind({ provide: TOKEN1, useValue: 42 });
+      container.bind({ token: TOKEN1, value: 42 });
       // @ts-expect-error
-      container.bind({ provide: TOKEN2, useValue: "Foo" });
+      container.bind({ token: TOKEN2, value: "Foo" });
     });
 
     it("bindAll()", () => {
       const container = new Container();
 
       container.bindAll(
-        { provide: FooService, useClass: FooChildService },
-        { provide: FooChildService, useClass: FooChildService }
+        { token: FooService, type: "Instance", value: FooChildService },
+        { token: FooChildService, type: "Instance", value: FooChildService }
       );
 
       // @ts-expect-error
-      container.bindAll({ provide: FooChildService, useClass: FooService });
+      container.bindAll({ token: FooChildService, type: "Instance", value: FooService });
 
       // 2 params
-      container.bindAll({ provide: TOKEN1, useValue: "Foo" }, { provide: TOKEN2, useValue: 42 });
+      container.bindAll({ token: TOKEN1, value: "Foo" }, { token: TOKEN2, value: 42 });
       container.bindAll(
-        { provide: TOKEN1, useValue: "Foo" },
+        { token: TOKEN1, value: "Foo" },
         // @ts-expect-error
-        { provide: TOKEN2, useValue: "Foo" }
+        { token: TOKEN2, value: "Foo" }
       );
 
       // 3 params
+      container.bindAll({ token: TOKEN1, value: "Foo" }, { token: TOKEN2, value: 42 }, { token: TOKEN1, value: "Foo" });
       container.bindAll(
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" }
-      );
-      container.bindAll(
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN1, useValue: "Foo" },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN1, value: "Foo" },
         // @ts-expect-error
-        { provide: TOKEN2, useValue: "Foo" }
+        { token: TOKEN2, value: "Foo" }
       );
 
       // 4 params
       container.bindAll(
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 }
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 }
       );
       container.bindAll(
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN1, useValue: "Foo" },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN1, value: "Foo" },
         // @ts-expect-error
-        { provide: TOKEN2, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 }
+        { token: TOKEN2, value: "Foo" },
+        { token: TOKEN2, value: 42 }
       );
 
       // 5 params
       container.bindAll(
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" }
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" }
       );
       container.bindAll(
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN1, useValue: "Foo" },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN1, value: "Foo" },
         // @ts-expect-error
-        { provide: TOKEN2, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" }
+        { token: TOKEN2, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" }
       );
 
       // 6 params
       container.bindAll(
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 }
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 }
       );
       container.bindAll(
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN1, useValue: "Foo" },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN1, value: "Foo" },
         // @ts-expect-error
-        { provide: TOKEN2, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 }
+        { token: TOKEN2, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 }
       );
 
       // 10 params
       container.bindAll(
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 }
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 }
       );
       container.bindAll(
-        { provide: TOKEN1, useValue: "Foo" },
+        { token: TOKEN1, value: "Foo" },
         // @ts-expect-error
-        { provide: TOKEN2, useValue: "Foo" },
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: 42 },
-        { provide: TOKEN1, useValue: "Foo" },
-        { provide: TOKEN2, useValue: "Foo" } // not type-checking (10th params)
+        { token: TOKEN2, value: "Foo" },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: 42 },
+        { token: TOKEN1, value: "Foo" },
+        { token: TOKEN2, value: "Foo" } // not type-checking (10th params)
       );
 
       // @ts-expect-error
-      container.bindAll({ provide: TOKEN1, useValue: 42 });
+      container.bindAll({ token: TOKEN1, value: 42 });
       // @ts-expect-error
-      container.bindAll({ provide: TOKEN2, useValue: "Foo" });
+      container.bindAll({ token: TOKEN2, value: "Foo" });
     });
   });
   it("Injection tokens", () => {
@@ -257,12 +265,12 @@ describe("Type-safety", () => {
 
     const container = new Container();
 
-    container.bind({ provide: SOME_NUMBER, useValue: 3 });
+    container.bind({ token: SOME_NUMBER, value: 3 });
     // @ts-expect-error
-    container.bind({ provide: SOME_NUMBER, useValue: "foo" });
-    container.bind({ provide: SOME_STRING, useValue: "foo" });
+    container.bind({ token: SOME_NUMBER, value: "foo" });
+    container.bind({ token: SOME_STRING, value: "foo" });
     // @ts-expect-error
-    container.bind({ provide: SOME_STRING, useValue: 3 });
+    container.bind({ token: SOME_STRING, value: 3 });
   });
   describe("Injecting", () => {
     class FooService {

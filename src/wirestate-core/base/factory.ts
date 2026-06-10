@@ -1,57 +1,57 @@
+import * as Guards from "./bindings";
+import { type Binding } from "./bindings";
 import { Container } from "./container";
 import { CircularDependencyError } from "./errors";
-import { type Provider } from "./providers";
-import * as Guards from "./providers";
-import { getToken, toString } from "./tokens";
+import { getBindingToken, toString } from "./tokens";
 import { assertNever } from "./utils";
 
 /**
- * Constructs values for providers, tracking the chain of providers under
+ * Constructs values for bindings, tracking the chain of bindings under
  * construction to detect circular dependencies.
  *
  * @internal
  */
 export class Factory {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private readonly underConstruction: Array<Provider<any>> = [];
+  private readonly underConstruction: Array<Binding<any>> = [];
 
   public constructor(private readonly container: Container) {}
 
   /**
-   * Constructs values for a provider.
+   * Constructs values for a binding.
    *
-   * @param provider - Provider to construct values for.
+   * @param binding - Binding to construct values for.
    * @returns Constructed values.
    */
-  public construct<T>(provider: Provider<T>): Array<T> {
+  public construct<T>(binding: Binding<T>): Array<T> {
     try {
-      if (this.underConstruction.includes(provider)) {
-        const dependencyGraph = [...this.underConstruction, provider].map(getToken).map(toString);
+      if (this.underConstruction.includes(binding)) {
+        const dependencyGraph = [...this.underConstruction, binding].map(getBindingToken).map(toString);
 
         throw new CircularDependencyError(dependencyGraph);
       }
 
-      this.underConstruction.push(provider);
+      this.underConstruction.push(binding);
 
-      return this.doConstruct(provider);
+      return this.doConstruct(binding);
     } finally {
       this.underConstruction.pop();
     }
   }
 
-  private doConstruct<T>(provider: Provider<T>): Array<T> {
-    if (Guards.isConstructorProvider(provider)) {
-      return [new provider()];
-    } else if (Guards.isClassProvider(provider)) {
-      return [new provider.useClass()];
-    } else if (Guards.isValueProvider(provider)) {
-      return [provider.useValue];
-    } else if (Guards.isFactoryProvider(provider)) {
-      return [provider.useFactory(this.container)];
-    } else if (Guards.isExistingProvider(provider)) {
-      return this.container.get(provider.useExisting, { multi: true });
+  private doConstruct<T>(binding: Binding<T>): Array<T> {
+    if (Guards.isConstructorBinding(binding)) {
+      return [new binding()];
+    } else if (Guards.isInstanceDescriptor(binding)) {
+      return [new binding.value()];
+    } else if (Guards.isDynamicValueDescriptor(binding)) {
+      return [binding.factory(this.container)];
+    } else if (Guards.isServiceRedirectionDescriptor(binding)) {
+      return this.container.get(binding.service, { multi: true });
+    } else if (Guards.isConstantValueDescriptor(binding)) {
+      return [binding.value];
     }
 
-    return assertNever(provider);
+    return assertNever(binding);
   }
 }

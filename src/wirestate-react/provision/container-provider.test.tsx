@@ -132,8 +132,8 @@ describe("ContainerProvider", () => {
     const secondParent: Container = new Container();
     const containers: Array<Container> = [];
 
-    firstParent.bind({ provide: PARENT_TOKEN, useValue: "first-parent" });
-    secondParent.bind({ provide: PARENT_TOKEN, useValue: "second-parent" });
+    firstParent.bind({ token: PARENT_TOKEN, value: "first-parent" });
+    secondParent.bind({ token: PARENT_TOKEN, value: "second-parent" });
 
     function TrackingConsumer() {
       const container: Container = useContainer();

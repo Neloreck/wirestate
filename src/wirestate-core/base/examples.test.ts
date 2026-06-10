@@ -36,12 +36,14 @@ describe("Container", () => {
 
     container
       .bind({
-        provide: MyService,
-        useClass: MyService,
+        token: MyService,
+        type: "Instance",
+        value: MyService,
       })
       .bind({
-        provide: OtherService,
-        useClass: OtherService,
+        token: OtherService,
+        type: "Instance",
+        value: OtherService,
       });
 
     const service = container.get(MyService);
@@ -80,20 +82,20 @@ describe("Container", () => {
 
     container.bindAll(
       {
-        provide: "by-value-with-token-as-string",
-        useValue: { foo: "value" },
+        token: "by-value-with-token-as-string",
+        value: { foo: "value" },
       },
       {
-        provide: fooToken1,
-        useFactory: factoryFn,
+        token: fooToken1,
+        factory: factoryFn,
       },
       {
-        provide: fooToken2,
-        useFactory: () => ({ foo: `${inject<Foo>(fooToken1).foo}-with-inject` }),
+        token: fooToken2,
+        factory: () => ({ foo: `${inject<Foo>(fooToken1).foo}-with-inject` }),
       },
       {
-        provide: fooToken3,
-        useExisting: fooToken1,
+        token: fooToken3,
+        service: fooToken1,
       }
     );
 
@@ -104,7 +106,7 @@ describe("Container", () => {
     expect(container.get(fooToken2)).toEqual({ foo: "factory-with-inject" });
     expect(container.get(fooToken3)).toBe(container.get(fooToken1));
     expect(container.get(tokenWithoutProvider, { optional: true })).toBeUndefined();
-    expect(() => container.get(tokenWithoutProvider)).toThrow("No provider(s) found");
+    expect(() => container.get(tokenWithoutProvider)).toThrow("No binding(s) found");
   });
 
   it("should support multi-providers", () => {
@@ -128,14 +130,16 @@ describe("Container", () => {
 
     container
       .bind({
-        provide: AbstractService,
+        token: AbstractService,
         multi: true,
-        useClass: FooService,
+        type: "Instance",
+        value: FooService,
       })
       .bind({
-        provide: AbstractService,
+        token: AbstractService,
         multi: true,
-        useClass: BarService,
+        type: "Instance",
+        value: BarService,
       });
 
     const services = container.get(AbstractService, { multi: true });
@@ -189,50 +193,54 @@ describe("Container", () => {
 
       container.bindAll(
         {
-          provide: FooService,
-          useClass: FooService,
+          token: FooService,
+          type: "Instance",
+          value: FooService,
           multi: true,
         },
         {
-          provide: BarService,
-          useClass: BarService,
+          token: BarService,
+          type: "Instance",
+          value: BarService,
           multi: true,
         },
         {
-          provide: SpecialBarService,
-          useClass: SpecialBarService,
+          token: SpecialBarService,
+          type: "Instance",
+          value: SpecialBarService,
           multi: true,
         },
         {
-          provide: SpecialBazService,
-          useClass: SpecialBazService,
+          token: SpecialBazService,
+          type: "Instance",
+          value: SpecialBazService,
           multi: true,
         },
 
         // not needed, but should not interfere with auto-binding of parent classes:
         {
-          provide: BarService,
-          useExisting: SpecialBarService,
+          token: BarService,
+          service: SpecialBarService,
           multi: true,
         },
         {
-          provide: BazService,
-          useExisting: SpecialBazService,
+          token: BazService,
+          service: SpecialBazService,
           multi: true,
         },
         {
-          provide: AbstractService,
-          useExisting: FooService,
+          token: AbstractService,
+          service: FooService,
           multi: true,
         },
         {
-          provide: AbstractService,
-          useExisting: BarService,
+          token: AbstractService,
+          service: BarService,
           multi: true,
         },
         {
-          provide: AbstractService,
-          useExisting: BazService,
+          token: AbstractService,
+          service: BazService,
           multi: true,
         }
       );
@@ -278,45 +286,49 @@ describe("Container", () => {
 
       container.bindAll(
         {
-          provide: FooService,
-          useClass: FooService,
+          token: FooService,
+          type: "Instance",
+          value: FooService,
           multi: true,
         },
         {
-          provide: BarService,
-          useClass: BarService,
+          token: BarService,
+          type: "Instance",
+          value: BarService,
           multi: true,
         },
         {
-          provide: SpecialBarService,
-          useClass: SpecialBarService,
+          token: SpecialBarService,
+          type: "Instance",
+          value: SpecialBarService,
           multi: true,
         },
         {
-          provide: SpecialBazService,
-          useClass: SpecialBazService,
+          token: SpecialBazService,
+          type: "Instance",
+          value: SpecialBazService,
           multi: true,
         },
 
         // not needed, but should not interfere with auto-binding of parent classes:
         {
-          provide: AbstractService,
-          useExisting: FooService,
+          token: AbstractService,
+          service: FooService,
           multi: true,
         },
         {
-          provide: AbstractService,
-          useExisting: BarService,
+          token: AbstractService,
+          service: BarService,
           multi: true,
         },
         {
-          provide: AbstractService,
-          useExisting: BazService,
+          token: AbstractService,
+          service: BazService,
           multi: true,
         },
         {
-          provide: BarService,
-          useExisting: SpecialBarService,
+          token: BarService,
+          service: SpecialBarService,
           multi: true,
         }
       );
@@ -361,27 +373,27 @@ describe("Container", () => {
   it("should not allow combination of multi=false and multi=true", () => {
     const container = new Container();
 
-    expect(() =>
-      container.bindAll({ provide: "key", useValue: 1 }, { provide: "key", multi: true, useValue: 2 })
-    ).toThrow("Cannot bind key as multi-provider, since there is already a provider which is not a multi-provider.");
+    expect(() => container.bindAll({ token: "key", value: 1 }, { token: "key", multi: true, value: 2 })).toThrow(
+      "Cannot bind key as multi-binding, since there is already a binding which is not a multi-binding."
+    );
 
     expect(() =>
-      container.bindAll({ provide: "otherKey", multi: true, useValue: 2 }, { provide: "otherKey", useValue: 1 })
-    ).toThrow("Cannot bind otherKey as provider, since there are already provider(s) that are multi-providers.");
+      container.bindAll({ token: "otherKey", multi: true, value: 2 }, { token: "otherKey", value: 1 })
+    ).toThrow("Cannot bind otherKey as binding, since there are already binding(s) that are multi-bindings.");
   });
 
   it("existing provider may not refer to itself", () => {
     const container = new Container();
 
-    expect(() => container.bind({ provide: "key", useExisting: "key" })).toThrow(
-      `The provider for token key with "useExisting" cannot refer to itself.`
+    expect(() => container.bind({ token: "key", service: "key" })).toThrow(
+      "The service redirection for token key cannot refer to itself."
     );
   });
 
   it("requesting single value for multiple providers throws error", () => {
     const container = new Container();
 
-    container.bindAll({ provide: "key", multi: true, useValue: 1 }, { provide: "key", multi: true, useValue: 2 });
+    container.bindAll({ token: "key", multi: true, value: 1 }, { token: "key", multi: true, value: 2 });
 
     expect(() => container.get("key")).toThrow("Requesting a single value for key, but multiple values were provided.");
   });
@@ -391,70 +403,70 @@ describe("Container", () => {
 
     container.bindAll(
       {
-        provide: "myNumbers",
-        useValue: 1,
+        token: "myNumbers",
+        value: 1,
         multi: true,
       },
       {
-        provide: "myNumbers",
-        useValue: 2,
+        token: "myNumbers",
+        value: 2,
         multi: true,
       },
       {
-        provide: "otherNumber",
-        useValue: 3,
+        token: "otherNumber",
+        value: 3,
       },
       {
-        provide: "anotherNumber",
-        useValue: 4,
+        token: "anotherNumber",
+        value: 4,
       },
       {
-        provide: "otherNumbers",
-        useValue: 5,
+        token: "otherNumbers",
+        value: 5,
         multi: true,
       },
       {
-        provide: "a",
-        useExisting: "myNumbers",
+        token: "a",
+        service: "myNumbers",
       },
       {
-        provide: "b",
-        useExisting: "myNumbers",
+        token: "b",
+        service: "myNumbers",
         multi: true,
       },
       {
-        provide: "b",
-        useExisting: "otherNumber",
+        token: "b",
+        service: "otherNumber",
         multi: true,
       },
       {
-        provide: "c",
-        useExisting: "anotherNumber",
+        token: "c",
+        service: "anotherNumber",
         multi: true,
       },
       {
-        provide: "d",
-        useExisting: "myNumbers",
+        token: "d",
+        service: "myNumbers",
         multi: true,
       },
       {
-        provide: "d",
-        useExisting: "otherNumbers",
+        token: "d",
+        service: "otherNumbers",
         multi: true,
       },
       {
-        provide: "d",
-        useExisting: "otherNumber",
+        token: "d",
+        service: "otherNumber",
         multi: true,
       },
       {
-        provide: "e",
-        useExisting: "otherNumber",
+        token: "e",
+        service: "otherNumber",
         multi: true,
       },
       {
-        provide: "f",
-        useExisting: "otherNumbers",
+        token: "f",
+        service: "otherNumbers",
         multi: true,
       }
     );
@@ -518,17 +530,17 @@ describe("Container", () => {
 
     container.bindAll(
       {
-        provide: Symbol.for("my-token"),
-        useValue: 42,
+        token: Symbol.for("my-token"),
+        value: 42,
       },
       {
-        provide: OTHER_TOKEN,
-        useValue: 2,
+        token: OTHER_TOKEN,
+        value: 2,
       }
     );
 
     expect(container.get(Symbol.for("my-token"))).toBe(42);
-    expect(() => container.get(Symbol.for("other-token"))).toThrow("No provider(s) found for other-token");
+    expect(() => container.get(Symbol.for("other-token"))).toThrow("No binding(s) found for other-token");
     expect(container.get(OTHER_TOKEN)).toBe(2);
   });
 

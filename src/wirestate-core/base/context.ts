@@ -1,24 +1,24 @@
 import { Container } from "./container";
-import type { Token } from "./tokens";
+import type { Identifier } from "./tokens";
 
 /**
  * Injects a service within the current injection context, using the token provided.
  *
  * @param token
  */
-export function inject<T>(token: Token<T>): T;
-export function inject<T>(token: Token<T>, options: { multi: true }): Array<T>;
-export function inject<T>(token: Token<T>, options: { optional: true }): T | undefined;
-export function inject<T>(token: Token<T>, options: { multi: true; optional: true }): Array<T> | undefined;
-export function inject<T>(token: Token<T>, options: { lazy: true }): () => T;
-export function inject<T>(token: Token<T>, options: { lazy: true; multi: true }): () => Array<T>;
-export function inject<T>(token: Token<T>, options: { lazy: true; optional: true }): () => T | undefined;
+export function inject<T>(token: Identifier<T>): T;
+export function inject<T>(token: Identifier<T>, options: { multi: true }): Array<T>;
+export function inject<T>(token: Identifier<T>, options: { optional: true }): T | undefined;
+export function inject<T>(token: Identifier<T>, options: { multi: true; optional: true }): Array<T> | undefined;
+export function inject<T>(token: Identifier<T>, options: { lazy: true }): () => T;
+export function inject<T>(token: Identifier<T>, options: { lazy: true; multi: true }): () => Array<T>;
+export function inject<T>(token: Identifier<T>, options: { lazy: true; optional: true }): () => T | undefined;
 export function inject<T>(
-  token: Token<T>,
+  token: Identifier<T>,
   options: { lazy: true; multi: true; optional: true }
 ): () => Array<T> | undefined;
 export function inject<T>(
-  token: Token<T>,
+  token: Identifier<T>,
   options?: { optional?: boolean; multi?: boolean; lazy?: boolean }
 ): T | Array<T> | undefined | (() => T | Array<T> | undefined) {
   try {

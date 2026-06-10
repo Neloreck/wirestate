@@ -1,7 +1,6 @@
 import { BindingType as BindingTypeValues, BindingScope as BindingScopeValues, Newable, Identifier } from "../alias";
 import type { Container } from "../base";
 
-
 /**
  * Identifier for one provider provision cycle of a service instance.
  *

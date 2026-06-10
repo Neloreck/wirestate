@@ -1,5 +1,5 @@
 import { Container } from "./container";
-import { NoProviderFoundError } from "./errors";
+import { NoBindingFoundError } from "./errors";
 import { InjectionToken } from "./tokens";
 
 describe("Container hierarchy", () => {
@@ -9,7 +9,7 @@ describe("Container hierarchy", () => {
 
     class MyService {}
 
-    parent.bind({ provide: MyService, useClass: MyService });
+    parent.bind({ token: MyService, type: "Instance", value: MyService });
 
     const fromChild = child.get(MyService);
     const fromParent = parent.get(MyService);
@@ -22,8 +22,8 @@ describe("Container hierarchy", () => {
     const child = parent.createChild();
     const token = new InjectionToken<string>("value");
 
-    parent.bind({ provide: token, useValue: "parent" });
-    child.bind({ provide: token, useValue: "child" });
+    parent.bind({ token: token, value: "parent" });
+    child.bind({ token: token, value: "child" });
 
     expect(child.get(token)).toBe("child");
     expect(parent.get(token)).toBe("parent");
@@ -42,13 +42,13 @@ describe("Container hierarchy", () => {
     const child = parent.createChild();
     const token = new InjectionToken<string>("value");
 
-    parent.bind({ provide: token, useValue: "parent" });
+    parent.bind({ token: token, value: "parent" });
 
     expect(child.has(token)).toBe(true);
     expect(child.hasOwn(token)).toBe(false);
     expect(parent.hasOwn(token)).toBe(true);
 
-    child.bind({ provide: token, useValue: "child" });
+    child.bind({ token: token, value: "child" });
 
     expect(child.hasOwn(token)).toBe(true);
   });
@@ -60,7 +60,7 @@ describe("Container hierarchy", () => {
 
     class MyService {}
 
-    parent.bind({ provide: MyService, useClass: MyService, onDeactivated });
+    parent.bind({ token: MyService, type: "Instance", value: MyService, onDeactivated });
 
     child.get(MyService);
     child.unbind(MyService);
@@ -76,7 +76,7 @@ describe("Explicit bindings", () => {
 
     class MyService {}
 
-    expect(() => container.get(MyService)).toThrow(NoProviderFoundError);
+    expect(() => container.get(MyService)).toThrow(NoBindingFoundError);
     expect(container.get(MyService, { optional: true })).toBeUndefined();
   });
 
@@ -96,6 +96,6 @@ describe("Explicit bindings", () => {
 
     class MyService {}
 
-    expect(() => child.get(MyService)).toThrow(NoProviderFoundError);
+    expect(() => child.get(MyService)).toThrow(NoBindingFoundError);
   });
 });

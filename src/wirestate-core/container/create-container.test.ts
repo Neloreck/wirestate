@@ -114,7 +114,7 @@ describe("createContainer", () => {
     const parent: Container = new Container();
     const PARENT_TOKEN: unique symbol = Symbol.for("PARENT_TOKEN");
 
-    parent.bind({ provide: PARENT_TOKEN, useValue: "parent-value" });
+    parent.bind({ token: PARENT_TOKEN, value: "parent-value" });
 
     const container: Container = createContainer({ parent });
 

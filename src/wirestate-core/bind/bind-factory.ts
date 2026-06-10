@@ -53,8 +53,8 @@ export function bindFactory(container: Container, descriptor: FactoryBindingDesc
   });
 
   container.bind({
-    provide: descriptor.token,
-    useFactory: (current) => descriptor.factory(current),
+    token: descriptor.token,
+    factory: (current) => descriptor.factory(current),
   });
 
   registerBinding(container, descriptor);

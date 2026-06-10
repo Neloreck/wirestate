@@ -2,15 +2,15 @@ import { Container } from "./container";
 import { inject } from "./context";
 import { InjectionToken } from "./tokens";
 
-describe("Provider lifecycle hooks", () => {
+describe("Binding lifecycle hooks", () => {
   describe("onActivated", () => {
-    it("should run once for singleton providers with instance and container", () => {
+    it("should run once for singleton bindings with instance and container", () => {
       const container = new Container();
       const onActivated = jest.fn();
 
       class MyService {}
 
-      container.bind({ provide: MyService, useClass: MyService, onActivated });
+      container.bind({ token: MyService, type: "Instance", value: MyService, onActivated });
 
       const instance = container.get(MyService);
 
@@ -20,13 +20,13 @@ describe("Provider lifecycle hooks", () => {
       expect(onActivated).toHaveBeenCalledWith(instance, container);
     });
 
-    it("should run for every construction of transient providers", () => {
+    it("should run for every construction of transient bindings", () => {
       const container = new Container();
       const onActivated = jest.fn();
 
       class MyService {}
 
-      container.bind({ provide: MyService, useClass: MyService, scope: "transient", onActivated });
+      container.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient", onActivated });
 
       container.get(MyService);
       container.get(MyService);
@@ -39,21 +39,21 @@ describe("Provider lifecycle hooks", () => {
       const token = new InjectionToken<string>("message");
 
       container.bind({
-        provide: token,
-        useFactory: () => "original",
+        token: token,
+        factory: () => "original",
         onActivated: (value) => `${value}-wrapped`,
       });
 
       expect(container.get(token)).toBe("original-wrapped");
     });
 
-    it("should run for value providers on first resolution", () => {
+    it("should run for constant value bindings on first resolution", () => {
       const container = new Container();
       const token = new InjectionToken<object>("value");
       const onActivated = jest.fn();
       const value = {};
 
-      container.bind({ provide: token, useValue: value, onActivated });
+      container.bind({ token: token, value: value, onActivated });
 
       expect(onActivated).not.toHaveBeenCalled();
 
@@ -72,7 +72,7 @@ describe("Provider lifecycle hooks", () => {
 
       class MyService {}
 
-      container.bind({ provide: MyService, useClass: MyService, onDeactivated });
+      container.bind({ token: MyService, type: "Instance", value: MyService, onDeactivated });
 
       const instance = container.get(MyService);
 
@@ -82,13 +82,13 @@ describe("Provider lifecycle hooks", () => {
       expect(onDeactivated).toHaveBeenCalledWith(instance, container);
     });
 
-    it("should not run when the provider never constructed a value", () => {
+    it("should not run when the binding never constructed a value", () => {
       const container = new Container();
       const onDeactivated = jest.fn();
 
       class MyService {}
 
-      container.bind({ provide: MyService, useClass: MyService, onDeactivated });
+      container.bind({ token: MyService, type: "Instance", value: MyService, onDeactivated });
       container.unbind(MyService);
 
       expect(onDeactivated).not.toHaveBeenCalled();
@@ -100,7 +100,7 @@ describe("Provider lifecycle hooks", () => {
 
       class MyService {}
 
-      container.bind({ provide: MyService, useClass: MyService, scope: "transient", onDeactivated });
+      container.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient", onDeactivated });
 
       container.get(MyService);
       container.unbind(MyService);
@@ -112,12 +112,12 @@ describe("Provider lifecycle hooks", () => {
       const container = new Container();
       const token = new InjectionToken<object>("value");
 
-      container.bind({ provide: token, useFactory: () => ({}) });
+      container.bind({ token: token, factory: () => ({}) });
 
       const first = container.get(token);
 
       container.unbind(token);
-      container.bind({ provide: token, useFactory: () => ({}) });
+      container.bind({ token: token, factory: () => ({}) });
 
       expect(container.get(token)).not.toBe(first);
     });
@@ -131,13 +131,15 @@ describe("Provider lifecycle hooks", () => {
       class BarService {}
 
       container.bind({
-        provide: FooService,
-        useClass: FooService,
+        token: FooService,
+        type: "Instance",
+        value: FooService,
         onDeactivated: () => deactivations.push("foo"),
       });
       container.bind({
-        provide: BarService,
-        useClass: BarService,
+        token: BarService,
+        type: "Instance",
+        value: BarService,
         onDeactivated: () => deactivations.push("bar"),
       });
 
@@ -159,13 +161,15 @@ describe("Provider lifecycle hooks", () => {
       }
 
       container.bind({
-        provide: BarService,
-        useClass: BarService,
+        token: BarService,
+        type: "Instance",
+        value: BarService,
         onDeactivated: () => deactivations.push("bar"),
       });
       container.bind({
-        provide: FooService,
-        useClass: FooService,
+        token: FooService,
+        type: "Instance",
+        value: FooService,
         onDeactivated: () => deactivations.push("foo"),
       });
 
@@ -185,11 +189,12 @@ describe("Provider lifecycle hooks", () => {
       class BarService {}
 
       container.bind({
-        provide: FooService,
-        useClass: FooService,
+        token: FooService,
+        type: "Instance",
+        value: FooService,
         onDeactivated: (instance, current) => resolved.push(current.get(BarService)),
       });
-      container.bind({ provide: BarService, useClass: BarService });
+      container.bind({ token: BarService, type: "Instance", value: BarService });
 
       container.get(FooService);
 
@@ -200,15 +205,15 @@ describe("Provider lifecycle hooks", () => {
       expect(resolved).toEqual([bar]);
     });
 
-    it("should not deactivate values resolved through alias providers twice", () => {
+    it("should not deactivate values resolved through service redirections twice", () => {
       const container = new Container();
       const onDeactivated = jest.fn();
       const alias = new InjectionToken<MyService>("alias");
 
       class MyService {}
 
-      container.bind({ provide: MyService, useClass: MyService, onDeactivated });
-      container.bind({ provide: alias, useExisting: MyService });
+      container.bind({ token: MyService, type: "Instance", value: MyService, onDeactivated });
+      container.bind({ token: alias, service: MyService });
 
       container.get(alias);
       container.unbind(alias);

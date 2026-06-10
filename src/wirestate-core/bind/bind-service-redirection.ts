@@ -66,8 +66,8 @@ export function bindServiceRedirection<T>(
   });
 
   container.bind<T>({
-    provide: descriptor.token as Identifier<T>,
-    useExisting: descriptor.service as Identifier<T>,
+    token: descriptor.token as Identifier<T>,
+    service: descriptor.service as Identifier<T>,
   });
 
   registerBinding(container, descriptor);

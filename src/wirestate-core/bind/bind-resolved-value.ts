@@ -6,7 +6,6 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { ResolvedValueBindingDescriptor, ResolvedValueInjectOption } from "../types/provision";
 
-import { toProviderScope } from "./utils/apply-binding-scope";
 import { registerBinding } from "./utils/register-binding";
 import { validateBindingDescriptor } from "./utils/validate-binding-descriptor";
 
@@ -83,9 +82,9 @@ export function bindResolvedValue<T, FA extends Array<unknown> = Array<unknown>>
     []) as ReadonlyArray<ResolvedValueInjectOption>;
 
   container.bind<T>({
-    provide: descriptor.token as Identifier<T>,
-    scope: toProviderScope(descriptor.scope),
-    useFactory: (current) => {
+    token: descriptor.token as Identifier<T>,
+    scope: descriptor.scope,
+    factory: (current) => {
       const args: Array<unknown> = injectOptions.map((option) => resolveInjectOption(current, option));
 
       return (descriptor.factory as (...resolved: Array<unknown>) => T)(...args);

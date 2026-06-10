@@ -1,12 +1,12 @@
-import { type Provider } from "./providers";
-import * as Guards from "./providers";
+import type { Binding } from "./bindings";
 import { type AbstractClass, type Class, isClassLike } from "./utils";
 
 /**
- * A token is a reference to a service in the dependency injection (DI) container.
- * When obtaining a service from the container, you should use this token.
+ * An identifier is a reference to a service in the dependency injection (DI) container:
+ * class constructor, abstract class, string, symbol, or {@link InjectionToken}.
+ * When obtaining a service from the container, you should use its identifier.
  */
-export type Token<T> = Class<T> | AbstractClass<T> | string | symbol | InjectionToken<T>;
+export type Identifier<T = unknown> = Class<T> | AbstractClass<T> | string | symbol | InjectionToken<T>;
 
 /**
  * A unique injection token object, that is used by reference. Can hold a generic type.
@@ -26,32 +26,32 @@ export class InjectionToken<T> {
 }
 
 /**
- * Type-guard to check if a token is a class reference.
+ * Type-guard to check if an identifier is a class reference.
  *
  * @param token
  * @internal
  */
-export function isClassToken<T>(token: Token<T>): token is Class<T> {
+export function isClassToken<T>(token: Identifier<T>): token is Class<T> {
   return isClassLike(token);
 }
 
 /**
- * Type-guard to check if a token is an InjectionToken.
+ * Type-guard to check if an identifier is an InjectionToken.
  *
  * @param token
  * @internal
  */
-export function isInjectionToken<T>(token: Token<T>): token is InjectionToken<T> {
+export function isInjectionToken<T>(token: Identifier<T>): token is InjectionToken<T> {
   return token instanceof InjectionToken;
 }
 
 /**
- * Describes a token, useful for error messages.
+ * Describes an identifier, useful for error messages.
  *
  * @param token
  * @internal
  */
-export function toString<T>(token: Token<T>): string {
+export function toString<T>(token: Identifier<T>): string {
   if (isClassLike(token)) {
     return token.name;
   } else if (typeof token === "symbol") {
@@ -64,11 +64,11 @@ export function toString<T>(token: Token<T>): string {
 }
 
 /**
- * Returns the token for a provider.
+ * Returns the token a binding is registered under.
  *
- * @param provider
+ * @param binding
  * @internal
  */
-export function getToken<T>(provider: Provider<T>): Token<T> {
-  return Guards.isConstructorProvider(provider) ? provider : provider.provide;
+export function getBindingToken<T>(binding: Binding<T>): Identifier<T> {
+  return isClassLike(binding) ? (binding as Identifier<T>) : binding.token;
 }

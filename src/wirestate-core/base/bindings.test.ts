@@ -10,15 +10,15 @@ class MyService {
   }
 }
 
-describe("Providers", () => {
+describe("Bindings", () => {
   afterEach(() => {
     myServiceConstructorSpy.mockReset();
   });
 
-  it("Constructor providers should be provided once", () => {
+  it("Constructor bindings should be provided once", () => {
     const container = new Container();
 
-    expect(() => container.get(MyService)).toThrow("No provider(s) found");
+    expect(() => container.get(MyService)).toThrow("No binding(s) found");
     expect(container.get(MyService, { optional: true })).toBeUndefined();
 
     container.bind(MyService);
@@ -32,18 +32,19 @@ describe("Providers", () => {
     expect(container.get(MyService, { optional: true })).toBe(myService);
     expect(myServiceConstructorSpy).toHaveBeenCalledTimes(1);
 
-    expect(() => container.bind(MyService)).toThrow("existing provider was already constructed");
+    expect(() => container.bind(MyService)).toThrow("existing binding was already constructed");
   });
 
-  it("Class providers should be provided once", () => {
+  it("Instance bindings should be provided once", () => {
     const container = new Container();
 
-    expect(() => container.get(MyService)).toThrow("No provider(s) found");
+    expect(() => container.get(MyService)).toThrow("No binding(s) found");
     expect(container.get(MyService, { optional: true })).toBeUndefined();
 
     container.bind({
-      provide: MyService,
-      useClass: MyService,
+      token: MyService,
+      type: "Instance",
+      value: MyService,
     });
 
     expect(myServiceConstructorSpy).not.toHaveBeenCalled();
@@ -56,17 +57,17 @@ describe("Providers", () => {
     expect(myServiceConstructorSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("Value providers should be provided", () => {
+  it("Constant value bindings should be provided", () => {
     const container = new Container();
 
-    expect(() => container.get(MyService)).toThrow("No provider(s) found");
+    expect(() => container.get(MyService)).toThrow("No binding(s) found");
     expect(container.get(MyService, { optional: true })).toBeUndefined();
 
     const myService = new MyService();
 
     container.bind({
-      provide: MyService,
-      useValue: myService,
+      token: MyService,
+      value: myService,
     });
 
     expect(myService).toBeInstanceOf(MyService);
@@ -75,15 +76,15 @@ describe("Providers", () => {
     expect(myServiceConstructorSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("Factory providers should be provided once", () => {
+  it("Dynamic value bindings should be provided once", () => {
     const container = new Container();
 
-    expect(() => container.get(MyService)).toThrow("No provider(s) found");
+    expect(() => container.get(MyService)).toThrow("No binding(s) found");
     expect(container.get(MyService, { optional: true })).toBeUndefined();
 
     container.bind({
-      provide: MyService,
-      useFactory: () => new MyService(),
+      token: MyService,
+      factory: () => new MyService(),
     });
 
     expect(myServiceConstructorSpy).not.toHaveBeenCalled();
@@ -96,18 +97,18 @@ describe("Providers", () => {
     expect(myServiceConstructorSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("Existing providers should be provided once", () => {
+  it("Service redirections should be provided once", () => {
     const container = new Container();
 
-    expect(() => container.get(MyService)).toThrow("No provider(s) found");
+    expect(() => container.get(MyService)).toThrow("No binding(s) found");
     expect(container.get(MyService, { optional: true })).toBeUndefined();
 
     const OTHER_TOKEN = new InjectionToken<MyService>("MyService");
 
     container.bind(MyService);
     container.bind({
-      provide: OTHER_TOKEN,
-      useExisting: MyService,
+      token: OTHER_TOKEN,
+      service: MyService,
     });
 
     expect(myServiceConstructorSpy).not.toHaveBeenCalled();
@@ -162,8 +163,8 @@ describe("Providers", () => {
       const container = new Container();
 
       container.bind(FooService).bind(BarService).bind({
-        provide: AbstractService,
-        useExisting: FooService,
+        token: AbstractService,
+        service: FooService,
       });
 
       expect(container.get(FooService)).toBeInstanceOf(FooService);
@@ -175,8 +176,8 @@ describe("Providers", () => {
     });
   });
 
-  describe("Multi-provider injection", () => {
-    it("should support multi-value providers", () => {
+  describe("Multi-binding injection", () => {
+    it("should support multi-value bindings", () => {
       const container = new Container();
 
       const TOKEN = new InjectionToken<number>("TOKEN");
@@ -184,25 +185,25 @@ describe("Providers", () => {
 
       container
         .bind({
-          provide: TOKEN,
+          token: TOKEN,
           multi: true,
-          useValue: 1,
+          value: 1,
         })
         .bind({
-          provide: TOKEN,
+          token: TOKEN,
           multi: true,
-          useValue: 2,
+          value: 2,
         });
 
       expect(container.get(TOKEN, { multi: true })).toEqual([1, 2]);
-      expect(() => container.get(OTHER_TOKEN, { multi: true })).toThrow("No provider(s) found");
+      expect(() => container.get(OTHER_TOKEN, { multi: true })).toThrow("No binding(s) found");
       expect(container.get(OTHER_TOKEN, { multi: true, optional: true })).toBeUndefined();
 
       expect(() => {
         container.bind({
-          provide: TOKEN,
+          token: TOKEN,
           multi: true,
-          useValue: 1,
+          value: 1,
         });
       }).toThrow("already constructed");
     });
@@ -215,16 +216,16 @@ describe("Providers", () => {
 
     container.bindAll(
       {
-        provide: "foo",
-        useFactory: fooFactory,
+        token: "foo",
+        factory: fooFactory,
       },
       {
-        provide: "bar",
-        useFactory: barFactory,
+        token: "bar",
+        factory: barFactory,
       },
       {
-        provide: "message",
-        useFactory: (c) => {
+        token: "message",
+        factory: (c) => {
           return `${c.get("foo")} ${c.get("bar")}`;
         },
       }
@@ -243,16 +244,16 @@ describe("Providers", () => {
 
     container.bindAll(
       {
-        provide: "foo",
-        useFactory: fooFactory,
+        token: "foo",
+        factory: fooFactory,
       },
       {
-        provide: "bar",
-        useFactory: barFactory,
+        token: "bar",
+        factory: barFactory,
       },
       {
-        provide: "message",
-        useFactory: () => {
+        token: "message",
+        factory: () => {
           const c = inject(Container);
 
           return `${c.get("foo")} ${c.get("bar")}`;
@@ -271,9 +272,9 @@ describe("Providers", () => {
       const child = parent.createChild();
       const grandChild = child.createChild();
 
-      parent.bind({ provide: "tokenA", useFactory: () => ["a"] });
-      child.bind({ provide: "tokenB", useFactory: () => ["b"] });
-      grandChild.bind({ provide: "tokenC", useFactory: () => ["c"] });
+      parent.bind({ token: "tokenA", factory: () => ["a"] });
+      child.bind({ token: "tokenB", factory: () => ["b"] });
+      grandChild.bind({ token: "tokenC", factory: () => ["c"] });
 
       expect(grandChild.get("tokenA")).toEqual(["a"]);
       expect(grandChild.get("tokenB")).toEqual(["b"]);
@@ -281,11 +282,11 @@ describe("Providers", () => {
 
       expect(child.get("tokenA")).toEqual(["a"]);
       expect(child.get("tokenB")).toEqual(["b"]);
-      expect(() => child.get("tokenC")).toThrow("No provider(s) found for tokenC");
+      expect(() => child.get("tokenC")).toThrow("No binding(s) found for tokenC");
 
       expect(parent.get("tokenA")).toEqual(["a"]);
-      expect(() => parent.get("tokenB")).toThrow("No provider(s) found for tokenB");
-      expect(() => child.get("tokenC")).toThrow("No provider(s) found for tokenC");
+      expect(() => parent.get("tokenB")).toThrow("No binding(s) found for tokenB");
+      expect(() => child.get("tokenC")).toThrow("No binding(s) found for tokenC");
     });
 
     it("should reuse singletons from their parent", () => {
@@ -293,8 +294,8 @@ describe("Providers", () => {
       const child = parent.createChild();
       const grandChild = child.createChild();
 
-      parent.bind({ provide: "tokenA", useFactory: () => ["a"] });
-      child.bind({ provide: "tokenB", useFactory: () => ["b"] });
+      parent.bind({ token: "tokenA", factory: () => ["a"] });
+      child.bind({ token: "tokenB", factory: () => ["b"] });
 
       const a1 = parent.get("tokenA");
       const a2 = grandChild.get("tokenA");
@@ -313,10 +314,10 @@ describe("Providers", () => {
       const parent = new Container();
       const child = parent.createChild();
 
-      child.bind({ provide: "tokenA", useFactory: () => ["a"] });
+      child.bind({ token: "tokenA", factory: () => ["a"] });
 
       expect(child.get("tokenA")).toEqual(["a"]);
-      expect(() => parent.get("tokenA")).toThrow("No provider(s) found for tokenA");
+      expect(() => parent.get("tokenA")).toThrow("No binding(s) found for tokenA");
     });
 
     it("should keep track of their own singletons if provider was overridden", () => {
@@ -324,8 +325,8 @@ describe("Providers", () => {
       const child = parent.createChild();
       const grandChild = child.createChild();
 
-      parent.bind({ provide: "tokenA", useFactory: () => ["a1"] });
-      child.bind({ provide: "tokenA", useFactory: () => ["a2"] });
+      parent.bind({ token: "tokenA", factory: () => ["a1"] });
+      child.bind({ token: "tokenA", factory: () => ["a2"] });
 
       expect(parent.get("tokenA")).toEqual(["a1"]);
       expect(child.get("tokenA")).toEqual(["a2"]);
@@ -337,12 +338,12 @@ describe("Providers", () => {
       const child = parent.createChild();
 
       parent
-        .bind({ provide: "tokenA", useFactory: () => "a1", multi: true })
-        .bind({ provide: "tokenA", useFactory: () => "a2", multi: true });
+        .bind({ token: "tokenA", factory: () => "a1", multi: true })
+        .bind({ token: "tokenA", factory: () => "a2", multi: true });
 
       child
-        .bind({ provide: "tokenA", useFactory: () => "a3", multi: true })
-        .bind({ provide: "tokenA", useFactory: () => "a4", multi: true });
+        .bind({ token: "tokenA", factory: () => "a3", multi: true })
+        .bind({ token: "tokenA", factory: () => "a4", multi: true });
 
       expect(parent.get("tokenA", { multi: true })).toEqual(["a1", "a2"]);
       expect(child.get("tokenA", { multi: true })).toEqual(["a3", "a4"]);

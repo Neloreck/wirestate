@@ -128,8 +128,9 @@ export function bindInstanceWithToken<T extends object>(
   });
 
   container.bind<T>({
-    provide: token,
-    useClass: binding,
+    token,
+    type: "Instance",
+    value: binding,
     onActivated: createInstanceActivatedHandler({ binding, container, options }),
     onDeactivated: createInstanceDeactivationHandler({ binding, container, options }),
   });

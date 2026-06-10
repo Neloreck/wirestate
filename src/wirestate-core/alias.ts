@@ -1,24 +1,15 @@
-import type { Token } from "./base";
-
 /**
  * Wirestate DI container and injection primitives.
  *
  * @group Container
  */
-export { Container, InjectionToken, inject, NoProviderFoundError, CircularDependencyError } from "./base";
+export { Container, InjectionToken, inject, NoBindingFoundError, CircularDependencyError } from "./base";
+export { Identifier } from "./base";
 
 /**
  * @group Bind
  */
 export { Injectable, isInjectable } from "./metadata/injectable";
-
-/**
- * Token used to register and resolve a service: class constructor, abstract
- * class, string, symbol, or {@link InjectionToken}.
- *
- * @group Container
- */
-export type Identifier<TInstance = unknown> = Token<TInstance>;
 
 /**
  * Constructable class reference.

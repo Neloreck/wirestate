@@ -7,9 +7,10 @@ describe("Library exported API from wirestate-core", () => {
     "BindingType",
     "CircularDependencyError",
     "Container",
+    "Identifier",
     "Injectable",
     "InjectionToken",
-    "NoProviderFoundError",
+    "NoBindingFoundError",
     "inject",
     "isInjectable",
     // Core.

@@ -30,7 +30,7 @@ describe("bindDynamicValue", () => {
     const GREETING_TOKEN: unique symbol = Symbol("greeting");
     const factory = jest.fn((current: Container) => `Hello, ${current.get<string>(NAME_TOKEN)}`);
 
-    container.bind({ provide: NAME_TOKEN, useValue: "Ada" });
+    container.bind({ token: NAME_TOKEN, value: "Ada" });
 
     bindDynamicValue(container, {
       type: BindingType.DynamicValue,

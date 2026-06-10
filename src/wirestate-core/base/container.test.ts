@@ -21,12 +21,12 @@ describe("Container API", () => {
     const container = new Container();
     const token = new InjectionToken<MyService>("some-token");
 
-    expect(() => container.get(token)).toThrow("No provider(s) found");
+    expect(() => container.get(token)).toThrow("No binding(s) found");
 
     container.bind(MyService);
     container.bind({
-      provide: token,
-      useFactory: () => inject(MyService),
+      token: token,
+      factory: () => inject(MyService),
     });
 
     expect(container.get(token)).toBeInstanceOf(MyService);
@@ -40,7 +40,7 @@ describe("Container API", () => {
     expect(container.has(token)).toBe(false);
     expect(childContainer.has(token)).toBe(false);
 
-    container.bind({ provide: token, useClass: MyService });
+    container.bind({ token: token, type: "Instance", value: MyService });
     expect(container.has(token)).toBe(true);
     expect(childContainer.has(token)).toBe(true);
 
@@ -49,8 +49,8 @@ describe("Container API", () => {
     const spy = jest.fn();
 
     container.bind({
-      provide: factoryToken,
-      useFactory: () => {
+      token: factoryToken,
+      factory: () => {
         spy();
 
         return new MyService();
@@ -64,26 +64,26 @@ describe("Container API", () => {
 
   describe("contexts", () => {
     it("should support nesting without interference", () => {
-      const container1 = new Container().bind({ provide: "a", useFactory: () => "A" });
-      const container2 = new Container().bind({ provide: "b", useFactory: () => container1.get("a") });
+      const container1 = new Container().bind({ token: "a", factory: () => "A" });
+      const container2 = new Container().bind({ token: "b", factory: () => container1.get("a") });
 
       const container3 = new Container()
-        .bind({ provide: "c", useFactory: () => container2.get("b") })
-        .bind({ provide: "d", useFactory: () => inject("c") })
-        .bind({ provide: "e", useFactory: () => inject("b") });
+        .bind({ token: "c", factory: () => container2.get("b") })
+        .bind({ token: "d", factory: () => inject("c") })
+        .bind({ token: "e", factory: () => inject("b") });
 
       expect(container3.get("c")).toBe("A");
       expect(container3.get("d")).toBe("A");
 
-      expect(() => container3.get("e")).toThrow("No provider(s) found for b");
-      expect(() => container3.get("b")).toThrow("No provider(s) found for b");
+      expect(() => container3.get("e")).toThrow("No binding(s) found for b");
+      expect(() => container3.get("b")).toThrow("No binding(s) found for b");
     });
   });
 
   it("should unbind a single service", () => {
     const container = new Container();
 
-    container.bind({ provide: MyService, useClass: MyService });
+    container.bind({ token: MyService, type: "Instance", value: MyService });
 
     expect(myServiceConstructorSpy).toHaveBeenCalledTimes(0);
 
@@ -95,9 +95,9 @@ describe("Container API", () => {
 
     container.unbind(MyService);
 
-    expect(() => container.get(MyService)).toThrow("No provider(s) found");
+    expect(() => container.get(MyService)).toThrow("No binding(s) found");
 
-    container.bind({ provide: MyService, useClass: MyService });
+    container.bind({ token: MyService, type: "Instance", value: MyService });
 
     const myService3 = container.get(MyService);
 
@@ -110,15 +110,15 @@ describe("Container API", () => {
     const container = new Container();
     const token = new InjectionToken<string>("value");
 
-    container.bind({ provide: token, useValue: "first" });
+    container.bind({ token: token, value: "first" });
 
     expect(container.get(token)).toBe("first");
 
     container.unbindAll();
 
-    expect(() => container.get(token)).toThrow("No provider(s) found");
+    expect(() => container.get(token)).toThrow("No binding(s) found");
 
-    container.bind({ provide: token, useValue: "second" });
+    container.bind({ token: token, value: "second" });
 
     expect(container.get(token)).toBe("second");
   });

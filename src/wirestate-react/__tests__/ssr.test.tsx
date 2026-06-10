@@ -115,7 +115,7 @@ describe("React SSR", () => {
     const STRING_VALUE_TOKEN: unique symbol = Symbol("STRING_VALUE_TOKEN");
     const container: Container = new Container();
 
-    container.bind({ provide: STRING_VALUE_TOKEN, useValue: "external-parent" });
+    container.bind({ token: STRING_VALUE_TOKEN, value: "external-parent" });
 
     function Consumer() {
       const value: string = useInjection(STRING_VALUE_TOKEN);

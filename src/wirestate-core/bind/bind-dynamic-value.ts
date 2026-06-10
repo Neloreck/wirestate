@@ -6,7 +6,6 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { DynamicValueBindingDescriptor } from "../types/provision";
 
-import { toProviderScope } from "./utils/apply-binding-scope";
 import { registerBinding } from "./utils/register-binding";
 import { validateBindingDescriptor } from "./utils/validate-binding-descriptor";
 
@@ -65,9 +64,9 @@ export function bindDynamicValue<T>(container: Container, descriptor: DynamicVal
   });
 
   container.bind({
-    provide: descriptor.token,
-    scope: toProviderScope(descriptor.scope),
-    useFactory: (current) => descriptor.factory(current),
+    token: descriptor.token,
+    scope: descriptor.scope,
+    factory: (current) => descriptor.factory(current),
   });
 
   registerBinding(container, descriptor);

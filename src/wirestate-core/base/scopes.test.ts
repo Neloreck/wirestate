@@ -1,18 +1,18 @@
 import { Container } from "./container";
 import { InjectionToken } from "./tokens";
 
-describe("Provider scopes", () => {
-  it("should default to singleton scope for class providers", () => {
+describe("Binding scopes", () => {
+  it("should default to singleton scope for instance bindings", () => {
     const container = new Container();
 
     class MyService {}
 
-    container.bind({ provide: MyService, useClass: MyService });
+    container.bind({ token: MyService, type: "Instance", value: MyService });
 
     expect(container.get(MyService)).toBe(container.get(MyService));
   });
 
-  it("should construct transient class providers on every resolution", () => {
+  it("should construct transient instance bindings on every resolution", () => {
     const container = new Container();
     const constructed = jest.fn();
 
@@ -22,7 +22,7 @@ describe("Provider scopes", () => {
       }
     }
 
-    container.bind({ provide: MyService, useClass: MyService, scope: "transient" });
+    container.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient" });
 
     const first = container.get(MyService);
     const second = container.get(MyService);
@@ -31,16 +31,16 @@ describe("Provider scopes", () => {
     expect(constructed).toHaveBeenCalledTimes(2);
   });
 
-  it("should construct transient factory providers on every resolution", () => {
+  it("should construct transient dynamic value bindings on every resolution", () => {
     const container = new Container();
     const token = new InjectionToken<{ id: number }>("counter");
 
     let id = 0;
 
     container.bind({
-      provide: token,
-      scope: "transient",
-      useFactory: () => ({ id: (id += 1) }),
+      token: token,
+      scope: "Transient",
+      factory: () => ({ id: (id += 1) }),
     });
 
     expect(container.get(token).id).toBe(1);
@@ -51,12 +51,12 @@ describe("Provider scopes", () => {
     const container = new Container();
     const token = new InjectionToken<object>("singleton");
 
-    container.bind({ provide: token, scope: "singleton", useFactory: () => ({}) });
+    container.bind({ token: token, scope: "Singleton", factory: () => ({}) });
 
     expect(container.get(token)).toBe(container.get(token));
   });
 
-  it("should resolve transient parent providers through child containers", () => {
+  it("should resolve transient parent bindings through child containers", () => {
     const parent = new Container();
     const child = parent.createChild();
 
@@ -64,21 +64,21 @@ describe("Provider scopes", () => {
     // the parent binding with a child-local singleton provider
     class MyService {}
 
-    parent.bind({ provide: MyService, useClass: MyService, scope: "transient" });
+    parent.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient" });
 
     expect(child.get(MyService)).not.toBe(child.get(MyService));
   });
 
-  it("should not block rebinding for transient providers", () => {
+  it("should not block rebinding for transient bindings", () => {
     const container = new Container();
     const token = new InjectionToken<string>("value");
 
-    container.bind({ provide: token, scope: "transient", useFactory: () => "first" });
+    container.bind({ token: token, scope: "Transient", factory: () => "first" });
 
     expect(container.get(token)).toBe("first");
 
     // transient providers never own constructed values, so rebinding stays allowed
-    container.bind({ provide: token, scope: "transient", useFactory: () => "second" });
+    container.bind({ token: token, scope: "Transient", factory: () => "second" });
 
     expect(container.get(token)).toBe("second");
   });

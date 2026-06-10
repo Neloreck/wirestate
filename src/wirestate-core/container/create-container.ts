@@ -145,18 +145,18 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
     }
   }
 
-  container.bind({ provide: SEEDS_TOKEN, useValue: seeds });
+  container.bind({ token: SEEDS_TOKEN, value: seeds });
 
   // Fallback to parent config as default value.
   container.bind({
-    provide: SEED_TOKEN,
-    useValue: config.seed ?? (config.parent?.has(SEED_TOKEN) ? (config.parent.get<AnyObject>(SEED_TOKEN) ?? {}) : {}),
+    token: SEED_TOKEN,
+    value: config.seed ?? (config.parent?.has(SEED_TOKEN) ? (config.parent.get<AnyObject>(SEED_TOKEN) ?? {}) : {}),
   });
 
   container.bind({
-    provide: WireScope,
-    scope: "transient",
-    useFactory: (): WireScope => new WireScope(container),
+    token: WireScope,
+    scope: "Transient",
+    factory: (): WireScope => new WireScope(container),
   });
 
   if (errorHandler) {
@@ -164,9 +164,9 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
   }
 
   if (!options.skipMessaging) {
-    container.bind({ provide: EventBus, useValue: new EventBus(container) });
-    container.bind({ provide: QueryBus, useValue: new QueryBus() });
-    container.bind({ provide: CommandBus, useValue: new CommandBus() });
+    container.bind({ token: EventBus, value: new EventBus(container) });
+    container.bind({ token: QueryBus, value: new QueryBus() });
+    container.bind({ token: CommandBus, value: new CommandBus() });
   }
 
   dbg.info(prefix(__filename), "Injecting bindings on creation:", { container, config, options });

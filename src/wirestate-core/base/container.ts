@@ -1,9 +1,9 @@
+import * as Guards from "./bindings";
+import type { Binding } from "./bindings";
 import { injectionContext } from "./context";
-import { NoProviderFoundError } from "./errors";
+import { NoBindingFoundError } from "./errors";
 import { Factory } from "./factory";
-import * as Guards from "./providers";
-import type { Provider } from "./providers";
-import { type Token, isClassToken, toString, getToken } from "./tokens";
+import { type Identifier, isClassToken, toString, getBindingToken } from "./tokens";
 import { assertPresent, assertSingle, getParentClasses, windowedSlice } from "./utils";
 
 /**
@@ -11,7 +11,7 @@ import { assertPresent, assertSingle, getParentClasses, windowedSlice } from "./
  * and hold the actual instances of your services.
  *
  * All bindings are explicit: services are constructed synchronously and
- * only when a provider was registered with {@link Container.bind}.
+ * only when a binding was registered with {@link Container.bind}.
  */
 export class Container {
   /**
@@ -19,7 +19,7 @@ export class Container {
    */
   public readonly parent?: Container;
 
-  private readonly providers: ProviderMap = new Map();
+  private readonly bindings: BindingMap = new Map();
   private readonly instances: InstanceMap = new Map();
   private readonly activated: Array<ActivationRecord> = [];
   private readonly factory: Factory;
@@ -27,150 +27,141 @@ export class Container {
   public constructor(parent?: Container) {
     this.parent = parent;
     this.factory = new Factory(this);
+
     this.bind({
-      provide: Container,
-      useValue: this,
+      token: Container,
+      value: this,
     });
   }
 
   /**
-   * Binds multiple providers to this container.
-   *
-   * {@link https://needle-di.io/concepts/binding.html#binding}.
+   * Binds multiple bindings to this container.
    */
-  public bindAll<A>(p1: Provider<A>): this;
-  public bindAll<A, B>(p1: Provider<A>, p2: Provider<B>): this;
-  public bindAll<A, B, C>(p1: Provider<A>, p2: Provider<B>, p3: Provider<C>): this;
-  public bindAll<A, B, C, D>(p1: Provider<A>, p2: Provider<B>, p3: Provider<C>, p4: Provider<D>): this;
-  public bindAll<A, B, C, D, E>(
-    p1: Provider<A>,
-    p2: Provider<B>,
-    p3: Provider<C>,
-    p4: Provider<D>,
-    p5: Provider<E>
-  ): this;
+  public bindAll<A>(b1: Binding<A>): this;
+  public bindAll<A, B>(b1: Binding<A>, b2: Binding<B>): this;
+  public bindAll<A, B, C>(b1: Binding<A>, b2: Binding<B>, b3: Binding<C>): this;
+  public bindAll<A, B, C, D>(b1: Binding<A>, b2: Binding<B>, b3: Binding<C>, b4: Binding<D>): this;
+  public bindAll<A, B, C, D, E>(b1: Binding<A>, b2: Binding<B>, b3: Binding<C>, b4: Binding<D>, b5: Binding<E>): this;
   public bindAll<A, B, C, D, E, F>(
-    p1: Provider<A>,
-    p2: Provider<B>,
-    p3: Provider<C>,
-    p4: Provider<D>,
-    p5: Provider<E>,
-    p6: Provider<F>
+    b1: Binding<A>,
+    b2: Binding<B>,
+    b3: Binding<C>,
+    b4: Binding<D>,
+    b5: Binding<E>,
+    b6: Binding<F>
   ): this;
   // noinspection JSUnusedGlobalSymbols
   public bindAll<A, B, C, D, E, F, G>(
-    p1: Provider<A>,
-    p2: Provider<B>,
-    p3: Provider<C>,
-    p4: Provider<D>,
-    p5: Provider<E>,
-    p6: Provider<F>,
-    p7: Provider<G>
+    b1: Binding<A>,
+    b2: Binding<B>,
+    b3: Binding<C>,
+    b4: Binding<D>,
+    b5: Binding<E>,
+    b6: Binding<F>,
+    b7: Binding<G>
   ): this;
   public bindAll<A, B, C, D, E, F, G, H>(
-    p1: Provider<A>,
-    p2: Provider<B>,
-    p3: Provider<C>,
-    p4: Provider<D>,
-    p5: Provider<E>,
-    p6: Provider<F>,
-    p7: Provider<G>,
-    p8: Provider<H>
+    b1: Binding<A>,
+    b2: Binding<B>,
+    b3: Binding<C>,
+    b4: Binding<D>,
+    b5: Binding<E>,
+    b6: Binding<F>,
+    b7: Binding<G>,
+    b8: Binding<H>
   ): this;
   // noinspection JSUnusedGlobalSymbols
   public bindAll<A, B, C, D, E, F, G, H, I>(
-    p1: Provider<A>,
-    p2: Provider<B>,
-    p3: Provider<C>,
-    p4: Provider<D>,
-    p5: Provider<E>,
-    p6: Provider<F>,
-    p7: Provider<G>,
-    p8: Provider<H>,
-    p9: Provider<I>
+    b1: Binding<A>,
+    b2: Binding<B>,
+    b3: Binding<C>,
+    b4: Binding<D>,
+    b5: Binding<E>,
+    b6: Binding<F>,
+    b7: Binding<G>,
+    b8: Binding<H>,
+    b9: Binding<I>
   ): this;
   public bindAll<A, B, C, D, E, F, G, H, I>(
-    p1: Provider<A>,
-    p2: Provider<B>,
-    p3: Provider<C>,
-    p4: Provider<D>,
-    p5: Provider<E>,
-    p6: Provider<F>,
-    p7: Provider<G>,
-    p8: Provider<H>,
-    p9: Provider<I>,
+    b1: Binding<A>,
+    b2: Binding<B>,
+    b3: Binding<C>,
+    b4: Binding<D>,
+    b5: Binding<E>,
+    b6: Binding<F>,
+    b7: Binding<G>,
+    b8: Binding<H>,
+    b9: Binding<I>,
     // eslint-disable-next-line
-    ...providers: Provider<any>[]
+    ...bindings: Binding<any>[]
   ): this;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public bindAll(...providers: Array<Provider<any>>): this {
-    providers.forEach((it) => this.bind(it));
+  public bindAll(...bindings: Array<Binding<any>>): this {
+    bindings.forEach((it) => this.bind(it));
 
     return this;
   }
 
   /**
-   * Binds a provider to this container.
+   * Binds a class or binding descriptor to this container.
    *
-   * {@link https://needle-di.io/concepts/binding.html#binding}.
-   *
-   * @param provider
+   * @param binding
    */
-  public bind<T>(provider: Provider<T>): this {
-    const token = getToken(provider);
+  public bind<T>(binding: Binding<T>): this {
+    const token = getBindingToken(binding);
 
     // running some validations...
-    if (Guards.isExistingProvider(provider) && provider.provide === provider.useExisting) {
-      throw Error(`The provider for token ${toString(token)} with "useExisting" cannot refer to itself.`);
+    if (Guards.isServiceRedirectionDescriptor(binding) && binding.token === binding.service) {
+      throw Error(`The service redirection for token ${toString(token)} cannot refer to itself.`);
     }
 
-    if (!Guards.isExistingProvider(provider) && this.hasConstructedProvider(token)) {
+    if (!Guards.isServiceRedirectionDescriptor(binding) && this.hasConstructedBinding(token)) {
       throw Error(
-        `Cannot bind a new provider for ${toString(token)}, since the existing provider was already constructed.`
+        `Cannot bind a new binding for ${toString(token)}, since the existing binding was already constructed.`
       );
     }
 
-    // ignore the new provider if it was already provided
+    // ignore the new binding if it was already registered
     if (
-      Guards.isExistingProvider(provider) &&
-      Guards.isMultiProvider(provider) &&
-      this.existingProviderAlreadyProvided(token, provider.useExisting)
+      Guards.isServiceRedirectionDescriptor(binding) &&
+      Guards.isMultiBinding(binding) &&
+      this.serviceRedirectionAlreadyBound(token, binding.service)
     ) {
       return this;
     }
 
-    const providers = this.providers.get(token) ?? [];
+    const bindings = this.bindings.get(token) ?? [];
 
-    // validating multi-provider inconsistencies...
-    const multi = Guards.isMultiProvider(provider);
+    // validating multi-binding inconsistencies...
+    const multi = Guards.isMultiBinding(binding);
 
-    if (multi && providers.some((it) => !Guards.isMultiProvider(it))) {
+    if (multi && bindings.some((it) => !Guards.isMultiBinding(it))) {
       throw Error(
-        `Cannot bind ${toString(token)} as multi-provider, since there is already a provider which is not a multi-provider.`
+        `Cannot bind ${toString(token)} as multi-binding, since there is already a binding which is not a multi-binding.`
       );
-    } else if (!multi && providers.some((it) => Guards.isMultiProvider(it))) {
-      if (!providers.every(Guards.isExistingProvider)) {
+    } else if (!multi && bindings.some((it) => Guards.isMultiBinding(it))) {
+      if (!bindings.every(Guards.isServiceRedirectionDescriptor)) {
         throw Error(
-          `Cannot bind ${toString(token)} as provider, since there are already provider(s) that are multi-providers.`
+          `Cannot bind ${toString(token)} as binding, since there are already binding(s) that are multi-bindings.`
         );
       }
     }
 
-    // appending or replacing providers...
-    this.providers.set(token, multi ? [...providers, provider] : [provider]);
+    // appending or replacing bindings...
+    this.bindings.set(token, multi ? [...bindings, binding] : [binding]);
 
     // inheritance support: also bind parent classes to their immediate child classes
-    if (isClassToken(token) && (Guards.isClassProvider(provider) || Guards.isConstructorProvider(provider))) {
+    if (isClassToken(token) && (Guards.isInstanceDescriptor(binding) || Guards.isConstructorBinding(binding))) {
       windowedSlice([token, ...getParentClasses(token)]).forEach(([childClass, parentClass]) => {
-        const parentProvider: Provider<typeof childClass> = {
-          provide: parentClass,
-          useExisting: childClass,
+        const parentBinding: Binding<typeof childClass> = {
+          token: parentClass,
+          service: childClass,
           multi: true,
         };
-        const existingParentProviders = this.providers.get(parentClass) ?? [];
+        const existingParentBindings = this.bindings.get(parentClass) ?? [];
 
-        if (!this.existingProviderAlreadyProvided(parentClass, childClass)) {
-          this.providers.set(parentClass, [...existingParentProviders, parentProvider]);
+        if (!this.serviceRedirectionAlreadyBound(parentClass, childClass)) {
+          this.bindings.set(parentClass, [...existingParentBindings, parentBinding]);
         }
       });
     }
@@ -179,37 +170,33 @@ export class Container {
   }
 
   /**
-   * Unbinds a provider, deactivating every container-owned value it constructed.
+   * Unbinds a token, deactivating every container-owned value it constructed.
    *
-   * {@link https://needle-di.io/concepts/binding.html#binding}.
-   *
-   * @param target - Token or provider to unbind.
+   * @param target - Token or binding to unbind.
    */
-  public unbind<T>(target: Token<T> | Provider<T>): this {
-    const token = resolveProviderToken(target);
+  public unbind<T>(target: Identifier<T> | Binding<T>): this {
+    const token = resolveBindingToken(target);
 
     this.deactivate(token);
 
-    this.providers.get(token)?.forEach((provider) => this.instances.delete(provider));
-    this.providers.delete(token);
+    this.bindings.get(token)?.forEach((binding) => this.instances.delete(binding));
+    this.bindings.delete(token);
 
     return this;
   }
 
   /**
-   * Unbinds all providers, deactivating container-owned values in creation order.
+   * Unbinds all bindings, deactivating container-owned values in creation order.
    * Bindings stay resolvable until every deactivation handler has run, so
    * deactivating services can still talk to each other.
-   *
-   * {@link https://needle-di.io/concepts/binding.html#binding}.
    */
   public unbindAll(): this {
-    for (const { provider, instance } of [...this.activated]) {
-      Guards.getLifecycle(provider).onDeactivated?.(instance, this);
+    for (const { binding, instance } of [...this.activated]) {
+      Guards.getLifecycle(binding).onDeactivated?.(instance, this);
     }
 
     this.activated.length = 0;
-    this.providers.clear();
+    this.bindings.clear();
     this.instances.clear();
 
     return this;
@@ -217,27 +204,25 @@ export class Container {
 
   /**
    * Retrieves a service from this container.
-   *
-   * {@link https://needle-di.io/concepts/containers.html}.
    */
-  public get<T>(token: Token<T>): T;
-  public get<T>(token: Token<T>, options: { multi: true }): Array<T>;
-  public get<T>(token: Token<T>, options: { optional: true }): T | undefined;
-  public get<T>(token: Token<T>, options: { multi: true; optional: true }): Array<T> | undefined;
-  public get<T>(token: Token<T>, options: { lazy: true }): () => T;
-  public get<T>(token: Token<T>, options: { lazy: true; multi: true }): () => Array<T>;
-  public get<T>(token: Token<T>, options: { lazy: true; optional: true }): () => T | undefined;
-  public get<T>(token: Token<T>, options: { lazy: true; multi: true; optional: true }): () => Array<T> | undefined;
+  public get<T>(token: Identifier<T>): T;
+  public get<T>(token: Identifier<T>, options: { multi: true }): Array<T>;
+  public get<T>(token: Identifier<T>, options: { optional: true }): T | undefined;
+  public get<T>(token: Identifier<T>, options: { multi: true; optional: true }): Array<T> | undefined;
+  public get<T>(token: Identifier<T>, options: { lazy: true }): () => T;
+  public get<T>(token: Identifier<T>, options: { lazy: true; multi: true }): () => Array<T>;
+  public get<T>(token: Identifier<T>, options: { lazy: true; optional: true }): () => T | undefined;
+  public get<T>(token: Identifier<T>, options: { lazy: true; multi: true; optional: true }): () => Array<T> | undefined;
   public get<T>(
-    token: Token<T>,
+    token: Identifier<T>,
     options?: { optional?: boolean; multi?: boolean; lazy?: false }
   ): T | Array<T> | undefined;
   public get<T>(
-    token: Token<T>,
+    token: Identifier<T>,
     options?: { optional?: boolean; multi?: boolean; lazy?: boolean }
   ): T | Array<T> | undefined | (() => T | Array<T> | undefined);
   public get<T>(
-    token: Token<T>,
+    token: Identifier<T>,
     options?: { optional?: boolean; multi?: boolean; lazy?: boolean }
   ): T | Array<T> | undefined | (() => T | Array<T> | undefined) {
     const lazy = options?.lazy ?? false;
@@ -248,7 +233,7 @@ export class Container {
 
     const optional = options?.optional ?? false;
 
-    if (!this.providers.has(token)) {
+    if (!this.bindings.has(token)) {
       if (this.parent) {
         return this.parent.get(token, { ...options, lazy: false });
       }
@@ -257,13 +242,11 @@ export class Container {
         return undefined;
       }
 
-      throw new NoProviderFoundError(token);
+      throw new NoBindingFoundError(token);
     }
 
-    const providers = assertPresent(this.providers.get(token));
-    const values = injectionContext(this).run(() =>
-      providers.flatMap((provider) => this.resolveProvider(provider, token))
-    );
+    const bindings = assertPresent(this.bindings.get(token));
+    const values = injectionContext(this).run(() => bindings.flatMap((binding) => this.resolveBinding(binding)));
 
     const multi = options?.multi ?? false;
 
@@ -281,70 +264,67 @@ export class Container {
 
   /**
    * Creates a child container.
-   *
-   * {@link https://needle-di.io/advanced/child-containers.html}.
    */
   public createChild(): Container {
     return new Container(this);
   }
 
   /**
-   * Returns whether this container or one of its parents has one or more providers for this token.
+   * Returns whether this container or one of its parents has one or more bindings for this token.
    *
    * @param token
    */
-  public has<T>(token: Token<T>): boolean {
-    return this.providers.has(token) || (this.parent?.has(token) ?? false);
+  public has<T>(token: Identifier<T>): boolean {
+    return this.bindings.has(token) || (this.parent?.has(token) ?? false);
   }
 
   /**
-   * Returns whether this container itself has one or more providers for this token,
+   * Returns whether this container itself has one or more bindings for this token,
    * ignoring parent containers.
    *
    * @param token - Token to check.
    */
-  public hasOwn<T>(token: Token<T>): boolean {
-    return this.providers.has(token);
+  public hasOwn<T>(token: Identifier<T>): boolean {
+    return this.bindings.has(token);
   }
 
   /**
-   * Resolves values for a single provider, applying scope caching and activation hooks.
+   * Resolves values for a single binding, applying scope caching and activation hooks.
    *
-   * @param provider - Provider to resolve.
-   * @param token - Token the provider was resolved for.
+   * @param binding - Binding to resolve.
    */
-  private resolveProvider<T>(provider: Provider<T>, token: Token<T>): Array<T> {
-    // Aliases delegate to their target token and never own the produced values.
-    if (Guards.isExistingProvider(provider)) {
-      return this.factory.construct(provider);
+  private resolveBinding<T>(binding: Binding<T>): Array<T> {
+    // Service redirections delegate to their target token and never own the produced values.
+    if (Guards.isServiceRedirectionDescriptor(binding)) {
+      return this.factory.construct(binding);
     }
 
-    if (Guards.getScope(provider) === "transient") {
-      return this.factory.construct(provider).map((value) => this.activate(provider, value));
+    if (Guards.getScope(binding) === "Transient") {
+      return this.factory.construct(binding).map((value) => this.activate(binding, value));
     }
 
-    const constructed = this.instances.get(provider);
+    const constructed = this.instances.get(binding);
 
     if (constructed) {
       return constructed;
     }
 
-    const values = this.factory.construct(provider).map((value) => this.activate(provider, value));
+    const values = this.factory.construct(binding).map((value) => this.activate(binding, value));
 
-    this.commit(provider, token, values);
+    this.commit(binding, values);
 
     return values;
   }
 
   /**
-   * Runs the provider activation hook for a freshly constructed value.
+   * Runs the binding activation hook for a freshly constructed value.
    *
-   * @param provider - Provider that constructed the value.
+   * @param binding - Binding that constructed the value.
    * @param instance - Constructed value.
    * @returns The constructed value, or its replacement returned by the hook.
    */
-  private activate<T>(provider: Provider<T>, instance: T): T {
-    const handler = Guards.getLifecycle(provider).onActivated;
+  private activate<T>(binding: Binding<T>, instance: T): T {
+    const handler = Guards.getLifecycle(binding).onActivated;
 
     if (!handler) {
       return instance;
@@ -356,15 +336,14 @@ export class Container {
   }
 
   /**
-   * Caches singleton values of a provider and records them for later deactivation.
+   * Caches singleton values of a binding and records them for later deactivation.
    *
-   * @param provider - Provider that constructed the values.
-   * @param token - Token the provider is bound under.
+   * @param binding - Binding that constructed the values.
    * @param values - Constructed values.
    */
-  private commit<T>(provider: Provider<T>, token: Token<T>, values: Array<T>): void {
-    this.instances.set(provider, values);
-    values.forEach((instance) => this.activated.push({ token, provider, instance }));
+  private commit<T>(binding: Binding<T>, values: Array<T>): void {
+    this.instances.set(binding, values);
+    values.forEach((instance) => this.activated.push({ token: getBindingToken(binding), binding, instance }));
   }
 
   /**
@@ -372,67 +351,67 @@ export class Container {
    *
    * @param token - Token to deactivate.
    */
-  private deactivate<T>(token: Token<T>): void {
+  private deactivate<T>(token: Identifier<T>): void {
     const records = this.activated.filter((record) => record.token === token);
 
     for (const record of records) {
-      Guards.getLifecycle(record.provider).onDeactivated?.(record.instance, this);
+      Guards.getLifecycle(record.binding).onDeactivated?.(record.instance, this);
 
       this.activated.splice(this.activated.indexOf(record), 1);
     }
   }
 
   /**
-   * Checks whether any provider bound for the token has already constructed values.
+   * Checks whether any binding registered for the token has already constructed values.
    *
    * @param token - Token to check.
    */
-  private hasConstructedProvider<T>(token: Token<T>): boolean {
-    return (this.providers.get(token) ?? []).some((provider) => this.instances.has(provider));
+  private hasConstructedBinding<T>(token: Identifier<T>): boolean {
+    return (this.bindings.get(token) ?? []).some((binding) => this.instances.has(binding));
   }
 
-  private existingProviderAlreadyProvided(token: Token<unknown>, existingToken: Token<unknown>): boolean {
-    return (this.providers.get(token) ?? []).some(
-      (it) => Guards.isExistingProvider(it) && it.provide === token && it.useExisting === existingToken
+  private serviceRedirectionAlreadyBound(token: Identifier<unknown>, service: Identifier<unknown>): boolean {
+    return (this.bindings.get(token) ?? []).some(
+      (it) => Guards.isServiceRedirectionDescriptor(it) && it.token === token && it.service === service
     );
   }
 }
 
-interface ProviderMap extends Map<Token<unknown>, Array<Provider<unknown>>> {
-  get<T>(key: Token<T>): Array<Provider<T>> | undefined;
+interface BindingMap extends Map<Identifier<unknown>, Array<Binding<unknown>>> {
+  get<T>(key: Identifier<T>): Array<Binding<T>> | undefined;
 
-  set<T>(key: Token<T>, value: Array<Provider<T>>): this;
+  set<T>(key: Identifier<T>, value: Array<Binding<T>>): this;
 }
 
 /**
- * Lifecycle hook parameters make `Provider<T>` invariant in `T`,
- * so internal storage is keyed by an any-typed provider.
+ * Lifecycle hook parameters make `Binding<T>` invariant in `T`,
+ * so internal storage is keyed by an any-typed binding.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyProvider = Provider<any>;
+type AnyBinding = Binding<any>;
 
-interface InstanceMap extends Map<AnyProvider, Array<unknown>> {
-  get<T>(key: Provider<T>): Array<T> | undefined;
+interface InstanceMap extends Map<AnyBinding, Array<unknown>> {
+  get<T>(key: Binding<T>): Array<T> | undefined;
 
-  set<T>(key: Provider<T>, value: Array<T>): this;
+  set<T>(key: Binding<T>, value: Array<T>): this;
 }
 
 interface ActivationRecord {
-  token: Token<unknown>;
-  provider: AnyProvider;
+  token: Identifier<unknown>;
+  binding: AnyBinding;
   instance: unknown;
 }
 
 /**
- * Resolves the token to unbind from a token or provider argument.
+ * Resolves the token to unbind from a token or binding argument.
  *
- * @param target - Token or provider.
- * @returns The token the provider is bound under, or the token itself.
+ * @param target - Token or binding.
+ * @returns The token the binding is registered under, or the token itself.
  */
-function resolveProviderToken<T>(target: Token<T> | Provider<T>): Token<T> {
-  if (typeof target === "object" && target !== null && "provide" in target) {
-    return getToken(target as Provider<T>);
+function resolveBindingToken<T>(target: Identifier<T> | Binding<T>): Identifier<T> {
+  if (typeof target === "object" && target !== null && "token" in target) {
+    return getBindingToken(target as Binding<T>);
   }
 
-  return target as Token<T>;
+  return target as Identifier<T>;
 }
