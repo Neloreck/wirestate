@@ -26,7 +26,6 @@ jobs:
     timeout-minutes: 45
     environment: npm-publish
     env:
-      PUBLISH_BRANCH: ${{ 'main' }}
       PUBLISH_SCRIPT: ${{ inputs.experimental && 'deploy:experimental' || 'deploy' }}
 
     steps:
@@ -44,7 +43,7 @@ jobs:
       - name: Checkout publish branch
         uses: actions/checkout@v6
         with:
-          ref: ${{ env.PUBLISH_BRANCH }}
+          ref: ${{ github.ref }}
 
       - uses: pnpm/action-setup@v6
         name: Install pnpm
