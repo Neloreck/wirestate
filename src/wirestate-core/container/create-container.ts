@@ -1,9 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Container, Identifier } from "../base";
-import { bind } from "../bind/bind";
-import { getBindingToken } from "../bind/utils/get-binding-token";
+import { Identifier } from "../binding/tokens";
 import { CommandBus } from "../commands/command-bus";
 import { getConfiguredInternalErrorHandler, setInternalErrorHandler } from "../error/internal-error-handler";
 import { EventBus } from "../events/event-bus";
@@ -14,6 +12,9 @@ import { AnyObject, Maybe } from "../types/general";
 import { Bindings } from "../types/provision";
 import { SeedBindings, SeedsMap } from "../types/seeds";
 
+import { Container } from "./container";
+import { getBindingToken } from "./get-binding-token";
+import { applySkipActivationHooks } from "./skip-activation-hooks";
 import { validateContainerConfig } from "./validate-container-config";
 import { WireScope } from "./wire-scope";
 
@@ -173,7 +174,7 @@ export function createContainer(config: ContainerConfig = {}, options: CreateCon
 
   if (config.bindings) {
     for (const binding of config.bindings) {
-      bind(container, binding, options);
+      container.bind(applySkipActivationHooks(binding, options.skipActivationHooks));
     }
   }
 

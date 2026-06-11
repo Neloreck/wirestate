@@ -1,8 +1,8 @@
 import { OnDeprovision, OnProvision } from "@wirestate/core";
 
-import { Injectable, Container } from "../base";
-import { bind } from "../bind/bind";
+import { Injectable } from "../metadata/injectable";
 
+import { Container } from "./container";
 import { ContainerProvisionLifecycle, deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
 import { createContainer } from "./create-container";
 import { WireStatus } from "./wire-status";
@@ -20,7 +20,7 @@ describe("WireStatus", () => {
 
     const container: Container = createContainer();
 
-    bind(container, TestService);
+    container.bind(TestService);
 
     const service: TestService = container.get(TestService);
 
@@ -40,7 +40,7 @@ describe("WireStatus", () => {
     const container: Container = createContainer();
     const lifecycle: ContainerProvisionLifecycle = new Map();
 
-    bind(container, TestService);
+    container.bind(TestService);
 
     const service: TestService = container.get(TestService);
     const status: WireStatus = WireStatus.for(service);
@@ -96,7 +96,7 @@ describe("WireStatus", () => {
     const container: Container = createContainer();
     const lifecycle: ContainerProvisionLifecycle = new Map();
 
-    bind(container, TestService);
+    container.bind(TestService);
 
     const service: TestService = container.get(TestService);
     const status: WireStatus = WireStatus.for(service);

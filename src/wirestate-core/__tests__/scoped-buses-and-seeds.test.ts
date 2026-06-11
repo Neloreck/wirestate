@@ -11,7 +11,6 @@ import {
   QueryBus,
   WireScope,
   createContainer,
-  unbindAll,
 } from "../index";
 import { Optional } from "../types/general";
 
@@ -114,7 +113,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     expect(parent.get(ParentCounterService).events).toEqual(["parent:from-parent"]);
     expect(child.get(ChildCounterService).events).toEqual(["child:from-child"]);
 
-    unbindAll(child);
+    child.unbindAll();
 
     expect(parent.get(CommandBus).execute(ADD_COMMAND, 2)).toBe(6);
     expect(parent.get(QueryBus).query(COUNT_QUERY)).toBe("root-label:6");
@@ -186,7 +185,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
       seeds: [[SETTINGS_TOKEN, { label: "cleanup-label", offset: 0 }]],
     });
 
-    unbindAll(container);
+    container.unbindAll();
 
     expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
     expect(commandResult).not.toBeNull();
@@ -272,7 +271,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
       bindings: [DeactivationCoordinatorService, DeactivationPeerService],
     });
 
-    unbindAll(container);
+    container.unbindAll();
 
     expect(logs).toEqual([
       "coordinator-deactivation",

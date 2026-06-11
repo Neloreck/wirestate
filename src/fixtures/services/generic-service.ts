@@ -1,9 +1,11 @@
-import { inject, Injectable, Container } from "../../wirestate-core/base";
-import { OnActivated } from "../../wirestate-core/bind/instance/on-activated";
-import { OnDeactivation } from "../../wirestate-core/bind/instance/on-deactivation";
 import { OnCommand } from "../../wirestate-core/commands/on-command";
+import { Container } from "../../wirestate-core/container/container";
+import { inject } from "../../wirestate-core/container/context";
 import { WireScope } from "../../wirestate-core/container/wire-scope";
 import { OnEvent } from "../../wirestate-core/events/on-event";
+import { OnActivated } from "../../wirestate-core/lifecycle/on-activated";
+import { OnDeactivation } from "../../wirestate-core/lifecycle/on-deactivation";
+import { Injectable } from "../../wirestate-core/metadata/injectable";
 import { OnQuery } from "../../wirestate-core/queries/on-query";
 import { WireEvent } from "../../wirestate-core/types/events";
 import { Maybe } from "../../wirestate-core/types/general";

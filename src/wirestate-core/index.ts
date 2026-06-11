@@ -4,26 +4,23 @@
  * @packageDocumentation
  */
 
-export {
-  BindingScope,
-  BindingType,
-  CircularDependencyError,
-  Container,
-  Identifier,
-  Injectable,
-  InjectionToken,
-  Newable,
-  NoBindingFoundError,
-  inject,
-  isInjectable,
-} from "./base";
+export { BindingScope, BindingType } from "./binding/binding";
+export { Identifier, InjectionToken } from "./binding/tokens";
 
-export { bind, BindOptions } from "./bind/bind";
-export { unbind, unbindAll } from "./bind/unbind";
-export { OnActivated } from "./bind/instance/on-activated";
-export { OnDeactivation } from "./bind/instance/on-deactivation";
-export { OnDeprovision } from "./bind/instance/on-deprovision";
-export { OnProvision } from "./bind/instance/on-provision";
+export { Container } from "./container/container";
+export { inject } from "./container/context";
+
+export { Injectable, isInjectable } from "./metadata/injectable";
+
+export { Newable } from "./utils/class-like";
+
+export { CircularDependencyError } from "./error/circular-dependency-error";
+export { NoBindingFoundError } from "./error/no-binding-found-error";
+
+export { OnActivated } from "./lifecycle/on-activated";
+export { OnDeactivation } from "./lifecycle/on-deactivation";
+export { OnDeprovision } from "./lifecycle/on-deprovision";
+export { OnProvision } from "./lifecycle/on-provision";
 
 export { OnCommand, OnCommandHandlerDecorator } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";

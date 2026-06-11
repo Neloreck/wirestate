@@ -33,14 +33,14 @@ const container: Container = createContainer({
 const users = container.get(UserService);
 ```
 
-Use `bind` when you need to add a service to an existing container.
+Use `container.bind` when you need to add a service to an existing container.
 
 ```ts
-import { bind, createContainer } from "@wirestate/core";
+import { createContainer } from "@wirestate/core";
 
 const container = createContainer();
 
-bind(container, UserService);
+container.bind(UserService);
 ```
 
 ## Constructor Injection
@@ -176,14 +176,14 @@ Use descriptors when a binding needs an explicit token or binding strategy. This
 service classes registered behind a token that is different from the class itself.
 
 ```ts
-import { BindingScope, BindingType, bind, createContainer } from "@wirestate/core";
+import { BindingScope, BindingType, createContainer } from "@wirestate/core";
 
 const API_URL = Symbol("API_URL");
 const DATE_NOW = Symbol("DATE_NOW");
 const container = createContainer();
 
-bind(container, { token: API_URL, value: "https://api.example.com" });
-bind(container, {
+container.bind({ token: API_URL, value: "https://api.example.com" });
+container.bind({
   token: DATE_NOW,
   type: BindingType.Factory,
   scope: BindingScope.Singleton,
@@ -193,18 +193,16 @@ bind(container, {
 
 ## Remove Services
 
-Use `unbind` when removing one Wirestate binding. Use `unbindAll` when disposing the whole container.
+Use `container.unbind` when removing one binding. Use `container.unbindAll` when disposing the whole container.
 
 ```ts
-import { unbind, unbindAll } from "@wirestate/core";
-
-unbind(container, UserService);
-unbindAll(container);
+container.unbind(UserService);
+container.unbindAll();
 ```
 
-The wrappers keep Wirestate's registered binding list and provider lifecycle state in sync with the container. If a provider
-owns a service when it is removed, `@OnDeprovision` runs before `@OnDeactivation`. After `unbindAll`, discard the
-container and create a new one for future work.
+The container deactivates removed services and keeps provider lifecycle state in sync. If a provider owns a service
+when it is removed, `@OnDeprovision` runs before `@OnDeactivation`. After `unbindAll`, discard the container and
+create a new one for future work.
 
 ## API Reference
 
@@ -212,4 +210,4 @@ container and create a new one for future work.
 [`WireScope`](/api/wirestate-core/classes/WireScope), [`WireStatus`](/api/wirestate-core/classes/WireStatus),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision), [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision),
 [`BindingDescriptor`](/api/wirestate-core/type-aliases/BindingDescriptor),
-[`unbind`](/api/wirestate-core/functions/unbind), [`unbindAll`](/api/wirestate-core/functions/unbindAll).
+[`Container`](/api/wirestate-core/classes/Container).

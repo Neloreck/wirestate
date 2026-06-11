@@ -1,0 +1,196 @@
+import type { Container } from "../container/container";
+import type { Newable } from "../utils/class-like";
+
+import type { Identifier } from "./tokens";
+
+/**
+ * Binding strategy names accepted by binding descriptors.
+ *
+ * @group Bind
+ */
+export const BindingType = {
+  Value: "Value",
+  Instance: "Instance",
+  Factory: "Factory",
+} as const;
+
+/**
+ * Binding strategy name.
+ *
+ * @group Bind
+ */
+export type TBindingType = keyof typeof BindingType;
+
+/**
+ * Lifetime scope names accepted by binding descriptors:
+ *
+ * - `Singleton` (default): the value is constructed once and reused for every resolution.
+ * - `Transient`: a new value is constructed for every resolution and never cached.
+ *
+ * @group Bind
+ */
+export const BindingScope = {
+  Singleton: "Singleton",
+  Transient: "Transient",
+} as const;
+
+/**
+ * Binding lifetime scope name.
+ *
+ * @group Bind
+ */
+export type TBindingScope = keyof typeof BindingScope;
+
+/**
+ * A handler invoked right after a binding constructs a value.
+ * When a non-`undefined` value is returned, it replaces the constructed value.
+ *
+ * @group Bind
+ */
+export type BindingActivationHandler<T> = (instance: T, container: Container) => T | void;
+
+/**
+ * A handler invoked for each container-owned value right before its binding is unbound.
+ *
+ * @group Bind
+ */
+export type BindingDeactivationHandler<T> = (instance: T, container: Container) => void;
+
+/**
+ * Describes a static value binding. Values are always singletons.
+ *
+ * @group Bind
+ */
+export interface ValueBindingDescriptor<T = unknown> {
+  /**
+   * Binding strategy.
+   */
+  readonly type?: "Value";
+
+  /**
+   * Token used to resolve the binding.
+   */
+  readonly token: Identifier<T>;
+
+  /**
+   * Value to bind.
+   */
+  readonly value: T;
+
+  /**
+   * Called when the value is first resolved. A returned value replaces it.
+   */
+  readonly onActivated?: BindingActivationHandler<NoInfer<T>>;
+
+  /**
+   * Called when the binding is removed after the value was resolved.
+   */
+  readonly onDeactivated?: BindingDeactivationHandler<NoInfer<T>>;
+}
+
+/**
+ * Describes a class binding behind a custom token,
+ * which may be the same class as the token, or a subclass.
+ *
+ * @group Bind
+ */
+export interface InstanceBindingDescriptor<T = unknown> {
+  /**
+   * Binding strategy.
+   */
+  readonly type: "Instance";
+
+  /**
+   * Token used to resolve the instance.
+   */
+  readonly token: Identifier<T>;
+
+  /**
+   * Service constructor to bind. Instances are singletons.
+   */
+  readonly value: Newable<NoInfer<T>>;
+
+  /**
+   * Skip `@OnActivated` and `@OnDeactivation` hooks for this binding.
+   * Message handlers and lifecycle status are wired either way.
+   *
+   * @default `false`
+   */
+  readonly skipActivationHooks?: boolean;
+
+  /**
+   * Called when the instance is constructed. A returned value replaces it.
+   */
+  readonly onActivated?: BindingActivationHandler<NoInfer<T>>;
+
+  /**
+   * Called when the binding is removed after the instance was constructed.
+   */
+  readonly onDeactivated?: BindingDeactivationHandler<NoInfer<T>>;
+}
+
+/**
+ * Describes a factory binding whose value is lazily produced by a factory function.
+ *
+ * @group Bind
+ */
+export interface FactoryBindingDescriptor<T = unknown> {
+  /**
+   * Binding strategy.
+   */
+  readonly type?: "Factory";
+
+  /**
+   * Token used to resolve the binding.
+   */
+  readonly token: Identifier<T>;
+
+  /**
+   * Factory used to produce the value at resolution time.
+   * Runs inside the injection context, so `inject()` works in its body.
+   */
+  readonly factory: (container: Container) => NoInfer<T>;
+
+  /**
+   * Lifetime scope for created values.
+   */
+  readonly scope?: TBindingScope;
+
+  /**
+   * Called for each constructed value. A returned value replaces it.
+   */
+  readonly onActivated?: BindingActivationHandler<NoInfer<T>>;
+
+  /**
+   * Called for each container-owned value when the binding is removed.
+   */
+  readonly onDeactivated?: BindingDeactivationHandler<NoInfer<T>>;
+}
+
+/**
+ * Describes one binding descriptor: a token together with a construction strategy.
+ *
+ * @remarks
+ * Descriptors without `type` are treated as `Value` bindings.
+ *
+ * @group Bind
+ *
+ * @template T - Resolved value type.
+ *
+ * @example
+ * ```typescript
+ * import { BindingType, BindingDescriptor } from "@wirestate/core";
+ *
+ * const API_URL = Symbol("API_URL");
+ *
+ * const descriptor: BindingDescriptor<string> = {
+ *   token: API_URL,
+ *   type: BindingType.Value,
+ *   value: "https://api.example.com",
+ * };
+ * ```
+ */
+export type BindingDescriptor<T = unknown> =
+  | ValueBindingDescriptor<T>
+  | InstanceBindingDescriptor<T>
+  | FactoryBindingDescriptor<T>;

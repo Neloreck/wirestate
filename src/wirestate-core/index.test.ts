@@ -15,7 +15,6 @@ describe("Library exported API from wirestate-core", () => {
     "inject",
     "isInjectable",
     // Core.
-    "BindOptions",
     "Binding",
     "BindingDescriptor",
     "Bindings",
@@ -62,13 +61,10 @@ describe("Library exported API from wirestate-core", () => {
     "WireScope",
     "WireStatus",
     "WirestateError",
-    "bind",
     "createContainer",
     "defaultInternalErrorHandler",
     "deprovisionContainer",
     "provisionContainer",
-    "unbind",
-    "unbindAll",
     "validateContainerConfig",
   ];
 

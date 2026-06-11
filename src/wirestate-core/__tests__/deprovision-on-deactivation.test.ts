@@ -1,6 +1,6 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { Container } from "../base";
+import { Container } from "../container/container";
 import {
   ContainerProvisionLifecycle,
   deprovisionContainer,

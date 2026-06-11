@@ -1,9 +1,10 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Injectable, Container, Identifier } from "../base";
+import { Identifier } from "../binding/tokens";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
+import { Injectable } from "../metadata/injectable";
 import { QueryBus } from "../queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 import { CommandHandler, CommandUnregister, CommandType } from "../types/commands";
@@ -11,6 +12,8 @@ import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "..
 import { Optional, AnyObject } from "../types/general";
 import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 import { SeedKey, SeedsMap } from "../types/seeds";
+
+import { Container } from "./container";
 
 /**
  * Per-instance handle for container work.

@@ -1,14 +1,16 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { BindingType, Container, inject, Injectable } from "../base";
-import { OnActivated } from "../bind/instance/on-activated";
-import { OnDeprovision } from "../bind/instance/on-deprovision";
-import { OnProvision } from "../bind/instance/on-provision";
-import { unbindAll } from "../bind/unbind";
+import { BindingType } from "../binding/binding";
+import { OnActivated } from "../lifecycle/on-activated";
+import { OnDeprovision } from "../lifecycle/on-deprovision";
+import { OnProvision } from "../lifecycle/on-provision";
+import { Injectable } from "../metadata/injectable";
 import { Optional } from "../types/general";
 import { ProvisionId } from "../types/provision";
 
+import { Container } from "./container";
 import { ContainerProvisionLifecycle, deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
+import { inject } from "./context";
 import { createContainer } from "./create-container";
 import { WireScope } from "./wire-scope";
 import { WireStatus } from "./wire-status";
@@ -17,6 +19,45 @@ describe("provision lifecycle", () => {
   function createProvisionLifecycle(): ContainerProvisionLifecycle {
     return new Map();
   }
+
+  it("should provision exactly the decorated services among infra bindings", () => {
+    const events: Array<string> = [];
+
+    @Injectable()
+    class PlainService {
+      public constructor() {
+        events.push("plain-constructed");
+      }
+    }
+
+    @Injectable()
+    class ProvisionedService {
+      @OnProvision()
+      public onProvision(): void {
+        events.push("provision");
+      }
+
+      @OnDeprovision()
+      public onDeprovision(): void {
+        events.push("deprovision");
+      }
+    }
+
+    // The default provisioning scan walks every own binding: the container
+    // self-binding, seeds, buses, WireScope, and both services. Only the
+    // provision-decorated service may be resolved and provisioned.
+    const container: Container = createContainer({ bindings: [PlainService, ProvisionedService] });
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+
+    provisionContainer(container, lifecycle);
+
+    expect(events).toEqual(["provision"]);
+    expect(lifecycle.get(container)).toEqual([container.get(ProvisionedService)]);
+
+    deprovisionContainer(container, lifecycle);
+
+    expect(events).toEqual(["provision", "deprovision"]);
+  });
 
   it("should provision lifecycle services and deprovision them in reverse order", () => {
     const events: Array<string> = [];
@@ -41,7 +82,7 @@ describe("provision lifecycle", () => {
       "deprovision-first",
     ]);
 
-    unbindAll(container);
+    container.unbindAll();
 
     expect(events).toEqual([
       "activated-first",
@@ -272,7 +313,7 @@ describe("provision lifecycle", () => {
 
     expect(events).toEqual(["provision", "deprovision"]);
 
-    unbindAll(container);
+    container.unbindAll();
 
     expect(events).toEqual(["provision", "deprovision", "deactivation"]);
   });

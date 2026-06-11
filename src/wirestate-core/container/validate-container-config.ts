@@ -1,9 +1,9 @@
-import { Identifier } from "../base";
-import { getBindingToken } from "../bind/utils/get-binding-token";
+import { Identifier } from "../binding/tokens";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 
 import type { ContainerConfig } from "./create-container";
+import { getBindingToken } from "./get-binding-token";
 
 /**
  * Checks a container config before creating a container.

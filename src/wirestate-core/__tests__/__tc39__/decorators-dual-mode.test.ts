@@ -1,18 +1,20 @@
-import { inject, Injectable, Container } from "../../base";
-import { getActivatedHandlerMetadata, OnActivated } from "../../bind/instance/on-activated";
-import { OnDeactivation } from "../../bind/instance/on-deactivation";
-import { OnDeprovision } from "../../bind/instance/on-deprovision";
-import { OnProvision } from "../../bind/instance/on-provision";
 import { OnCommand } from "../../commands/on-command";
+import { Container } from "../../container/container";
 import {
   ContainerProvisionLifecycle,
   deprovisionContainer,
   provisionContainer,
 } from "../../container/container-provision-lifecycle";
+import { inject } from "../../container/context";
 import { createContainer } from "../../container/create-container";
 import { WireScope } from "../../container/wire-scope";
 import { WirestateError } from "../../error/wirestate-error";
 import { OnEvent } from "../../events/on-event";
+import { getActivatedHandlerMetadata, OnActivated } from "../../lifecycle/on-activated";
+import { OnDeactivation } from "../../lifecycle/on-deactivation";
+import { OnDeprovision } from "../../lifecycle/on-deprovision";
+import { OnProvision } from "../../lifecycle/on-provision";
+import { Injectable } from "../../metadata/injectable";
 import { OnQuery } from "../../queries/on-query";
 import { WireEvent } from "../../types/events";
 

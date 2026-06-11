@@ -2,9 +2,10 @@
 
 ### Added
 
-- Add a built-in dependency injection container (vendored fork of [needle-di](https://github.com/needle-di/needle-di), MIT) at
-  `@wirestate/core` — synchronous resolution, explicit bindings, per-binding `Singleton`/`Transient` scopes, activation/
-  deactivation hooks, lifecycle-aware `unbind`/`unbindAll`, `hasOwn`, public `container.parent`, and named
+- Add a built-in dependency injection container (vendored fork of [needle-di](https://github.com/needle-di/needle-di),
+  MIT, © Dirk Luijk — since fully assimilated into the core layout) at `@wirestate/core` — synchronous resolution,
+  explicit bindings, per-binding `Singleton`/`Transient` scopes, activation/deactivation hooks, lifecycle-aware
+  `unbind`/`unbindAll`, `hasOwn`, public `container.parent`, and named
   `NoBindingFoundError`/`CircularDependencyError` errors.
 - Add `inject(token, options?)` as the single injection style (constructor parameter defaults and field initializers),
   with `optional` and `lazy` options. `inject()` works identically under legacy decorators, TC39 standard
@@ -13,6 +14,12 @@
 - Add `onActivated`/`onDeactivated` lifecycle hooks on all binding descriptors. For instance bindings the hooks
   compose with the Wirestate lifecycle: activation hooks run after `@OnActivated`, deactivation hooks run before
   `@OnDeactivation` cleanup.
+- Add bare service class support to `container.bind`: `container.bind(MyService)` registers a singleton instance
+  binding with full Wirestate wiring. Instance binding descriptors gain an optional `skipActivationHooks` field.
+- Add container introspection: `container.getOwnBindings()` (registration order),
+  `container.getActiveInstances()` (creation order), and the `getInstanceContainer(instance)` helper.
+- Add `container.addUnbindInterceptor(interceptor)` — interceptors run before deactivation in `container.unbind`
+  and `container.unbindAll`, which is how provider deprovision precedes `@OnDeactivation` without wrapper APIs.
 - Add TC39 standard decorator support for every Wirestate decorator: `@Injectable`, `@OnActivated`,
   `@OnDeactivation`, `@OnProvision`, `@OnDeprovision`, `@OnEvent`, `@OnCommand`, and `@OnQuery` are dual-mode —
   the same source compiles under legacy `experimentalDecorators` and standard (`2023-11`) decorators. Standard-mode
@@ -49,6 +56,13 @@
 - Replace InversifyJS with the built-in DI container. The DI stack is no longer an external dependency: consumer bundles
   drop ~57 KB min of inversify and ~14 KB min of reflect-metadata; the complete core including DI now measures
   ~24.6 KB min / ~7.4 KB gzip.
+- Make the container the single owner of service lifecycle: `container.bind` wires `@OnEvent`/`@OnCommand`/`@OnQuery`
+  handler registration, `WireStatus` tracking, and `@OnActivated`/`@OnDeactivation` hooks for instance bindings, so
+  binding a service class through the container can no longer produce a half-wired service. Instance and handler
+  tracking moved from module-level registries onto container activation records.
+- Unify the error model on `WirestateError`: `NoBindingFoundError` and `CircularDependencyError` extend it with
+  `NO_BINDING_FOUND`/`CIRCULAR_DEPENDENCY` codes, and container binding validation throws `WirestateError` with
+  `INVALID_ARGUMENTS`/`INVALID_BINDING_SCOPE`/`VALIDATION_ERROR` codes.
 - Migrate constructor injection from `@Inject`/`@Optional` parameter decorators to `inject()` /
   `inject(token, { optional: true })`. Parameter decorators do not exist in TC39 standard decorators, so this is the
   portable injection style going forward.
@@ -137,8 +151,11 @@
 - Limit `Transient` scope to factory bindings — transient class instances would bypass deactivation tracking, so
   instance bindings are always singletons. Binding descriptor types are now declared once in the DI base and
   re-exported.
-- Trim the internal DI container to the surface Wirestate actually uses: `bindAll`, `createChild`, bare-class
-  bindings, unbind-by-descriptor, implicit inheritance aliasing, multi-bindings, and service redirections are removed.
+- Trim the internal DI container to the surface Wirestate actually uses: `bindAll`, `createChild`,
+  unbind-by-descriptor, implicit inheritance aliasing, multi-bindings, and service redirections are removed.
+- Remove `bind`, `BindOptions`, `unbind`, and `unbindAll` from `@wirestate/core` — use `container.bind`,
+  `container.unbind`, and `container.unbindAll` directly. `BindOptions.skipActivationHooks` moved onto instance
+  binding descriptors, and `CreateContainerOptions.skipActivationHooks` stamps it on registered class bindings.
 
 - Remove `createIocContainer`; use `createContainer`.
 - Remove `@wirestate/core/test-utils`.

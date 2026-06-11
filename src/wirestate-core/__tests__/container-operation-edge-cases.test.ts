@@ -1,9 +1,6 @@
-import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
+﻿import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { Container, Injectable } from "../base";
-import { OnProvision } from "../bind/instance/on-provision";
-import { unbind, unbindAll } from "../bind/unbind";
-import { getContainerBindings } from "../bind/utils/register-binding";
+import { Container } from "../container/container";
 import {
   ContainerProvisionLifecycle,
   deprovisionContainer,
@@ -11,6 +8,8 @@ import {
 } from "../container/container-provision-lifecycle";
 import { createContainer } from "../container/create-container";
 import { WireScope } from "../container/wire-scope";
+import { OnProvision } from "../lifecycle/on-provision";
+import { Injectable } from "../metadata/injectable";
 
 describe("container operation edge cases", () => {
   it("treats deprovision of a never-provisioned container as a no-op", () => {
@@ -74,9 +73,9 @@ describe("container operation edge cases", () => {
   it("treats unbinding a never-bound token as a no-op", () => {
     const container: Container = createContainer();
 
-    expect(() => unbind(container, "NEVER_BOUND")).not.toThrow();
+    expect(() => container.unbind("NEVER_BOUND")).not.toThrow();
     expect(container.hasOwn("NEVER_BOUND")).toBe(false);
-    expect(getContainerBindings(container)).toEqual([]);
+    expect(container.getOwnBindings()).not.toContainEqual(expect.objectContaining({ token: "NEVER_BOUND" }));
   });
 
   it("treats deprovision after a full unbind as a no-op", () => {
@@ -87,7 +86,7 @@ describe("container operation edge cases", () => {
     provisionContainer(container, lifecycle);
     expect(events).toEqual(["activated", "provision"]);
 
-    unbindAll(container);
+    container.unbindAll();
 
     expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
 

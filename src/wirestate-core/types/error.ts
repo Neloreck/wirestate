@@ -1,4 +1,4 @@
-import { Container } from "../base";
+import type { Container } from "../container/container";
 
 import { WireEvent } from "./events";
 

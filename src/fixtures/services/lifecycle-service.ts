@@ -1,9 +1,10 @@
-import { inject, Injectable } from "../../wirestate-core/base";
-import { OnActivated } from "../../wirestate-core/bind/instance/on-activated";
-import { OnDeactivation } from "../../wirestate-core/bind/instance/on-deactivation";
-import { OnDeprovision } from "../../wirestate-core/bind/instance/on-deprovision";
-import { OnProvision } from "../../wirestate-core/bind/instance/on-provision";
+import { inject } from "../../wirestate-core/container/context";
 import { WireScope } from "../../wirestate-core/container/wire-scope";
+import { OnActivated } from "../../wirestate-core/lifecycle/on-activated";
+import { OnDeactivation } from "../../wirestate-core/lifecycle/on-deactivation";
+import { OnDeprovision } from "../../wirestate-core/lifecycle/on-deprovision";
+import { OnProvision } from "../../wirestate-core/lifecycle/on-provision";
+import { Injectable } from "../../wirestate-core/metadata/injectable";
 
 /**
  * Lifecycle callback names supported by {@link createLifecycleService}.

@@ -1,13 +1,14 @@
 // Install the Symbol.metadata polyfill before any consumer class definition.
 import "./metadata/symbol-metadata";
 
-import { Container, Identifier } from "./base";
-import { WireStatus } from "./container/wire-status";
-import { CommandHandlerMetadata, CommandUnregister } from "./types/commands";
-import { InternalErrorHandler } from "./types/error";
-import { EventHandlerMetadata, EventUnsubscriber } from "./types/events";
-import { Binding, ProvisionId } from "./types/provision";
-import { QueryHandlerMetadata, QueryUnregister } from "./types/queries";
+import type { Identifier } from "./binding/tokens";
+import type { Container } from "./container/container";
+import type { WireStatus } from "./container/wire-status";
+import type { CommandHandlerMetadata } from "./types/commands";
+import type { InternalErrorHandler } from "./types/error";
+import type { EventHandlerMetadata } from "./types/events";
+import type { ProvisionId } from "./types/provision";
+import type { QueryHandlerMetadata } from "./types/queries";
 
 /**
  * Registry of class constructors to their declared query handlers.
@@ -174,18 +175,6 @@ export const EVENT_HANDLER_METADATA: WeakMap<object, Array<EventHandlerMetadata>
 export const EVENT_METADATA_KEY: symbol = Symbol.for("@wirestate/core/metadata/event");
 
 /**
- * Internal storage for mapping instances to their originating containers.
- *
- * @remarks
- * Used during the instance lifecycle to ensure that resolution and messaging
- * occur within the correct container context.
- *
- * @group Bind
- * @internal
- */
-export const CONTAINER_REFS_BY_INSTANCE: WeakMap<object, Container> = new WeakMap();
-
-/**
  * Internal storage for service lifecycle status keyed by instance.
  *
  * @remarks
@@ -198,69 +187,12 @@ export const CONTAINER_REFS_BY_INSTANCE: WeakMap<object, Container> = new WeakMa
 export const INSTANCE_STATUSES_BY_INSTANCE: WeakMap<object, WireStatus> = new WeakMap();
 
 /**
- * Internal storage for active service instances keyed by container.
- *
- * @remarks
- * Tracks which resolved instances currently belong to each container so
- * provider lifecycle can eagerly update their stable {@link WireStatus}
- * handles.
- *
- * @group Container
- * @internal
- */
-export const ACTIVE_INSTANCES_BY_CONTAINER: WeakMap<Container, Set<object>> = new WeakMap();
-
-/**
  * Internal storage for current provider ownership state keyed by container.
  *
  * @group Container
  * @internal
  */
 export const PROVISION_STATUS_BY_CONTAINER: WeakMap<Container, boolean> = new WeakMap();
-
-/**
- * Internal storage for event unsubscribers.
- *
- * @remarks
- * Stores the unsubscription functions returned when an instance automatically
- * subscribes to events via the {@link OnEvent} decorator.
- *
- * @group Events
- * @internal
- */
-export const EVENT_UNSUBSCRIBERS_BY_INSTANCE: WeakMap<object, EventUnsubscriber> = new WeakMap();
-
-/**
- * Internal storage for instance query unregisters.
- *
- * @remarks
- * Stores the unregistration functions returned when an instance automatically
- * registers query handlers via the {@link OnQuery} decorator.
- *
- * @group Queries
- * @internal
- */
-export const QUERY_UNREGISTERS_BY_INSTANCE: WeakMap<object, Array<QueryUnregister>> = new WeakMap();
-
-/**
- * Internal storage for instance command unregisters.
- *
- * @remarks
- * Stores the unregistration functions returned when an instance automatically
- * registers command handlers via the {@link OnCommand} decorator.
- *
- * @group Commands
- * @internal
- */
-export const COMMAND_UNREGISTERS_BY_INSTANCE: WeakMap<object, Array<CommandUnregister>> = new WeakMap();
-
-/**
- * Internal storage for bindings registered on a container through Wirestate helpers.
- *
- * @group Container
- * @internal
- */
-export const CONTAINER_BINDINGS: WeakMap<Container, Array<Binding>> = new WeakMap();
 
 /**
  * Internal storage for provider lifecycle maps that currently own a container.

@@ -1,14 +1,15 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { BindingType, Container, inject, Injectable } from "../base";
-import { bind } from "../bind/bind";
-import { unbindAll } from "../bind/unbind";
+import { BindingType } from "../binding/binding";
 import { CommandBus } from "../commands/command-bus";
 import { getConfiguredInternalErrorHandler } from "../error/internal-error-handler";
 import { EventBus } from "../events/event-bus";
+import { Injectable } from "../metadata/injectable";
 import { QueryBus } from "../queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 
+import { Container } from "./container";
+import { inject } from "./context";
 import { createContainer } from "./create-container";
 import { WireScope } from "./wire-scope";
 
@@ -207,7 +208,7 @@ describe("createContainer", () => {
     @Injectable()
     class TestService {}
 
-    bind(container, TestService);
+    container.bind(TestService);
 
     expect(container.get(TestService)).toBe(container.get(TestService));
   });
@@ -359,7 +360,7 @@ describe("createContainer", () => {
     expect(container.get(LifecycleService)).toBeInstanceOf(LifecycleService);
     expect(events).toEqual(["activated"]);
 
-    unbindAll(container);
+    container.unbindAll();
 
     expect(events).toEqual(["activated", "deactivation"]);
   });
@@ -378,7 +379,7 @@ describe("createContainer", () => {
     expect(container.get(LifecycleService)).toBeInstanceOf(LifecycleService);
     expect(events).toEqual([]);
 
-    unbindAll(container);
+    container.unbindAll();
 
     expect(events).toEqual([]);
   });

@@ -10,9 +10,10 @@ export type {
   ValueBindingDescriptor,
   InstanceBindingDescriptor,
   FactoryBindingDescriptor,
-} from "../base";
+} from "../binding/binding";
 
-import type { BindingDescriptor, Newable } from "../base";
+import type { BindingDescriptor } from "../binding/binding";
+import type { Newable } from "../utils/class-like";
 
 /**
  * Identifier for one provider provision cycle of a service instance.

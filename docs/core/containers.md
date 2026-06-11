@@ -90,40 +90,33 @@ the child should share event, command, and query handlers with the parent scope.
 
 ## Direct Container Work
 
-`createContainer` returns a Wirestate `Container`. You can still use normal container methods when a lower-level
-operation needs them.
+`createContainer` returns a Wirestate `Container`. The container is the registration and disposal API: binding a
+service class through `container.bind` wires the full Wirestate lifecycle — `@OnActivated`/`@OnDeactivation` hooks,
+`@OnEvent`/`@OnCommand`/`@OnQuery` handlers, and `WireStatus` tracking.
 
 ```ts
-if (container.isBound(UserService)) {
+container.bind(UserService);
+
+if (container.has(UserService)) {
   const users = container.get(UserService);
 }
 ```
 
-Prefer Wirestate bindings and bind/unbind helpers for Wirestate services. They keep lifecycle, provider ownership, and
-messaging metadata in sync.
-
 ## Removing Bindings
 
-Use [`unbind`](/api/wirestate-core/functions/unbind) when removing one binding added through Wirestate. Use
-[`unbindAll`](/api/wirestate-core/functions/unbindAll) when disposing a container completely.
+Use `container.unbind` when removing one binding. Use `container.unbindAll` when disposing a container completely.
 
 ```ts
-import { unbind, unbindAll } from "@wirestate/core";
-
-unbind(container, UserService);
-unbindAll(child);
+container.unbind(UserService);
+child.unbindAll();
 ```
 
-These wrappers call the container unbind operation and clean Wirestate-owned bookkeeping. If a provider owns the
+The container deactivates removed services and runs registered unbind interceptors first. If a provider owns the
 service, `@OnDeprovision` runs before service deactivation. After `unbindAll`, discard the container.
-
-Raw `container.unbind(...)` and `container.unbindAll()` remain available as low-level escape hatches, but they do not clean
-Wirestate's registered binding list.
 
 ## API Reference
 
 [`createContainer`](/api/wirestate-core/functions/createContainer), [`ContainerConfig`](/api/wirestate-core/interfaces/ContainerConfig),
 [`CreateContainerOptions`](/api/wirestate-core/interfaces/CreateContainerOptions),
 [`Container`](/api/wirestate-core/classes/Container), [`provisionContainer`](/api/wirestate-core/functions/provisionContainer),
-[`deprovisionContainer`](/api/wirestate-core/functions/deprovisionContainer),
-[`unbind`](/api/wirestate-core/functions/unbind), [`unbindAll`](/api/wirestate-core/functions/unbindAll).
+[`deprovisionContainer`](/api/wirestate-core/functions/deprovisionContainer).

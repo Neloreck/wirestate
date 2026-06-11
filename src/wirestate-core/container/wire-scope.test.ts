@@ -1,14 +1,15 @@
-import { GenericService } from "@/fixtures/services/generic-service";
+﻿import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Container, inject, Injectable } from "../base";
-import { bind } from "../bind/bind";
-import { OnActivated } from "../bind/instance/on-activated";
-import { OnDeactivation } from "../bind/instance/on-deactivation";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
+import { OnActivated } from "../lifecycle/on-activated";
+import { OnDeactivation } from "../lifecycle/on-deactivation";
+import { Injectable } from "../metadata/injectable";
 import { QueryBus } from "../queries/query-bus";
 import { Optional } from "../types/general";
 
+import { Container } from "./container";
+import { inject } from "./context";
 import { createContainer } from "./create-container";
 import { WireScope } from "./wire-scope";
 
@@ -395,7 +396,7 @@ describe("WireScope", () => {
     expect(commandBus.hasHandler("TEST_COMMAND")).toBe(false);
     expect(queryBus.hasHandler("TEST_QUERY")).toBe(false);
 
-    const service: ServiceWithManualSubs = bind(container, ServiceWithManualSubs).get(ServiceWithManualSubs);
+    const service: ServiceWithManualSubs = container.bind(ServiceWithManualSubs).get(ServiceWithManualSubs);
 
     expect(eventBus.hasSubscribers()).toBe(true);
     expect(commandBus.hasHandler("TEST_COMMAND")).toBe(true);

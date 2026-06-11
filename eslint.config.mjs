@@ -140,4 +140,10 @@ export default [
       ],
     },
   },
+  {
+    files: ["src/wirestate-core/**/*.ts"],
+    rules: {
+      "import/no-cycle": ["error", { ignoreExternal: true }],
+    },
+  },
 ];

@@ -1,4 +1,4 @@
-import { Container } from "../base";
+import { Container } from "../container/container";
 import { createContainer } from "../container/create-container";
 import { InternalErrorDescriptor } from "../types/error";
 
