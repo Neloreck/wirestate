@@ -8,7 +8,6 @@ import {
   createContainer,
   deprovisionContainer,
   provisionContainer,
-  unbindAll,
   validateContainerConfig,
 } from "@wirestate/core";
 
@@ -295,6 +294,6 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
 
     this.container = null;
 
-    unbindAll(container);
+    container.unbindAll();
   }
 }

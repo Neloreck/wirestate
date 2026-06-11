@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { bind, Container, Identifier, createContainer } from "@wirestate/core";
+import { Container, Identifier, createContainer } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
@@ -38,7 +38,7 @@ describe("optionalInjection", () => {
   it("should inject bound instance", () => {
     const container: Container = createContainer();
 
-    bind(container, GenericService);
+    container.bind(GenericService);
     fixture = createLitProvision(container);
 
     @customElement("test-optional-injection-bound-element")
@@ -98,7 +98,7 @@ describe("optionalInjection", () => {
     const unboundToken: Identifier<string> = Symbol("unbound-token");
     const boundToken: Identifier<string> = Symbol("bound-token");
 
-    bind(container, {
+    container.bind({
       token: boundToken,
       value: "bound-value",
     });

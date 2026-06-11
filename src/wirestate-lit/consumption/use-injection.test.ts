@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { bind, Container, createContainer } from "@wirestate/core";
+import { Container, createContainer } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
@@ -13,7 +13,7 @@ describe("useInjection", () => {
   beforeEach(() => {
     const container: Container = createContainer();
 
-    bind(container, GenericService);
+    container.bind(GenericService);
 
     fixture = createLitProvision(container);
   });
@@ -53,7 +53,7 @@ describe("useInjection", () => {
   it("should inject string constants from symbol tokens", () => {
     const API_URL: unique symbol = Symbol("api-url");
 
-    bind(fixture.container, {
+    fixture.container.bind({
       token: API_URL,
       value: "https://api.example.com",
     });
@@ -74,7 +74,7 @@ describe("useInjection", () => {
     const STATUS_TOKEN: string = "status-token";
     const READY_STATUS: unique symbol = Symbol("ready-status");
 
-    bind(fixture.container, {
+    fixture.container.bind({
       token: STATUS_TOKEN,
       value: READY_STATUS,
     });
