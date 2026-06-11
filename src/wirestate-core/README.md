@@ -39,8 +39,8 @@ counterService.increment();
 
 ## What Is Included
 
-- DI primitives such as `Injectable`, `inject`, `Container`, and `Identifier`.
-- `createContainer`, `bind`, `unbind`, and `unbindAll`.
+- DI primitives such as `Injectable`, `inject`, `Container`, `Identifier`, and `InjectionToken`.
+- `createContainer` and container methods such as `bind`, `unbind`, `unbindAll`, `get`, `has`, and `getOwnBindings`.
 - `WireScope` for scoped resolution, seeds, events, commands, and queries.
 - `WireStatus` and `ProvisionId` for lifecycle guards on resolved service instances.
 - `EventBus`, `CommandBus`, `QueryBus`, and their decorators.

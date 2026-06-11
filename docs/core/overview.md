@@ -14,7 +14,8 @@ or reactive objects created by another package.
 npm install @wirestate/core
 ```
 
-Enable decorators in TypeScript when using `@Injectable`, `@OnEvent`, and other Wirestate decorators.
+Wirestate decorators work with legacy TypeScript decorators and TC39 standard decorators. For legacy TypeScript
+decorators, enable `experimentalDecorators`. `emitDecoratorMetadata` is not required.
 
 ```json
 {

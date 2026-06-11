@@ -90,8 +90,8 @@ the child should share event, command, and query handlers with the parent scope.
 
 ## Direct Container Work
 
-`createContainer` returns a Wirestate `Container`. The container is the registration and disposal API: binding a
-service class through `container.bind` wires the full Wirestate lifecycle — `@OnActivated`/`@OnDeactivation` hooks,
+`createContainer` returns a Wirestate `Container`. The container is the registration and disposal API. Binding a service
+class through `container.bind` wires the full Wirestate lifecycle: `@OnActivated`/`@OnDeactivation` hooks,
 `@OnEvent`/`@OnCommand`/`@OnQuery` handlers, and `WireStatus` tracking.
 
 ```ts

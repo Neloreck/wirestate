@@ -161,9 +161,11 @@ export class Container {
   /**
    * Retrieves a service from this container.
    *
+   * Resolution options can make a lookup optional or lazy. Optional lookups
+   * resolve `undefined` instead of throwing. Lazy lookups return a thunk that
+   * resolves on first call.
+   *
    * @param token - Token to resolve.
-   * @param options - Resolution options: `optional` resolves `undefined` instead of throwing,
-   * `lazy` returns a thunk resolving on first call.
    * @returns The resolved value, thunk, or `undefined` for optional misses.
    *
    * @throws {@link NoBindingFoundError} If the token is not bound and not optional.
