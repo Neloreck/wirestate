@@ -1,6 +1,5 @@
 import { Container } from "../container/container";
 import { inject } from "../container/context";
-import { createContainer } from "../container/create-container";
 import { Injectable } from "../metadata/injectable";
 
 describe("forward references with inject()", () => {
@@ -21,7 +20,7 @@ describe("forward references with inject()", () => {
       public readonly label: string = "logger";
     }
 
-    const container: Container = createContainer({ bindings: [ConsumerService, LoggerService] });
+    const container: Container = new Container({ bindings: [ConsumerService, LoggerService] });
 
     const consumer: ConsumerService = container.get(ConsumerService);
 
@@ -45,7 +44,7 @@ describe("forward references with inject()", () => {
       public constructor(public readonly first: FirstService = inject(FirstService)) {}
     }
 
-    const container: Container = createContainer({ bindings: [FirstService, SecondService] });
+    const container: Container = new Container({ bindings: [FirstService, SecondService] });
 
     const first: FirstService = container.get(FirstService);
 

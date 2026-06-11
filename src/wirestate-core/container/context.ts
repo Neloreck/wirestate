@@ -1,6 +1,6 @@
 import type { Identifier } from "../binding/tokens";
 
-import type { Container } from "./container";
+import type { ContainerKernel } from "./container-kernel";
 
 /**
  * Injects a service within the current injection context, using the token provided.
@@ -33,7 +33,7 @@ export function inject<T>(
  * @internal
  */
 interface Context {
-  run<T>(block: (container: Container) => T): T;
+  run<T>(block: (container: ContainerKernel) => T): T;
 }
 
 /**
@@ -53,9 +53,9 @@ class GlobalContext implements Context {
  * @internal
  */
 class InjectionContext implements Context {
-  public constructor(private readonly container: Container) {}
+  public constructor(private readonly container: ContainerKernel) {}
 
-  public run<T>(block: (container: Container) => T): T {
+  public run<T>(block: (container: ContainerKernel) => T): T {
     const originalContext = _currentContext;
 
     try {
@@ -74,11 +74,11 @@ let _currentContext: GlobalContext | InjectionContext = new GlobalContext();
 /**
  * Creates a new injection context.
  *
- * @param container - Container the context resolves against.
+ * @param container - ContainerKernel the context resolves against.
  * @returns Injection context bound to the container.
  * @internal
  */
-export function injectionContext(container: Container): Context {
+export function injectionContext(container: ContainerKernel): Context {
   return new InjectionContext(container);
 }
 

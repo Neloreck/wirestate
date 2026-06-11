@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { Container } from "../container/container";
+import type { ContainerKernel } from "../container/container-kernel";
 import { reportWirestateInternalError } from "../error/internal-error-handler";
 import { EventDispatch, EventHandler, EventType } from "../types/events";
 import { Maybe } from "../types/general";
@@ -41,7 +41,7 @@ interface DispatcherPlan {
  * @template T - Type of the instance.
  *
  * @param instance - The instance to scan for handlers.
- * @param container - Container that owns the instance.
+ * @param container - ContainerKernel that owns the instance.
  * @returns One subscription descriptor per decorated method; empty when none are declared.
  *
  * @example
@@ -53,7 +53,7 @@ interface DispatcherPlan {
  */
 export function buildEventDispatchers<T extends object>(
   instance: T,
-  container?: Container
+  container?: ContainerKernel
 ): ReadonlyArray<EventDispatch> {
   dbg.info(prefix(__filename), "Build event dispatchers for:", { name: instance.constructor.name, instance });
 

@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { QueryBus, Container, createContainer } from "@wirestate/core";
+import { QueryBus, Container } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
@@ -70,7 +70,7 @@ describe("OnQueryController", () => {
     const QUERY: string = "TEST_QUERY";
 
     const firstBus: QueryBus = firstContainer.get(QueryBus);
-    const secondContainer: Container = createContainer();
+    const secondContainer: Container = new Container();
     const secondBus: QueryBus = secondContainer.get(QueryBus);
 
     const element: TestConsumerElement = new TestConsumerElement();

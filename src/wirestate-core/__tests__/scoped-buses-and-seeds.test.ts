@@ -10,7 +10,6 @@ import {
   OnQuery,
   QueryBus,
   WireScope,
-  createContainer,
 } from "../index";
 import { Optional } from "../types/general";
 
@@ -85,12 +84,12 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
   }
 
   it("keeps parent and child messaging in separate scope", async () => {
-    const parent: Container = createContainer({
+    const parent: Container = new Container({
       activate: [ParentCounterService],
       bindings: [ParentCounterService, { token: PARENT_TOKEN, value: "root-value" }],
       seeds: [[SETTINGS_TOKEN, { label: "root-label", offset: 1 }]],
     });
-    const child: Container = createContainer({
+    const child: Container = new Container({
       activate: [ChildCounterService],
       bindings: [ChildCounterService],
       parent: parent,
@@ -123,7 +122,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
   });
 
   it("uses the root seed separately from targeted seeds", () => {
-    const container: Container = createContainer({
+    const container: Container = new Container({
       seed: { appName: "wirestate" },
       seeds: [[SETTINGS_TOKEN, { label: "targeted", offset: 7 }]],
     });
@@ -179,7 +178,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       activate: [CleanupService],
       bindings: [CleanupService],
       seeds: [[SETTINGS_TOKEN, { label: "cleanup-label", offset: 0 }]],
@@ -266,7 +265,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       activate: [DeactivationCoordinatorService, DeactivationPeerService],
       bindings: [DeactivationCoordinatorService, DeactivationPeerService],
     });

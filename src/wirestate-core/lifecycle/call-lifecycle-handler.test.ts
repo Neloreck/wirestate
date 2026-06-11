@@ -1,5 +1,4 @@
 import { Container } from "../container/container";
-import { createContainer } from "../container/create-container";
 import { Injectable } from "../metadata/injectable";
 
 import { callLifecycleHandler } from "./call-lifecycle-handler";
@@ -16,7 +15,7 @@ describe("callLifecycleHandler", () => {
     }
 
     const onError = jest.fn();
-    const container: Container = createContainer({ bindings: [TestService], onError });
+    const container: Container = new Container({ bindings: [TestService], onError });
     const instance: TestService = container.get(TestService);
 
     callLifecycleHandler({
@@ -38,7 +37,7 @@ describe("callLifecycleHandler", () => {
     }
 
     const onError = jest.fn();
-    const container: Container = createContainer({ onError });
+    const container: Container = new Container({ onError });
 
     callLifecycleHandler({
       container,
@@ -62,7 +61,7 @@ describe("callLifecycleHandler", () => {
     }
 
     const onError = jest.fn();
-    const container: Container = createContainer({ onError });
+    const container: Container = new Container({ onError });
     const instance = new TestService();
 
     expect(() =>
@@ -102,7 +101,7 @@ describe("callLifecycleHandler", () => {
     }
 
     const onError = jest.fn();
-    const container: Container = createContainer({ onError });
+    const container: Container = new Container({ onError });
     const instance = new TestService();
 
     expect(() =>
@@ -139,7 +138,7 @@ describe("callLifecycleHandler", () => {
     }
 
     const onError = jest.fn();
-    const container: Container = createContainer({ onError });
+    const container: Container = new Container({ onError });
     const instance = new TestService();
 
     callLifecycleHandler({
@@ -181,7 +180,7 @@ describe("callLifecycleHandler", () => {
     }
 
     const onError = jest.fn();
-    const container: Container = createContainer({ onError });
+    const container: Container = new Container({ onError });
     const instance = new TestService();
 
     callLifecycleHandler({

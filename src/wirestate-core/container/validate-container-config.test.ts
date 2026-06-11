@@ -61,6 +61,6 @@ describe("validateContainerConfig", () => {
       validateContainerConfig({
         onError: "not-a-function",
       } as never)
-    ).toThrow("createContainer: 'onError' must be a function.");
+    ).toThrow("Container: 'onError' must be a function.");
   });
 });

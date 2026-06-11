@@ -4,7 +4,6 @@ import { Injectable } from "../metadata/injectable";
 
 import { Container } from "./container";
 import { deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
-import { createContainer } from "./create-container";
 import { ContainerProvisionLifecycle } from "./provision-state";
 import { WireStatus } from "./wire-status";
 
@@ -19,7 +18,7 @@ describe("WireStatus", () => {
       public readonly status: WireStatus = WireStatus.for(this, { initialize: true });
     }
 
-    const container: Container = createContainer();
+    const container: Container = new Container();
 
     container.bind(TestService);
 
@@ -38,7 +37,7 @@ describe("WireStatus", () => {
     @Injectable()
     class TestService {}
 
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const lifecycle: ContainerProvisionLifecycle = new Map();
 
     container.bind(TestService);
@@ -94,7 +93,7 @@ describe("WireStatus", () => {
       public onDeprovision(): void {}
     }
 
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const lifecycle: ContainerProvisionLifecycle = new Map();
 
     container.bind(TestService);

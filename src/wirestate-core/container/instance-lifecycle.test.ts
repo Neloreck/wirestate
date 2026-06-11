@@ -1,3 +1,5 @@
+import { BindingScope, WireScope } from "@wirestate/core";
+
 import { GenericService } from "@/fixtures/services/generic-service";
 
 import { CommandBus } from "../commands/command-bus";
@@ -8,9 +10,9 @@ import { Injectable } from "../metadata/injectable";
 import { QueryBus } from "../queries/query-bus";
 
 import { Container } from "./container";
-import { createContainer } from "./create-container";
 import { getInstanceContainer, initializeInstanceStatus, unregisterInstanceStatus } from "./instance-lifecycle";
 import { setContainerProvisioned } from "./provision-state";
+import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
 import { WireStatus } from "./wire-status";
 
 describe("instance lifecycle tracking", () => {
@@ -18,7 +20,7 @@ describe("instance lifecycle tracking", () => {
     @Injectable()
     class TestService {}
 
-    const container: Container = createContainer();
+    const container: Container = new Container();
 
     container.bind({ token: TestService, type: "Instance", value: TestService });
 
@@ -40,7 +42,7 @@ describe("instance lifecycle tracking", () => {
     }
 
     const onError = jest.fn();
-    const container: Container = createContainer({ onError });
+    const container: Container = new Container({ onError });
 
     container.bind({ token: FailingService, type: "Instance", value: FailingService });
 
@@ -53,7 +55,7 @@ describe("instance lifecycle tracking", () => {
     @Injectable()
     class TestService {}
 
-    const container: Container = createContainer();
+    const container: Container = new Container();
 
     container.bind({ token: TestService, type: "Instance", value: TestService });
 
@@ -68,7 +70,7 @@ describe("instance lifecycle tracking", () => {
   });
 
   it("should not report value or factory binding values as active instances", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
 
     container.bind({ token: "config", value: { key: "value" } });
     container.bind({ token: "made", factory: () => ({ made: true }) });
@@ -80,7 +82,7 @@ describe("instance lifecycle tracking", () => {
   });
 
   it("should fully wire bare-class binds through the container", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
 
     container.bind(GenericService);
 
@@ -117,7 +119,7 @@ describe("instance lifecycle tracking", () => {
       }
     }
 
-    const container: Container = createContainer();
+    const container: Container = new Container();
 
     container.bind({ token: HookedService, type: "Instance", value: HookedService, skipActivationHooks: true });
 
@@ -155,14 +157,21 @@ describe("instance lifecycle tracking", () => {
     const bindings = container.getOwnBindings();
 
     expect(bindings[0]).toEqual({ token: Container, value: container });
-    expect(bindings[1]).toBe(valueBinding);
-    expect(bindings[2]).toBe(instanceBinding);
+    expect(bindings[1]).toEqual({ token: SEEDS_TOKEN, value: new Map() });
+    expect(bindings[2]).toEqual({ token: SEED_TOKEN, value: {} });
+    expect(bindings[3]).toEqual({ token: WireScope, scope: BindingScope.Transient, factory: expect.any(Function) });
+    expect(bindings[4]).toEqual({ token: EventBus, value: container.get(EventBus) });
+    expect(bindings[5]).toEqual({ token: QueryBus, value: container.get(QueryBus) });
+    expect(bindings[6]).toEqual({ token: CommandBus, value: container.get(CommandBus) });
+
+    expect(bindings[7]).toBe(valueBinding);
+    expect(bindings[8]).toBe(instanceBinding);
   });
 });
 
 describe("instance status", () => {
   it("should initialize an untracked instance with null provider status", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const instance: object = {};
 
     expect(() => WireStatus.for(instance)).toThrow("Object is not tracked by Wirestate.");
@@ -178,8 +187,8 @@ describe("instance status", () => {
   });
 
   it("should derive deprovisioned status from container provision state", () => {
-    const provisionedContainer: Container = createContainer();
-    const deprovisionedContainer: Container = createContainer();
+    const provisionedContainer: Container = new Container();
+    const deprovisionedContainer: Container = new Container();
     const provisionedInstance: object = {};
     const deprovisionedInstance: object = {};
 
@@ -194,7 +203,7 @@ describe("instance status", () => {
   });
 
   it("should reuse and reset a reserved status during initialization", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const instance: object = {};
     const status: WireStatus = WireStatus.for(instance, { initialize: true });
 
@@ -214,7 +223,7 @@ describe("instance status", () => {
   });
 
   it("should mark an initialized instance as disposed and deprovisioned on unregister", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const instance: object = {};
 
     initializeInstanceStatus(container, instance);

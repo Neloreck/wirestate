@@ -12,7 +12,7 @@ import { Optional, AnyObject } from "../types/general";
 import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 import { SeedKey, SeedsMap } from "../types/seeds";
 
-import { Container } from "./container";
+import type { Container } from "./container";
 import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
 
 /**

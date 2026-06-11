@@ -10,7 +10,7 @@ import { getDeprovisionHandlerMetadata } from "../lifecycle/on-deprovision";
 import { getProvisionHandlerMetadata } from "../lifecycle/on-provision";
 import { Maybe } from "../types/general";
 
-import { Container } from "./container";
+import type { Container } from "./container";
 import { getBindingToken } from "./get-binding-token";
 import { getInstanceContainer } from "./instance-lifecycle";
 import {
@@ -40,7 +40,7 @@ import { ProvisionId, WireStatus } from "./wire-status";
  *
  * @example
  * ```typescript
- * import { Injectable, OnProvision, createContainer, provisionContainer } from "@wirestate/core";
+ * import { Injectable, OnProvision, Container, provisionContainer } from "@wirestate/core";
  *
  * @Injectable()
  * class PanelService {
@@ -48,7 +48,7 @@ import { ProvisionId, WireStatus } from "./wire-status";
  *   public connect(): void {}
  * }
  *
- * const container = createContainer({ bindings: [PanelService] });
+ * const container = new Container({ bindings: [PanelService] });
  * const lifecycle = new Map();
  *
  * provisionContainer(container, lifecycle);
@@ -83,7 +83,7 @@ export function provisionContainer(
  *
  * @example
  * ```typescript
- * import { Injectable, OnDeprovision, createContainer, deprovisionContainer, provisionContainer } from "@wirestate/core";
+ * import { Injectable, OnDeprovision, Container, deprovisionContainer, provisionContainer } from "@wirestate/core";
  *
  * @Injectable()
  * class PanelService {
@@ -91,7 +91,7 @@ export function provisionContainer(
  *   public disconnect(): void {}
  * }
  *
- * const container = createContainer({ bindings: [PanelService] });
+ * const container = new Container({ bindings: [PanelService] });
  * const lifecycle = new Map();
  *
  * provisionContainer(container, lifecycle, [PanelService]);

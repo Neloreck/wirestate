@@ -1,4 +1,4 @@
-import type { Container } from "../container/container";
+import type { ContainerKernel } from "../container/container-kernel";
 import type { Newable } from "../utils/class-like";
 
 import type { Identifier } from "./tokens";
@@ -40,14 +40,14 @@ export type BindingScopeValue = keyof typeof BindingScope;
  *
  * @group Bind
  */
-export type BindingActivationHandler<T> = (instance: T, container: Container) => T | void;
+export type BindingActivationHandler<T> = (instance: T, container: ContainerKernel) => T | void;
 
 /**
  * A handler invoked for each container-owned value right before its binding is unbound.
  *
  * @group Bind
  */
-export type BindingDeactivationHandler<T> = (instance: T, container: Container) => void;
+export type BindingDeactivationHandler<T> = (instance: T, container: ContainerKernel) => void;
 
 /**
  * Describes a static value binding. Values are always singletons.
@@ -142,7 +142,7 @@ export interface FactoryBindingDescriptor<T = unknown> {
    * Factory used to produce the value at resolution time.
    * Runs inside the injection context, so `inject()` works in its body.
    */
-  readonly factory: (container: Container) => NoInfer<T>;
+  readonly factory: (container: ContainerKernel) => NoInfer<T>;
 
   /**
    * Lifetime scope for created values.

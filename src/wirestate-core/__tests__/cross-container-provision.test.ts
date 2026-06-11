@@ -2,15 +2,14 @@ import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { Container } from "../container/container";
 import { deprovisionContainer, provisionContainer } from "../container/container-provision-lifecycle";
-import { createContainer } from "../container/create-container";
 import { ContainerProvisionLifecycle } from "../container/provision-state";
 
 describe("cross-container provider lifecycle ownership", () => {
   it("shares a single parent-owned instance by reference with child containers", () => {
     const { LifecycleService } = createLifecycleService({ methods: ["provision", "deprovision"] });
 
-    const parent: Container = createContainer({ bindings: [LifecycleService] });
-    const child: Container = createContainer({ parent });
+    const parent: Container = new Container({ bindings: [LifecycleService] });
+    const child: Container = new Container({ parent });
 
     expect(child.get(LifecycleService)).toBe(parent.get(LifecycleService));
   });
@@ -20,8 +19,8 @@ describe("cross-container provider lifecycle ownership", () => {
     const { LifecycleService } = createLifecycleService({ events, methods: ["provision", "deprovision"] });
 
     // LifecycleService is bound only on the parent; the child merely inherits it.
-    const parent: Container = createContainer({ bindings: [LifecycleService] });
-    const child: Container = createContainer({ parent });
+    const parent: Container = new Container({ bindings: [LifecycleService] });
+    const child: Container = new Container({ parent });
 
     const childLifecycle: ContainerProvisionLifecycle = new Map();
 
@@ -46,8 +45,8 @@ describe("cross-container provider lifecycle ownership", () => {
       suffix: "child",
     });
 
-    const parent: Container = createContainer({ bindings: [ParentService] });
-    const child: Container = createContainer({ parent, bindings: [ChildService] });
+    const parent: Container = new Container({ bindings: [ParentService] });
+    const child: Container = new Container({ parent, bindings: [ChildService] });
     const childLifecycle: ContainerProvisionLifecycle = new Map();
 
     // The child owns ChildService, so its provider lifecycle works normally and
@@ -63,7 +62,7 @@ describe("cross-container provider lifecycle ownership", () => {
     const events: Array<string> = [];
     const { LifecycleService } = createLifecycleService({ events, methods: ["provision", "deprovision"] });
 
-    const parent: Container = createContainer({ bindings: [LifecycleService] });
+    const parent: Container = new Container({ bindings: [LifecycleService] });
     const parentLifecycle: ContainerProvisionLifecycle = new Map();
 
     provisionContainer(parent, parentLifecycle);

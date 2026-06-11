@@ -2,7 +2,6 @@ import { OnCommand } from "../../commands/on-command";
 import { Container } from "../../container/container";
 import { deprovisionContainer, provisionContainer } from "../../container/container-provision-lifecycle";
 import { inject } from "../../container/context";
-import { createContainer } from "../../container/create-container";
 import { ContainerProvisionLifecycle } from "../../container/provision-state";
 import { WireScope } from "../../container/wire-scope";
 import { WirestateError } from "../../error/wirestate-error";
@@ -51,7 +50,7 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = createContainer({ bindings: [MessagingService] });
+    const container: Container = new Container({ bindings: [MessagingService] });
     const service: MessagingService = container.get(MessagingService);
 
     service.scope.emitEvent("PING", "one");
@@ -91,7 +90,7 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = createContainer({ bindings: [LifecycleProbeService] });
+    const container: Container = new Container({ bindings: [LifecycleProbeService] });
     const lifecycle: ContainerProvisionLifecycle = new Map();
 
     // Provision participation is decided from the bare class prototype before
@@ -121,7 +120,7 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = createContainer({ bindings: [DeprovisionProbeService] });
+    const container: Container = new Container({ bindings: [DeprovisionProbeService] });
     const lifecycle: ContainerProvisionLifecycle = new Map();
 
     provisionContainer(container, lifecycle);
@@ -163,7 +162,7 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = createContainer({ bindings: [ChildMessagingService] });
+    const container: Container = new Container({ bindings: [ChildMessagingService] });
     const child: ChildMessagingService = container.get(ChildMessagingService);
 
     expect(log).toEqual(["base-activated"]);
@@ -197,7 +196,7 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = createContainer({ bindings: [RedecoratedChildService] });
+    const container: Container = new Container({ bindings: [RedecoratedChildService] });
 
     container.get(RedecoratedChildService);
 
@@ -295,7 +294,7 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = createContainer({ bindings: [MultiHandlerService] });
+    const container: Container = new Container({ bindings: [MultiHandlerService] });
     const service: MultiHandlerService = container.get(MultiHandlerService);
 
     service.scope.emitEvent("FIRST_EVENT");
@@ -319,7 +318,7 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = createContainer({ bindings: [UnsubscribingService] });
+    const container: Container = new Container({ bindings: [UnsubscribingService] });
     const service: UnsubscribingService = container.get(UnsubscribingService);
     const scope: WireScope = service.scope;
 

@@ -39,7 +39,7 @@ jobs:
 
       - run: pnpm typecheck
 
-      - run: pnpm test
+      - run: pnpm test:all
 
       - run: pnpm build:dts
 
@@ -51,7 +51,7 @@ jobs:
 
       - run: pnpm build:pkg
 
-      - run: pnpm test:package-consumption
+      - run: pnpm test:e2e
 
       - name: Install zip
         uses: montudor/action-zip@v1

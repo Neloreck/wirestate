@@ -1,4 +1,4 @@
-import { Container, Injectable, OnDeactivation, OnDeprovision, OnProvision, createContainer } from "@wirestate/core";
+import { Container, Injectable, OnDeactivation, OnDeprovision, OnProvision } from "@wirestate/core";
 import { ReactiveElement } from "lit";
 import { customElement } from "lit/decorators.js";
 
@@ -42,7 +42,7 @@ describe("ContainerProvider provision errors", () => {
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [FirstProvisionService, FailingProvisionService],
       onError: onError,
     });

@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { Container, WireScope, createContainer } from "@wirestate/core";
+import { Container, WireScope } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
 import { Optional } from "../types/general";
@@ -8,7 +8,7 @@ import { useScope } from "./use-scope";
 
 describe("useScope", () => {
   it("should return current container scope", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     let scope: Optional<WireScope> = null as Optional<WireScope>;
 
     function TestComponent() {

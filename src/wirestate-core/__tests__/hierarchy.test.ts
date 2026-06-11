@@ -1,12 +1,12 @@
 import { InjectionToken } from "../binding/tokens";
-import { Container } from "../container/container";
+import { ContainerKernel } from "../container/container-kernel";
 import { NoBindingFoundError } from "../error/no-binding-found-error";
 import { Injectable } from "../metadata/injectable";
 
-describe("Container hierarchy", () => {
+describe("ContainerKernel hierarchy", () => {
   it("should share singleton identity between parent and child containers", () => {
-    const parent = new Container();
-    const child = new Container(parent);
+    const parent = new ContainerKernel();
+    const child = new ContainerKernel(parent);
 
     @Injectable()
     class MyService {}
@@ -20,8 +20,8 @@ describe("Container hierarchy", () => {
   });
 
   it("should allow children to override parent bindings without affecting the parent", () => {
-    const parent = new Container();
-    const child = new Container(parent);
+    const parent = new ContainerKernel();
+    const child = new ContainerKernel(parent);
     const token = new InjectionToken<string>("value");
 
     parent.bind({ token: token, value: "parent" });
@@ -32,16 +32,16 @@ describe("Container hierarchy", () => {
   });
 
   it("should expose the parent container", () => {
-    const parent = new Container();
-    const child = new Container(parent);
+    const parent = new ContainerKernel();
+    const child = new ContainerKernel(parent);
 
     expect(child.parent).toBe(parent);
     expect(parent.parent).toBeUndefined();
   });
 
   it("should distinguish own bindings from inherited bindings", () => {
-    const parent = new Container();
-    const child = new Container(parent);
+    const parent = new ContainerKernel();
+    const child = new ContainerKernel(parent);
     const token = new InjectionToken<string>("value");
 
     parent.bind({ token: token, value: "parent" });
@@ -56,8 +56,8 @@ describe("Container hierarchy", () => {
   });
 
   it("should not deactivate parent-owned values when a child unbinds", () => {
-    const parent = new Container();
-    const child = new Container(parent);
+    const parent = new ContainerKernel();
+    const child = new ContainerKernel(parent);
     const onDeactivated = jest.fn();
 
     @Injectable()
@@ -75,7 +75,7 @@ describe("Container hierarchy", () => {
 
 describe("Explicit bindings", () => {
   it("should not resolve unbound classes", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
 
     class MyService {}
 
@@ -84,7 +84,7 @@ describe("Explicit bindings", () => {
   });
 
   it("should resolve explicit bindings", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
 
     @Injectable()
     class MyService {}
@@ -95,8 +95,8 @@ describe("Explicit bindings", () => {
   });
 
   it("should not resolve unbound classes in child containers", () => {
-    const parent = new Container();
-    const child = new Container(parent);
+    const parent = new ContainerKernel();
+    const child = new ContainerKernel(parent);
 
     class MyService {}
 

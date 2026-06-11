@@ -1,6 +1,7 @@
 import type { Identifier } from "../binding/tokens";
 
 import type { Container } from "./container";
+import type { ContainerKernel } from "./container-kernel";
 import type { ProvisionId } from "./wire-status";
 
 /**
@@ -19,7 +20,7 @@ export type ContainerProvisionLifecycle = Map<Container, Array<object>>;
  * @internal
  */
 export const UNBIND_INTERCEPTOR_REMOVERS: WeakMap<
-  Container,
+  ContainerKernel,
   Map<ContainerProvisionLifecycle, () => void>
 > = new WeakMap();
 
@@ -28,7 +29,10 @@ export const UNBIND_INTERCEPTOR_REMOVERS: WeakMap<
  *
  * @internal
  */
-export const PROVISION_LIFECYCLES_BY_CONTAINER: WeakMap<Container, Set<ContainerProvisionLifecycle>> = new WeakMap();
+export const PROVISION_LIFECYCLES_BY_CONTAINER: WeakMap<
+  ContainerKernel,
+  Set<ContainerProvisionLifecycle>
+> = new WeakMap();
 
 /**
  * Internal storage for provider lifecycle tokens represented by an instance.
@@ -50,7 +54,7 @@ export const PROVISION_IDS_BY_INSTANCE: WeakMap<object, ProvisionId> = new WeakM
  * Tri-state: `true` while provider-owned, `false` after deprovisioning, and
  * absent for containers that never entered provider ownership.
  */
-const PROVISION_STATUS_BY_CONTAINER: WeakMap<Container, boolean> = new WeakMap();
+const PROVISION_STATUS_BY_CONTAINER: WeakMap<ContainerKernel, boolean> = new WeakMap();
 
 /**
  * Stores the provider ownership state for a container.
@@ -58,10 +62,10 @@ const PROVISION_STATUS_BY_CONTAINER: WeakMap<Container, boolean> = new WeakMap()
  * @group Container
  * @internal
  *
- * @param container - Container entering or leaving provider ownership.
+ * @param container - ContainerKernel entering or leaving provider ownership.
  * @param provisioned - `true` when provisioned, `false` when deprovisioned.
  */
-export function setContainerProvisioned(container: Container, provisioned: boolean): void {
+export function setContainerProvisioned(container: ContainerKernel, provisioned: boolean): void {
   PROVISION_STATUS_BY_CONTAINER.set(container, provisioned);
 }
 
@@ -71,9 +75,9 @@ export function setContainerProvisioned(container: Container, provisioned: boole
  * @group Container
  * @internal
  *
- * @param container - Container whose ownership state is reset.
+ * @param container - ContainerKernel whose ownership state is reset.
  */
-export function clearContainerProvisionStatus(container: Container): void {
+export function clearContainerProvisionStatus(container: ContainerKernel): void {
   PROVISION_STATUS_BY_CONTAINER.delete(container);
 }
 
@@ -83,10 +87,10 @@ export function clearContainerProvisionStatus(container: Container): void {
  * @group Container
  * @internal
  *
- * @param container - Container to inspect.
+ * @param container - ContainerKernel to inspect.
  * @returns `true` while provider-owned, `false` after deprovisioning, or
  * `undefined` when the container never entered provider ownership.
  */
-export function getContainerProvisionStatus(container: Container): boolean | undefined {
+export function getContainerProvisionStatus(container: ContainerKernel): boolean | undefined {
   return PROVISION_STATUS_BY_CONTAINER.get(container);
 }

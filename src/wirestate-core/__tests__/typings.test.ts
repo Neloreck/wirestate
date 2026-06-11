@@ -3,7 +3,7 @@
 
 import type { FactoryBindingDescriptor, InstanceBindingDescriptor, ValueBindingDescriptor } from "../binding/binding";
 import { InjectionToken } from "../binding/tokens";
-import { Container } from "../container/container";
+import { ContainerKernel } from "../container/container-kernel";
 import { inject } from "../container/context";
 import { Injectable } from "../metadata/injectable";
 
@@ -95,7 +95,7 @@ describe("Type-safety", () => {
     const TOKEN2 = new InjectionToken<number>("token2");
 
     it("bind()", () => {
-      const container = new Container();
+      const container = new ContainerKernel();
 
       container.bind({ token: FooService, type: "Instance", value: FooChildService });
       container.bind({ token: FooChildService, type: "Instance", value: FooChildService });
@@ -116,7 +116,7 @@ describe("Type-safety", () => {
     const SOME_NUMBER = new InjectionToken<number>("SOME_NUMBER");
     const SOME_STRING = new InjectionToken<string>("SOME_STRING");
 
-    const container = new Container();
+    const container = new ContainerKernel();
 
     container.bind({ token: SOME_NUMBER, value: 3 });
     // @ts-expect-error

@@ -2,7 +2,6 @@ import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { Container } from "../container/container";
 import { deprovisionContainer, provisionContainer } from "../container/container-provision-lifecycle";
-import { createContainer } from "../container/create-container";
 import { ContainerProvisionLifecycle } from "../container/provision-state";
 
 describe("container unbind deprovision", () => {
@@ -12,7 +11,7 @@ describe("container unbind deprovision", () => {
 
   it("should unbind a token and remove the container's own binding", () => {
     const { LifecycleService } = createLifecycleService();
-    const container: Container = createContainer({
+    const container: Container = new Container({
       activate: false,
       bindings: [LifecycleService],
     });
@@ -31,7 +30,7 @@ describe("container unbind deprovision", () => {
 
   it("should unbind all tokens and clear the container's own bindings", () => {
     const { LifecycleService } = createLifecycleService();
-    const container: Container = createContainer({
+    const container: Container = new Container({
       activate: false,
       bindings: [LifecycleService, { token: "CONFIG", value: "config-value" }],
     });
@@ -54,7 +53,7 @@ describe("container unbind deprovision", () => {
     const { LifecycleService, events } = createLifecycleService({
       methods: ["provision", "deprovision", "deactivation"],
     });
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [LifecycleService],
     });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
@@ -85,7 +84,7 @@ describe("container unbind deprovision", () => {
       methods: ["provision", "deprovision", "deactivation"],
       suffix: "b",
     });
-    const container: Container = createContainer({ bindings: [ServiceA, ServiceB] });
+    const container: Container = new Container({ bindings: [ServiceA, ServiceB] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle);
@@ -106,7 +105,7 @@ describe("container unbind deprovision", () => {
     const events: Array<string> = [];
     const { LifecycleService: ServiceA } = createLifecycleService({ events, suffix: "a" });
     const { LifecycleService: ServiceB } = createLifecycleService({ events, suffix: "b" });
-    const container: Container = createContainer({ bindings: [ServiceA, ServiceB] });
+    const container: Container = new Container({ bindings: [ServiceA, ServiceB] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle);
@@ -130,7 +129,7 @@ describe("container unbind deprovision", () => {
   it("should deprovision a provisioned instance on raw unbind and not re-deprovision afterwards", () => {
     const { LifecycleService, events } = createLifecycleService();
 
-    const container: Container = createContainer({ bindings: [LifecycleService] });
+    const container: Container = new Container({ bindings: [LifecycleService] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle);

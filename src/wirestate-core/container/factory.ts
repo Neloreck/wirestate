@@ -4,7 +4,7 @@ import { toString } from "../binding/tokens";
 import { CircularDependencyError } from "../error/circular-dependency-error";
 import { assertNever } from "../utils/asserts";
 
-import type { Container } from "./container";
+import type { ContainerKernel } from "./container-kernel";
 
 /**
  * Constructs values for binding descriptors, tracking the chain of descriptors
@@ -16,7 +16,7 @@ export class Factory {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private readonly underConstruction: Array<BindingDescriptor<any>> = [];
 
-  public constructor(private readonly container: Container) {}
+  public constructor(private readonly container: ContainerKernel) {}
 
   /**
    * Constructs the value for a binding descriptor.

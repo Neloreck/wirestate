@@ -4,7 +4,6 @@ import { Injectable } from "../metadata/injectable";
 
 import { Container } from "./container";
 import { provisionContainer } from "./container-provision-lifecycle";
-import { createContainer } from "./create-container";
 import { ContainerProvisionLifecycle } from "./provision-state";
 
 describe("provision lifecycle errors", () => {
@@ -24,7 +23,7 @@ describe("provision lifecycle errors", () => {
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [FailingProvisionService],
       onError,
     });
@@ -90,7 +89,7 @@ describe("provision lifecycle errors", () => {
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [FirstProvisionService, FailingProvisionService, ThirdProvisionService],
       onError,
     });
@@ -123,7 +122,7 @@ describe("provision lifecycle errors", () => {
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [AsyncFailingProvisionService],
       onError,
     });

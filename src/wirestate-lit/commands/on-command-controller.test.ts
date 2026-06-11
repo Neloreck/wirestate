@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { CommandBus, Container, createContainer } from "@wirestate/core";
+import { CommandBus, Container } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
@@ -79,7 +79,7 @@ describe("OnCommandController", () => {
     const COMMAND: string = "TEST_COMMAND";
 
     const firstBus: CommandBus = firstContainer.get(CommandBus);
-    const secondContainer: Container = createContainer();
+    const secondContainer: Container = new Container();
     const secondBus: CommandBus = secondContainer.get(CommandBus);
 
     const element: TestConsumerElement = new TestConsumerElement();

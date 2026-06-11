@@ -40,9 +40,9 @@ interface EventSubscription {
  *
  * @example
  * ```typescript
- * import { EventBus, createContainer } from "@wirestate/core";
+ * import { EventBus, Container } from "@wirestate/core";
  *
- * const container = createContainer();
+ * const container = new Container();
  * const bus = container.get(EventBus);
  * const unsubscribe = bus.subscribe((event) => console.log(event.type));
  *

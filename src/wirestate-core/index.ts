@@ -16,44 +16,40 @@ export {
 } from "./binding/binding";
 export { Identifier, InjectionToken } from "./binding/tokens";
 
-export { Container } from "./container/container";
-export { inject } from "./container/context";
-
-export { Injectable, isInjectable } from "./metadata/injectable";
-
-export { Newable } from "./utils/class-like";
-
-export { CircularDependencyError } from "./error/circular-dependency-error";
-export { NoBindingFoundError } from "./error/no-binding-found-error";
-
-export { OnActivated } from "./lifecycle/on-activated";
-export { OnDeactivation } from "./lifecycle/on-deactivation";
-export { OnDeprovision } from "./lifecycle/on-deprovision";
-export { OnProvision } from "./lifecycle/on-provision";
-
 export { OnCommand, OnCommandHandlerDecorator } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";
 
-export { createContainer, ContainerConfig, CreateContainerOptions } from "./container/create-container";
+export { Container, ContainerConfig, ContainerOptions } from "./container/container";
+export { inject } from "./container/context";
+export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "./container/seeds";
 export { deprovisionContainer, provisionContainer } from "./container/container-provision-lifecycle";
 export { ContainerProvisionLifecycle } from "./container/provision-state";
 export { ProvisionId, WireStatus } from "./container/wire-status";
 export { validateContainerConfig } from "./container/validate-container-config";
 export { WireScope } from "./container/wire-scope";
 
+export { CircularDependencyError } from "./error/circular-dependency-error";
+export { NoBindingFoundError } from "./error/no-binding-found-error";
 export { WirestateError } from "./error/wirestate-error";
 export { defaultInternalErrorHandler } from "./error/internal-error-handler";
 
 export { OnEvent, OnEventHandlerDecorator } from "./events/on-event";
 export { EventBus } from "./events/event-bus";
 
+export { OnActivated } from "./lifecycle/on-activated";
+export { OnDeactivation } from "./lifecycle/on-deactivation";
+export { OnDeprovision } from "./lifecycle/on-deprovision";
+export { OnProvision } from "./lifecycle/on-provision";
+
+export { Injectable, isInjectable } from "./metadata/injectable";
+
 export { QueryBus } from "./queries/query-bus";
 export { OnQuery, OnQueryHandlerDecorator } from "./queries/on-query";
-
-export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "./container/seeds";
 
 export { CommandHandler, CommandType, CommandUnregister } from "./types/commands";
 export { InternalErrorHandler, InternalErrorDescriptor, InternalErrorSource } from "./types/error";
 export { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "./types/events";
 export { QueryHandler, QueryType, QueryUnregister } from "./types/queries";
 export { SeedsMap, SeedBindings, SeedBinding, SeedKey } from "./types/seeds";
+
+export { Newable } from "./utils/class-like";

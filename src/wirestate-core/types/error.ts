@@ -1,4 +1,4 @@
-import type { Container } from "../container/container";
+import type { ContainerKernel } from "../container/container-kernel";
 
 import { WireEvent } from "./events";
 
@@ -22,9 +22,9 @@ export type InternalErrorSource =
  */
 export interface InternalErrorDescriptor {
   /**
-   * Container that owns the failed internal work.
+   * ContainerKernel that owns the failed internal work.
    */
-  readonly container?: Container;
+  readonly container?: ContainerKernel;
 
   /**
    * Extra values printed between the message and error by the default handler.

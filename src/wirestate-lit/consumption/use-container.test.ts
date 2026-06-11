@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
@@ -11,7 +11,7 @@ describe("useContainer", () => {
   let container: Container;
 
   beforeEach(() => {
-    container = createContainer();
+    container = new Container();
     fixture = createLitProvision(container);
   });
 
@@ -33,7 +33,7 @@ describe("useContainer", () => {
   });
 
   it("should update the active container when parent context changes", () => {
-    const nextContainer: Container = createContainer();
+    const nextContainer: Container = new Container();
 
     @customElement("test-use-container-updates-element")
     class TestElement extends ReactiveElement {

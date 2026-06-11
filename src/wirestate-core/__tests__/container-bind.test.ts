@@ -12,7 +12,6 @@ import { CommandBus } from "../commands/command-bus";
 import { OnCommand } from "../commands/on-command";
 import { Container } from "../container/container";
 import { inject } from "../container/context";
-import { createContainer } from "../container/create-container";
 import { WireScope } from "../container/wire-scope";
 import { WireStatus } from "../container/wire-status";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
@@ -27,7 +26,7 @@ import { AnyObject, Optional } from "../types/general";
 
 describe("container.bind", () => {
   it("should bind a class directly", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const result: Container = container.bind(GenericService);
 
     expect(result).toBe(container);
@@ -37,7 +36,7 @@ describe("container.bind", () => {
   it("should bind a value descriptor", () => {
     const TOKEN: unique symbol = Symbol("config");
 
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const result: Container = container.bind({
       token: TOKEN,
       value: { key: "value" },
@@ -49,7 +48,7 @@ describe("container.bind", () => {
   });
 
   it("should bind a value when type is undefined", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const TOKEN: unique symbol = Symbol("config");
 
     container.bind({ token: TOKEN, value: 42 });
@@ -58,7 +57,7 @@ describe("container.bind", () => {
   });
 
   it("should bind a factory descriptor", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const TOKEN: unique symbol = Symbol("dynamic");
 
     let callCount: number = 0;
@@ -80,7 +79,7 @@ describe("container.bind", () => {
   });
 
   it("should bind descriptors with string literal type and scope", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const TOKEN: unique symbol = Symbol("literal-factory");
 
     const descriptor: FactoryBindingDescriptor = {
@@ -99,7 +98,7 @@ describe("container.bind", () => {
   });
 
   it("should bind an instance descriptor", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
 
     container.bind({
       type: BindingType.Instance,
@@ -111,7 +110,7 @@ describe("container.bind", () => {
   });
 
   it("should bind an instance descriptor to its descriptor token", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const TOKEN: unique symbol = Symbol("token");
     const binding: BindingDescriptor = {
       type: BindingType.Instance,
@@ -127,7 +126,7 @@ describe("container.bind", () => {
   });
 
   it("should throw for instance descriptor without token", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const binding = {
       type: BindingType.Instance,
       value: GenericService,
@@ -138,7 +137,7 @@ describe("container.bind", () => {
   });
 
   it("should throw for instance descriptor with unknown scope", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const binding = {
       type: BindingType.Instance,
       token: GenericService,
@@ -151,7 +150,7 @@ describe("container.bind", () => {
   });
 
   it("should throw for unknown type", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const binding = {
       type: "UNKNOWN",
       token: GenericService,
@@ -163,7 +162,7 @@ describe("container.bind", () => {
   });
 
   it("should throw for removed ServiceRedirection type", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const binding = {
       type: "ServiceRedirection",
       token: "redirected",
@@ -175,7 +174,7 @@ describe("container.bind", () => {
   });
 
   it("should throw for missing descriptor token", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const binding = { value: "my-value" } as unknown as BindingDescriptor;
 
     expect(() => container.bind(binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
@@ -183,7 +182,7 @@ describe("container.bind", () => {
   });
 
   it("should throw for unknown scope", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
 
     expect(() =>
       container.bind({
@@ -202,7 +201,7 @@ describe("container.bind", () => {
   });
 
   it("should throw for descriptors without value or factory", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
 
     expect(() =>
       container.bind({
@@ -219,7 +218,7 @@ describe("container.bind", () => {
   });
 
   it("should throw for factory descriptor with invalid factory", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
 
     expect(() =>
       container.bind({
@@ -285,7 +284,7 @@ describe("container.bind", () => {
     }
 
     it("should bind instances and handle lifecycle", async () => {
-      const container: Container = createContainer();
+      const container: Container = new Container();
 
       const result: Container = container.bind(GenericService);
 
@@ -329,7 +328,7 @@ describe("container.bind", () => {
     });
 
     it("should skip activation hooks while keeping message decorators wired", () => {
-      const container: Container = createContainer();
+      const container: Container = new Container();
 
       container.bind({ token: GenericService, type: "Instance", value: GenericService, skipActivationHooks: true });
 
@@ -363,7 +362,7 @@ describe("container.bind", () => {
     });
 
     it("should throw for instance descriptor without constructor value", () => {
-      const container: Container = createContainer();
+      const container: Container = new Container();
       const binding = {
         type: BindingType.Instance,
         token: GenericService,
@@ -377,7 +376,7 @@ describe("container.bind", () => {
     });
 
     it("should throw for instance descriptor without token", () => {
-      const container: Container = createContainer();
+      const container: Container = new Container();
       const binding = {
         type: BindingType.Instance,
         value: GenericService,
@@ -390,7 +389,7 @@ describe("container.bind", () => {
     });
 
     it("should throw for instance descriptor with unknown scope", () => {
-      const container: Container = createContainer();
+      const container: Container = new Container();
       const binding = {
         type: BindingType.Instance,
         token: GenericService,
@@ -407,7 +406,7 @@ describe("container.bind", () => {
     it("should handle async @OnActivated and catch errors", async () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-      const container: Container = createContainer();
+      const container: Container = new Container();
 
       container.bind(AsyncFailService);
 
@@ -434,7 +433,7 @@ describe("container.bind", () => {
     it("should throw on failing @OnActivated methods without failing resolution", () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-      const container: Container = createContainer();
+      const container: Container = new Container();
 
       container.bind(SyncFailActivationService);
 
@@ -445,7 +444,7 @@ describe("container.bind", () => {
 
     it("should report sync @OnActivated errors to container error handler before rethrowing", () => {
       const onError = jest.fn();
-      const container: Container = createContainer({
+      const container: Container = new Container({
         onError,
       });
 
@@ -502,7 +501,7 @@ describe("container.bind", () => {
       }
 
       const onError = jest.fn();
-      const container: Container = createContainer({ onError });
+      const container: Container = new Container({ onError });
 
       container.bind(SyncFailActivationWithHandlersService);
 
@@ -537,7 +536,7 @@ describe("container.bind", () => {
     it("should catch and log failing @OnDeactivation methods while preserving cleanup", () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-      const container: Container = createContainer();
+      const container: Container = new Container();
 
       container.bind(SyncFailDeactivationService);
 
@@ -572,7 +571,7 @@ describe("container.bind", () => {
 
     it("should report async @OnActivated errors to container error handler", async () => {
       const onError = jest.fn();
-      const container: Container = createContainer({
+      const container: Container = new Container({
         activate: true,
         bindings: [AsyncFailService],
         onError,
@@ -594,7 +593,7 @@ describe("container.bind", () => {
 
     it("should keep configured error handler available during container cleanup", () => {
       const onError = jest.fn();
-      const container: Container = createContainer({
+      const container: Container = new Container({
         activate: true,
         bindings: [SyncFailDeactivationService],
 
@@ -625,7 +624,7 @@ describe("container.bind", () => {
         }
       }
 
-      const container: Container = createContainer({
+      const container: Container = new Container({
         activate: true,
         bindings: [FailingEventService],
         onError,
@@ -658,7 +657,7 @@ describe("container.bind", () => {
         }
       }
 
-      const container: Container = createContainer({
+      const container: Container = new Container({
         activate: true,
         bindings: [MultiDecoratedService],
       });
@@ -676,7 +675,7 @@ describe("container.bind", () => {
     });
 
     it("should handle non-function @OnQuery or @OnActivated properties during activation", () => {
-      const container: Container = createContainer();
+      const container: Container = new Container();
 
       container.bind(CorruptedService);
 

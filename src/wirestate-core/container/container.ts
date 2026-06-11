@@ -1,370 +1,188 @@
-import { BindingDescriptor } from "../binding/binding";
-import { isInstanceDescriptor } from "../binding/binding-guards";
-import { getBindingLifecycle, getBindingScope } from "../binding/binding-lifecycle";
-import { Identifier } from "../binding/tokens";
-import { NoBindingFoundError } from "../error/no-binding-found-error";
-import { Newable } from "../utils/class-like";
+import { dbg } from "@/macroses/dbg.macro";
+import { prefix } from "@/macroses/prefix.macro";
 
-import { ActivationRecord, BindingMap, InstanceMap } from "./binding-storage";
-import { injectionContext } from "./context";
-import { Factory } from "./factory";
-import { activateInstance, deactivateInstance, rollbackInstanceActivation } from "./instance-lifecycle";
-import { validateBinding } from "./validate-binding";
+import { Bindings } from "../binding/binding";
+import { Identifier } from "../binding/tokens";
+import { CommandBus } from "../commands/command-bus";
+import { getConfiguredInternalErrorHandler, setInternalErrorHandler } from "../error/internal-error-handler";
+import { EventBus } from "../events/event-bus";
+import { QueryBus } from "../queries/query-bus";
+import { InternalErrorHandler } from "../types/error";
+import { AnyObject, Maybe } from "../types/general";
+import { SeedBindings, SeedsMap } from "../types/seeds";
+
+import { ContainerKernel } from "./container-kernel";
+import { getBindingToken } from "./get-binding-token";
+import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
+import { applySkipActivationHooks } from "./skip-activation-hooks";
+import { validateContainerConfig } from "./validate-container-config";
+import { WireScope } from "./wire-scope";
 
 /**
- * Intercepts container unbind operations before any value is deactivated.
+ * Describes reusable {@link Container} construction config.
  *
- * @remarks
- * Interceptors let external orchestration, such as provider deprovisioning,
- * run ahead of binding deactivation without the container importing it.
+ * @group Container
  */
-export interface UnbindInterceptor {
+export interface ContainerConfig {
   /**
-   * Called before a token's container-owned values are deactivated by {@link Container.unbind}.
-   *
-   * @param token - Token being unbound.
+   * Bindings to resolve immediately.
    */
-  onUnbind?(token: Identifier<unknown>): void;
+  readonly activate?: boolean | ReadonlyArray<Identifier>;
 
   /**
-   * Called exactly once before container-owned values are deactivated by {@link Container.unbindAll}.
+   * Services or binding descriptors to register.
    */
-  onUnbindAll?(): void;
+  readonly bindings?: Bindings;
+
+  /**
+   * Parent container for inherited bindings.
+   */
+  readonly parent?: Container;
+
+  /**
+   * Handles isolated internal errors that Wirestate catches instead of
+   * rethrowing, such as event handler failures and lifecycle rejections.
+   */
+  readonly onError?: InternalErrorHandler;
+
+  /**
+   * Shared seed object. Read it with `scope.getSeed()` or inject `SEED`.
+   */
+  readonly seed?: AnyObject;
+
+  /**
+   * Seed values keyed by class, string, or symbol.
+   */
+  readonly seeds?: SeedBindings;
 }
 
 /**
- * A dependency injection (DI) container will keep track of all bindings
- * and hold the actual instances of your services.
+ * Describes options for {@link Container} construction.
  *
- * All bindings are explicit: services are constructed synchronously and
- * only when a binding descriptor was registered with {@link Container.bind}.
+ * @group Container
  */
-export class Container {
+export interface ContainerOptions {
   /**
-   * Parent container when this container was created as a child container.
+   * Skip binding container-scoped event, query, and command buses.
+   *
+   * @remarks
+   * A child container can still inherit buses from its parent. Without inherited
+   * buses, resolving `WireScope` fails because it depends on `EventBus`,
+   * `QueryBus`, and `CommandBus`.
+   *
+   * @default `false`
    */
-  public readonly parent?: Container;
+  readonly skipMessaging?: boolean;
 
-  private readonly bindings: BindingMap = new Map();
-  private readonly instances: InstanceMap = new Map();
-  private readonly activated: Array<ActivationRecord> = [];
-  private readonly unbindInterceptors: Array<UnbindInterceptor> = [];
-  private readonly factory: Factory;
+  /**
+   * Skip `@OnActivated` and `@OnDeactivation` hooks for class bindings.
+   *
+   * @default `false`
+   */
+  readonly skipActivationHooks?: boolean;
+}
 
-  public constructor(parent?: Container) {
-    this.parent = parent;
-    this.factory = new Factory(this);
+/**
+ * A Wirestate-ready dependency injection container.
+ *
+ * @remarks
+ * Extends the bare {@link ContainerKernel} with the Wirestate composition:
+ *
+ * @group Container
+ *
+ * @throws {@link WirestateError} If `activate` names a token missing from `bindings`.
+ *
+ * @example
+ * ```typescript
+ * import { Container, Injectable } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class LoggerService {}
+ *
+ * @Injectable()
+ * class CounterService {}
+ *
+ * const container: Container = new Container({
+ *   activate: [LoggerService],
+ *   bindings: [CounterService, LoggerService],
+ *   seeds: [[CounterService, { count: 10 }]],
+ * });
+ *
+ * const logger = container.get(LoggerService);
+ * ```
+ */
+export class Container extends ContainerKernel {
+  /**
+   * Creates a Wirestate container.
+   *
+   * @param config - Container setup config.
+   * @param options - Container creation options.
+   */
+  public constructor(config: ContainerConfig = {}, options: ContainerOptions = {}) {
+    dbg.info(prefix(__filename), "Creating container:", { config, options });
+
+    validateContainerConfig(config);
+
+    super(config.parent);
 
     this.bind({
       token: Container,
       value: this,
     });
-  }
 
-  /**
-   * Binds a service class or a binding descriptor to this container, replacing
-   * any binding previously registered for the same token.
-   *
-   * @remarks
-   * A bare class is its own token and binds as a singleton instance binding:
-   * `container.bind(MyService)` is equivalent to
-   * `container.bind({ token: MyService, type: "Instance", value: MyService })`.
-   *
-   * @param binding - Service class or binding descriptor to register.
-   * @returns The same container for chaining.
-   *
-   * @throws {@link WirestateError} If the binding is invalid or the token's existing
-   * binding already constructed values.
-   */
-  public bind<T>(binding: Newable<object> | BindingDescriptor<T>): this {
-    const descriptor: BindingDescriptor<T> =
-      typeof binding === "function"
-        ? ({ token: binding, type: "Instance", value: binding } as unknown as BindingDescriptor<T>)
-        : binding;
-    const token = descriptor?.token;
+    const activate: ReadonlyArray<Identifier> =
+      (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
 
-    validateBinding(token, descriptor, this.hasConstructedBinding(token));
+    const errorHandler: Maybe<InternalErrorHandler> =
+      config.onError ?? getConfiguredInternalErrorHandler(config.parent);
 
-    this.bindings.set(token, descriptor);
+    this.bind({ token: Container, value: this });
 
-    return this;
-  }
+    // Merge with parent seeds map.
+    const seeds = new Map(
+      config.parent?.has(SEEDS_TOKEN) ? (config.parent.get<SeedsMap>(SEEDS_TOKEN) ?? []) : []
+    ) as SeedsMap;
 
-  /**
-   * Unbinds a token, deactivating every container-owned value it constructed.
-   * Unbind interceptors run first, so deprovision orchestration precedes deactivation.
-   *
-   * @param token - Token to unbind.
-   * @returns The same container for chaining.
-   */
-  public unbind<T>(token: Identifier<T>): this {
-    for (const interceptor of [...this.unbindInterceptors]) {
-      interceptor.onUnbind?.(token);
-    }
-
-    this.deactivate(token);
-
-    const binding = this.bindings.get(token);
-
-    if (binding) {
-      this.instances.delete(binding);
-    }
-
-    this.bindings.delete(token);
-
-    return this;
-  }
-
-  /**
-   * Unbinds all bindings, deactivating container-owned values in creation order.
-   * Unbind interceptors run first, so deprovision orchestration precedes
-   * deactivation. Bindings stay resolvable until every deactivation handler has
-   * run, so deactivating services can still talk to each other.
-   *
-   * @returns The same container for chaining.
-   */
-  public unbindAll(): this {
-    for (const interceptor of [...this.unbindInterceptors]) {
-      interceptor.onUnbindAll?.();
-    }
-
-    for (const record of [...this.activated]) {
-      this.deactivateRecord(record);
-    }
-
-    this.activated.length = 0;
-    this.bindings.clear();
-    this.instances.clear();
-
-    return this;
-  }
-
-  /**
-   * Registers an interceptor invoked before {@link Container.unbind} and
-   * {@link Container.unbindAll} deactivate container-owned values.
-   *
-   * @param interceptor - Interceptor to register.
-   * @returns A callback removing the interceptor.
-   */
-  public addUnbindInterceptor(interceptor: UnbindInterceptor): () => void {
-    this.unbindInterceptors.push(interceptor);
-
-    return () => {
-      const index = this.unbindInterceptors.indexOf(interceptor);
-
-      if (index !== -1) {
-        this.unbindInterceptors.splice(index, 1);
-      }
-    };
-  }
-
-  /**
-   * Retrieves a service from this container.
-   *
-   * Resolution options can make a lookup optional or lazy. Optional lookups
-   * resolve `undefined` instead of throwing. Lazy lookups return a thunk that
-   * resolves on first call.
-   *
-   * @param token - Token to resolve.
-   * @returns The resolved value, thunk, or `undefined` for optional misses.
-   *
-   * @throws {@link NoBindingFoundError} If the token is not bound and not optional.
-   */
-  public get<T>(token: Identifier<T>): T;
-  public get<T>(token: Identifier<T>, options: { optional: true }): T | undefined;
-  public get<T>(token: Identifier<T>, options: { lazy: true }): () => T;
-  public get<T>(token: Identifier<T>, options: { lazy: true; optional: true }): () => T | undefined;
-  public get<T>(token: Identifier<T>, options?: { optional?: boolean; lazy?: false }): T | undefined;
-  public get<T>(
-    token: Identifier<T>,
-    options?: { optional?: boolean; lazy?: boolean }
-  ): T | undefined | (() => T | undefined);
-  public get<T>(
-    token: Identifier<T>,
-    options?: { optional?: boolean; lazy?: boolean }
-  ): T | undefined | (() => T | undefined) {
-    const lazy = options?.lazy ?? false;
-
-    if (lazy) {
-      return () => this.get(token, { ...options, lazy: false });
-    }
-
-    const binding = this.bindings.get(token);
-
-    if (!binding) {
-      if (this.parent) {
-        return this.parent.get(token, { ...options, lazy: false });
-      }
-
-      if (options?.optional) {
-        return undefined;
-      }
-
-      throw new NoBindingFoundError(token);
-    }
-
-    return injectionContext(this).run(() => this.resolve(binding));
-  }
-
-  /**
-   * Returns whether this container or one of its parents has a binding for this token.
-   *
-   * @param token - Token to check.
-   * @returns Whether the token can be resolved from this container.
-   */
-  public has<T>(token: Identifier<T>): boolean {
-    return this.bindings.has(token) || (this.parent?.has(token) ?? false);
-  }
-
-  /**
-   * Returns whether this container itself has a binding for this token,
-   * ignoring parent containers.
-   *
-   * @param token - Token to check.
-   * @returns Whether this container owns a binding for the token.
-   */
-  public hasOwn<T>(token: Identifier<T>): boolean {
-    return this.bindings.has(token);
-  }
-
-  /**
-   * Returns the binding descriptors registered on this container in registration order,
-   * ignoring parent containers.
-   *
-   * @returns Snapshot of this container's own binding descriptors.
-   */
-  public getOwnBindings(): ReadonlyArray<BindingDescriptor<unknown>> {
-    return Array.from(this.bindings.values());
-  }
-
-  /**
-   * Returns the service instances this container constructed for instance bindings,
-   * in creation order. Values constructed for value and factory bindings are not
-   * service instances and are not included.
-   *
-   * @returns Snapshot of this container's active service instances.
-   */
-  public getActiveInstances(): ReadonlyArray<object> {
-    const instances: Array<object> = [];
-
-    for (const record of this.activated) {
-      if (isInstanceDescriptor(record.binding)) {
-        instances.push(record.instance as object);
+    if (config.seeds) {
+      for (const [key, value] of config.seeds) {
+        seeds.set(key, value);
       }
     }
 
-    return instances;
-  }
+    this.bind({ token: SEEDS_TOKEN, value: seeds });
 
-  /**
-   * Resolves the value for a binding descriptor, applying scope caching, activation
-   * hooks, and instance lifecycle wiring.
-   *
-   * @param binding - Binding descriptor to resolve.
-   * @returns The resolved value.
-   */
-  private resolve<T>(binding: BindingDescriptor<T>): T {
-    if (getBindingScope(binding) === "Transient") {
-      return this.activate(binding, this.factory.construct(binding));
+    // Fallback to parent config as default value.
+    this.bind({
+      token: SEED_TOKEN,
+      value: config.seed ?? (config.parent?.has(SEED_TOKEN) ? (config.parent.get<AnyObject>(SEED_TOKEN) ?? {}) : {}),
+    });
+
+    this.bind({
+      token: WireScope,
+      scope: "Transient",
+      factory: (): WireScope => new WireScope(this),
+    });
+
+    if (errorHandler) {
+      setInternalErrorHandler(this, errorHandler);
     }
 
-    if (this.instances.has(binding)) {
-      return this.instances.get(binding) as T;
+    if (!options.skipMessaging) {
+      this.bind({ token: EventBus, value: new EventBus(this) });
+      this.bind({ token: QueryBus, value: new QueryBus() });
+      this.bind({ token: CommandBus, value: new CommandBus() });
     }
 
-    const record: ActivationRecord = {
-      token: binding.token,
-      binding,
-      instance: this.factory.construct(binding),
-      disposers: [],
-    };
+    dbg.info(prefix(__filename), "Injecting bindings on creation:", { container: this, config, options });
 
-    if (isInstanceDescriptor(binding)) {
-      try {
-        activateInstance(this, record);
-
-        record.instance = this.activate(binding, record.instance as T);
-      } catch (error) {
-        rollbackInstanceActivation(this, record);
-
-        throw error;
+    if (config.bindings) {
+      for (const binding of config.bindings) {
+        this.bind(applySkipActivationHooks(binding, options.skipActivationHooks));
       }
-    } else {
-      record.instance = this.activate(binding, record.instance as T);
     }
 
-    this.commit(record);
-
-    return record.instance as T;
-  }
-
-  /**
-   * Runs the binding activation hook for a freshly constructed value.
-   *
-   * @param binding - Binding descriptor that constructed the value.
-   * @param instance - Constructed value.
-   * @returns The constructed value, or its replacement returned by the hook.
-   */
-  private activate<T>(binding: BindingDescriptor<T>, instance: T): T {
-    const handler = getBindingLifecycle(binding).onActivated;
-
-    if (!handler) {
-      return instance;
+    for (const binding of activate) {
+      this.get(binding);
     }
-
-    const replaced = handler(instance, this) as T | undefined;
-
-    return replaced === undefined ? instance : replaced;
-  }
-
-  /**
-   * Caches the singleton value of a binding descriptor and records it for later deactivation.
-   *
-   * @param record - Activation record holding the constructed value.
-   */
-  private commit(record: ActivationRecord): void {
-    this.instances.set(record.binding, record.instance);
-    this.activated.push(record);
-  }
-
-  /**
-   * Deactivates all container-owned values of a token in creation order.
-   *
-   * @param token - Token to deactivate.
-   */
-  private deactivate<T>(token: Identifier<T>): void {
-    const records = this.activated.filter((record) => record.token === token);
-
-    for (const record of records) {
-      this.deactivateRecord(record);
-
-      this.activated.splice(this.activated.indexOf(record), 1);
-    }
-  }
-
-  /**
-   * Deactivates one container-owned value: the user deactivation hook runs first,
-   * then instance bindings run Wirestate lifecycle cleanup.
-   *
-   * @param record - Activation record being deactivated.
-   */
-  private deactivateRecord(record: ActivationRecord): void {
-    getBindingLifecycle(record.binding).onDeactivated?.(record.instance, this);
-
-    if (isInstanceDescriptor(record.binding)) {
-      deactivateInstance(this, record);
-    }
-  }
-
-  /**
-   * Checks whether the binding registered for the token has already constructed values.
-   *
-   * @param token - Token to check.
-   * @returns Whether a constructed value exists for the token.
-   */
-  private hasConstructedBinding<T>(token: Identifier<T>): boolean {
-    const binding = this.bindings.get(token);
-
-    return binding !== undefined && this.instances.has(binding);
   }
 }

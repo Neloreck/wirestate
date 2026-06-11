@@ -1,5 +1,5 @@
 import { InjectionToken } from "../binding/tokens";
-import { Container } from "../container/container";
+import { ContainerKernel } from "../container/container-kernel";
 import { inject } from "../container/context";
 import { Injectable } from "../metadata/injectable";
 
@@ -33,9 +33,9 @@ interface Foo {
   foo: string;
 }
 
-describe("Container", () => {
+describe("ContainerKernel", () => {
   it("should bind classes", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
 
     container
       .bind({
@@ -55,7 +55,7 @@ describe("Container", () => {
   });
 
   it("should allow initializer injection", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
 
     container
       .bind({ token: MyService, type: "Instance", value: MyService })
@@ -67,7 +67,7 @@ describe("Container", () => {
   });
 
   it("should not allow injection outside injection context", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
 
     container
       .bind({ token: MyService, type: "Instance", value: MyService })
@@ -79,7 +79,7 @@ describe("Container", () => {
   });
 
   it("should support all kinds of providers", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
     const factoryFn = jest.fn(() => ({ foo: "factory" }));
 
     const fooToken1 = new InjectionToken<Foo>("foo-token1");
@@ -126,7 +126,7 @@ describe("Container", () => {
       }
     }
 
-    const container = new Container();
+    const container = new ContainerKernel();
 
     container.bind({ token: Foo, type: "Instance", value: Foo }).bind({ token: Bar, type: "Instance", value: Bar });
 
@@ -136,7 +136,7 @@ describe("Container", () => {
   });
 
   it("should support symbols", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
     const OTHER_TOKEN = Symbol("other-token");
 
     container
@@ -199,7 +199,7 @@ describe("Container", () => {
       }
     }
 
-    const container = new Container();
+    const container = new ContainerKernel();
 
     container
       .bind({ token: App, type: "Instance", value: App })
@@ -250,7 +250,7 @@ describe("Container", () => {
       }
     }
 
-    const container = new Container();
+    const container = new ContainerKernel();
 
     container
       .bind({ token: Foo, type: "Instance", value: Foo })

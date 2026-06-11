@@ -1,4 +1,4 @@
-﻿import { Container } from "../container/container";
+import { ContainerKernel } from "../container/container-kernel";
 import { inject } from "../container/context";
 import { Injectable } from "../metadata/injectable";
 
@@ -17,7 +17,7 @@ describe("Bindings", () => {
   });
 
   it("Instance bindings should reject re-binding once constructed", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
 
     expect(() => container.get(MyService)).toThrow("No binding(s) found");
     expect(container.get(MyService, { optional: true })).toBeUndefined();
@@ -43,7 +43,7 @@ describe("Bindings", () => {
   });
 
   it("Instance bindings should be provided once", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
 
     expect(() => container.get(MyService)).toThrow("No binding(s) found");
     expect(container.get(MyService, { optional: true })).toBeUndefined();
@@ -65,7 +65,7 @@ describe("Bindings", () => {
   });
 
   it("Constant value bindings should be provided", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
 
     expect(() => container.get(MyService)).toThrow("No binding(s) found");
     expect(container.get(MyService, { optional: true })).toBeUndefined();
@@ -84,7 +84,7 @@ describe("Bindings", () => {
   });
 
   it("Dynamic value bindings should be provided once", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
 
     expect(() => container.get(MyService)).toThrow("No binding(s) found");
     expect(container.get(MyService, { optional: true })).toBeUndefined();
@@ -105,7 +105,7 @@ describe("Bindings", () => {
   });
 
   it("should pass the container to the factory", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
     const fooFactory = jest.fn(() => "Foo");
     const barFactory = jest.fn(() => "Bar");
 
@@ -130,40 +130,11 @@ describe("Bindings", () => {
     expect(barFactory).toHaveBeenCalledTimes(1);
   });
 
-  it("should bind the container itself", () => {
-    const container = new Container();
-
-    const fooFactory = jest.fn(() => "Foo");
-    const barFactory = jest.fn(() => "Bar");
-
-    container
-      .bind({
-        token: "foo",
-        factory: fooFactory,
-      })
-      .bind({
-        token: "bar",
-        factory: barFactory,
-      })
-      .bind({
-        token: "message",
-        factory: () => {
-          const c = inject(Container);
-
-          return `${c.get("foo")} ${c.get("bar")}`;
-        },
-      });
-
-    expect(container.get("message")).toBe("Foo Bar");
-    expect(fooFactory).toHaveBeenCalledTimes(1);
-    expect(barFactory).toHaveBeenCalledTimes(1);
-  });
-
   describe("Child containers", () => {
     it("should be able to provide services provided on one of their ancestors", () => {
-      const parent = new Container();
-      const child = new Container(parent);
-      const grandChild = new Container(child);
+      const parent = new ContainerKernel();
+      const child = new ContainerKernel(parent);
+      const grandChild = new ContainerKernel(child);
 
       parent.bind({ token: "tokenA", factory: () => ["a"] });
       child.bind({ token: "tokenB", factory: () => ["b"] });
@@ -183,9 +154,9 @@ describe("Bindings", () => {
     });
 
     it("should reuse singletons from their parent", () => {
-      const parent = new Container();
-      const child = new Container(parent);
-      const grandChild = new Container(child);
+      const parent = new ContainerKernel();
+      const child = new ContainerKernel(parent);
+      const grandChild = new ContainerKernel(child);
 
       parent.bind({ token: "tokenA", factory: () => ["a"] });
       child.bind({ token: "tokenB", factory: () => ["b"] });
@@ -204,8 +175,8 @@ describe("Bindings", () => {
     });
 
     it("should not share their services with their parent", () => {
-      const parent = new Container();
-      const child = new Container(parent);
+      const parent = new ContainerKernel();
+      const child = new ContainerKernel(parent);
 
       child.bind({ token: "tokenA", factory: () => ["a"] });
 
@@ -214,9 +185,9 @@ describe("Bindings", () => {
     });
 
     it("should keep track of their own singletons if provider was overridden", () => {
-      const parent = new Container();
-      const child = new Container(parent);
-      const grandChild = new Container(child);
+      const parent = new ContainerKernel();
+      const child = new ContainerKernel(parent);
+      const grandChild = new ContainerKernel(child);
 
       parent.bind({ token: "tokenA", factory: () => ["a1"] });
       child.bind({ token: "tokenA", factory: () => ["a2"] });
@@ -259,7 +230,7 @@ describe("Bindings", () => {
         }
       }
 
-      const container = new Container();
+      const container = new ContainerKernel();
 
       container
         .bind({ token: OtherService, type: "Instance", value: OtherService })
@@ -300,7 +271,7 @@ describe("Bindings", () => {
         }
       }
 
-      const container = new Container();
+      const container = new ContainerKernel();
 
       container.bind({ token: FooService, type: "Instance", value: FooService });
 

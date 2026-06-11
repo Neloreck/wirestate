@@ -1,5 +1,4 @@
 import { Container } from "../container/container";
-import { createContainer } from "../container/create-container";
 import { InternalErrorDescriptor } from "../types/error";
 
 import { defaultInternalErrorHandler, reportWirestateInternalError } from "./internal-error-handler";
@@ -34,7 +33,7 @@ describe("internal error handler", () => {
   it("routes to a configured container error handler instead of the default", () => {
     const onError = jest.fn();
 
-    const container: Container = createContainer({ onError });
+    const container: Container = new Container({ onError });
     const descriptor: InternalErrorDescriptor = {
       container,
       error: new Error("boom"),
@@ -56,7 +55,7 @@ describe("internal error handler", () => {
       throw handlerError;
     });
 
-    const container: Container = createContainer({ onError });
+    const container: Container = new Container({ onError });
 
     reportWirestateInternalError({
       container,

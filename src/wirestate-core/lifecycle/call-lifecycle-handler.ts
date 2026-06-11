@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { Container } from "../container/container";
+import type { ContainerKernel } from "../container/container-kernel";
 import { reportWirestateInternalError } from "../error/internal-error-handler";
 import { InternalErrorSource } from "../types/error";
 import { MaybePromise } from "../types/general";
@@ -13,9 +13,9 @@ export interface CallLifecycleHandlerOptions {
   readonly args?: ReadonlyArray<unknown>;
 
   /**
-   * Container that owns the lifecycle handler.
+   * ContainerKernel that owns the lifecycle handler.
    */
-  readonly container?: Container;
+  readonly container?: ContainerKernel;
 
   /**
    * Lifecycle name used in diagnostics.

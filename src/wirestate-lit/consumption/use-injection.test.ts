@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
@@ -11,7 +11,7 @@ describe("useInjection", () => {
   let fixture: LitProvisionFixture;
 
   beforeEach(() => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
 
     container.bind(GenericService);
 

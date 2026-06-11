@@ -14,17 +14,17 @@ import type { Maybe } from "../types/general";
 import type { QueryHandler } from "../types/queries";
 
 import type { ActivationRecord } from "./binding-storage";
-import type { Container } from "./container";
+import type { ContainerKernel } from "./container-kernel";
 import { getContainerProvisionStatus } from "./provision-state";
 import { WireStatus } from "./wire-status";
 
 /**
- * Container-maintained mapping of activated service instances to their owning containers.
+ * ContainerKernel-maintained mapping of activated service instances to their owning containers.
  *
  * Written at the container's activation commit point and cleared on deactivation,
  * so lookups never observe a partially activated instance.
  */
-const INSTANCE_CONTAINERS: WeakMap<object, Container> = new WeakMap();
+const INSTANCE_CONTAINERS: WeakMap<object, ContainerKernel> = new WeakMap();
 
 /**
  * Returns the container that activated a service instance.
@@ -32,7 +32,7 @@ const INSTANCE_CONTAINERS: WeakMap<object, Container> = new WeakMap();
  * @param instance - Resolved service instance to look up.
  * @returns The owning container, or `undefined` when the instance is not active.
  */
-export function getInstanceContainer(instance: object): Container | undefined {
+export function getInstanceContainer(instance: object): ContainerKernel | undefined {
   return INSTANCE_CONTAINERS.get(instance);
 }
 
@@ -49,11 +49,11 @@ export function getInstanceContainer(instance: object): Container | undefined {
  * Handler unregister callbacks are collected onto `record.disposers`, so a
  * failed activation can roll back with {@link rollbackInstanceActivation}.
  *
- * @param container - Container resolving the instance binding.
+ * @param container - ContainerKernel resolving the instance binding.
  * @param record - Activation record carrying the constructed instance.
  * @internal
  */
-export function activateInstance(container: Container, record: ActivationRecord): void {
+export function activateInstance(container: ContainerKernel, record: ActivationRecord): void {
   const binding: InstanceBindingDescriptor<object> = record.binding as InstanceBindingDescriptor<object>;
   const instance: object = record.instance as object;
 
@@ -90,11 +90,11 @@ export function activateInstance(container: Container, record: ActivationRecord)
  * `skipActivationHooks`, marks the {@link WireStatus} as disposed, runs the
  * collected handler disposers, and clears the instance to container mapping.
  *
- * @param container - Container that owns the activation record.
+ * @param container - ContainerKernel that owns the activation record.
  * @param record - Activation record of the instance being deactivated.
  * @internal
  */
-export function deactivateInstance(container: Container, record: ActivationRecord): void {
+export function deactivateInstance(container: ContainerKernel, record: ActivationRecord): void {
   const binding: InstanceBindingDescriptor<object> = record.binding as InstanceBindingDescriptor<object>;
   const instance: object = record.instance as object;
 
@@ -128,11 +128,11 @@ export function deactivateInstance(container: Container, record: ActivationRecor
  * before the failure, and clears the instance to container mapping. The
  * container drops the activation record, so no partial registration survives.
  *
- * @param container - Container whose activation failed.
+ * @param container - ContainerKernel whose activation failed.
  * @param record - Activation record of the instance that failed to activate.
  * @internal
  */
-export function rollbackInstanceActivation(container: Container, record: ActivationRecord): void {
+export function rollbackInstanceActivation(container: ContainerKernel, record: ActivationRecord): void {
   const instance: object = record.instance as object;
 
   unregisterInstanceStatus(instance);
@@ -148,7 +148,7 @@ export function rollbackInstanceActivation(container: Container, record: Activat
  * @param instance - Activated instance.
  * @internal
  */
-export function initializeInstanceStatus(container: Container, instance: object): void {
+export function initializeInstanceStatus(container: ContainerKernel, instance: object): void {
   const status: WireStatus = WireStatus.for(instance, { initialize: true });
 
   status.isDisposed = false;
@@ -180,11 +180,11 @@ export function unregisterInstanceStatus(instance: object): void {
  * messaging skip handler registration gracefully. Each registration's
  * unregister callback is collected into `disposers`.
  *
- * @param container - Container that owns the instance.
+ * @param container - ContainerKernel that owns the instance.
  * @param instance - Activated instance.
  * @param disposers - Collector for handler unregister callbacks.
  */
-function registerInstanceHandlers(container: Container, instance: object, disposers: Array<() => void>): void {
+function registerInstanceHandlers(container: ContainerKernel, instance: object, disposers: Array<() => void>): void {
   const dispatches: ReadonlyArray<EventDispatch> = buildEventDispatchers(instance, container);
 
   if (dispatches.length) {

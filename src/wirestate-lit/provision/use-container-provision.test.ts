@@ -1,6 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { ContainerContext } from "../context/container-context";
@@ -21,7 +21,7 @@ describe("useContainerProvider hook", () => {
   });
 
   it("should return an instance of ContainerProvider", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const element: TestProviderElement = new TestProviderElement();
     const provider: ContainerProvider = useContainerProvider(element, { container });
 
@@ -45,7 +45,7 @@ describe("useContainerProvider hook", () => {
   });
 
   it("should use the provided container", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const element: TestProviderElement = new TestProviderElement();
     const provider: ContainerProvider = useContainerProvider(element, { container });
 
@@ -61,7 +61,7 @@ describe("useContainerProvider hook", () => {
   });
 
   it("should provide IocContext to child consumers", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
     const provider: ContainerProvider = useContainerProvider(element, { container });

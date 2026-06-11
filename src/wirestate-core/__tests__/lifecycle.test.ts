@@ -1,12 +1,12 @@
 import { InjectionToken } from "../binding/tokens";
-import { Container } from "../container/container";
+import { ContainerKernel } from "../container/container-kernel";
 import { inject } from "../container/context";
 import { Injectable } from "../metadata/injectable";
 
 describe("Binding lifecycle hooks", () => {
   describe("onActivated", () => {
     it("should run once for singleton bindings with instance and container", () => {
-      const container = new Container();
+      const container = new ContainerKernel();
       const onActivated = jest.fn();
 
       @Injectable()
@@ -23,7 +23,7 @@ describe("Binding lifecycle hooks", () => {
     });
 
     it("should run for every construction of transient bindings", () => {
-      const container = new Container();
+      const container = new ContainerKernel();
       const onActivated = jest.fn();
 
       @Injectable()
@@ -38,7 +38,7 @@ describe("Binding lifecycle hooks", () => {
     });
 
     it("should replace the constructed value when returning a value", () => {
-      const container = new Container();
+      const container = new ContainerKernel();
       const token = new InjectionToken<string>("message");
 
       container.bind({
@@ -51,7 +51,7 @@ describe("Binding lifecycle hooks", () => {
     });
 
     it("should run for constant value bindings on first resolution", () => {
-      const container = new Container();
+      const container = new ContainerKernel();
       const token = new InjectionToken<object>("value");
       const onActivated = jest.fn();
       const value = {};
@@ -70,7 +70,7 @@ describe("Binding lifecycle hooks", () => {
 
   describe("onDeactivated", () => {
     it("should run on unbind for constructed singletons", () => {
-      const container = new Container();
+      const container = new ContainerKernel();
       const onDeactivated = jest.fn();
 
       @Injectable()
@@ -87,7 +87,7 @@ describe("Binding lifecycle hooks", () => {
     });
 
     it("should not run when the binding never constructed a value", () => {
-      const container = new Container();
+      const container = new ContainerKernel();
       const onDeactivated = jest.fn();
 
       @Injectable()
@@ -100,7 +100,7 @@ describe("Binding lifecycle hooks", () => {
     });
 
     it("should not run for transient values", () => {
-      const container = new Container();
+      const container = new ContainerKernel();
       const onDeactivated = jest.fn();
 
       @Injectable()
@@ -115,7 +115,7 @@ describe("Binding lifecycle hooks", () => {
     });
 
     it("should allow rebinding and reconstruction after unbind", () => {
-      const container = new Container();
+      const container = new ContainerKernel();
       const token = new InjectionToken<object>("value");
 
       container.bind({ token: token, factory: () => ({}) });
@@ -129,7 +129,7 @@ describe("Binding lifecycle hooks", () => {
     });
 
     it("should deactivate only values of the unbound token", () => {
-      const container = new Container();
+      const container = new ContainerKernel();
       const deactivations: Array<string> = [];
 
       @Injectable()
@@ -159,7 +159,7 @@ describe("Binding lifecycle hooks", () => {
     });
 
     it("should deactivate in creation order on unbindAll", () => {
-      const container = new Container();
+      const container = new ContainerKernel();
       const deactivations: Array<string> = [];
 
       @Injectable()
@@ -191,7 +191,7 @@ describe("Binding lifecycle hooks", () => {
     });
 
     it("should keep bindings resolvable while unbindAll deactivation handlers run", () => {
-      const container = new Container();
+      const container = new ContainerKernel();
       const resolved: Array<unknown> = [];
 
       @Injectable()

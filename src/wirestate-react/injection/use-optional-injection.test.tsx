@@ -1,5 +1,5 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, Identifier, createContainer } from "@wirestate/core";
+import { Container, Identifier } from "@wirestate/core";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
@@ -20,7 +20,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should return null when token is not bound", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
 
     const { getByTestId } = render(
       <ContainerProvider container={container}>
@@ -32,7 +32,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should resolve bound instance", () => {
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [GenericService],
     });
 
@@ -46,7 +46,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should use fallback when token is not bound", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const token: unique symbol = Symbol("optional-token");
 
     function FallbackComponent() {
@@ -65,7 +65,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should type fallback values separately from injection values", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const token: Identifier<string> = Symbol("optional-token");
 
     function FallbackComponent() {
@@ -84,7 +84,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should provide container to fallback", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const unboundToken: unique symbol = Symbol("unbound-token");
     const boundToken: unique symbol = Symbol("bound-token");
 
@@ -106,7 +106,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should not re-trigger resolving in fallback changes (depend only on container changes)", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const token: unique symbol = Symbol("optional-token");
 
     function FallbackComponent({ value }: { value: string }) {
@@ -133,7 +133,7 @@ describe("useOptionalInjection", () => {
   });
 
   it("should not re-resolve bound token when fallback changes", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const token: unique symbol = Symbol("optional-token");
     const originalGet = container.get.bind(container);
     let resolveCount = 0;

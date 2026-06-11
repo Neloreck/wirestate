@@ -1,10 +1,10 @@
 import { InjectionToken } from "../binding/tokens";
-import { Container } from "../container/container";
+import { ContainerKernel } from "../container/container-kernel";
 import { Injectable } from "../metadata/injectable";
 
 describe("Binding scopes", () => {
   it("should default to singleton scope for instance bindings", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
 
     @Injectable()
     class MyService {}
@@ -15,7 +15,7 @@ describe("Binding scopes", () => {
   });
 
   it("should construct transient instance bindings on every resolution", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
     const constructed = jest.fn();
 
     @Injectable()
@@ -35,7 +35,7 @@ describe("Binding scopes", () => {
   });
 
   it("should construct transient dynamic value bindings on every resolution", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
     const token = new InjectionToken<{ id: number }>("counter");
 
     let id = 0;
@@ -51,7 +51,7 @@ describe("Binding scopes", () => {
   });
 
   it("should keep singleton scope when requested explicitly", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
     const token = new InjectionToken<object>("singleton");
 
     container.bind({ token: token, scope: "Singleton", factory: () => ({}) });
@@ -60,8 +60,8 @@ describe("Binding scopes", () => {
   });
 
   it("should resolve transient parent bindings through child containers", () => {
-    const parent = new Container();
-    const child = new Container(parent);
+    const parent = new ContainerKernel();
+    const child = new ContainerKernel(parent);
 
     @Injectable()
     class MyService {}
@@ -72,7 +72,7 @@ describe("Binding scopes", () => {
   });
 
   it("should not block rebinding for transient bindings", () => {
-    const container = new Container();
+    const container = new ContainerKernel();
     const token = new InjectionToken<string>("value");
 
     container.bind({ token: token, scope: "Transient", factory: () => "first" });
