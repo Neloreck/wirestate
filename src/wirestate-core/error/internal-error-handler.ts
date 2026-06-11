@@ -1,7 +1,11 @@
 import type { Container } from "../container/container";
-import { WIRESTATE_INTERNAL_ERROR_HANDLERS } from "../registry";
 import { InternalErrorDescriptor, InternalErrorHandler } from "../types/error";
 import { Maybe } from "../types/general";
+
+/**
+ * Internal storage for container error handlers.
+ */
+const WIRESTATE_INTERNAL_ERROR_HANDLERS: WeakMap<Container, InternalErrorHandler> = new WeakMap();
 
 /**
  * Handles internal Wirestate errors with the default console output.

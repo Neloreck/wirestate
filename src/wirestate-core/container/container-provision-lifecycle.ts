@@ -8,33 +8,21 @@ import { WirestateError } from "../error/wirestate-error";
 import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
 import { getDeprovisionHandlerMetadata } from "../lifecycle/on-deprovision";
 import { getProvisionHandlerMetadata } from "../lifecycle/on-provision";
-import {
-  PROVISION_IDS_BY_INSTANCE,
-  PROVISION_LIFECYCLES_BY_CONTAINER,
-  PROVISION_STATUS_BY_CONTAINER,
-  PROVISION_TOKENS_BY_INSTANCE,
-} from "../registry";
 import { Maybe } from "../types/general";
 
 import { Container } from "./container";
 import { getBindingToken } from "./get-binding-token";
 import { getInstanceContainer } from "./instance-lifecycle";
+import {
+  clearContainerProvisionStatus,
+  ContainerProvisionLifecycle,
+  PROVISION_IDS_BY_INSTANCE,
+  PROVISION_LIFECYCLES_BY_CONTAINER,
+  PROVISION_TOKENS_BY_INSTANCE,
+  setContainerProvisioned,
+  UNBIND_INTERCEPTOR_REMOVERS,
+} from "./provision-state";
 import { ProvisionId, WireStatus } from "./wire-status";
-
-/**
- * Represents provider lifecycle state keyed by container.
- *
- * Framework adapters keep one map per provider tree.
- *
- * @group Container
- */
-export type ContainerProvisionLifecycle = Map<Container, Array<object>>;
-
-/**
- * Internal storage for unbind interceptor removers registered while a provider
- * lifecycle owns a container, keyed by container and lifecycle.
- */
-const UNBIND_INTERCEPTOR_REMOVERS: WeakMap<Container, Map<ContainerProvisionLifecycle, () => void>> = new WeakMap();
 
 /**
  * Provisions a container for a framework provider.
@@ -77,12 +65,12 @@ export function provisionContainer(
 
   dbg.info(prefix(__filename), "Provisioning container:", { container });
 
-  PROVISION_STATUS_BY_CONTAINER.delete(container);
+  clearContainerProvisionStatus(container);
 
   lifecycle.set(container, provisionInstances(container, bindings));
   trackProvisionLifecycle(container, lifecycle);
 
-  PROVISION_STATUS_BY_CONTAINER.set(container, true);
+  setContainerProvisioned(container, true);
 }
 
 /**
@@ -111,7 +99,7 @@ export function provisionContainer(
  * ```
  */
 export function deprovisionContainer(container: Container, lifecycle: ContainerProvisionLifecycle): void {
-  PROVISION_STATUS_BY_CONTAINER.set(container, false);
+  setContainerProvisioned(container, false);
 
   const instances: Maybe<Array<object>> = lifecycle.get(container);
 
@@ -294,7 +282,7 @@ export function provisionInstances(container: Container, bindings: Bindings = []
     } catch (error) {
       const reachedInstances: Array<object> = instances.slice(0, index + 1);
 
-      PROVISION_STATUS_BY_CONTAINER.set(container, false);
+      setContainerProvisioned(container, false);
 
       deprovisionInstances(reachedInstances);
 

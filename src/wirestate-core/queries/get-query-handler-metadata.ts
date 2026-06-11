@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { collectHandlerMetadata } from "../metadata/handler-metadata";
-import { QUERY_HANDLER_METADATA, QUERY_METADATA_KEY } from "../registry";
+import { QUERY_HANDLER_METADATA, QUERY_METADATA_KEY } from "../metadata/registry";
 import { QueryHandlerMetadata } from "../types/queries";
 
 /**

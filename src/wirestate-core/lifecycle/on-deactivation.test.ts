@@ -1,4 +1,4 @@
-import { DEACTIVATION_HANDLER_METADATA } from "../registry";
+import { DEACTIVATION_HANDLER_METADATA } from "../metadata/registry";
 
 import { getDeactivationHandlerMetadata, OnDeactivation } from "./on-deactivation";
 

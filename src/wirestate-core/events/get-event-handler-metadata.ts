@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { collectHandlerMetadata } from "../metadata/handler-metadata";
-import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "../registry";
+import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "../metadata/registry";
 import { EventHandlerMetadata } from "../types/events";
 
 /**

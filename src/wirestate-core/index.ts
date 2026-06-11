@@ -35,11 +35,8 @@ export { OnCommand, OnCommandHandlerDecorator } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";
 
 export { createContainer, ContainerConfig, CreateContainerOptions } from "./container/create-container";
-export {
-  ContainerProvisionLifecycle,
-  deprovisionContainer,
-  provisionContainer,
-} from "./container/container-provision-lifecycle";
+export { deprovisionContainer, provisionContainer } from "./container/container-provision-lifecycle";
+export { ContainerProvisionLifecycle } from "./container/provision-state";
 export { ProvisionId, WireStatus } from "./container/wire-status";
 export { validateContainerConfig } from "./container/validate-container-config";
 export { WireScope } from "./container/wire-scope";
@@ -53,7 +50,7 @@ export { EventBus } from "./events/event-bus";
 export { QueryBus } from "./queries/query-bus";
 export { OnQuery, OnQueryHandlerDecorator } from "./queries/on-query";
 
-export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "./registry";
+export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "./container/seeds";
 
 export { CommandHandler, CommandType, CommandUnregister } from "./types/commands";
 export { InternalErrorHandler, InternalErrorDescriptor, InternalErrorSource } from "./types/error";

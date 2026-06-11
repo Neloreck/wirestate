@@ -1,12 +1,9 @@
 import { OnCommand } from "../../commands/on-command";
 import { Container } from "../../container/container";
-import {
-  ContainerProvisionLifecycle,
-  deprovisionContainer,
-  provisionContainer,
-} from "../../container/container-provision-lifecycle";
+import { deprovisionContainer, provisionContainer } from "../../container/container-provision-lifecycle";
 import { inject } from "../../container/context";
 import { createContainer } from "../../container/create-container";
+import { ContainerProvisionLifecycle } from "../../container/provision-state";
 import { WireScope } from "../../container/wire-scope";
 import { WirestateError } from "../../error/wirestate-error";
 import { OnEvent } from "../../events/on-event";

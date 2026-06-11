@@ -1,8 +1,8 @@
+import { PROVISION_HANDLER_METADATA, PROVISION_METADATA_KEY } from "../metadata/registry";
 import {
   createSingleMethodDecoratorDescriptor,
   SingleMethodLifecycleDecorator,
 } from "../metadata/single-method-lifecycle-decorator";
-import { PROVISION_HANDLER_METADATA, PROVISION_METADATA_KEY } from "../registry";
 import { Maybe } from "../types/general";
 
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({

@@ -2,8 +2,8 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../metadata/handler-metadata";
+import { COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY } from "../metadata/registry";
 import { validateStandardMethodContext } from "../metadata/standard-decorator-context";
-import { COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY } from "../registry";
 import { CommandType } from "../types/commands";
 
 /**

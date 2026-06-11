@@ -6,7 +6,6 @@ import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
 import { Injectable } from "../metadata/injectable";
 import { QueryBus } from "../queries/query-bus";
-import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 import { CommandHandler, CommandUnregister, CommandType } from "../types/commands";
 import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 import { Optional, AnyObject } from "../types/general";
@@ -14,6 +13,7 @@ import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 import { SeedKey, SeedsMap } from "../types/seeds";
 
 import { Container } from "./container";
+import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
 
 /**
  * Per-instance handle for container work.

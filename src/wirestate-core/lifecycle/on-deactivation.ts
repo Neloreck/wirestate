@@ -1,8 +1,8 @@
+import { DEACTIVATION_HANDLER_METADATA, DEACTIVATION_METADATA_KEY } from "../metadata/registry";
 import {
   createSingleMethodDecoratorDescriptor,
   SingleMethodLifecycleDecorator,
 } from "../metadata/single-method-lifecycle-decorator";
-import { DEACTIVATION_HANDLER_METADATA, DEACTIVATION_METADATA_KEY } from "../registry";
 import { Maybe } from "../types/general";
 
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({

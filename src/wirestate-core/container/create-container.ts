@@ -7,13 +7,13 @@ import { CommandBus } from "../commands/command-bus";
 import { getConfiguredInternalErrorHandler, setInternalErrorHandler } from "../error/internal-error-handler";
 import { EventBus } from "../events/event-bus";
 import { QueryBus } from "../queries/query-bus";
-import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 import { InternalErrorHandler } from "../types/error";
 import { AnyObject, Maybe } from "../types/general";
 import { SeedBindings, SeedsMap } from "../types/seeds";
 
 import { Container } from "./container";
 import { getBindingToken } from "./get-binding-token";
+import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
 import { applySkipActivationHooks } from "./skip-activation-hooks";
 import { validateContainerConfig } from "./validate-container-config";
 import { WireScope } from "./wire-scope";

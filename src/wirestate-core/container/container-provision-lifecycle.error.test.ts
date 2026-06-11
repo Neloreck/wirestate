@@ -3,8 +3,9 @@ import { OnProvision } from "../lifecycle/on-provision";
 import { Injectable } from "../metadata/injectable";
 
 import { Container } from "./container";
-import { ContainerProvisionLifecycle, provisionContainer } from "./container-provision-lifecycle";
+import { provisionContainer } from "./container-provision-lifecycle";
 import { createContainer } from "./create-container";
+import { ContainerProvisionLifecycle } from "./provision-state";
 
 describe("provision lifecycle errors", () => {
   function createProvisionLifecycle(): ContainerProvisionLifecycle {

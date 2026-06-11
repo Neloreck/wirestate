@@ -8,9 +8,10 @@ import { Injectable } from "../metadata/injectable";
 import { Optional } from "../types/general";
 
 import { Container } from "./container";
-import { ContainerProvisionLifecycle, deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
+import { deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
 import { inject } from "./context";
 import { createContainer } from "./create-container";
+import { ContainerProvisionLifecycle } from "./provision-state";
 import { WireScope } from "./wire-scope";
 import { ProvisionId, WireStatus } from "./wire-status";
 

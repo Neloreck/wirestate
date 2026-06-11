@@ -6,11 +6,11 @@ import { getConfiguredInternalErrorHandler } from "../error/internal-error-handl
 import { EventBus } from "../events/event-bus";
 import { Injectable } from "../metadata/injectable";
 import { QueryBus } from "../queries/query-bus";
-import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 
 import { Container } from "./container";
 import { inject } from "./context";
 import { createContainer } from "./create-container";
+import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
 import { WireScope } from "./wire-scope";
 
 describe("createContainer", () => {

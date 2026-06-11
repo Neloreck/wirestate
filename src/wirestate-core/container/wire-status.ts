@@ -1,6 +1,13 @@
 import { WirestateError } from "../error/wirestate-error";
-import { INSTANCE_STATUSES_BY_INSTANCE } from "../registry";
 import { Optional } from "../types/general";
+
+/**
+ * Internal storage for service lifecycle status keyed by instance.
+ *
+ * Status survives deactivation while the instance object is still reachable,
+ * which lets callers inspect lifecycle state by instance reference.
+ */
+const INSTANCE_STATUSES_BY_INSTANCE: WeakMap<object, WireStatus> = new WeakMap();
 
 /**
  * Identifier for one provider provision cycle of a service instance.

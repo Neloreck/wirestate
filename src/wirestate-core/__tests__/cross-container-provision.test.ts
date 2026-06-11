@@ -1,12 +1,9 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { Container } from "../container/container";
-import {
-  ContainerProvisionLifecycle,
-  deprovisionContainer,
-  provisionContainer,
-} from "../container/container-provision-lifecycle";
+import { deprovisionContainer, provisionContainer } from "../container/container-provision-lifecycle";
 import { createContainer } from "../container/create-container";
+import { ContainerProvisionLifecycle } from "../container/provision-state";
 
 describe("cross-container provider lifecycle ownership", () => {
   it("shares a single parent-owned instance by reference with child containers", () => {

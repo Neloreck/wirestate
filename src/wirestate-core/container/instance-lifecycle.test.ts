@@ -6,11 +6,11 @@ import { OnActivated } from "../lifecycle/on-activated";
 import { OnDeactivation } from "../lifecycle/on-deactivation";
 import { Injectable } from "../metadata/injectable";
 import { QueryBus } from "../queries/query-bus";
-import { PROVISION_STATUS_BY_CONTAINER } from "../registry";
 
 import { Container } from "./container";
 import { createContainer } from "./create-container";
 import { getInstanceContainer, initializeInstanceStatus, unregisterInstanceStatus } from "./instance-lifecycle";
+import { setContainerProvisioned } from "./provision-state";
 import { WireStatus } from "./wire-status";
 
 describe("instance lifecycle tracking", () => {
@@ -183,8 +183,8 @@ describe("instance status", () => {
     const provisionedInstance: object = {};
     const deprovisionedInstance: object = {};
 
-    PROVISION_STATUS_BY_CONTAINER.set(provisionedContainer, true);
-    PROVISION_STATUS_BY_CONTAINER.set(deprovisionedContainer, false);
+    setContainerProvisioned(provisionedContainer, true);
+    setContainerProvisioned(deprovisionedContainer, false);
 
     initializeInstanceStatus(provisionedContainer, provisionedInstance);
     initializeInstanceStatus(deprovisionedContainer, deprovisionedInstance);

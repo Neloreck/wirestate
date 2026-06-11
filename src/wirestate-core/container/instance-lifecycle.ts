@@ -8,7 +8,6 @@ import { getActivatedHandlerMetadata } from "../lifecycle/on-activated";
 import { getDeactivationHandlerMetadata } from "../lifecycle/on-deactivation";
 import { getQueryHandlerMetadata } from "../queries/get-query-handler-metadata";
 import { QueryBus } from "../queries/query-bus";
-import { PROVISION_STATUS_BY_CONTAINER } from "../registry";
 import type { CommandHandler } from "../types/commands";
 import type { EventDispatch, EventUnsubscriber } from "../types/events";
 import type { Maybe } from "../types/general";
@@ -16,6 +15,7 @@ import type { QueryHandler } from "../types/queries";
 
 import type { ActivationRecord } from "./binding-storage";
 import type { Container } from "./container";
+import { getContainerProvisionStatus } from "./provision-state";
 import { WireStatus } from "./wire-status";
 
 /**
@@ -153,7 +153,7 @@ export function initializeInstanceStatus(container: Container, instance: object)
 
   status.isDisposed = false;
 
-  const isProvisioned = PROVISION_STATUS_BY_CONTAINER.get(container);
+  const isProvisioned = getContainerProvisionStatus(container);
 
   status.isDeprovisioned = isProvisioned === undefined ? null : !isProvisioned;
   status.provisionId = null;

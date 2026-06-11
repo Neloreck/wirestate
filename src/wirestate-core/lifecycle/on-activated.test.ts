@@ -1,4 +1,4 @@
-import { ACTIVATED_HANDLER_METADATA } from "../registry";
+import { ACTIVATED_HANDLER_METADATA } from "../metadata/registry";
 
 import { getActivatedHandlerMetadata, OnActivated } from "./on-activated";
 

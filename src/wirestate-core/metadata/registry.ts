@@ -1,13 +1,9 @@
 // Install the Symbol.metadata polyfill before any consumer class definition.
-import "./metadata/symbol-metadata";
+import "./symbol-metadata";
 
-import type { Identifier } from "./binding/tokens";
-import type { Container } from "./container/container";
-import type { ProvisionId, WireStatus } from "./container/wire-status";
-import type { CommandHandlerMetadata } from "./types/commands";
-import type { InternalErrorHandler } from "./types/error";
-import type { EventHandlerMetadata } from "./types/events";
-import type { QueryHandlerMetadata } from "./types/queries";
+import type { CommandHandlerMetadata } from "../types/commands";
+import type { EventHandlerMetadata } from "../types/events";
+import type { QueryHandlerMetadata } from "../types/queries";
 
 /**
  * Registry of class constructors to their declared query handlers.
@@ -172,89 +168,3 @@ export const EVENT_HANDLER_METADATA: WeakMap<object, Array<EventHandlerMetadata>
  * @internal
  */
 export const EVENT_METADATA_KEY: symbol = Symbol.for("@wirestate/core/metadata/event");
-
-/**
- * Internal storage for service lifecycle status keyed by instance.
- *
- * @remarks
- * Status survives deactivation while the instance object is still reachable,
- * which lets callers inspect lifecycle state by instance reference.
- *
- * @group Container
- * @internal
- */
-export const INSTANCE_STATUSES_BY_INSTANCE: WeakMap<object, WireStatus> = new WeakMap();
-
-/**
- * Internal storage for current provider ownership state keyed by container.
- *
- * @group Container
- * @internal
- */
-export const PROVISION_STATUS_BY_CONTAINER: WeakMap<Container, boolean> = new WeakMap();
-
-/**
- * Internal storage for provider lifecycle maps that currently own a container.
- *
- * @group Container
- * @internal
- */
-export const PROVISION_LIFECYCLES_BY_CONTAINER: WeakMap<Container, Set<Map<Container, Array<object>>>> = new WeakMap();
-
-/**
- * Internal storage for provider lifecycle tokens represented by an instance.
- *
- * @group Container
- * @internal
- */
-export const PROVISION_TOKENS_BY_INSTANCE: WeakMap<object, Set<Identifier>> = new WeakMap();
-
-/**
- * Internal storage for the latest provider provision cycle ID per instance.
- *
- * @group Container
- * @internal
- */
-export const PROVISION_IDS_BY_INSTANCE: WeakMap<object, ProvisionId> = new WeakMap();
-
-/**
- * Internal storage for container error handlers.
- *
- * @group Error
- * @internal
- */
-export const WIRESTATE_INTERNAL_ERROR_HANDLERS: WeakMap<Container, InternalErrorHandler> = new WeakMap();
-
-/**
- * Unique symbol used as a token for the container-scoped seeds map.
- *
- * @remarks
- * This token is used to bind and resolve the {@link SeedsMap} in the {@link Container}.
- *
- * @group Seeds
- *
- * @example
- * ```typescript
- * import { SEEDS, type SeedsMap } from "@wirestate/core";
- *
- * const seedsMap: SeedsMap = container.get(SEEDS);
- * ```
- */
-export const SEEDS_TOKEN: unique symbol = Symbol("@wirestate/core/seeds");
-
-/**
- * Unique symbol used as a token for the container-scoped shared seed object.
- *
- * @remarks
- * This token is used to bind and resolve the shared seed object in the {@link Container}.
- *
- * @group Seeds
- *
- * @example
- * ```typescript
- * import { SEED } from "@wirestate/core";
- *
- * const sharedSeed: Record<string, unknown> = container.get(SEED);
- * ```
- */
-export const SEED_TOKEN: unique symbol = Symbol("@wirestate/core/seed");

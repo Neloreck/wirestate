@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { collectHandlerMetadata } from "../metadata/handler-metadata";
-import { COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY } from "../registry";
+import { COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY } from "../metadata/registry";
 import { CommandHandlerMetadata } from "../types/commands";
 
 /**
