@@ -4,8 +4,7 @@
  * @group Bind
  */
 export type {
-  TBindingType,
-  TBindingScope,
+  BindingScopeValue,
   BindingDescriptor,
   ValueBindingDescriptor,
   InstanceBindingDescriptor,

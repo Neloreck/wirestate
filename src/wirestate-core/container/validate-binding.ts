@@ -1,4 +1,4 @@
-import { BindingScope, BindingType, type BindingDescriptor, type TBindingType } from "../binding/binding";
+import { BindingScope, BindingType, type BindingDescriptor } from "../binding/binding";
 import { isFactoryDescriptor } from "../binding/binding-guards";
 import { type Identifier, toString } from "../binding/tokens";
 import {
@@ -62,7 +62,7 @@ export function validateBinding<T>(
     );
   }
 
-  const type: TBindingType = binding.type ?? (isFactoryDescriptor(binding) ? BindingType.Factory : BindingType.Value);
+  const type = binding.type ?? (isFactoryDescriptor(binding) ? BindingType.Factory : BindingType.Value);
 
   if (type === BindingType.Instance) {
     const value: unknown = (binding as { value?: unknown }).value;

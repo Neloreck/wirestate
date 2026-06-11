@@ -1,4 +1,9 @@
-import type { BindingActivationHandler, BindingDeactivationHandler, BindingDescriptor, TBindingScope } from "./binding";
+import type {
+  BindingActivationHandler,
+  BindingDeactivationHandler,
+  BindingDescriptor,
+  BindingScopeValue,
+} from "./binding";
 import { isFactoryDescriptor } from "./binding-guards";
 
 /**
@@ -8,7 +13,7 @@ import { isFactoryDescriptor } from "./binding-guards";
  * @param binding - Binding descriptor to inspect.
  * @returns The binding scope, `Singleton` by default.
  */
-export function getBindingScope<T>(binding: BindingDescriptor<T>): TBindingScope {
+export function getBindingScope<T>(binding: BindingDescriptor<T>): BindingScopeValue {
   if (isFactoryDescriptor(binding)) {
     return binding.scope ?? "Singleton";
   }

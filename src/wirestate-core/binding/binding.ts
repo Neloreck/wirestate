@@ -15,13 +15,6 @@ export const BindingType = {
 } as const;
 
 /**
- * Binding strategy name.
- *
- * @group Bind
- */
-export type TBindingType = keyof typeof BindingType;
-
-/**
  * Lifetime scope names accepted by binding descriptors:
  *
  * - `Singleton` (default): the value is constructed once and reused for every resolution.
@@ -39,7 +32,7 @@ export const BindingScope = {
  *
  * @group Bind
  */
-export type TBindingScope = keyof typeof BindingScope;
+export type BindingScopeValue = keyof typeof BindingScope;
 
 /**
  * A handler invoked right after a binding constructs a value.
@@ -154,7 +147,7 @@ export interface FactoryBindingDescriptor<T = unknown> {
   /**
    * Lifetime scope for created values.
    */
-  readonly scope?: TBindingScope;
+  readonly scope?: BindingScopeValue;
 
   /**
    * Called for each constructed value. A returned value replaces it.
