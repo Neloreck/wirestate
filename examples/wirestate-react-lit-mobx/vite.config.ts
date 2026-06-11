@@ -40,7 +40,6 @@ export default defineConfig({
     babel({
       presets: [reactCompilerPreset(), "@babel/preset-typescript"],
       plugins: [
-        "babel-plugin-transform-typescript-metadata",
         ["@babel/plugin-proposal-decorators", { version: "legacy" }],
         ["@babel/plugin-transform-class-properties", { loose: true }],
       ],

@@ -24,18 +24,18 @@ tenant, or test.
 
 ## Packages
 
-| Package                                                               | Purpose                                                             |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| [`@wirestate/core`](./src/wirestate-core/README.md)                   | Containers, injectable services, lifecycle, seeds, messaging.       |
-| [`@wirestate/react`](./src/wirestate-react/README.md)                 | React provider, injection hooks, and component-owned handlers.      |
-| [`@wirestate/lit`](./src/wirestate-lit/README.md)                     | Lit providers, decorators, controllers, and element handlers.       |
-| [`@wirestate/mobx`](./src/wirestate-mobx/README.md)                   | Framework-agnostic MobX exports for shared services.                |
-| [`@wirestate/react-mobx`](./src/wirestate-react-mobx/README.md)       | MobX React reactivity binding (`mobx-react-lite`).                  |
+| Package                                                               | Purpose                                                                                           |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| [`@wirestate/core`](./src/wirestate-core/README.md)                   | Containers, injectable services, lifecycle, seeds, messaging.                                     |
+| [`@wirestate/react`](./src/wirestate-react/README.md)                 | React provider, injection hooks, and component-owned handlers.                                    |
+| [`@wirestate/lit`](./src/wirestate-lit/README.md)                     | Lit providers, decorators, controllers, and element handlers.                                     |
+| [`@wirestate/mobx`](./src/wirestate-mobx/README.md)                   | Framework-agnostic MobX exports for shared services.                                              |
+| [`@wirestate/react-mobx`](./src/wirestate-react-mobx/README.md)       | MobX React reactivity binding (`mobx-react-lite`).                                                |
 | [`@wirestate/lit-mobx`](./src/wirestate-lit-mobx/README.md)           | MobX Lit reactivity binding ([`@adobe/lit-mobx`](https://www.npmjs.com/package/@adobe/lit-mobx)). |
-| [`@wirestate/signals`](./src/wirestate-signals/README.md)             | Framework-agnostic Preact Signals exports for shared services.      |
-| [`@wirestate/react-signals`](./src/wirestate-react-signals/README.md) | Preact Signals React reactivity binding.                            |
-| [`@wirestate/lit-signals`](./src/wirestate-lit-signals/README.md)     | Preact Signals Lit reactivity binding (`@lit-labs/preact-signals`). |
-| [`wirestate`](./src/wirestate/README.md)                              | Compatibility package for the unscoped package name.                |
+| [`@wirestate/signals`](./src/wirestate-signals/README.md)             | Framework-agnostic Preact Signals exports for shared services.                                    |
+| [`@wirestate/react-signals`](./src/wirestate-react-signals/README.md) | Preact Signals React reactivity binding.                                                          |
+| [`@wirestate/lit-signals`](./src/wirestate-lit-signals/README.md)     | Preact Signals Lit reactivity binding (`@lit-labs/preact-signals`).                               |
+| [`wirestate`](./src/wirestate/README.md)                              | Compatibility package for the unscoped package name.                                              |
 
 ## Install
 
