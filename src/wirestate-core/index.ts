@@ -4,7 +4,16 @@
  * @packageDocumentation
  */
 
-export { BindingScope, BindingType } from "./binding/binding";
+export {
+  Binding,
+  BindingDescriptor,
+  Bindings,
+  BindingScope,
+  BindingType,
+  FactoryBindingDescriptor,
+  InstanceBindingDescriptor,
+  ValueBindingDescriptor,
+} from "./binding/binding";
 export { Identifier, InjectionToken } from "./binding/tokens";
 
 export { Container } from "./container/container";
@@ -31,7 +40,7 @@ export {
   deprovisionContainer,
   provisionContainer,
 } from "./container/container-provision-lifecycle";
-export { WireStatus } from "./container/wire-status";
+export { ProvisionId, WireStatus } from "./container/wire-status";
 export { validateContainerConfig } from "./container/validate-container-config";
 export { WireScope } from "./container/wire-scope";
 
@@ -49,14 +58,5 @@ export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "./registry";
 export { CommandHandler, CommandType, CommandUnregister } from "./types/commands";
 export { InternalErrorHandler, InternalErrorDescriptor, InternalErrorSource } from "./types/error";
 export { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "./types/events";
-export {
-  BindingDescriptor,
-  Binding,
-  Bindings,
-  ValueBindingDescriptor,
-  FactoryBindingDescriptor,
-  InstanceBindingDescriptor,
-  ProvisionId,
-} from "./types/provision";
 export { QueryHandler, QueryType, QueryUnregister } from "./types/queries";
 export { SeedsMap, SeedBindings, SeedBinding, SeedKey } from "./types/seeds";

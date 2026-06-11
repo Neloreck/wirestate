@@ -3,11 +3,10 @@ import "./metadata/symbol-metadata";
 
 import type { Identifier } from "./binding/tokens";
 import type { Container } from "./container/container";
-import type { WireStatus } from "./container/wire-status";
+import type { ProvisionId, WireStatus } from "./container/wire-status";
 import type { CommandHandlerMetadata } from "./types/commands";
 import type { InternalErrorHandler } from "./types/error";
 import type { EventHandlerMetadata } from "./types/events";
-import type { ProvisionId } from "./types/provision";
 import type { QueryHandlerMetadata } from "./types/queries";
 
 /**

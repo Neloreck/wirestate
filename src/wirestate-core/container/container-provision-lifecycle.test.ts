@@ -6,14 +6,13 @@ import { OnDeprovision } from "../lifecycle/on-deprovision";
 import { OnProvision } from "../lifecycle/on-provision";
 import { Injectable } from "../metadata/injectable";
 import { Optional } from "../types/general";
-import { ProvisionId } from "../types/provision";
 
 import { Container } from "./container";
 import { ContainerProvisionLifecycle, deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
 import { inject } from "./context";
 import { createContainer } from "./create-container";
 import { WireScope } from "./wire-scope";
-import { WireStatus } from "./wire-status";
+import { ProvisionId, WireStatus } from "./wire-status";
 
 describe("provision lifecycle", () => {
   function createProvisionLifecycle(): ContainerProvisionLifecycle {

@@ -1,7 +1,19 @@
 import { WirestateError } from "../error/wirestate-error";
 import { INSTANCE_STATUSES_BY_INSTANCE } from "../registry";
 import { Optional } from "../types/general";
-import { ProvisionId } from "../types/provision";
+
+/**
+ * Identifier for one provider provision cycle of a service instance.
+ *
+ * @remarks
+ * IDs are unique only within a single service instance. Use the value passed to
+ * `@OnProvision` and `@OnDeprovision` with
+ * `WireStatus.for(instance).provisionId` to ignore async work from an older
+ * provision cycle.
+ *
+ * @group Container
+ */
+export type ProvisionId = number;
 
 /**
  * Options for {@link WireStatus.for}.

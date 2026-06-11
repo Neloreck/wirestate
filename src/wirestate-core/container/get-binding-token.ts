@@ -1,5 +1,5 @@
+import { BindingDescriptor } from "../binding/binding";
 import { Identifier } from "../binding/tokens";
-import { BindingDescriptor } from "../types/provision";
 import { Newable } from "../utils/class-like";
 
 /**

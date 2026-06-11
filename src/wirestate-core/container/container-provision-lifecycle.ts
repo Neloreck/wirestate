@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType } from "../binding/binding";
+import { Binding, Bindings, BindingType } from "../binding/binding";
 import { Identifier } from "../binding/tokens";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
@@ -15,12 +15,11 @@ import {
   PROVISION_TOKENS_BY_INSTANCE,
 } from "../registry";
 import { Maybe } from "../types/general";
-import { Binding, Bindings, ProvisionId } from "../types/provision";
 
 import { Container } from "./container";
 import { getBindingToken } from "./get-binding-token";
 import { getInstanceContainer } from "./instance-lifecycle";
-import { WireStatus } from "./wire-status";
+import { ProvisionId, WireStatus } from "./wire-status";
 
 /**
  * Represents provider lifecycle state keyed by container.

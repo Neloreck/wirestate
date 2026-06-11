@@ -1,5 +1,4 @@
-import { BindingType } from "../binding/binding";
-import { Binding, InstanceBindingDescriptor } from "../types/provision";
+import { Binding, BindingType, InstanceBindingDescriptor } from "../binding/binding";
 
 /**
  * Stamps the `skipActivationHooks` option onto instance bindings.

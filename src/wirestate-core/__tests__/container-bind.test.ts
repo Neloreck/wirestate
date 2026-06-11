@@ -1,6 +1,13 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { BindingScope, BindingType } from "../binding/binding";
+import {
+  BindingDescriptor,
+  BindingScope,
+  BindingType,
+  FactoryBindingDescriptor,
+  InstanceBindingDescriptor,
+  ValueBindingDescriptor,
+} from "../binding/binding";
 import { CommandBus } from "../commands/command-bus";
 import { OnCommand } from "../commands/on-command";
 import { Container } from "../container/container";
@@ -17,12 +24,6 @@ import { Injectable } from "../metadata/injectable";
 import { OnQuery } from "../queries/on-query";
 import { QueryBus } from "../queries/query-bus";
 import { AnyObject, Optional } from "../types/general";
-import {
-  BindingDescriptor,
-  FactoryBindingDescriptor,
-  InstanceBindingDescriptor,
-  ValueBindingDescriptor,
-} from "../types/provision";
 
 describe("container.bind", () => {
   it("should bind a class directly", () => {

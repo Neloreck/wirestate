@@ -187,3 +187,25 @@ export type BindingDescriptor<T = unknown> =
   | ValueBindingDescriptor<T>
   | InstanceBindingDescriptor<T>
   | FactoryBindingDescriptor<T>;
+
+/**
+ * Represents a single binding accepted by Wirestate registration APIs.
+ *
+ * @remarks
+ * A binding is either a class {@link Newable} constructor or a {@link BindingDescriptor}
+ * for values, factories, or custom-token class bindings.
+ *
+ * @group Bind
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Binding<T extends object = object> = Newable<T> | BindingDescriptor<any>;
+
+/**
+ * Represents bindings accepted by Wirestate registration APIs.
+ *
+ * @remarks
+ * Each item is either a class reference or an {@link BindingDescriptor}.
+ *
+ * @group Bind
+ */
+export type Bindings = ReadonlyArray<Binding>;

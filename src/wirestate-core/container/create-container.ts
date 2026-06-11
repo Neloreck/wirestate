@@ -1,6 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { Bindings } from "../binding/binding";
 import { Identifier } from "../binding/tokens";
 import { CommandBus } from "../commands/command-bus";
 import { getConfiguredInternalErrorHandler, setInternalErrorHandler } from "../error/internal-error-handler";
@@ -9,7 +10,6 @@ import { QueryBus } from "../queries/query-bus";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 import { InternalErrorHandler } from "../types/error";
 import { AnyObject, Maybe } from "../types/general";
-import { Bindings } from "../types/provision";
 import { SeedBindings, SeedsMap } from "../types/seeds";
 
 import { Container } from "./container";
