@@ -14,8 +14,7 @@
     "@wirestate/lit": "^1.0.0-experimental.4",
     "@wirestate/lit-mobx": "^1.0.0-experimental.4",
     "@wirestate/mobx": "^1.0.0-experimental.4",
-    "lit": "^3.3.2",
-    "mobx": "^6.16.1"
+    "lit": "^3.3.2"
   },
   "devDependencies": {
     "@eslint/js": "9.39.4",
