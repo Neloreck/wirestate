@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/core",
-  "version": "1.0.0-experimental.4",
+  "version": "1.0.0-experimental.5",
   "description": "State management core with built-in dependency injection",
   "sideEffects": false,
   "author": "Syrotenko Igor",

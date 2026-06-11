@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/react-signals",
-  "version": "1.0.0-experimental.4",
+  "version": "1.0.0-experimental.5",
   "description": "Preact Signals React reactivity binding (@preact/signals-react) for Wirestate React services",
   "sideEffects": false,
   "author": "Syrotenko Igor",
