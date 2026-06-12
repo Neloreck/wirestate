@@ -1,9 +1,9 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
 import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../../metadata/metadata-handlers";
 import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "../../metadata/metadata-registry";
-import { validateStandardMethodContext } from "../../metadata/standard-decorator-context";
 import type { Optional } from "../../types/general";
 
 import type { EventType, WireEvent } from "./events";

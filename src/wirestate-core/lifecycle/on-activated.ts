@@ -1,8 +1,8 @@
 import { ACTIVATED_HANDLER_METADATA, ACTIVATED_METADATA_KEY } from "../metadata/metadata-registry";
 import {
   createSingleMethodDecoratorDescriptor,
-  SingleMethodLifecycleDecorator,
-} from "../metadata/single-method-lifecycle-decorator";
+  SingleMethodDecorator,
+} from "../metadata/metadata-single-method-decorator";
 import { Maybe } from "../types/general";
 
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
@@ -42,7 +42,7 @@ const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
  * }
  * ```
  */
-export function OnActivated(): SingleMethodLifecycleDecorator {
+export function OnActivated(): SingleMethodDecorator {
   return decorator();
 }
 

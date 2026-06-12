@@ -1,7 +1,7 @@
 import {
   createSingleMethodDecoratorDescriptor,
   SingleMethodDecoratorDescriptor,
-} from "./single-method-lifecycle-decorator";
+} from "./metadata-single-method-decorator";
 
 describe("createSingleMethodDecoratorDescriptor", () => {
   const buildLifecycle = (): {

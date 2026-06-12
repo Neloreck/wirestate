@@ -5,15 +5,15 @@ import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { Maybe } from "../types/general";
 
+import { validateStandardMethodContext } from "./metadata-decorator-context";
 import { getPrototypeChainMetadata } from "./metadata-prototype-chain";
-import { validateStandardMethodContext } from "./standard-decorator-context";
 
 /**
  * Method decorator attached by single-method lifecycle hooks such as `@OnActivated`.
  *
  * @group Lifecycle
  */
-export interface SingleMethodLifecycleDecorator {
+export interface SingleMethodDecorator {
   // Standard (TC39):
   <This>(value: (this: This, ...args: Array<never>) => unknown, context: ClassMethodDecoratorContext<This>): void;
   // Legacy/experimental:
@@ -74,7 +74,7 @@ export interface SingleMethodDecoratorDescriptor {
   /**
    * Method decorator factory that records the decorated method name.
    */
-  readonly decorator: () => SingleMethodLifecycleDecorator;
+  readonly decorator: () => SingleMethodDecorator;
 
   /**
    * Resolves the decorated method name for an instance, or `null` when none exists.
@@ -97,7 +97,7 @@ export function createSingleMethodDecoratorDescriptor(
   const { registry, metadataKey, name, duplicateMessage, hierarchyMessage } = options;
 
   return {
-    decorator: (): SingleMethodLifecycleDecorator => {
+    decorator: (): SingleMethodDecorator => {
       return ((target: object, nameOrContext: string | symbol | ClassMethodDecoratorContext): void => {
         if (typeof nameOrContext === "object") {
           // Standard decorators:
@@ -144,7 +144,7 @@ export function createSingleMethodDecoratorDescriptor(
 
           registry.set(constructor, nameOrContext);
         }
-      }) as SingleMethodLifecycleDecorator;
+      }) as SingleMethodDecorator;
     },
     getMetadata: (instance: object): Maybe<string | symbol> => {
       dbg.info(prefix(__filename), `Resolving ${name} metadata:`, { name: instance.constructor.name, instance });
