@@ -1,7 +1,3 @@
-import { BindingScope, BindingType, type BindingDescriptor } from "../binding/binding";
-import type { Newable } from "../binding/binding-class";
-import { isFactoryDescriptor } from "../binding/binding-guards";
-import { type Identifier, toString } from "../binding/binding-tokens";
 import {
   ERROR_CODE_INVALID_ARGUMENTS,
   ERROR_CODE_INVALID_BINDING_SCOPE,
@@ -9,6 +5,11 @@ import {
 } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { isInjectable } from "../metadata/injectable";
+
+import { BindingScope, BindingType, type BindingDescriptor } from "./binding";
+import type { Newable } from "./binding-class";
+import { isFactoryDescriptor } from "./binding-guards";
+import { type Identifier, toString } from "./binding-tokens";
 
 /**
  * Validates a binding descriptor before registration.
@@ -93,7 +94,7 @@ export function validateBinding<T>(
 
   if (hasConstructedValues) {
     throw new WirestateError(
-      `Cannot bind a new binding for ${toString(token)}, since the existing binding was already constructed.`,
+      `Cannot bind a new binding for '${toString(token)}', since the existing binding was already constructed.`,
       ERROR_CODE_VALIDATION_ERROR
     );
   }

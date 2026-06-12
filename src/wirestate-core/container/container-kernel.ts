@@ -3,13 +3,13 @@ import { Newable } from "../binding/binding-class";
 import { isInstanceDescriptor } from "../binding/binding-guards";
 import { getBindingScope } from "../binding/binding-lifecycle";
 import { Identifier } from "../binding/binding-tokens";
+import { validateBinding } from "../binding/binding-validation";
 import { NoBindingFoundError } from "../error/no-binding-found-error";
 
 import { ActivationRecord, BindingMap, InstanceMap } from "./binding-storage";
 import { injectionContext } from "./context";
 import { Factory } from "./factory";
 import { activateInstance, deactivateInstance, rollbackInstanceActivation } from "./instance-lifecycle";
-import { validateBinding } from "./validate-binding";
 
 /**
  * Intercepts container unbind operations before any value is deactivated.
@@ -24,7 +24,7 @@ export interface UnbindInterceptor {
    *
    * @param token - Token being unbound.
    */
-  onUnbind?(token: Identifier<unknown>): void;
+  onUnbind?(token: Identifier): void;
 
   /**
    * Called exactly once before container-owned values are deactivated by {@link ContainerKernel.unbindAll}.

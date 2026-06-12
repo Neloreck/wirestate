@@ -28,10 +28,12 @@ export class WirestateError extends Error {
    * The name of the error class, useful for identification in minified environments.
    */
   public readonly name: string = "WirestateError";
+
   /**
    * String error code identifying the specific failure type.
    */
   public readonly code: string;
+
   /**
    * Human-readable description of the error.
    */
