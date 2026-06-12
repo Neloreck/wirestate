@@ -18,7 +18,7 @@ export function inject<T>(
   options?: { optional?: boolean; lazy?: boolean }
 ): Definable<T> | (() => Definable<T>) {
   try {
-    return _currentContext.run((container) => container.get(token, options));
+    return currentContext.run((container) => container.get(token, options));
   } catch (error) {
     if (error instanceof NeedsInjectionContextError && options?.optional === true) {
       return undefined;
@@ -57,20 +57,20 @@ class InjectionContext implements Context {
   public constructor(private readonly container: ContainerKernel) {}
 
   public run<T>(block: (container: ContainerKernel) => T): T {
-    const originalContext = _currentContext;
+    const originalContext = currentContext;
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-this-alias
-      _currentContext = this;
+      currentContext = this;
 
       return block(this.container);
     } finally {
-      _currentContext = originalContext;
+      currentContext = originalContext;
     }
   }
 }
 
-let _currentContext: GlobalContext | InjectionContext = new GlobalContext();
+let currentContext: GlobalContext | InjectionContext = new GlobalContext();
 
 /**
  * Creates a new injection context.
