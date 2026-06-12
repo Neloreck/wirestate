@@ -1,18 +1,18 @@
-import { Container } from "../../container/container";
-import { deprovisionContainer, provisionContainer } from "../../container/container-provision-lifecycle";
-import { inject } from "../../container/context";
-import { ContainerProvisionLifecycle } from "../../container/provision-state";
-import { WireScope } from "../../container/wire-scope";
-import { WirestateError } from "../../error/wirestate-error";
-import { getActivatedHandlerMetadata, OnActivated } from "../../lifecycle/on-activated";
-import { OnDeactivation } from "../../lifecycle/on-deactivation";
-import { OnDeprovision } from "../../lifecycle/on-deprovision";
-import { OnProvision } from "../../lifecycle/on-provision";
-import { OnCommand } from "../../messaging/commands/on-command";
-import { WireEvent } from "../../messaging/events/events";
-import { OnEvent } from "../../messaging/events/on-event";
-import { OnQuery } from "../../messaging/queries/on-query";
-import { Injectable } from "../../metadata/metadata-injectable";
+import { Container } from "../container/container";
+import { deprovisionContainer, provisionContainer } from "../container/container-provision-lifecycle";
+import { inject } from "../container/context";
+import { ContainerProvisionLifecycle } from "../container/provision-state";
+import { WireScope } from "../container/wire-scope";
+import { WirestateError } from "../error/wirestate-error";
+import { getActivatedHandlerMetadata, OnActivated } from "../lifecycle/on-activated";
+import { OnDeactivation } from "../lifecycle/on-deactivation";
+import { OnDeprovision } from "../lifecycle/on-deprovision";
+import { OnProvision } from "../lifecycle/on-provision";
+import { OnCommand } from "../messaging/commands/on-command";
+import { WireEvent } from "../messaging/events/events";
+import { OnEvent } from "../messaging/events/on-event";
+import { OnQuery } from "../messaging/queries/on-query";
+import { Injectable } from "../metadata/metadata-injectable";
 
 /**
  * Shared dual-mode decorator behavior matrix.
