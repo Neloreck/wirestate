@@ -1,6 +1,6 @@
 import { OnDeprovision } from "../lifecycle/on-deprovision";
 import { OnProvision } from "../lifecycle/on-provision";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 
 import { Container } from "./container";
 import { provisionContainer } from "./container-provision-lifecycle";

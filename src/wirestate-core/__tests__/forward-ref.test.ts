@@ -1,6 +1,6 @@
 import { Container } from "../container/container";
 import { inject } from "../container/context";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 
 describe("forward references with inject()", () => {
   it("resolves a dependency that is declared after its consumer", () => {

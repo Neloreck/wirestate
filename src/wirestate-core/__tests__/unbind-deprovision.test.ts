@@ -4,7 +4,7 @@ import { Container } from "../container/container";
 import { deprovisionContainer, provisionContainer } from "../container/container-provision-lifecycle";
 import { ContainerProvisionLifecycle } from "../container/provision-state";
 import { WireStatus } from "../container/wire-status";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 
 describe("container unbind deprovision", () => {
   function createProvisionLifecycle(): ContainerProvisionLifecycle {

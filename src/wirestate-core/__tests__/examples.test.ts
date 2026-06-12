@@ -1,7 +1,7 @@
 import { InjectionToken } from "../binding/binding-tokens";
 import { ContainerKernel } from "../container/container-kernel";
 import { inject } from "../container/context";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 
 @Injectable()
 class OtherService {

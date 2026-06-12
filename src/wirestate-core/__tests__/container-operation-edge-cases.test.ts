@@ -5,7 +5,7 @@ import { deprovisionContainer, provisionContainer } from "../container/container
 import { ContainerProvisionLifecycle } from "../container/provision-state";
 import { WireScope } from "../container/wire-scope";
 import { OnProvision } from "../lifecycle/on-provision";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 
 describe("container operation edge cases", () => {
   it("treats deprovision of a never-provisioned container as a no-op", () => {

@@ -5,7 +5,7 @@ import { OnDeactivation } from "../lifecycle/on-deactivation";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { EventBus } from "../messaging/events/event-bus";
 import { QueryBus } from "../messaging/queries/query-bus";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 import { Optional } from "../types/general";
 
 import { Container } from "./container";

@@ -1,5 +1,5 @@
 import { Container } from "../container/container";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 
 import { callLifecycleHandler } from "./call-lifecycle-handler";
 

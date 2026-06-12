@@ -8,7 +8,7 @@ import { EventBus } from "../messaging/events/event-bus";
 import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../messaging/events/events";
 import { QueryHandler, QueryUnregister, QueryType } from "../messaging/queries/queries";
 import { QueryBus } from "../messaging/queries/query-bus";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 import { Optional, AnyObject } from "../types/general";
 import { SeedKey, SeedsMap } from "../types/seeds";
 

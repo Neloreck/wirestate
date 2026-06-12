@@ -4,7 +4,7 @@ import { BindingType } from "../binding/binding";
 import { OnActivated } from "../lifecycle/on-activated";
 import { OnDeprovision } from "../lifecycle/on-deprovision";
 import { OnProvision } from "../lifecycle/on-provision";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 import { Optional } from "../types/general";
 
 import { Container } from "./container";

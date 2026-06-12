@@ -6,7 +6,7 @@ import { OnActivated } from "../lifecycle/on-activated";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { EventBus } from "../messaging/events/event-bus";
 import { QueryBus } from "../messaging/queries/query-bus";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 
 import { Container } from "./container";
 import { getInstanceContainer, initializeInstanceStatus, unregisterInstanceStatus } from "./instance-lifecycle";

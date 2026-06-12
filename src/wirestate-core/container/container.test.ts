@@ -5,7 +5,7 @@ import { getConfiguredInternalErrorHandler } from "../error/internal-error-handl
 import { CommandBus } from "../messaging/commands/command-bus";
 import { EventBus } from "../messaging/events/event-bus";
 import { QueryBus } from "../messaging/queries/query-bus";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 
 import { Container } from "./container";
 import { ContainerKernel } from "./container-kernel";

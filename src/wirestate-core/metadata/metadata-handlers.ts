@@ -1,6 +1,6 @@
 import { Maybe } from "../types/general";
 
-import { getPrototypeChainMetadata } from "./prototype-chain";
+import { getPrototypeChainMetadata } from "./metadata-prototype-chain";
 
 /**
  * Appends an entry to a constructor's handler-metadata list, creating it on first use.

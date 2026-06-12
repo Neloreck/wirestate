@@ -5,7 +5,7 @@ import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { Maybe } from "../types/general";
 
-import { getPrototypeChainMetadata } from "./prototype-chain";
+import { getPrototypeChainMetadata } from "./metadata-prototype-chain";
 import { validateStandardMethodContext } from "./standard-decorator-context";
 
 /**

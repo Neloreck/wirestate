@@ -5,7 +5,7 @@ import {
   ERROR_CODE_VALIDATION_ERROR,
 } from "../error/error-code";
 import { OnDeactivation } from "../lifecycle/on-deactivation";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 
 import { ContainerKernel } from "./container-kernel";
 import { inject } from "./context";

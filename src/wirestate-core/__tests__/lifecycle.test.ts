@@ -3,7 +3,7 @@ import { ContainerKernel } from "../container/container-kernel";
 import { inject } from "../container/context";
 import { OnActivated } from "../lifecycle/on-activated";
 import { OnDeactivation } from "../lifecycle/on-deactivation";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 
 describe("kernel instance lifecycle guarantees", () => {
   it("should activate singleton instance bindings exactly once", () => {

@@ -4,7 +4,7 @@ import {
   ERROR_CODE_VALIDATION_ERROR,
 } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { isInjectable } from "../metadata/injectable";
+import { isInjectable } from "../metadata/metadata-injectable";
 
 import { BindingScope, BindingType, type BindingDescriptor } from "./binding";
 import type { Newable } from "./binding-class";

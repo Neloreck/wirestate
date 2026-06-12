@@ -53,6 +53,7 @@ export function getPrototypeChainMetadata<T>(
       metadata.push(own);
     }
 
+    // TC39 variant with 3rd parameter defined:
     if (metadataKey !== undefined) {
       const standard: Definable<T> = getOwnStandardMetadata(constructor, metadataKey);
 

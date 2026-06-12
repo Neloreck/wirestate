@@ -12,7 +12,7 @@ import { OnCommand } from "../../messaging/commands/on-command";
 import { WireEvent } from "../../messaging/events/events";
 import { OnEvent } from "../../messaging/events/on-event";
 import { OnQuery } from "../../messaging/queries/on-query";
-import { Injectable } from "../../metadata/injectable";
+import { Injectable } from "../../metadata/metadata-injectable";
 
 /**
  * Shared dual-mode decorator behavior matrix.

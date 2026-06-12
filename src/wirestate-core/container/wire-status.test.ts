@@ -1,6 +1,6 @@
 import { OnDeprovision, OnProvision } from "@wirestate/core";
 
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 
 import { Container } from "./container";
 import { deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";

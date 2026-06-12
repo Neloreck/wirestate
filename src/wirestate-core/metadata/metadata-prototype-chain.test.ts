@@ -1,4 +1,4 @@
-import { getPrototypeChainMetadata } from "./prototype-chain";
+import { getPrototypeChainMetadata } from "./metadata-prototype-chain";
 
 describe("getPrototypeChainMetadata", () => {
   const metadataRegistry = new WeakMap<object, unknown>();

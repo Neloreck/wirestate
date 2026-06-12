@@ -1,6 +1,6 @@
 import { InjectionToken } from "../binding/binding-tokens";
 import { ContainerKernel } from "../container/container-kernel";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 
 describe("Binding scopes", () => {
   it("should default to singleton scope for instance bindings", () => {

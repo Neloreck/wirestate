@@ -35,7 +35,7 @@ export { OnDeactivation } from "./lifecycle/on-deactivation";
 export { OnDeprovision } from "./lifecycle/on-deprovision";
 export { OnProvision } from "./lifecycle/on-provision";
 
-export { Injectable, isInjectable } from "./metadata/injectable";
+export { Injectable, isInjectable } from "./metadata/metadata-injectable";
 
 export { CommandBus } from "./messaging/commands/command-bus";
 export { CommandHandler, CommandType, CommandUnregister } from "./messaging/commands/commands";

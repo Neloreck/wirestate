@@ -21,7 +21,7 @@ import { EventBus } from "../messaging/events/event-bus";
 import { OnEvent } from "../messaging/events/on-event";
 import { OnQuery } from "../messaging/queries/on-query";
 import { QueryBus } from "../messaging/queries/query-bus";
-import { Injectable } from "../metadata/injectable";
+import { Injectable } from "../metadata/metadata-injectable";
 import { AnyObject, Optional } from "../types/general";
 
 describe("container.bind", () => {
