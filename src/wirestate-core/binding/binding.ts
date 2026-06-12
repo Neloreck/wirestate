@@ -35,21 +35,6 @@ export const BindingScope = {
 export type BindingScopeValue = keyof typeof BindingScope;
 
 /**
- * A handler invoked right after a binding constructs a value.
- * When a non-`undefined` value is returned, it replaces the constructed value.
- *
- * @group Bind
- */
-export type BindingActivationHandler<T> = (instance: T, container: ContainerKernel) => T | void;
-
-/**
- * A handler invoked for each container-owned value right before its binding is unbound.
- *
- * @group Bind
- */
-export type BindingDeactivationHandler<T> = (instance: T, container: ContainerKernel) => void;
-
-/**
  * Describes a static value binding. Values are always singletons.
  *
  * @group Bind
@@ -69,16 +54,6 @@ export interface ValueBindingDescriptor<T = unknown> {
    * Value to bind.
    */
   readonly value: T;
-
-  /**
-   * Called when the value is first resolved. A returned value replaces it.
-   */
-  readonly onActivated?: BindingActivationHandler<NoInfer<T>>;
-
-  /**
-   * Called when the binding is removed after the value was resolved.
-   */
-  readonly onDeactivated?: BindingDeactivationHandler<NoInfer<T>>;
 }
 
 /**
@@ -110,16 +85,6 @@ export interface InstanceBindingDescriptor<T = unknown> {
    * @default `false`
    */
   readonly skipActivationHooks?: boolean;
-
-  /**
-   * Called when the instance is constructed. A returned value replaces it.
-   */
-  readonly onActivated?: BindingActivationHandler<NoInfer<T>>;
-
-  /**
-   * Called when the binding is removed after the instance was constructed.
-   */
-  readonly onDeactivated?: BindingDeactivationHandler<NoInfer<T>>;
 }
 
 /**
@@ -148,16 +113,6 @@ export interface FactoryBindingDescriptor<T = unknown> {
    * Lifetime scope for created values.
    */
   readonly scope?: BindingScopeValue;
-
-  /**
-   * Called for each constructed value. A returned value replaces it.
-   */
-  readonly onActivated?: BindingActivationHandler<NoInfer<T>>;
-
-  /**
-   * Called for each container-owned value when the binding is removed.
-   */
-  readonly onDeactivated?: BindingDeactivationHandler<NoInfer<T>>;
 }
 
 /**

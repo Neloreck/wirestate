@@ -3,6 +3,8 @@ import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 import { Container } from "../container/container";
 import { deprovisionContainer, provisionContainer } from "../container/container-provision-lifecycle";
 import { ContainerProvisionLifecycle } from "../container/provision-state";
+import { WireStatus } from "../container/wire-status";
+import { Injectable } from "../metadata/injectable";
 
 describe("container unbind deprovision", () => {
   function createProvisionLifecycle(): ContainerProvisionLifecycle {
@@ -147,5 +149,70 @@ describe("container unbind deprovision", () => {
 
     expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
     expect(lifecycle.has(container)).toBe(false);
+  });
+
+  it("should mark remaining active services deprovisioned after the last lifecycle binding is unbound", () => {
+    @Injectable()
+    class PlainService {}
+
+    const { LifecycleService, events } = createLifecycleService();
+    const container: Container = new Container({ bindings: [PlainService, LifecycleService] });
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+    const plainService: PlainService = container.get(PlainService);
+    const plainStatus: WireStatus = WireStatus.for(plainService);
+
+    provisionContainer(container, lifecycle);
+
+    expect(plainStatus.isDeprovisioned).toBe(false);
+
+    // Unbinding the last lifecycle binding removes the container's lifecycle entry.
+    container.unbind(LifecycleService);
+
+    expect(lifecycle.has(container)).toBe(false);
+
+    deprovisionContainer(container, lifecycle);
+
+    expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
+    expect(plainStatus.isDeprovisioned).toBe(true);
+  });
+
+  it("should not touch active statuses when deprovisioning a never-provisioned container", () => {
+    @Injectable()
+    class PlainService {}
+
+    const container: Container = new Container({ bindings: [PlainService] });
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+    const status: WireStatus = WireStatus.for(container.get(PlainService));
+
+    expect(status.isDeprovisioned).toBeNull();
+
+    deprovisionContainer(container, lifecycle);
+
+    expect(status.isDeprovisioned).toBeNull();
+  });
+
+  it("should keep deprovision idempotent after the lifecycle entry is gone", () => {
+    @Injectable()
+    class PlainService {}
+
+    const { LifecycleService, events } = createLifecycleService();
+    const container: Container = new Container({ bindings: [PlainService, LifecycleService] });
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+    const plainStatus: WireStatus = WireStatus.for(container.get(PlainService));
+
+    provisionContainer(container, lifecycle);
+    container.unbind(LifecycleService);
+    deprovisionContainer(container, lifecycle);
+
+    expect(plainStatus.isDeprovisioned).toBe(true);
+
+    // Resurrect the flag to prove a second deprovision of an already
+    // deprovisioned container does not re-mark active instances.
+    plainStatus.isDeprovisioned = false;
+
+    deprovisionContainer(container, lifecycle);
+
+    expect(plainStatus.isDeprovisioned).toBe(false);
+    expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
   });
 });

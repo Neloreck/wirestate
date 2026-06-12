@@ -1,6 +1,7 @@
 import { InjectionToken } from "../binding/tokens";
 import { ContainerKernel } from "../container/container-kernel";
 import { NoBindingFoundError } from "../error/no-binding-found-error";
+import { OnDeactivation } from "../lifecycle/on-deactivation";
 import { Injectable } from "../metadata/injectable";
 
 describe("ContainerKernel hierarchy", () => {
@@ -58,17 +59,22 @@ describe("ContainerKernel hierarchy", () => {
   it("should not deactivate parent-owned values when a child unbinds", () => {
     const parent = new ContainerKernel();
     const child = new ContainerKernel(parent);
-    const onDeactivated = jest.fn();
+    const events: Array<string> = [];
 
     @Injectable()
-    class MyService {}
+    class MyService {
+      @OnDeactivation()
+      public onDeactivation(): void {
+        events.push("deactivated");
+      }
+    }
 
-    parent.bind({ token: MyService, type: "Instance", value: MyService, onDeactivated });
+    parent.bind({ token: MyService, type: "Instance", value: MyService });
 
     child.get(MyService);
     child.unbind(MyService);
 
-    expect(onDeactivated).not.toHaveBeenCalled();
+    expect(events).toEqual([]);
     expect(parent.get(MyService)).toBeInstanceOf(MyService);
   });
 });

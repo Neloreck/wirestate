@@ -1,220 +1,206 @@
 import { InjectionToken } from "../binding/tokens";
 import { ContainerKernel } from "../container/container-kernel";
 import { inject } from "../container/context";
+import { OnActivated } from "../lifecycle/on-activated";
+import { OnDeactivation } from "../lifecycle/on-deactivation";
 import { Injectable } from "../metadata/injectable";
 
-describe("Binding lifecycle hooks", () => {
-  describe("onActivated", () => {
-    it("should run once for singleton bindings with instance and container", () => {
-      const container = new ContainerKernel();
-      const onActivated = jest.fn();
+describe("kernel instance lifecycle guarantees", () => {
+  it("should activate singleton instance bindings exactly once", () => {
+    const events: Array<string> = [];
 
-      @Injectable()
-      class MyService {}
+    @Injectable()
+    class MyService {
+      @OnActivated()
+      public onActivated(): void {
+        events.push("activated");
+      }
+    }
 
-      container.bind({ token: MyService, type: "Instance", value: MyService, onActivated });
+    const container = new ContainerKernel();
 
-      const instance = container.get(MyService);
+    container.bind({ token: MyService, type: "Instance", value: MyService });
 
-      container.get(MyService);
+    container.get(MyService);
+    container.get(MyService);
 
-      expect(onActivated).toHaveBeenCalledTimes(1);
-      expect(onActivated).toHaveBeenCalledWith(instance, container);
-    });
-
-    it("should run for every construction of transient bindings", () => {
-      const container = new ContainerKernel();
-      const onActivated = jest.fn();
-
-      @Injectable()
-      class MyService {}
-
-      container.bind({ token: MyService, scope: "Transient", factory: () => new MyService(), onActivated });
-
-      container.get(MyService);
-      container.get(MyService);
-
-      expect(onActivated).toHaveBeenCalledTimes(2);
-    });
-
-    it("should replace the constructed value when returning a value", () => {
-      const container = new ContainerKernel();
-      const token = new InjectionToken<string>("message");
-
-      container.bind({
-        token: token,
-        factory: () => "original",
-        onActivated: (value) => `${value}-wrapped`,
-      });
-
-      expect(container.get(token)).toBe("original-wrapped");
-    });
-
-    it("should run for constant value bindings on first resolution", () => {
-      const container = new ContainerKernel();
-      const token = new InjectionToken<object>("value");
-      const onActivated = jest.fn();
-      const value = {};
-
-      container.bind({ token: token, value: value, onActivated });
-
-      expect(onActivated).not.toHaveBeenCalled();
-
-      container.get(token);
-      container.get(token);
-
-      expect(onActivated).toHaveBeenCalledTimes(1);
-      expect(onActivated).toHaveBeenCalledWith(value, container);
-    });
+    expect(events).toEqual(["activated"]);
   });
 
-  describe("onDeactivated", () => {
-    it("should run on unbind for constructed singletons", () => {
-      const container = new ContainerKernel();
-      const onDeactivated = jest.fn();
+  it("should construct transient factory values on every resolution", () => {
+    const container = new ContainerKernel();
+    const token = new InjectionToken<{ id: number }>("transient");
 
-      @Injectable()
-      class MyService {}
+    let constructions: number = 0;
 
-      container.bind({ token: MyService, type: "Instance", value: MyService, onDeactivated });
+    container.bind({ token: token, scope: "Transient", factory: () => ({ id: ++constructions }) });
 
-      const instance = container.get(MyService);
+    expect(container.get(token)).toEqual({ id: 1 });
+    expect(container.get(token)).toEqual({ id: 2 });
+  });
 
-      container.unbind(MyService);
+  it("should deactivate constructed singletons on unbind", () => {
+    const events: Array<string> = [];
 
-      expect(onDeactivated).toHaveBeenCalledTimes(1);
-      expect(onDeactivated).toHaveBeenCalledWith(instance, container);
-    });
-
-    it("should not run when the binding never constructed a value", () => {
-      const container = new ContainerKernel();
-      const onDeactivated = jest.fn();
-
-      @Injectable()
-      class MyService {}
-
-      container.bind({ token: MyService, type: "Instance", value: MyService, onDeactivated });
-      container.unbind(MyService);
-
-      expect(onDeactivated).not.toHaveBeenCalled();
-    });
-
-    it("should not run for transient values", () => {
-      const container = new ContainerKernel();
-      const onDeactivated = jest.fn();
-
-      @Injectable()
-      class MyService {}
-
-      container.bind({ token: MyService, scope: "Transient", factory: () => new MyService(), onDeactivated });
-
-      container.get(MyService);
-      container.unbind(MyService);
-
-      expect(onDeactivated).not.toHaveBeenCalled();
-    });
-
-    it("should allow rebinding and reconstruction after unbind", () => {
-      const container = new ContainerKernel();
-      const token = new InjectionToken<object>("value");
-
-      container.bind({ token: token, factory: () => ({}) });
-
-      const first = container.get(token);
-
-      container.unbind(token);
-      container.bind({ token: token, factory: () => ({}) });
-
-      expect(container.get(token)).not.toBe(first);
-    });
-
-    it("should deactivate only values of the unbound token", () => {
-      const container = new ContainerKernel();
-      const deactivations: Array<string> = [];
-
-      @Injectable()
-      class FooService {}
-
-      @Injectable()
-      class BarService {}
-
-      container.bind({
-        token: FooService,
-        type: "Instance",
-        value: FooService,
-        onDeactivated: () => deactivations.push("foo"),
-      });
-      container.bind({
-        token: BarService,
-        type: "Instance",
-        value: BarService,
-        onDeactivated: () => deactivations.push("bar"),
-      });
-
-      container.get(FooService);
-      container.get(BarService);
-      container.unbind(FooService);
-
-      expect(deactivations).toEqual(["foo"]);
-    });
-
-    it("should deactivate in creation order on unbindAll", () => {
-      const container = new ContainerKernel();
-      const deactivations: Array<string> = [];
-
-      @Injectable()
-      class BarService {}
-
-      @Injectable()
-      class FooService {
-        public constructor(public readonly bar: BarService = inject(BarService)) {}
+    @Injectable()
+    class MyService {
+      @OnDeactivation()
+      public onDeactivation(): void {
+        events.push("deactivated");
       }
+    }
 
-      container.bind({
-        token: BarService,
-        type: "Instance",
-        value: BarService,
-        onDeactivated: () => deactivations.push("bar"),
-      });
-      container.bind({
-        token: FooService,
-        type: "Instance",
-        value: FooService,
-        onDeactivated: () => deactivations.push("foo"),
-      });
+    const container = new ContainerKernel();
 
-      // constructing FooService constructs BarService first
-      container.get(FooService);
-      container.unbindAll();
+    container.bind({ token: MyService, type: "Instance", value: MyService });
+    container.get(MyService);
+    container.unbind(MyService);
 
-      expect(deactivations).toEqual(["bar", "foo"]);
-    });
+    expect(events).toEqual(["deactivated"]);
+  });
 
-    it("should keep bindings resolvable while unbindAll deactivation handlers run", () => {
-      const container = new ContainerKernel();
-      const resolved: Array<unknown> = [];
+  it("should not deactivate bindings that never constructed a value", () => {
+    const events: Array<string> = [];
 
-      @Injectable()
-      class FooService {}
+    @Injectable()
+    class MyService {
+      @OnDeactivation()
+      public onDeactivation(): void {
+        events.push("deactivated");
+      }
+    }
 
-      @Injectable()
-      class BarService {}
+    const container = new ContainerKernel();
 
-      container.bind({
-        token: FooService,
-        type: "Instance",
-        value: FooService,
-        onDeactivated: (instance, current) => resolved.push(current.get(BarService)),
-      });
-      container.bind({ token: BarService, type: "Instance", value: BarService });
+    container.bind({ token: MyService, type: "Instance", value: MyService });
+    container.unbind(MyService);
 
-      container.get(FooService);
+    expect(events).toEqual([]);
+  });
 
-      const bar = container.get(BarService);
+  it("should not track transient values for deactivation", () => {
+    const events: Array<string> = [];
 
-      container.unbindAll();
+    @Injectable()
+    class MyService {
+      @OnDeactivation()
+      public onDeactivation(): void {
+        events.push("deactivated");
+      }
+    }
 
-      expect(resolved).toEqual([bar]);
-    });
+    const container = new ContainerKernel();
+
+    container.bind({ token: MyService, scope: "Transient", factory: () => new MyService() });
+
+    container.get(MyService);
+    container.unbind(MyService);
+
+    expect(events).toEqual([]);
+  });
+
+  it("should allow rebinding and reconstruction after unbind", () => {
+    const container = new ContainerKernel();
+    const token = new InjectionToken<object>("value");
+
+    container.bind({ token: token, factory: () => ({}) });
+
+    const first = container.get(token);
+
+    container.unbind(token);
+    container.bind({ token: token, factory: () => ({}) });
+
+    expect(container.get(token)).not.toBe(first);
+  });
+
+  it("should deactivate only values of the unbound token", () => {
+    const deactivations: Array<string> = [];
+
+    @Injectable()
+    class FooService {
+      @OnDeactivation()
+      public onDeactivation(): void {
+        deactivations.push("foo");
+      }
+    }
+
+    @Injectable()
+    class BarService {
+      @OnDeactivation()
+      public onDeactivation(): void {
+        deactivations.push("bar");
+      }
+    }
+
+    const container = new ContainerKernel();
+
+    container.bind({ token: FooService, type: "Instance", value: FooService });
+    container.bind({ token: BarService, type: "Instance", value: BarService });
+
+    container.get(FooService);
+    container.get(BarService);
+    container.unbind(FooService);
+
+    expect(deactivations).toEqual(["foo"]);
+  });
+
+  it("should deactivate in creation order on unbindAll", () => {
+    const deactivations: Array<string> = [];
+
+    @Injectable()
+    class BarService {
+      @OnDeactivation()
+      public onDeactivation(): void {
+        deactivations.push("bar");
+      }
+    }
+
+    @Injectable()
+    class FooService {
+      public constructor(public readonly bar: BarService = inject(BarService)) {}
+
+      @OnDeactivation()
+      public onDeactivation(): void {
+        deactivations.push("foo");
+      }
+    }
+
+    const container = new ContainerKernel();
+
+    container.bind({ token: BarService, type: "Instance", value: BarService });
+    container.bind({ token: FooService, type: "Instance", value: FooService });
+
+    // constructing FooService constructs BarService first
+    container.get(FooService);
+    container.unbindAll();
+
+    expect(deactivations).toEqual(["bar", "foo"]);
+  });
+
+  it("should keep bindings resolvable while unbindAll deactivation handlers run", () => {
+    const container = new ContainerKernel();
+    const resolved: Array<unknown> = [];
+
+    @Injectable()
+    class BarService {}
+
+    @Injectable()
+    class FooService {
+      @OnDeactivation()
+      public onDeactivation(): void {
+        resolved.push(container.get(BarService));
+      }
+    }
+
+    container.bind({ token: FooService, type: "Instance", value: FooService });
+    container.bind({ token: BarService, type: "Instance", value: BarService });
+
+    container.get(FooService);
+
+    const bar = container.get(BarService);
+
+    container.unbindAll();
+
+    expect(resolved).toEqual([bar]);
   });
 });

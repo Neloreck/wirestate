@@ -4,6 +4,7 @@ import {
   ERROR_CODE_INVALID_BINDING_SCOPE,
   ERROR_CODE_VALIDATION_ERROR,
 } from "../error/error-code";
+import { OnDeactivation } from "../lifecycle/on-deactivation";
 import { Injectable } from "../metadata/injectable";
 
 import { ContainerKernel } from "./container-kernel";
@@ -213,9 +214,18 @@ describe("ContainerKernel API", () => {
   describe("unbind interceptors", () => {
     it("should run interceptors before deactivation on unbind", () => {
       const events: Array<string> = [];
+
+      @Injectable()
+      class ServiceA {
+        @OnDeactivation()
+        public onDeactivation(): void {
+          events.push("deactivate-a");
+        }
+      }
+
       const container = new ContainerKernel();
 
-      container.bind({ token: "a", value: "A", onDeactivated: () => events.push("deactivate-a") });
+      container.bind<ServiceA>({ token: "a", type: "Instance", value: ServiceA });
       container.get("a");
 
       container.addUnbindInterceptor({ onUnbind: (token) => events.push(`intercept-${String(token)}`) });
@@ -226,10 +236,27 @@ describe("ContainerKernel API", () => {
 
     it("should run onUnbindAll exactly once before deactivation", () => {
       const events: Array<string> = [];
+
+      @Injectable()
+      class ServiceA {
+        @OnDeactivation()
+        public onDeactivation(): void {
+          events.push("deactivate-a");
+        }
+      }
+
+      @Injectable()
+      class ServiceB {
+        @OnDeactivation()
+        public onDeactivation(): void {
+          events.push("deactivate-b");
+        }
+      }
+
       const container = new ContainerKernel();
 
-      container.bind({ token: "a", value: "A", onDeactivated: () => events.push("deactivate-a") });
-      container.bind({ token: "b", value: "B", onDeactivated: () => events.push("deactivate-b") });
+      container.bind<ServiceA>({ token: "a", type: "Instance", value: ServiceA });
+      container.bind<ServiceB>({ token: "b", type: "Instance", value: ServiceB });
       container.get("a");
       container.get("b");
 

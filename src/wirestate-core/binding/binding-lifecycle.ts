@@ -1,9 +1,4 @@
-import type {
-  BindingActivationHandler,
-  BindingDeactivationHandler,
-  BindingDescriptor,
-  BindingScopeValue,
-} from "./binding";
+import type { BindingDescriptor, BindingScopeValue } from "./binding";
 import { isFactoryDescriptor } from "./binding-guards";
 
 /**
@@ -19,17 +14,4 @@ export function getBindingScope<T>(binding: BindingDescriptor<T>): BindingScopeV
   }
 
   return "Singleton";
-}
-
-/**
- * Resolves lifecycle hooks of a binding descriptor.
- *
- * @param binding - Binding descriptor to inspect.
- * @returns Activation/deactivation handlers declared by the descriptor, if any.
- */
-export function getBindingLifecycle<T>(binding: BindingDescriptor<T>): {
-  onActivated?: BindingActivationHandler<T>;
-  onDeactivated?: BindingDeactivationHandler<T>;
-} {
-  return { onActivated: binding.onActivated, onDeactivated: binding.onDeactivated };
 }

@@ -1,6 +1,6 @@
 import { BindingDescriptor } from "../binding/binding";
 import { isInstanceDescriptor } from "../binding/binding-guards";
-import { getBindingLifecycle, getBindingScope } from "../binding/binding-lifecycle";
+import { getBindingScope } from "../binding/binding-lifecycle";
 import { Identifier } from "../binding/tokens";
 import { NoBindingFoundError } from "../error/no-binding-found-error";
 import { Newable } from "../utils/class-like";
@@ -252,15 +252,15 @@ export class ContainerKernel {
   }
 
   /**
-   * Resolves the value for a binding descriptor, applying scope caching, activation
-   * hooks, and instance lifecycle wiring.
+   * Resolves the value for a binding descriptor, applying scope caching and
+   * instance lifecycle wiring.
    *
    * @param binding - Binding descriptor to resolve.
    * @returns The resolved value.
    */
   private resolve<T>(binding: BindingDescriptor<T>): T {
     if (getBindingScope(binding) === "Transient") {
-      return this.activate(binding, this.factory.construct(binding));
+      return this.factory.construct(binding);
     }
 
     if (this.instances.has(binding)) {
@@ -277,39 +277,16 @@ export class ContainerKernel {
     if (isInstanceDescriptor(binding)) {
       try {
         activateInstance(this, record);
-
-        record.instance = this.activate(binding, record.instance as T);
       } catch (error) {
         rollbackInstanceActivation(this, record);
 
         throw error;
       }
-    } else {
-      record.instance = this.activate(binding, record.instance as T);
     }
 
     this.commit(record);
 
     return record.instance as T;
-  }
-
-  /**
-   * Runs the binding activation hook for a freshly constructed value.
-   *
-   * @param binding - Binding descriptor that constructed the value.
-   * @param instance - Constructed value.
-   * @returns The constructed value, or its replacement returned by the hook.
-   */
-  private activate<T>(binding: BindingDescriptor<T>, instance: T): T {
-    const handler = getBindingLifecycle(binding).onActivated;
-
-    if (!handler) {
-      return instance;
-    }
-
-    const replaced = handler(instance, this) as T | undefined;
-
-    return replaced === undefined ? instance : replaced;
   }
 
   /**
@@ -338,14 +315,12 @@ export class ContainerKernel {
   }
 
   /**
-   * Deactivates one container-owned value: the user deactivation hook runs first,
-   * then instance bindings run Wirestate lifecycle cleanup.
+   * Deactivates one container-owned value: instance bindings run Wirestate
+   * lifecycle cleanup, other binding kinds are simply dropped.
    *
    * @param record - Activation record being deactivated.
    */
   private deactivateRecord(record: ActivationRecord): void {
-    getBindingLifecycle(record.binding).onDeactivated?.(record.instance, this);
-
     if (isInstanceDescriptor(record.binding)) {
       deactivateInstance(this, record);
     }

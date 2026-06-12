@@ -16,6 +16,7 @@ import { getInstanceContainer } from "./instance-lifecycle";
 import {
   clearContainerProvisionStatus,
   ContainerProvisionLifecycle,
+  getContainerProvisionStatus,
   PROVISION_IDS_BY_INSTANCE,
   PROVISION_LIFECYCLES_BY_CONTAINER,
   PROVISION_TOKENS_BY_INSTANCE,
@@ -99,6 +100,8 @@ export function provisionContainer(
  * ```
  */
 export function deprovisionContainer(container: Container, lifecycle: ContainerProvisionLifecycle): void {
+  const wasProvisioned: boolean = getContainerProvisionStatus(container) === true;
+
   setContainerProvisioned(container, false);
 
   const instances: Maybe<Array<object>> = lifecycle.get(container);
@@ -111,11 +114,7 @@ export function deprovisionContainer(container: Container, lifecycle: ContainerP
 
     deprovisionInstances(instances);
 
-    for (const instance of container.getActiveInstances()) {
-      const status: WireStatus = WireStatus.for(instance);
-
-      status.isDeprovisioned = true;
-    }
+    markActiveInstancesDeprovisioned(container);
 
     for (const instance of instances) {
       PROVISION_TOKENS_BY_INSTANCE.delete(instance);
@@ -124,6 +123,23 @@ export function deprovisionContainer(container: Container, lifecycle: ContainerP
     lifecycle.delete(container);
 
     untrackProvisionLifecycle(container, lifecycle);
+  } else if (wasProvisioned) {
+    // Unbinding the last lifecycle binding already removed the lifecycle entry,
+    // but the container itself is only leaving provider ownership now.
+    markActiveInstancesDeprovisioned(container);
+  }
+}
+
+/**
+ * Marks every active service instance of a container as deprovisioned.
+ *
+ * @param container - Container leaving provider ownership.
+ */
+function markActiveInstancesDeprovisioned(container: Container): void {
+  for (const instance of container.getActiveInstances()) {
+    const status: WireStatus = WireStatus.for(instance);
+
+    status.isDeprovisioned = true;
   }
 }
 
