@@ -77,14 +77,6 @@ export interface InstanceBindingDescriptor<T = unknown> {
    * Service constructor to bind. Instances are singletons.
    */
   readonly value: Newable<NoInfer<T>>;
-
-  /**
-   * Skip `@OnActivated` and `@OnDeactivation` hooks for this binding.
-   * Message handlers and lifecycle status are wired either way.
-   *
-   * @default `false`
-   */
-  readonly skipActivationHooks?: boolean;
 }
 
 /**

@@ -349,7 +349,7 @@ describe("Container", () => {
     expect(activated).toBe(false);
   });
 
-  it("should handle activation hooks when skipActivationHooks is false", () => {
+  it("should run lifecycle hooks for activated bindings", () => {
     const { LifecycleService, events } = createLifecycleService();
 
     const container: Container = new Container({
@@ -363,25 +363,6 @@ describe("Container", () => {
     container.unbindAll();
 
     expect(events).toEqual(["activated", "deactivation"]);
-  });
-
-  it("should skip activation hooks when skipActivationHooks is true", () => {
-    const { LifecycleService, events } = createLifecycleService();
-
-    const container: Container = new Container(
-      {
-        activate: [LifecycleService],
-        bindings: [LifecycleService],
-      },
-      { skipActivationHooks: true }
-    );
-
-    expect(container.get(LifecycleService)).toBeInstanceOf(LifecycleService);
-    expect(events).toEqual([]);
-
-    container.unbindAll();
-
-    expect(events).toEqual([]);
   });
 
   it("should throw error if activate is provided without bindings", () => {

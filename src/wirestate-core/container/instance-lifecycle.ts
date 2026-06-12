@@ -35,8 +35,7 @@ export function getInstanceContainer(instance: object): ContainerKernel | undefi
  * Runs the Wirestate side of instance activation: tracks the instance to
  * container mapping, initializes {@link WireStatus}, runs the container's
  * activation adapter (the composition root installs messaging registration
- * there), and invokes the `@OnActivated` hook unless the binding opted out
- * with `skipActivationHooks`.
+ * there), and invokes the `@OnActivated` hook.
  *
  * Adapter cleanup callbacks are collected onto `record.disposers`, so a
  * failed activation can roll back with {@link rollbackInstanceActivation}.
@@ -53,10 +52,6 @@ export function activateInstance(container: ContainerKernel, record: ActivationR
 
   initializeInstanceStatus(container, instance);
   getActivationAdapter(container)?.(container, instance, record.disposers);
-
-  if (binding.skipActivationHooks) {
-    return;
-  }
 
   const methodName: Maybe<string | symbol> = getActivatedHandlerMetadata(instance);
 
@@ -78,9 +73,9 @@ export function activateInstance(container: ContainerKernel, record: ActivationR
  * Deactivates a service instance for an instance binding.
  *
  * @remarks
- * Invokes the `@OnDeactivation` hook unless the binding opted out with
- * `skipActivationHooks`, marks the {@link WireStatus} as disposed, runs the
- * collected handler disposers, and clears the instance to container mapping.
+ * Invokes the `@OnDeactivation` hook, marks the {@link WireStatus} as
+ * disposed, runs the collected handler disposers, and clears the instance to
+ * container mapping.
  *
  * @param container - ContainerKernel that owns the activation record.
  * @param record - Activation record of the instance being deactivated.
@@ -90,20 +85,18 @@ export function deactivateInstance(container: ContainerKernel, record: Activatio
   const binding: InstanceBindingDescriptor<object> = record.binding as InstanceBindingDescriptor<object>;
   const instance: object = record.instance as object;
 
-  if (!binding.skipActivationHooks) {
-    const methodName: Maybe<string | symbol> = getDeactivationHandlerMetadata(instance);
+  const methodName: Maybe<string | symbol> = getDeactivationHandlerMetadata(instance);
 
-    if (methodName) {
-      callLifecycleHandler({
-        container,
-        name: "@OnDeactivation",
-        details: [binding.value.name, String(methodName)],
-        instance,
-        instanceName: binding.value.name,
-        methodName,
-        source: "instance-deactivation",
-      });
-    }
+  if (methodName) {
+    callLifecycleHandler({
+      container,
+      name: "@OnDeactivation",
+      details: [binding.value.name, String(methodName)],
+      instance,
+      instanceName: binding.value.name,
+      methodName,
+      source: "instance-deactivation",
+    });
   }
 
   unregisterInstanceStatus(instance);

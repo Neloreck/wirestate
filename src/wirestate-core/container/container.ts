@@ -16,7 +16,6 @@ import { ContainerKernel } from "./container-kernel";
 import { getBindingToken } from "./get-binding-token";
 import { messagingActivationAdapter } from "./messaging-activation";
 import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
-import { applySkipActivationHooks } from "./skip-activation-hooks";
 import { validateContainerConfig } from "./validate-container-config";
 import { WireScope } from "./wire-scope";
 
@@ -75,13 +74,6 @@ export interface ContainerOptions {
    * @default `false`
    */
   readonly skipMessaging?: boolean;
-
-  /**
-   * Skip `@OnActivated` and `@OnDeactivation` hooks for class bindings.
-   *
-   * @default `false`
-   */
-  readonly skipActivationHooks?: boolean;
 }
 
 /**
@@ -178,7 +170,7 @@ export class Container extends ContainerKernel {
 
     if (config.bindings) {
       for (const binding of config.bindings) {
-        this.bind(applySkipActivationHooks(binding, options.skipActivationHooks));
+        this.bind(binding);
       }
     }
 

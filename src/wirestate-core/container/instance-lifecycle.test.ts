@@ -5,7 +5,6 @@ import { GenericService } from "@/fixtures/services/generic-service";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
 import { OnActivated } from "../lifecycle/on-activated";
-import { OnDeactivation } from "../lifecycle/on-deactivation";
 import { Injectable } from "../metadata/injectable";
 import { QueryBus } from "../queries/query-bus";
 
@@ -101,47 +100,6 @@ describe("instance lifecycle tracking", () => {
     expect(instance.isActivated).toBe(false);
     expect(container.get(QueryBus).hasHandler("TEST_STRING_QUERY")).toBe(false);
     expect(container.get(CommandBus).hasHandler("TEST_SYNC_COMMAND")).toBe(false);
-  });
-
-  it("should skip activation hooks when the descriptor opts out", () => {
-    const events: Array<string> = [];
-
-    @Injectable()
-    class HookedService {
-      @OnActivated()
-      public activated(): void {
-        events.push("activated");
-      }
-
-      @OnDeactivation()
-      public deactivated(): void {
-        events.push("deactivated");
-      }
-    }
-
-    const container: Container = new Container();
-
-    container.bind({ token: HookedService, type: "Instance", value: HookedService, skipActivationHooks: true });
-
-    const instance: HookedService = container.get(HookedService);
-
-    expect(events).toEqual([]);
-    expect(WireStatus.for(instance)).toEqual({
-      isDisposed: false,
-      isDeprovisioned: null,
-      isInactive: false,
-      provisionId: null,
-    });
-
-    container.unbind(HookedService);
-
-    expect(events).toEqual([]);
-    expect(WireStatus.for(instance)).toEqual({
-      isDisposed: true,
-      isDeprovisioned: true,
-      isInactive: true,
-      provisionId: null,
-    });
   });
 
   it("should expose own bindings in registration order", () => {
