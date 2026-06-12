@@ -1,4 +1,5 @@
 import type { Identifier } from "../binding/binding-tokens";
+import type { Definable } from "../types/general";
 
 import type { ContainerKernel } from "./container-kernel";
 
@@ -9,13 +10,13 @@ import type { ContainerKernel } from "./container-kernel";
  * @returns The resolved value, values, thunk, or `undefined` for optional misses.
  */
 export function inject<T>(token: Identifier<T>): T;
-export function inject<T>(token: Identifier<T>, options: { optional: true }): T | undefined;
+export function inject<T>(token: Identifier<T>, options: { optional: true }): Definable<T>;
 export function inject<T>(token: Identifier<T>, options: { lazy: true }): () => T;
-export function inject<T>(token: Identifier<T>, options: { lazy: true; optional: true }): () => T | undefined;
+export function inject<T>(token: Identifier<T>, options: { lazy: true; optional: true }): () => Definable<T>;
 export function inject<T>(
   token: Identifier<T>,
   options?: { optional?: boolean; lazy?: boolean }
-): T | undefined | (() => T | undefined) {
+): Definable<T> | (() => Definable<T>) {
   try {
     return _currentContext.run((container) => container.get(token, options));
   } catch (error) {

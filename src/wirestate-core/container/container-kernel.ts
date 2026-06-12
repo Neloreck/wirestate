@@ -6,6 +6,7 @@ import { Identifier, tokenToString } from "../binding/binding-tokens";
 import { validateBinding } from "../binding/binding-validation";
 import { ERROR_CODE_NO_BINDING_FOUND } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
+import { Definable } from "../types/general";
 
 import { ActivationRecord, BindingMap, InstanceMap } from "./binding-storage";
 import { injectionContext } from "./context";
@@ -167,18 +168,18 @@ export class ContainerKernel {
    * @throws {@link WirestateError} If the token is not bound and not optional.
    */
   public get<T>(token: Identifier<T>): T;
-  public get<T>(token: Identifier<T>, options: { optional: true }): T | undefined;
+  public get<T>(token: Identifier<T>, options: { optional: true }): Definable<T>;
   public get<T>(token: Identifier<T>, options: { lazy: true }): () => T;
-  public get<T>(token: Identifier<T>, options: { lazy: true; optional: true }): () => T | undefined;
-  public get<T>(token: Identifier<T>, options?: { optional?: boolean; lazy?: false }): T | undefined;
+  public get<T>(token: Identifier<T>, options: { lazy: true; optional: true }): () => Definable<T>;
+  public get<T>(token: Identifier<T>, options?: { optional?: boolean; lazy?: false }): Definable<T>;
   public get<T>(
     token: Identifier<T>,
     options?: { optional?: boolean; lazy?: boolean }
-  ): T | undefined | (() => T | undefined);
+  ): Definable<T> | (() => Definable<T>);
   public get<T>(
     token: Identifier<T>,
     options?: { optional?: boolean; lazy?: boolean }
-  ): T | undefined | (() => T | undefined) {
+  ): Definable<T> | (() => Definable<T>) {
     const lazy = options?.lazy ?? false;
 
     if (lazy) {

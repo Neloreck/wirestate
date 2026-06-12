@@ -1,4 +1,5 @@
 import type { Identifier } from "../binding/binding-tokens";
+import { Definable } from "../types/general";
 
 import type { Container } from "./container";
 import type { ContainerKernel } from "./container-kernel";
@@ -91,6 +92,6 @@ export function clearContainerProvisionStatus(container: ContainerKernel): void 
  * @returns `true` while provider-owned, `false` after deprovisioning, or
  * `undefined` when the container never entered provider ownership.
  */
-export function getContainerProvisionStatus(container: ContainerKernel): boolean | undefined {
+export function getContainerProvisionStatus(container: ContainerKernel): Definable<boolean> {
   return PROVISION_STATUS_BY_CONTAINER.get(container);
 }

@@ -2,7 +2,7 @@ import type { InstanceBindingDescriptor } from "../binding/binding";
 import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
 import { getActivatedHandlerMetadata } from "../lifecycle/on-activated";
 import { getDeactivationHandlerMetadata } from "../lifecycle/on-deactivation";
-import type { Maybe } from "../types/general";
+import type { Definable, Maybe } from "../types/general";
 
 import { getActivationAdapter } from "./activation-adapter";
 import type { ActivationRecord } from "./binding-storage";
@@ -24,7 +24,7 @@ const INSTANCE_CONTAINERS: WeakMap<object, ContainerKernel> = new WeakMap();
  * @param instance - Resolved service instance to look up.
  * @returns The owning container, or `undefined` when the instance is not active.
  */
-export function getInstanceContainer(instance: object): ContainerKernel | undefined {
+export function getInstanceContainer(instance: object): Definable<ContainerKernel> {
   return INSTANCE_CONTAINERS.get(instance);
 }
 

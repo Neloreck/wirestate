@@ -5,7 +5,7 @@ import { customElement } from "lit/decorators.js";
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Optional } from "../types/general";
+import { Definable, Optional } from "../types/general";
 
 import { optionalInjection } from "./optional-injection";
 
@@ -213,7 +213,7 @@ describe("optionalInjection (new standard decorator)", () => {
     property: PropertyKey,
     decorator: (target: ClassAccessorDecoratorTarget<C, V>, context: ClassAccessorDecoratorContext<C, V>) => void
   ): void {
-    const descriptor: PropertyDescriptor | undefined = Object.getOwnPropertyDescriptor(
+    const descriptor: Definable<PropertyDescriptor> = Object.getOwnPropertyDescriptor(
       Object.getPrototypeOf(element),
       property
     );
