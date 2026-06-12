@@ -99,7 +99,7 @@ export function injection<T>(optionsOrToken: InjectionOptions<T> | Identifier<T>
         new ContextConsumer(this, {
           context: ContainerContext,
           callback: (container) => {
-            protoOrTarget.set.call(this, container.get(token));
+            nameOrContext.access.set(this, container.get(token));
           },
           subscribe: !once,
         });

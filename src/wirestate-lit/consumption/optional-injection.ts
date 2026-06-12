@@ -107,7 +107,7 @@ export function optionalInjection<T, F = null>(
         new ContextConsumer(this, {
           context: ContainerContext,
           callback: (container) => {
-            protoOrTarget.set.call(this, resolve(container));
+            nameOrContext.access.set(this, resolve(container));
           },
           subscribe: !once,
         });

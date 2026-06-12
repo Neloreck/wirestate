@@ -82,7 +82,7 @@ export function provideContainer<E extends ReactiveElement>(
     if (typeof nameOrContext === "object") {
       // Standard decorators:
       nameOrContext.addInitializer(function () {
-        protoOrTarget.set.call(this, new ContainerProvider(this as unknown as E, options));
+        nameOrContext.access.set(this, new ContainerProvider(this as unknown as E, options));
       });
     } else {
       (protoOrTarget.constructor as typeof ReactiveElement).addInitializer((element: ReactiveElement): void => {

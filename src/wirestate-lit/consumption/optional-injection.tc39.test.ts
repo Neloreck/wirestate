@@ -228,10 +228,21 @@ describe("optionalInjection (new standard decorator)", () => {
     const initializers: Array<(this: C) => void> = [];
 
     decorator(target, {
+      kind: "accessor",
+      name: property,
+      access: {
+        get(object: C): V {
+          return target.get.call(object);
+        },
+        set(object: C, value: V): void {
+          target.set.call(object, value);
+        },
+        has: (object: C): boolean => property in object,
+      },
       addInitializer: (initializer: (this: C) => void): void => {
         initializers.push(initializer);
       },
-    } as ClassAccessorDecoratorContext<C, V>);
+    } as unknown as ClassAccessorDecoratorContext<C, V>);
 
     initializers.forEach((initializer) => initializer.call(element));
   }
