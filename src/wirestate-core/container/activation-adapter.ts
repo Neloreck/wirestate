@@ -1,3 +1,5 @@
+import { Maybe } from "../types/general";
+
 import type { ContainerKernel } from "./container-kernel";
 
 /**
@@ -45,11 +47,11 @@ export function setActivationAdapter(container: ContainerKernel, adapter: Activa
  * @returns The nearest installed adapter, or `undefined`.
  * @internal
  */
-export function getActivationAdapter(container: ContainerKernel): ActivationAdapter | undefined {
-  let current: ContainerKernel | undefined = container;
+export function getActivationAdapter(container: ContainerKernel): Maybe<ActivationAdapter> {
+  let current: Maybe<ContainerKernel> = container;
 
   while (current) {
-    const adapter: ActivationAdapter | undefined = ACTIVATION_ADAPTERS.get(current);
+    const adapter: Maybe<ActivationAdapter> = ACTIVATION_ADAPTERS.get(current);
 
     if (adapter) {
       return adapter;
@@ -58,5 +60,5 @@ export function getActivationAdapter(container: ContainerKernel): ActivationAdap
     current = current.parent;
   }
 
-  return undefined;
+  return null;
 }

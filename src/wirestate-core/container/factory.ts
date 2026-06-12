@@ -2,7 +2,7 @@ import type { BindingDescriptor } from "../binding/binding";
 import { isFactoryDescriptor, isInstanceDescriptor, isValueDescriptor } from "../binding/binding-guards";
 import { toString } from "../binding/binding-tokens";
 import { CircularDependencyError } from "../error/circular-dependency-error";
-import { assertNever } from "../utils/asserts";
+import { WirestateError } from "../error/wirestate-error";
 
 import type { ContainerKernel } from "./container-kernel";
 
@@ -51,6 +51,6 @@ export class Factory {
       return binding.value;
     }
 
-    return assertNever(binding);
+    throw new WirestateError("Invalid state.");
   }
 }
