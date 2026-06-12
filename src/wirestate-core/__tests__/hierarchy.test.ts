@@ -1,6 +1,6 @@
 import { InjectionToken } from "../binding/binding-tokens";
 import { ContainerKernel } from "../container/container-kernel";
-import { NoBindingFoundError } from "../error/no-binding-found-error";
+import { ERROR_CODE_NO_BINDING_FOUND } from "../error/error-code";
 import { OnDeactivation } from "../lifecycle/on-deactivation";
 import { Injectable } from "../metadata/injectable";
 
@@ -85,7 +85,7 @@ describe("Explicit bindings", () => {
 
     class MyService {}
 
-    expect(() => container.get(MyService)).toThrow(NoBindingFoundError);
+    expect(() => container.get(MyService)).toThrow(expect.objectContaining({ code: ERROR_CODE_NO_BINDING_FOUND }));
     expect(container.get(MyService, { optional: true })).toBeUndefined();
   });
 
@@ -106,6 +106,6 @@ describe("Explicit bindings", () => {
 
     class MyService {}
 
-    expect(() => child.get(MyService)).toThrow(NoBindingFoundError);
+    expect(() => child.get(MyService)).toThrow(expect.objectContaining({ code: ERROR_CODE_NO_BINDING_FOUND }));
   });
 });

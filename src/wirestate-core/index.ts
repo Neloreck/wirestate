@@ -29,8 +29,6 @@ export { ProvisionId, WireStatus } from "./container/wire-status";
 export { validateContainerConfig } from "./container/validate-container-config";
 export { WireScope } from "./container/wire-scope";
 
-export { CircularDependencyError } from "./error/circular-dependency-error";
-export { NoBindingFoundError } from "./error/no-binding-found-error";
 export { WirestateError } from "./error/wirestate-error";
 export { defaultInternalErrorHandler } from "./error/internal-error-handler";
 

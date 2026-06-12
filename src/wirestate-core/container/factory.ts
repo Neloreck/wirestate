@@ -1,7 +1,7 @@
 import type { BindingDescriptor } from "../binding/binding";
 import { isFactoryDescriptor, isInstanceDescriptor, isValueDescriptor } from "../binding/binding-guards";
 import { toString } from "../binding/binding-tokens";
-import { CircularDependencyError } from "../error/circular-dependency-error";
+import { ERROR_CODE_CIRCULAR_DEPENDENCY } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 
 import type { ContainerKernel } from "./container-kernel";
@@ -24,14 +24,18 @@ export class Factory {
    * @param binding - Binding descriptor to construct the value for.
    * @returns Constructed value.
    *
-   * @throws {@link CircularDependencyError} When the descriptor is already under construction.
+   * @throws {@link WirestateError} When the descriptor is already under construction.
    */
   public construct<T>(binding: BindingDescriptor<T>): T {
     try {
       if (this.underConstruction.includes(binding)) {
         const dependencyGraph = [...this.underConstruction, binding].map((it) => toString(it.token));
 
-        throw new CircularDependencyError(dependencyGraph);
+        throw new WirestateError(
+          `Detected circular dependency: ${dependencyGraph.join(" -> ")}. ` +
+            `Please change your dependency graph or use lazy injection instead.`,
+          ERROR_CODE_CIRCULAR_DEPENDENCY
+        );
       }
 
       this.underConstruction.push(binding);

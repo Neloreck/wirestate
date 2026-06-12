@@ -2,9 +2,10 @@ import { BindingDescriptor } from "../binding/binding";
 import { Newable } from "../binding/binding-class";
 import { isInstanceDescriptor } from "../binding/binding-guards";
 import { getBindingScope } from "../binding/binding-lifecycle";
-import { Identifier } from "../binding/binding-tokens";
+import { Identifier, toString } from "../binding/binding-tokens";
 import { validateBinding } from "../binding/binding-validation";
-import { NoBindingFoundError } from "../error/no-binding-found-error";
+import { ERROR_CODE_NO_BINDING_FOUND } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
 
 import { ActivationRecord, BindingMap, InstanceMap } from "./binding-storage";
 import { injectionContext } from "./context";
@@ -163,7 +164,7 @@ export class ContainerKernel {
    * @param token - Token to resolve.
    * @returns The resolved value, thunk, or `undefined` for optional misses.
    *
-   * @throws {@link NoBindingFoundError} If the token is not bound and not optional.
+   * @throws {@link WirestateError} If the token is not bound and not optional.
    */
   public get<T>(token: Identifier<T>): T;
   public get<T>(token: Identifier<T>, options: { optional: true }): T | undefined;
@@ -195,7 +196,7 @@ export class ContainerKernel {
         return undefined;
       }
 
-      throw new NoBindingFoundError(token);
+      throw new WirestateError(`No binding(s) found for '${toString(token)}'.`, ERROR_CODE_NO_BINDING_FOUND);
     }
 
     return injectionContext(this).run(() => this.resolve(binding));
