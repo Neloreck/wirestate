@@ -144,8 +144,7 @@ export type BindingDescriptor<T = unknown> =
  *
  * @group Bind
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Binding<T extends object = object> = Newable<T> | BindingDescriptor<any>;
+export type Binding = Newable<object> | BindingDescriptor;
 
 /**
  * Represents bindings accepted by Wirestate registration APIs.
