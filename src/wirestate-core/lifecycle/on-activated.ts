@@ -1,4 +1,4 @@
-import { ACTIVATED_HANDLER_METADATA, ACTIVATED_METADATA_KEY } from "../metadata/registry";
+import { ACTIVATED_HANDLER_METADATA, ACTIVATED_METADATA_KEY } from "../metadata/metadata-registry";
 import {
   createSingleMethodDecoratorDescriptor,
   SingleMethodLifecycleDecorator,

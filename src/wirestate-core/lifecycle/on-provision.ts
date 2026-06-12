@@ -1,4 +1,4 @@
-import { PROVISION_HANDLER_METADATA, PROVISION_METADATA_KEY } from "../metadata/registry";
+import { PROVISION_HANDLER_METADATA, PROVISION_METADATA_KEY } from "../metadata/metadata-registry";
 import {
   createSingleMethodDecoratorDescriptor,
   SingleMethodLifecycleDecorator,

@@ -1,5 +1,5 @@
 // Install the Symbol.metadata polyfill before any consumer class definition.
-import "./symbol-metadata";
+import "./metadata-symbol";
 
 import type { CommandHandlerMetadata } from "../messaging/commands/commands";
 import type { EventHandlerMetadata } from "../messaging/events/events";

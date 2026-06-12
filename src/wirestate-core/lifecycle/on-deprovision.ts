@@ -1,4 +1,4 @@
-import { DEPROVISION_HANDLER_METADATA, DEPROVISION_METADATA_KEY } from "../metadata/registry";
+import { DEPROVISION_HANDLER_METADATA, DEPROVISION_METADATA_KEY } from "../metadata/metadata-registry";
 import {
   createSingleMethodDecoratorDescriptor,
   SingleMethodLifecycleDecorator,
