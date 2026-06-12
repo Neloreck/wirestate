@@ -146,4 +146,20 @@ export default [
       "import/no-cycle": ["error", { ignoreExternal: true }],
     },
   },
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["**/wirestate-*/**", "**/wirestate/**"],
+              message: "Cross-package imports must use the package public entry, e.g. `@wirestate/core`.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];

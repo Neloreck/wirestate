@@ -1,8 +1,7 @@
 import { ContextProvider } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
 import { Container } from "@wirestate/core";
-
-import { ContainerContext } from "../../wirestate-lit/context/container-context";
+import { ContainerContext } from "@wirestate/lit";
 
 let isProviderDefined: boolean = false;
 
