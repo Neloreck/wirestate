@@ -1,22 +1,14 @@
 import type { BindingDescriptor } from "../binding/binding";
 import type { Identifier } from "../binding/binding-tokens";
-
-/**
- * Lifecycle hook parameters make `BindingDescriptor<T>` invariant in `T`,
- * so internal storage is keyed by an any-typed descriptor.
- *
- * @internal
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AnyBinding = BindingDescriptor<any>;
+import { Definable } from "../types/general";
 
 /**
  * Token-keyed storage of registered binding descriptors.
  *
  * @internal
  */
-export interface BindingMap extends Map<Identifier<unknown>, BindingDescriptor<unknown>> {
-  get<T>(key: Identifier<T>): BindingDescriptor<T> | undefined;
+export interface BindingMap extends Map<Identifier, BindingDescriptor> {
+  get<T>(key: Identifier<T>): Definable<BindingDescriptor<T>>;
   set<T>(key: Identifier<T>, value: BindingDescriptor<T>): this;
 }
 
@@ -25,8 +17,8 @@ export interface BindingMap extends Map<Identifier<unknown>, BindingDescriptor<u
  *
  * @internal
  */
-export interface InstanceMap extends Map<AnyBinding, unknown> {
-  get<T>(key: BindingDescriptor<T>): T | undefined;
+export interface InstanceMap extends Map<BindingDescriptor, unknown> {
+  get<T>(key: BindingDescriptor<T>): Definable<T>;
   set<T>(key: BindingDescriptor<T>, value: T): this;
 }
 
@@ -36,8 +28,8 @@ export interface InstanceMap extends Map<AnyBinding, unknown> {
  * @internal
  */
 export interface ActivationRecord {
-  token: Identifier<unknown>;
-  binding: AnyBinding;
+  token: Identifier;
+  binding: BindingDescriptor;
   instance: unknown;
   /**
    * Cleanup callbacks collected while the value was activated,

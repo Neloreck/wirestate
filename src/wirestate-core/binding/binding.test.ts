@@ -146,11 +146,11 @@ describe("Bindings", () => {
 
       expect(child.get("tokenA")).toEqual(["a"]);
       expect(child.get("tokenB")).toEqual(["b"]);
-      expect(() => child.get("tokenC")).toThrow("No binding(s) found for tokenC");
+      expect(() => child.get("tokenC")).toThrow("No binding(s) found for 'tokenC'");
 
       expect(parent.get("tokenA")).toEqual(["a"]);
-      expect(() => parent.get("tokenB")).toThrow("No binding(s) found for tokenB");
-      expect(() => child.get("tokenC")).toThrow("No binding(s) found for tokenC");
+      expect(() => parent.get("tokenB")).toThrow("No binding(s) found for 'tokenB'");
+      expect(() => child.get("tokenC")).toThrow("No binding(s) found for 'tokenC'");
     });
 
     it("should reuse singletons from their parent", () => {
@@ -181,7 +181,7 @@ describe("Bindings", () => {
       child.bind({ token: "tokenA", factory: () => ["a"] });
 
       expect(child.get("tokenA")).toEqual(["a"]);
-      expect(() => parent.get("tokenA")).toThrow("No binding(s) found for tokenA");
+      expect(() => parent.get("tokenA")).toThrow("No binding(s) found for 'tokenA'");
     });
 
     it("should keep track of their own singletons if provider was overridden", () => {

@@ -163,8 +163,8 @@ describe("ContainerKernel API", () => {
       expect(container3.get("c")).toBe("A");
       expect(container3.get("d")).toBe("A");
 
-      expect(() => container3.get("e")).toThrow("No binding(s) found for b");
-      expect(() => container3.get("b")).toThrow("No binding(s) found for b");
+      expect(() => container3.get("e")).toThrow("No binding(s) found for 'b'");
+      expect(() => container3.get("b")).toThrow("No binding(s) found for 'b'");
     });
   });
 

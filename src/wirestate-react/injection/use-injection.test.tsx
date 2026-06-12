@@ -30,7 +30,7 @@ describe("useInjection", () => {
 
     consoleSpy.mockRestore();
 
-    expect(getByText("No binding(s) found for SimpleService", { exact: false })).toBeTruthy();
+    expect(getByText("No binding(s) found for 'SimpleService'", { exact: false })).toBeTruthy();
   });
 
   it("should resolve bound instance from container", () => {

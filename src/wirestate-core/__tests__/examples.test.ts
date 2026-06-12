@@ -150,7 +150,7 @@ describe("ContainerKernel", () => {
       });
 
     expect(container.get(Symbol.for("my-token"))).toBe(42);
-    expect(() => container.get(Symbol.for("other-token"))).toThrow("No binding(s) found for other-token");
+    expect(() => container.get(Symbol.for("other-token"))).toThrow("No binding(s) found for 'other-token'");
     expect(container.get(OTHER_TOKEN)).toBe(2);
   });
 

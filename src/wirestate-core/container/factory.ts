@@ -13,8 +13,7 @@ import type { ContainerKernel } from "./container-kernel";
  * @internal
  */
 export class Factory {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private readonly underConstruction: Array<BindingDescriptor<any>> = [];
+  private readonly underConstruction: Array<BindingDescriptor> = [];
 
   public constructor(private readonly container: ContainerKernel) {}
 
