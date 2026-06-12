@@ -8,7 +8,7 @@ handler becomes active again.
 ## Handle a Query
 
 ```ts
-import { Injectable, OnQuery } from "@wirestate/core";
+import { Injectable, OnQuery, inject } from "@wirestate/core";
 
 @Injectable()
 export class CartSummaryService {
@@ -27,11 +27,11 @@ export class CartSummaryService {
 ## Run a Query
 
 ```ts
-import { Inject, Injectable, WireScope } from "@wirestate/core";
+import { Injectable, WireScope, inject } from "@wirestate/core";
 
 @Injectable()
 export class HeaderCartService {
-  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   public getCheckoutSummary(): { itemCount: number; total: number } {
     return this.scope.query("CHECKOUT_SUMMARY");
@@ -52,7 +52,7 @@ whether the handler is sync or async.
 ## Register Directly
 
 ```ts
-import { QueryBus, createContainer } from "@wirestate/core";
+import { QueryBus, createContainer, inject } from "@wirestate/core";
 
 const container = createContainer();
 const bus = container.get(QueryBus);
@@ -69,14 +69,14 @@ When a service owns a dynamic query handler, register it during provider lifecyc
 deprovision.
 
 ```ts
-import { Inject, Injectable, OnDeprovision, OnProvision, QueryUnregister, WireScope } from "@wirestate/core";
+import { Injectable, OnDeprovision, OnProvision, QueryUnregister, WireScope, inject } from "@wirestate/core";
 
 @Injectable()
 export class ShippingQuoteQueryService {
   private unregisterShippingQuote: QueryUnregister | null = null;
   private quote = { etaDays: 3, price: 12 };
 
-  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   @OnProvision()
   public onProvision(): void {

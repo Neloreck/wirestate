@@ -1,11 +1,4 @@
-import {
-  Container,
-  ContainerConfig,
-  createContainer,
-  deprovisionContainer,
-  provisionContainer,
-  WirestateError,
-} from "@wirestate/core";
+import { Container, ContainerConfig, deprovisionContainer, provisionContainer, WirestateError } from "@wirestate/core";
 import { createElement, ReactNode, useEffect, useRef, useState } from "react";
 
 import { ContainerContext } from "../context/container-context";
@@ -179,7 +172,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
   const [state, setState] = useState<Optional<ContainerProviderState>>(() =>
     normalizedSource
       ? {
-          container: createContainer(normalizedSource, { skipMessaging: scope === ContainerProviderScope.Parent }),
+          container: new Container(normalizedSource, { skipMessaging: scope === ContainerProviderScope.Parent }),
           scope,
           source: normalizedSource,
         }
@@ -209,7 +202,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
 
   if (needsReplacement && normalizedSource) {
     activeState = {
-      container: createContainer(normalizedSource, { skipMessaging: scope === ContainerProviderScope.Parent }),
+      container: new Container(normalizedSource, { skipMessaging: scope === ContainerProviderScope.Parent }),
       scope,
       source: normalizedSource,
     };

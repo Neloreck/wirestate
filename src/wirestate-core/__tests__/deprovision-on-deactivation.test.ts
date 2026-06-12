@@ -1,12 +1,8 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { Container } from "../alias";
-import {
-  ContainerProvisionLifecycle,
-  deprovisionContainer,
-  provisionContainer,
-} from "../container/container-provision-lifecycle";
-import { createContainer } from "../container/create-container";
+import { Container } from "../container/container";
+import { deprovisionContainer, provisionContainer } from "../container/container-provision-lifecycle";
+import { ContainerProvisionLifecycle } from "../container/provision-state";
 
 describe("deprovision on deactivation", () => {
   function createProvisionLifecycle(): ContainerProvisionLifecycle {
@@ -15,7 +11,7 @@ describe("deprovision on deactivation", () => {
 
   it("runs @OnDeprovision before @OnDeactivation when a provisioned instance is destroyed", () => {
     const { LifecycleService, events } = createLifecycleService();
-    const container: Container = createContainer({ bindings: [LifecycleService] });
+    const container: Container = new Container({ bindings: [LifecycleService] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle);
@@ -28,7 +24,7 @@ describe("deprovision on deactivation", () => {
 
   it("does not run @OnDeprovision when the instance was never provisioned", () => {
     const { LifecycleService, events } = createLifecycleService();
-    const container: Container = createContainer({ bindings: [LifecycleService] });
+    const container: Container = new Container({ bindings: [LifecycleService] });
 
     // Activate without provisioning (isDeprovisioned stays null, not false).
     container.get(LifecycleService);
@@ -41,7 +37,7 @@ describe("deprovision on deactivation", () => {
 
   it("does not double-deprovision after an explicit container deprovision", () => {
     const { LifecycleService, events } = createLifecycleService();
-    const container: Container = createContainer({ bindings: [LifecycleService] });
+    const container: Container = new Container({ bindings: [LifecycleService] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle);

@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { Container, Injectable, Newable, createContainer } from "@wirestate/core";
+import { Container, Injectable, Newable } from "@wirestate/core";
 
 import { ErrorLogBoundary } from "@/fixtures/react-components/error-log-boundary";
 
@@ -21,7 +21,7 @@ describe("useInjection", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     const { getByText } = render(
-      <ContainerProvider container={createContainer()}>
+      <ContainerProvider container={new Container()}>
         <ErrorLogBoundary>
           <TestComponent />
         </ErrorLogBoundary>
@@ -30,11 +30,11 @@ describe("useInjection", () => {
 
     consoleSpy.mockRestore();
 
-    expect(getByText(/No bindings found for service:/)).toBeTruthy();
+    expect(getByText("No binding(s) found for 'SimpleService'", { exact: false })).toBeTruthy();
   });
 
   it("should resolve bound instance from container", () => {
-    const container: Container = createContainer({ bindings: [SimpleService] });
+    const container: Container = new Container({ bindings: [SimpleService] });
 
     const { getByTestId } = render(
       <ContainerProvider container={container}>
@@ -62,7 +62,7 @@ describe("useInjection", () => {
   });
 
   it("should memoize instance", () => {
-    const container: Container = createContainer({ bindings: [SimpleService] });
+    const container: Container = new Container({ bindings: [SimpleService] });
 
     const originalGet = container.get.bind(container);
     let resolveCount = 0;
@@ -96,9 +96,10 @@ describe("useInjection", () => {
   });
 
   it("should re-resolve when token changes", () => {
+    @Injectable()
     class AnotherService {}
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [SimpleService, AnotherService],
     });
 

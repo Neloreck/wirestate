@@ -14,19 +14,13 @@ or reactive objects created by another package.
 npm install @wirestate/core
 ```
 
-Import `reflect-metadata` once before decorated services are loaded.
-
-```ts
-import "reflect-metadata";
-```
-
-Enable decorator metadata in TypeScript.
+Wirestate decorators work with legacy TypeScript decorators and TC39 standard decorators. For legacy TypeScript
+decorators, enable `experimentalDecorators`. `emitDecoratorMetadata` is not required.
 
 ```json
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "experimentalDecorators": true
   }
 }
 ```

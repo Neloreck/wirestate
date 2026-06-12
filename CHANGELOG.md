@@ -2,6 +2,30 @@
 
 ### Added
 
+- Add a built-in dependency injection container (vendored fork of [needle-di](https://github.com/needle-di/needle-di),
+  MIT, © Dirk Luijk — since fully assimilated into the core layout) at `@wirestate/core` — synchronous resolution,
+  explicit bindings, per-binding `Singleton`/`Transient` scopes, activation/deactivation hooks, lifecycle-aware
+  `unbind`/`unbindAll`, `hasOwn`, public `container.parent`, and named
+  `NoBindingFoundError`/`CircularDependencyError` errors.
+- Add `inject(token, options?)` as the single injection style (constructor parameter defaults and field initializers),
+  with `optional` and `lazy` options. `inject()` works identically under legacy decorators, TC39 standard
+  decorators, and no decorators at all.
+- Add `InjectionToken` for type-safe non-class tokens and `isInjectable` for `@Injectable` checks.
+- Add `onActivated`/`onDeactivated` lifecycle hooks on all binding descriptors. For instance bindings the hooks
+  compose with the Wirestate lifecycle: activation hooks run after `@OnActivated`, deactivation hooks run before
+  `@OnDeactivation` cleanup.
+- Add bare service class support to `container.bind`: `container.bind(MyService)` registers a singleton instance
+  binding with full Wirestate wiring. Instance binding descriptors gain an optional `skipActivationHooks` field.
+- Add container introspection: `container.getOwnBindings()` (registration order),
+  `container.getActiveInstances()` (creation order), and the `getInstanceContainer(instance)` helper.
+- Add `container.addUnbindInterceptor(interceptor)` — interceptors run before deactivation in `container.unbind`
+  and `container.unbindAll`, which is how provider deprovision precedes `@OnDeactivation` without wrapper APIs.
+- Add TC39 standard decorator support for every Wirestate decorator: `@Injectable`, `@OnActivated`,
+  `@OnDeactivation`, `@OnProvision`, `@OnDeprovision`, `@OnEvent`, `@OnCommand`, and `@OnQuery` are dual-mode —
+  the same source compiles under legacy `experimentalDecorators` and standard (`2023-11`) decorators. Standard-mode
+  metadata is stored via decorator metadata (`Symbol.metadata`); a one-line polyfill ships with the package and loads
+  automatically. The decorator behavior suite runs in CI under both compilation modes.
+
 - Add `@wirestate/lit` with Lit context provisioning, `ContainerProvider`, `provideContainer`,
   `useContainerProvider`, injection decorators/controllers, event/command/query decorators, and controllers.
 - Add framework-agnostic `@wirestate/mobx` (`mobx` re-exports and decorator aliases) and `@wirestate/signals`
@@ -22,13 +46,33 @@
   buses.
 - Add React `useContainer`, `useScope`, `useAsyncCommandExecutor`, `useOptionalAsyncCommandExecutor`,
   `useAsyncQueryExecutor`, and `useOptionalAsyncQueryExecutor`.
-- Add expanded MobX, React Signals, Lit Signals, and Inversify alias exports.
+- Add expanded MobX, React Signals, Lit Signals, and DI alias exports.
 - Add number support for event, command, and query identifiers.
 - Add regression tests for scoped buses, seeds, service shadowing, lifecycle, event subscriptions, controller cleanup,
   SSR, package consumption, and provider replacement.
 
 ### Changed
 
+- Replace InversifyJS with the built-in DI container. The DI stack is no longer an external dependency: consumer bundles
+  drop ~57 KB min of inversify and ~14 KB min of reflect-metadata; the complete core including DI now measures
+  ~24.6 KB min / ~7.4 KB gzip.
+- Make the container the single owner of service lifecycle: `container.bind` wires `@OnEvent`/`@OnCommand`/`@OnQuery`
+  handler registration, `WireStatus` tracking, and `@OnActivated`/`@OnDeactivation` hooks for instance bindings, so
+  binding a service class through the container can no longer produce a half-wired service. Instance and handler
+  tracking moved from module-level registries onto container activation records.
+- Unify the error model on `WirestateError`: `NoBindingFoundError` and `CircularDependencyError` extend it with
+  `NO_BINDING_FOUND`/`CIRCULAR_DEPENDENCY` codes, and container binding validation throws `WirestateError` with
+  `INVALID_ARGUMENTS`/`INVALID_BINDING_SCOPE`/`VALIDATION_ERROR` codes.
+- Migrate constructor injection from `@Inject`/`@Optional` parameter decorators to `inject()` /
+  `inject(token, { optional: true })`. Parameter decorators do not exist in TC39 standard decorators, so this is the
+  portable injection style going forward.
+- `@Injectable()` is now enforced at bind time for class bindings and acts as a pure validation marker — no metadata
+  emission is involved.
+- Binding descriptors without `scope` are always singletons (previously, raw Inversify containers defaulted to
+  transient while `createContainer` forced singleton).
+- `unbindAll` deactivates container-owned services in creation order and keeps bindings resolvable until every
+  deactivation handler has run; `@OnDeprovision` still runs in reverse order first.
+- Resolution errors read `No binding(s) found for X` and are thrown as `NoBindingFoundError`.
 - Replace `createIocContainer` with `createContainer`, using `createContainer(config, options)` for reusable container
   config and creation tweaks.
 - Split service activation/deactivation from provider provision/deprovision so framework rendering lifecycles are no
@@ -44,8 +88,7 @@
 - Rename React `useEventsHandler` to `useAllEvents`.
 - Change event emitters to accept `(type, payload?, options?)` with `options.source` instead of a positional source
   argument.
-- Rename public Inversify aliases from `ServiceIdentifier` and `LazyServiceIdentifier` to `Identifier` and
-  `LazyIdentifier`.
+- Rename the public service identifier type to `Identifier`.
 - Rename `skipLifecycle` container/bind options to `skipActivationHooks`.
 - Reorder `CommandHandler` and `QueryHandler` generics to result, payload, and type. Update React and Lit command/query
   types to use payload terminology.
@@ -91,6 +134,28 @@
   bundles.
 
 ### Removed
+
+- Remove the `inversify` dependency and the `reflect-metadata` peer dependency. Applications no longer import
+  `reflect-metadata` at their entry points, and `emitDecoratorMetadata` is no longer required in consumer tsconfigs.
+- Remove `@Inject`, `@Optional`, `@MultiInject`, `@Named`, and `@Tagged` from the public API — use `inject()` options
+  instead (named/tagged bindings had no replacement use case).
+- Remove `forwardRef` and `LazyIdentifier` — `inject()` evaluates tokens at construction time, so late declarations
+  need no wrapper; use `inject(token, { lazy: true })` for circular dependencies.
+- Remove the `Request` binding scope.
+- Reduce binding descriptors to three kinds: `Value` (renamed from `ConstantValue`), `Instance`, and `Factory`
+  (absorbing `DynamicValue`). `ResolvedValue` is removed — factories run inside the injection context, so
+  `inject()` works directly in factory bodies. `ServiceRedirection` is removed — alias tokens with a factory
+  delegating to `container.get`.
+- Move `@Injectable()` into the DI base, enforced there for instance bindings; the decorator and `isInjectable`
+  keep their public exports.
+- Limit `Transient` scope to factory bindings — transient class instances would bypass deactivation tracking, so
+  instance bindings are always singletons. Binding descriptor types are now declared once in the DI base and
+  re-exported.
+- Trim the internal DI container to the surface Wirestate actually uses: `bindAll`, `createChild`,
+  unbind-by-descriptor, implicit inheritance aliasing, multi-bindings, and service redirections are removed.
+- Remove `bind`, `BindOptions`, `unbind`, and `unbindAll` from `@wirestate/core` — use `container.bind`,
+  `container.unbind`, and `container.unbindAll` directly. `BindOptions.skipActivationHooks` moved onto instance
+  binding descriptors, and `CreateContainerOptions.skipActivationHooks` stamps it on registered class bindings.
 
 - Remove `createIocContainer`; use `createContainer`.
 - Remove `@wirestate/core/test-utils`.

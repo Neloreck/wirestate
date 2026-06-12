@@ -7,11 +7,11 @@ Each container owns its own `EventBus`. Events stay in that container and do not
 ## Emit from a Service
 
 ```ts
-import { Inject, Injectable, WireScope } from "@wirestate/core";
+import { Injectable, WireScope, inject } from "@wirestate/core";
 
 @Injectable()
 export class CartService {
-  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   public addItem(item: CartItem): void {
     this.scope.emitEvent("CART_ITEM_ADDED", item, { source: this });
@@ -22,7 +22,7 @@ export class CartService {
 ## Handle with a Decorator
 
 ```ts
-import { Injectable, OnEvent, WireEvent } from "@wirestate/core";
+import { Injectable, OnEvent, WireEvent, inject } from "@wirestate/core";
 
 @Injectable()
 export class AnalyticsService {
@@ -48,7 +48,7 @@ Useful forms:
 Use direct subscriptions when the handler is dynamic or created at runtime.
 
 ```ts
-import { EventBus, createContainer } from "@wirestate/core";
+import { EventBus, createContainer, inject } from "@wirestate/core";
 
 const container = createContainer();
 const bus = container.get(EventBus);
@@ -75,13 +75,13 @@ const unsubscribe = bus.subscribe(["CART_VIEWED", "CART_CLEARED"], (event) => {
 When a service owns a dynamic subscription, attach it during provider lifecycle and remove it during deprovision.
 
 ```ts
-import { EventUnsubscriber, Inject, Injectable, OnDeprovision, OnProvision, WireScope } from "@wirestate/core";
+import { EventUnsubscriber, Injectable, OnDeprovision, OnProvision, WireScope, inject } from "@wirestate/core";
 
 @Injectable()
 export class CartActivityService {
   private unsubscribe: EventUnsubscriber | null = null;
 
-  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   @OnProvision()
   public onProvision(): void {

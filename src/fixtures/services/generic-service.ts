@@ -1,12 +1,17 @@
-import { Inject, Injectable, Container } from "../../wirestate-core/alias";
-import { OnActivated } from "../../wirestate-core/bind/instance/on-activated";
-import { OnDeactivation } from "../../wirestate-core/bind/instance/on-deactivation";
-import { OnCommand } from "../../wirestate-core/commands/on-command";
-import { WireScope } from "../../wirestate-core/container/wire-scope";
-import { OnEvent } from "../../wirestate-core/events/on-event";
-import { OnQuery } from "../../wirestate-core/queries/on-query";
-import { WireEvent } from "../../wirestate-core/types/events";
-import { Maybe } from "../../wirestate-core/types/general";
+import {
+  Container,
+  inject,
+  Injectable,
+  OnActivated,
+  OnCommand,
+  OnDeactivation,
+  OnEvent,
+  OnQuery,
+  WireEvent,
+  WireScope,
+} from "@wirestate/core";
+
+import { Maybe } from "../types";
 
 @Injectable()
 export class GenericService {
@@ -18,10 +23,7 @@ export class GenericService {
 
   public value: string = "test-value";
 
-  public constructor(
-    @Inject(WireScope)
-    public readonly scope: WireScope
-  ) {}
+  public constructor(public readonly scope: WireScope = inject(WireScope)) {}
 
   @OnActivated()
   public activate(): void {

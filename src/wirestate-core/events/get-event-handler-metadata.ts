@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { collectHandlerMetadata } from "../metadata/handler-metadata";
-import { EVENT_HANDLER_METADATA } from "../registry";
+import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "../metadata/registry";
 import { EventHandlerMetadata } from "../types/events";
 
 /**
@@ -31,5 +31,5 @@ import { EventHandlerMetadata } from "../types/events";
 export function getEventHandlerMetadata(instance: object): ReadonlyArray<EventHandlerMetadata> {
   dbg.info(prefix(__filename), "Retrieving event handler metadata:", { name: instance.constructor.name, instance });
 
-  return collectHandlerMetadata(instance, EVENT_HANDLER_METADATA);
+  return collectHandlerMetadata(instance, EVENT_HANDLER_METADATA, EVENT_METADATA_KEY);
 }

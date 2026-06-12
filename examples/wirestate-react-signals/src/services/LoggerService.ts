@@ -1,5 +1,4 @@
 import {
-  Inject,
   Injectable,
   OnActivated,
   OnCommand,
@@ -8,19 +7,15 @@ import {
   OnEvent,
   OnProvision,
   OnQuery,
-  Optional,
   WireScope,
   type WireEvent,
+  inject,
 } from "@wirestate/core";
 import { Signal, signal } from "@wirestate/signals";
 
 import { EGlobalCommand } from "@/constants/commands";
 import { EGlobalEvent } from "@/constants/events";
-import {
-  GLOBAL_CONFIG,
-  GLOBAL_DYNAMIC_CONFIG,
-  GLOBAL_NOT_EXISTING_CONFIG,
-} from "@/constants/id";
+import { GLOBAL_CONFIG, GLOBAL_DYNAMIC_CONFIG, GLOBAL_NOT_EXISTING_CONFIG } from "@/constants/id";
 import { EGlobalQuery } from "@/constants/queries";
 import { ThemeService } from "@/services/ThemeService";
 
@@ -40,20 +35,18 @@ export class LoggerService {
   private nextId: number = 1;
 
   public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope,
-    @Inject(GLOBAL_CONFIG)
-    protected readonly globalConfig: object,
-    @Inject(GLOBAL_DYNAMIC_CONFIG)
-    protected readonly globalDynamicConfig: object,
-    @Optional()
-    @Inject(GLOBAL_NOT_EXISTING_CONFIG)
-    protected readonly globalNotExistingConfig?: object,
+    private readonly scope: WireScope = inject(WireScope),
+    protected readonly globalConfig: object = inject(GLOBAL_CONFIG),
+    protected readonly globalDynamicConfig: object = inject(GLOBAL_DYNAMIC_CONFIG),
+    protected readonly globalNotExistingConfig: object | undefined = inject(GLOBAL_NOT_EXISTING_CONFIG, {
+      optional: true,
+    }),
   ) {
-    console.info(
-      `[${this.constructor.name}] Constructing with constant global configs:`,
-      { globalConfig, globalDynamicConfig, globalNotExistingConfig },
-    );
+    console.info(`[${this.constructor.name}] Constructing with constant global configs:`, {
+      globalConfig,
+      globalDynamicConfig,
+      globalNotExistingConfig,
+    });
   }
 
   @OnActivated()
@@ -135,10 +128,7 @@ export class LoggerService {
 
   @OnEvent([EGlobalEvent.COUNTER_RESET])
   public onReset(event: Event): void {
-    this.log(
-      `[${this.constructor.name}] Observed [onReset] event:`,
-      event.type,
-    );
+    this.log(`[${this.constructor.name}] Observed [onReset] event:`, event.type);
   }
 
   @OnQuery(EGlobalQuery.GET_RECENT_LOGS)

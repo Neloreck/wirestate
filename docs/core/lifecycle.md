@@ -3,13 +3,13 @@
 Wirestate lifecycle has one service layer and one provider layer. Use this map to choose where service setup and cleanup
 belong.
 
-| Application                 | Wirestate                                                                              | Use it for                                                                                              |
-| --------------------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Constructor resolution      | Service constructor and constructor dependencies.                                      | Assign injected dependencies and cheap field defaults. Avoid side effects that need cleanup.            |
-| Container activation        | `@OnActivated` after the service instance is resolved.                                 | Read static seeds and do cheap setup that can run before a UI boundary is committed.                    |
-| Provider mount/connect      | `@OnProvision` in binding order. Provider lifecycle participants are resolved first.   | Start provider-owned timers, subscriptions, sockets, observers, and async loops.                        |
-| Provider unmount/disconnect | `@OnDeprovision` in reverse provision order, then the provider releases the container. | Stop every resource started in `@OnProvision`. Make cleanup complete and repeatable.                    |
-| Container disposal          | `unbind` or `unbindAll`, then `@OnDeactivation` for resolved services.                 | Tear down service-level registrations and final service state. Discard the container after `unbindAll`. |
+| Application                 | Wirestate                                                                                  | Use it for                                                                                              |
+| --------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| Constructor resolution      | Service constructor and constructor dependencies.                                          | Assign injected dependencies and cheap field defaults. Avoid side effects that need cleanup.            |
+| Container activation        | `@OnActivated` after the service instance is resolved.                                     | Read static seeds and do cheap setup that can run before a UI boundary is committed.                    |
+| Provider mount/connect      | `@OnProvision` in binding order. Provider lifecycle participants are resolved first.       | Start provider-owned timers, subscriptions, sockets, observers, and async loops.                        |
+| Provider unmount/disconnect | `@OnDeprovision` in reverse provision order, then the provider releases the container.     | Stop every resource started in `@OnProvision`. Make cleanup complete and repeatable.                    |
+| Container disposal          | `container.unbind` or `container.unbindAll`, then `@OnDeactivation` for resolved services. | Tear down service-level registrations and final service state. Discard the container after `unbindAll`. |
 
 Managed providers activate all bindings by default unless `activate` is set, then dispose owned containers after
 deprovision. External providers provision and deprovision the passed `container`, but disposal stays with the external
@@ -41,11 +41,11 @@ async work needs to know whether the instance is still active.
 ## Ownership
 
 Managed providers own the container they create from `config`. They provision it while mounted or connected,
-deprovision it when that boundary ends, and then dispose it with `unbindAll`.
+deprovision it when that boundary ends, and then dispose it with `container.unbindAll()`.
 
 External providers publish a container passed through `container`. They provision and deprovision it for their own
-boundary, but they never dispose it. The code that created the external container remains responsible for `unbind` or
-`unbindAll`.
+boundary, but they never dispose it. The code that created the external container remains responsible for
+`container.unbind` or `container.unbindAll`.
 
 [`WireStatus`](/api/wirestate-core/classes/WireStatus) exposes lifecycle state for late async guards:
 
@@ -89,4 +89,4 @@ export class SearchService {
 [`ProvisionId`](/api/wirestate-core/type-aliases/ProvisionId),
 [`provisionContainer`](/api/wirestate-core/functions/provisionContainer),
 [`deprovisionContainer`](/api/wirestate-core/functions/deprovisionContainer),
-[`unbind`](/api/wirestate-core/functions/unbind), [`unbindAll`](/api/wirestate-core/functions/unbindAll).
+[`Container`](/api/wirestate-core/classes/Container).

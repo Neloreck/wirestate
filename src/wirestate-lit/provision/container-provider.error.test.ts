@@ -1,4 +1,4 @@
-import { Container, Injectable, OnDeactivation, OnDeprovision, OnProvision, createContainer } from "@wirestate/core";
+import { Container, Injectable, OnDeactivation, OnDeprovision, OnProvision } from "@wirestate/core";
 import { ReactiveElement } from "lit";
 import { customElement } from "lit/decorators.js";
 
@@ -42,7 +42,7 @@ describe("ContainerProvider provision errors", () => {
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [FirstProvisionService, FailingProvisionService],
       onError: onError,
     });
@@ -54,8 +54,8 @@ describe("ContainerProvider provision errors", () => {
     expect(controller.value).toBeUndefined();
     expect(events).toEqual(["provision-first", "provision-failing", "deprovision-failing", "deprovision-first"]);
     expect(unbindAllSpy).not.toHaveBeenCalled();
-    expect(container.isBound(FirstProvisionService)).toBe(true);
-    expect(container.isBound(FailingProvisionService)).toBe(true);
+    expect(container.has(FirstProvisionService)).toBe(true);
+    expect(container.has(FailingProvisionService)).toBe(true);
   });
 
   it("should rollback failed managed provision and rethrow before publishing the container", () => {

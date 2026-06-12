@@ -1,4 +1,4 @@
-import { createContainer } from "../container/create-container";
+import { Container } from "../container/container";
 import { EventUnsubscriber } from "../types/events";
 
 import { EventBus } from "./event-bus";
@@ -166,7 +166,7 @@ describe("EventBus", () => {
   it("should report handler errors to container error handler", () => {
     const error = new Error("handler error");
     const onError = jest.fn();
-    const container = createContainer({ onError });
+    const container = new Container({ onError });
     const bus: EventBus = container.get(EventBus);
 
     bus.subscribe(() => {

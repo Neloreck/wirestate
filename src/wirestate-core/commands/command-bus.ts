@@ -84,10 +84,7 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    *
    * @throws {@link WirestateError} If no handler is registered.
    */
-  public executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
-    type: T,
-    payload?: P
-  ): Promise<R> {
+  public executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): Promise<R> {
     dbg.info(prefix(__filename), "Execute async command:", { type, payload });
 
     return this.dispatchAsync<R, P>(type, payload);

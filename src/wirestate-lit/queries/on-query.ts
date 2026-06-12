@@ -45,9 +45,7 @@ export interface OnQueryDecorator<R = unknown, P = unknown, T extends QueryType 
  * }
  * ```
  */
-export function onQuery<R = unknown, P = unknown, T extends QueryType = QueryType>(
-  type: T
-): OnQueryDecorator<R, P, T> {
+export function onQuery<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T): OnQueryDecorator<R, P, T> {
   return ((protoOrTarget: object, nameOrContext: PropertyKey | ClassMethodDecoratorContext) => {
     if (typeof nameOrContext === "object") {
       // Standard decorators:

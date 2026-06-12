@@ -17,7 +17,6 @@ export default defineConfig({
       presets: [reactCompilerPreset(), "@babel/preset-typescript"],
       plugins: [
         "module:@preact/signals-react-transform",
-        "babel-plugin-transform-typescript-metadata",
         ["@babel/plugin-proposal-decorators", { version: "legacy" }],
         ["@babel/plugin-transform-class-properties", { loose: true }],
       ],

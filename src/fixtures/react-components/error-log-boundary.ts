@@ -1,6 +1,6 @@
 import { Component, createElement, ReactNode } from "react";
 
-import { Optional } from "../../wirestate-core/types/general";
+import { Optional } from "../types";
 
 interface ErrorLogBoundaryProps {
   readonly children?: ReactNode;

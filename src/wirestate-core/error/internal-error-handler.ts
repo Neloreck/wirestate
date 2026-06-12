@@ -1,7 +1,11 @@
-import { Container } from "../alias";
-import { WIRESTATE_INTERNAL_ERROR_HANDLERS } from "../registry";
+import type { ContainerKernel } from "../container/container-kernel";
 import { InternalErrorDescriptor, InternalErrorHandler } from "../types/error";
 import { Maybe } from "../types/general";
+
+/**
+ * Internal storage for container error handlers.
+ */
+const WIRESTATE_INTERNAL_ERROR_HANDLERS: WeakMap<ContainerKernel, InternalErrorHandler> = new WeakMap();
 
 /**
  * Handles internal Wirestate errors with the default console output.
@@ -29,10 +33,10 @@ export function defaultInternalErrorHandler(descriptor: InternalErrorDescriptor)
  *
  * @internal
  *
- * @param container - Container to inspect.
+ * @param container - ContainerKernel to inspect.
  * @returns Configured handler, or `undefined` when none is configured.
  */
-export function getConfiguredInternalErrorHandler(container?: Container): Maybe<InternalErrorHandler> {
+export function getConfiguredInternalErrorHandler(container?: ContainerKernel): Maybe<InternalErrorHandler> {
   return container ? WIRESTATE_INTERNAL_ERROR_HANDLERS.get(container) : null;
 }
 
@@ -41,10 +45,10 @@ export function getConfiguredInternalErrorHandler(container?: Container): Maybe<
  *
  * @internal
  *
- * @param container - Container that owns the handler.
+ * @param container - ContainerKernel that owns the handler.
  * @param handler - Handler to store.
  */
-export function setInternalErrorHandler(container: Container, handler: InternalErrorHandler): void {
+export function setInternalErrorHandler(container: ContainerKernel, handler: InternalErrorHandler): void {
   WIRESTATE_INTERNAL_ERROR_HANDLERS.set(container, handler);
 }
 

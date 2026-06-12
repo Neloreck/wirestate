@@ -37,7 +37,7 @@ The React MobX rendering binding (`observer`) lives in
 ## Start
 
 ```ts
-import { Injectable, createContainer } from "wirestate";
+import { Injectable, Container } from "wirestate";
 import { Action, Observable, makeObservable, observer } from "wirestate/mobx";
 import { signal, useSignals } from "wirestate/signals";
 ```

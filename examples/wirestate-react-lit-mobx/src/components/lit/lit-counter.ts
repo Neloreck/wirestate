@@ -53,15 +53,12 @@ export class LitCounter extends MobxLitElement {
   protected render() {
     return html`
       <button class="accent" @click=${() => this.counterService.increment()}>
-        Increment — count: ${this.counterService.count}
-        (${this.counterService.isEven ? "even" : "odd"})
+        Increment — count: ${this.counterService.count} (${this.counterService.isEven ? "even" : "odd"})
       </button>
 
       <button @click=${() => this.counterService.reset()}>Reset counter</button>
 
-      <button @click=${() => this.themeService.toggle()}>
-        Toggle theme (${this.themeService.theme})
-      </button>
+      <button @click=${() => this.themeService.toggle()}>Toggle theme (${this.themeService.theme})</button>
     `;
   }
 }

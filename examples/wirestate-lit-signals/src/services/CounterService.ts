@@ -1,5 +1,4 @@
 import {
-  Inject,
   Injectable,
   OnActivated,
   OnDeactivation,
@@ -9,6 +8,7 @@ import {
   OnQuery,
   OnProvision,
   OnDeprovision,
+  inject,
 } from "@wirestate/core";
 import { Signal, computed, signal } from "@wirestate/signals";
 
@@ -28,10 +28,8 @@ export class CounterService {
   public isEven = computed(() => this.count.value % 2 === 0);
 
   public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope,
-    @Inject(LoggerService)
-    private readonly loggerService: LoggerService
+    private readonly scope: WireScope = inject(WireScope),
+    private readonly loggerService: LoggerService = inject(LoggerService)
   ) {}
 
   @OnActivated()

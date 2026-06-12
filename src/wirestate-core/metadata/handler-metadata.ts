@@ -30,11 +30,27 @@ export function appendHandlerMetadata<T>(registry: WeakMap<object, Array<T>>, co
 }
 
 /**
- * Collects a class hierarchy's handler-metadata entries in base-to-derived order.
+ * Appends an entry to a standard decorator metadata object's handler list.
  *
- * @remarks
- * Entries are flattened from the prototype chain so base-class handlers come
- * before derived-class handlers.
+ * @group Metadata
+ * @internal
+ *
+ * @template T - Handler metadata entry type.
+ *
+ * @param metadata - Standard decorator metadata object of the class being defined.
+ * @param key - Standard decorator metadata key for the handler list.
+ * @param entry - Metadata entry to record.
+ */
+export function appendStandardHandlerMetadata<T>(metadata: DecoratorMetadataObject, key: symbol, entry: T): void {
+  if (Object.hasOwn(metadata, key)) {
+    (metadata[key] as Array<T>).push(entry);
+  } else {
+    metadata[key] = [entry];
+  }
+}
+
+/**
+ * Collects a class hierarchy's handler-metadata entries in base-to-derived order.
  *
  * @group Metadata
  * @internal
@@ -43,8 +59,13 @@ export function appendHandlerMetadata<T>(registry: WeakMap<object, Array<T>>, co
  *
  * @param instance - Instance to scan.
  * @param registry - Registry keyed by class constructor.
+ * @param metadataKey - Optional standard decorator metadata key to also read.
  * @returns Handler metadata entries, ordered from base to derived class.
  */
-export function collectHandlerMetadata<T>(instance: object, registry: WeakMap<object, Array<T>>): ReadonlyArray<T> {
-  return getPrototypeChainMetadata(instance, registry).reverse().flat();
+export function collectHandlerMetadata<T>(
+  instance: object,
+  registry: WeakMap<object, Array<T>>,
+  metadataKey?: symbol
+): ReadonlyArray<T> {
+  return getPrototypeChainMetadata(instance, registry, metadataKey).reverse().flat();
 }

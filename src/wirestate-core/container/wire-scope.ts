@@ -1,16 +1,19 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Injectable, Container, Identifier } from "../alias";
+import { Identifier } from "../binding/binding-tokens";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
+import { Injectable } from "../metadata/injectable";
 import { QueryBus } from "../queries/query-bus";
-import { SEED_TOKEN, SEEDS_TOKEN } from "../registry";
 import { CommandHandler, CommandUnregister, CommandType } from "../types/commands";
 import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 import { Optional, AnyObject } from "../types/general";
 import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 import { SeedKey, SeedsMap } from "../types/seeds";
+
+import type { Container } from "./container";
+import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
 
 /**
  * Per-instance handle for container work.
@@ -23,11 +26,11 @@ import { SeedKey, SeedsMap } from "../types/seeds";
  *
  * @example
  * ```typescript
- * import { Inject, Injectable, WireScope } from "@wirestate/core";
+ * import { Injectable, WireScope, inject } from "@wirestate/core";
  *
  * @Injectable()
  * class CartService {
- *   public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+ *   public constructor(private readonly scope: WireScope = inject(WireScope)) {}
  *
  *   public addItem(item: CartItem): void {
  *     this.scope.emitEvent("CART_ITEM_ADDED", item);
@@ -114,7 +117,7 @@ export class WireScope {
       token,
     });
 
-    return this.container.isBound(token) ? this.container.get<T>(token) : null;
+    return this.container.has(token) ? this.container.get<T>(token) : null;
   }
 
   /**

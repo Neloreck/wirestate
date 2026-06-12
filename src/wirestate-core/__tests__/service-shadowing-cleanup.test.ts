@@ -9,7 +9,6 @@ import {
   OnEvent,
   OnQuery,
   QueryBus,
-  createContainer,
 } from "../index";
 
 describe("core instance shadowing and cleanup integration", () => {
@@ -90,7 +89,7 @@ describe("core instance shadowing and cleanup integration", () => {
   });
 
   it("restores previous command and query handlers after the shadowing instance is removed", async () => {
-    const container: Container = createContainer({
+    const container: Container = new Container({
       activate: [PrimaryHandlerService, SecondaryHandlerService],
       bindings: [PrimaryHandlerService, SecondaryHandlerService],
     });
@@ -122,7 +121,7 @@ describe("core instance shadowing and cleanup integration", () => {
   });
 
   it("broadcasts events to all active services and removes only disconnected listeners", () => {
-    const container: Container = createContainer({
+    const container: Container = new Container({
       activate: [PrimaryHandlerService, SecondaryHandlerService],
       bindings: [PrimaryHandlerService, SecondaryHandlerService],
     });

@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, WireScope, createContainer } from "@wirestate/core";
+import { Container, WireScope } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
@@ -11,7 +11,7 @@ describe("useScope", () => {
   let container: Container;
 
   beforeEach(() => {
-    container = createContainer();
+    container = new Container();
     fixture = createLitProvision(container);
   });
 

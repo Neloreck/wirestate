@@ -1,5 +1,4 @@
 import {
-  Inject,
   Injectable,
   OnActivated,
   OnDeactivation,
@@ -9,23 +8,15 @@ import {
   OnQuery,
   SEED,
   WireScope,
+  inject,
 } from "@wirestate/core";
-import {
-  type ReadonlySignal,
-  Signal,
-  computed,
-  signal,
-} from "@wirestate/signals";
+import { type ReadonlySignal, Signal, computed, signal } from "@wirestate/signals";
 
 import { EGlobalEvent } from "@/constants/events";
 import { LoggerService } from "@/services/LoggerService";
 import type { Optional } from "@/types";
 
-import {
-  ECounterServiceQuery,
-  type ICounterSnapshot,
-  type ICounterSummary,
-} from "./CounterService.query";
+import { ECounterServiceQuery, type ICounterSnapshot, type ICounterSummary } from "./CounterService.query";
 
 export interface ICounterSeed {
   readonly count?: number;
@@ -36,22 +27,14 @@ export interface ICounterSeed {
 export class CounterService {
   public readonly count: Signal = signal(0);
   public readonly lastIncrementAt: Signal<Optional<number>> = signal(null);
-  public readonly isEven: ReadonlySignal<boolean> = computed(
-    () => this.count.value % 2 === 0,
-  );
+  public readonly isEven: ReadonlySignal<boolean> = computed(() => this.count.value % 2 === 0);
 
   public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope,
-    @Inject(LoggerService)
-    private readonly loggerService: LoggerService,
-    @Inject(SEED)
-    protected readonly seed: object,
+    private readonly scope: WireScope = inject(WireScope),
+    private readonly loggerService: LoggerService = inject(LoggerService),
+    protected readonly seed: object = inject(SEED),
   ) {
-    console.info(
-      `[${this.constructor.name}] Shared seed on construction:`,
-      seed,
-    );
+    console.info(`[${this.constructor.name}] Shared seed on construction:`, seed);
   }
 
   @OnActivated()
@@ -87,10 +70,7 @@ export class CounterService {
   private initializeFromSeed(): void {
     const seed: Optional<ICounterSeed> = this.scope.getSeed(CounterService);
 
-    console.info(
-      `[${this.constructor.name}] Seed from current DI context:`,
-      seed,
-    );
+    console.info(`[${this.constructor.name}] Seed from current DI context:`, seed);
 
     if (seed) {
       if (typeof seed.count === "number") {
@@ -105,9 +85,7 @@ export class CounterService {
 
   public increment(): void {
     // or this.resolve(LoggerService) to avoid circular refs
-    this.loggerService.log(
-      `[${this.constructor.name}][action] Incrementing counter`,
-    );
+    this.loggerService.log(`[${this.constructor.name}][action] Incrementing counter`);
 
     this.count.value += 1;
     this.lastIncrementAt.value = Date.now();
@@ -138,10 +116,7 @@ export class CounterService {
    */
   @OnQuery(ECounterServiceQuery.GET_COUNTER_SUMMARY)
   public provideCounterSummary(data?: object): ICounterSummary {
-    this.loggerService.log(
-      `[${this.constructor.name}][query] Fetching sync snapshot:`,
-      data,
-    );
+    this.loggerService.log(`[${this.constructor.name}][query] Fetching sync snapshot:`, data);
 
     return {
       count: this.count.value,
@@ -157,9 +132,7 @@ export class CounterService {
    */
   @OnQuery(ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT)
   public async fetchCounterSnapshot(): Promise<ICounterSnapshot> {
-    this.loggerService.log(
-      `[${this.constructor.name}][query] Fetching async snapshot`,
-    );
+    this.loggerService.log(`[${this.constructor.name}][query] Fetching async snapshot`);
 
     await new Promise((resolve) => setTimeout(resolve, 500));
 

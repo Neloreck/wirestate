@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, createContainer, EventBus } from "@wirestate/core";
+import { Container, EventBus } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
@@ -81,7 +81,7 @@ describe("OnEventController", () => {
     const { provider, contextProvider, container: firstContainer } = fixture;
 
     const firstBus: EventBus = firstContainer.get(EventBus);
-    const secondContainer: Container = createContainer();
+    const secondContainer: Container = new Container();
     const secondBus: EventBus = secondContainer.get(EventBus);
 
     const element: TestConsumerElement = new TestConsumerElement();

@@ -2,7 +2,7 @@ import {
   CommandBus,
   Container,
   EventBus,
-  Inject,
+  inject,
   Injectable,
   OnCommand,
   OnDeactivation,
@@ -10,8 +10,6 @@ import {
   OnQuery,
   QueryBus,
   WireScope,
-  createContainer,
-  unbindAll,
 } from "../index";
 import { Optional } from "../types/general";
 
@@ -32,10 +30,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     public readonly events: Array<string> = [];
     private count: number = 0;
 
-    public constructor(
-      @Inject(WireScope)
-      private readonly scope: WireScope
-    ) {}
+    public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
     @OnCommand(ADD_COMMAND)
     public add(value: number): number {
@@ -64,10 +59,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     public readonly events: Array<string> = [];
     private count: number = 100;
 
-    public constructor(
-      @Inject(WireScope)
-      private readonly scope: WireScope
-    ) {}
+    public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
     @OnCommand(ADD_COMMAND)
     public add(value: number): number {
@@ -92,12 +84,12 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
   }
 
   it("keeps parent and child messaging in separate scope", async () => {
-    const parent: Container = createContainer({
+    const parent: Container = new Container({
       activate: [ParentCounterService],
       bindings: [ParentCounterService, { token: PARENT_TOKEN, value: "root-value" }],
       seeds: [[SETTINGS_TOKEN, { label: "root-label", offset: 1 }]],
     });
-    const child: Container = createContainer({
+    const child: Container = new Container({
       activate: [ChildCounterService],
       bindings: [ChildCounterService],
       parent: parent,
@@ -120,7 +112,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     expect(parent.get(ParentCounterService).events).toEqual(["parent:from-parent"]);
     expect(child.get(ChildCounterService).events).toEqual(["child:from-child"]);
 
-    unbindAll(child);
+    child.unbindAll();
 
     expect(parent.get(CommandBus).execute(ADD_COMMAND, 2)).toBe(6);
     expect(parent.get(QueryBus).query(COUNT_QUERY)).toBe("root-label:6");
@@ -130,7 +122,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
   });
 
   it("uses the root seed separately from targeted seeds", () => {
-    const container: Container = createContainer({
+    const container: Container = new Container({
       seed: { appName: "wirestate" },
       seeds: [[SETTINGS_TOKEN, { label: "targeted", offset: 7 }]],
     });
@@ -153,10 +145,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     @Injectable()
     class CleanupService {
-      public constructor(
-        @Inject(WireScope)
-        private readonly scope: WireScope
-      ) {}
+      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
       @OnDeactivation()
       public onDeactivation(): void {
@@ -189,13 +178,13 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       activate: [CleanupService],
       bindings: [CleanupService],
       seeds: [[SETTINGS_TOKEN, { label: "cleanup-label", offset: 0 }]],
     });
 
-    unbindAll(container);
+    container.unbindAll();
 
     expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
     expect(commandResult).not.toBeNull();
@@ -204,10 +193,10 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     expect(result).toBe("command-result");
     expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
-    expect(container.isBound(CleanupService)).toBe(false);
-    expect(container.isBound(EventBus)).toBe(false);
-    expect(container.isBound(QueryBus)).toBe(false);
-    expect(container.isBound(CommandBus)).toBe(false);
+    expect(container.has(CleanupService)).toBe(false);
+    expect(container.has(EventBus)).toBe(false);
+    expect(container.has(QueryBus)).toBe(false);
+    expect(container.has(CommandBus)).toBe(false);
   });
 
   it("keeps services able to communicate with each other while deactivating", async () => {
@@ -223,10 +212,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     @Injectable()
     class DeactivationPeerService {
-      public constructor(
-        @Inject(WireScope)
-        private readonly scope: WireScope
-      ) {}
+      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
       @OnDeactivation()
       public onDeactivation(): void {
@@ -261,10 +247,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     @Injectable()
     class DeactivationCoordinatorService {
-      public constructor(
-        @Inject(WireScope)
-        private readonly scope: WireScope
-      ) {}
+      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
       @OnDeactivation()
       public onDeactivation(): void {
@@ -282,12 +265,12 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       activate: [DeactivationCoordinatorService, DeactivationPeerService],
       bindings: [DeactivationCoordinatorService, DeactivationPeerService],
     });
 
-    unbindAll(container);
+    container.unbindAll();
 
     expect(logs).toEqual([
       "coordinator-deactivation",

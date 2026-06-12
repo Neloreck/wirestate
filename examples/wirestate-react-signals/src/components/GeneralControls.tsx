@@ -38,25 +38,15 @@ export function GeneralControls() {
   return (
     <div className={"general-controls"}>
       <div className={"counter-row"}>
-        <button
-          className={"counter"}
-          onClick={() => counterService.increment()}
-        >
-          Increment — count: {counterService.count} (
-          {counterService.isEven.value ? "even" : "odd"})
+        <button className={"counter"} onClick={() => counterService.increment()}>
+          Increment — count: {counterService.count.value} ({counterService.isEven.value ? "even" : "odd"})
         </button>
-        <button
-          className={"counter ghost"}
-          onClick={() => counterService.reset()}
-        >
+        <button className={"counter ghost"} onClick={() => counterService.reset()}>
           Reset counter
         </button>
 
-        <button
-          className={"counter ghost"}
-          onClick={() => themeService.toggle()}
-        >
-          Toggle theme ({themeService.theme})
+        <button className={"counter ghost"} onClick={() => themeService.toggle()}>
+          Toggle theme ({themeService.theme.value})
         </button>
 
         <button className={"counter ghost"} onClick={() => onUserPinged()}>

@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { Container, EventBus, createContainer } from "@wirestate/core";
+import { Container, EventBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
 import { EventEmitter } from "../types/events";
@@ -8,7 +8,7 @@ import { useEventEmitter } from "./use-event-emitter";
 
 describe("useEventEmitter", () => {
   it("should return an emitter that dispatches events", () => {
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 

@@ -36,7 +36,7 @@ export interface UseContainerValue {
  *   private container: UseContainerValue = useContainer(this);
  *
  *   public render() {
- *     return html`<div>${this.container.value.isBound(MyService)}</div>`;
+ *     return html`<div>${this.container.value.has(MyService)}</div>`;
  *   }
  * }
  * ```

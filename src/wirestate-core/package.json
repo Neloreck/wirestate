@@ -1,7 +1,7 @@
 {
   "name": "@wirestate/core",
-  "version": "1.0.0-experimental.4",
-  "description": "State management core with InversifyJS dependency injection",
+  "version": "1.0.0-experimental.5",
+  "description": "State management core with built-in dependency injection",
   "sideEffects": false,
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/Neloreck/wirestate#readme",
@@ -35,8 +35,6 @@
     "class-based",
     "declarative",
     "framework-agnostic",
-    "inversify",
-    "inversifyjs",
     "ioc",
     "di",
     "dependency-injection",
@@ -49,11 +47,7 @@
     "store",
     "typescript"
   ],
-  "dependencies": {
-    "inversify": "^8.1.0"
-  },
   "peerDependencies": {
-    "reflect-metadata": ">=0.2.0",
     "tslib": ">=2.5.0"
   },
   "optionalDependencies": {}

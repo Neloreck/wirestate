@@ -1,9 +1,10 @@
-import { Container, Injectable } from "../alias";
-import { OnDeprovision } from "../bind/instance/on-deprovision";
-import { OnProvision } from "../bind/instance/on-provision";
+import { OnDeprovision } from "../lifecycle/on-deprovision";
+import { OnProvision } from "../lifecycle/on-provision";
+import { Injectable } from "../metadata/injectable";
 
-import { ContainerProvisionLifecycle, provisionContainer } from "./container-provision-lifecycle";
-import { createContainer } from "./create-container";
+import { Container } from "./container";
+import { provisionContainer } from "./container-provision-lifecycle";
+import { ContainerProvisionLifecycle } from "./provision-state";
 
 describe("provision lifecycle errors", () => {
   function createProvisionLifecycle(): ContainerProvisionLifecycle {
@@ -22,7 +23,7 @@ describe("provision lifecycle errors", () => {
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [FailingProvisionService],
       onError,
     });
@@ -88,7 +89,7 @@ describe("provision lifecycle errors", () => {
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [FirstProvisionService, FailingProvisionService, ThirdProvisionService],
       onError,
     });
@@ -121,7 +122,7 @@ describe("provision lifecycle errors", () => {
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [AsyncFailingProvisionService],
       onError,
     });

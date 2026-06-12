@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Container } from "../alias";
+import type { Container } from "../container/container";
 import { reportWirestateInternalError } from "../error/internal-error-handler";
 import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "../types/events";
 import { Maybe, Optional } from "../types/general";
@@ -40,9 +40,9 @@ interface EventSubscription {
  *
  * @example
  * ```typescript
- * import { EventBus, createContainer } from "@wirestate/core";
+ * import { EventBus, Container } from "@wirestate/core";
  *
- * const container = createContainer();
+ * const container = new Container();
  * const bus = container.get(EventBus);
  * const unsubscribe = bus.subscribe((event) => console.log(event.type));
  *

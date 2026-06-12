@@ -1,7 +1,5 @@
 import "@/styles/index.css";
 
-import "reflect-metadata";
-
 import "@/components/general-controls";
 import "@/components/events-log";
 import "@/components/queries-data";
@@ -103,7 +101,7 @@ export class Application extends LitElement {
         {
           token: GLOBAL_DYNAMIC_CONFIG,
           factory: () => ({ random: Math.random(), another: true }),
-          type: BindingType.DynamicValue,
+          type: BindingType.Factory,
           scope: BindingScope.Singleton,
         },
       ],

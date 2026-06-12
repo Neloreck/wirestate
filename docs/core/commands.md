@@ -11,7 +11,7 @@ previous handler becomes active again.
 ## Handle a Command
 
 ```ts
-import { Injectable, OnCommand } from "@wirestate/core";
+import { Injectable, OnCommand, inject } from "@wirestate/core";
 
 @Injectable()
 export class SearchService {
@@ -29,11 +29,11 @@ export class SearchService {
 ## Execute a Command
 
 ```ts
-import { Inject, Injectable, WireScope } from "@wirestate/core";
+import { Injectable, WireScope, inject } from "@wirestate/core";
 
 @Injectable()
 export class HeaderService {
-  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   public openSearch(): void {
     const opened: boolean = this.scope.executeCommand("OPEN_SEARCH");
@@ -50,7 +50,7 @@ export class HeaderService {
 ## Handle an Async Command
 
 ```ts
-import { Inject, Injectable, OnCommand, WireScope } from "@wirestate/core";
+import { Injectable, OnCommand, WireScope, inject } from "@wirestate/core";
 
 @Injectable()
 export class AuthService {
@@ -62,7 +62,7 @@ export class AuthService {
 
 @Injectable()
 export class HeaderService {
-  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   public async logout(): Promise<void> {
     await this.scope.executeCommandAsync("LOGOUT");
@@ -85,7 +85,7 @@ const uploaded: UploadReceipt | null = await this.scope.executeOptionalCommandAs
 ## Register Directly
 
 ```ts
-import { CommandBus, createContainer } from "@wirestate/core";
+import { CommandBus, createContainer, inject } from "@wirestate/core";
 
 const container = createContainer();
 const bus = container.get(CommandBus);
@@ -112,13 +112,13 @@ When a service owns a dynamic command handler, register it during provider lifec
 deprovision.
 
 ```ts
-import { CommandUnregister, Inject, Injectable, OnDeprovision, OnProvision, WireScope } from "@wirestate/core";
+import { CommandUnregister, Injectable, OnDeprovision, OnProvision, WireScope, inject } from "@wirestate/core";
 
 @Injectable()
 export class CartCommandService {
   private unregisterSaveCart: CommandUnregister | null = null;
 
-  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   @OnProvision()
   public onProvision(): void {

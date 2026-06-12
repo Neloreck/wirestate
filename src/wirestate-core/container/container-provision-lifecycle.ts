@@ -1,35 +1,29 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { BindingType, Container, Identifier } from "../alias";
-import { getDeprovisionHandlerMetadata } from "../bind/instance/on-deprovision";
-import { getProvisionHandlerMetadata } from "../bind/instance/on-provision";
-import { getBindingToken } from "../bind/utils/get-binding-token";
-import { getContainerBindings } from "../bind/utils/register-binding";
+import { Binding, Bindings, BindingType } from "../binding/binding";
+import { Identifier } from "../binding/binding-tokens";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
+import { getDeprovisionHandlerMetadata } from "../lifecycle/on-deprovision";
+import { getProvisionHandlerMetadata } from "../lifecycle/on-provision";
+import { Maybe } from "../types/general";
+
+import type { Container } from "./container";
+import { getBindingToken } from "./get-binding-token";
+import { getInstanceContainer } from "./instance-lifecycle";
 import {
-  ACTIVE_INSTANCES_BY_CONTAINER,
-  CONTAINER_REFS_BY_INSTANCE,
+  clearContainerProvisionStatus,
+  ContainerProvisionLifecycle,
+  getContainerProvisionStatus,
   PROVISION_IDS_BY_INSTANCE,
   PROVISION_LIFECYCLES_BY_CONTAINER,
-  PROVISION_STATUS_BY_CONTAINER,
   PROVISION_TOKENS_BY_INSTANCE,
-} from "../registry";
-import { Maybe } from "../types/general";
-import { Binding, Bindings, ProvisionId } from "../types/provision";
-
-import { WireStatus } from "./wire-status";
-
-/**
- * Represents provider lifecycle state keyed by container.
- *
- * Framework adapters keep one map per provider tree.
- *
- * @group Container
- */
-export type ContainerProvisionLifecycle = Map<Container, Array<object>>;
+  setContainerProvisioned,
+  UNBIND_INTERCEPTOR_REMOVERS,
+} from "./provision-state";
+import { ProvisionId, WireStatus } from "./wire-status";
 
 /**
  * Provisions a container for a framework provider.
@@ -47,7 +41,7 @@ export type ContainerProvisionLifecycle = Map<Container, Array<object>>;
  *
  * @example
  * ```typescript
- * import { Injectable, OnProvision, createContainer, provisionContainer } from "@wirestate/core";
+ * import { Injectable, OnProvision, Container, provisionContainer } from "@wirestate/core";
  *
  * @Injectable()
  * class PanelService {
@@ -55,7 +49,7 @@ export type ContainerProvisionLifecycle = Map<Container, Array<object>>;
  *   public connect(): void {}
  * }
  *
- * const container = createContainer({ bindings: [PanelService] });
+ * const container = new Container({ bindings: [PanelService] });
  * const lifecycle = new Map();
  *
  * provisionContainer(container, lifecycle);
@@ -64,7 +58,7 @@ export type ContainerProvisionLifecycle = Map<Container, Array<object>>;
 export function provisionContainer(
   container: Container,
   lifecycle: ContainerProvisionLifecycle,
-  bindings: Bindings = getContainerBindings(container)
+  bindings: Bindings = container.getOwnBindings()
 ): void {
   if (lifecycle.has(container)) {
     return;
@@ -72,12 +66,12 @@ export function provisionContainer(
 
   dbg.info(prefix(__filename), "Provisioning container:", { container });
 
-  PROVISION_STATUS_BY_CONTAINER.delete(container);
+  clearContainerProvisionStatus(container);
 
   lifecycle.set(container, provisionInstances(container, bindings));
   trackProvisionLifecycle(container, lifecycle);
 
-  PROVISION_STATUS_BY_CONTAINER.set(container, true);
+  setContainerProvisioned(container, true);
 }
 
 /**
@@ -90,7 +84,7 @@ export function provisionContainer(
  *
  * @example
  * ```typescript
- * import { Injectable, OnDeprovision, createContainer, deprovisionContainer, provisionContainer } from "@wirestate/core";
+ * import { Injectable, OnDeprovision, Container, deprovisionContainer, provisionContainer } from "@wirestate/core";
  *
  * @Injectable()
  * class PanelService {
@@ -98,7 +92,7 @@ export function provisionContainer(
  *   public disconnect(): void {}
  * }
  *
- * const container = createContainer({ bindings: [PanelService] });
+ * const container = new Container({ bindings: [PanelService] });
  * const lifecycle = new Map();
  *
  * provisionContainer(container, lifecycle, [PanelService]);
@@ -106,7 +100,9 @@ export function provisionContainer(
  * ```
  */
 export function deprovisionContainer(container: Container, lifecycle: ContainerProvisionLifecycle): void {
-  PROVISION_STATUS_BY_CONTAINER.set(container, false);
+  const wasProvisioned: boolean = getContainerProvisionStatus(container) === true;
+
+  setContainerProvisioned(container, false);
 
   const instances: Maybe<Array<object>> = lifecycle.get(container);
 
@@ -118,11 +114,7 @@ export function deprovisionContainer(container: Container, lifecycle: ContainerP
 
     deprovisionInstances(instances);
 
-    for (const instance of ACTIVE_INSTANCES_BY_CONTAINER.get(container) ?? []) {
-      const status: WireStatus = WireStatus.for(instance);
-
-      status.isDeprovisioned = true;
-    }
+    markActiveInstancesDeprovisioned(container);
 
     for (const instance of instances) {
       PROVISION_TOKENS_BY_INSTANCE.delete(instance);
@@ -131,6 +123,23 @@ export function deprovisionContainer(container: Container, lifecycle: ContainerP
     lifecycle.delete(container);
 
     untrackProvisionLifecycle(container, lifecycle);
+  } else if (wasProvisioned) {
+    // Unbinding the last lifecycle binding already removed the lifecycle entry,
+    // but the container itself is only leaving provider ownership now.
+    markActiveInstancesDeprovisioned(container);
+  }
+}
+
+/**
+ * Marks every active service instance of a container as deprovisioned.
+ *
+ * @param container - Container leaving provider ownership.
+ */
+function markActiveInstancesDeprovisioned(container: Container): void {
+  for (const instance of container.getActiveInstances()) {
+    const status: WireStatus = WireStatus.for(instance);
+
+    status.isDeprovisioned = true;
   }
 }
 
@@ -224,10 +233,7 @@ export function provisionInstances(container: Container, bindings: Bindings = []
   for (const binding of bindings) {
     const token: Identifier = getBindingToken(binding);
 
-    if (
-      isProviderLifecycleParticipant(getProviderLifecycleMetadataToken(binding)) &&
-      !container.isCurrentBound(token)
-    ) {
+    if (isProviderLifecycleParticipant(getProviderLifecycleMetadataToken(binding)) && !container.hasOwn(token)) {
       throw new WirestateError(
         `Cannot provision binding '${typeof token === "function" ? token.name : String(token)}' that is not bound on ` +
           `this container. Provider lifecycle is owned by the container that declares the binding.`,
@@ -253,7 +259,7 @@ export function provisionInstances(container: Container, bindings: Bindings = []
   }
 
   // Phase 2: reset active instances to in-flight markers before any hook runs.
-  for (const instance of ACTIVE_INSTANCES_BY_CONTAINER.get(container) ?? []) {
+  for (const instance of container.getActiveInstances()) {
     const status: WireStatus = WireStatus.for(instance);
 
     if (!status.isDisposed) {
@@ -278,7 +284,7 @@ export function provisionInstances(container: Container, bindings: Bindings = []
       if (methodName) {
         callLifecycleHandler({
           args: [provisionId],
-          container: CONTAINER_REFS_BY_INSTANCE.get(instance),
+          container: getInstanceContainer(instance),
           name: "@OnProvision",
           details: [instance.constructor.name, String(methodName)],
           instance,
@@ -292,11 +298,11 @@ export function provisionInstances(container: Container, bindings: Bindings = []
     } catch (error) {
       const reachedInstances: Array<object> = instances.slice(0, index + 1);
 
-      PROVISION_STATUS_BY_CONTAINER.set(container, false);
+      setContainerProvisioned(container, false);
 
       deprovisionInstances(reachedInstances);
 
-      for (const activeInstance of ACTIVE_INSTANCES_BY_CONTAINER.get(container) ?? []) {
+      for (const activeInstance of container.getActiveInstances()) {
         const activeStatus: WireStatus = WireStatus.for(activeInstance);
 
         activeStatus.isDeprovisioned = true;
@@ -311,7 +317,7 @@ export function provisionInstances(container: Container, bindings: Bindings = []
   }
 
   // Phase 4: mark remaining active non-participants as provisioned.
-  for (const instance of ACTIVE_INSTANCES_BY_CONTAINER.get(container) ?? []) {
+  for (const instance of container.getActiveInstances()) {
     const status: WireStatus = WireStatus.for(instance);
 
     if (!status.isDisposed) {
@@ -346,7 +352,7 @@ export function deprovisionInstances(instances: ReadonlyArray<object>): void {
     if (methodName) {
       callLifecycleHandler({
         args: provisionId === undefined ? [] : [provisionId],
-        container: CONTAINER_REFS_BY_INSTANCE.get(instance),
+        container: getInstanceContainer(instance),
         name: "@OnDeprovision",
         details: [instance.constructor.name, String(methodName)],
         instance,
@@ -368,6 +374,11 @@ export function deprovisionInstances(instances: ReadonlyArray<object>): void {
 /**
  * Tracks a provider lifecycle map that currently owns a container.
  *
+ * @remarks
+ * Also registers an unbind interceptor on the container, so raw
+ * `container.unbind`/`container.unbindAll` calls deprovision owned instances
+ * before binding deactivation.
+ *
  * @internal
  *
  * @param container - Provisioned container.
@@ -382,10 +393,32 @@ function trackProvisionLifecycle(container: Container, lifecycle: ContainerProvi
   }
 
   lifecycles.add(lifecycle);
+
+  let removers: Maybe<Map<ContainerProvisionLifecycle, () => void>> = UNBIND_INTERCEPTOR_REMOVERS.get(container);
+
+  if (!removers) {
+    removers = new Map();
+    UNBIND_INTERCEPTOR_REMOVERS.set(container, removers);
+  }
+
+  if (!removers.has(lifecycle)) {
+    removers.set(
+      lifecycle,
+      container.addUnbindInterceptor({
+        onUnbind: (token) => {
+          if (container.hasOwn(token)) {
+            deprovisionContainerBinding(container, token);
+          }
+        },
+        onUnbindAll: () => deprovisionContainerBindings(container),
+      })
+    );
+  }
 }
 
 /**
- * Removes a provider lifecycle map from a container.
+ * Removes a provider lifecycle map from a container, together with the unbind
+ * interceptor registered when the lifecycle took ownership.
  *
  * @internal
  *
@@ -395,14 +428,24 @@ function trackProvisionLifecycle(container: Container, lifecycle: ContainerProvi
 function untrackProvisionLifecycle(container: Container, lifecycle: ContainerProvisionLifecycle): void {
   const lifecycles: Maybe<Set<ContainerProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
 
-  if (!lifecycles) {
-    return;
+  if (lifecycles) {
+    lifecycles.delete(lifecycle);
+
+    if (lifecycles.size === 0) {
+      PROVISION_LIFECYCLES_BY_CONTAINER.delete(container);
+    }
   }
 
-  lifecycles.delete(lifecycle);
+  const removers: Maybe<Map<ContainerProvisionLifecycle, () => void>> = UNBIND_INTERCEPTOR_REMOVERS.get(container);
+  const remove: Maybe<() => void> = removers?.get(lifecycle);
 
-  if (lifecycles.size === 0) {
-    PROVISION_LIFECYCLES_BY_CONTAINER.delete(container);
+  if (removers && remove) {
+    remove();
+    removers.delete(lifecycle);
+
+    if (removers.size === 0) {
+      UNBIND_INTERCEPTOR_REMOVERS.delete(container);
+    }
   }
 }
 

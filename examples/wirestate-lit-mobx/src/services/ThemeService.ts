@@ -1,5 +1,4 @@
 import {
-  Inject,
   Injectable,
   OnActivated,
   OnDeactivation,
@@ -7,6 +6,7 @@ import {
   OnProvision,
   SEED,
   WireScope,
+  inject,
 } from "@wirestate/core";
 import { Action, makeObservable, Observable } from "@wirestate/mobx";
 
@@ -19,10 +19,8 @@ export class ThemeService {
   public theme: Theme = "light";
 
   public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope,
-    @Inject(SEED)
-    protected readonly seed: object
+    private readonly scope: WireScope = inject(WireScope),
+    protected readonly seed: object = inject(SEED)
   ) {
     makeObservable(this);
 

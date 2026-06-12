@@ -2,8 +2,8 @@
 
 Install the Wirestate packages for the stack you use.
 
-The commands below list Wirestate packages only. Modern package managers resolve React, Lit, MobX, Signals, and
-decorator metadata peers. If your package manager reports a missing peer, install that package directly.
+The commands below list Wirestate packages only. Modern package managers resolve React, Lit, MobX, and Signals peers. If
+your package manager reports a missing peer, install that package directly.
 
 ## Packages
 
@@ -48,26 +48,15 @@ npm install @wirestate/core @wirestate/signals @wirestate/lit @wirestate/lit-sig
 npm install @wirestate/core @wirestate/mobx @wirestate/lit @wirestate/lit-mobx
 ```
 
-## Runtime Import
-
-Import `reflect-metadata` once, before decorated services are loaded.
-
-```ts
-import "reflect-metadata";
-```
-
-React Signals users should also configure the Preact Signals React transform or call `useSignals()` in components that
-read signal values during render. See [React Signals](/react-signals/overview) for that setup.
-
 ## TypeScript
 
-Enable decorator metadata.
+Wirestate decorators work with legacy TypeScript decorators and TC39 standard decorators. For legacy TypeScript
+decorators, enable `experimentalDecorators`.
 
 ```json
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "experimentalDecorators": true
   }
 }
 ```

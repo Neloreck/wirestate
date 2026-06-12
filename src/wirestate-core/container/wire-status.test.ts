@@ -1,10 +1,10 @@
 import { OnDeprovision, OnProvision } from "@wirestate/core";
 
-import { Container, Injectable } from "../alias";
-import { bind } from "../bind/bind";
+import { Injectable } from "../metadata/injectable";
 
-import { ContainerProvisionLifecycle, deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
-import { createContainer } from "./create-container";
+import { Container } from "./container";
+import { deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
+import { ContainerProvisionLifecycle } from "./provision-state";
 import { WireStatus } from "./wire-status";
 
 describe("WireStatus", () => {
@@ -18,9 +18,9 @@ describe("WireStatus", () => {
       public readonly status: WireStatus = WireStatus.for(this, { initialize: true });
     }
 
-    const container: Container = createContainer();
+    const container: Container = new Container();
 
-    bind(container, TestService);
+    container.bind(TestService);
 
     const service: TestService = container.get(TestService);
 
@@ -37,10 +37,10 @@ describe("WireStatus", () => {
     @Injectable()
     class TestService {}
 
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const lifecycle: ContainerProvisionLifecycle = new Map();
 
-    bind(container, TestService);
+    container.bind(TestService);
 
     const service: TestService = container.get(TestService);
     const status: WireStatus = WireStatus.for(service);
@@ -93,10 +93,10 @@ describe("WireStatus", () => {
       public onDeprovision(): void {}
     }
 
-    const container: Container = createContainer();
+    const container: Container = new Container();
     const lifecycle: ContainerProvisionLifecycle = new Map();
 
-    bind(container, TestService);
+    container.bind(TestService);
 
     const service: TestService = container.get(TestService);
     const status: WireStatus = WireStatus.for(service);

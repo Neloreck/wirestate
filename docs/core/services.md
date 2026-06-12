@@ -33,30 +33,31 @@ const container: Container = createContainer({
 const users = container.get(UserService);
 ```
 
-Use `bind` when you need to add a service to an existing container.
+Use `container.bind` when you need to add a service to an existing container.
 
 ```ts
-import { bind, createContainer } from "@wirestate/core";
+import { createContainer } from "@wirestate/core";
 
 const container = createContainer();
 
-bind(container, UserService);
+container.bind(UserService);
 ```
 
 ## Constructor Injection
 
-Use `@Inject(Token)` for constructor dependencies. A token can be a class, string, or symbol.
+Use `inject(token)` in constructor parameter defaults or field initializers. A token can be a class, string, symbol,
+or `InjectionToken`. Pass `{ optional: true }` to resolve `undefined` instead of throwing when the token is not
+bound. Because `inject()` is a plain function call, the same service compiles under legacy decorators, TC39 standard
+decorators, or no decorators at all.
 
 ```ts
-import { Inject, Injectable } from "@wirestate/core";
+import { Injectable, inject } from "@wirestate/core";
 
 @Injectable()
 export class OrderService {
   public constructor(
-    @Inject(UserService)
-    private readonly users: UserService,
-    @Inject(LoggerService)
-    private readonly logger: LoggerService
+    private readonly users: UserService = inject(UserService),
+    private readonly logger: LoggerService = inject(LoggerService)
   ) {}
 }
 ```
@@ -67,11 +68,11 @@ Inject [`WireScope`](/api/wirestate-core/classes/WireScope) when a service needs
 queries, or seeds from its container.
 
 ```ts
-import { Inject, Injectable, WireScope } from "@wirestate/core";
+import { Injectable, WireScope, inject } from "@wirestate/core";
 
 @Injectable()
 export class CartService {
-  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   public checkout(): void {
     this.scope.emitEvent("CHECKOUT_STARTED");
@@ -155,11 +156,11 @@ Use `scope.resolve(Token)` when the dependency is only needed later. `scope.reso
 the token is not bound.
 
 ```ts
-import { Inject, Injectable, WireScope } from "@wirestate/core";
+import { Injectable, WireScope, inject } from "@wirestate/core";
 
 @Injectable()
 export class NotificationService {
-  public constructor(@Inject(WireScope) private readonly scope: WireScope) {}
+  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   public notify(message: string): void {
     const logger = this.scope.resolve(LoggerService);
@@ -175,16 +176,16 @@ Use descriptors when a binding needs an explicit token or binding strategy. This
 service classes registered behind a token that is different from the class itself.
 
 ```ts
-import { BindingScope, BindingType, bind, createContainer } from "@wirestate/core";
+import { BindingScope, BindingType, createContainer } from "@wirestate/core";
 
 const API_URL = Symbol("API_URL");
 const DATE_NOW = Symbol("DATE_NOW");
 const container = createContainer();
 
-bind(container, { token: API_URL, value: "https://api.example.com" });
-bind(container, {
+container.bind({ token: API_URL, value: "https://api.example.com" });
+container.bind({
   token: DATE_NOW,
-  type: BindingType.DynamicValue,
+  type: BindingType.Factory,
   scope: BindingScope.Singleton,
   factory: () => new Date(),
 });
@@ -192,23 +193,21 @@ bind(container, {
 
 ## Remove Services
 
-Use `unbind` when removing one Wirestate binding. Use `unbindAll` when disposing the whole container.
+Use `container.unbind` when removing one binding. Use `container.unbindAll` when disposing the whole container.
 
 ```ts
-import { unbind, unbindAll } from "@wirestate/core";
-
-unbind(container, UserService);
-unbindAll(container);
+container.unbind(UserService);
+container.unbindAll();
 ```
 
-The wrappers keep Wirestate's registered binding list and provider lifecycle state in sync with Inversify. If a provider
-owns a service when it is removed, `@OnDeprovision` runs before `@OnDeactivation`. After `unbindAll`, discard the
-container and create a new one for future work.
+The container deactivates removed services and keeps provider lifecycle state in sync. If a provider owns a service
+when it is removed, `@OnDeprovision` runs before `@OnDeactivation`. After `unbindAll`, discard the container and
+create a new one for future work.
 
 ## API Reference
 
-[`Injectable`](/api/wirestate-core/functions/Injectable), [`Inject`](/api/wirestate-core/functions/Inject),
+[`Injectable`](/api/wirestate-core/functions/Injectable), [`inject`](/api/wirestate-core/functions/inject),
 [`WireScope`](/api/wirestate-core/classes/WireScope), [`WireStatus`](/api/wirestate-core/classes/WireStatus),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision), [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision),
 [`BindingDescriptor`](/api/wirestate-core/type-aliases/BindingDescriptor),
-[`unbind`](/api/wirestate-core/functions/unbind), [`unbindAll`](/api/wirestate-core/functions/unbindAll).
+[`Container`](/api/wirestate-core/classes/Container).

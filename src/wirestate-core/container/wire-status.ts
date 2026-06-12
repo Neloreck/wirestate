@@ -1,7 +1,26 @@
 import { WirestateError } from "../error/wirestate-error";
-import { INSTANCE_STATUSES_BY_INSTANCE } from "../registry";
 import { Optional } from "../types/general";
-import { ProvisionId } from "../types/provision";
+
+/**
+ * Internal storage for service lifecycle status keyed by instance.
+ *
+ * Status survives deactivation while the instance object is still reachable,
+ * which lets callers inspect lifecycle state by instance reference.
+ */
+const INSTANCE_STATUSES_BY_INSTANCE: WeakMap<object, WireStatus> = new WeakMap();
+
+/**
+ * Identifier for one provider provision cycle of a service instance.
+ *
+ * @remarks
+ * IDs are unique only within a single service instance. Use the value passed to
+ * `@OnProvision` and `@OnDeprovision` with
+ * `WireStatus.for(instance).provisionId` to ignore async work from an older
+ * provision cycle.
+ *
+ * @group Container
+ */
+export type ProvisionId = number;
 
 /**
  * Options for {@link WireStatus.for}.

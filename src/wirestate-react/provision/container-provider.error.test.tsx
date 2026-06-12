@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { Container, Injectable, OnDeactivation, OnDeprovision, OnProvision, createContainer } from "@wirestate/core";
+import { Container, Injectable, OnDeactivation, OnDeprovision, OnProvision } from "@wirestate/core";
 import { Component, ReactNode } from "react";
 
 import { ContainerProvider } from "./container-provider";
@@ -160,7 +160,7 @@ describe("ContainerProvider provision errors", () => {
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [FirstProvisionService, FailingProvisionService],
     });
 
@@ -178,7 +178,7 @@ describe("ContainerProvider provision errors", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(unbindAllSpy).not.toHaveBeenCalled();
-    expect(container.isBound(FirstProvisionService)).toBe(true);
-    expect(container.isBound(FailingProvisionService)).toBe(true);
+    expect(container.has(FirstProvisionService)).toBe(true);
+    expect(container.has(FailingProvisionService)).toBe(true);
   });
 });

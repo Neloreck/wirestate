@@ -5,10 +5,8 @@ import {
   ContainerConfig,
   ContainerProvisionLifecycle,
   WirestateError,
-  createContainer,
   deprovisionContainer,
   provisionContainer,
-  unbindAll,
   validateContainerConfig,
 } from "@wirestate/core";
 
@@ -167,7 +165,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
 
   public hostConnected(): void {
     const container: Container = this.config
-      ? (this.container = createContainer(this.config, {
+      ? (this.container = new Container(this.config, {
           skipMessaging: this.scope === ContainerProviderScope.Parent,
         }))
       : (this.container as Container);
@@ -263,7 +261,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
         this.destroyManagedContainer(this.container);
       }
 
-      const container: Container = createContainer(this.config, {
+      const container: Container = new Container(this.config, {
         skipMessaging: this.scope === ContainerProviderScope.Parent,
       });
 
@@ -295,6 +293,6 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
 
     this.container = null;
 
-    unbindAll(container);
+    container.unbindAll();
   }
 }

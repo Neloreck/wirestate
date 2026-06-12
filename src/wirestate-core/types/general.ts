@@ -15,6 +15,14 @@ export type AnyObject = Record<string | symbol, any>;
 export type Optional<T> = T | null;
 
 /**
+ * Represents value that can be `T` or `undefined`.
+ *
+ * @template T - The base type.
+ * @group general-types
+ */
+export type Definable<T> = T | undefined;
+
+/**
  * Represents value that can be `T` or a Promise of `T`.
  *
  * @template T - The base type.

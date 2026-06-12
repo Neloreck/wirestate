@@ -34,7 +34,7 @@ export function useOptionalInjection<T, F = null>(token: Identifier<T>, fallback
 
   // Revision bump forces a container reset; force re-resolution to drop stale instances.
   return useMemo(() => {
-    if (container.isBound(token)) {
+    if (container.has(token)) {
       dbg.info(prefix(__filename), "Resolving injection:", {
         token,
         name: (token as AnyObject)?.name ?? token,

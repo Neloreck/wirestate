@@ -1,9 +1,9 @@
-import { Identifier } from "../alias";
-import { getBindingToken } from "../bind/utils/get-binding-token";
+import { Identifier } from "../binding/binding-tokens";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 
-import type { ContainerConfig } from "./create-container";
+import type { ContainerConfig } from "./container";
+import { getBindingToken } from "./get-binding-token";
 
 /**
  * Checks a container config before creating a container.
@@ -13,7 +13,7 @@ import type { ContainerConfig } from "./create-container";
  *
  * @group Container
  *
- * @param config - Container configuration to validate.
+ * @param config - ContainerKernel configuration to validate.
  * @throws {@link WirestateError} If `activate` references a token missing from `bindings`.
  *
  * @example
@@ -31,7 +31,7 @@ import type { ContainerConfig } from "./create-container";
  */
 export function validateContainerConfig(config: ContainerConfig): void {
   if (config.onError !== undefined && typeof config.onError !== "function") {
-    throw new WirestateError("createContainer: 'onError' must be a function.", ERROR_CODE_VALIDATION_ERROR);
+    throw new WirestateError("Container: 'onError' must be a function.", ERROR_CODE_VALIDATION_ERROR);
   }
 
   const activate: ReadonlyArray<Identifier> =
@@ -53,7 +53,7 @@ export function validateContainerConfig(config: ContainerConfig): void {
   for (const eager of activate) {
     if (!bindingTokens.has(eager)) {
       throw new WirestateError(
-        `createContainer: '${String(eager)}' is listed in 'activate' but was not provided in 'bindings'.`,
+        `Container: '${String(eager)}' is listed in 'activate' but was not provided in 'bindings'.`,
         ERROR_CODE_VALIDATION_ERROR
       );
     }

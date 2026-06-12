@@ -1,29 +1,69 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { BindingType, Container, Inject, Injectable } from "../alias";
-import { OnActivated } from "../bind/instance/on-activated";
-import { OnDeprovision } from "../bind/instance/on-deprovision";
-import { OnProvision } from "../bind/instance/on-provision";
-import { unbindAll } from "../bind/unbind";
+import { BindingType } from "../binding/binding";
+import { OnActivated } from "../lifecycle/on-activated";
+import { OnDeprovision } from "../lifecycle/on-deprovision";
+import { OnProvision } from "../lifecycle/on-provision";
+import { Injectable } from "../metadata/injectable";
 import { Optional } from "../types/general";
-import { ProvisionId } from "../types/provision";
 
-import { ContainerProvisionLifecycle, deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
-import { createContainer } from "./create-container";
+import { Container } from "./container";
+import { deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
+import { inject } from "./context";
+import { ContainerProvisionLifecycle } from "./provision-state";
 import { WireScope } from "./wire-scope";
-import { WireStatus } from "./wire-status";
+import { ProvisionId, WireStatus } from "./wire-status";
 
 describe("provision lifecycle", () => {
   function createProvisionLifecycle(): ContainerProvisionLifecycle {
     return new Map();
   }
 
+  it("should provision exactly the decorated services among infra bindings", () => {
+    const events: Array<string> = [];
+
+    @Injectable()
+    class PlainService {
+      public constructor() {
+        events.push("plain-constructed");
+      }
+    }
+
+    @Injectable()
+    class ProvisionedService {
+      @OnProvision()
+      public onProvision(): void {
+        events.push("provision");
+      }
+
+      @OnDeprovision()
+      public onDeprovision(): void {
+        events.push("deprovision");
+      }
+    }
+
+    // The default provisioning scan walks every own binding: the container
+    // self-binding, seeds, buses, WireScope, and both services. Only the
+    // provision-decorated service may be resolved and provisioned.
+    const container: Container = new Container({ bindings: [PlainService, ProvisionedService] });
+    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
+
+    provisionContainer(container, lifecycle);
+
+    expect(events).toEqual(["provision"]);
+    expect(lifecycle.get(container)).toEqual([container.get(ProvisionedService)]);
+
+    deprovisionContainer(container, lifecycle);
+
+    expect(events).toEqual(["provision", "deprovision"]);
+  });
+
   it("should provision lifecycle services and deprovision them in reverse order", () => {
     const events: Array<string> = [];
     const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
     const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
 
-    const container: Container = createContainer({ activate: false, bindings: [FirstService, SecondService] });
+    const container: Container = new Container({ activate: false, bindings: [FirstService, SecondService] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     provisionContainer(container, lifecycle);
@@ -41,7 +81,7 @@ describe("provision lifecycle", () => {
       "deprovision-first",
     ]);
 
-    unbindAll(container);
+    container.unbindAll();
 
     expect(events).toEqual([
       "activated-first",
@@ -59,7 +99,7 @@ describe("provision lifecycle", () => {
     const TOKEN: unique symbol = Symbol("token");
     const { LifecycleService, events } = createLifecycleService({ methods: ["provision"] });
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [
         {
           type: BindingType.Instance,
@@ -92,7 +132,7 @@ describe("provision lifecycle", () => {
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [PlainService],
     });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
@@ -113,7 +153,7 @@ describe("provision lifecycle", () => {
       }
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [PlainService],
     });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
@@ -145,7 +185,7 @@ describe("provision lifecycle", () => {
     @Injectable()
     class PlainService {}
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [PlainService],
     });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
@@ -178,7 +218,7 @@ describe("provision lifecycle", () => {
     @Injectable()
     class PlainService {}
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [
         {
           type: BindingType.Instance,
@@ -217,10 +257,7 @@ describe("provision lifecycle", () => {
 
     @Injectable()
     class ResolvingLifecycleService {
-      public constructor(
-        @Inject(WireScope)
-        private readonly scope: WireScope
-      ) {}
+      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
       @OnActivated()
       public onActivated(): void {
@@ -231,7 +268,7 @@ describe("provision lifecycle", () => {
       public onProvision(): void {}
     }
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [PlainService, ResolvingLifecycleService],
     });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
@@ -263,7 +300,7 @@ describe("provision lifecycle", () => {
       methods: ["provision", "deprovision", "deactivation"],
     });
 
-    const container: Container = createContainer({
+    const container: Container = new Container({
       bindings: [LifecycleService],
     });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
@@ -275,7 +312,7 @@ describe("provision lifecycle", () => {
 
     expect(events).toEqual(["provision", "deprovision"]);
 
-    unbindAll(container);
+    container.unbindAll();
 
     expect(events).toEqual(["provision", "deprovision", "deactivation"]);
   });
@@ -302,7 +339,7 @@ describe("provision lifecycle", () => {
       suffix: () => "second-" + getScopeStates(),
     });
 
-    const container: Container = createContainer({ bindings: [FirstService, SecondService] });
+    const container: Container = new Container({ bindings: [FirstService, SecondService] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     first = container.get(FirstService);
@@ -358,10 +395,7 @@ describe("provision lifecycle", () => {
 
     @Injectable()
     class ScopedLifecycleService {
-      public constructor(
-        @Inject(WireScope)
-        public readonly scope: WireScope
-      ) {}
+      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
 
       @OnProvision()
       public onProvision(provisionId: ProvisionId): void {
@@ -374,7 +408,7 @@ describe("provision lifecycle", () => {
       }
     }
 
-    const container: Container = createContainer({ bindings: [ScopedLifecycleService] });
+    const container: Container = new Container({ bindings: [ScopedLifecycleService] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
     const service: ScopedLifecycleService = container.get(ScopedLifecycleService);
     const status: WireStatus = WireStatus.for(service);
@@ -411,10 +445,7 @@ describe("provision lifecycle", () => {
 
     @Injectable()
     class ScopedLifecycleService {
-      public constructor(
-        @Inject(WireScope)
-        public readonly scope: WireScope
-      ) {}
+      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
 
       @OnProvision()
       public onProvision(provisionId: ProvisionId): void {
@@ -427,7 +458,7 @@ describe("provision lifecycle", () => {
       }
     }
 
-    const container: Container = createContainer({ bindings: [ScopedLifecycleService] });
+    const container: Container = new Container({ bindings: [ScopedLifecycleService] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
     const service: ScopedLifecycleService = container.get(ScopedLifecycleService);
     const status: WireStatus = WireStatus.for(service);
@@ -468,7 +499,7 @@ describe("provision lifecycle", () => {
         String(second ? WireStatus.for(second).provisionId : undefined),
     });
 
-    const container: Container = createContainer({ bindings: [FirstService, SecondService] });
+    const container: Container = new Container({ bindings: [FirstService, SecondService] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
     first = container.get(FirstService);

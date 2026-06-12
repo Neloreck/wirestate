@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { BindingType, Container, ContainerConfig, EventBus, createContainer } from "@wirestate/core";
+import { BindingType, Container, ContainerConfig, EventBus } from "@wirestate/core";
 import { StrictMode } from "react";
 
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
@@ -132,8 +132,8 @@ describe("ContainerProvider", () => {
     const secondParent: Container = new Container();
     const containers: Array<Container> = [];
 
-    firstParent.bind(PARENT_TOKEN).toConstantValue("first-parent");
-    secondParent.bind(PARENT_TOKEN).toConstantValue("second-parent");
+    firstParent.bind({ token: PARENT_TOKEN, value: "first-parent" });
+    secondParent.bind({ token: PARENT_TOKEN, value: "second-parent" });
 
     function TrackingConsumer() {
       const container: Container = useContainer();
@@ -164,7 +164,7 @@ describe("ContainerProvider", () => {
   });
 
   it("should create a managed messaging scope by default", () => {
-    const parent: Container = createContainer();
+    const parent: Container = new Container();
     const eventBuses: Array<EventBus> = [];
 
     function TrackingConsumer() {
@@ -185,7 +185,7 @@ describe("ContainerProvider", () => {
   });
 
   it("should inherit parent messaging scope when scope is parent", () => {
-    const parent: Container = createContainer();
+    const parent: Container = new Container();
     const eventBuses: Array<EventBus> = [];
 
     function TrackingConsumer() {
@@ -206,7 +206,7 @@ describe("ContainerProvider", () => {
   });
 
   it("should accept enum messaging scope values", () => {
-    const parent: Container = createContainer();
+    const parent: Container = new Container();
     const eventBuses: Array<EventBus> = [];
 
     function TrackingConsumer() {
@@ -226,7 +226,7 @@ describe("ContainerProvider", () => {
   });
 
   it("should recreate managed container when scope changes", () => {
-    const parent: Container = createContainer();
+    const parent: Container = new Container();
     const containers: Array<Container> = [];
     const eventBuses: Array<EventBus> = [];
 
@@ -320,7 +320,7 @@ describe("ContainerProvider", () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(containers[0].isCurrentBound(CONFIG_TOKEN)).toBe(false);
+    expect(containers[0].hasOwn(CONFIG_TOKEN)).toBe(false);
     expect(containers).toHaveLength(2);
   });
 
@@ -406,7 +406,7 @@ describe("ContainerProvider lifecycle", () => {
 
   it("should call provision lifecycle for external container without disposing it", async () => {
     const { LifecycleService, events } = createLifecycleService();
-    const container: Container = createContainer({ bindings: [LifecycleService] });
+    const container: Container = new Container({ bindings: [LifecycleService] });
     const unbindAllSpy = jest.spyOn(container, "unbindAll");
 
     const { unmount } = render(<ContainerProvider container={container} />);
@@ -421,12 +421,12 @@ describe("ContainerProvider lifecycle", () => {
 
     expect(events).toEqual(["activated", "provision", "deprovision"]);
     expect(unbindAllSpy).not.toHaveBeenCalled();
-    expect(container.isBound(LifecycleService)).toBe(true);
+    expect(container.has(LifecycleService)).toBe(true);
   });
 
   it("should not provision the same external container twice on stable rerender", () => {
     const { LifecycleService, events } = createLifecycleService({ methods: ["provision", "deprovision"] });
-    const container: Container = createContainer({ bindings: [LifecycleService] });
+    const container: Container = new Container({ bindings: [LifecycleService] });
 
     const { rerender, unmount } = render(<ContainerProvider container={container} />);
 
@@ -446,13 +446,11 @@ describe("ContainerProvider lifecycle", () => {
     const { LifecycleService: FirstLifecycleService } = createLifecycleService({ events, suffix: "first" });
     const { LifecycleService: SecondLifecycleService } = createLifecycleService({ events, suffix: "second" });
 
-    const { rerender } = render(
-      <ContainerProvider container={createContainer({ bindings: [FirstLifecycleService] })} />
-    );
+    const { rerender } = render(<ContainerProvider container={new Container({ bindings: [FirstLifecycleService] })} />);
 
     expect(events).toEqual(["activated-first", "provision-first"]);
 
-    rerender(<ContainerProvider container={createContainer({ bindings: [SecondLifecycleService] })} />);
+    rerender(<ContainerProvider container={new Container({ bindings: [SecondLifecycleService] })} />);
 
     expect(events).toEqual([
       "activated-first",

@@ -1,9 +1,7 @@
 import {
-  Inject,
   Injectable,
   OnActivated,
   OnDeactivation,
-  Optional,
   WireScope,
   WireEvent,
   OnEvent,
@@ -11,6 +9,7 @@ import {
   OnQuery,
   OnProvision,
   OnDeprovision,
+  inject,
 } from "@wirestate/core";
 import { Signal, signal } from "@wirestate/signals";
 
@@ -36,15 +35,12 @@ export class LoggerService {
   private nextId: number = 1;
 
   public constructor(
-    @Inject(WireScope)
-    private readonly scope: WireScope,
-    @Inject(GLOBAL_CONFIG)
-    protected readonly globalConfig: object,
-    @Inject(GLOBAL_DYNAMIC_CONFIG)
-    protected readonly globalDynamicConfig: object,
-    @Optional()
-    @Inject(GLOBAL_NOT_EXISTING_CONFIG)
-    protected readonly globalNotExistingConfig?: object
+    private readonly scope: WireScope = inject(WireScope),
+    protected readonly globalConfig: object = inject(GLOBAL_CONFIG),
+    protected readonly globalDynamicConfig: object = inject(GLOBAL_DYNAMIC_CONFIG),
+    protected readonly globalNotExistingConfig: object | undefined = inject(GLOBAL_NOT_EXISTING_CONFIG, {
+      optional: true,
+    })
   ) {
     console.info(`[${this.constructor.name}] Constructing with constant global configs:`, {
       globalConfig,

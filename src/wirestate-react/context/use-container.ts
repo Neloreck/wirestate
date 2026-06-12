@@ -20,7 +20,7 @@ import { ContainerContext } from "./container-context";
  * @example
  * ```tsx
  * const container: Container = useContainer();
- * const isBound: boolean = container.isBound(MyToken);
+ * const isBound: boolean = container.has(MyToken);
  * ```
  */
 export function useContainer(): Container {

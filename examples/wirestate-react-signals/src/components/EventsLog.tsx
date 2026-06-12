@@ -11,19 +11,13 @@ export function EventsLog() {
     <div id={"logs"}>
       <div className={"event-log"}>
         {loggerService.logs.value.length === 0 ? (
-          <div className={"event-log__empty"}>
-            No events yet — try the buttons above.
-          </div>
+          <div className={"event-log__empty"}>No events yet — try the buttons above.</div>
         ) : (
           loggerService.logs.value.map((entry) => (
             <div key={entry.id} className={"event-log__entry"}>
-              <span className={"event-log__type"}>
-                {JSON.stringify(entry.type)}
-              </span>
+              <span className={"event-log__type"}>{JSON.stringify(entry.type)}</span>
               <span className={"event-log__payload"}>
-                {entry.payload !== undefined
-                  ? JSON.stringify(entry.payload)
-                  : "—"}
+                {entry.payload !== undefined ? JSON.stringify(entry.payload) : "—"}
               </span>
             </div>
           ))

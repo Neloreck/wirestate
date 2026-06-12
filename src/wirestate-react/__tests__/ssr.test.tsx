@@ -1,4 +1,4 @@
-import { Container, Inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
+import { Container, inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
 import { renderToString } from "react-dom/server";
 
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
@@ -22,10 +22,7 @@ describe("React SSR", () => {
     class SeededService {
       public value: string = "pending";
 
-      public constructor(
-        @Inject(WireScope)
-        private readonly scope: WireScope
-      ) {}
+      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
       @OnActivated()
       public initialize(): void {
@@ -68,10 +65,7 @@ describe("React SSR", () => {
     class LazySeededService {
       public value: string = "pending";
 
-      public constructor(
-        @Inject(WireScope)
-        private readonly scope: WireScope
-      ) {}
+      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
       @OnActivated()
       public onActivated(): void {
@@ -121,7 +115,7 @@ describe("React SSR", () => {
     const STRING_VALUE_TOKEN: unique symbol = Symbol("STRING_VALUE_TOKEN");
     const container: Container = new Container();
 
-    container.bind(STRING_VALUE_TOKEN).toConstantValue("external-parent");
+    container.bind({ token: STRING_VALUE_TOKEN, value: "external-parent" });
 
     function Consumer() {
       const value: string = useInjection(STRING_VALUE_TOKEN);

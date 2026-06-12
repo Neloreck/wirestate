@@ -18,9 +18,9 @@ import { QueryHandler, QueryType, QueryUnregister } from "../types/queries";
  *
  * @example
  * ```typescript
- * import { QueryBus, createContainer } from "@wirestate/core";
+ * import { QueryBus, Container } from "@wirestate/core";
  *
- * const container = createContainer();
+ * const container = new Container();
  * const bus = container.get(QueryBus);
  * bus.register("CURRENT_USER", () => ({ id: "u1" }));
  *

@@ -7,7 +7,7 @@
 Wirestate is a TypeScript state-management toolkit built around dependency-injected services.
 
 Application logic lives in `@Injectable` classes. React and Lit adapters provide those services to UI trees. Reactivity
-is separate: use MobX, Signals, plain values, or another state bridge inside your services.
+is separate: use MobX, Preact Signals, plain values, or another state bridge inside your services.
 
 Use Wirestate when you want service-owned state and workflows that can be scoped to an app, subtree, feature, modal,
 tenant, or test.
@@ -24,18 +24,18 @@ tenant, or test.
 
 ## Packages
 
-| Package                                                               | Purpose                                                             |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| [`@wirestate/core`](./src/wirestate-core/README.md)                   | Containers, injectable services, lifecycle, seeds, messaging.       |
-| [`@wirestate/react`](./src/wirestate-react/README.md)                 | React provider, injection hooks, and component-owned handlers.      |
-| [`@wirestate/lit`](./src/wirestate-lit/README.md)                     | Lit providers, decorators, controllers, and element handlers.       |
-| [`@wirestate/mobx`](./src/wirestate-mobx/README.md)                   | Framework-agnostic MobX exports for shared services.                |
-| [`@wirestate/react-mobx`](./src/wirestate-react-mobx/README.md)       | MobX React reactivity binding (`mobx-react-lite`).                  |
-| [`@wirestate/lit-mobx`](./src/wirestate-lit-mobx/README.md)           | MobX Lit reactivity binding (`@adobe/lit-mobx`).                    |
-| [`@wirestate/signals`](./src/wirestate-signals/README.md)             | Framework-agnostic Preact Signals exports for shared services.      |
-| [`@wirestate/react-signals`](./src/wirestate-react-signals/README.md) | Preact Signals React reactivity binding.                            |
-| [`@wirestate/lit-signals`](./src/wirestate-lit-signals/README.md)     | Preact Signals Lit reactivity binding (`@lit-labs/preact-signals`). |
-| [`wirestate`](./src/wirestate/README.md)                              | Compatibility package for the unscoped package name.                |
+| Package                                                               | Purpose                                                                                           |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| [`@wirestate/core`](./src/wirestate-core/README.md)                   | Containers, injectable services, lifecycle, seeds, messaging.                                     |
+| [`@wirestate/react`](./src/wirestate-react/README.md)                 | React provider, injection hooks, and component-owned handlers.                                    |
+| [`@wirestate/lit`](./src/wirestate-lit/README.md)                     | Lit providers, decorators, controllers, and element handlers.                                     |
+| [`@wirestate/mobx`](./src/wirestate-mobx/README.md)                   | Framework-agnostic MobX exports for shared services.                                              |
+| [`@wirestate/react-mobx`](./src/wirestate-react-mobx/README.md)       | MobX React reactivity binding (`mobx-react-lite`).                                                |
+| [`@wirestate/lit-mobx`](./src/wirestate-lit-mobx/README.md)           | MobX Lit reactivity binding ([`@adobe/lit-mobx`](https://www.npmjs.com/package/@adobe/lit-mobx)). |
+| [`@wirestate/signals`](./src/wirestate-signals/README.md)             | Framework-agnostic Preact Signals exports for shared services.                                    |
+| [`@wirestate/react-signals`](./src/wirestate-react-signals/README.md) | Preact Signals React reactivity binding.                                                          |
+| [`@wirestate/lit-signals`](./src/wirestate-lit-signals/README.md)     | Preact Signals Lit reactivity binding (`@lit-labs/preact-signals`).                               |
+| [`wirestate`](./src/wirestate/README.md)                              | Compatibility package for the unscoped package name.                                              |
 
 ## Install
 
@@ -55,19 +55,13 @@ npm install @wirestate/core @wirestate/signals @wirestate/lit @wirestate/lit-sig
 npm install @wirestate/core @wirestate/mobx @wirestate/lit @wirestate/lit-mobx
 ```
 
-Import `reflect-metadata` once before decorated services are loaded.
-
-```ts
-import "reflect-metadata";
-```
-
-Enable decorator metadata in TypeScript.
+Wirestate decorators work with legacy TypeScript decorators and TC39 standard decorators. For legacy TypeScript
+decorators, enable `experimentalDecorators`.
 
 ```json
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "experimentalDecorators": true
   }
 }
 ```
@@ -107,7 +101,7 @@ export function App() {
 ```
 
 `@wirestate/react` connects the component to the service. `useSignals()` subscribes this component to signal reads
-during render. The same service pattern can use MobX or Signals in React or Lit.
+during render. The same service pattern can use MobX or Preact Signals in React or Lit.
 
 ## Documentation
 

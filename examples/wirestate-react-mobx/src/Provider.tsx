@@ -1,8 +1,4 @@
-import {
-  BindingType,
-  BindingScope,
-  type ContainerConfig,
-} from "@wirestate/core";
+import { BindingType, BindingScope, type ContainerConfig } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
 import { type PropsWithChildren, useMemo } from "react";
 
@@ -34,7 +30,7 @@ export function Provider({ children }: PropsWithChildren) {
         },
         {
           token: GLOBAL_DYNAMIC_CONFIG,
-          type: BindingType.DynamicValue,
+          type: BindingType.Factory,
           scope: BindingScope.Singleton,
           factory: () => ({ random: Math.random(), another: true }),
         },
