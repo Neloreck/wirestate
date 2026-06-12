@@ -1,8 +1,7 @@
 /**
  * Constructable class reference.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Newable<T = unknown> = new (...args: Array<any>) => T;
+export type Newable<T = unknown> = new (...args: Array<never>) => T;
 
 /**
  * Abstract class reference that cannot be constructed directly,

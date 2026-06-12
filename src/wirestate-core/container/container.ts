@@ -125,11 +125,6 @@ export class Container extends ContainerKernel {
 
     super(config.parent);
 
-    this.bind({
-      token: Container,
-      value: this,
-    });
-
     const activate: ReadonlyArray<Identifier> =
       (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
 
