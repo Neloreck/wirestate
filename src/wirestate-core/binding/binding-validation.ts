@@ -9,7 +9,7 @@ import { isInjectable } from "../metadata/injectable";
 import { BindingScope, BindingType, type BindingDescriptor } from "./binding";
 import type { Newable } from "./binding-class";
 import { isFactoryDescriptor } from "./binding-guards";
-import { type Identifier, toString } from "./binding-tokens";
+import { type Identifier, tokenToString } from "./binding-tokens";
 
 /**
  * Validates a binding descriptor before registration.
@@ -94,7 +94,7 @@ export function validateBinding<T>(
 
   if (hasConstructedValues) {
     throw new WirestateError(
-      `Cannot bind a new binding for '${toString(token)}', since the existing binding was already constructed.`,
+      `Cannot bind a new binding for '${tokenToString(token)}', since the existing binding was already constructed.`,
       ERROR_CODE_VALIDATION_ERROR
     );
   }

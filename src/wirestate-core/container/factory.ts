@@ -1,6 +1,6 @@
 import type { BindingDescriptor } from "../binding/binding";
 import { isFactoryDescriptor, isInstanceDescriptor, isValueDescriptor } from "../binding/binding-guards";
-import { toString } from "../binding/binding-tokens";
+import { tokenToString } from "../binding/binding-tokens";
 import { ERROR_CODE_CIRCULAR_DEPENDENCY } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 
@@ -29,7 +29,7 @@ export class Factory {
   public construct<T>(binding: BindingDescriptor<T>): T {
     try {
       if (this.underConstruction.includes(binding)) {
-        const dependencyGraph = [...this.underConstruction, binding].map((it) => toString(it.token));
+        const dependencyGraph = [...this.underConstruction, binding].map((it) => tokenToString(it.token));
 
         throw new WirestateError(
           `Detected circular dependency: ${dependencyGraph.join(" -> ")}. ` +

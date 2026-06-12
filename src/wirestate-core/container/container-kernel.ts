@@ -2,7 +2,7 @@ import { BindingDescriptor } from "../binding/binding";
 import { Newable } from "../binding/binding-class";
 import { isInstanceDescriptor } from "../binding/binding-guards";
 import { getBindingScope } from "../binding/binding-lifecycle";
-import { Identifier, toString } from "../binding/binding-tokens";
+import { Identifier, tokenToString } from "../binding/binding-tokens";
 import { validateBinding } from "../binding/binding-validation";
 import { ERROR_CODE_NO_BINDING_FOUND } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
@@ -196,7 +196,7 @@ export class ContainerKernel {
         return undefined;
       }
 
-      throw new WirestateError(`No binding(s) found for '${toString(token)}'.`, ERROR_CODE_NO_BINDING_FOUND);
+      throw new WirestateError(`No binding(s) found for '${tokenToString(token)}'.`, ERROR_CODE_NO_BINDING_FOUND);
     }
 
     return injectionContext(this).run(() => this.resolve(binding));

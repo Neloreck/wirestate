@@ -31,7 +31,7 @@ export class InjectionToken<T> {
  * @returns Human-readable identifier description.
  * @internal
  */
-export function toString<T>(token: Identifier<T>): string {
+export function tokenToString<T>(token: Identifier<T>): string {
   if (isClassLike(token)) {
     return token.name;
   } else if (typeof token === "symbol") {
