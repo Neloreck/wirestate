@@ -85,9 +85,9 @@ const uploaded: UploadReceipt | null = await this.scope.executeOptionalCommandAs
 ## Register Directly
 
 ```ts
-import { CommandBus, createContainer, inject } from "@wirestate/core";
+import { CommandBus, Container } from "@wirestate/core";
 
-const container = createContainer();
+const container = new Container();
 const bus = container.get(CommandBus);
 
 const unregister = bus.register("SAVE_CART", async (cart: Cart) => {

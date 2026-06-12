@@ -20,13 +20,13 @@ export class UserService {
 
 ## Bind Services
 
-`createContainer({ bindings })` registers services and descriptors during container creation.
+`new Container({ bindings })` registers services and descriptors during container creation.
 
 ```ts
-import { Container, createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 import { UserService } from "./UserService";
 
-const container: Container = createContainer({
+const container: Container = new Container({
   bindings: [UserService],
 });
 
@@ -36,9 +36,9 @@ const users = container.get(UserService);
 Use `container.bind` when you need to add a service to an existing container.
 
 ```ts
-import { createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 
-const container = createContainer();
+const container = new Container();
 
 container.bind(UserService);
 ```
@@ -47,8 +47,8 @@ container.bind(UserService);
 
 Use `inject(token)` in constructor parameter defaults or field initializers. A token can be a class, string, symbol,
 or `InjectionToken`. Pass `{ optional: true }` to resolve `undefined` instead of throwing when the token is not
-bound. Because `inject()` is a plain function call, the same service compiles under legacy decorators, TC39 standard
-decorators, or no decorators at all.
+bound. Because `inject()` is a plain function call, dependency declarations do not need parameter decorators or
+`emitDecoratorMetadata`.
 
 ```ts
 import { Injectable, inject } from "@wirestate/core";
@@ -82,8 +82,8 @@ export class CartService {
 
 `WireScope` is transient. Each service gets its own scope handle.
 
-`WireScope` depends on the container's `EventBus`, `QueryBus`, and `CommandBus`. Containers created with
-`createContainer(config, { skipMessaging: true })` can only resolve `WireScope` when those buses are inherited from a
+`WireScope` depends on the container's `EventBus`, `QueryBus`, and `CommandBus`. Containers constructed with
+`new Container(config, { skipMessaging: true })` can only resolve `WireScope` when those buses are inherited from a
 parent container. Without inherited messaging, use direct container injection instead of `WireScope`.
 
 ## Lifecycle
@@ -176,11 +176,11 @@ Use descriptors when a binding needs an explicit token or binding strategy. This
 service classes registered behind a token that is different from the class itself.
 
 ```ts
-import { BindingScope, BindingType, createContainer } from "@wirestate/core";
+import { BindingScope, BindingType, Container } from "@wirestate/core";
 
 const API_URL = Symbol("API_URL");
 const DATE_NOW = Symbol("DATE_NOW");
-const container = createContainer();
+const container = new Container();
 
 container.bind({ token: API_URL, value: "https://api.example.com" });
 container.bind({
@@ -208,6 +208,7 @@ create a new one for future work.
 
 [`Injectable`](/api/wirestate-core/functions/Injectable), [`inject`](/api/wirestate-core/functions/inject),
 [`WireScope`](/api/wirestate-core/classes/WireScope), [`WireStatus`](/api/wirestate-core/classes/WireStatus),
-[`OnProvision`](/api/wirestate-core/functions/OnProvision), [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision),
+[`OnProvision`](/api/wirestate-core/functions/OnProvision),
+[`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision),
 [`BindingDescriptor`](/api/wirestate-core/type-aliases/BindingDescriptor),
 [`Container`](/api/wirestate-core/classes/Container).

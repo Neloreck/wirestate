@@ -23,14 +23,14 @@ test("logs a message", () => {
 
 ## One Service
 
-Use `container.bind` with a fresh `createContainer` when one service needs Wirestate wiring.
+Use `container.bind` with a fresh `Container` when one service needs Wirestate wiring.
 
 ```ts
-import { createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 import { CounterService } from "./CounterService";
 
 test("increments count", () => {
-  const service = createContainer().bind(CounterService).get(CounterService);
+  const service = new Container().bind(CounterService).get(CounterService);
 
   service.increment();
 
@@ -38,25 +38,17 @@ test("increments count", () => {
 });
 ```
 
-Skip activation hooks when that setup is unrelated to the test.
-
-```ts
-import { createContainer } from "@wirestate/core";
-
-const service = createContainer({ bindings: [CounterService] }, { skipActivationHooks: true }).get(CounterService);
-```
-
 ## Several Services
 
-`createContainer` binds a group of services. Use `activate` when activation behavior needs to run before assertions. Use
-`provisionContainer` when the behavior under test lives in `@OnProvision` or `@OnDeprovision`.
+`new Container(...)` binds a group of services. Use `activate` when activation behavior needs to run before assertions.
+Use `provisionContainer` when the behavior under test lives in `@OnProvision` or `@OnDeprovision`.
 
 ```ts
-import { EventBus, createContainer } from "@wirestate/core";
+import { Container, EventBus } from "@wirestate/core";
 import { CounterService, LoggerService } from "./services";
 
 test("counter emits event on increment", () => {
-  const container = createContainer({
+  const container = new Container({
     activate: [CounterService],
     bindings: [LoggerService, CounterService],
   });
@@ -77,11 +69,11 @@ test("counter emits event on increment", () => {
 Use `container.bind` when a test starts from an existing container and needs one more service or descriptor.
 
 ```ts
-import { createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 import { CartService, PricingService } from "./services";
 
 test("cart uses pricing service", () => {
-  const container = createContainer({ bindings: [CartService] });
+  const container = new Container({ bindings: [CartService] });
 
   container.bind(PricingService);
 
@@ -94,9 +86,9 @@ test("cart uses pricing service", () => {
 Use `container.unbind` to remove a binding, deactivating any constructed service.
 
 ```ts
-import { createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 
-const container = createContainer({ bindings: [CartService] });
+const container = new Container({ bindings: [CartService] });
 
 container.bind(PricingService);
 container.unbind(PricingService);
@@ -107,10 +99,10 @@ container.unbind(PricingService);
 Bind a constant under the dependency token before resolving the service under test.
 
 ```ts
-import { createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 
 test("cart uses mocked api client", async () => {
-  const container = createContainer({ bindings: [CartService] });
+  const container = new Container({ bindings: [CartService] });
   const api = { post: jest.fn().mockResolvedValue({ ok: true }) };
 
   container.bind({ token: ApiClient, value: api as unknown as ApiClient });
@@ -124,5 +116,4 @@ test("cart uses mocked api client", async () => {
 
 ## API Reference
 
-[`createContainer`](/api/wirestate-core/functions/createContainer),
 [`Container`](/api/wirestate-core/classes/Container).

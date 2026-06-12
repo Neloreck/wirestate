@@ -2,8 +2,8 @@
 
 `@wirestate/core` contains the framework-agnostic part of Wirestate.
 
-Use it to define services, [create scoped containers](/api/wirestate-core/functions/createContainer), run lifecycle
-hooks, pass seed data, and communicate through container-local events, commands, and queries.
+Use it to define services, [construct scoped containers](/api/wirestate-core/classes/Container), run lifecycle hooks,
+pass seed data, and communicate through container-local events, commands, and queries.
 
 The core package does not choose a reactivity system. A service can hold plain values, immutable data, external stores,
 or reactive objects created by another package.
@@ -28,7 +28,7 @@ decorators, enable `experimentalDecorators`. `emitDecoratorMetadata` is not requ
 ## Basic Shape
 
 ```ts
-import { Container, Injectable, createContainer } from "@wirestate/core";
+import { Container, Injectable } from "@wirestate/core";
 
 @Injectable()
 class CounterService {
@@ -39,7 +39,7 @@ class CounterService {
   }
 }
 
-const container: Container = createContainer({
+const container: Container = new Container({
   bindings: [CounterService],
 });
 
@@ -62,6 +62,6 @@ counter.increment();
 
 ## API Reference
 
-[`createContainer`](/api/wirestate-core/functions/createContainer), [`WireScope`](/api/wirestate-core/classes/WireScope),
+[`Container`](/api/wirestate-core/classes/Container), [`WireScope`](/api/wirestate-core/classes/WireScope),
 [`WireStatus`](/api/wirestate-core/classes/WireStatus), [`EventBus`](/api/wirestate-core/classes/EventBus),
 [`CommandBus`](/api/wirestate-core/classes/CommandBus), [`QueryBus`](/api/wirestate-core/classes/QueryBus).

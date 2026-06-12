@@ -13,7 +13,7 @@ import { getBindingToken } from "./get-binding-token";
  *
  * @group Container
  *
- * @param config - ContainerKernel configuration to validate.
+ * @param config - Container configuration to validate.
  * @throws {@link WirestateError} If `activate` references a token missing from `bindings`.
  *
  * @example

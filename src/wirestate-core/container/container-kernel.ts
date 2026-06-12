@@ -22,14 +22,14 @@ import { activateInstance, deactivateInstance, rollbackInstanceActivation } from
  */
 export interface UnbindInterceptor {
   /**
-   * Called before a token's container-owned values are deactivated by {@link ContainerKernel.unbind}.
+   * Called before a token's container-owned values are deactivated by `unbind`.
    *
    * @param token - Token being unbound.
    */
   onUnbind?(token: Identifier): void;
 
   /**
-   * Called exactly once before container-owned values are deactivated by {@link ContainerKernel.unbindAll}.
+   * Called exactly once before container-owned values are deactivated by `unbindAll`.
    */
   onUnbindAll?(): void;
 }
@@ -39,7 +39,7 @@ export interface UnbindInterceptor {
  * and hold the actual instances of your services.
  *
  * All bindings are explicit: services are constructed synchronously and
- * only when a binding descriptor was registered with {@link ContainerKernel.bind}.
+ * only when a binding descriptor was registered with `bind`.
  */
 export class ContainerKernel {
   /**
@@ -137,8 +137,8 @@ export class ContainerKernel {
   }
 
   /**
-   * Registers an interceptor invoked before {@link ContainerKernel.unbind} and
-   * {@link ContainerKernel.unbindAll} deactivate container-owned values.
+   * Registers an interceptor invoked before `unbind` and `unbindAll`
+   * deactivate container-owned values.
    *
    * @param interceptor - Interceptor to register.
    * @returns A callback removing the interceptor.

@@ -8,7 +8,7 @@ bindings, but keep their own buses and seed data.
 ## Root Container
 
 ```ts
-import { Container, Injectable, createContainer } from "@wirestate/core";
+import { Container, Injectable } from "@wirestate/core";
 
 @Injectable()
 class UserService {}
@@ -16,7 +16,7 @@ class UserService {}
 @Injectable()
 class AuthService {}
 
-const container: Container = createContainer({
+const container: Container = new Container({
   activate: [AuthService],
   bindings: [UserService, AuthService],
   seed: { apiUrl: "https://api.example.com" },
@@ -38,7 +38,7 @@ Pass `onError` to send isolated internal errors to application logging. Without 
 `console.error`.
 
 ```ts
-const container = createContainer({
+const container = new Container({
   bindings: [AuthService],
   onError: (descriptor) => {
     reportError(descriptor.error, {
@@ -57,9 +57,9 @@ hook rejections.
 Pass `parent` to create a child container.
 
 ```ts
-import { Container, createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 
-const child: Container = createContainer({
+const child: Container = new Container({
   parent: container,
   bindings: [CartService],
 });
@@ -72,11 +72,11 @@ local messaging.
 
 ## Inherited Messaging
 
-Pass `{ skipMessaging: true }` as the second `createContainer` argument when a child should use the parent's message
-buses instead of creating its own.
+Pass `{ skipMessaging: true }` as the second `Container` constructor argument when a child should use the parent's
+message buses instead of creating its own.
 
 ```ts
-const child = createContainer(
+const child = new Container(
   {
     parent: container,
     bindings: [CartService],
@@ -90,9 +90,9 @@ the child should share event, command, and query handlers with the parent scope.
 
 ## Direct Container Work
 
-`createContainer` returns a Wirestate `Container`. The container is the registration and disposal API. Binding a service
-class through `container.bind` wires the full Wirestate lifecycle: `@OnActivated`/`@OnDeactivation` hooks,
-`@OnEvent`/`@OnCommand`/`@OnQuery` handlers, and `WireStatus` tracking.
+`Container` is the registration and disposal API. Binding a service class through `container.bind` wires the full
+Wirestate lifecycle: `@OnActivated`/`@OnDeactivation` hooks, `@OnEvent`/`@OnCommand`/`@OnQuery` handlers, and
+`WireStatus` tracking.
 
 ```ts
 container.bind(UserService);
@@ -116,7 +116,8 @@ service, `@OnDeprovision` runs before service deactivation. After `unbindAll`, d
 
 ## API Reference
 
-[`createContainer`](/api/wirestate-core/functions/createContainer), [`ContainerConfig`](/api/wirestate-core/interfaces/ContainerConfig),
-[`CreateContainerOptions`](/api/wirestate-core/interfaces/CreateContainerOptions),
-[`Container`](/api/wirestate-core/classes/Container), [`provisionContainer`](/api/wirestate-core/functions/provisionContainer),
+[`Container`](/api/wirestate-core/classes/Container),
+[`ContainerConfig`](/api/wirestate-core/interfaces/ContainerConfig),
+[`ContainerOptions`](/api/wirestate-core/interfaces/ContainerOptions),
+[`provisionContainer`](/api/wirestate-core/functions/provisionContainer),
 [`deprovisionContainer`](/api/wirestate-core/functions/deprovisionContainer).

@@ -62,10 +62,10 @@ function CheckoutFlow() {
 Pass `container` when your code creates and owns the container.
 
 ```tsx
-import { Container, createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
 
-const container: Container = createContainer({
+const container: Container = new Container({
   bindings: [CounterService, LoggerService],
 });
 
@@ -94,7 +94,7 @@ function DevTools() {
   const container: Container = useContainer();
   const scope: WireScope = useScope();
 
-  return <button onClick={() => scope.emitEvent("DEVTOOLS_OPENED")}>{String(container.isBound("DEBUG"))}</button>;
+  return <button onClick={() => scope.emitEvent("DEVTOOLS_OPENED")}>{String(container.has("DEBUG"))}</button>;
 }
 ```
 

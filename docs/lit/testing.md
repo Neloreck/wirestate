@@ -1,13 +1,13 @@
 # Lit Testing
 
-Test services with `createContainer`. Use `ContainerProvider` when an element needs a container context.
+Test services with `Container`. Use `ContainerProvider` when an element needs a container context.
 
 ## Provide a Test Container
 
 Create a small host element that publishes the test container through Lit context, then append tested elements under it.
 
 ```ts
-import { Container, createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 import { ContainerProvider, injection } from "@wirestate/lit";
 import { html, LitElement } from "lit";
 import { customElement } from "lit/decorators.js";
@@ -40,7 +40,7 @@ describe("CounterView", () => {
   let container: Container;
 
   beforeEach(() => {
-    container = createContainer({ bindings: [CounterService], activate: [CounterService] });
+    container = new Container({ bindings: [CounterService], activate: [CounterService] });
     host = new TestHost();
     host.container = container;
 
@@ -66,4 +66,4 @@ Append elements under the host so they can consume the provided context.
 ## API Reference
 
 [`ContainerProvider`](/api/wirestate-lit/classes/ContainerProvider),
-[`createContainer`](/api/wirestate-core/functions/createContainer).
+[`Container`](/api/wirestate-core/classes/Container).

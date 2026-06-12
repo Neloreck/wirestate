@@ -36,12 +36,12 @@ Managed providers create container-local event, command, and query buses by defa
 container should inherit those buses from `config.parent`.
 
 ```ts
-import { Container, createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 import { ContainerProvider, provideContainer } from "@wirestate/lit";
 import { LitElement } from "lit";
 import { CheckoutService, RootService } from "./services";
 
-const rootContainer: Container = createContainer({ bindings: [RootService] });
+const rootContainer: Container = new Container({ bindings: [RootService] });
 
 class CheckoutRoot extends LitElement {
   @provideContainer({
@@ -75,10 +75,10 @@ Pass `container` to expose an existing container. The Lit provider provisions it
 disconnect, but does not dispose it.
 
 ```ts
-import { createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 import { ContainerProvider, provideContainer } from "@wirestate/lit";
 
-const container = createContainer({ bindings: [CounterService] });
+const container = new Container({ bindings: [CounterService] });
 
 class ApplicationRoot extends LitElement {
   @provideContainer({ container })

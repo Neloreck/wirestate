@@ -49,7 +49,7 @@ import { useContainer } from "@wirestate/react";
 function DebugFlag() {
   const container = useContainer();
 
-  return <span>{String(container.isBound(DebugService))}</span>;
+  return <span>{String(container.has(DebugService))}</span>;
 }
 ```
 

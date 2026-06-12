@@ -1,18 +1,18 @@
 # React Testing
 
-Test services with `createContainer`. Use `ContainerProvider` when a component needs a Wirestate provider.
+Test services with `Container`. Use `ContainerProvider` when a component needs a Wirestate provider.
 
 ## Render with a Container
 
 ```tsx
 import { render } from "@testing-library/react";
-import { createContainer } from "@wirestate/core";
+import { Container } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
 import { Counter } from "./Counter";
 import { CounterService } from "./CounterService";
 
 test("renders count", () => {
-  const container = createContainer({ bindings: [CounterService], activate: true });
+  const container = new Container({ bindings: [CounterService], activate: true });
 
   const { getByText } = render(
     <ContainerProvider container={container}>
@@ -30,12 +30,12 @@ Command, query, and event hooks register against the active container. Render th
 the behavior through user events or the container bus.
 
 ```tsx
-import { CommandBus, createContainer } from "@wirestate/core";
+import { CommandBus, Container } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
 import { render } from "@testing-library/react";
 
 test("opens search from command", async () => {
-  const container = createContainer();
+  const container = new Container();
 
   const { findByText } = render(
     <ContainerProvider container={container}>
@@ -52,12 +52,12 @@ test("opens search from command", async () => {
 For async command handlers, use the async bus method so the test waits for the handler.
 
 ```tsx
-import { CommandBus, createContainer } from "@wirestate/core";
+import { CommandBus, Container } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
 import { render, screen } from "@testing-library/react";
 
 test("saves draft from command", async () => {
-  const container = createContainer();
+  const container = new Container();
 
   render(
     <ContainerProvider container={container}>
@@ -74,4 +74,4 @@ test("saves draft from command", async () => {
 ## API Reference
 
 [`ContainerProvider`](/api/wirestate-react/functions/ContainerProvider),
-[`createContainer`](/api/wirestate-core/functions/createContainer).
+[`Container`](/api/wirestate-core/classes/Container).

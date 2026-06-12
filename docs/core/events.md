@@ -48,9 +48,9 @@ Useful forms:
 Use direct subscriptions when the handler is dynamic or created at runtime.
 
 ```ts
-import { EventBus, createContainer, inject } from "@wirestate/core";
+import { Container, EventBus } from "@wirestate/core";
 
-const container = createContainer();
+const container = new Container();
 const bus = container.get(EventBus);
 
 const unsubscribe = bus.subscribe((event) => {

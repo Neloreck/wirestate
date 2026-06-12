@@ -10,12 +10,12 @@ There are two kinds:
 
 ## Shared Seed
 
-Pass `seed` to `createContainer`. Read it with the `SEED` token or `scope.getSeed()`.
+Pass `seed` to the `Container` constructor. Read it with the `SEED` token or `scope.getSeed()`.
 
 Shared seeds work well for static app or environment config that every service in the container can read.
 
 ```ts
-import { Container, Injectable, SEED, createContainer, inject } from "@wirestate/core";
+import { Container, Injectable, SEED, inject } from "@wirestate/core";
 
 interface ApplicationSeed {
   apiUrl: string;
@@ -32,7 +32,7 @@ class ApiClient {
   }
 }
 
-const container: Container = createContainer({
+const container: Container = new Container({
   bindings: [ApiClient],
   seed: {
     apiUrl: "https://api.example.com",
@@ -48,9 +48,9 @@ Targeted seeds belong to one key. They do not change the shared seed object. Use
 or static config tied to one token.
 
 ```ts
-import { Container, createContainer, inject } from "@wirestate/core";
+import { Container, inject } from "@wirestate/core";
 
-const container: Container = createContainer({
+const container: Container = new Container({
   bindings: [CounterService],
   seeds: [
     [CounterService, { count: 10 }],

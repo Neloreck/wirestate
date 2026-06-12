@@ -52,9 +52,9 @@ whether the handler is sync or async.
 ## Register Directly
 
 ```ts
-import { QueryBus, createContainer, inject } from "@wirestate/core";
+import { Container, QueryBus } from "@wirestate/core";
 
-const container = createContainer();
+const container = new Container();
 const bus = container.get(QueryBus);
 
 const unregister = bus.register("CURRENT_USER", () => ({ id: "u1" }));

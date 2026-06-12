@@ -80,7 +80,7 @@ export interface ContainerOptions {
  * A Wirestate-ready dependency injection container.
  *
  * @remarks
- * Extends the bare {@link ContainerKernel} with the Wirestate composition:
+ * Extends the internal bare container kernel with the Wirestate composition.
  *
  * @group Container
  *
