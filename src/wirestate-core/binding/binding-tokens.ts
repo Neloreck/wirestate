@@ -1,4 +1,4 @@
-﻿import { type AbstractClass, type Newable, isClassLike } from "../utils/class-like";
+﻿import { type AbstractClass, type Newable, isClassLike } from "./binding-class";
 
 /**
  * An identifier is a reference to a service in the dependency injection (DI) container:

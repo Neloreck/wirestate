@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { Binding, Bindings, BindingType } from "../binding/binding";
-import { Identifier } from "../binding/tokens";
+import { Identifier } from "../binding/binding-tokens";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";

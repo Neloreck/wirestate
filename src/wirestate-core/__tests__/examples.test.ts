@@ -1,4 +1,4 @@
-import { InjectionToken } from "../binding/tokens";
+import { InjectionToken } from "../binding/binding-tokens";
 import { ContainerKernel } from "../container/container-kernel";
 import { inject } from "../container/context";
 import { Injectable } from "../metadata/injectable";

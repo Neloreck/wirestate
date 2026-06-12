@@ -2,7 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { Bindings } from "../binding/binding";
-import { Identifier } from "../binding/tokens";
+import { Identifier } from "../binding/binding-tokens";
 import { CommandBus } from "../commands/command-bus";
 import { getConfiguredInternalErrorHandler, setInternalErrorHandler } from "../error/internal-error-handler";
 import { EventBus } from "../events/event-bus";

@@ -1,4 +1,4 @@
-import { InjectionToken } from "../binding/tokens";
+import { InjectionToken } from "../binding/binding-tokens";
 import { ContainerKernel } from "../container/container-kernel";
 import { NoBindingFoundError } from "../error/no-binding-found-error";
 import { OnDeactivation } from "../lifecycle/on-deactivation";

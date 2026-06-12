@@ -1,9 +1,9 @@
 import { BindingDescriptor } from "../binding/binding";
+import { Newable } from "../binding/binding-class";
 import { isInstanceDescriptor } from "../binding/binding-guards";
 import { getBindingScope } from "../binding/binding-lifecycle";
-import { Identifier } from "../binding/tokens";
+import { Identifier } from "../binding/binding-tokens";
 import { NoBindingFoundError } from "../error/no-binding-found-error";
-import { Newable } from "../utils/class-like";
 
 import { ActivationRecord, BindingMap, InstanceMap } from "./binding-storage";
 import { injectionContext } from "./context";

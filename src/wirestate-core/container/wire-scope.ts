@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Identifier } from "../binding/tokens";
+import { Identifier } from "../binding/binding-tokens";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
 import { Injectable } from "../metadata/injectable";

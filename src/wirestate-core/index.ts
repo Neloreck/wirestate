@@ -14,7 +14,8 @@ export {
   InstanceBindingDescriptor,
   ValueBindingDescriptor,
 } from "./binding/binding";
-export { Identifier, InjectionToken } from "./binding/tokens";
+export { Newable } from "./binding/binding-class";
+export { Identifier, InjectionToken } from "./binding/binding-tokens";
 
 export { OnCommand, OnCommandHandlerDecorator } from "./commands/on-command";
 export { CommandBus } from "./commands/command-bus";
@@ -51,5 +52,3 @@ export { InternalErrorHandler, InternalErrorDescriptor, InternalErrorSource } fr
 export { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "./types/events";
 export { QueryHandler, QueryType, QueryUnregister } from "./types/queries";
 export { SeedsMap, SeedBindings, SeedBinding, SeedKey } from "./types/seeds";
-
-export { Newable } from "./utils/class-like";

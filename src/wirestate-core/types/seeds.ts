@@ -1,4 +1,4 @@
-import { Newable } from "../utils/class-like";
+import { Newable } from "../binding/binding-class";
 
 /**
  * Represents a lookup key for targeted seed values.

@@ -1,4 +1,4 @@
-import { type Identifier, toString } from "../binding/tokens";
+import { type Identifier, toString } from "../binding/binding-tokens";
 
 import { ERROR_CODE_NO_BINDING_FOUND } from "./error-code";
 import { WirestateError } from "./wirestate-error";

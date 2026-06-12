@@ -1,4 +1,4 @@
-import type { Identifier } from "../binding/tokens";
+import type { Identifier } from "../binding/binding-tokens";
 
 import type { Container } from "./container";
 import type { ContainerKernel } from "./container-kernel";

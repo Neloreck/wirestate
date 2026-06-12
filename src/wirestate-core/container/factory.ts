@@ -1,6 +1,6 @@
 import type { BindingDescriptor } from "../binding/binding";
 import { isFactoryDescriptor, isInstanceDescriptor, isValueDescriptor } from "../binding/binding-guards";
-import { toString } from "../binding/tokens";
+import { toString } from "../binding/binding-tokens";
 import { CircularDependencyError } from "../error/circular-dependency-error";
 import { assertNever } from "../utils/asserts";
 

@@ -1,4 +1,4 @@
-import { InjectionToken } from "../binding/tokens";
+import { InjectionToken } from "../binding/binding-tokens";
 import {
   ERROR_CODE_INVALID_ARGUMENTS,
   ERROR_CODE_INVALID_BINDING_SCOPE,

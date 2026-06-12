@@ -1,6 +1,6 @@
+import type { Newable } from "../binding/binding-class";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import type { Newable } from "../utils/class-like";
 
 /**
  * Classes marked with `@Injectable()`, eligible for container instance bindings.

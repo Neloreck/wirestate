@@ -1,6 +1,7 @@
 import { BindingScope, BindingType, type BindingDescriptor } from "../binding/binding";
+import type { Newable } from "../binding/binding-class";
 import { isFactoryDescriptor } from "../binding/binding-guards";
-import { type Identifier, toString } from "../binding/tokens";
+import { type Identifier, toString } from "../binding/binding-tokens";
 import {
   ERROR_CODE_INVALID_ARGUMENTS,
   ERROR_CODE_INVALID_BINDING_SCOPE,
@@ -8,7 +9,6 @@ import {
 } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { isInjectable } from "../metadata/injectable";
-import type { Newable } from "../utils/class-like";
 
 /**
  * Validates a binding descriptor before registration.

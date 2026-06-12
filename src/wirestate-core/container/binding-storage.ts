@@ -1,5 +1,5 @@
 import type { BindingDescriptor } from "../binding/binding";
-import type { Identifier } from "../binding/tokens";
+import type { Identifier } from "../binding/binding-tokens";
 
 /**
  * Lifecycle hook parameters make `BindingDescriptor<T>` invariant in `T`,

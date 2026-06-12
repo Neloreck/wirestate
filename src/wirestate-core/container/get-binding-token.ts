@@ -1,6 +1,6 @@
 import { BindingDescriptor } from "../binding/binding";
-import { Identifier } from "../binding/tokens";
-import { Newable } from "../utils/class-like";
+import { Newable } from "../binding/binding-class";
+import { Identifier } from "../binding/binding-tokens";
 
 /**
  * Returns the token for a binding.

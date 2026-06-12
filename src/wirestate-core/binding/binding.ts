@@ -1,7 +1,7 @@
 import type { ContainerKernel } from "../container/container-kernel";
-import type { Newable } from "../utils/class-like";
 
-import type { Identifier } from "./tokens";
+import type { Newable } from "./binding-class";
+import type { Identifier } from "./binding-tokens";
 
 /**
  * Binding strategy names accepted by binding descriptors.
