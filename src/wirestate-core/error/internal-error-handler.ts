@@ -1,6 +1,7 @@
 import type { ContainerKernel } from "../container/container-kernel";
-import { InternalErrorDescriptor, InternalErrorHandler } from "../types/error";
 import { Maybe } from "../types/general";
+
+import { InternalErrorDescriptor, InternalErrorHandler } from "./error";
 
 /**
  * Internal storage for container error handlers.

@@ -1,10 +1,11 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { Container } from "../container/container";
-import { reportWirestateInternalError } from "../error/internal-error-handler";
-import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "../types/events";
-import { Maybe, Optional } from "../types/general";
+import type { Container } from "../../container/container";
+import { reportWirestateInternalError } from "../../error/internal-error-handler";
+import type { Maybe, Optional } from "../../types/general";
+
+import type { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "./events";
 
 /**
  * Private key under which catch-all handlers are stored.

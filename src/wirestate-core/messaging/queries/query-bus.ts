@@ -1,11 +1,12 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "../../error/error-code";
+import { WirestateError } from "../../error/wirestate-error";
+import type { Optional } from "../../types/general";
 import { HandlerStackBus } from "../bus/handler-stack-bus";
-import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "../error/error-code";
-import { WirestateError } from "../error/wirestate-error";
-import { Optional } from "../types/general";
-import { QueryHandler, QueryType, QueryUnregister } from "../types/queries";
+
+import { QueryHandler, QueryType, QueryUnregister } from "./queries";
 
 /**
  * Dispatches named queries to one active handler.

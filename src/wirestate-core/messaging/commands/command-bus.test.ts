@@ -1,7 +1,7 @@
-import { CommandUnregister } from "../types/commands";
-import { Optional } from "../types/general";
+import type { Optional } from "../../types/general";
 
 import { CommandBus } from "./command-bus";
+import type { CommandUnregister } from "./commands";
 
 describe("CommandBus", () => {
   it("should register and dispatch a command handler synchronously", () => {

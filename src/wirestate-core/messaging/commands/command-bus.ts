@@ -1,11 +1,12 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER } from "../../error/error-code";
+import { WirestateError } from "../../error/wirestate-error";
+import type { Optional } from "../../types/general";
 import { HandlerStackBus } from "../bus/handler-stack-bus";
-import { ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER } from "../error/error-code";
-import { WirestateError } from "../error/wirestate-error";
-import { CommandHandler, CommandType, CommandUnregister } from "../types/commands";
-import { Optional } from "../types/general";
+
+import type { CommandHandler, CommandType, CommandUnregister } from "./commands";
 
 /**
  * Dispatches named commands to one active handler.

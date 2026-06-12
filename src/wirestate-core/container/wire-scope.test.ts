@@ -1,11 +1,11 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { CommandBus } from "../commands/command-bus";
-import { EventBus } from "../events/event-bus";
 import { OnActivated } from "../lifecycle/on-activated";
 import { OnDeactivation } from "../lifecycle/on-deactivation";
+import { CommandBus } from "../messaging/commands/command-bus";
+import { EventBus } from "../messaging/events/event-bus";
+import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/injectable";
-import { QueryBus } from "../queries/query-bus";
 import { Optional } from "../types/general";
 
 import { Container } from "./container";

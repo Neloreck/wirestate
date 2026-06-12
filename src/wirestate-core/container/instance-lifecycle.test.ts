@@ -2,11 +2,11 @@ import { BindingScope, WireScope } from "@wirestate/core";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { CommandBus } from "../commands/command-bus";
-import { EventBus } from "../events/event-bus";
 import { OnActivated } from "../lifecycle/on-activated";
+import { CommandBus } from "../messaging/commands/command-bus";
+import { EventBus } from "../messaging/events/event-bus";
+import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/injectable";
-import { QueryBus } from "../queries/query-bus";
 
 import { Container } from "./container";
 import { getInstanceContainer, initializeInstanceStatus, unregisterInstanceStatus } from "./instance-lifecycle";

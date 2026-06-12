@@ -1,6 +1,6 @@
-import { Optional } from "../types/general";
-import { QueryUnregister } from "../types/queries";
+import type { Optional } from "../../types/general";
 
+import type { QueryUnregister } from "./queries";
 import { QueryBus } from "./query-bus";
 
 describe("QueryBus", () => {

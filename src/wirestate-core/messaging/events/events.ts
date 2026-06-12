@@ -1,4 +1,4 @@
-import { Optional } from "./general";
+import type { Optional } from "../../types/general";
 
 /**
  * Represents token used to emit and filter events.

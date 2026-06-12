@@ -1,7 +1,7 @@
-import { Container } from "../container/container";
-import { EventUnsubscriber } from "../types/events";
+import { Container } from "../../container/container";
 
 import { EventBus } from "./event-bus";
+import type { EventUnsubscriber } from "./events";
 
 describe("EventBus", () => {
   it("should emit event to subscribed handler", () => {

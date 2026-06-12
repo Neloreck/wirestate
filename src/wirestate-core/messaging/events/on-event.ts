@@ -1,11 +1,12 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../metadata/handler-metadata";
-import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "../metadata/registry";
-import { validateStandardMethodContext } from "../metadata/standard-decorator-context";
-import { EventType, WireEvent } from "../types/events";
-import { Optional } from "../types/general";
+import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../../metadata/handler-metadata";
+import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "../../metadata/registry";
+import { validateStandardMethodContext } from "../../metadata/standard-decorator-context";
+import type { Optional } from "../../types/general";
+
+import type { EventType, WireEvent } from "./events";
 
 /**
  * Describes the decorator returned by {@link OnEvent}.

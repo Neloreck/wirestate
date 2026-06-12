@@ -1,10 +1,11 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../metadata/handler-metadata";
-import { QUERY_HANDLER_METADATA, QUERY_METADATA_KEY } from "../metadata/registry";
-import { validateStandardMethodContext } from "../metadata/standard-decorator-context";
-import { QueryType } from "../types/queries";
+import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../../metadata/handler-metadata";
+import { QUERY_HANDLER_METADATA, QUERY_METADATA_KEY } from "../../metadata/registry";
+import { validateStandardMethodContext } from "../../metadata/standard-decorator-context";
+
+import type { QueryType } from "./queries";
 
 /**
  * Describes the decorator returned by {@link OnQuery}.

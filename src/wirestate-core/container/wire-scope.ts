@@ -2,14 +2,14 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { Identifier } from "../binding/binding-tokens";
-import { CommandBus } from "../commands/command-bus";
-import { EventBus } from "../events/event-bus";
+import { CommandBus } from "../messaging/commands/command-bus";
+import { CommandHandler, CommandUnregister, CommandType } from "../messaging/commands/commands";
+import { EventBus } from "../messaging/events/event-bus";
+import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../messaging/events/events";
+import { QueryHandler, QueryUnregister, QueryType } from "../messaging/queries/queries";
+import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/injectable";
-import { QueryBus } from "../queries/query-bus";
-import { CommandHandler, CommandUnregister, CommandType } from "../types/commands";
-import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../types/events";
 import { Optional, AnyObject } from "../types/general";
-import { QueryHandler, QueryUnregister, QueryType } from "../types/queries";
 import { SeedKey, SeedsMap } from "../types/seeds";
 
 import type { Container } from "./container";

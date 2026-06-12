@@ -1,10 +1,11 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../metadata/handler-metadata";
-import { COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY } from "../metadata/registry";
-import { validateStandardMethodContext } from "../metadata/standard-decorator-context";
-import { CommandType } from "../types/commands";
+import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../../metadata/handler-metadata";
+import { COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY } from "../../metadata/registry";
+import { validateStandardMethodContext } from "../../metadata/standard-decorator-context";
+
+import type { CommandType } from "./commands";
 
 /**
  * Describes the decorator returned by {@link OnCommand}.

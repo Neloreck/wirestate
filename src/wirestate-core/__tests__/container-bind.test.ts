@@ -8,20 +8,20 @@ import {
   InstanceBindingDescriptor,
   ValueBindingDescriptor,
 } from "../binding/binding";
-import { CommandBus } from "../commands/command-bus";
-import { OnCommand } from "../commands/on-command";
 import { Container } from "../container/container";
 import { inject } from "../container/context";
 import { WireScope } from "../container/wire-scope";
 import { WireStatus } from "../container/wire-status";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
-import { EventBus } from "../events/event-bus";
-import { OnEvent } from "../events/on-event";
 import { OnActivated } from "../lifecycle/on-activated";
 import { OnDeactivation } from "../lifecycle/on-deactivation";
+import { CommandBus } from "../messaging/commands/command-bus";
+import { OnCommand } from "../messaging/commands/on-command";
+import { EventBus } from "../messaging/events/event-bus";
+import { OnEvent } from "../messaging/events/on-event";
+import { OnQuery } from "../messaging/queries/on-query";
+import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/injectable";
-import { OnQuery } from "../queries/on-query";
-import { QueryBus } from "../queries/query-bus";
 import { AnyObject, Optional } from "../types/general";
 
 describe("container.bind", () => {

@@ -3,11 +3,11 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { Bindings } from "../binding/binding";
 import { Identifier } from "../binding/binding-tokens";
-import { CommandBus } from "../commands/command-bus";
+import { InternalErrorHandler } from "../error/error";
 import { getConfiguredInternalErrorHandler, setInternalErrorHandler } from "../error/internal-error-handler";
-import { EventBus } from "../events/event-bus";
-import { QueryBus } from "../queries/query-bus";
-import { InternalErrorHandler } from "../types/error";
+import { CommandBus } from "../messaging/commands/command-bus";
+import { EventBus } from "../messaging/events/event-bus";
+import { QueryBus } from "../messaging/queries/query-bus";
 import { AnyObject, Maybe } from "../types/general";
 import { SeedBindings, SeedsMap } from "../types/seeds";
 

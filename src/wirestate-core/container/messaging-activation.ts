@@ -1,13 +1,13 @@
-import { CommandBus } from "../commands/command-bus";
-import { getCommandHandlerMetadata } from "../commands/get-command-handler-metadata";
-import { buildEventDispatchers } from "../events/build-event-dispatchers";
-import { EventBus } from "../events/event-bus";
-import { getQueryHandlerMetadata } from "../queries/get-query-handler-metadata";
-import { QueryBus } from "../queries/query-bus";
-import type { CommandHandler } from "../types/commands";
-import type { EventDispatch, EventUnsubscriber } from "../types/events";
+import { CommandBus } from "../messaging/commands/command-bus";
+import type { CommandHandler } from "../messaging/commands/commands";
+import { getCommandHandlerMetadata } from "../messaging/commands/get-command-handler-metadata";
+import { buildEventDispatchers } from "../messaging/events/build-event-dispatchers";
+import { EventBus } from "../messaging/events/event-bus";
+import type { EventDispatch, EventUnsubscriber } from "../messaging/events/events";
+import { getQueryHandlerMetadata } from "../messaging/queries/get-query-handler-metadata";
+import type { QueryHandler } from "../messaging/queries/queries";
+import { QueryBus } from "../messaging/queries/query-bus";
 import type { Maybe } from "../types/general";
-import type { QueryHandler } from "../types/queries";
 
 import type { ContainerKernel } from "./container-kernel";
 

@@ -1,8 +1,8 @@
-import { EventDispatch, EventType } from "../types/events";
-import { Optional } from "../types/general";
+import type { Optional } from "../../types/general";
 
 import { buildEventDispatchers } from "./build-event-dispatchers";
 import { EventBus } from "./event-bus";
+import type { EventDispatch, EventType } from "./events";
 import { OnEvent } from "./on-event";
 
 describe("buildEventDispatcher", () => {

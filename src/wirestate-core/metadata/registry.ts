@@ -1,9 +1,9 @@
 // Install the Symbol.metadata polyfill before any consumer class definition.
 import "./symbol-metadata";
 
-import type { CommandHandlerMetadata } from "../types/commands";
-import type { EventHandlerMetadata } from "../types/events";
-import type { QueryHandlerMetadata } from "../types/queries";
+import type { CommandHandlerMetadata } from "../messaging/commands/commands";
+import type { EventHandlerMetadata } from "../messaging/events/events";
+import type { QueryHandlerMetadata } from "../messaging/queries/queries";
 
 /**
  * Registry of class constructors to their declared query handlers.

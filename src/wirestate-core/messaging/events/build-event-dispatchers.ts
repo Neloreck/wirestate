@@ -1,11 +1,11 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { ContainerKernel } from "../container/container-kernel";
-import { reportWirestateInternalError } from "../error/internal-error-handler";
-import { EventDispatch, EventHandler, EventType } from "../types/events";
-import { Maybe } from "../types/general";
+import type { ContainerKernel } from "../../container/container-kernel";
+import { reportWirestateInternalError } from "../../error/internal-error-handler";
+import type { Maybe } from "../../types/general";
 
+import { EventDispatch, EventHandler, EventType } from "./events";
 import { getEventHandlerMetadata } from "./get-event-handler-metadata";
 
 /**

@@ -2,9 +2,9 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import type { ContainerKernel } from "../container/container-kernel";
+import type { InternalErrorSource } from "../error/error";
 import { reportWirestateInternalError } from "../error/internal-error-handler";
-import { InternalErrorSource } from "../types/error";
-import { MaybePromise } from "../types/general";
+import type { MaybePromise } from "../types/general";
 
 export interface CallLifecycleHandlerOptions {
   /**
