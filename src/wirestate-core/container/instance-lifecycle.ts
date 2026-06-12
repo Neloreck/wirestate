@@ -1,18 +1,10 @@
 import type { InstanceBindingDescriptor } from "../binding/binding";
-import { CommandBus } from "../commands/command-bus";
-import { getCommandHandlerMetadata } from "../commands/get-command-handler-metadata";
-import { buildEventDispatchers } from "../events/build-event-dispatchers";
-import { EventBus } from "../events/event-bus";
 import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
 import { getActivatedHandlerMetadata } from "../lifecycle/on-activated";
 import { getDeactivationHandlerMetadata } from "../lifecycle/on-deactivation";
-import { getQueryHandlerMetadata } from "../queries/get-query-handler-metadata";
-import { QueryBus } from "../queries/query-bus";
-import type { CommandHandler } from "../types/commands";
-import type { EventDispatch, EventUnsubscriber } from "../types/events";
 import type { Maybe } from "../types/general";
-import type { QueryHandler } from "../types/queries";
 
+import { getActivationAdapter } from "./activation-adapter";
 import type { ActivationRecord } from "./binding-storage";
 import type { ContainerKernel } from "./container-kernel";
 import { getContainerProvisionStatus } from "./provision-state";
@@ -41,12 +33,12 @@ export function getInstanceContainer(instance: object): ContainerKernel | undefi
  *
  * @remarks
  * Runs the Wirestate side of instance activation: tracks the instance to
- * container mapping, initializes {@link WireStatus}, registers decorated
- * `@OnEvent`, `@OnQuery`, and `@OnCommand` handlers on the container's buses
- * (skipped gracefully when no buses are bound), and invokes the `@OnActivated`
- * hook unless the binding opted out with `skipActivationHooks`.
+ * container mapping, initializes {@link WireStatus}, runs the container's
+ * activation adapter (the composition root installs messaging registration
+ * there), and invokes the `@OnActivated` hook unless the binding opted out
+ * with `skipActivationHooks`.
  *
- * Handler unregister callbacks are collected onto `record.disposers`, so a
+ * Adapter cleanup callbacks are collected onto `record.disposers`, so a
  * failed activation can roll back with {@link rollbackInstanceActivation}.
  *
  * @param container - ContainerKernel resolving the instance binding.
@@ -60,7 +52,7 @@ export function activateInstance(container: ContainerKernel, record: ActivationR
   INSTANCE_CONTAINERS.set(instance, container);
 
   initializeInstanceStatus(container, instance);
-  registerInstanceHandlers(container, instance, record.disposers);
+  getActivationAdapter(container)?.(container, instance, record.disposers);
 
   if (binding.skipActivationHooks) {
     return;
@@ -170,74 +162,6 @@ export function unregisterInstanceStatus(instance: object): void {
 
   status.isDisposed = true;
   status.isDeprovisioned = true;
-}
-
-/**
- * Registers decorated event, query, and command handlers for an instance.
- *
- * @remarks
- * Buses are resolved by token with `{ optional: true }`, so containers without
- * messaging skip handler registration gracefully. Each registration's
- * unregister callback is collected into `disposers`.
- *
- * @param container - ContainerKernel that owns the instance.
- * @param instance - Activated instance.
- * @param disposers - Collector for handler unregister callbacks.
- */
-function registerInstanceHandlers(container: ContainerKernel, instance: object, disposers: Array<() => void>): void {
-  const dispatches: ReadonlyArray<EventDispatch> = buildEventDispatchers(instance, container);
-
-  if (dispatches.length) {
-    const eventBus: Maybe<EventBus> = container.get(EventBus, { optional: true });
-
-    if (eventBus) {
-      const unsubscribers: Array<EventUnsubscriber> = dispatches.map((dispatch) =>
-        eventBus.subscribe(dispatch.types, dispatch.handler)
-      );
-
-      disposers.push(() => {
-        for (const unsubscribe of unsubscribers) {
-          unsubscribe();
-        }
-      });
-    }
-  }
-
-  const queryHandlers = getQueryHandlerMetadata(instance);
-
-  if (queryHandlers.length) {
-    const queryBus: Maybe<QueryBus> = container.get(QueryBus, { optional: true });
-
-    if (queryBus) {
-      for (const meta of queryHandlers) {
-        const method: unknown = (instance as Record<string | symbol, unknown>)[meta.methodName];
-
-        if (typeof method !== "function") {
-          continue;
-        }
-
-        disposers.push(queryBus.register(meta.type, (method as QueryHandler).bind(instance)));
-      }
-    }
-  }
-
-  const commandHandlers = getCommandHandlerMetadata(instance);
-
-  if (commandHandlers.length) {
-    const commandBus: Maybe<CommandBus> = container.get(CommandBus, { optional: true });
-
-    if (commandBus) {
-      for (const meta of commandHandlers) {
-        const method: unknown = (instance as Record<string | symbol, unknown>)[meta.methodName];
-
-        if (typeof method !== "function") {
-          continue;
-        }
-
-        disposers.push(commandBus.register(meta.type, (method as CommandHandler).bind(instance)));
-      }
-    }
-  }
 }
 
 /**

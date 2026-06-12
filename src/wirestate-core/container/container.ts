@@ -11,8 +11,10 @@ import { InternalErrorHandler } from "../types/error";
 import { AnyObject, Maybe } from "../types/general";
 import { SeedBindings, SeedsMap } from "../types/seeds";
 
+import { setActivationAdapter } from "./activation-adapter";
 import { ContainerKernel } from "./container-kernel";
 import { getBindingToken } from "./get-binding-token";
+import { messagingActivationAdapter } from "./messaging-activation";
 import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
 import { applySkipActivationHooks } from "./skip-activation-hooks";
 import { validateContainerConfig } from "./validate-container-config";
@@ -124,6 +126,10 @@ export class Container extends ContainerKernel {
     validateContainerConfig(config);
 
     super(config.parent);
+
+    // Installed before any binding activates; the adapter resolves buses with
+    // optional lookups, so it is installed even under `skipMessaging`.
+    setActivationAdapter(this, messagingActivationAdapter);
 
     const activate: ReadonlyArray<Identifier> =
       (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
