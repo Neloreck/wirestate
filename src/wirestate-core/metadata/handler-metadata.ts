@@ -32,12 +32,6 @@ export function appendHandlerMetadata<T>(registry: WeakMap<object, Array<T>>, co
 /**
  * Appends an entry to a standard decorator metadata object's handler list.
  *
- * @remarks
- * Standard decorator metadata objects prototype-chain to the parent class's
- * metadata object, so a plain key lookup can resolve the parent's array.
- * Pushing into that inherited array would corrupt the base class's entries;
- * this helper only pushes into an own array and otherwise defines a new one.
- *
  * @group Metadata
  * @internal
  *
@@ -57,12 +51,6 @@ export function appendStandardHandlerMetadata<T>(metadata: DecoratorMetadataObje
 
 /**
  * Collects a class hierarchy's handler-metadata entries in base-to-derived order.
- *
- * @remarks
- * Entries are flattened from the prototype chain so base-class handlers come
- * before derived-class handlers. Both legacy WeakMap registries and, when
- * `metadataKey` is provided, standard decorator metadata are merged per
- * constructor.
  *
  * @group Metadata
  * @internal

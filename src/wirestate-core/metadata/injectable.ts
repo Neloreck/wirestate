@@ -23,13 +23,6 @@ export interface InjectableDecorator {
 /**
  * Marks a class as eligible for container instance bindings.
  *
- * @remarks
- * The decorator is a validation marker: binding a class that is not decorated
- * fails fast at registration time. Dependencies are declared with `inject()`
- * in constructor parameter defaults or field initializers — no parameter
- * decorators are involved, so the same class compiles under legacy and TC39
- * standard decorators alike.
- *
  * @returns A class decorator registering the class as injectable.
  */
 export function Injectable(): InjectableDecorator {

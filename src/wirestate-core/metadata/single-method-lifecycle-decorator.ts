@@ -11,9 +11,6 @@ import { validateStandardMethodContext } from "./standard-decorator-context";
 /**
  * Method decorator attached by single-method lifecycle hooks such as `@OnActivated`.
  *
- * @remarks
- * Supports both TC39 and legacy experimental decorators.
- *
  * @group Lifecycle
  */
 export interface SingleMethodLifecycleDecorator {
@@ -40,8 +37,7 @@ export interface SingleMethodDecoratorOptions {
    * the class `Symbol.metadata` object.
    *
    * @remarks
-   * Required for TC39 standard decorator support; legacy decoration works
-   * without it.
+   * Required for TC39 standard decorator support.
    */
   readonly metadataKey?: symbol;
 

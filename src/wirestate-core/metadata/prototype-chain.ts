@@ -1,15 +1,9 @@
-import { Maybe } from "../types/general";
+import { Definable, Maybe } from "../types/general";
 
 import { METADATA_SYMBOL } from "./symbol-metadata";
 
 /**
  * Reads a standard-decorator metadata value owned by a single constructor.
- *
- * @remarks
- * Two own-property checks are mandatory: `Symbol.metadata` itself is inherited
- * through the constructor prototype chain, and the metadata object inherits
- * keys from the parent class's metadata object. Without both checks, base
- * class metadata would be re-attributed to derived classes.
  *
  * @group Metadata
  * @internal
@@ -20,7 +14,7 @@ import { METADATA_SYMBOL } from "./symbol-metadata";
  * @param metadataKey - Key under which the value is stored on the metadata object.
  * @returns The own metadata value, or `undefined` when none exists.
  */
-function getOwnStandardMetadata<T>(constructor: object, metadataKey: symbol): T | undefined {
+function getOwnStandardMetadata<T>(constructor: object, metadataKey: symbol): Definable<T> {
   const descriptor: Maybe<PropertyDescriptor> = Object.getOwnPropertyDescriptor(constructor, METADATA_SYMBOL);
 
   if (descriptor?.value && Object.hasOwn(descriptor.value as object, metadataKey)) {
@@ -32,12 +26,6 @@ function getOwnStandardMetadata<T>(constructor: object, metadataKey: symbol): T 
 
 /**
  * Retrieves metadata registered on constructors in an instance's inheritance chain.
- *
- * @remarks
- * For each constructor in the chain, both storage channels are read: the
- * legacy decorator WeakMap registry and, when `metadataKey` is provided, the
- * own standard decorator metadata attached at `Symbol.metadata`. Per
- * constructor, the legacy value comes first.
  *
  * @group Metadata
  * @internal
@@ -59,14 +47,14 @@ export function getPrototypeChainMetadata<T>(
   let constructor: unknown = instance.constructor;
 
   while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
-    const own: T | undefined = metadataRegistry.get(constructor);
+    const own: Definable<T> = metadataRegistry.get(constructor);
 
     if (own !== undefined) {
       metadata.push(own);
     }
 
     if (metadataKey !== undefined) {
-      const standard: T | undefined = getOwnStandardMetadata(constructor, metadataKey);
+      const standard: Definable<T> = getOwnStandardMetadata(constructor, metadataKey);
 
       if (standard !== undefined) {
         metadata.push(standard);
