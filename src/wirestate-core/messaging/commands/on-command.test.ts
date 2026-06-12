@@ -1,4 +1,4 @@
-import { getCommandHandlerMetadata } from "./get-command-handler-metadata";
+import { getCommandHandlerMetadata } from "./on-command";
 import { OnCommand } from "./on-command";
 
 describe("OnCommand and getCommandHandlerMetadata", () => {

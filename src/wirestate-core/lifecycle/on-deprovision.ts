@@ -1,9 +1,10 @@
-import { DEPROVISION_HANDLER_METADATA, DEPROVISION_METADATA_KEY } from "../metadata/metadata-registry";
 import {
   createSingleMethodDecoratorDescriptor,
   SingleMethodDecorator,
 } from "../metadata/metadata-single-method-decorator";
 import { Maybe } from "../types/general";
+
+import { DEPROVISION_HANDLER_METADATA, DEPROVISION_METADATA_KEY } from "./lifecycle-registry";
 
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
   registry: DEPROVISION_HANDLER_METADATA,

@@ -2,7 +2,7 @@
   "name": "@wirestate/core",
   "version": "1.0.0-experimental.5",
   "description": "State management core with built-in dependency injection",
-  "sideEffects": false,
+  "sideEffects": ["**/metadata-symbol-polyfill.js"],
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/Neloreck/wirestate#readme",
   "license": "MIT",

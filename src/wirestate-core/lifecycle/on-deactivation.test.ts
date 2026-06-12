@@ -1,5 +1,3 @@
-import { DEACTIVATION_HANDLER_METADATA } from "../metadata/metadata-registry";
-
 import { getDeactivationHandlerMetadata, OnDeactivation } from "./on-deactivation";
 
 describe("OnDeactivation", () => {
@@ -9,7 +7,7 @@ describe("OnDeactivation", () => {
       public onDeactivation(): void {}
     }
 
-    expect(DEACTIVATION_HANDLER_METADATA.get(MyService)).toBe("onDeactivation");
+    expect(getDeactivationHandlerMetadata(new MyService())).toBe("onDeactivation");
   });
 
   it("should reject multiple deactivation handlers on the same class", () => {

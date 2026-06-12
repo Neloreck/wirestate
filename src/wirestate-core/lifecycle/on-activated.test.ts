@@ -1,5 +1,3 @@
-import { ACTIVATED_HANDLER_METADATA } from "../metadata/metadata-registry";
-
 import { getActivatedHandlerMetadata, OnActivated } from "./on-activated";
 
 describe("OnActivated", () => {
@@ -9,7 +7,7 @@ describe("OnActivated", () => {
       public onActivated(): void {}
     }
 
-    expect(ACTIVATED_HANDLER_METADATA.get(MyService)).toBe("onActivated");
+    expect(getActivatedHandlerMetadata(new MyService())).toBe("onActivated");
   });
 
   it("should reject multiple activation handlers on the same class", () => {

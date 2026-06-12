@@ -2,10 +2,14 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
-import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../../metadata/metadata-handlers";
-import { COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY } from "../../metadata/metadata-registry";
+import {
+  appendHandlerMetadata,
+  appendStandardHandlerMetadata,
+  collectHandlerMetadata,
+} from "../../metadata/metadata-handlers";
 
-import type { CommandType } from "./commands";
+import type { CommandHandlerMetadata, CommandType } from "./commands";
+import { COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY } from "./commands-registry";
 
 /**
  * Describes the decorator returned by {@link OnCommand}.
@@ -74,4 +78,26 @@ export function OnCommand(type: CommandType): OnCommandHandlerDecorator {
       appendHandlerMetadata(COMMAND_HANDLER_METADATA, target.constructor, { methodName: nameOrContext, type });
     }
   }) as OnCommandHandlerDecorator;
+}
+
+/**
+ * Retrieves `@OnCommand` metadata from the class hierarchy.
+ *
+ * @remarks
+ * Traverses the prototype chain to collect all command handlers.
+ * Returns metadata ordered from base class to derived class to ensure parent-first execution.
+ *
+ * @group Commands
+ * @internal
+ *
+ * @param instance - The instance to inspect.
+ * @returns A read-only array of metadata for all discovered command handlers.
+ */
+export function getCommandHandlerMetadata(instance: object): ReadonlyArray<CommandHandlerMetadata> {
+  dbg.info(prefix(__filename), "Resolving instance command metadata:", {
+    name: instance.constructor.name,
+    instance,
+  });
+
+  return collectHandlerMetadata(instance, COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY);
 }

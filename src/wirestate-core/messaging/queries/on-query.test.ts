@@ -1,4 +1,4 @@
-import { getQueryHandlerMetadata } from "./get-query-handler-metadata";
+import { getQueryHandlerMetadata } from "./on-query";
 import { OnQuery } from "./on-query";
 
 describe("OnQuery and getQueryHandlerMetadata", () => {

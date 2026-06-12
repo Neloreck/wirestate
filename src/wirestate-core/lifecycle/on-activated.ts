@@ -1,9 +1,10 @@
-import { ACTIVATED_HANDLER_METADATA, ACTIVATED_METADATA_KEY } from "../metadata/metadata-registry";
 import {
   createSingleMethodDecoratorDescriptor,
   SingleMethodDecorator,
 } from "../metadata/metadata-single-method-decorator";
 import { Maybe } from "../types/general";
+
+import { ACTIVATED_HANDLER_METADATA, ACTIVATED_METADATA_KEY } from "./lifecycle-registry";
 
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
   registry: ACTIVATED_HANDLER_METADATA,

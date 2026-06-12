@@ -2,10 +2,14 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
-import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../../metadata/metadata-handlers";
-import { QUERY_HANDLER_METADATA, QUERY_METADATA_KEY } from "../../metadata/metadata-registry";
+import {
+  appendHandlerMetadata,
+  appendStandardHandlerMetadata,
+  collectHandlerMetadata,
+} from "../../metadata/metadata-handlers";
 
-import type { QueryType } from "./queries";
+import type { QueryHandlerMetadata, QueryType } from "./queries";
+import { QUERY_HANDLER_METADATA, QUERY_METADATA_KEY } from "./queries-registry";
 
 /**
  * Describes the decorator returned by {@link OnQuery}.
@@ -78,4 +82,23 @@ export function OnQuery(type: QueryType): OnQueryHandlerDecorator {
       appendHandlerMetadata(QUERY_HANDLER_METADATA, target.constructor, { methodName: nameOrContext, type });
     }
   }) as OnQueryHandlerDecorator;
+}
+
+/**
+ * Retrieves `@OnQuery` metadata from the class hierarchy.
+ *
+ * @remarks
+ * Traverses the prototype chain to collect all query handlers.
+ * Returns metadata ordered from base class to derived class to ensure parent-first execution.
+ *
+ * @group Queries
+ * @internal
+ *
+ * @param instance - The instance to scan for query handlers.
+ * @returns A read-only array of query handler metadata, ordered from base to derived class.
+ */
+export function getQueryHandlerMetadata(instance: object): ReadonlyArray<QueryHandlerMetadata> {
+  dbg.info(prefix(__filename), "Resolving instance query metadata:", { name: instance.constructor.name, instance });
+
+  return collectHandlerMetadata(instance, QUERY_HANDLER_METADATA, QUERY_METADATA_KEY);
 }

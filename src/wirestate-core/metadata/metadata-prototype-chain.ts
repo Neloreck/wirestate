@@ -1,6 +1,6 @@
 import { Definable, Maybe } from "../types/general";
 
-import { METADATA_SYMBOL } from "./metadata-symbol";
+import { METADATA_SYMBOL } from "./metadata-symbol-polyfill";
 
 /**
  * Reads a standard-decorator metadata value owned by a single constructor.

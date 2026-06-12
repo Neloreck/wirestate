@@ -6,7 +6,7 @@ import { reportWirestateInternalError } from "../../error/internal-error-handler
 import type { Maybe } from "../../types/general";
 
 import { EventDispatch, EventHandler, EventType } from "./events";
-import { getEventHandlerMetadata } from "./get-event-handler-metadata";
+import { getEventHandlerMetadata } from "./on-event";
 
 /**
  * Accumulates a single method's merged `@OnEvent` decorations during a build pass.

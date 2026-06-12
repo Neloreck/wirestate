@@ -4,6 +4,11 @@
  * @packageDocumentation
  */
 
+// Installs the `Symbol.metadata` polyfill before any consumer class definition:
+// importing anything from this package guarantees standard decorators can attach metadata.
+// Kept as the first statement on purpose.
+import "./metadata/metadata-symbol-polyfill";
+
 export {
   Binding,
   BindingDescriptor,

@@ -2,11 +2,15 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
-import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../../metadata/metadata-handlers";
-import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "../../metadata/metadata-registry";
+import {
+  appendHandlerMetadata,
+  appendStandardHandlerMetadata,
+  collectHandlerMetadata,
+} from "../../metadata/metadata-handlers";
 import type { Optional } from "../../types/general";
 
-import type { EventType, WireEvent } from "./events";
+import type { EventHandlerMetadata, EventType, WireEvent } from "./events";
+import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "./events-registry";
 
 /**
  * Describes the decorator returned by {@link OnEvent}.
@@ -94,4 +98,23 @@ export function OnEvent<E extends WireEvent = WireEvent>(
       });
     }
   }) as OnEventHandlerDecorator<E>;
+}
+
+/**
+ * Retrieves `@OnEvent` metadata from the class hierarchy.
+ *
+ * @remarks
+ * Traverses the prototype chain to collect all event handlers.
+ * Returns metadata ordered from base class to derived class to ensure parent-first execution.
+ *
+ * @group Events
+ * @internal
+ *
+ * @param instance - The instance to scan for event handlers.
+ * @returns A read-only array of event handler metadata, ordered from base to derived class.
+ */
+export function getEventHandlerMetadata(instance: object): ReadonlyArray<EventHandlerMetadata> {
+  dbg.info(prefix(__filename), "Retrieving event handler metadata:", { name: instance.constructor.name, instance });
+
+  return collectHandlerMetadata(instance, EVENT_HANDLER_METADATA, EVENT_METADATA_KEY);
 }
