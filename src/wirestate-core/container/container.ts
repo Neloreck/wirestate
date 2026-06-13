@@ -10,7 +10,7 @@ import { QueryBus } from "../messaging/queries/query-bus";
 import { AnyObject, Maybe } from "../types/general";
 import { SeedBindings, SeedsMap } from "../types/seeds";
 
-import { setActivationAdapter } from "./activation-adapter";
+import { setContainerActivationAdapter } from "./container-activation-adapter";
 import { ContainerKernel } from "./container-kernel";
 import { getBindingToken } from "./get-binding-token";
 import { messagingActivationAdapter } from "./messaging-activation";
@@ -120,7 +120,7 @@ export class Container extends ContainerKernel {
 
     // Installed before any binding activates; the adapter resolves buses with
     // optional lookups, so it is installed even under `skipMessaging`.
-    setActivationAdapter(this, messagingActivationAdapter);
+    setContainerActivationAdapter(this, messagingActivationAdapter);
 
     const activate: ReadonlyArray<Identifier> =
       (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];

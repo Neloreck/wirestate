@@ -7,7 +7,7 @@ import { ERROR_CODE_NO_BINDING_FOUND } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import type { Definable, Newable } from "../types/general";
 
-import { ActivationRecord, BindingMap, InstanceMap } from "./binding-storage";
+import { ActivationRecord, BindingMap, InstanceMap } from "./container-storage";
 import { injectionContext } from "./context";
 import { Factory } from "./factory";
 import { activateInstance, deactivateInstance, rollbackInstanceActivation } from "./instance-lifecycle";
