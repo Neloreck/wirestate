@@ -48,7 +48,7 @@
   `useAsyncQueryExecutor`, and `useOptionalAsyncQueryExecutor`.
 - Add expanded MobX, React Signals, Lit Signals, and DI alias exports.
 - Add number support for event, command, and query identifiers.
-- Add regression tests for scoped buses, seeds, service shadowing, lifecycle, event subscriptions, controller cleanup,
+- Add regression tests for scoped buses, service shadowing, lifecycle, event subscriptions, controller cleanup,
   SSR, package consumption, and provider replacement.
 
 ### Changed
@@ -78,7 +78,7 @@
 - Split service activation/deactivation from provider provision/deprovision so framework rendering lifecycles are no
   longer coupled to service activation.
 - Move provider lifecycle decorators and lifecycle execution helpers from framework packages into `@wirestate/core`.
-- Give each container its own `EventBus`, `CommandBus`, `QueryBus`, seeds, and `WireScope` essentials while preserving
+- Give each container its own `EventBus`, `CommandBus`, `QueryBus`, and `WireScope` essentials while preserving
   inherited parent bindings. Child containers can inherit parent messaging with `skipMessaging` or provider
   `scope="parent"`.
 - Keep command and query handlers stack-based so unregistering a handler restores the previous handler for that type.
@@ -98,8 +98,6 @@
   container activation by default.
 - Rework binding descriptors around `token`, `type`, and `scope` fields, and support constant, dynamic value, factory,
   instance, resolved value, and service redirection bindings.
-- Rework seed storage around shared seeds and targeted per-token seeds, including public `SEED` and `SEEDS` aliases.
-- Rename initial-state APIs and docs to seed/seeds terminology.
 - Rename binding lifecycle internals, JSDoc, and internal error descriptors from service to instance terminology.
 - Rework `wirestate` compatibility package entry points to re-export the published `@wirestate/*` packages directly.
 - Update package metadata, peer dependencies, workspace configuration, and package-manager metadata for the expanded
@@ -107,10 +105,9 @@
 
 ### Fixed
 
-- Preserve falsy targeted seed values in `WireScope.getSeed` and return `null` only when targeted seed data is missing.
 - Report missing `reflect-metadata` for service binding with a dedicated `WirestateError`, and declare
   `reflect-metadata` as a peer dependency where needed.
-- Recreate managed React containers when normalized `seed`, `seeds`, `bindings`, `parent`, or `activate` values change.
+- Recreate managed React containers when normalized `bindings`, `parent`, or `activate` values change.
 - Recreate containers synchronously with rendering where required so consumers do not see stale container state.
 - Track provider deprovision state for resolved services, even when they do not declare provider lifecycle hooks.
 - Correct React `useContainer` subscription behavior.
@@ -135,6 +132,10 @@
 
 ### Removed
 
+- Remove seed support from `@wirestate/core`: the `seed`/`seeds` container config, the `SEED`/`SEEDS` tokens,
+  `WireScope.getSeed`, and the `SeedsMap`/`SeedBindings`/`SeedBinding`/`SeedKey` types. Pass construction-time data as
+  ordinary value bindings instead (`bind({ token, value })` + `inject(token)`); the container resolves them, and
+  framework providers recreate on `bindings` change.
 - Remove the `inversify` dependency and the `reflect-metadata` peer dependency. Applications no longer import
   `reflect-metadata` at their entry points, and `emitDecoratorMetadata` is no longer required in consumer tsconfigs.
 - Remove `@Inject`, `@Optional`, `@MultiInject`, `@Named`, and `@Tagged` from the public API — use `inject()` options
@@ -171,7 +172,7 @@
 ### Documentation and Tooling
 
 - Add the VitePress docs site, Typedoc generation, API docs source-link plugin, docs workflows, and guide pages for
-  containers, services, lifecycle, seeds, messaging, testing, React MobX, React Signals, and Lit Signals.
+  containers, services, lifecycle, messaging, testing, React MobX, React Signals, and Lit Signals.
 - Add and update README files for core, React, Lit, React MobX, React Signals, Lit Signals, portable bundles, and the
   root project.
 - Document `WireStatus`, provider deprovision tracking, and async lifecycle guards.

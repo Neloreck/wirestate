@@ -3,7 +3,7 @@
 A [container](/api/wirestate-core/classes/Container) owns service instances, seed data, and one set of message buses.
 
 Services in the same container share the same `EventBus`, `CommandBus`, and `QueryBus`. Child containers inherit parent
-bindings, but keep their own buses and seed data.
+bindings, but keep their own buses.
 
 ## Root Container
 
@@ -19,7 +19,6 @@ class AuthService {}
 const container: Container = new Container({
   activate: [AuthService],
   bindings: [UserService, AuthService],
-  seed: { apiUrl: "https://api.example.com" },
 });
 ```
 
@@ -65,7 +64,7 @@ const child: Container = new Container({
 });
 ```
 
-Child containers inherit parent bindings. Their buses and targeted seeds stay local to the child.
+Child containers inherit parent bindings. Their buses stay local to the child.
 
 Use child containers for modal state, checkout flows, tenant scope, tests, or any branch that needs its own services or
 local messaging.

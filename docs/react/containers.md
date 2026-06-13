@@ -29,7 +29,7 @@ Do not start resource work during activation. React creates managed containers b
 Strict Mode may create and discard an extra container. Start timers, subscriptions, sockets, and provider-scoped async
 work in `@OnProvision`; clean them up in `@OnDeprovision`. See [Core Lifecycle](/core/lifecycle).
 
-Managed providers recreate the container when `parent`, `onError`, `seed`, `seeds`, `bindings`, or `activate` changes by
+Managed providers recreate the container when `parent`, `onError`, `bindings`, or `activate` changes by
 shallow comparison. Keep config objects and arrays stable with `useMemo` when the container should not be replaced.
 
 ## Messaging Scope

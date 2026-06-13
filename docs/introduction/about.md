@@ -13,7 +13,6 @@ Reactivity stays outside the core. Use MobX, Preact Signals, or your own state b
 - Scoped containers for apps, subtrees, tests, tenants, modals, and features.
 - Lifecycle hooks for service setup, provider ownership, cleanup, and disposal.
 - Container-local events, commands, and queries.
-- Seeds for SSR hydration, deterministic tests, and subtree startup data.
 - React and Lit adapters for connecting containers to UI trees.
 
 ## When It Fits
@@ -26,8 +25,8 @@ Use Wirestate when feature logic, state, or workflows should live outside UI com
 
 ## Start Here
 
-- [Core](/core/overview) covers framework-agnostic services, containers, lifecycle, messaging, seeds, and tests.
-- [React](/react/overview) covers React providers, hooks, messaging, seeds, and tests.
-- [Lit](/lit/overview) covers Lit providers, decorators, controllers, messaging, seeds, and tests.
+- [Core](/core/overview) covers framework-agnostic services, containers, lifecycle, messaging, and tests.
+- [React](/react/overview) covers React providers, hooks, messaging, and tests.
+- [Lit](/lit/overview) covers Lit providers, decorators, controllers, messaging, and tests.
 - [React Signals](/react-signals/overview), [React MobX](/react-mobx/overview),
   [Lit Signals](/lit-signals/overview), and [Lit MobX](/lit-mobx/overview) cover framework reactivity packages.

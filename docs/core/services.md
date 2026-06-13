@@ -65,7 +65,7 @@ export class OrderService {
 ## WireScope
 
 Inject [`WireScope`](/api/wirestate-core/classes/WireScope) when a service needs lazy resolution, events, commands,
-queries, or seeds from its container.
+or queries from its container.
 
 ```ts
 import { Injectable, WireScope, inject } from "@wirestate/core";

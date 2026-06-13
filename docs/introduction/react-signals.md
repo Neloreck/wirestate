@@ -70,5 +70,4 @@ function Counter() {
 - [React events](/react/events)
 - [React commands](/react/commands)
 - [React queries](/react/queries)
-- [React seeds](/react/seeds)
 - [React testing](/react/testing)

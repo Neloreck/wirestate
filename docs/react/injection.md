@@ -55,7 +55,7 @@ function DebugFlag() {
 
 ## Scope
 
-`useScope` returns the `WireScope` bound in the active container. Use it for events, commands, queries, seeds, or lazy
+`useScope` returns the `WireScope` bound in the active container. Use it for events, commands, queries, or lazy
 resolution.
 
 ```tsx

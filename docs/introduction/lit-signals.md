@@ -63,5 +63,4 @@ class CounterButton extends SignalWatcher(LitElement) {
 - [Lit events](/lit/events)
 - [Lit commands](/lit/commands)
 - [Lit queries](/lit/queries)
-- [Lit seeds](/lit/seeds)
 - [Lit testing](/lit/testing)

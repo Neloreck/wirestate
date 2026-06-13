@@ -3,7 +3,7 @@
 `@wirestate/core` contains the framework-agnostic part of Wirestate.
 
 Use it to define services, [construct scoped containers](/api/wirestate-core/classes/Container), run lifecycle hooks,
-pass seed data, and communicate through container-local events, commands, and queries.
+and communicate through container-local events, commands, and queries.
 
 The core package does not choose a reactivity system. A service can hold plain values, immutable data, external stores,
 or reactive objects created by another package.
@@ -57,7 +57,6 @@ counter.increment();
 - Events for broadcast notifications.
 - Commands for one-handler write operations.
 - Queries for one-handler read operations.
-- Shared and targeted seed data.
 - Test helpers for service and container tests.
 
 ## API Reference

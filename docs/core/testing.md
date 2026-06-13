@@ -2,7 +2,7 @@
 
 Services are TypeScript classes, but most services are designed to be resolved by a container. Test simple services
 directly when their constructor and methods do not need Wirestate. Use a fresh container when dependency injection,
-lifecycle, seeds, or message buses are part of the behavior.
+lifecycle or message buses are part of the behavior.
 
 ## No Container
 
