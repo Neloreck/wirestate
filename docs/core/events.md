@@ -75,11 +75,11 @@ const unsubscribe = bus.subscribe(["CART_VIEWED", "CART_CLEARED"], (event) => {
 When a service owns a dynamic subscription, attach it during provider lifecycle and remove it during deprovision.
 
 ```ts
-import { EventUnsubscriber, Injectable, OnDeprovision, OnProvision, WireScope, inject } from "@wirestate/core";
+import { EventUnsubscribe, Injectable, OnDeprovision, OnProvision, WireScope, inject } from "@wirestate/core";
 
 @Injectable()
 export class CartActivityService {
-  private unsubscribe: EventUnsubscriber | null = null;
+  private unsubscribe: EventUnsubscribe | null = null;
 
   public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
@@ -110,4 +110,4 @@ If an event handler throws, Wirestate logs the error and continues with the next
 
 [`EventBus`](/api/wirestate-core/classes/EventBus), [`WireScope`](/api/wirestate-core/classes/WireScope),
 [`OnEvent`](/api/wirestate-core/functions/OnEvent), [`WireEvent`](/api/wirestate-core/interfaces/WireEvent),
-[`EventUnsubscriber`](/api/wirestate-core/type-aliases/EventUnsubscriber).
+[`EventUnsubscribe`](/api/wirestate-core/type-aliases/EventUnsubscribe).
