@@ -7,8 +7,8 @@ import {
 } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
 
+import { inject } from "./container-context";
 import { ContainerKernel } from "./container-kernel";
-import { inject } from "./context";
 
 const myServiceConstructorSpy = jest.fn();
 

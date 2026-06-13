@@ -9,9 +9,9 @@ import { Injectable } from "../metadata/metadata-injectable";
 import { WireScope } from "../scope/wire-scope";
 
 import { Container } from "./container";
+import { inject } from "./container-context";
 import { ContainerKernel } from "./container-kernel";
-import { inject } from "./context";
-import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
+import { SEED_TOKEN, SEEDS_TOKEN } from "./container-seeds";
 
 describe("Container", () => {
   it("should create a container with default essentials", () => {

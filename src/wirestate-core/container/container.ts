@@ -14,9 +14,9 @@ import { WireScope } from "../scope/wire-scope";
 import { AnyObject, Maybe } from "../types/general";
 import { SeedBindings, SeedsMap } from "../types/seeds";
 
+import { validateContainerConfig } from "./container-config-validation";
 import { ContainerKernel } from "./container-kernel";
-import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
-import { validateContainerConfig } from "./validate-container-config";
+import { SEED_TOKEN, SEEDS_TOKEN } from "./container-seeds";
 
 /**
  * Describes reusable {@link Container} construction config.

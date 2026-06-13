@@ -27,9 +27,9 @@ export {
 export { InjectionToken } from "./binding/binding-tokens";
 
 export { Container, ContainerConfig, ContainerOptions } from "./container/container";
-export { inject } from "./container/context";
-export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "./container/seeds";
-export { validateContainerConfig } from "./container/validate-container-config";
+export { inject } from "./container/container-context";
+export { validateContainerConfig } from "./container/container-config-validation";
+export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "./container/container-seeds";
 
 export { InternalErrorHandler, InternalErrorDescriptor, InternalErrorSource } from "./error/error";
 export { defaultInternalErrorHandler } from "./error/internal-error-handler";

@@ -3,7 +3,7 @@ import { BindingScope, WireScope } from "@wirestate/core";
 import { GenericService } from "@/fixtures/services/generic-service";
 
 import { Container } from "../container/container";
-import { SEED_TOKEN, SEEDS_TOKEN } from "../container/seeds";
+import { SEED_TOKEN, SEEDS_TOKEN } from "../container/container-seeds";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { EventBus } from "../messaging/events/event-bus";
 import { QueryBus } from "../messaging/queries/query-bus";

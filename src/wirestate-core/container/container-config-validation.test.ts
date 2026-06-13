@@ -1,7 +1,7 @@
 import { BindingType } from "../binding/binding";
 import { Injectable } from "../metadata/metadata-injectable";
 
-import { validateContainerConfig } from "./validate-container-config";
+import { validateContainerConfig } from "./container-config-validation";
 
 describe("validateContainerConfig", () => {
   it("should validate container config without creating a container", () => {

@@ -1,5 +1,5 @@
 import { Container } from "../container/container";
-import { inject } from "../container/context";
+import { inject } from "../container/container-context";
 import { Injectable } from "../metadata/metadata-injectable";
 
 describe("forward references with inject()", () => {

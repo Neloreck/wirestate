@@ -3,8 +3,8 @@
 
 import type { FactoryBindingDescriptor, InstanceBindingDescriptor, ValueBindingDescriptor } from "../binding/binding";
 import { InjectionToken } from "../binding/binding-tokens";
+import { inject } from "../container/container-context";
 import { ContainerKernel } from "../container/container-kernel";
-import { inject } from "../container/context";
 import { Injectable } from "../metadata/metadata-injectable";
 import { Definable } from "../types/general";
 

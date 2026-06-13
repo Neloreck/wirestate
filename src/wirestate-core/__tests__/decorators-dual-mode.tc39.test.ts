@@ -1,7 +1,7 @@
 import { getActivatedHandlerMetadata, OnActivated } from "../activation/on-activated";
 import { OnDeactivation } from "../activation/on-deactivation";
 import { Container } from "../container/container";
-import { inject } from "../container/context";
+import { inject } from "../container/container-context";
 import { WirestateError } from "../error/wirestate-error";
 import { OnCommand } from "../messaging/commands/on-command";
 import { WireEvent } from "../messaging/events/events";

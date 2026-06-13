@@ -1,5 +1,5 @@
+import { inject } from "../container/container-context";
 import { ContainerKernel } from "../container/container-kernel";
-import { inject } from "../container/context";
 import { Injectable } from "../metadata/metadata-injectable";
 import { Definable } from "../types/general";
 

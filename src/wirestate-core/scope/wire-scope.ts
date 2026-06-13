@@ -3,7 +3,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import type { Identifier } from "../binding/binding";
 import type { Container } from "../container/container";
-import { SEED_TOKEN, SEEDS_TOKEN } from "../container/seeds";
+import { SEED_TOKEN, SEEDS_TOKEN } from "../container/container-seeds";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { CommandHandler, CommandUnregister, CommandType } from "../messaging/commands/commands";
 import { EventBus } from "../messaging/events/event-bus";

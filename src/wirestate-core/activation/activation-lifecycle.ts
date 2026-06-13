@@ -1,5 +1,5 @@
 import type { InstanceBindingDescriptor } from "../binding/binding";
-import { callLifecycleHandler } from "../container/call-lifecycle-handler";
+import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
 import type { ContainerKernel } from "../container/container-kernel";
 import type { ActivationRecord } from "../container/container-storage";
 import { getContainerProvisionStatus } from "../provision/provision-state";

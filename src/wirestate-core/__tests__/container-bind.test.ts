@@ -12,7 +12,7 @@ import {
   ValueBindingDescriptor,
 } from "../binding/binding";
 import { Container } from "../container/container";
-import { inject } from "../container/context";
+import { inject } from "../container/container-context";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { OnCommand } from "../messaging/commands/on-command";
