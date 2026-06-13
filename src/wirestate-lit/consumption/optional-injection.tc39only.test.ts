@@ -56,6 +56,26 @@ describe("optionalInjection on standard accessors", () => {
     expect(element.service?.getValue()).toBe("test-value");
   });
 
+  it("should reject non-nullable members without a fallback at compile time", () => {
+    const container: Container = new Container();
+    const token: Identifier<string> = Symbol("optional-token");
+
+    fixture = createLitProvision(container);
+
+    @customElement("test-optional-injection-non-nullable-element")
+    class TestNonNullableElement extends ReactiveElement {
+      // @ts-expect-error - the default `null` fallback is not assignable to a non-nullable accessor.
+      @optionalInjection(token)
+      public accessor value: string = "";
+
+      // @ts-expect-error - the default `null` fallback is not assignable to a non-nullable field.
+      @optionalInjection(token)
+      public field: string = "";
+    }
+
+    expect(TestNonNullableElement).toBeDefined();
+  });
+
   it("should use fallback for accessors when token is not bound", () => {
     const container: Container = new Container();
     const token: Identifier<string> = Symbol("optional-token");

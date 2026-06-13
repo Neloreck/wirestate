@@ -53,6 +53,19 @@ export type Interface<T> = {
 export type DecoratorReturn = void | any;
 
 /**
+ * Ensures a provided type is assignable to the decorated member type.
+ *
+ * @group Types
+ */
+export type ProvidedTypeMustMatch<ProvidedType, ConsumingType> = [ProvidedType] extends [ConsumingType]
+  ? unknown
+  : {
+      message: "provided type not assignable to consuming member";
+      provided: ProvidedType;
+      consuming: ConsumingType;
+    };
+
+/**
  * Ensures that a decorated field matches the type being provided.
  *
  * @group Types

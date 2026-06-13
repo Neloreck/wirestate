@@ -3,7 +3,7 @@ import { ReactiveElement } from "@lit/reactive-element";
 import { Identifier } from "@wirestate/core";
 
 import { ContainerContext } from "../context/container-context";
-import { AnyObject, FieldMustMatchProvidedType, Interface } from "../types/general";
+import { AnyObject, FieldMustMatchProvidedType, Interface, ProvidedTypeMustMatch } from "../types/general";
 
 /**
  * Describes type returned by {@link injection}.
@@ -14,21 +14,17 @@ import { AnyObject, FieldMustMatchProvidedType, Interface } from "../types/gener
  * @group Consumption
  */
 export interface InjectionDecorator<T> {
-  // Standard, `accessor` declarations. The `set` parameter enforces that the
-  // injected value is assignable to the accessor type, so wider accessors are accepted.
+  // Standard, `accessor` declarations. Wider accessor types are accepted; the
+  // injected value must be assignable to the accessor type.
   <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V>(
     value: ClassAccessorDecoratorTarget<C, V>,
-    context: Omit<ClassAccessorDecoratorContext<C, V>, "access"> & {
-      readonly access: { readonly set: (object: C, value: T) => void };
-    }
+    context: ClassAccessorDecoratorContext<C, V> & ProvidedTypeMustMatch<T, V>
   ): void;
-  // Standard, plain field declarations. The `set` parameter enforces that the
-  // injected value is assignable to the field type, so wider fields are accepted.
-  <C extends Interface<Omit<ReactiveElement, "renderRoot">>>(
+  // Standard, plain field declarations. Wider field types are accepted; the
+  // injected value must be assignable to the field type.
+  <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V>(
     value: undefined,
-    context: Omit<ClassFieldDecoratorContext<C, T>, "access"> & {
-      readonly access: { readonly set: (object: C, value: T) => void };
-    }
+    context: ClassFieldDecoratorContext<C, V> & ProvidedTypeMustMatch<T, V>
   ): void;
   // Legacy:
   <K extends PropertyKey, Proto extends Interface<Omit<ReactiveElement, "renderRoot">>>(

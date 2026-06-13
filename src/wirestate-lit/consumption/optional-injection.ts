@@ -3,7 +3,7 @@ import { ReactiveElement } from "@lit/reactive-element";
 import { Container, Identifier } from "@wirestate/core";
 
 import { ContainerContext } from "../context/container-context";
-import { AnyObject, FieldMustMatchProvidedType, Interface, Optional } from "../types/general";
+import { AnyObject, FieldMustMatchProvidedType, Interface, Optional, ProvidedTypeMustMatch } from "../types/general";
 
 import type { OptionalInjectionFallback } from "./use-optional-injection";
 
@@ -16,21 +16,17 @@ import type { OptionalInjectionFallback } from "./use-optional-injection";
  * @group Consumption
  */
 export interface OptionalInjectionDecorator<T, F = null> {
-  // Standard, `accessor` declarations. The `set` parameter enforces that the
-  // injected value is assignable to the accessor type, so wider accessors are accepted.
+  // Standard, `accessor` declarations. Wider accessor types are accepted; the
+  // injected or fallback value must be assignable to the accessor type.
   <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V>(
     value: ClassAccessorDecoratorTarget<C, V>,
-    context: Omit<ClassAccessorDecoratorContext<C, V>, "access"> & {
-      readonly access: { readonly set: (object: C, value: T | F) => void };
-    }
+    context: ClassAccessorDecoratorContext<C, V> & ProvidedTypeMustMatch<T | F, V>
   ): void;
-  // Standard, plain field declarations. The `set` parameter enforces that the
-  // injected value is assignable to the field type, so wider fields are accepted.
-  <C extends Interface<Omit<ReactiveElement, "renderRoot">>>(
+  // Standard, plain field declarations. Wider field types are accepted; the
+  // injected or fallback value must be assignable to the field type.
+  <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V>(
     value: undefined,
-    context: Omit<ClassFieldDecoratorContext<C, T | F>, "access"> & {
-      readonly access: { readonly set: (object: C, value: T | F) => void };
-    }
+    context: ClassFieldDecoratorContext<C, V> & ProvidedTypeMustMatch<T | F, V>
   ): void;
   // Legacy:
   <K extends PropertyKey, Proto extends Interface<Omit<ReactiveElement, "renderRoot">>>(

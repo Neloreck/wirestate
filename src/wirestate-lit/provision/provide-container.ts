@@ -1,6 +1,6 @@
 import { ReactiveElement } from "@lit/reactive-element";
 
-import { FieldMustMatchProvidedType, Interface, Maybe } from "../types/general";
+import { FieldMustMatchProvidedType, Interface, Maybe, ProvidedTypeMustMatch } from "../types/general";
 
 import { ContainerProvider, ContainerProviderOptions } from "./container-provider";
 
@@ -13,21 +13,17 @@ import { ContainerProvider, ContainerProviderOptions } from "./container-provide
  * @group Provision
  */
 export interface ProvideContainerDecorator<E extends ReactiveElement = ReactiveElement> {
-  // Standard, `accessor` declarations. The `set` parameter enforces that the
-  // provider is assignable to the accessor type, so wider accessors are accepted.
+  // Standard, `accessor` declarations. Wider accessor types are accepted; the
+  // provider must be assignable to the accessor type.
   <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V>(
     value: ClassAccessorDecoratorTarget<C, V>,
-    context: Omit<ClassAccessorDecoratorContext<C, V>, "access"> & {
-      readonly access: { readonly set: (object: C, value: ContainerProvider<E>) => void };
-    }
+    context: ClassAccessorDecoratorContext<C, V> & ProvidedTypeMustMatch<ContainerProvider<E>, V>
   ): void;
-  // Standard, plain field declarations. The `set` parameter enforces that the
-  // provider is assignable to the field type, so wider fields are accepted.
-  <C extends Interface<Omit<ReactiveElement, "renderRoot">>>(
+  // Standard, plain field declarations. Wider field types are accepted; the
+  // provider must be assignable to the field type.
+  <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V>(
     value: undefined,
-    context: Omit<ClassFieldDecoratorContext<C, ContainerProvider<E>>, "access"> & {
-      readonly access: { readonly set: (object: C, value: ContainerProvider<E>) => void };
-    }
+    context: ClassFieldDecoratorContext<C, V> & ProvidedTypeMustMatch<ContainerProvider<E>, V>
   ): void;
   // Legacy/experimental:
   <K extends PropertyKey, Proto extends Interface<Omit<ReactiveElement, "renderRoot">>>(
