@@ -152,7 +152,7 @@ export class ProfileService {
 
 ## Lazy Resolution
 
-Use `scope.resolve(Token)` when the dependency is only needed later. `scope.resolveOptional(Token)` returns `null` when
+Use `scope.get(Token)` when the dependency is only needed later. `scope.getOptional(Token)` returns `null` when
 the token is not bound.
 
 ```ts
@@ -163,7 +163,7 @@ export class NotificationService {
   public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   public notify(message: string): void {
-    const logger = this.scope.resolve(LoggerService);
+    const logger = this.scope.get(LoggerService);
 
     logger.log(message);
   }

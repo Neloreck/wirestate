@@ -63,7 +63,7 @@ export class DraftCommands extends LitElement {
 
 ## Execute from an Element
 
-Use `executeCommand` for synchronous handlers.
+Use `execute` for synchronous handlers.
 
 ```ts
 import { WireScope } from "@wirestate/core";
@@ -75,12 +75,12 @@ class SearchButton extends LitElement {
   private scope!: WireScope;
 
   protected render() {
-    return html`<button @click=${() => this.scope.executeCommand("OPEN_SEARCH")}>Search</button>`;
+    return html`<button @click=${() => this.scope.execute("OPEN_SEARCH")}>Search</button>`;
   }
 }
 ```
 
-Use `executeCommandAsync` for async work.
+Use `executeAsync` for async work.
 
 ```ts
 import { WireScope } from "@wirestate/core";
@@ -99,7 +99,7 @@ class SaveButton extends LitElement {
     this.saving = true;
 
     try {
-      await this.scope.executeCommandAsync("SAVE_DOCUMENT");
+      await this.scope.executeAsync("SAVE_DOCUMENT");
     } finally {
       this.saving = false;
     }
@@ -114,7 +114,7 @@ class SaveButton extends LitElement {
 Use optional commands when a missing handler is valid.
 
 ```ts
-await this.scope.executeOptionalCommandAsync("EXPORT_TRACE");
+await this.scope.executeOptionalAsync("EXPORT_TRACE");
 ```
 
 If several handlers use the same command type, the newest one handles the command.

@@ -18,7 +18,7 @@ owner.
 ## Service Layer
 
 Constructor resolution and activation belong to the container. A service can be resolved lazily through
-`container.get(Token)` or `scope.resolve(Token)`. It can also be resolved eagerly when `new Container({ activate })`
+`container.get(Token)` or `scope.get(Token)`. It can also be resolved eagerly when `new Container({ activate })`
 or a managed provider activates bindings.
 
 `@OnActivated` runs during that first resolution. It is synchronous from the container's point of view: if the hook
@@ -51,7 +51,7 @@ boundary, but they never dispose it. The code that created the external containe
 
 | Field             | Meaning                                                                                                                       |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `isDisposed`      | `true` after service deactivation.                                                                                            |
+| `isDeactivated`   | `true` after service deactivation.                                                                                            |
 | `isDeprovisioned` | `null` before provider provisioning reaches the service, `false` while provider-owned, and `true` after provider deprovision. |
 | `isInactive`      | `true` when the service has been disposed or deprovisioned.                                                                   |
 | `provisionId`     | Current provider provision cycle ID, or `null` before provider lifecycle reaches the service.                                 |

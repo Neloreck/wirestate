@@ -36,7 +36,7 @@ export class HeaderService {
   public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   public openSearch(): void {
-    const opened: boolean = this.scope.executeCommand("OPEN_SEARCH");
+    const opened: boolean = this.scope.execute("OPEN_SEARCH");
 
     if (!opened) {
       console.error("Failed to open search");
@@ -45,7 +45,7 @@ export class HeaderService {
 }
 ```
 
-`executeCommand` throws `WirestateError` when no handler exists.
+`execute` throws `WirestateError` when no handler exists.
 
 ## Handle an Async Command
 
@@ -65,21 +65,21 @@ export class HeaderService {
   public constructor(private readonly scope: WireScope = inject(WireScope)) {}
 
   public async logout(): Promise<void> {
-    await this.scope.executeCommandAsync("LOGOUT");
+    await this.scope.executeAsync("LOGOUT");
   }
 }
 ```
 
-`executeCommandAsync` wraps synchronous handler results in a Promise and passes asynchronous results through.
+`executeAsync` wraps synchronous handler results in a Promise and passes asynchronous results through.
 
 ## Execute Optional Commands
 
 Use optional commands when a missing handler is valid, such as an optional devtools integration.
 
 ```ts
-const refreshed: boolean | null = this.scope.executeOptionalCommand("REFRESH_DEVTOOLS");
+const refreshed: boolean | null = this.scope.executeOptional("REFRESH_DEVTOOLS");
 
-const uploaded: UploadReceipt | null = await this.scope.executeOptionalCommandAsync("UPLOAD_DRAFT", draft);
+const uploaded: UploadReceipt | null = await this.scope.executeOptionalAsync("UPLOAD_DRAFT", draft);
 ```
 
 ## Register Directly
