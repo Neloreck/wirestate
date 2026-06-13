@@ -5,11 +5,11 @@ import {
 } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { isInjectable } from "../metadata/metadata-injectable";
+import type { Newable } from "../types/general";
 
-import { BindingScope, BindingType, type BindingDescriptor } from "./binding";
-import type { Newable } from "./binding-class";
+import { BindingScope, BindingType, type BindingDescriptor, Identifier } from "./binding";
 import { isFactoryDescriptor } from "./binding-guards";
-import { type Identifier, tokenToString } from "./binding-tokens";
+import { tokenToString } from "./binding-tokens";
 
 /**
  * Validates a binding descriptor before registration.

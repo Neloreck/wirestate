@@ -1,7 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Identifier } from "../binding/binding-tokens";
+import type { Identifier } from "../binding/binding";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { CommandHandler, CommandUnregister, CommandType } from "../messaging/commands/commands";
 import { EventBus } from "../messaging/events/event-bus";

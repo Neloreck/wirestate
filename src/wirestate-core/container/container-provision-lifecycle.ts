@@ -1,14 +1,13 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Binding, Bindings, BindingType } from "../binding/binding";
-import { Identifier } from "../binding/binding-tokens";
+import { Binding, Bindings, BindingType, Identifier } from "../binding/binding";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
 import { getDeprovisionHandlerMetadata } from "../lifecycle/on-deprovision";
 import { getProvisionHandlerMetadata } from "../lifecycle/on-provision";
-import { Maybe } from "../types/general";
+import type { Maybe } from "../types/general";
 
 import type { Container } from "./container";
 import { getBindingToken } from "./get-binding-token";

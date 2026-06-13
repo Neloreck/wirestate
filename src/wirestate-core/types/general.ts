@@ -37,3 +37,17 @@ export type MaybePromise<T> = T | Promise<T>;
  * @group general-types
  */
 export type Maybe<T> = T | null | undefined;
+
+/**
+ * Constructable class reference.
+ */
+export type Newable<T = unknown> = new (...args: Array<never>) => T;
+
+/**
+ * Abstract class reference that cannot be constructed directly,
+ * but can serve as a binding token.
+ */
+export interface AbstractClass<T> {
+  prototype: T;
+  name: string;
+}

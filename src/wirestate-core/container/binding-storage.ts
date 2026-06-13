@@ -1,6 +1,5 @@
-import type { BindingDescriptor } from "../binding/binding";
-import type { Identifier } from "../binding/binding-tokens";
-import { Definable } from "../types/general";
+import type { BindingDescriptor, Identifier } from "../binding/binding";
+import type { Definable } from "../types/general";
 
 /**
  * Token-keyed storage of registered binding descriptors.

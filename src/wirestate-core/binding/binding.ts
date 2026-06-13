@@ -1,7 +1,7 @@
 import type { ContainerKernel } from "../container/container-kernel";
+import type { AbstractClass, Newable } from "../types/general";
 
-import type { Newable } from "./binding-class";
-import type { Identifier } from "./binding-tokens";
+import type { InjectionToken } from "./binding-tokens";
 
 /**
  * Binding strategy names accepted by binding descriptors.
@@ -33,6 +33,13 @@ export const BindingScope = {
  * @group Bind
  */
 export type BindingScopeValue = keyof typeof BindingScope;
+
+/**
+ * An identifier is a reference to a service in the dependency injection (DI) container:
+ * class constructor, abstract class, string, symbol, or {@link InjectionToken}.
+ * When obtaining a service from the container, you should use its identifier.
+ */
+export type Identifier<T = unknown> = Newable<T> | AbstractClass<T> | string | symbol | InjectionToken<T>;
 
 /**
  * Describes a static value binding. Values are always singletons.

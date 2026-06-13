@@ -1,5 +1,5 @@
-import type { Identifier } from "../binding/binding-tokens";
-import { Definable } from "../types/general";
+import type { Identifier } from "../binding/binding";
+import type { Definable } from "../types/general";
 
 import type { Container } from "./container";
 import type { ContainerKernel } from "./container-kernel";

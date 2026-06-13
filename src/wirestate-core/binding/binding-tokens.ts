@@ -1,11 +1,4 @@
-﻿import { type AbstractClass, type Newable, isClassLike } from "./binding-class";
-
-/**
- * An identifier is a reference to a service in the dependency injection (DI) container:
- * class constructor, abstract class, string, symbol, or {@link InjectionToken}.
- * When obtaining a service from the container, you should use its identifier.
- */
-export type Identifier<T = unknown> = Newable<T> | AbstractClass<T> | string | symbol | InjectionToken<T>;
+﻿import type { Identifier } from "./binding";
 
 /**
  * A unique injection token object, that is used by reference. Can hold a generic type.
@@ -32,13 +25,13 @@ export class InjectionToken<T> {
  * @internal
  */
 export function tokenToString<T>(token: Identifier<T>): string {
-  if (isClassLike(token)) {
+  if (typeof token === "function") {
     return token.name;
   } else if (typeof token === "symbol") {
     return token.description ?? String(token);
   } else if (token instanceof InjectionToken) {
     return token.toString();
   } else {
-    return token;
+    return token as string;
   }
 }

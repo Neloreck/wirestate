@@ -12,15 +12,15 @@ import "./metadata/metadata-symbol-polyfill";
 export {
   Binding,
   BindingDescriptor,
-  Bindings,
   BindingScope,
   BindingType,
+  Bindings,
   FactoryBindingDescriptor,
+  Identifier,
   InstanceBindingDescriptor,
   ValueBindingDescriptor,
 } from "./binding/binding";
-export { Newable } from "./binding/binding-class";
-export { Identifier, InjectionToken } from "./binding/binding-tokens";
+export { InjectionToken } from "./binding/binding-tokens";
 
 export { Container, ContainerConfig, ContainerOptions } from "./container/container";
 export { inject } from "./container/context";
@@ -52,4 +52,5 @@ export { QueryHandler, QueryType, QueryUnregister } from "./messaging/queries/qu
 export { QueryBus } from "./messaging/queries/query-bus";
 export { OnQuery, OnQueryHandlerDecorator } from "./messaging/queries/on-query";
 
+export { Newable } from "./types/general";
 export { SeedsMap, SeedBindings, SeedBinding, SeedKey } from "./types/seeds";

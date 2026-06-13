@@ -1,8 +1,7 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { Bindings } from "../binding/binding";
-import { Identifier } from "../binding/binding-tokens";
+import type { Bindings, Identifier } from "../binding/binding";
 import { InternalErrorHandler } from "../error/error";
 import { getConfiguredInternalErrorHandler, setInternalErrorHandler } from "../error/internal-error-handler";
 import { CommandBus } from "../messaging/commands/command-bus";

@@ -1,4 +1,4 @@
-import { Identifier } from "../binding/binding-tokens";
+import type { Identifier } from "../binding/binding";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 
