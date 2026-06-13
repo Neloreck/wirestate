@@ -113,15 +113,16 @@ export class Container extends ContainerKernel {
 
     super(config.parent);
 
+    const errorHandler: Maybe<InternalErrorHandler> =
+      config.onError ?? getConfiguredInternalErrorHandler(config.parent);
+
+    if (errorHandler) {
+      setInternalErrorHandler(this, errorHandler);
+    }
+
     // Installed before any binding activates; the adapter resolves buses with
     // optional lookups, so it is installed even under `skipMessaging`.
     setActivationAdapter(this, wirestateActivationAdapter);
-
-    const activate: ReadonlyArray<ServiceToken> =
-      (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
-
-    const errorHandler: Maybe<InternalErrorHandler> =
-      config.onError ?? getConfiguredInternalErrorHandler(config.parent);
 
     this.bind({ token: Container, value: this });
 
@@ -130,10 +131,6 @@ export class Container extends ContainerKernel {
       scope: "Transient",
       factory: (): WireScope => new WireScope(this),
     });
-
-    if (errorHandler) {
-      setInternalErrorHandler(this, errorHandler);
-    }
 
     if (!options.skipMessaging) {
       this.bind({ token: EventBus, value: new EventBus(this) });
@@ -148,6 +145,9 @@ export class Container extends ContainerKernel {
         this.bind(binding);
       }
     }
+
+    const activate: ReadonlyArray<ServiceToken> =
+      (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
 
     for (const binding of activate) {
       this.get(binding);
