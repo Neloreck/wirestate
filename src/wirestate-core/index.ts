@@ -20,7 +20,7 @@ export {
   BindingType,
   Bindings,
   FactoryBindingDescriptor,
-  Identifier,
+  ServiceToken,
   InstanceBindingDescriptor,
   ValueBindingDescriptor,
 } from "./binding/binding";
@@ -31,8 +31,12 @@ export { inject } from "./container/container-context";
 export { validateContainerConfig } from "./container/container-config-validation";
 export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "./container/container-seeds";
 
-export { InternalErrorHandler, InternalErrorDescriptor, InternalErrorSource } from "./error/error";
-export { defaultInternalErrorHandler } from "./error/internal-error-handler";
+export {
+  defaultInternalErrorHandler,
+  InternalErrorDescriptor,
+  InternalErrorHandler,
+  InternalErrorSource,
+} from "./error/internal-error-handler";
 export { WirestateError } from "./error/wirestate-error";
 
 export { CommandBus } from "./messaging/commands/command-bus";
@@ -40,7 +44,7 @@ export { CommandHandler, CommandType, CommandUnregister } from "./messaging/comm
 export { OnCommand, OnCommandHandlerDecorator } from "./messaging/commands/on-command";
 export { OnEvent, OnEventHandlerDecorator } from "./messaging/events/on-event";
 export { EventBus } from "./messaging/events/event-bus";
-export { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "./messaging/events/events";
+export { EventEmitOptions, EventHandler, EventType, EventUnsubscribe, WireEvent } from "./messaging/events/events";
 export { QueryHandler, QueryType, QueryUnregister } from "./messaging/queries/queries";
 export { QueryBus } from "./messaging/queries/query-bus";
 export { OnQuery, OnQueryHandlerDecorator } from "./messaging/queries/on-query";

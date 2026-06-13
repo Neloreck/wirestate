@@ -14,9 +14,9 @@ import { Optional } from "./general";
  *
  * @template R - The expected result type of the command.
  * @template P - The type of the command payload.
- * @template T - The command identifier type.
+ * @template T - The command type.
  *
- * @param type - The command identifier.
+ * @param type - The command type.
  * @param payload - Optional payload for the command.
  *
  * @returns The command result.
@@ -37,9 +37,9 @@ export type CommandExecutor = <R = unknown, P = unknown, T extends CommandType =
  *
  * @template R - The expected result type of the command.
  * @template P - The type of the command payload.
- * @template T - The command identifier type.
+ * @template T - The command type.
  *
- * @param type - The command identifier.
+ * @param type - The command type.
  * @param payload - Optional payload for the command.
  *
  * @returns A Promise resolving to the command result.
@@ -60,9 +60,9 @@ export type AsyncCommandExecutor = <R = unknown, P = unknown, T extends CommandT
  *
  * @template R - The expected result type of the command.
  * @template P - The type of the command payload.
- * @template T - The command identifier type.
+ * @template T - The command type.
  *
- * @param type - The command identifier.
+ * @param type - The command type.
  * @param payload - Optional payload for the command.
  *
  * @returns The command result if a handler was found, or `null` otherwise.
@@ -83,9 +83,9 @@ export type OptionalCommandExecutor = <R = unknown, P = unknown, T extends Comma
  *
  * @template R - The expected result type of the command.
  * @template P - The type of the command payload.
- * @template T - The command identifier type.
+ * @template T - The command type.
  *
- * @param type - The command identifier.
+ * @param type - The command type.
  * @param payload - Optional payload for the command.
  *
  * @returns A Promise resolving to the command result, or `null` if no handler was found.

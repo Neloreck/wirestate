@@ -17,7 +17,7 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  *
  * @template R - Result type of the command.
  * @template P - Payload type of the command.
- * @template T - Command identifier type.
+ * @template T - Command type.
  *
  * @param type - Command type (string or symbol).
  * @param handler - Command handler function.

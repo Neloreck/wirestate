@@ -1,7 +1,10 @@
 import { Container } from "../container/container";
 
-import { InternalErrorDescriptor } from "./error";
-import { defaultInternalErrorHandler, reportWirestateInternalError } from "./internal-error-handler";
+import {
+  defaultInternalErrorHandler,
+  InternalErrorDescriptor,
+  reportWirestateInternalError,
+} from "./internal-error-handler";
 
 describe("internal error handler", () => {
   let consoleErrorSpy: jest.SpyInstance;

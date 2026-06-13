@@ -1,7 +1,7 @@
 import type { MaybePromise } from "../../types/general";
 
 /**
- * Represents token used to dispatch and handle commands.
+ * Represents the type used to dispatch and handle commands.
  *
  * @remarks
  * Use strings for public commands and symbols for private/scoped commands to avoid name collisions.
@@ -29,7 +29,7 @@ export type CommandType = string | symbol | number;
  *
  * @template R - Type of the result returned by the handler (can be wrapped in a Promise).
  * @template P - Type of the command payload.
- * @template T - Type of the command identifier.
+ * @template T - Type of the command.
  *
  * @example
  * ```typescript

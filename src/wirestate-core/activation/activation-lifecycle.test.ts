@@ -10,7 +10,7 @@ import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
 import { setContainerProvisioned } from "../provision/provision-state";
 
-import { getInstanceContainer, initializeInstanceStatus, unregisterInstanceStatus } from "./activation-lifecycle";
+import { getInstanceContainer, initializeInstanceStatus, finalizeInstanceStatus } from "./activation-lifecycle";
 import { OnActivated } from "./on-activated";
 import { WireStatus } from "./wire-status";
 
@@ -137,7 +137,7 @@ describe("instance status", () => {
     initializeInstanceStatus(container, instance);
 
     expect(WireStatus.for(instance)).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: null,
       isInactive: false,
       provisionId: null,
@@ -165,7 +165,7 @@ describe("instance status", () => {
     const instance: object = {};
     const status: WireStatus = WireStatus.for(instance, { initialize: true });
 
-    status.isDisposed = true;
+    status.isDeactivated = true;
     status.isDeprovisioned = true;
     status.provisionId = 10;
 
@@ -173,7 +173,7 @@ describe("instance status", () => {
 
     expect(WireStatus.for(instance)).toBe(status);
     expect(status).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: null,
       isInactive: false,
       provisionId: null,
@@ -185,10 +185,10 @@ describe("instance status", () => {
     const instance: object = {};
 
     initializeInstanceStatus(container, instance);
-    unregisterInstanceStatus(instance);
+    finalizeInstanceStatus(instance);
 
     expect(WireStatus.for(instance)).toEqual({
-      isDisposed: true,
+      isDeactivated: true,
       isDeprovisioned: true,
       isInactive: true,
       provisionId: null,

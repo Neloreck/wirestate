@@ -1,4 +1,4 @@
-import { Container, Identifier } from "@wirestate/core";
+import { Container, ServiceToken } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -29,7 +29,7 @@ import { AnyObject } from "../types/general";
  * const api: ApiService = useInjection(ApiService);
  * ```
  */
-export function useInjection<T>(token: Identifier<T>): T {
+export function useInjection<T>(token: ServiceToken<T>): T {
   const container: Container = useContainer();
 
   // Revision bump causes a container reset; force re-resolution to drop stale instances.

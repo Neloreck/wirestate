@@ -35,11 +35,11 @@ export const BindingScope = {
 export type BindingScopeValue = keyof typeof BindingScope;
 
 /**
- * An identifier is a reference to a service in the dependency injection (DI) container:
+ * A service token is a reference to a service in the dependency injection (DI) container:
  * class constructor, abstract class, string, symbol, or {@link InjectionToken}.
- * When obtaining a service from the container, you should use its identifier.
+ * When obtaining a service from the container, you should use its service token.
  */
-export type Identifier<T = unknown> = Newable<T> | AbstractClass<T> | string | symbol | InjectionToken<T>;
+export type ServiceToken<T = unknown> = Newable<T> | AbstractClass<T> | string | symbol | InjectionToken<T>;
 
 /**
  * Describes a static value binding. Values are always singletons.
@@ -55,7 +55,7 @@ export interface ValueBindingDescriptor<T = unknown> {
   /**
    * Token used to resolve the binding.
    */
-  readonly token: Identifier<T>;
+  readonly token: ServiceToken<T>;
 
   /**
    * Value to bind.
@@ -78,7 +78,7 @@ export interface InstanceBindingDescriptor<T = unknown> {
   /**
    * Token used to resolve the instance.
    */
-  readonly token: Identifier<T>;
+  readonly token: ServiceToken<T>;
 
   /**
    * Service constructor to bind. Instances are singletons.
@@ -100,7 +100,7 @@ export interface FactoryBindingDescriptor<T = unknown> {
   /**
    * Token used to resolve the binding.
    */
-  readonly token: Identifier<T>;
+  readonly token: ServiceToken<T>;
 
   /**
    * Factory used to produce the value at resolution time.

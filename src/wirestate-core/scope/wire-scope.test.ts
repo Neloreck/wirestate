@@ -17,7 +17,7 @@ describe("WireScope", () => {
     const container: Container = new Container();
     const scope: WireScope = new WireScope(container);
 
-    expect(scope.resolve(Container)).toBe(container);
+    expect(scope.get(Container)).toBe(container);
   });
 
   it("should resolve from container", () => {
@@ -26,8 +26,8 @@ describe("WireScope", () => {
 
     container.bind({ token: "TEST", value: "VALUE" });
 
-    expect(scope.resolve("TEST")).toBe("VALUE");
-    expect(() => scope.resolve("NOT_EXISTING")).toThrow(Error);
+    expect(scope.get("TEST")).toBe("VALUE");
+    expect(() => scope.get("NOT_EXISTING")).toThrow(Error);
   });
 
   it("should resolve optional from container", () => {
@@ -36,8 +36,8 @@ describe("WireScope", () => {
 
     container.bind({ token: "TEST", value: "VALUE" });
 
-    expect(scope.resolveOptional("TEST")).toBe("VALUE");
-    expect(scope.resolveOptional("NON_EXISTENT")).toBeNull();
+    expect(scope.getOptional("TEST")).toBe("VALUE");
+    expect(scope.getOptional("NON_EXISTENT")).toBeNull();
   });
 
   it("should emit events via event bus", () => {
@@ -162,12 +162,12 @@ describe("WireScope", () => {
 
     jest.spyOn(bus, "execute");
 
-    const result: string = scope.executeCommand("TEST_COMMAND", "first-attempt");
+    const result: string = scope.execute("TEST_COMMAND", "first-attempt");
 
     expect(result).toBe("result-from-command-bus");
     expect(bus.execute).toHaveBeenCalledWith("TEST_COMMAND", "first-attempt");
 
-    expect(() => scope.executeCommand("NOT_EXISTING", "second-attempt")).toThrow(
+    expect(() => scope.execute("NOT_EXISTING", "second-attempt")).toThrow(
       "No command handler registered in container for type: 'NOT_EXISTING'."
     );
 
@@ -186,17 +186,13 @@ describe("WireScope", () => {
 
     jest.spyOn(bus, "executeAsync");
 
-    await expect(scope.executeCommandAsync("TEST_SYNC_COMMAND", { param: 100 })).resolves.toBe(
-      "result-from-sync-command"
-    );
+    await expect(scope.executeAsync("TEST_SYNC_COMMAND", { param: 100 })).resolves.toBe("result-from-sync-command");
     expect(bus.executeAsync).toHaveBeenCalledWith("TEST_SYNC_COMMAND", { param: 100 });
 
-    await expect(scope.executeCommandAsync("TEST_ASYNC_COMMAND", { param: 1000 })).resolves.toBe(
-      "result-from-async-command"
-    );
+    await expect(scope.executeAsync("TEST_ASYNC_COMMAND", { param: 1000 })).resolves.toBe("result-from-async-command");
     expect(bus.executeAsync).toHaveBeenCalledWith("TEST_ASYNC_COMMAND", { param: 1000 });
 
-    await expect(scope.executeCommandAsync("NOT_EXISTING", "second-attempt")).rejects.toThrow(
+    await expect(scope.executeAsync("NOT_EXISTING", "second-attempt")).rejects.toThrow(
       "No command handler registered in container for type: 'NOT_EXISTING'."
     );
   });
@@ -208,13 +204,13 @@ describe("WireScope", () => {
 
     jest.spyOn(bus, "executeOptional");
 
-    const missing: Optional<unknown> = scope.executeOptionalCommand("TEST_COMMAND", "first-attempt");
+    const missing: Optional<unknown> = scope.executeOptional("TEST_COMMAND", "first-attempt");
 
     expect(missing).toBeNull();
 
     bus.register("TEST_COMMAND", () => "result-from-command-bus");
 
-    const result: Optional<string> = scope.executeOptionalCommand("TEST_COMMAND", "second-attempt");
+    const result: Optional<string> = scope.executeOptional("TEST_COMMAND", "second-attempt");
 
     expect(result).toBe("result-from-command-bus");
 
@@ -232,10 +228,8 @@ describe("WireScope", () => {
 
     jest.spyOn(bus, "executeOptionalAsync");
 
-    await expect(scope.executeOptionalCommandAsync("MISSING_COMMAND", "first-attempt")).resolves.toBeNull();
-    await expect(scope.executeOptionalCommandAsync("TEST_COMMAND", "second-attempt")).resolves.toBe(
-      "result-from-command-bus"
-    );
+    await expect(scope.executeOptionalAsync("MISSING_COMMAND", "first-attempt")).resolves.toBeNull();
+    await expect(scope.executeOptionalAsync("TEST_COMMAND", "second-attempt")).resolves.toBe("result-from-command-bus");
 
     expect(bus.executeOptionalAsync).toHaveBeenCalledTimes(2);
     expect(bus.executeOptionalAsync).toHaveBeenCalledWith("MISSING_COMMAND", "first-attempt");
@@ -261,8 +255,8 @@ describe("WireScope", () => {
     expect(scope.query("TEST_QUERY", 1)).toBe(2);
     expect(scope.query("TEST_QUERY", 2)).toBe(3);
 
-    expect(scope.executeCommand("TEST_COMMAND", 1)).toBe(2);
-    expect(scope.executeCommand("TEST_COMMAND", 2)).toBe(3);
+    expect(scope.execute("TEST_COMMAND", 1)).toBe(2);
+    expect(scope.execute("TEST_COMMAND", 2)).toBe(3);
 
     expect(getSpy.mock.calls.filter(([token]) => token === EventBus)).toHaveLength(1);
     expect(getSpy.mock.calls.filter(([token]) => token === QueryBus)).toHaveLength(1);
@@ -409,7 +403,7 @@ describe("WireScope", () => {
     expect(scope.query("TEST_QUERY")).toBe("query-value");
     expect(service.onQuery).toHaveBeenCalledTimes(1);
 
-    expect(scope.executeCommand("TEST_COMMAND")).toBe("command-value");
+    expect(scope.execute("TEST_COMMAND")).toBe("command-value");
     expect(service.onCommand).toHaveBeenCalledTimes(1);
 
     container.unbind(ServiceWithManualSubs);
@@ -424,7 +418,7 @@ describe("WireScope", () => {
     expect(() => scope.query("TEST_QUERY")).toThrow("No query handler registered in container for type: 'TEST_QUERY'.");
     expect(service.onQuery).toHaveBeenCalledTimes(1);
 
-    expect(() => scope.executeCommand("TEST_COMMAND")).toThrow(
+    expect(() => scope.execute("TEST_COMMAND")).toThrow(
       "No command handler registered in container for type: 'TEST_COMMAND'."
     );
     expect(service.onCommand).toHaveBeenCalledTimes(1);

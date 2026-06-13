@@ -1,6 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveControllerHost } from "@lit/reactive-element";
-import { Container, Identifier } from "@wirestate/core";
+import { Container, ServiceToken } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -38,7 +38,7 @@ export interface UseOptionalInjectionOptions<T, F = null> {
   /**
    * The token to inject.
    */
-  token: Identifier<T>;
+  token: ServiceToken<T>;
 
   /**
    * Provides a value when the token is not bound.
@@ -55,7 +55,7 @@ export interface UseOptionalInjectionValue<T, F = null> {
   /**
    * The token used for injection.
    */
-  token: Identifier<T>;
+  token: ServiceToken<T>;
   /**
    * The injected instance, fallback value, or `null`.
    */
@@ -91,13 +91,13 @@ export interface UseOptionalInjectionValue<T, F = null> {
  */
 export function useOptionalInjection<T, F = null>(
   host: ReactiveControllerHost & HTMLElement,
-  optionsOrToken: UseOptionalInjectionOptions<T, F> | Identifier<T>,
+  optionsOrToken: UseOptionalInjectionOptions<T, F> | ServiceToken<T>,
   fallback?: OptionalInjectionFallback<F>
 ): UseOptionalInjectionValue<T, F> {
   const options: UseOptionalInjectionOptions<T, F> =
     typeof optionsOrToken === "object" && optionsOrToken !== null && "token" in optionsOrToken
       ? optionsOrToken
-      : { token: optionsOrToken as Identifier<T>, fallback: fallback };
+      : { token: optionsOrToken as ServiceToken<T>, fallback: fallback };
 
   const { once, token, value } = options;
   const resolvedFallback: Optional<OptionalInjectionFallback<F>> = options.fallback ?? fallback ?? null;

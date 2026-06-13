@@ -5,7 +5,7 @@ import type { Container } from "../../container/container";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
 import type { Maybe, Optional } from "../../types/general";
 
-import type { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent } from "./events";
+import type { EventEmitOptions, EventHandler, EventType, EventUnsubscribe, WireEvent } from "./events";
 
 /**
  * Private key under which catch-all handlers are stored.
@@ -68,7 +68,7 @@ export class EventBus {
    * the next handler still runs. Catch-all handlers run before type-specific ones.
    *
    * @template P - Type of the event payload.
-   * @template T - Type of the event identifier.
+   * @template T - Type of the event.
    * @template S - Type of the event source.
    *
    * @param type - Event token.
@@ -120,12 +120,12 @@ export class EventBus {
    *
    * @example
    * ```typescript
-   * const unsubscribe: EventUnsubscriber = eventBus.subscribe((event) => {
+   * const unsubscribe: EventUnsubscribe = eventBus.subscribe((event) => {
    *   console.log("Received event:", event);
    * });
    * ```
    */
-  public subscribe(handler: EventHandler): EventUnsubscriber;
+  public subscribe(handler: EventHandler): EventUnsubscribe;
 
   /**
    * Subscribes to one or more event types.
@@ -141,17 +141,17 @@ export class EventBus {
    *
    * @example
    * ```typescript
-   * const unsubscribe: EventUnsubscriber = eventBus.subscribe(["USER_ADDED", "USER_REMOVED"], (event) => {
+   * const unsubscribe: EventUnsubscribe = eventBus.subscribe(["USER_ADDED", "USER_REMOVED"], (event) => {
    *   refreshList();
    * });
    * ```
    */
-  public subscribe(types: Optional<EventType | ReadonlyArray<EventType>>, handler: EventHandler): EventUnsubscriber;
+  public subscribe(types: Optional<EventType | ReadonlyArray<EventType>>, handler: EventHandler): EventUnsubscribe;
 
   public subscribe(
     typesOrHandler: EventHandler | Optional<EventType | ReadonlyArray<EventType>>,
     handler?: EventHandler
-  ): EventUnsubscriber {
+  ): EventUnsubscribe {
     // Resolve the overloads: a single function argument is a catch-all handler.
     const resolvedHandler: EventHandler = handler ?? (typesOrHandler as EventHandler);
     const types: Optional<EventType | ReadonlyArray<EventType>> =

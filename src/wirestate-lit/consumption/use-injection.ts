@@ -1,6 +1,6 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveControllerHost } from "@lit/reactive-element";
-import { Identifier } from "@wirestate/core";
+import { ServiceToken } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -31,7 +31,7 @@ export interface UseInjectionOptions<T> {
   /**
    * The token to inject.
    */
-  token: Identifier<T>;
+  token: ServiceToken<T>;
 }
 
 /**
@@ -43,7 +43,7 @@ export interface UseInjectionValue<T> {
   /**
    * The token used for injection.
    */
-  token: Identifier<T>;
+  token: ServiceToken<T>;
 
   /**
    * The injected value.
@@ -84,12 +84,12 @@ export interface UseInjectionValue<T> {
  */
 export function useInjection<T>(
   host: ReactiveControllerHost & HTMLElement,
-  optionsOrToken: UseInjectionOptions<T> | Identifier<T>
+  optionsOrToken: UseInjectionOptions<T> | ServiceToken<T>
 ): UseInjectionValue<T> {
   const options: UseInjectionOptions<T> =
     typeof optionsOrToken === "object" && optionsOrToken !== null && "token" in optionsOrToken
       ? optionsOrToken
-      : { token: optionsOrToken as Identifier<T> };
+      : { token: optionsOrToken as ServiceToken<T> };
 
   const { once, token, value } = options;
 

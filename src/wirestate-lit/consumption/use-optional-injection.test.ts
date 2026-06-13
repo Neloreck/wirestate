@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, Identifier } from "@wirestate/core";
+import { Container, ServiceToken } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
@@ -74,7 +74,7 @@ describe("useOptionalInjection", () => {
 
   it("should type fallback values separately from injection values", () => {
     const container: Container = new Container();
-    const token: Identifier<string> = Symbol("optional-token");
+    const token: ServiceToken<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -116,7 +116,7 @@ describe("useOptionalInjection", () => {
 
   it("should use fallback from options object", () => {
     const container: Container = new Container();
-    const token: Identifier<string> = Symbol("optional-token");
+    const token: ServiceToken<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -137,7 +137,7 @@ describe("useOptionalInjection", () => {
 
   it("should use separate fallback parameter with options object", () => {
     const container: Container = new Container();
-    const token: Identifier<string> = Symbol("optional-token");
+    const token: ServiceToken<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -158,7 +158,7 @@ describe("useOptionalInjection", () => {
 
   it("should prefer options fallback over separate fallback parameter", () => {
     const container: Container = new Container();
-    const token: Identifier<string> = Symbol("optional-token");
+    const token: ServiceToken<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -183,7 +183,7 @@ describe("useOptionalInjection", () => {
 
   it("should type fallback values from options object separately from injection values", () => {
     const container: Container = new Container();
-    const token: Identifier<string> = Symbol("optional-token");
+    const token: ServiceToken<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -207,7 +207,7 @@ describe("useOptionalInjection", () => {
 
   it("should expose initial value until context resolves", () => {
     const container: Container = new Container();
-    const token: Identifier<string> = Symbol("optional-token");
+    const token: ServiceToken<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 

@@ -21,11 +21,11 @@ import { OptionalCommandExecutor } from "../types/commands";
  *
  * @example
  * ```tsx
- * const executeOptionalCommand: OptionalCommandExecutor = useOptionalCommandExecutor();
+ * const executeOptional: OptionalCommandExecutor = useOptionalCommandExecutor();
  *
  * const onClick = useCallback(() => {
- *   const result: string | null = executeOptionalCommand("OPTIONAL_COMMAND", payload);
- * }, [payload, executeOptionalCommand]);
+ *   const result: string | null = executeOptional("OPTIONAL_COMMAND", payload);
+ * }, [payload, executeOptional]);
  * ```
  */
 export function useOptionalCommandExecutor(): OptionalCommandExecutor {

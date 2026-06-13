@@ -155,7 +155,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
         this.scope.emitEvent(DEACTIVATE_EVENT, "cleanup");
         logs.push(`query-result:${this.scope.query(DEACTIVATE_QUERY)}`);
 
-        commandResult = this.scope.executeCommandAsync<string>(DEACTIVATE_COMMAND);
+        commandResult = this.scope.executeAsync<string>(DEACTIVATE_COMMAND);
       }
 
       @OnCommand(DEACTIVATE_COMMAND)
@@ -219,9 +219,9 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
         logs.push("peer-deactivation");
 
         fromDeactivationPeerService.push(
-          this.scope.resolve(WireScope),
-          this.scope.resolve(DeactivationCoordinatorService),
-          this.scope.resolve(DeactivationPeerService)
+          this.scope.get(WireScope),
+          this.scope.get(DeactivationCoordinatorService),
+          this.scope.get(DeactivationPeerService)
         );
       }
 
@@ -255,12 +255,12 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
         this.scope.emitEvent(PEER_DEACTIVATE_EVENT, "from-coordinator");
         logs.push(`coordinator-query:${this.scope.query(PEER_DEACTIVATE_QUERY, "from-coordinator")}`);
 
-        commandResult = this.scope.executeCommandAsync<string, string>(PEER_DEACTIVATE_COMMAND, "from-coordinator");
+        commandResult = this.scope.executeAsync<string, string>(PEER_DEACTIVATE_COMMAND, "from-coordinator");
 
         fromDeactivationCoordinatorService.push(
-          this.scope.resolve(WireScope),
-          this.scope.resolve(DeactivationCoordinatorService),
-          this.scope.resolve(DeactivationPeerService)
+          this.scope.get(WireScope),
+          this.scope.get(DeactivationCoordinatorService),
+          this.scope.get(DeactivationPeerService)
         );
       }
     }

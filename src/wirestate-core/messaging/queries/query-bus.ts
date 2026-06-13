@@ -32,7 +32,7 @@ export class QueryBus extends HandlerStackBus<QueryType> {
   /**
    * Builds the error thrown when a required query dispatch finds no handler.
    *
-   * @param type - Query identifier that failed to resolve.
+   * @param type - Query type that failed to resolve.
    * @returns The error to throw.
    */
   protected createMissingHandlerError(type: QueryType): WirestateError {
@@ -51,9 +51,9 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    *
    * @template R - Type of the expected query result.
    * @template P - Type of the query payload.
-   * @template T - Type of the query identifier.
+   * @template T - Type of the query.
    *
-   * @param type - Unique query identifier.
+   * @param type - Query type.
    * @param payload - Optional payload for the handler.
    * @returns The result of the query execution.
    *
@@ -78,9 +78,9 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    *
    * @template R - Type of the expected query result.
    * @template P - Type of the query payload.
-   * @template T - Type of the query identifier.
+   * @template T - Type of the query.
    *
-   * @param type - Unique query identifier.
+   * @param type - Query type.
    * @param payload - Optional payload for the handler.
    * @returns A Promise resolving to the query result.
    *
@@ -101,9 +101,9 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    *
    * @template R - Type of the expected query result.
    * @template P - Type of the query payload.
-   * @template T - Type of the query identifier.
+   * @template T - Type of the query.
    *
-   * @param type - Unique query identifier.
+   * @param type - Query type.
    * @param payload - Optional payload for the handler.
    * @returns The query handler result as-is, or `null` if no handler is found.
    */
@@ -118,9 +118,9 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    *
    * @template R - Type of the expected query result.
    * @template P - Type of the query payload.
-   * @template T - Type of the query identifier.
+   * @template T - Type of the query.
    *
-   * @param type - Unique query identifier.
+   * @param type - Query type.
    * @param payload - Optional payload for the handler.
    * @returns A Promise resolving to the query result, or `null` if no handler is found.
    */
@@ -141,7 +141,7 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    *
    * @template R - Type of the query result.
    * @template P - Type of the query payload.
-   * @template T - Type of the query identifier.
+   * @template T - Type of the query.
    *
    * @param type - Query token.
    * @param handler - Query handler.
@@ -173,9 +173,9 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    *
    * @template R - Type of the query result.
    * @template P - Type of the query payload.
-   * @template T - Type of the query identifier.
+   * @template T - Type of the query.
    *
-   * @param type - Unique query identifier.
+   * @param type - Query type.
    * @param handler - The handler function instance to remove.
    */
   public unregister<R = unknown, P = unknown, T extends QueryType = QueryType>(

@@ -1,5 +1,5 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, Identifier } from "@wirestate/core";
+import { Container, ServiceToken } from "@wirestate/core";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
@@ -9,7 +9,7 @@ import { AnyObject, Optional } from "../types/general";
 import { useOptionalInjection } from "./use-optional-injection";
 
 describe("useOptionalInjection", () => {
-  function TestComponent({ token = GenericService as Identifier<unknown> }) {
+  function TestComponent({ token = GenericService as ServiceToken<unknown> }) {
     const value: Optional<unknown> = useOptionalInjection(token);
 
     return <div data-testid={"injectable-name"}>{value === null ? "null" : (value as AnyObject).constructor.name}</div>;
@@ -66,7 +66,7 @@ describe("useOptionalInjection", () => {
 
   it("should type fallback values separately from injection values", () => {
     const container: Container = new Container();
-    const token: Identifier<string> = Symbol("optional-token");
+    const token: ServiceToken<string> = Symbol("optional-token");
 
     function FallbackComponent() {
       const data: string | number = useOptionalInjection(token, () => 10);

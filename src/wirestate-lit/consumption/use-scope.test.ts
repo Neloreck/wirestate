@@ -30,6 +30,6 @@ describe("useScope", () => {
     fixture.provider.appendChild(element);
 
     expect(element.scope.value).toBeInstanceOf(WireScope);
-    expect(element.scope.value.resolve(Container)).toBe(container);
+    expect(element.scope.value.get(Container)).toBe(container);
   });
 });

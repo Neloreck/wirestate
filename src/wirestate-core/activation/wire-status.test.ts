@@ -26,7 +26,7 @@ describe("WireStatus", () => {
 
     expect(WireStatus.for(service)).toBe(service.status);
     expect(service.status).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: null,
       isInactive: false,
       provisionId: null,
@@ -48,7 +48,7 @@ describe("WireStatus", () => {
     expect(status).toBeInstanceOf(WireStatus);
     expect(WireStatus.for(service)).toBe(status);
     expect(status).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: null,
       isInactive: false,
       provisionId: null,
@@ -58,7 +58,7 @@ describe("WireStatus", () => {
 
     expect(WireStatus.for(service)).toBe(status);
     expect(WireStatus.for(service)).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
       provisionId: null,
@@ -67,7 +67,7 @@ describe("WireStatus", () => {
     deprovisionContainer(container, lifecycle);
 
     expect(WireStatus.for(service)).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
       provisionId: null,
@@ -76,7 +76,7 @@ describe("WireStatus", () => {
     container.unbind(TestService);
 
     expect(WireStatus.for(service)).toEqual({
-      isDisposed: true,
+      isDeactivated: true,
       isDeprovisioned: true,
       isInactive: true,
       provisionId: null,
@@ -104,7 +104,7 @@ describe("WireStatus", () => {
     expect(status).toBeInstanceOf(WireStatus);
     expect(WireStatus.for(service)).toBe(status);
     expect(status).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: null,
       isInactive: false,
       provisionId: null,
@@ -114,7 +114,7 @@ describe("WireStatus", () => {
 
     expect(WireStatus.for(service)).toBe(status);
     expect(WireStatus.for(service)).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
       provisionId: 1,
@@ -123,7 +123,7 @@ describe("WireStatus", () => {
     deprovisionContainer(container, lifecycle);
 
     expect(WireStatus.for(service)).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
       provisionId: 1,
@@ -133,7 +133,7 @@ describe("WireStatus", () => {
 
     expect(WireStatus.for(service)).toBe(status);
     expect(WireStatus.for(service)).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
       provisionId: 2,
@@ -142,7 +142,7 @@ describe("WireStatus", () => {
     deprovisionContainer(container, lifecycle);
 
     expect(WireStatus.for(service)).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
       provisionId: 2,
@@ -151,7 +151,7 @@ describe("WireStatus", () => {
     container.unbind(TestService);
 
     expect(WireStatus.for(service)).toEqual({
-      isDisposed: true,
+      isDeactivated: true,
       isDeprovisioned: true,
       isInactive: true,
       provisionId: 2,

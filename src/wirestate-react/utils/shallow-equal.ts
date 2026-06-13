@@ -1,4 +1,4 @@
-import { Identifier } from "@wirestate/core";
+import { ServiceToken } from "@wirestate/core";
 
 import { AnyObject, Maybe } from "../types/general";
 
@@ -97,8 +97,8 @@ export function shallowEqualArrays<T>(left: Maybe<ReadonlyArray<T>>, right: Mayb
  * @returns `true` when activation options are shallowly equal, otherwise `false`.
  */
 export function shallowEqualActivation(
-  left: Maybe<boolean | ReadonlyArray<Identifier>>,
-  right: Maybe<boolean | ReadonlyArray<Identifier>>
+  left: Maybe<boolean | ReadonlyArray<ServiceToken>>,
+  right: Maybe<boolean | ReadonlyArray<ServiceToken>>
 ): boolean {
   return left === right || (Array.isArray(left) && Array.isArray(right) && shallowEqualArrays(left, right));
 }

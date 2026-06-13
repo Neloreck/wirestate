@@ -1,7 +1,7 @@
 import type { MaybePromise } from "../../types/general";
 
 /**
- * Represents token used to dispatch and handle queries.
+ * Represents the type used to dispatch and handle queries.
  *
  * @remarks
  * Queries use a request-response pattern. Using symbols is recommended for
@@ -27,7 +27,7 @@ export type QueryType = string | symbol | number;
  *
  * @template R - Type of the returned result.
  * @template P - Type of the query payload.
- * @template T - Type of the query identifier.
+ * @template T - Type of the query.
  *
  * @example
  * ```typescript
@@ -70,7 +70,7 @@ export interface QueryHandlerMetadata {
    */
   readonly methodName: string | symbol;
   /**
-   * The query identifier this method handles.
+   * The query type this method handles.
    */
   readonly type: QueryType;
 }

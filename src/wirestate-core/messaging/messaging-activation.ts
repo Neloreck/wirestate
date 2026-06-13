@@ -6,7 +6,7 @@ import type { CommandHandler } from "./commands/commands";
 import { getCommandHandlerMetadata } from "./commands/on-command";
 import { buildEventDispatchers } from "./events/build-event-dispatchers";
 import { EventBus } from "./events/event-bus";
-import type { EventDispatch, EventUnsubscriber } from "./events/events";
+import type { EventDispatch, EventUnsubscribe } from "./events/events";
 import { getQueryHandlerMetadata } from "./queries/on-query";
 import type { QueryHandler } from "./queries/queries";
 import { QueryBus } from "./queries/query-bus";
@@ -36,7 +36,7 @@ export function messagingActivationAdapter(
     const eventBus: Maybe<EventBus> = container.get(EventBus, { optional: true });
 
     if (eventBus) {
-      const unsubscribers: Array<EventUnsubscriber> = dispatches.map((dispatch) =>
+      const unsubscribers: Array<EventUnsubscribe> = dispatches.map((dispatch) =>
         eventBus.subscribe(dispatch.types, dispatch.handler)
       );
 

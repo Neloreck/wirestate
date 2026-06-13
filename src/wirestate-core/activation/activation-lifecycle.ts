@@ -95,11 +95,12 @@ export function deactivateInstance(container: ContainerKernel, record: Activatio
       instance,
       instanceName: binding.value.name,
       methodName,
+      rethrowSync: false,
       source: "instance-deactivation",
     });
   }
 
-  unregisterInstanceStatus(instance);
+  finalizeInstanceStatus(instance);
   runDisposers(record);
 
   INSTANCE_CONTAINERS.delete(instance);
@@ -120,7 +121,7 @@ export function deactivateInstance(container: ContainerKernel, record: Activatio
 export function rollbackInstanceActivation(container: ContainerKernel, record: ActivationRecord): void {
   const instance: object = record.instance as object;
 
-  unregisterInstanceStatus(instance);
+  finalizeInstanceStatus(instance);
   runDisposers(record);
 
   INSTANCE_CONTAINERS.delete(instance);
@@ -136,24 +137,24 @@ export function rollbackInstanceActivation(container: ContainerKernel, record: A
 export function initializeInstanceStatus(container: ContainerKernel, instance: object): void {
   const status: WireStatus = WireStatus.for(instance, { initialize: true });
 
-  status.isDisposed = false;
+  status.isDeactivated = false;
 
-  const isProvisioned = getContainerProvisionStatus(container);
+  const isProvisioned: Definable<boolean> = getContainerProvisionStatus(container);
 
   status.isDeprovisioned = isProvisioned === undefined ? null : !isProvisioned;
   status.provisionId = null;
 }
 
 /**
- * Marks an instance as deactivated.
+ * Ends lifecycle tracking for a deactivated instance.
  *
  * @param instance - Deactivated instance.
  * @internal
  */
-export function unregisterInstanceStatus(instance: object): void {
+export function finalizeInstanceStatus(instance: object): void {
   const status: WireStatus = WireStatus.for(instance);
 
-  status.isDisposed = true;
+  status.isDeactivated = true;
   status.isDeprovisioned = true;
 }
 

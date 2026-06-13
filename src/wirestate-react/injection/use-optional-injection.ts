@@ -1,4 +1,4 @@
-import { Container, Identifier } from "@wirestate/core";
+import { Container, ServiceToken } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { dbg } from "@/macroses/dbg.macro";
@@ -29,7 +29,10 @@ import { AnyObject } from "../types/general";
  * const logger = useOptionalInjection(FileLogger, (container) => container.get(ConsoleLoggerService));
  * ```
  */
-export function useOptionalInjection<T, F = null>(token: Identifier<T>, fallback?: (container: Container) => F): T | F {
+export function useOptionalInjection<T, F = null>(
+  token: ServiceToken<T>,
+  fallback?: (container: Container) => F
+): T | F {
   const container: Container = useContainer();
 
   // Revision bump forces a container reset; force re-resolution to drop stale instances.

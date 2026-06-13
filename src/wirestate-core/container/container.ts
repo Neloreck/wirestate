@@ -2,10 +2,13 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { setActivationAdapter } from "../activation/activation-adapter";
-import type { Bindings, Identifier } from "../binding/binding";
+import type { Bindings, ServiceToken } from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
-import { InternalErrorHandler } from "../error/error";
-import { getConfiguredInternalErrorHandler, setInternalErrorHandler } from "../error/internal-error-handler";
+import {
+  getConfiguredInternalErrorHandler,
+  InternalErrorHandler,
+  setInternalErrorHandler,
+} from "../error/internal-error-handler";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { EventBus } from "../messaging/events/event-bus";
 import { messagingActivationAdapter } from "../messaging/messaging-activation";
@@ -27,7 +30,7 @@ export interface ContainerConfig {
   /**
    * Bindings to resolve immediately.
    */
-  readonly activate?: boolean | ReadonlyArray<Identifier>;
+  readonly activate?: boolean | ReadonlyArray<ServiceToken>;
 
   /**
    * Services or binding descriptors to register.
@@ -122,7 +125,7 @@ export class Container extends ContainerKernel {
     // optional lookups, so it is installed even under `skipMessaging`.
     setActivationAdapter(this, messagingActivationAdapter);
 
-    const activate: ReadonlyArray<Identifier> =
+    const activate: ReadonlyArray<ServiceToken> =
       (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
 
     const errorHandler: Maybe<InternalErrorHandler> =

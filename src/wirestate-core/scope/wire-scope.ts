@@ -1,13 +1,13 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { Identifier } from "../binding/binding";
+import type { ServiceToken } from "../binding/binding";
 import type { Container } from "../container/container";
 import { SEED_TOKEN, SEEDS_TOKEN } from "../container/container-seeds";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { CommandHandler, CommandUnregister, CommandType } from "../messaging/commands/commands";
 import { EventBus } from "../messaging/events/event-bus";
-import { EventEmitOptions, EventHandler, EventType, EventUnsubscriber } from "../messaging/events/events";
+import { EventEmitOptions, EventHandler, EventType, EventUnsubscribe } from "../messaging/events/events";
 import { QueryHandler, QueryUnregister, QueryType } from "../messaging/queries/queries";
 import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
@@ -72,7 +72,7 @@ export class WireScope {
    * @remarks
    * Use this for lazy work or to reduce direct constructor dependencies.
    * Constructor injection resolves dependencies during instance creation;
-   * `resolve` looks up a dependency later, only when the method is called.
+   * `get` looks up a dependency later, only when the method is called.
    *
    * @template T - Type of the instance or value to resolve.
    *
@@ -83,10 +83,10 @@ export class WireScope {
    *
    * @example
    * ```typescript
-   * const service: MyService = scope.resolve(MyService);
+   * const service: MyService = scope.get(MyService);
    * ```
    */
-  public resolve<T>(token: Identifier<T>): T {
+  public get<T>(token: ServiceToken<T>): T {
     dbg.info(prefix(__filename), "Lazy resolve:", {
       name: (token as AnyObject)?.name ?? token,
       token,
@@ -105,12 +105,12 @@ export class WireScope {
    *
    * @example
    * ```typescript
-   * const logger: Logger | null = scope.resolveOptional(Logger);
+   * const logger: Logger | null = scope.getOptional(Logger);
    *
    * logger?.info("Resolved optionally");
    * ```
    */
-  public resolveOptional<T>(token: Identifier<T>): Optional<T> {
+  public getOptional<T>(token: ServiceToken<T>): Optional<T> {
     dbg.info(prefix(__filename), "Lazy optional resolve:", {
       name: (token as AnyObject)?.name ?? token,
       token,
@@ -123,10 +123,10 @@ export class WireScope {
    * Dispatches an event to the {@link EventBus}.
    *
    * @template P - Type of the event payload.
-   * @template T - Type of the event identifier.
+   * @template T - Type of the event.
    * @template S - Type of the event source.
    *
-   * @param type - Event identifier.
+   * @param type - Event type.
    * @param payload - Optional event payload.
    * @param options - Event emission options.
    *
@@ -151,12 +151,12 @@ export class WireScope {
    *
    * @example
    * ```typescript
-   * const unsubscribe: EventUnsubscriber = scope.subscribeToEvent((event) => {
+   * const unsubscribe: EventUnsubscribe = scope.subscribeToEvent((event) => {
    *   console.log("Event received:", event);
    * });
    * ```
    */
-  public subscribeToEvent(handler: EventHandler): EventUnsubscriber;
+  public subscribeToEvent(handler: EventHandler): EventUnsubscribe;
 
   /**
    * Subscribes to one or more event types on the {@link EventBus}.
@@ -171,7 +171,7 @@ export class WireScope {
    *
    * @example
    * ```typescript
-   * const unsubscribe: EventUnsubscriber = scope.subscribeToEvent("USER_LOGGED_IN", (event) => {
+   * const unsubscribe: EventUnsubscribe = scope.subscribeToEvent("USER_LOGGED_IN", (event) => {
    *   console.log("User logged in:", event);
    * });
    * ```
@@ -179,12 +179,12 @@ export class WireScope {
   public subscribeToEvent(
     types: Optional<EventType | ReadonlyArray<EventType>>,
     handler: EventHandler
-  ): EventUnsubscriber;
+  ): EventUnsubscribe;
 
   public subscribeToEvent(
     typesOrHandler: EventHandler | Optional<EventType | ReadonlyArray<EventType>>,
     handler?: EventHandler
-  ): EventUnsubscriber {
+  ): EventUnsubscribe {
     return handler
       ? this.eventBus.subscribe(typesOrHandler as Optional<EventType | ReadonlyArray<EventType>>, handler)
       : this.eventBus.subscribe(typesOrHandler as EventHandler);
@@ -236,9 +236,9 @@ export class WireScope {
    *
    * @template R - Type of the query result.
    * @template P - Type of the query payload.
-   * @template T - Type of the query identifier.
+   * @template T - Type of the query.
    *
-   * @param type - Query identifier.
+   * @param type - Query type.
    * @param payload - Payload for the query handler.
    * @returns The query result.
    *
@@ -258,9 +258,9 @@ export class WireScope {
    *
    * @template R - Type of the query result.
    * @template P - Type of the query payload.
-   * @template T - Type of the query identifier.
+   * @template T - Type of the query.
    *
-   * @param type - Query identifier.
+   * @param type - Query type.
    * @param payload - Payload for the query handler.
    * @returns A Promise resolving to the query result.
    *
@@ -280,9 +280,9 @@ export class WireScope {
    *
    * @template R - Type of the query result.
    * @template P - Type of the query payload.
-   * @template T - Type of the query identifier.
+   * @template T - Type of the query.
    *
-   * @param type - Query identifier.
+   * @param type - Query type.
    * @param payload - Payload for the query handler.
    * @returns The query result or `null`.
    *
@@ -300,9 +300,9 @@ export class WireScope {
    *
    * @template R - Type of the query result.
    * @template P - Type of the query payload.
-   * @template T - Type of the query identifier.
+   * @template T - Type of the query.
    *
-   * @param type - Query identifier.
+   * @param type - Query type.
    * @param payload - Payload for the query handler.
    * @returns A Promise resolving to the query result or `null`.
    *
@@ -323,9 +323,9 @@ export class WireScope {
    *
    * @template R - Type of the query result.
    * @template P - Type of the query payload.
-   * @template T - Type of the query identifier.
+   * @template T - Type of the query.
    *
-   * @param type - Query identifier.
+   * @param type - Query type.
    * @param handler - The handler function.
    * @returns A function to unregister the handler.
    *
@@ -346,9 +346,9 @@ export class WireScope {
    *
    * @template R - Type of the query result.
    * @template P - Type of the query payload.
-   * @template T - Type of the query identifier.
+   * @template T - Type of the query.
    *
-   * @param type - Query identifier.
+   * @param type - Query type.
    * @param handler - The handler instance to remove.
    *
    * @example
@@ -368,9 +368,9 @@ export class WireScope {
    *
    * @template R - Type of the command result.
    * @template P - Type of the command payload.
-   * @template T - Type of the command identifier.
+   * @template T - Type of the command.
    *
-   * @param type - Command identifier.
+   * @param type - Command type.
    * @param payload - Payload for the command.
    * @returns The command result.
    *
@@ -378,10 +378,10 @@ export class WireScope {
    *
    * @example
    * ```typescript
-   * scope.executeCommand("LOGOUT");
+   * scope.execute("LOGOUT");
    * ```
    */
-  public executeCommand<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R {
+  public execute<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R {
     return this.commandBus.execute<R, P, T>(type, payload);
   }
 
@@ -390,9 +390,9 @@ export class WireScope {
    *
    * @template R - Type of the command result.
    * @template P - Type of the command payload.
-   * @template T - Type of the command identifier.
+   * @template T - Type of the command.
    *
-   * @param type - Command identifier.
+   * @param type - Command type.
    * @param payload - Payload for the command.
    * @returns A Promise resolving to the command result.
    *
@@ -400,13 +400,10 @@ export class WireScope {
    *
    * @example
    * ```typescript
-   * await scope.executeCommandAsync("LOGOUT");
+   * await scope.executeAsync("LOGOUT");
    * ```
    */
-  public executeCommandAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
-    type: T,
-    payload?: P
-  ): Promise<R> {
+  public executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): Promise<R> {
     return this.commandBus.executeAsync<R, P, T>(type, payload);
   }
 
@@ -415,18 +412,18 @@ export class WireScope {
    *
    * @template R - Type of the command result.
    * @template P - Type of the command payload.
-   * @template T - Type of the command identifier.
+   * @template T - Type of the command.
    *
-   * @param type - Command identifier.
+   * @param type - Command type.
    * @param payload - Payload for the command.
    * @returns The command result or `null`.
    *
    * @example
    * ```typescript
-   * scope.executeOptionalCommand("CLEANUP_CACHE");
+   * scope.executeOptional("CLEANUP_CACHE");
    * ```
    */
-  public executeOptionalCommand<R = unknown, P = unknown, T extends CommandType = CommandType>(
+  public executeOptional<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,
     payload?: P
   ): Optional<R> {
@@ -438,18 +435,18 @@ export class WireScope {
    *
    * @template R - Type of the command result.
    * @template P - Type of the command payload.
-   * @template T - Type of the command identifier.
+   * @template T - Type of the command.
    *
-   * @param type - Command identifier.
+   * @param type - Command type.
    * @param payload - Payload for the command.
    * @returns A Promise resolving to the command result or `null`.
    *
    * @example
    * ```typescript
-   * const result: string | null = await scope.executeOptionalCommandAsync("CLEANUP_CACHE");
+   * const result: string | null = await scope.executeOptionalAsync("CLEANUP_CACHE");
    * ```
    */
-  public executeOptionalCommandAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
+  public executeOptionalAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,
     payload?: P
   ): Promise<Optional<R>> {
@@ -461,9 +458,9 @@ export class WireScope {
    *
    * @template R - Type of the command result.
    * @template P - Type of the command payload.
-   * @template T - Type of the command identifier.
+   * @template T - Type of the command.
    *
-   * @param type - Command identifier.
+   * @param type - Command type.
    * @param handler - The handler function.
    * @returns A function to unregister the handler.
    *
@@ -486,9 +483,9 @@ export class WireScope {
    *
    * @template R - Type of the command result.
    * @template P - Type of the command payload.
-   * @template T - Type of the command identifier.
+   * @template T - Type of the command.
    *
-   * @param type - Command identifier.
+   * @param type - Command type.
    * @param handler - The handler instance to remove.
    *
    * @example

@@ -1,4 +1,4 @@
-import type { Identifier } from "../binding/binding";
+import type { ServiceToken } from "../binding/binding";
 import type { Definable } from "../types/general";
 
 import type { ContainerKernel } from "./container-kernel";
@@ -9,12 +9,12 @@ import type { ContainerKernel } from "./container-kernel";
  * @param token - Token to resolve from the current container.
  * @returns The resolved value, values, thunk, or `undefined` for optional misses.
  */
-export function inject<T>(token: Identifier<T>): T;
-export function inject<T>(token: Identifier<T>, options: { optional: true }): Definable<T>;
-export function inject<T>(token: Identifier<T>, options: { lazy: true }): () => T;
-export function inject<T>(token: Identifier<T>, options: { lazy: true; optional: true }): () => Definable<T>;
+export function inject<T>(token: ServiceToken<T>): T;
+export function inject<T>(token: ServiceToken<T>, options: { optional: true }): Definable<T>;
+export function inject<T>(token: ServiceToken<T>, options: { lazy: true }): () => T;
+export function inject<T>(token: ServiceToken<T>, options: { lazy: true; optional: true }): () => Definable<T>;
 export function inject<T>(
-  token: Identifier<T>,
+  token: ServiceToken<T>,
   options?: { optional?: boolean; lazy?: boolean }
 ): Definable<T> | (() => Definable<T>) {
   try {

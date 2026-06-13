@@ -16,9 +16,9 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  *
  * @template R - Result type of the query.
  * @template P - Payload type of the query.
- * @template T - Query identifier type.
+ * @template T - Query type.
  *
- * @param type - Query identifier (string or symbol).
+ * @param type - Query type (string or symbol).
  * @param handler - Function that responds to the query.
  *
  * @example

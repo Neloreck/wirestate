@@ -1,4 +1,4 @@
-import type { BindingDescriptor, Identifier } from "../binding/binding";
+import type { BindingDescriptor, ServiceToken } from "../binding/binding";
 import type { Definable } from "../types/general";
 
 /**
@@ -6,9 +6,9 @@ import type { Definable } from "../types/general";
  *
  * @internal
  */
-export interface BindingMap extends Map<Identifier, BindingDescriptor> {
-  get<T>(key: Identifier<T>): Definable<BindingDescriptor<T>>;
-  set<T>(key: Identifier<T>, value: BindingDescriptor<T>): this;
+export interface BindingMap extends Map<ServiceToken, BindingDescriptor> {
+  get<T>(key: ServiceToken<T>): Definable<BindingDescriptor<T>>;
+  set<T>(key: ServiceToken<T>, value: BindingDescriptor<T>): this;
 }
 
 /**
@@ -27,7 +27,7 @@ export interface InstanceMap extends Map<BindingDescriptor, unknown> {
  * @internal
  */
 export interface ActivationRecord {
-  token: Identifier;
+  token: ServiceToken;
   binding: BindingDescriptor;
   instance: unknown;
   /**

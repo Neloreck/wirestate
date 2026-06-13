@@ -1,7 +1,7 @@
 import type { Optional } from "../../types/general";
 
 /**
- * Represents token used to emit and filter events.
+ * Represents the type used to emit and filter events.
  *
  * @group Events
  */
@@ -27,7 +27,7 @@ export interface WireEvent<P = unknown, T extends EventType = EventType, S = unk
  */
 export interface EventEmitOptions<S = unknown> {
   /**
-   * Optional source identifier attached to the emitted event.
+   * Optional source attached to the emitted event.
    */
   readonly source?: S;
 }
@@ -44,7 +44,7 @@ export type EventHandler<E extends WireEvent = WireEvent> = (event: E) => void;
  *
  * @group Events
  */
-export type EventUnsubscriber = () => void;
+export type EventUnsubscribe = () => void;
 
 /**
  * Represents a single bus subscription for one decorated method.

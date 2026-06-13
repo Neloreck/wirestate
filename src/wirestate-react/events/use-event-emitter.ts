@@ -17,8 +17,8 @@ import { EventEmitter } from "../types/events";
  * @group Events
  *
  * @template P - Default payload type for emitted events.
- * @template T - Default event identifier type.
- * @template S - Default source identifier type.
+ * @template T - Default event type.
+ * @template S - Default source type.
  *
  * @returns An event emitter function.
  *

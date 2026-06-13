@@ -58,7 +58,7 @@ describe("dual-mode method decorators", () => {
 
     expect(service.received).toEqual(["one", "two"]);
     expect(service.scope.query("GET_RECEIVED_COUNT")).toBe(2);
-    expect(service.scope.executeCommand("APPEND_VALUE", "three")).toBe("appended:three");
+    expect(service.scope.execute("APPEND_VALUE", "three")).toBe("appended:three");
     expect(service.received).toEqual(["one", "two", "three"]);
   });
 

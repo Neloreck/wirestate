@@ -40,11 +40,11 @@ export class GenericService {
   }
 
   public testResolveService(): GenericService {
-    return this.scope.resolve(GenericService);
+    return this.scope.get(GenericService);
   }
 
   public testGetContainer(): Container {
-    return this.scope.resolve(Container);
+    return this.scope.get(Container);
   }
 
   public testGetSeed(): Container {

@@ -20,11 +20,11 @@ import { OptionalAsyncCommandExecutor } from "../types/commands";
  *
  * @example
  * ```tsx
- * const executeOptionalCommandAsync: OptionalAsyncCommandExecutor = useOptionalAsyncCommandExecutor();
+ * const executeOptionalAsync: OptionalAsyncCommandExecutor = useOptionalAsyncCommandExecutor();
  *
  * const onClick = useCallback(async () => {
- *   const result: string | null = await executeOptionalCommandAsync("OPTIONAL_COMMAND", payload);
- * }, [payload, executeOptionalCommandAsync]);
+ *   const result: string | null = await executeOptionalAsync("OPTIONAL_COMMAND", payload);
+ * }, [payload, executeOptionalAsync]);
  * ```
  */
 export function useOptionalAsyncCommandExecutor(): OptionalAsyncCommandExecutor {

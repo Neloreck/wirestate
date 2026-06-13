@@ -1,4 +1,4 @@
-import type { Identifier } from "../binding/binding";
+import type { ServiceToken } from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
@@ -34,7 +34,7 @@ export function validateContainerConfig(config: ContainerConfig): void {
     throw new WirestateError("Container: 'onError' must be a function.", ERROR_CODE_VALIDATION_ERROR);
   }
 
-  const activate: ReadonlyArray<Identifier> =
+  const activate: ReadonlyArray<ServiceToken> =
     (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
 
   if (!activate.length) {
@@ -48,7 +48,7 @@ export function validateContainerConfig(config: ContainerConfig): void {
     );
   }
 
-  const bindingTokens: ReadonlySet<Identifier> = new Set(config.bindings.map(getBindingToken));
+  const bindingTokens: ReadonlySet<ServiceToken> = new Set(config.bindings.map(getBindingToken));
 
   for (const eager of activate) {
     if (!bindingTokens.has(eager)) {

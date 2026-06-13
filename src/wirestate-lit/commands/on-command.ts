@@ -32,7 +32,7 @@ export interface OnCommandDecorator<R = unknown, P = unknown, T extends CommandT
  *
  * @group Commands
  *
- * @param type - Unique identifier of the command to handle.
+ * @param type - Command type to handle.
  * @returns A method decorator function.
  *
  * @example

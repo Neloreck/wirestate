@@ -1,5 +1,5 @@
 import type { ProvisionId } from "../activation/wire-status";
-import type { Identifier } from "../binding/binding";
+import type { ServiceToken } from "../binding/binding";
 import type { Container } from "../container/container";
 import type { ContainerKernel } from "../container/container-kernel";
 import type { Definable } from "../types/general";
@@ -39,7 +39,7 @@ export const PROVISION_LIFECYCLES_BY_CONTAINER: WeakMap<
  *
  * @internal
  */
-export const PROVISION_TOKENS_BY_INSTANCE: WeakMap<object, Set<Identifier>> = new WeakMap();
+export const PROVISION_TOKENS_BY_INSTANCE: WeakMap<object, Set<ServiceToken>> = new WeakMap();
 
 /**
  * Internal storage for the latest provider provision cycle ID per instance.

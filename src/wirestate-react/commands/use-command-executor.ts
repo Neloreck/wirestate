@@ -20,11 +20,11 @@ import { CommandExecutor } from "../types/commands";
  *
  * @example
  * ```tsx
- * const executeCommand: CommandExecutor = useCommandExecutor();
+ * const execute: CommandExecutor = useCommandExecutor();
  *
  * const onClick = useCallback(() => {
- *   return executeCommand("SAVE_USER_COMMAND", { id: 1 });
- * }, [executeCommand]);
+ *   return execute("SAVE_USER_COMMAND", { id: 1 });
+ * }, [execute]);
  * ```
  */
 export function useCommandExecutor(): CommandExecutor {

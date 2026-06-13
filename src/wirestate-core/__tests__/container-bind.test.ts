@@ -295,7 +295,7 @@ describe("container.bind", () => {
 
       expect(instance.isActivated).toBe(true);
       expect(WireStatus.for(instance)).toEqual({
-        isDisposed: false,
+        isDeactivated: false,
         isDeprovisioned: null,
         isInactive: false,
         provisionId: null,
@@ -315,9 +315,9 @@ describe("container.bind", () => {
       // Test deactivation.
       container.unbind(GenericService);
       expect(instance.isActivated).toBe(false);
-      expect(instance.scope.resolve(Container)).toBe(container);
+      expect(instance.scope.get(Container)).toBe(container);
       expect(WireStatus.for(instance)).toEqual({
-        isDisposed: true,
+        isDeactivated: true,
         isDeprovisioned: true,
         isInactive: true,
         provisionId: null,
@@ -479,9 +479,9 @@ describe("container.bind", () => {
       expect(instanceRef.current).not.toBeNull();
       expect(scopeRef.current).not.toBeNull();
 
-      expect((scopeRef.current as WireScope).resolve(Container)).toBe(container);
+      expect((scopeRef.current as WireScope).get(Container)).toBe(container);
       expect(WireStatus.for(instanceRef.current as object)).toEqual({
-        isDisposed: true,
+        isDeactivated: true,
         isDeprovisioned: true,
         isInactive: true,
         provisionId: null,
@@ -511,9 +511,9 @@ describe("container.bind", () => {
       expect(container.get(QueryBus).query("SYNC_FAIL_DEACTIVATION_QUERY")).toBe("query-response");
       expect(() => container.unbind(SyncFailDeactivationService)).not.toThrow();
 
-      expect(instance.scope.resolve(Container)).toBe(container);
+      expect(instance.scope.get(Container)).toBe(container);
       expect(WireStatus.for(instance)).toEqual({
-        isDisposed: true,
+        isDeactivated: true,
         isDeprovisioned: true,
         isInactive: true,
         provisionId: null,

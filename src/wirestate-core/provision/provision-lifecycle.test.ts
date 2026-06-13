@@ -164,7 +164,7 @@ describe("provision lifecycle", () => {
 
     expect(events).toEqual(["activated"]);
     expect(status).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
       provisionId: null,
@@ -174,7 +174,7 @@ describe("provision lifecycle", () => {
 
     expect(events).toEqual(["activated"]);
     expect(status).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
       provisionId: null,
@@ -196,7 +196,7 @@ describe("provision lifecycle", () => {
     const status: WireStatus = WireStatus.for(service);
 
     expect(status).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
       provisionId: null,
@@ -205,7 +205,7 @@ describe("provision lifecycle", () => {
     deprovisionContainer(container, lifecycle);
 
     expect(status).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
       provisionId: null,
@@ -235,7 +235,7 @@ describe("provision lifecycle", () => {
     const status: WireStatus = WireStatus.for(service);
 
     expect(status).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
       provisionId: null,
@@ -244,7 +244,7 @@ describe("provision lifecycle", () => {
     deprovisionContainer(container, lifecycle);
 
     expect(status).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
       provisionId: null,
@@ -261,7 +261,7 @@ describe("provision lifecycle", () => {
 
       @OnActivated()
       public onActivated(): void {
-        this.scope.resolve(PlainService);
+        this.scope.get(PlainService);
       }
 
       @OnProvision()
@@ -279,7 +279,7 @@ describe("provision lifecycle", () => {
     const status: WireStatus = WireStatus.for(service);
 
     expect(status).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
       provisionId: null,
@@ -288,7 +288,7 @@ describe("provision lifecycle", () => {
     deprovisionContainer(container, lifecycle);
 
     expect(status).toEqual({
-      isDisposed: false,
+      isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
       provisionId: null,

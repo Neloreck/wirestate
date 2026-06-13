@@ -20,11 +20,11 @@ import { AsyncCommandExecutor } from "../types/commands";
  *
  * @example
  * ```tsx
- * const executeCommandAsync: AsyncCommandExecutor = useAsyncCommandExecutor();
+ * const executeAsync: AsyncCommandExecutor = useAsyncCommandExecutor();
  *
  * const onClick = useCallback(async () => {
- *   await executeCommandAsync("SAVE_USER_COMMAND", { id: 1 });
- * }, [executeCommandAsync]);
+ *   await executeAsync("SAVE_USER_COMMAND", { id: 1 });
+ * }, [executeAsync]);
  * ```
  */
 export function useAsyncCommandExecutor(): AsyncCommandExecutor {

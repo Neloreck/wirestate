@@ -43,7 +43,7 @@ export class OnQueryController<
 
   /**
    * @param host - The host element.
-   * @param type - Unique identifier of the query to handle.
+   * @param type - Query type to handle.
    * @param handler - The query handler function.
    */
   public constructor(host: ReactiveElement, type: T, handler: QueryHandler<R, P, T>) {

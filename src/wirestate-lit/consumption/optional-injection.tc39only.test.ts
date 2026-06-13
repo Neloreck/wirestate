@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, Identifier } from "@wirestate/core";
+import { Container, ServiceToken } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
@@ -18,7 +18,7 @@ describe("optionalInjection on standard accessors", () => {
 
   it("should assign null for accessors when token is not bound", () => {
     const container: Container = new Container();
-    const token: Identifier<string> = Symbol("optional-token");
+    const token: ServiceToken<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -58,7 +58,7 @@ describe("optionalInjection on standard accessors", () => {
 
   it("should reject non-nullable members without a fallback at compile time", () => {
     const container: Container = new Container();
-    const token: Identifier<string> = Symbol("optional-token");
+    const token: ServiceToken<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
@@ -78,7 +78,7 @@ describe("optionalInjection on standard accessors", () => {
 
   it("should use fallback for accessors when token is not bound", () => {
     const container: Container = new Container();
-    const token: Identifier<string> = Symbol("optional-token");
+    const token: ServiceToken<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 

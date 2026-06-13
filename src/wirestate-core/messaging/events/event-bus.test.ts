@@ -1,7 +1,7 @@
 import { Container } from "../../container/container";
 
 import { EventBus } from "./event-bus";
-import type { EventUnsubscriber } from "./events";
+import type { EventUnsubscribe } from "./events";
 
 describe("EventBus", () => {
   it("should emit event to subscribed handler", () => {
@@ -77,7 +77,7 @@ describe("EventBus", () => {
     const bus = new EventBus();
     const handler = jest.fn();
 
-    const unsubscribe: EventUnsubscriber = bus.subscribe(handler);
+    const unsubscribe: EventUnsubscribe = bus.subscribe(handler);
 
     unsubscribe();
     bus.emit("TEST");
@@ -291,7 +291,7 @@ describe("EventBus", () => {
       const bus: EventBus = new EventBus();
       const handler = jest.fn();
 
-      const unsubscribe: EventUnsubscriber = bus.subscribe(["A", "B"], handler);
+      const unsubscribe: EventUnsubscribe = bus.subscribe(["A", "B"], handler);
 
       unsubscribe();
       bus.emit("A");
@@ -306,7 +306,7 @@ describe("EventBus", () => {
       const first = jest.fn();
       const second = jest.fn();
 
-      const unsubscribeFirst: EventUnsubscriber = bus.subscribe("SHARED", first);
+      const unsubscribeFirst: EventUnsubscribe = bus.subscribe("SHARED", first);
 
       bus.subscribe("SHARED", second);
 
@@ -363,7 +363,7 @@ describe("EventBus", () => {
       const bus: EventBus = new EventBus();
       const handler = jest.fn();
 
-      const unsubscribe: EventUnsubscriber = bus.subscribe("ONCE", () => {
+      const unsubscribe: EventUnsubscribe = bus.subscribe("ONCE", () => {
         handler();
         unsubscribe();
       });
@@ -377,8 +377,8 @@ describe("EventBus", () => {
     it("should report no subscribers once all typed and catch-all handlers are removed", () => {
       const bus: EventBus = new EventBus();
 
-      const unsubscribeTyped: EventUnsubscriber = bus.subscribe("A", jest.fn());
-      const unsubscribeCatchAll: EventUnsubscriber = bus.subscribe(jest.fn());
+      const unsubscribeTyped: EventUnsubscribe = bus.subscribe("A", jest.fn());
+      const unsubscribeCatchAll: EventUnsubscribe = bus.subscribe(jest.fn());
 
       expect(bus.hasSubscribers()).toBe(true);
 
@@ -407,7 +407,7 @@ describe("EventBus", () => {
       const bus: EventBus = new EventBus();
       const handler = jest.fn();
 
-      const unsubscribeFirst: EventUnsubscriber = bus.subscribe("A", handler);
+      const unsubscribeFirst: EventUnsubscribe = bus.subscribe("A", handler);
 
       bus.subscribe("A", handler);
 
@@ -421,7 +421,7 @@ describe("EventBus", () => {
       const bus: EventBus = new EventBus();
       const handler = jest.fn();
 
-      const unsubscribeFirst: EventUnsubscriber = bus.subscribe(["A", "B"], handler);
+      const unsubscribeFirst: EventUnsubscribe = bus.subscribe(["A", "B"], handler);
 
       bus.subscribe(["B", "C"], handler);
 

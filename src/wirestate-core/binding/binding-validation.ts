@@ -7,7 +7,7 @@ import { WirestateError } from "../error/wirestate-error";
 import { isInjectable } from "../metadata/metadata-injectable";
 import type { Newable } from "../types/general";
 
-import { BindingScope, BindingType, type BindingDescriptor, Identifier } from "./binding";
+import { BindingScope, BindingType, type BindingDescriptor, ServiceToken } from "./binding";
 import { isFactoryDescriptor } from "./binding-guards";
 import { tokenToString } from "./binding-tokens";
 
@@ -32,7 +32,7 @@ import { tokenToString } from "./binding-tokens";
  * existing binding already constructed values.
  */
 export function validateBinding<T>(
-  token: Identifier<T>,
+  token: ServiceToken<T>,
   binding: BindingDescriptor<T>,
   hasConstructedValues: boolean
 ): void {

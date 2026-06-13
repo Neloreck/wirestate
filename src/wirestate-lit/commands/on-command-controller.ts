@@ -42,7 +42,7 @@ export class OnCommandController<
 
   /**
    * @param host - The host element.
-   * @param type - Unique identifier of the command to handle.
+   * @param type - Command type to handle.
    * @param handler - The command handler function.
    */
   public constructor(host: ReactiveElement, type: T, handler: CommandHandler<R, P, T>) {

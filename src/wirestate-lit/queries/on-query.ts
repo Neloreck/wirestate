@@ -32,7 +32,7 @@ export interface OnQueryDecorator<R = unknown, P = unknown, T extends QueryType 
  *
  * @group Queries
  *
- * @param type - Unique identifier of the query to handle.
+ * @param type - Query type to handle.
  * @returns A method decorator function.
  *
  * @example

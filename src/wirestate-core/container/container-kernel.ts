@@ -1,5 +1,5 @@
 import { activateInstance, deactivateInstance, rollbackInstanceActivation } from "../activation/activation-lifecycle";
-import type { BindingDescriptor, Identifier } from "../binding/binding";
+import type { BindingDescriptor, ServiceToken } from "../binding/binding";
 import { isInstanceDescriptor } from "../binding/binding-guards";
 import { getBindingScope } from "../binding/binding-lifecycle";
 import { tokenToString } from "../binding/binding-tokens";
@@ -25,7 +25,7 @@ export interface UnbindInterceptor {
    *
    * @param token - Token being unbound.
    */
-  onUnbind?(token: Identifier): void;
+  onUnbind?(token: ServiceToken): void;
 
   /**
    * Called exactly once before container-owned values are deactivated by `unbindAll`.
@@ -34,8 +34,13 @@ export interface UnbindInterceptor {
 }
 
 /**
- * A dependency injection (DI) container will keep track of all bindings
- * and hold the actual instances of your services.
+ * Internal dependency injection (DI) engine: tracks bindings and holds the
+ * resolved instances of your services.
+ *
+ * @remarks
+ * This is the base class that {@link Container} extends; the public
+ * {@link Container} adds messaging, scope, and seed support on top. Application
+ * code interacts with `Container`, not `ContainerKernel` directly.
  *
  * All bindings are explicit: services are constructed synchronously and
  * only when a binding descriptor was registered with `bind`.
@@ -93,7 +98,7 @@ export class ContainerKernel {
    * @param token - Token to unbind.
    * @returns The same container for chaining.
    */
-  public unbind<T>(token: Identifier<T>): this {
+  public unbind<T>(token: ServiceToken<T>): this {
     for (const interceptor of [...this.unbindInterceptors]) {
       interceptor.onUnbind?.(token);
     }
@@ -166,17 +171,17 @@ export class ContainerKernel {
    *
    * @throws {@link WirestateError} If the token is not bound and not optional.
    */
-  public get<T>(token: Identifier<T>): T;
-  public get<T>(token: Identifier<T>, options: { optional: true }): Definable<T>;
-  public get<T>(token: Identifier<T>, options: { lazy: true }): () => T;
-  public get<T>(token: Identifier<T>, options: { lazy: true; optional: true }): () => Definable<T>;
-  public get<T>(token: Identifier<T>, options?: { optional?: boolean; lazy?: false }): Definable<T>;
+  public get<T>(token: ServiceToken<T>): T;
+  public get<T>(token: ServiceToken<T>, options: { optional: true }): Definable<T>;
+  public get<T>(token: ServiceToken<T>, options: { lazy: true }): () => T;
+  public get<T>(token: ServiceToken<T>, options: { lazy: true; optional: true }): () => Definable<T>;
+  public get<T>(token: ServiceToken<T>, options?: { optional?: boolean; lazy?: false }): Definable<T>;
   public get<T>(
-    token: Identifier<T>,
+    token: ServiceToken<T>,
     options?: { optional?: boolean; lazy?: boolean }
   ): Definable<T> | (() => Definable<T>);
   public get<T>(
-    token: Identifier<T>,
+    token: ServiceToken<T>,
     options?: { optional?: boolean; lazy?: boolean }
   ): Definable<T> | (() => Definable<T>) {
     const lazy = options?.lazy ?? false;
@@ -208,7 +213,7 @@ export class ContainerKernel {
    * @param token - Token to check.
    * @returns Whether the token can be resolved from this container.
    */
-  public has<T>(token: Identifier<T>): boolean {
+  public has<T>(token: ServiceToken<T>): boolean {
     return this.bindings.has(token) || (this.parent?.has(token) ?? false);
   }
 
@@ -219,7 +224,7 @@ export class ContainerKernel {
    * @param token - Token to check.
    * @returns Whether this container owns a binding for the token.
    */
-  public hasOwn<T>(token: Identifier<T>): boolean {
+  public hasOwn<T>(token: ServiceToken<T>): boolean {
     return this.bindings.has(token);
   }
 
@@ -305,7 +310,7 @@ export class ContainerKernel {
    *
    * @param token - Token to deactivate.
    */
-  private deactivate<T>(token: Identifier<T>): void {
+  private deactivate<T>(token: ServiceToken<T>): void {
     const records = this.activated.filter((record) => record.token === token);
 
     for (const record of records) {
@@ -333,7 +338,7 @@ export class ContainerKernel {
    * @param token - Token to check.
    * @returns Whether a constructed value exists for the token.
    */
-  private hasConstructedBinding<T>(token: Identifier<T>): boolean {
+  private hasConstructedBinding<T>(token: ServiceToken<T>): boolean {
     const binding = this.bindings.get(token);
 
     return binding !== undefined && this.instances.has(binding);

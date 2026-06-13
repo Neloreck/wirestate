@@ -12,9 +12,9 @@ import { Optional } from "./general";
  *
  * @template R - The result type of the query.
  * @template P - The type of the query payload.
- * @template T - The query identifier type.
+ * @template T - The query type.
  *
- * @param type - The query identifier.
+ * @param type - The query type.
  * @param payload - Optional payload for the query.
  *
  * @returns The query handler result as-is.
@@ -31,9 +31,9 @@ export type QueryExecutor = <R = unknown, P = unknown, T extends QueryType = Que
  *
  * @template R - The result type of the query.
  * @template P - The type of the query payload.
- * @template T - The query identifier type.
+ * @template T - The query type.
  *
- * @param type - The query identifier.
+ * @param type - The query type.
  * @param payload - Optional payload for the query.
  *
  * @returns A Promise resolving to the query result.
@@ -54,9 +54,9 @@ export type AsyncQueryExecutor = <R = unknown, P = unknown, T extends QueryType 
  *
  * @template R - The result type of the query.
  * @template P - The type of the query payload.
- * @template T - The query identifier type.
+ * @template T - The query type.
  *
- * @param type - The query identifier.
+ * @param type - The query type.
  * @param payload - Optional payload for the query.
  *
  * @returns The query handler result as-is, or `null` if no handler was found.
@@ -77,9 +77,9 @@ export type OptionalQueryExecutor = <R = unknown, P = unknown, T extends QueryTy
  *
  * @template R - The result type of the query.
  * @template P - The type of the query payload.
- * @template T - The query identifier type.
+ * @template T - The query type.
  *
- * @param type - The query identifier.
+ * @param type - The query type.
  * @param payload - Optional payload for the query.
  *
  * @returns A Promise resolving to the query result, or `null` if no handler was found.

@@ -31,7 +31,7 @@ export class CommandBus extends HandlerStackBus<CommandType> {
   /**
    * Builds the error thrown when a required command dispatch finds no handler.
    *
-   * @param type - Command identifier that failed to resolve.
+   * @param type - Command type that failed to resolve.
    * @returns The error to throw.
    */
   protected createMissingHandlerError(type: CommandType): WirestateError {
@@ -50,7 +50,7 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    *
    * @template R - Type of the command result.
    * @template P - Type of the command payload.
-   * @template T - Type of the command identifier.
+   * @template T - Type of the command.
    *
    * @param type - Command token.
    * @param payload - Command payload.
@@ -77,7 +77,7 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    *
    * @template R - Type of the command result.
    * @template P - Type of the command payload.
-   * @template T - Type of the command identifier.
+   * @template T - Type of the command.
    *
    * @param type - Command token.
    * @param payload - Command payload.
@@ -96,9 +96,9 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    *
    * @template R - Type of the command result.
    * @template P - Type of the command payload.
-   * @template T - Type of the command identifier.
+   * @template T - Type of the command.
    *
-   * @param type - Command identifier.
+   * @param type - Command type.
    * @param payload - Optional payload for the handler.
    * @returns The command result, or `null` when no handler exists.
    */
@@ -116,9 +116,9 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    *
    * @template R - Type of the command result.
    * @template P - Type of the command payload.
-   * @template T - Type of the command identifier.
+   * @template T - Type of the command.
    *
-   * @param type - Command identifier.
+   * @param type - Command type.
    * @param payload - Optional payload for the handler.
    * @returns A Promise resolving to the command result, or `null` if no handler is found.
    */
@@ -139,9 +139,9 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    *
    * @template R - Type of the command execution result.
    * @template P - Type of the command payload.
-   * @template T - Type of the command identifier.
+   * @template T - Type of the command.
    *
-   * @param type - Command identifier.
+   * @param type - Command type.
    * @param handler - Function to execute when the command is dispatched.
    * @returns A function to unregister the handler.
    *
@@ -173,9 +173,9 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    *
    * @template R - Type of the command execution result.
    * @template P - Type of the command payload.
-   * @template T - Type of the command identifier.
+   * @template T - Type of the command.
    *
-   * @param type - Command identifier.
+   * @param type - Command type.
    * @param handler - The handler function instance to remove.
    */
   public unregister<R = unknown, P = unknown, T extends CommandType = CommandType>(

@@ -10,7 +10,7 @@ import { Optional } from "../types/general";
 const INSTANCE_STATUSES_BY_INSTANCE: WeakMap<object, WireStatus> = new WeakMap();
 
 /**
- * Identifier for one provider provision cycle of a service instance.
+ * Numeric ID for one provider provision cycle of a service instance.
  *
  * @remarks
  * IDs are unique only within a single service instance. Use the value passed to
@@ -79,9 +79,9 @@ export class WireStatus {
   }
 
   /**
-   * Whether the instance was deactivated and disposed from its container.
+   * Whether the instance was deactivated and removed from its container.
    */
-  public isDisposed: boolean = false;
+  public isDeactivated: boolean = false;
 
   /**
    * Whether the instance has been removed from provider ownership.
@@ -97,7 +97,7 @@ export class WireStatus {
    * Whether the instance should stop work because its lifecycle ended.
    *
    * @remarks
-   * This is derived from `isDisposed` and `isDeprovisioned`.
+   * This is derived from `isDeactivated` and `isDeprovisioned`.
    */
   public isInactive!: boolean;
 
@@ -119,7 +119,7 @@ export class WireStatus {
     Object.defineProperty(this, "isInactive", {
       enumerable: true,
       get() {
-        return this.isDisposed || this.isDeprovisioned === true;
+        return this.isDeactivated || this.isDeprovisioned === true;
       },
     });
   }
