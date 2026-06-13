@@ -1,13 +1,13 @@
 import type { InstanceBindingDescriptor } from "../binding/binding";
-import { getActivatedHandlerMetadata } from "../lifecycle/on-activated";
-import { getDeactivationHandlerMetadata } from "../lifecycle/on-deactivation";
+import { callLifecycleHandler } from "../container/call-lifecycle-handler";
+import type { ContainerKernel } from "../container/container-kernel";
+import type { ActivationRecord } from "../container/container-storage";
+import { getContainerProvisionStatus } from "../provision/provision-state";
 import type { Definable, Maybe } from "../types/general";
 
-import { callLifecycleHandler } from "./call-lifecycle-handler";
-import { getContainerActivationAdapter } from "./container-activation-adapter";
-import type { ContainerKernel } from "./container-kernel";
-import type { ActivationRecord } from "./container-storage";
-import { getContainerProvisionStatus } from "./provision-state";
+import { getActivationAdapter } from "./activation-adapter";
+import { getActivatedHandlerMetadata } from "./on-activated";
+import { getDeactivationHandlerMetadata } from "./on-deactivation";
 import { WireStatus } from "./wire-status";
 
 /**
@@ -51,7 +51,7 @@ export function activateInstance(container: ContainerKernel, record: ActivationR
   INSTANCE_CONTAINERS.set(instance, container);
 
   initializeInstanceStatus(container, instance);
-  getContainerActivationAdapter(container)?.(container, instance, record.disposers);
+  getActivationAdapter(container)?.(container, instance, record.disposers);
 
   const methodName: Maybe<string | symbol> = getActivatedHandlerMetadata(instance);
 

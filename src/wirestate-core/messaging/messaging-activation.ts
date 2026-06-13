@@ -1,15 +1,15 @@
-import { CommandBus } from "../messaging/commands/command-bus";
-import type { CommandHandler } from "../messaging/commands/commands";
-import { getCommandHandlerMetadata } from "../messaging/commands/on-command";
-import { buildEventDispatchers } from "../messaging/events/build-event-dispatchers";
-import { EventBus } from "../messaging/events/event-bus";
-import type { EventDispatch, EventUnsubscriber } from "../messaging/events/events";
-import { getQueryHandlerMetadata } from "../messaging/queries/on-query";
-import type { QueryHandler } from "../messaging/queries/queries";
-import { QueryBus } from "../messaging/queries/query-bus";
+import type { ContainerKernel } from "../container/container-kernel";
 import type { Maybe } from "../types/general";
 
-import type { ContainerKernel } from "./container-kernel";
+import { CommandBus } from "./commands/command-bus";
+import type { CommandHandler } from "./commands/commands";
+import { getCommandHandlerMetadata } from "./commands/on-command";
+import { buildEventDispatchers } from "./events/build-event-dispatchers";
+import { EventBus } from "./events/event-bus";
+import type { EventDispatch, EventUnsubscriber } from "./events/events";
+import { getQueryHandlerMetadata } from "./queries/on-query";
+import type { QueryHandler } from "./queries/queries";
+import { QueryBus } from "./queries/query-bus";
 
 /**
  * Registers decorated event, query, and command handlers for an instance.

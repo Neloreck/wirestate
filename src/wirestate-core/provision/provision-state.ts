@@ -1,9 +1,8 @@
+import type { ProvisionId } from "../activation/wire-status";
 import type { Identifier } from "../binding/binding";
+import type { Container } from "../container/container";
+import type { ContainerKernel } from "../container/container-kernel";
 import type { Definable } from "../types/general";
-
-import type { Container } from "./container";
-import type { ContainerKernel } from "./container-kernel";
-import type { ProvisionId } from "./wire-status";
 
 /**
  * Represents provider lifecycle state keyed by container.

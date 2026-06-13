@@ -1,4 +1,6 @@
-﻿import type { Identifier } from "./binding";
+﻿import type { Newable } from "../types/general";
+
+import type { BindingDescriptor, Identifier } from "./binding";
 
 /**
  * A unique injection token object, that is used by reference. Can hold a generic type.
@@ -34,4 +36,18 @@ export function tokenToString<T>(token: Identifier<T>): string {
   } else {
     return token as string;
   }
+}
+
+/**
+ * Returns the token for a binding.
+ *
+ * @internal
+ *
+ * @template T - Injectable type.
+ *
+ * @param binding - Service class or descriptor.
+ * @returns Token used for container resolution.
+ */
+export function getBindingToken<T extends object = object>(binding: Newable<T> | BindingDescriptor): Identifier {
+  return typeof binding === "function" ? binding : binding.token;
 }

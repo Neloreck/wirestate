@@ -1,17 +1,18 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { getInstanceContainer } from "../activation/activation-lifecycle";
+import { ProvisionId, WireStatus } from "../activation/wire-status";
 import { Binding, Bindings, BindingType, Identifier } from "../binding/binding";
+import { getBindingToken } from "../binding/binding-tokens";
+import { callLifecycleHandler } from "../container/call-lifecycle-handler";
+import type { Container } from "../container/container";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { getDeprovisionHandlerMetadata } from "../lifecycle/on-deprovision";
-import { getProvisionHandlerMetadata } from "../lifecycle/on-provision";
 import type { Maybe } from "../types/general";
 
-import { callLifecycleHandler } from "./call-lifecycle-handler";
-import type { Container } from "./container";
-import { getBindingToken } from "./get-binding-token";
-import { getInstanceContainer } from "./instance-lifecycle";
+import { getDeprovisionHandlerMetadata } from "./on-deprovision";
+import { getProvisionHandlerMetadata } from "./on-provision";
 import {
   clearContainerProvisionStatus,
   ContainerProvisionLifecycle,
@@ -22,7 +23,6 @@ import {
   setContainerProvisioned,
   UNBIND_INTERCEPTOR_REMOVERS,
 } from "./provision-state";
-import { ProvisionId, WireStatus } from "./wire-status";
 
 /**
  * Provisions a container for a framework provider.

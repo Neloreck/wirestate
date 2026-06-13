@@ -1,18 +1,18 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
+import { OnActivated } from "../activation/on-activated";
+import { ProvisionId, WireStatus } from "../activation/wire-status";
 import { BindingType } from "../binding/binding";
-import { OnActivated } from "../lifecycle/on-activated";
-import { OnDeprovision } from "../lifecycle/on-deprovision";
-import { OnProvision } from "../lifecycle/on-provision";
+import { Container } from "../container/container";
+import { inject } from "../container/context";
 import { Injectable } from "../metadata/metadata-injectable";
+import { WireScope } from "../scope/wire-scope";
 import { Optional } from "../types/general";
 
-import { Container } from "./container";
-import { deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
-import { inject } from "./context";
+import { OnDeprovision } from "./on-deprovision";
+import { OnProvision } from "./on-provision";
+import { deprovisionContainer, provisionContainer } from "./provision-lifecycle";
 import { ContainerProvisionLifecycle } from "./provision-state";
-import { WireScope } from "./wire-scope";
-import { ProvisionId, WireStatus } from "./wire-status";
 
 describe("provision lifecycle", () => {
   function createProvisionLifecycle(): ContainerProvisionLifecycle {

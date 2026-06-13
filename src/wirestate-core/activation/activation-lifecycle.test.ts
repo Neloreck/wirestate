@@ -2,16 +2,16 @@ import { BindingScope, WireScope } from "@wirestate/core";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { OnActivated } from "../lifecycle/on-activated";
+import { Container } from "../container/container";
+import { SEED_TOKEN, SEEDS_TOKEN } from "../container/seeds";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { EventBus } from "../messaging/events/event-bus";
 import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
+import { setContainerProvisioned } from "../provision/provision-state";
 
-import { Container } from "./container";
-import { getInstanceContainer, initializeInstanceStatus, unregisterInstanceStatus } from "./instance-lifecycle";
-import { setContainerProvisioned } from "./provision-state";
-import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
+import { getInstanceContainer, initializeInstanceStatus, unregisterInstanceStatus } from "./activation-lifecycle";
+import { OnActivated } from "./on-activated";
 import { WireStatus } from "./wire-status";
 
 describe("instance lifecycle tracking", () => {

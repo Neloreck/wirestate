@@ -1,69 +1,65 @@
-import { OnActivated } from "../lifecycle/on-activated";
+import { ContainerKernel } from "../container/container-kernel";
 import { Injectable } from "../metadata/metadata-injectable";
 
-import {
-  ContainerActivationAdapter,
-  getContainerActivationAdapter,
-  setContainerActivationAdapter,
-} from "./container-activation-adapter";
-import { ContainerKernel } from "./container-kernel";
+import { ActivationAdapter, getActivationAdapter, setActivationAdapter } from "./activation-adapter";
+import { OnActivated } from "./on-activated";
 
 describe("container activation adapter registry", () => {
   it("should return null when no adapter is installed", () => {
-    expect(getContainerActivationAdapter(new ContainerKernel())).toBeNull();
+    expect(getActivationAdapter(new ContainerKernel())).toBeNull();
   });
 
   it("should return the installed adapter", () => {
     const container = new ContainerKernel();
-    const adapter: ContainerActivationAdapter = jest.fn();
+    const adapter: ActivationAdapter = jest.fn();
 
-    setContainerActivationAdapter(container, adapter);
+    setActivationAdapter(container, adapter);
 
-    expect(getContainerActivationAdapter(container)).toBe(adapter);
+    expect(getActivationAdapter(container)).toBe(adapter);
   });
 
   it("should replace a previously installed adapter", () => {
     const container = new ContainerKernel();
-    const first: ContainerActivationAdapter = jest.fn();
-    const second: ContainerActivationAdapter = jest.fn();
+    const first: ActivationAdapter = jest.fn();
+    const second: ActivationAdapter = jest.fn();
 
-    setContainerActivationAdapter(container, first);
-    setContainerActivationAdapter(container, second);
+    setActivationAdapter(container, first);
+    setActivationAdapter(container, second);
 
-    expect(getContainerActivationAdapter(container)).toBe(second);
+    expect(getActivationAdapter(container)).toBe(second);
   });
 
   it("should walk the parent chain to the nearest installed adapter", () => {
     const grandparent = new ContainerKernel();
     const parent = new ContainerKernel(grandparent);
     const child = new ContainerKernel(parent);
-    const adapter: ContainerActivationAdapter = jest.fn();
+    const adapter: ActivationAdapter = jest.fn();
 
-    setContainerActivationAdapter(grandparent, adapter);
+    setActivationAdapter(grandparent, adapter);
 
-    expect(getContainerActivationAdapter(child)).toBe(adapter);
-    expect(getContainerActivationAdapter(parent)).toBe(adapter);
+    expect(getActivationAdapter(child)).toBe(adapter);
+    expect(getActivationAdapter(parent)).toBe(adapter);
   });
 
   it("should prefer the own adapter over ancestor adapters", () => {
     const parent = new ContainerKernel();
     const child = new ContainerKernel(parent);
-    const parentAdapter: ContainerActivationAdapter = jest.fn();
-    const childAdapter: ContainerActivationAdapter = jest.fn();
+    const parentAdapter: ActivationAdapter = jest.fn();
+    const childAdapter: ActivationAdapter = jest.fn();
 
-    setContainerActivationAdapter(parent, parentAdapter);
-    setContainerActivationAdapter(child, childAdapter);
+    setActivationAdapter(parent, parentAdapter);
+    setActivationAdapter(child, childAdapter);
 
-    expect(getContainerActivationAdapter(child)).toBe(childAdapter);
+    expect(getActivationAdapter(child)).toBe(childAdapter);
   });
 
   it("should not leak adapters between unrelated containers", () => {
     const first = new ContainerKernel();
     const second = new ContainerKernel();
 
-    setContainerActivationAdapter(first, jest.fn());
+    setActivationAdapter(first, jest.fn());
 
-    expect(getContainerActivationAdapter(second)).toBeNull();
+    expect(getActivationAdapter(second)).toBeNull();
   });
 });
 
@@ -75,7 +71,7 @@ describe("container activation adapter seam", () => {
     const container = new ContainerKernel();
     const calls: Array<{ container: ContainerKernel; instance: object }> = [];
 
-    setContainerActivationAdapter(container, (target, instance) => {
+    setActivationAdapter(container, (target, instance) => {
       calls.push({ container: target, instance });
     });
 
@@ -105,7 +101,7 @@ describe("container activation adapter seam", () => {
 
     const container = new ContainerKernel();
 
-    setContainerActivationAdapter(container, () => {
+    setActivationAdapter(container, () => {
       events.push("adapter");
     });
 
@@ -122,7 +118,7 @@ describe("container activation adapter seam", () => {
     const events: Array<string> = [];
     const container = new ContainerKernel();
 
-    setContainerActivationAdapter(container, (_target, _instance, disposers) => {
+    setActivationAdapter(container, (_target, _instance, disposers) => {
       disposers.push(() => events.push("disposed"));
     });
 
@@ -143,7 +139,7 @@ describe("container activation adapter seam", () => {
     const events: Array<string> = [];
     const container = new ContainerKernel();
 
-    setContainerActivationAdapter(container, (_target, _instance, disposers) => {
+    setActivationAdapter(container, (_target, _instance, disposers) => {
       disposers.push(() => events.push("disposed"));
 
       throw new Error("adapter-fail");
@@ -164,7 +160,7 @@ describe("container activation adapter seam", () => {
     const child = new ContainerKernel(parent);
     const activatedIn: Array<ContainerKernel> = [];
 
-    setContainerActivationAdapter(parent, (target) => {
+    setActivationAdapter(parent, (target) => {
       activatedIn.push(target);
     });
 

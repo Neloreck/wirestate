@@ -1,10 +1,10 @@
 import { OnDeprovision, OnProvision } from "@wirestate/core";
 
+import { Container } from "../container/container";
 import { Injectable } from "../metadata/metadata-injectable";
+import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
+import { ContainerProvisionLifecycle } from "../provision/provision-state";
 
-import { Container } from "./container";
-import { deprovisionContainer, provisionContainer } from "./container-provision-lifecycle";
-import { ContainerProvisionLifecycle } from "./provision-state";
 import { WireStatus } from "./wire-status";
 
 describe("WireStatus", () => {

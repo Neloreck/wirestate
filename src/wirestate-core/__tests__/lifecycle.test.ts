@@ -1,8 +1,8 @@
+import { OnActivated } from "../activation/on-activated";
+import { OnDeactivation } from "../activation/on-deactivation";
 import { InjectionToken } from "../binding/binding-tokens";
 import { ContainerKernel } from "../container/container-kernel";
 import { inject } from "../container/context";
-import { OnActivated } from "../lifecycle/on-activated";
-import { OnDeactivation } from "../lifecycle/on-deactivation";
 import { Injectable } from "../metadata/metadata-injectable";
 
 describe("kernel instance lifecycle guarantees", () => {

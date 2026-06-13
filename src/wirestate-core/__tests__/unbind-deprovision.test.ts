@@ -1,10 +1,10 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
+import { WireStatus } from "../activation/wire-status";
 import { Container } from "../container/container";
-import { deprovisionContainer, provisionContainer } from "../container/container-provision-lifecycle";
-import { ContainerProvisionLifecycle } from "../container/provision-state";
-import { WireStatus } from "../container/wire-status";
 import { Injectable } from "../metadata/metadata-injectable";
+import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
+import { ContainerProvisionLifecycle } from "../provision/provision-state";
 
 describe("container unbind deprovision", () => {
   function createProvisionLifecycle(): ContainerProvisionLifecycle {

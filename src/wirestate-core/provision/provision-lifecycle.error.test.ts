@@ -1,9 +1,9 @@
-import { OnDeprovision } from "../lifecycle/on-deprovision";
-import { OnProvision } from "../lifecycle/on-provision";
+import { Container } from "../container/container";
 import { Injectable } from "../metadata/metadata-injectable";
 
-import { Container } from "./container";
-import { provisionContainer } from "./container-provision-lifecycle";
+import { OnDeprovision } from "./on-deprovision";
+import { OnProvision } from "./on-provision";
+import { provisionContainer } from "./provision-lifecycle";
 import { ContainerProvisionLifecycle } from "./provision-state";
 
 describe("provision lifecycle errors", () => {

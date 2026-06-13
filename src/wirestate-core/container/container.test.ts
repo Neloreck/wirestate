@@ -6,12 +6,12 @@ import { CommandBus } from "../messaging/commands/command-bus";
 import { EventBus } from "../messaging/events/event-bus";
 import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
+import { WireScope } from "../scope/wire-scope";
 
 import { Container } from "./container";
 import { ContainerKernel } from "./container-kernel";
 import { inject } from "./context";
 import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
-import { WireScope } from "./wire-scope";
 
 describe("Container", () => {
   it("should create a container with default essentials", () => {

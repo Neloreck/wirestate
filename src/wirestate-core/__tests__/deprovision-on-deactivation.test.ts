@@ -1,8 +1,8 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { Container } from "../container/container";
-import { deprovisionContainer, provisionContainer } from "../container/container-provision-lifecycle";
-import { ContainerProvisionLifecycle } from "../container/provision-state";
+import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
+import { ContainerProvisionLifecycle } from "../provision/provision-state";
 
 describe("deprovision on deactivation", () => {
   function createProvisionLifecycle(): ContainerProvisionLifecycle {

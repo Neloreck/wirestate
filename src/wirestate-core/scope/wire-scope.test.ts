@@ -1,15 +1,15 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { OnActivated } from "../lifecycle/on-activated";
-import { OnDeactivation } from "../lifecycle/on-deactivation";
+import { OnActivated } from "../activation/on-activated";
+import { OnDeactivation } from "../activation/on-deactivation";
+import { Container } from "../container/container";
+import { inject } from "../container/context";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { EventBus } from "../messaging/events/event-bus";
 import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
 import { Optional } from "../types/general";
 
-import { Container } from "./container";
-import { inject } from "./context";
 import { WireScope } from "./wire-scope";
 
 describe("WireScope", () => {

@@ -9,6 +9,10 @@
 // Kept as the first statement on purpose.
 import "./metadata/metadata-symbol-polyfill";
 
+export { ProvisionId, WireStatus } from "./activation/wire-status";
+export { OnActivated } from "./activation/on-activated";
+export { OnDeactivation } from "./activation/on-deactivation";
+
 export {
   Binding,
   BindingDescriptor,
@@ -25,22 +29,11 @@ export { InjectionToken } from "./binding/binding-tokens";
 export { Container, ContainerConfig, ContainerOptions } from "./container/container";
 export { inject } from "./container/context";
 export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "./container/seeds";
-export { deprovisionContainer, provisionContainer } from "./container/container-provision-lifecycle";
-export { ContainerProvisionLifecycle } from "./container/provision-state";
-export { ProvisionId, WireStatus } from "./container/wire-status";
 export { validateContainerConfig } from "./container/validate-container-config";
-export { WireScope } from "./container/wire-scope";
 
 export { InternalErrorHandler, InternalErrorDescriptor, InternalErrorSource } from "./error/error";
 export { defaultInternalErrorHandler } from "./error/internal-error-handler";
 export { WirestateError } from "./error/wirestate-error";
-
-export { OnActivated } from "./lifecycle/on-activated";
-export { OnDeactivation } from "./lifecycle/on-deactivation";
-export { OnDeprovision } from "./lifecycle/on-deprovision";
-export { OnProvision } from "./lifecycle/on-provision";
-
-export { Injectable, isInjectable } from "./metadata/metadata-injectable";
 
 export { CommandBus } from "./messaging/commands/command-bus";
 export { CommandHandler, CommandType, CommandUnregister } from "./messaging/commands/commands";
@@ -51,6 +44,15 @@ export { EventEmitOptions, EventHandler, EventType, EventUnsubscriber, WireEvent
 export { QueryHandler, QueryType, QueryUnregister } from "./messaging/queries/queries";
 export { QueryBus } from "./messaging/queries/query-bus";
 export { OnQuery, OnQueryHandlerDecorator } from "./messaging/queries/on-query";
+
+export { Injectable, isInjectable } from "./metadata/metadata-injectable";
+
+export { deprovisionContainer, provisionContainer } from "./provision/provision-lifecycle";
+export { OnDeprovision } from "./provision/on-deprovision";
+export { OnProvision } from "./provision/on-provision";
+export { ContainerProvisionLifecycle } from "./provision/provision-state";
+
+export { WireScope } from "./scope/wire-scope";
 
 export { Newable } from "./types/general";
 export { SeedsMap, SeedBindings, SeedBinding, SeedKey } from "./types/seeds";

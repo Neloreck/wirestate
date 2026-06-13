@@ -1,10 +1,10 @@
+import { OnDeactivation } from "../activation/on-deactivation";
 import { InjectionToken } from "../binding/binding-tokens";
 import {
   ERROR_CODE_INVALID_ARGUMENTS,
   ERROR_CODE_INVALID_BINDING_SCOPE,
   ERROR_CODE_VALIDATION_ERROR,
 } from "../error/error-code";
-import { OnDeactivation } from "../lifecycle/on-deactivation";
 import { Injectable } from "../metadata/metadata-injectable";
 
 import { ContainerKernel } from "./container-kernel";

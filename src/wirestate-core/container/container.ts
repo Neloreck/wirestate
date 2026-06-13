@@ -1,22 +1,22 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import { setActivationAdapter } from "../activation/activation-adapter";
 import type { Bindings, Identifier } from "../binding/binding";
+import { getBindingToken } from "../binding/binding-tokens";
 import { InternalErrorHandler } from "../error/error";
 import { getConfiguredInternalErrorHandler, setInternalErrorHandler } from "../error/internal-error-handler";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { EventBus } from "../messaging/events/event-bus";
+import { messagingActivationAdapter } from "../messaging/messaging-activation";
 import { QueryBus } from "../messaging/queries/query-bus";
+import { WireScope } from "../scope/wire-scope";
 import { AnyObject, Maybe } from "../types/general";
 import { SeedBindings, SeedsMap } from "../types/seeds";
 
-import { setContainerActivationAdapter } from "./container-activation-adapter";
 import { ContainerKernel } from "./container-kernel";
-import { getBindingToken } from "./get-binding-token";
-import { messagingActivationAdapter } from "./messaging-activation";
 import { SEED_TOKEN, SEEDS_TOKEN } from "./seeds";
 import { validateContainerConfig } from "./validate-container-config";
-import { WireScope } from "./wire-scope";
 
 /**
  * Describes reusable {@link Container} construction config.
@@ -120,7 +120,7 @@ export class Container extends ContainerKernel {
 
     // Installed before any binding activates; the adapter resolves buses with
     // optional lookups, so it is installed even under `skipMessaging`.
-    setContainerActivationAdapter(this, messagingActivationAdapter);
+    setActivationAdapter(this, messagingActivationAdapter);
 
     const activate: ReadonlyArray<Identifier> =
       (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];

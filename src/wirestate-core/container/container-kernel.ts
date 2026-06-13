@@ -1,3 +1,4 @@
+import { activateInstance, deactivateInstance, rollbackInstanceActivation } from "../activation/activation-lifecycle";
 import type { BindingDescriptor, Identifier } from "../binding/binding";
 import { isInstanceDescriptor } from "../binding/binding-guards";
 import { getBindingScope } from "../binding/binding-lifecycle";
@@ -10,7 +11,6 @@ import type { Definable, Newable } from "../types/general";
 import { ActivationRecord, BindingMap, InstanceMap } from "./container-storage";
 import { injectionContext } from "./context";
 import { Factory } from "./factory";
-import { activateInstance, deactivateInstance, rollbackInstanceActivation } from "./instance-lifecycle";
 
 /**
  * Intercepts container unbind operations before any value is deactivated.
