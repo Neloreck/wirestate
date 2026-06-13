@@ -3,8 +3,8 @@ import { createElement, ReactNode, useEffect, useRef, useState } from "react";
 
 import { ContainerContext } from "../context/container-context";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
-import { AnyObject, Maybe, Optional } from "../types/general";
-import { shallowEqualActivation, shallowEqualArrays, shallowEqualObjects } from "../utils/shallow-equal";
+import { Maybe, Optional } from "../types/general";
+import { shallowEqualActivation, shallowEqualArrays } from "../utils/shallow-equal";
 
 import { ReactContainerProvisionLifecycle, retainContainer, scheduleContainerDestruction } from "./provision-lifecycle";
 
@@ -192,8 +192,6 @@ export function ContainerProvider(props: ContainerProviderProps) {
     (state.scope !== scope ||
       state.source.parent !== normalizedSource.parent ||
       state.source.onError !== normalizedSource.onError ||
-      !shallowEqualObjects(state.source.seed, normalizedSource.seed) ||
-      !shallowEqualObjects(state.source.seeds as Maybe<AnyObject>, normalizedSource.seeds as Maybe<AnyObject>) ||
       !shallowEqualArrays(state.source.bindings, normalizedSource.bindings) ||
       !shallowEqualActivation(state.source.activate, normalizedSource.activate))
   );

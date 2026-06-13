@@ -271,7 +271,8 @@ describe("ContainerProvider", () => {
     expect(events).toEqual(["activated", "activated"]);
   });
 
-  it("should recreate managed container when seed changes", () => {
+  it("should recreate managed container when bindings change", () => {
+    const CONFIG_TOKEN: string = "CONFIG_TOKEN";
     const containers: Array<Container> = [];
 
     function TrackingConsumer() {
@@ -281,13 +282,13 @@ describe("ContainerProvider", () => {
     }
 
     const { rerender } = render(
-      <ContainerProvider config={{ seed: { value: "first" } }}>
+      <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "first" }] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
 
     rerender(
-      <ContainerProvider config={{ seed: { value: "second" } }}>
+      <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "second" }] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );

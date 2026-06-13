@@ -43,7 +43,7 @@ describe("provision lifecycle", () => {
     }
 
     // The default provisioning scan walks every own binding: the container
-    // self-binding, seeds, buses, WireScope, and both services. Only the
+    // self-binding, buses, WireScope, and both services. Only the
     // provision-decorated service may be resolved and provisioned.
     const container: Container = new Container({ bindings: [PlainService, ProvisionedService] });
     const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();

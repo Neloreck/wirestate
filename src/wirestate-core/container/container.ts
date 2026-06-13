@@ -14,12 +14,10 @@ import { EventBus } from "../messaging/events/event-bus";
 import { messagingActivationAdapter } from "../messaging/messaging-activation";
 import { QueryBus } from "../messaging/queries/query-bus";
 import { WireScope } from "../scope/wire-scope";
-import { AnyObject, Maybe } from "../types/general";
-import { SeedBindings, SeedsMap } from "../types/seeds";
+import { Maybe } from "../types/general";
 
 import { validateContainerConfig } from "./container-config-validation";
 import { ContainerKernel } from "./container-kernel";
-import { SEED_TOKEN, SEEDS_TOKEN } from "./container-seeds";
 
 /**
  * Describes reusable {@link Container} construction config.
@@ -47,16 +45,6 @@ export interface ContainerConfig {
    * rethrowing, such as event handler failures and lifecycle rejections.
    */
   readonly onError?: InternalErrorHandler;
-
-  /**
-   * Shared seed object. Read it with `scope.getSeed()` or inject `SEED`.
-   */
-  readonly seed?: AnyObject;
-
-  /**
-   * Seed values keyed by class, string, or symbol.
-   */
-  readonly seeds?: SeedBindings;
 }
 
 /**
@@ -101,7 +89,6 @@ export interface ContainerOptions {
  * const container: Container = new Container({
  *   activate: [LoggerService],
  *   bindings: [CounterService, LoggerService],
- *   seeds: [[CounterService, { count: 10 }]],
  * });
  *
  * const logger = container.get(LoggerService);
@@ -132,25 +119,6 @@ export class Container extends ContainerKernel {
       config.onError ?? getConfiguredInternalErrorHandler(config.parent);
 
     this.bind({ token: Container, value: this });
-
-    // Merge with parent seeds map.
-    const seeds = new Map(
-      config.parent?.has(SEEDS_TOKEN) ? (config.parent.get<SeedsMap>(SEEDS_TOKEN) ?? []) : []
-    ) as SeedsMap;
-
-    if (config.seeds) {
-      for (const [key, value] of config.seeds) {
-        seeds.set(key, value);
-      }
-    }
-
-    this.bind({ token: SEEDS_TOKEN, value: seeds });
-
-    // Fallback to parent config as default value.
-    this.bind({
-      token: SEED_TOKEN,
-      value: config.seed ?? (config.parent?.has(SEED_TOKEN) ? (config.parent.get<AnyObject>(SEED_TOKEN) ?? {}) : {}),
-    });
 
     this.bind({
       token: WireScope,

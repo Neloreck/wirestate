@@ -1,6 +1,6 @@
 import type { ContainerKernel } from "../container/container-kernel";
 import type { WireEvent } from "../messaging/events/events";
-import { Maybe } from "../types/general";
+import type { Maybe } from "../types/general";
 
 /**
  * Internal Wirestate error source.

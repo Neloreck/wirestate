@@ -3,7 +3,6 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import type { ServiceToken } from "../binding/binding";
 import type { Container } from "../container/container";
-import { SEED_TOKEN, SEEDS_TOKEN } from "../container/container-seeds";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { CommandHandler, CommandUnregister, CommandType } from "../messaging/commands/commands";
 import { EventBus } from "../messaging/events/event-bus";
@@ -12,13 +11,12 @@ import { QueryHandler, QueryUnregister, QueryType } from "../messaging/queries/q
 import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
 import { Optional, AnyObject } from "../types/general";
-import { SeedKey, SeedsMap } from "../types/seeds";
 
 /**
  * Per-instance handle for container work.
  *
  * @remarks
- * Inject `WireScope` when a service needs buses, seeds, or lazy resolution.
+ * Inject `WireScope` when a service needs buses or lazy resolution.
  * Each bound instance gets its own transient scope.
  *
  * @group Container
@@ -498,58 +496,5 @@ export class WireScope {
     handler: CommandHandler<R, P, T>
   ): void {
     this.commandBus.unregister<R, P, T>(type, handler);
-  }
-
-  /**
-   * Reads the shared seed object.
-   *
-   * @remarks
-   * Call without a key to get the one shared seed for this container.
-   *
-   * @template T - Expected type of the shared seed object.
-   *
-   * @returns The shared seed object.
-   *
-   * @example
-   * ```typescript
-   * interface ApplicationSeed {
-   *   apiUrl: string;
-   * }
-   *
-   * const seed: ApplicationSeed = scope.getSeed();
-   * ```
-   */
-  public getSeed<T extends AnyObject>(): T;
-
-  /**
-   * Reads a targeted seed value.
-   *
-   * @remarks
-   * Targeted seeds are keyed by class, string, or symbol.
-   *
-   * @template T - Expected type of the seed value.
-   *
-   * @param seed - Lookup token for the seed.
-   * @returns The seed value or `null` if not found.
-   *
-   * @example
-   * ```typescript
-   * const apiUrl = scope.getSeed<string>("API_URL");
-   * ```
-   */
-  public getSeed<T>(seed: SeedKey): Optional<T>;
-
-  public getSeed<T>(seed?: SeedKey): Optional<T> {
-    dbg.info(prefix(__filename), "Get seed for key:", {
-      key: (seed as AnyObject)?.name ?? seed,
-    });
-
-    if (seed === undefined) {
-      return this.container.get<T>(SEED_TOKEN);
-    } else {
-      const seeds: SeedsMap = this.container.get<SeedsMap>(SEEDS_TOKEN);
-
-      return seeds.has(seed) ? (seeds.get(seed) as T) : null;
-    }
   }
 }

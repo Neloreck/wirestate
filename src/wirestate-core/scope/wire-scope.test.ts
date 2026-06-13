@@ -1,5 +1,3 @@
-import { GenericService } from "@/fixtures/services/generic-service";
-
 import { OnActivated } from "../activation/on-activated";
 import { OnDeactivation } from "../activation/on-deactivation";
 import { Container } from "../container/container";
@@ -321,37 +319,6 @@ describe("WireScope", () => {
 
     expect(bus.unregister).toHaveBeenCalledWith("TEST_COMMAND", handler);
     expect(bus.hasHandler("TEST_COMMAND")).toBe(false);
-  });
-
-  it("should get global seed from container", () => {
-    const container: Container = new Container({ seed: { key: "val" } });
-    const scope: WireScope = new WireScope(container);
-
-    expect(scope.getSeed()).toEqual({ key: "val" });
-  });
-
-  it("should get bound seed from container", () => {
-    const container: Container = new Container({ seeds: [[GenericService, { a: 1, b: 2 }]] });
-    const scope: WireScope = new WireScope(container);
-
-    expect(scope.getSeed(GenericService)).toEqual({ a: 1, b: 2 });
-    expect(scope.getSeed("NOT_EXISTING")).toBeNull();
-  });
-
-  it("should get falsy bound seeds from container", () => {
-    const container: Container = new Container({
-      seeds: [
-        ["FALSE_SEED", false],
-        ["ZERO_SEED", 0],
-        ["EMPTY_STRING_SEED", ""],
-      ],
-    });
-    const scope: WireScope = new WireScope(container);
-
-    expect(scope.getSeed("FALSE_SEED")).toBe(false);
-    expect(scope.getSeed("ZERO_SEED")).toBe(0);
-    expect(scope.getSeed("EMPTY_STRING_SEED")).toBe("");
-    expect(scope.getSeed("NOT_EXISTING")).toBeNull();
   });
 
   it("should support full handler lifecycle: register on activation and unregister on deactivation without throwing", async () => {

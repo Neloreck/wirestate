@@ -1,5 +1,5 @@
 /**
- * Framework-agnostic Wirestate APIs for containers, services, lifecycle, messaging, seeds, and dependency injection.
+ * Framework-agnostic Wirestate APIs for containers, services, lifecycle, messaging, and dependency injection.
  *
  * @packageDocumentation
  */
@@ -29,7 +29,6 @@ export { InjectionToken } from "./binding/binding-tokens";
 export { Container, ContainerConfig, ContainerOptions } from "./container/container";
 export { inject } from "./container/container-context";
 export { validateContainerConfig } from "./container/container-config-validation";
-export { SEED_TOKEN as SEED, SEEDS_TOKEN as SEEDS } from "./container/container-seeds";
 
 export {
   defaultInternalErrorHandler,
@@ -59,4 +58,3 @@ export { ContainerProvisionLifecycle } from "./provision/provision-state";
 export { WireScope } from "./scope/wire-scope";
 
 export { Newable } from "./types/general";
-export { SeedsMap, SeedBindings, SeedBinding, SeedKey } from "./types/seeds";

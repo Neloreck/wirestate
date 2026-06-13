@@ -47,10 +47,6 @@ export class GenericService {
     return this.scope.get(Container);
   }
 
-  public testGetSeed(): Container {
-    return this.scope.getSeed();
-  }
-
   public testEmitEvent(): void {
     this.scope.emitEvent("TEST_EVENT", 0);
   }

@@ -19,14 +19,13 @@ tenant, or test.
 - Events broadcast notifications inside a container.
 - Commands run one active write handler.
 - Queries run one active read handler.
-- Seeds pass startup, hydration, and test data into services.
 - Provider lifecycle hooks connect service work to React or Lit ownership.
 
 ## Packages
 
 | Package                                                               | Purpose                                                                                           |
 | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| [`@wirestate/core`](./src/wirestate-core/README.md)                   | Containers, injectable services, lifecycle, seeds, messaging.                                     |
+| [`@wirestate/core`](./src/wirestate-core/README.md)                   | Containers, injectable services, lifecycle, messaging.                                     |
 | [`@wirestate/react`](./src/wirestate-react/README.md)                 | React provider, injection hooks, and component-owned handlers.                                    |
 | [`@wirestate/lit`](./src/wirestate-lit/README.md)                     | Lit providers, decorators, controllers, and element handlers.                                     |
 | [`@wirestate/mobx`](./src/wirestate-mobx/README.md)                   | Framework-agnostic MobX exports for shared services.                                              |

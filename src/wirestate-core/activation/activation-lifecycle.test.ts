@@ -3,7 +3,6 @@ import { BindingScope, WireScope } from "@wirestate/core";
 import { GenericService } from "@/fixtures/services/generic-service";
 
 import { Container } from "../container/container";
-import { SEED_TOKEN, SEEDS_TOKEN } from "../container/container-seeds";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { EventBus } from "../messaging/events/event-bus";
 import { QueryBus } from "../messaging/queries/query-bus";
@@ -115,15 +114,13 @@ describe("instance lifecycle tracking", () => {
     const bindings = container.getOwnBindings();
 
     expect(bindings[0]).toEqual({ token: Container, value: container });
-    expect(bindings[1]).toEqual({ token: SEEDS_TOKEN, value: new Map() });
-    expect(bindings[2]).toEqual({ token: SEED_TOKEN, value: {} });
-    expect(bindings[3]).toEqual({ token: WireScope, scope: BindingScope.Transient, factory: expect.any(Function) });
-    expect(bindings[4]).toEqual({ token: EventBus, value: container.get(EventBus) });
-    expect(bindings[5]).toEqual({ token: QueryBus, value: container.get(QueryBus) });
-    expect(bindings[6]).toEqual({ token: CommandBus, value: container.get(CommandBus) });
+    expect(bindings[1]).toEqual({ token: WireScope, scope: BindingScope.Transient, factory: expect.any(Function) });
+    expect(bindings[2]).toEqual({ token: EventBus, value: container.get(EventBus) });
+    expect(bindings[3]).toEqual({ token: QueryBus, value: container.get(QueryBus) });
+    expect(bindings[4]).toEqual({ token: CommandBus, value: container.get(CommandBus) });
 
-    expect(bindings[7]).toBe(valueBinding);
-    expect(bindings[8]).toBe(instanceBinding);
+    expect(bindings[5]).toBe(valueBinding);
+    expect(bindings[6]).toBe(instanceBinding);
   });
 });
 

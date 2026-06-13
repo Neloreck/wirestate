@@ -5,7 +5,6 @@ import { Injectable } from "../metadata/metadata-injectable";
 import { OnProvision } from "../provision/on-provision";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
 import { ContainerProvisionLifecycle } from "../provision/provision-state";
-import { WireScope } from "../scope/wire-scope";
 
 describe("container operation edge cases", () => {
   it("treats deprovision of a never-provisioned container as a no-op", () => {
@@ -56,14 +55,6 @@ describe("container operation edge cases", () => {
 
     expect(() => provisionContainer(container, lifecycle, [PlainService])).not.toThrow();
     expect(lifecycle.get(container)).toEqual([]);
-  });
-
-  it("returns an empty shared seed when none was configured", () => {
-    const container: Container = new Container();
-    const scope: WireScope = new WireScope(container);
-
-    expect(scope.getSeed()).toEqual({});
-    expect(scope.getSeed("ANY_KEY")).toBeNull();
   });
 
   it("treats unbinding a never-bound token as a no-op", () => {

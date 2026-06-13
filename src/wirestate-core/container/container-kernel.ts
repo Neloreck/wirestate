@@ -39,7 +39,7 @@ export interface UnbindInterceptor {
  *
  * @remarks
  * This is the base class that {@link Container} extends; the public
- * {@link Container} adds messaging, scope, and seed support on top. Application
+ * {@link Container} adds messaging and scope support on top. Application
  * code interacts with `Container`, not `ContainerKernel` directly.
  *
  * All bindings are explicit: services are constructed synchronously and

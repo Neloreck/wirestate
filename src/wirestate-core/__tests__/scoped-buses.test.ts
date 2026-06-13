@@ -13,14 +13,14 @@ import {
 } from "../index";
 import { Optional } from "../types/general";
 
-describe("core scoped buses and seeds integration (parent-child separation)", () => {
+describe("core scoped buses integration (parent-child separation)", () => {
   const ADD_COMMAND: string = "ADD_COMMAND";
   const COUNT_QUERY: string = "COUNT_QUERY";
   const LOG_EVENT: string = "LOG_EVENT";
   const PARENT_TOKEN: string = "PARENT_TOKEN";
   const SETTINGS_TOKEN: string = "SETTINGS_TOKEN";
 
-  interface SettingsSeed {
+  interface SettingsData {
     readonly offset: number;
     readonly label: string;
   }
@@ -34,7 +34,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     @OnCommand(ADD_COMMAND)
     public add(value: number): number {
-      const settings: SettingsSeed = this.scope.getSeed(SETTINGS_TOKEN) as SettingsSeed;
+      const settings: SettingsData = this.scope.get<SettingsData>(SETTINGS_TOKEN);
 
       this.count += value + settings.offset;
 
@@ -43,7 +43,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     @OnQuery(COUNT_QUERY)
     public getCount(): string {
-      const settings: SettingsSeed = this.scope.getSeed(SETTINGS_TOKEN) as SettingsSeed;
+      const settings: SettingsData = this.scope.get<SettingsData>(SETTINGS_TOKEN);
 
       return `${settings.label}:${this.count}`;
     }
@@ -63,7 +63,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     @OnCommand(ADD_COMMAND)
     public add(value: number): number {
-      const settings: SettingsSeed = this.scope.getSeed(SETTINGS_TOKEN) as SettingsSeed;
+      const settings: SettingsData = this.scope.get<SettingsData>(SETTINGS_TOKEN);
 
       this.count += value + settings.offset;
 
@@ -72,7 +72,7 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     @OnQuery(COUNT_QUERY)
     public getCount(): string {
-      const settings: SettingsSeed = this.scope.getSeed(SETTINGS_TOKEN) as SettingsSeed;
+      const settings: SettingsData = this.scope.get<SettingsData>(SETTINGS_TOKEN);
 
       return `${settings.label}:${this.count}`;
     }
@@ -86,14 +86,16 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
   it("keeps parent and child messaging in separate scope", async () => {
     const parent: Container = new Container({
       activate: [ParentCounterService],
-      bindings: [ParentCounterService, { token: PARENT_TOKEN, value: "root-value" }],
-      seeds: [[SETTINGS_TOKEN, { label: "root-label", offset: 1 }]],
+      bindings: [
+        ParentCounterService,
+        { token: PARENT_TOKEN, value: "root-value" },
+        { token: SETTINGS_TOKEN, value: { label: "root-label", offset: 1 } },
+      ],
     });
     const child: Container = new Container({
       activate: [ChildCounterService],
-      bindings: [ChildCounterService],
+      bindings: [ChildCounterService, { token: SETTINGS_TOKEN, value: { label: "child-label", offset: 10 } }],
       parent: parent,
-      seeds: [[SETTINGS_TOKEN, { label: "child-label", offset: 10 }]],
     });
 
     expect(child.get(PARENT_TOKEN)).toBe("root-value");
@@ -121,19 +123,6 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
     expect(parent.get(ParentCounterService).events).toEqual(["parent:from-parent", "parent:from-parent"]);
   });
 
-  it("uses the root seed separately from targeted seeds", () => {
-    const container: Container = new Container({
-      seed: { appName: "wirestate" },
-      seeds: [[SETTINGS_TOKEN, { label: "targeted", offset: 7 }]],
-    });
-
-    const scope: WireScope = container.get(WireScope);
-
-    expect(scope.getSeed()).toEqual({ appName: "wirestate" });
-    expect(scope.getSeed(SETTINGS_TOKEN)).toEqual({ label: "targeted", offset: 7 });
-    expect(scope.getSeed("MISSING_SEED")).toBeNull();
-  });
-
   it("keeps scoped essentials available while services deactivate", async () => {
     const DEACTIVATE_COMMAND: string = "DEACTIVATE_COMMAND";
     const DEACTIVATE_EVENT: string = "DEACTIVATE_EVENT";
@@ -149,9 +138,9 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
       @OnDeactivation()
       public onDeactivation(): void {
-        const settings: SettingsSeed = this.scope.getSeed(SETTINGS_TOKEN) as SettingsSeed;
+        const settings: SettingsData = this.scope.get<SettingsData>(SETTINGS_TOKEN);
 
-        logs.push(`seed:${settings.label}`);
+        logs.push(`settings:${settings.label}`);
         this.scope.emitEvent(DEACTIVATE_EVENT, "cleanup");
         logs.push(`query-result:${this.scope.query(DEACTIVATE_QUERY)}`);
 
@@ -180,19 +169,18 @@ describe("core scoped buses and seeds integration (parent-child separation)", ()
 
     const container: Container = new Container({
       activate: [CleanupService],
-      bindings: [CleanupService],
-      seeds: [[SETTINGS_TOKEN, { label: "cleanup-label", offset: 0 }]],
+      bindings: [CleanupService, { token: SETTINGS_TOKEN, value: { label: "cleanup-label", offset: 0 } }],
     });
 
     container.unbindAll();
 
-    expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
+    expect(logs).toEqual(["settings:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
     expect(commandResult).not.toBeNull();
 
     const result: Optional<string> = await commandResult;
 
     expect(result).toBe("command-result");
-    expect(logs).toEqual(["seed:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
+    expect(logs).toEqual(["settings:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
     expect(container.has(CleanupService)).toBe(false);
     expect(container.has(EventBus)).toBe(false);
     expect(container.has(QueryBus)).toBe(false);
