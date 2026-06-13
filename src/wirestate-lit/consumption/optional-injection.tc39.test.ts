@@ -5,7 +5,7 @@ import { customElement } from "lit/decorators.js";
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Definable, Optional } from "../types/general";
+import { Optional } from "../types/general";
 
 import { optionalInjection } from "./optional-injection";
 
@@ -204,118 +204,5 @@ describe("optionalInjection", () => {
     fixture.provider.appendChild(element);
 
     expect(element.value).toBe(20);
-  });
-});
-
-describe("optionalInjection (new standard decorator)", () => {
-  function initializeStandardAccessor<C extends ReactiveElement, V>(
-    element: C,
-    property: PropertyKey,
-    decorator: (target: ClassAccessorDecoratorTarget<C, V>, context: ClassAccessorDecoratorContext<C, V>) => void
-  ): void {
-    const descriptor: Definable<PropertyDescriptor> = Object.getOwnPropertyDescriptor(
-      Object.getPrototypeOf(element),
-      property
-    );
-
-    expect(descriptor?.get).toBeDefined();
-    expect(descriptor?.set).toBeDefined();
-
-    const target: ClassAccessorDecoratorTarget<C, V> = {
-      get: descriptor?.get as (this: C) => V,
-      set: descriptor?.set as (this: C, value: V) => void,
-    };
-    const initializers: Array<(this: C) => void> = [];
-
-    decorator(target, {
-      kind: "accessor",
-      name: property,
-      access: {
-        get(object: C): V {
-          return target.get.call(object);
-        },
-        set(object: C, value: V): void {
-          target.set.call(object, value);
-        },
-        has: (object: C): boolean => property in object,
-      },
-      addInitializer: (initializer: (this: C) => void): void => {
-        initializers.push(initializer);
-      },
-    } as unknown as ClassAccessorDecoratorContext<C, V>);
-
-    initializers.forEach((initializer) => initializer.call(element));
-  }
-
-  let fixture: LitProvisionFixture;
-
-  afterEach(() => {
-    fixture.cleanup();
-  });
-
-  it("should assign null for standard accessors when token is not bound", () => {
-    const container: Container = new Container();
-    const token: Identifier<string> = Symbol("optional-token");
-
-    fixture = createLitProvision(container);
-
-    @customElement("test-optional-injection-standard-missing-element")
-    class TestStandardMissingElement extends ReactiveElement {
-      private injectedValue: Optional<string> = "initial-value";
-
-      public get value(): Optional<string> {
-        return this.injectedValue;
-      }
-
-      public set value(value: Optional<string>) {
-        this.injectedValue = value;
-      }
-    }
-
-    const element: TestStandardMissingElement = new TestStandardMissingElement();
-
-    initializeStandardAccessor<TestStandardMissingElement, Optional<string>>(
-      element,
-      "value",
-      optionalInjection(token)
-    );
-
-    fixture.provider.appendChild(element);
-
-    expect(element.value).toBeNull();
-  });
-
-  it("should inject bound instances for standard accessors", () => {
-    const container: Container = new Container({
-      bindings: [GenericService],
-    });
-
-    fixture = createLitProvision(container);
-
-    @customElement("test-optional-injection-standard-bound-element")
-    class TestStandardBoundElement extends ReactiveElement {
-      private injectedService: Optional<GenericService> = null;
-
-      public get service(): Optional<GenericService> {
-        return this.injectedService;
-      }
-
-      public set service(service: Optional<GenericService>) {
-        this.injectedService = service;
-      }
-    }
-
-    const element: TestStandardBoundElement = new TestStandardBoundElement();
-
-    initializeStandardAccessor<TestStandardBoundElement, Optional<GenericService>>(
-      element,
-      "service",
-      optionalInjection(GenericService)
-    );
-
-    fixture.provider.appendChild(element);
-
-    expect(element.service).toBeInstanceOf(GenericService);
-    expect(element.service?.getValue()).toBe("test-value");
   });
 });

@@ -16,10 +16,21 @@ import type { OptionalInjectionFallback } from "./use-optional-injection";
  * @group Consumption
  */
 export interface OptionalInjectionDecorator<T, F = null> {
-  // Standard:
-  <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V extends T | F>(
+  // Standard, `accessor` declarations. The `set` parameter enforces that the
+  // injected value is assignable to the accessor type, so wider accessors are accepted.
+  <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V>(
     value: ClassAccessorDecoratorTarget<C, V>,
-    context: ClassAccessorDecoratorContext<C, V>
+    context: Omit<ClassAccessorDecoratorContext<C, V>, "access"> & {
+      readonly access: { readonly set: (object: C, value: T | F) => void };
+    }
+  ): void;
+  // Standard, plain field declarations. The `set` parameter enforces that the
+  // injected value is assignable to the field type, so wider fields are accepted.
+  <C extends Interface<Omit<ReactiveElement, "renderRoot">>>(
+    value: undefined,
+    context: Omit<ClassFieldDecoratorContext<C, T | F>, "access"> & {
+      readonly access: { readonly set: (object: C, value: T | F) => void };
+    }
   ): void;
   // Legacy:
   <K extends PropertyKey, Proto extends Interface<Omit<ReactiveElement, "renderRoot">>>(

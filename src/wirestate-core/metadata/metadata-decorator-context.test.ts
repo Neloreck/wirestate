@@ -22,8 +22,8 @@ describe("validateStandardMethodContext", () => {
     expect(validateStandardMethodContext("OnEvent", mockContext({ metadata }))).toBe(metadata);
   });
 
-  it("should reject contexts of other kinds", () => {
-    expect(() => validateStandardMethodContext("OnEvent", mockContext({ kind: "field" }))).toThrow(
+  it.each(["accessor", "field", "getter", "setter", "class"])("should reject '%s' contexts", (kind) => {
+    expect(() => validateStandardMethodContext("OnEvent", mockContext({ kind }))).toThrow(
       expect.objectContaining({
         message: "@OnEvent() can only decorate class methods.",
         code: ERROR_CODE_VALIDATION_ERROR,

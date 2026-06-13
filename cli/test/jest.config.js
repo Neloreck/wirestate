@@ -20,19 +20,21 @@ module.exports = {
   projects: [
     {
       ...shared,
-      // Legacy experimental decorators: sweeps every test file, including
-      // `*.tc39.test.ts` files — those run under BOTH transforms.
+      // Legacy experimental decorators: sweeps every test file, including `*.tc39.test.ts` files.
+      // Those run under BOTH transforms. Files using standard-exclusive syntax (the `accessor` keyword)
+      // opt out via the `.tc39only.test.ts` suffix and run in the tc39 project alone.
       displayName: "legacy",
+      testPathIgnorePatterns: ["\\.tc39only\\.test\\.[jt]sx?$"],
       transform: {
         "^.+\\.[t|j]sx?$": ["babel-jest", { configFile: path.resolve(__dirname, "babel.test.config.js") }],
       },
     },
     {
       ...shared,
-      // TC39 standard decorators: runs only files opting in via the
-      // `.tc39.test.ts` suffix.
+      // TC39 standard decorators: runs files opting in via the `.tc39.test.ts`
+      // (dual-run) and `.tc39only.test.ts` (standard-exclusive syntax) suffixes.
       displayName: "tc39",
-      testMatch: ["**/*.tc39.test.ts", "**/*.tc39.test.tsx"],
+      testMatch: ["**/*.tc39.test.ts", "**/*.tc39.test.tsx", "**/*.tc39only.test.ts", "**/*.tc39only.test.tsx"],
       transform: {
         "^.+\\.[t|j]sx?$": ["babel-jest", { configFile: path.resolve(__dirname, "babel.tc39.config.js") }],
       },

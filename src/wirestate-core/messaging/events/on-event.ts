@@ -9,7 +9,7 @@ import {
 } from "../../metadata/metadata-handlers";
 import type { Optional } from "../../types/general";
 
-import type { EventHandlerMetadata, EventType, WireEvent } from "./events";
+import type { EventHandlerMetadata, EventType } from "./events";
 import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "./events-registry";
 
 /**
@@ -20,9 +20,10 @@ import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "./events-registry";
  *
  * @group Events
  */
-export interface OnEventHandlerDecorator<E extends WireEvent = WireEvent> {
-  // Standard (TC39):
-  <This>(value: (this: This, event: E) => void, context: ClassMethodDecoratorContext<This>): void;
+export interface OnEventHandlerDecorator {
+  // Standard (TC39). Parameters are `never[]`: contravariance keeps handlers with
+  // narrowed event payloads assignable, matching {@link OnCommand} and {@link OnQuery}.
+  <This>(value: (this: This, ...args: Array<never>) => unknown, context: ClassMethodDecoratorContext<This>): void;
   // Legacy/experimental:
   (target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor): void;
 }
@@ -56,9 +57,7 @@ export interface OnEventHandlerDecorator<E extends WireEvent = WireEvent> {
  * }
  * ```
  */
-export function OnEvent<E extends WireEvent = WireEvent>(
-  types?: EventType | ReadonlyArray<EventType>
-): OnEventHandlerDecorator<E> {
+export function OnEvent(types?: EventType | ReadonlyArray<EventType>): OnEventHandlerDecorator {
   // Normalize types to a deduplicated array, or null for catch-all.
   const normalized: Optional<ReadonlyArray<EventType>> =
     types === undefined
@@ -97,7 +96,7 @@ export function OnEvent<E extends WireEvent = WireEvent>(
         types: normalized,
       });
     }
-  }) as OnEventHandlerDecorator<E>;
+  }) as OnEventHandlerDecorator;
 }
 
 /**
