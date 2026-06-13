@@ -4,12 +4,10 @@ import {
 } from "../metadata/metadata-single-method-decorator";
 import { Maybe } from "../types/general";
 
-import { ACTIVATED_HANDLER_METADATA, ACTIVATED_METADATA_KEY } from "./lifecycle-registry";
-
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
-  registry: ACTIVATED_HANDLER_METADATA,
-  metadataKey: ACTIVATED_METADATA_KEY,
   name: "OnActivated",
+  registry: new WeakMap(),
+  metadataKey: Symbol("@wirestate/core/lifecycle/activated"),
   duplicateMessage: (className) => `Only one @OnActivated method can be declared on '${className}'.`,
   hierarchyMessage: (className) =>
     `Only one @OnActivated method can be declared across class hierarchy for '${className}'.`,

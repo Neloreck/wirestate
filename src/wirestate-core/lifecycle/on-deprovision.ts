@@ -4,12 +4,10 @@ import {
 } from "../metadata/metadata-single-method-decorator";
 import { Maybe } from "../types/general";
 
-import { DEPROVISION_HANDLER_METADATA, DEPROVISION_METADATA_KEY } from "./lifecycle-registry";
-
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
-  registry: DEPROVISION_HANDLER_METADATA,
-  metadataKey: DEPROVISION_METADATA_KEY,
   name: "OnDeprovision",
+  registry: new WeakMap(),
+  metadataKey: Symbol("@wirestate/core/lifecycle/deprovision"),
   duplicateMessage: (className) => `Only one @OnDeprovision method can be declared on provider '${className}'.`,
   hierarchyMessage: (className) =>
     `Only one @OnDeprovision method can be declared across provider hierarchy '${className}'.`,

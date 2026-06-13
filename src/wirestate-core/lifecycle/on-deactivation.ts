@@ -4,12 +4,10 @@ import {
 } from "../metadata/metadata-single-method-decorator";
 import { Maybe } from "../types/general";
 
-import { DEACTIVATION_HANDLER_METADATA, DEACTIVATION_METADATA_KEY } from "./lifecycle-registry";
-
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
-  registry: DEACTIVATION_HANDLER_METADATA,
-  metadataKey: DEACTIVATION_METADATA_KEY,
   name: "OnDeactivation",
+  registry: new WeakMap(),
+  metadataKey: Symbol("@wirestate/core/lifecycle/deactivation"),
   duplicateMessage: (className) => `Only one @OnDeactivation method can be declared on '${className}'.`,
   hierarchyMessage: (className) =>
     `Only one @OnDeactivation method can be declared across class hierarchy for '${className}'.`,
