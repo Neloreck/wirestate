@@ -1,11 +1,11 @@
 import { OnActivated } from "../activation/on-activated";
 import { OnDeactivation } from "../activation/on-deactivation";
 import { InjectionToken } from "../binding/binding-tokens";
+import { Container } from "../container/container";
 import { inject } from "../container/container-context";
-import { ContainerKernel } from "../container/container-kernel";
 import { Injectable } from "../metadata/metadata-injectable";
 
-describe("kernel instance lifecycle guarantees", () => {
+describe("instance lifecycle guarantees", () => {
   it("should activate singleton instance bindings exactly once", () => {
     const events: Array<string> = [];
 
@@ -17,7 +17,7 @@ describe("kernel instance lifecycle guarantees", () => {
       }
     }
 
-    const container = new ContainerKernel();
+    const container = new Container();
 
     container.bind({ token: MyService, type: "Instance", value: MyService });
 
@@ -28,7 +28,7 @@ describe("kernel instance lifecycle guarantees", () => {
   });
 
   it("should construct transient factory values on every resolution", () => {
-    const container = new ContainerKernel();
+    const container = new Container();
     const token = new InjectionToken<{ id: number }>("transient");
 
     let constructions: number = 0;
@@ -50,7 +50,7 @@ describe("kernel instance lifecycle guarantees", () => {
       }
     }
 
-    const container = new ContainerKernel();
+    const container = new Container();
 
     container.bind({ token: MyService, type: "Instance", value: MyService });
     container.get(MyService);
@@ -70,7 +70,7 @@ describe("kernel instance lifecycle guarantees", () => {
       }
     }
 
-    const container = new ContainerKernel();
+    const container = new Container();
 
     container.bind({ token: MyService, type: "Instance", value: MyService });
     container.unbind(MyService);
@@ -89,7 +89,7 @@ describe("kernel instance lifecycle guarantees", () => {
       }
     }
 
-    const container = new ContainerKernel();
+    const container = new Container();
 
     container.bind({ token: MyService, scope: "Transient", factory: () => new MyService() });
 
@@ -100,7 +100,7 @@ describe("kernel instance lifecycle guarantees", () => {
   });
 
   it("should allow rebinding and reconstruction after unbind", () => {
-    const container = new ContainerKernel();
+    const container = new Container();
     const token = new InjectionToken<object>("value");
 
     container.bind({ token: token, factory: () => ({}) });
@@ -132,7 +132,7 @@ describe("kernel instance lifecycle guarantees", () => {
       }
     }
 
-    const container = new ContainerKernel();
+    const container = new Container();
 
     container.bind({ token: FooService, type: "Instance", value: FooService });
     container.bind({ token: BarService, type: "Instance", value: BarService });
@@ -165,7 +165,7 @@ describe("kernel instance lifecycle guarantees", () => {
       }
     }
 
-    const container = new ContainerKernel();
+    const container = new Container();
 
     container.bind({ token: BarService, type: "Instance", value: BarService });
     container.bind({ token: FooService, type: "Instance", value: FooService });
@@ -178,7 +178,7 @@ describe("kernel instance lifecycle guarantees", () => {
   });
 
   it("should keep bindings resolvable while unbindAll deactivation handlers run", () => {
-    const container = new ContainerKernel();
+    const container = new Container();
     const resolved: Array<unknown> = [];
 
     @Injectable()

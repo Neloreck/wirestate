@@ -15,17 +15,17 @@ import { QueryBus } from "./queries/query-bus";
  * Registers decorated event, query, and command handlers for an instance.
  *
  * @remarks
- * The messaging side of instance Activation, installed by the {@link Container}
- * composition constructor. Buses are resolved by token with `{ optional: true }`,
- * so containers without messaging skip handler registration gracefully. Each
- * registration's unregister callback is collected into `disposers`.
+ * The messaging side of instance Activation, called by the Wirestate activation
+ * adapter. Buses are resolved by token with `{ optional: true }`, so containers
+ * without messaging skip handler registration gracefully. Each registration's
+ * unregister callback is collected into `disposers`.
  *
  * @param container - Container that owns the instance.
  * @param instance - Activated instance.
  * @param disposers - Collector for handler unregister callbacks.
  * @internal
  */
-export function messagingActivationAdapter(
+export function registerMessagingHandlers(
   container: ContainerKernel,
   instance: object,
   disposers: Array<() => void>

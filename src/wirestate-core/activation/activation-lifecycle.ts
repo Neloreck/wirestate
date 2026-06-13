@@ -2,16 +2,17 @@ import type { InstanceBindingDescriptor } from "../binding/binding";
 import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
 import type { ContainerKernel } from "../container/container-kernel";
 import type { ActivationRecord } from "../container/container-storage";
+import { registerMessagingHandlers } from "../messaging/messaging-activation";
 import { getContainerProvisionStatus } from "../provision/provision-state";
 import type { Definable, Maybe } from "../types/general";
 
-import { getActivationAdapter } from "./activation-adapter";
+import type { ActivationAdapter } from "./activation-adapter";
 import { getActivatedHandlerMetadata } from "./on-activated";
 import { getDeactivationHandlerMetadata } from "./on-deactivation";
 import { WireStatus } from "./wire-status";
 
 /**
- * ContainerKernel-maintained mapping of activated service instances to their owning containers.
+ * Kernel-maintained mapping of activated service instances to their owning containers.
  *
  * Written at the container's activation commit point and cleared on deactivation,
  * so lookups never observe a partially activated instance.
@@ -29,103 +30,77 @@ export function getInstanceContainer(instance: object): Definable<ContainerKerne
 }
 
 /**
- * Activates a service instance for an instance binding.
+ * The Wirestate instance lifecycle layered on the pure-DI kernel.
  *
  * @remarks
- * Runs the Wirestate side of instance activation: tracks the instance to
- * container mapping, initializes {@link WireStatus}, runs the container's
- * activation adapter (the composition root installs messaging registration
- * there), and invokes the `@OnActivated` hook.
+ * Installed by the {@link Container} composition root via `setActivationAdapter`.
+ * It tracks the instance↔container mapping, initializes {@link WireStatus}
+ * (including the container's current provision status), registers messaging
+ * handlers, and invokes the `@OnActivated` / `@OnDeactivation` hooks. A bare
+ * {@link ContainerKernel} without this adapter constructs and caches only.
  *
- * Adapter cleanup callbacks are collected onto `record.disposers`, so a
- * failed activation can roll back with {@link rollbackInstanceActivation}.
- *
- * @param container - ContainerKernel resolving the instance binding.
- * @param record - Activation record carrying the constructed instance.
  * @internal
  */
-export function activateInstance(container: ContainerKernel, record: ActivationRecord): void {
-  const binding: InstanceBindingDescriptor<object> = record.binding as InstanceBindingDescriptor<object>;
-  const instance: object = record.instance as object;
+export const wirestateActivationAdapter: ActivationAdapter = {
+  activate(container: ContainerKernel, record: ActivationRecord): void {
+    const binding: InstanceBindingDescriptor<object> = record.binding as InstanceBindingDescriptor<object>;
+    const instance: object = record.instance as object;
 
-  INSTANCE_CONTAINERS.set(instance, container);
+    INSTANCE_CONTAINERS.set(instance, container);
 
-  initializeInstanceStatus(container, instance);
-  getActivationAdapter(container)?.(container, instance, record.disposers);
+    initializeInstanceStatus(container, instance);
+    registerMessagingHandlers(container, instance, record.disposers);
 
-  const methodName: Maybe<string | symbol> = getActivatedHandlerMetadata(instance);
+    const methodName: Maybe<string | symbol> = getActivatedHandlerMetadata(instance);
 
-  if (methodName) {
-    callLifecycleHandler({
-      container,
-      name: "@OnActivated",
-      details: [binding.value.name, String(methodName)],
-      instance,
-      instanceName: binding.value.name,
-      methodName,
-      rethrowSync: true,
-      source: "instance-activation",
-    });
-  }
-}
+    if (methodName) {
+      callLifecycleHandler({
+        container,
+        name: "@OnActivated",
+        details: [binding.value.name, String(methodName)],
+        instance,
+        instanceName: binding.value.name,
+        methodName,
+        rethrowSync: true,
+        source: "instance-activation",
+      });
+    }
+  },
 
-/**
- * Deactivates a service instance for an instance binding.
- *
- * @remarks
- * Invokes the `@OnDeactivation` hook, marks the {@link WireStatus} as
- * disposed, runs the collected handler disposers, and clears the instance to
- * container mapping.
- *
- * @param container - ContainerKernel that owns the activation record.
- * @param record - Activation record of the instance being deactivated.
- * @internal
- */
-export function deactivateInstance(container: ContainerKernel, record: ActivationRecord): void {
-  const binding: InstanceBindingDescriptor<object> = record.binding as InstanceBindingDescriptor<object>;
-  const instance: object = record.instance as object;
+  deactivate(container: ContainerKernel, record: ActivationRecord): void {
+    const binding: InstanceBindingDescriptor<object> = record.binding as InstanceBindingDescriptor<object>;
+    const instance: object = record.instance as object;
 
-  const methodName: Maybe<string | symbol> = getDeactivationHandlerMetadata(instance);
+    const methodName: Maybe<string | symbol> = getDeactivationHandlerMetadata(instance);
 
-  if (methodName) {
-    callLifecycleHandler({
-      container,
-      name: "@OnDeactivation",
-      details: [binding.value.name, String(methodName)],
-      instance,
-      instanceName: binding.value.name,
-      methodName,
-      rethrowSync: false,
-      source: "instance-deactivation",
-    });
-  }
+    if (methodName) {
+      callLifecycleHandler({
+        container,
+        name: "@OnDeactivation",
+        details: [binding.value.name, String(methodName)],
+        instance,
+        instanceName: binding.value.name,
+        methodName,
+        rethrowSync: false,
+        source: "instance-deactivation",
+      });
+    }
 
-  finalizeInstanceStatus(instance);
-  runDisposers(record);
+    finalizeInstanceStatus(instance);
+    runDisposers(record);
 
-  INSTANCE_CONTAINERS.delete(instance);
-}
+    INSTANCE_CONTAINERS.delete(instance);
+  },
 
-/**
- * Rolls back a failed instance activation.
- *
- * @remarks
- * Marks the {@link WireStatus} as disposed, runs the disposers collected
- * before the failure, and clears the instance to container mapping. The
- * container drops the activation record, so no partial registration survives.
- *
- * @param container - ContainerKernel whose activation failed.
- * @param record - Activation record of the instance that failed to activate.
- * @internal
- */
-export function rollbackInstanceActivation(container: ContainerKernel, record: ActivationRecord): void {
-  const instance: object = record.instance as object;
+  rollback(_container: ContainerKernel, record: ActivationRecord): void {
+    const instance: object = record.instance as object;
 
-  finalizeInstanceStatus(instance);
-  runDisposers(record);
+    finalizeInstanceStatus(instance);
+    runDisposers(record);
 
-  INSTANCE_CONTAINERS.delete(instance);
-}
+    INSTANCE_CONTAINERS.delete(instance);
+  },
+};
 
 /**
  * Starts lifecycle tracking for an activated instance.

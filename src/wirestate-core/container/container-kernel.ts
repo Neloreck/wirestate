@@ -1,4 +1,4 @@
-import { activateInstance, deactivateInstance, rollbackInstanceActivation } from "../activation/activation-lifecycle";
+import { getActivationAdapter } from "../activation/activation-adapter";
 import type { BindingDescriptor, ServiceToken } from "../binding/binding";
 import { isInstanceDescriptor } from "../binding/binding-guards";
 import { getBindingScope } from "../binding/binding-lifecycle";
@@ -230,12 +230,16 @@ export class ContainerKernel {
     };
 
     if (isInstanceDescriptor(binding)) {
-      try {
-        activateInstance(this, record);
-      } catch (error) {
-        rollbackInstanceActivation(this, record);
+      const adapter = getActivationAdapter(this);
 
-        throw error;
+      if (adapter) {
+        try {
+          adapter.activate(this, record);
+        } catch (error) {
+          adapter.rollback(this, record);
+
+          throw error;
+        }
       }
     }
 
@@ -270,14 +274,14 @@ export class ContainerKernel {
   }
 
   /**
-   * Deactivates one container-owned value: instance bindings run Wirestate
-   * lifecycle cleanup, other binding kinds are simply dropped.
+   * Deactivates one container-owned value: instance bindings run the installed
+   * activation adapter's cleanup, other binding kinds are simply dropped.
    *
    * @param record - Activation record being deactivated.
    */
   private deactivateRecord(record: ActivationRecord): void {
     if (isInstanceDescriptor(record.binding)) {
-      deactivateInstance(this, record);
+      getActivationAdapter(this)?.deactivate(this, record);
     }
   }
 

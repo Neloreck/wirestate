@@ -2,6 +2,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { setActivationAdapter } from "../activation/activation-adapter";
+import { wirestateActivationAdapter } from "../activation/activation-lifecycle";
 import type { Bindings, ServiceToken } from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
 import {
@@ -11,7 +12,6 @@ import {
 } from "../error/internal-error-handler";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { EventBus } from "../messaging/events/event-bus";
-import { messagingActivationAdapter } from "../messaging/messaging-activation";
 import { QueryBus } from "../messaging/queries/query-bus";
 import {
   deprovisionContainer,
@@ -115,7 +115,7 @@ export class Container extends ContainerKernel {
 
     // Installed before any binding activates; the adapter resolves buses with
     // optional lookups, so it is installed even under `skipMessaging`.
-    setActivationAdapter(this, messagingActivationAdapter);
+    setActivationAdapter(this, wirestateActivationAdapter);
 
     const activate: ReadonlyArray<ServiceToken> =
       (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];

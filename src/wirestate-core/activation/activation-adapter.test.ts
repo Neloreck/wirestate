@@ -2,7 +2,15 @@ import { ContainerKernel } from "../container/container-kernel";
 import { Injectable } from "../metadata/metadata-injectable";
 
 import { ActivationAdapter, getActivationAdapter, setActivationAdapter } from "./activation-adapter";
-import { OnActivated } from "./on-activated";
+
+function mockAdapter(overrides: Partial<ActivationAdapter> = {}): ActivationAdapter {
+  return {
+    activate: jest.fn(),
+    deactivate: jest.fn(),
+    rollback: jest.fn(),
+    ...overrides,
+  };
+}
 
 describe("container activation adapter registry", () => {
   it("should return null when no adapter is installed", () => {
@@ -11,7 +19,7 @@ describe("container activation adapter registry", () => {
 
   it("should return the installed adapter", () => {
     const container = new ContainerKernel();
-    const adapter: ActivationAdapter = jest.fn();
+    const adapter: ActivationAdapter = mockAdapter();
 
     setActivationAdapter(container, adapter);
 
@@ -20,8 +28,8 @@ describe("container activation adapter registry", () => {
 
   it("should replace a previously installed adapter", () => {
     const container = new ContainerKernel();
-    const first: ActivationAdapter = jest.fn();
-    const second: ActivationAdapter = jest.fn();
+    const first: ActivationAdapter = mockAdapter();
+    const second: ActivationAdapter = mockAdapter();
 
     setActivationAdapter(container, first);
     setActivationAdapter(container, second);
@@ -33,7 +41,7 @@ describe("container activation adapter registry", () => {
     const grandparent = new ContainerKernel();
     const parent = new ContainerKernel(grandparent);
     const child = new ContainerKernel(parent);
-    const adapter: ActivationAdapter = jest.fn();
+    const adapter: ActivationAdapter = mockAdapter();
 
     setActivationAdapter(grandparent, adapter);
 
@@ -44,8 +52,8 @@ describe("container activation adapter registry", () => {
   it("should prefer the own adapter over ancestor adapters", () => {
     const parent = new ContainerKernel();
     const child = new ContainerKernel(parent);
-    const parentAdapter: ActivationAdapter = jest.fn();
-    const childAdapter: ActivationAdapter = jest.fn();
+    const parentAdapter: ActivationAdapter = mockAdapter();
+    const childAdapter: ActivationAdapter = mockAdapter();
 
     setActivationAdapter(parent, parentAdapter);
     setActivationAdapter(child, childAdapter);
@@ -57,23 +65,26 @@ describe("container activation adapter registry", () => {
     const first = new ContainerKernel();
     const second = new ContainerKernel();
 
-    setActivationAdapter(first, jest.fn());
+    setActivationAdapter(first, mockAdapter());
 
     expect(getActivationAdapter(second)).toBeNull();
   });
 });
 
 describe("container activation adapter seam", () => {
-  it("should run the adapter once per instance activation", () => {
+  it("should activate once per instance binding, not for value or factory bindings", () => {
     @Injectable()
     class TestService {}
 
     const container = new ContainerKernel();
-    const calls: Array<{ container: ContainerKernel; instance: object }> = [];
+    const activated: Array<{ container: ContainerKernel; instance: unknown }> = [];
 
-    setActivationAdapter(container, (target, instance) => {
-      calls.push({ container: target, instance });
-    });
+    setActivationAdapter(
+      container,
+      mockAdapter({
+        activate: (target, record) => activated.push({ container: target, instance: record.instance }),
+      })
+    );
 
     container.bind({ token: TestService, type: "Instance", value: TestService });
     container.bind({ token: "config", value: { key: "value" } });
@@ -85,70 +96,75 @@ describe("container activation adapter seam", () => {
     container.get("config");
     container.get("made");
 
-    expect(calls).toEqual([{ container, instance }]);
+    expect(activated).toEqual([{ container, instance }]);
   });
 
-  it("should run the adapter before the @OnActivated hook", () => {
-    const events: Array<string> = [];
-
-    @Injectable()
-    class TestService {
-      @OnActivated()
-      public onActivated(): void {
-        events.push("activated");
-      }
-    }
-
-    const container = new ContainerKernel();
-
-    setActivationAdapter(container, () => {
-      events.push("adapter");
-    });
-
-    container.bind({ token: TestService, type: "Instance", value: TestService });
-    container.get(TestService);
-
-    expect(events).toEqual(["adapter", "activated"]);
-  });
-
-  it("should run adapter disposers on deactivation", () => {
+  it("should deactivate a constructed instance on unbind", () => {
     @Injectable()
     class TestService {}
 
-    const events: Array<string> = [];
     const container = new ContainerKernel();
+    const deactivated: Array<unknown> = [];
 
-    setActivationAdapter(container, (_target, _instance, disposers) => {
-      disposers.push(() => events.push("disposed"));
-    });
+    setActivationAdapter(
+      container,
+      mockAdapter({
+        deactivate: (_target, record) => deactivated.push(record.instance),
+      })
+    );
 
     container.bind({ token: TestService, type: "Instance", value: TestService });
-    container.get(TestService);
 
-    expect(events).toEqual([]);
+    const instance: TestService = container.get(TestService);
+
+    expect(deactivated).toEqual([]);
 
     container.unbind(TestService);
 
-    expect(events).toEqual(["disposed"]);
+    expect(deactivated).toEqual([instance]);
   });
 
-  it("should roll back the activation when the adapter throws", () => {
+  it("should roll back (not deactivate) and rethrow when activate throws", () => {
     @Injectable()
     class TestService {}
 
-    const events: Array<string> = [];
     const container = new ContainerKernel();
+    const rollback = jest.fn();
+    const deactivate = jest.fn();
 
-    setActivationAdapter(container, (_target, _instance, disposers) => {
-      disposers.push(() => events.push("disposed"));
-
-      throw new Error("adapter-fail");
-    });
+    setActivationAdapter(
+      container,
+      mockAdapter({
+        activate: () => {
+          throw new Error("activate-fail");
+        },
+        rollback,
+        deactivate,
+      })
+    );
 
     container.bind({ token: TestService, type: "Instance", value: TestService });
 
-    expect(() => container.get(TestService)).toThrow("adapter-fail");
-    expect(events).toEqual(["disposed"]);
+    expect(() => container.get(TestService)).toThrow("activate-fail");
+    expect(rollback).toHaveBeenCalledTimes(1);
+    expect(deactivate).not.toHaveBeenCalled();
+    expect(container.getActiveInstances()).toEqual([]);
+  });
+
+  it("should construct and drop instances without an installed adapter", () => {
+    @Injectable()
+    class TestService {}
+
+    const container = new ContainerKernel();
+
+    container.bind({ token: TestService, type: "Instance", value: TestService });
+
+    const instance: TestService = container.get(TestService);
+
+    expect(instance).toBeInstanceOf(TestService);
+    expect(container.getActiveInstances()).toEqual([instance]);
+
+    expect(() => container.unbind(TestService)).not.toThrow();
     expect(container.getActiveInstances()).toEqual([]);
   });
 
@@ -160,9 +176,12 @@ describe("container activation adapter seam", () => {
     const child = new ContainerKernel(parent);
     const activatedIn: Array<ContainerKernel> = [];
 
-    setActivationAdapter(parent, (target) => {
-      activatedIn.push(target);
-    });
+    setActivationAdapter(
+      parent,
+      mockAdapter({
+        activate: (target) => activatedIn.push(target),
+      })
+    );
 
     child.bind({ token: TestService, type: "Instance", value: TestService });
     child.get(TestService);

@@ -25,7 +25,7 @@ tenant, or test.
 
 | Package                                                               | Purpose                                                                                           |
 | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| [`@wirestate/core`](./src/wirestate-core/README.md)                   | Containers, injectable services, lifecycle, messaging.                                     |
+| [`@wirestate/core`](./src/wirestate-core/README.md)                   | Containers, injectable services, lifecycle, messaging.                                            |
 | [`@wirestate/react`](./src/wirestate-react/README.md)                 | React provider, injection hooks, and component-owned handlers.                                    |
 | [`@wirestate/lit`](./src/wirestate-lit/README.md)                     | Lit providers, decorators, controllers, and element handlers.                                     |
 | [`@wirestate/mobx`](./src/wirestate-mobx/README.md)                   | Framework-agnostic MobX exports for shared services.                                              |
