@@ -1,9 +1,9 @@
 import type { InstanceBindingDescriptor } from "../binding/binding";
-import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
 import { getActivatedHandlerMetadata } from "../lifecycle/on-activated";
 import { getDeactivationHandlerMetadata } from "../lifecycle/on-deactivation";
 import type { Definable, Maybe } from "../types/general";
 
+import { callLifecycleHandler } from "./call-lifecycle-handler";
 import { getContainerActivationAdapter } from "./container-activation-adapter";
 import type { ContainerKernel } from "./container-kernel";
 import type { ActivationRecord } from "./container-storage";

@@ -1,7 +1,7 @@
-import { Container } from "../container/container";
 import { Injectable } from "../metadata/metadata-injectable";
 
 import { callLifecycleHandler } from "./call-lifecycle-handler";
+import { Container } from "./container";
 
 describe("callLifecycleHandler", () => {
   it("should call lifecycle handler with the instance as this", () => {
