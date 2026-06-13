@@ -4,13 +4,9 @@ import { Injectable } from "../metadata/metadata-injectable";
 import { OnDeprovision } from "./on-deprovision";
 import { OnProvision } from "./on-provision";
 import { provisionContainer } from "./provision-lifecycle";
-import { ContainerProvisionLifecycle } from "./provision-state";
+import { getProvisionState } from "./provision-state";
 
 describe("provision lifecycle errors", () => {
-  function createProvisionLifecycle(): ContainerProvisionLifecycle {
-    return new Map();
-  }
-
   it("should report provider lifecycle errors to container error handler", () => {
     const error = new Error("provision-fail");
     const onError = jest.fn();
@@ -27,9 +23,8 @@ describe("provision lifecycle errors", () => {
       bindings: [FailingProvisionService],
       onError,
     });
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
-    expect(() => provisionContainer(container, lifecycle, [FailingProvisionService])).toThrow(error);
+    expect(() => provisionContainer(container, [FailingProvisionService])).toThrow(error);
 
     expect(onError).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -93,11 +88,10 @@ describe("provision lifecycle errors", () => {
       bindings: [FirstProvisionService, FailingProvisionService, ThirdProvisionService],
       onError,
     });
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
-    expect(() => provisionContainer(container, lifecycle)).toThrow(error);
+    expect(() => provisionContainer(container)).toThrow(error);
     expect(events).toEqual(["provision-first", "provision-failing", "deprovision-failing", "deprovision-first"]);
-    expect(lifecycle.has(container)).toBe(false);
+    expect(getProvisionState(container)?.instances ?? null).toBeNull();
     expect(onError).toHaveBeenCalledWith(
       expect.objectContaining({
         container,
@@ -127,9 +121,7 @@ describe("provision lifecycle errors", () => {
       onError,
     });
 
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
-
-    provisionContainer(container, lifecycle, [AsyncFailingProvisionService]);
+    provisionContainer(container, [AsyncFailingProvisionService]);
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 

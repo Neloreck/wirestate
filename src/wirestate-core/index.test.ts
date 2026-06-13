@@ -14,7 +14,6 @@ describe("Library exported API from wirestate-core", () => {
     "Container",
     "ContainerConfig",
     "ContainerOptions",
-    "ContainerProvisionLifecycle",
     "EventBus",
     "EventEmitOptions",
     "EventHandler",
@@ -50,10 +49,8 @@ describe("Library exported API from wirestate-core", () => {
     "WireStatus",
     "WirestateError",
     "defaultInternalErrorHandler",
-    "deprovisionContainer",
     "inject",
     "isInjectable",
-    "provisionContainer",
     "validateContainerConfig",
   ];
 

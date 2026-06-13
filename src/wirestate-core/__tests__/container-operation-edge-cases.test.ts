@@ -4,31 +4,29 @@ import { Container } from "../container/container";
 import { Injectable } from "../metadata/metadata-injectable";
 import { OnProvision } from "../provision/on-provision";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
-import { ContainerProvisionLifecycle } from "../provision/provision-state";
+import { getProvisionState } from "../provision/provision-state";
 
 describe("container operation edge cases", () => {
   it("treats deprovision of a never-provisioned container as a no-op", () => {
     const { LifecycleService, events } = createLifecycleService();
     const container: Container = new Container({ bindings: [LifecycleService] });
-    const lifecycle: ContainerProvisionLifecycle = new Map();
 
     container.get(LifecycleService);
 
     expect(events).toEqual(["activated"]);
 
-    expect(() => deprovisionContainer(container, lifecycle)).not.toThrow();
-    expect(lifecycle.has(container)).toBe(false);
+    expect(() => deprovisionContainer(container)).not.toThrow();
+    expect(getProvisionState(container)?.instances ?? null).toBeNull();
     expect(events).toEqual(["activated"]);
   });
 
   it("treats provisioning with an empty bindings list as a no-op", () => {
     const { LifecycleService, events } = createLifecycleService();
     const container: Container = new Container({ bindings: [LifecycleService] });
-    const lifecycle: ContainerProvisionLifecycle = new Map();
 
-    provisionContainer(container, lifecycle, []);
+    provisionContainer(container, []);
 
-    expect(lifecycle.get(container)).toEqual([]);
+    expect(getProvisionState(container)?.instances).toEqual([]);
     expect(events).toEqual([]);
   });
 
@@ -41,7 +39,7 @@ describe("container operation edge cases", () => {
 
     const container: Container = new Container();
 
-    expect(() => provisionContainer(container, new Map(), [UnboundProvider])).toThrow(
+    expect(() => provisionContainer(container, [UnboundProvider])).toThrow(
       "Cannot provision binding 'UnboundProvider' that is not bound on this container."
     );
   });
@@ -51,10 +49,9 @@ describe("container operation edge cases", () => {
     class PlainService {}
 
     const container: Container = new Container({ bindings: [PlainService] });
-    const lifecycle: ContainerProvisionLifecycle = new Map();
 
-    expect(() => provisionContainer(container, lifecycle, [PlainService])).not.toThrow();
-    expect(lifecycle.get(container)).toEqual([]);
+    expect(() => provisionContainer(container, [PlainService])).not.toThrow();
+    expect(getProvisionState(container)?.instances).toEqual([]);
   });
 
   it("treats unbinding a never-bound token as a no-op", () => {
@@ -68,9 +65,8 @@ describe("container operation edge cases", () => {
   it("treats deprovision after a full unbind as a no-op", () => {
     const { LifecycleService, events } = createLifecycleService();
     const container: Container = new Container({ bindings: [LifecycleService] });
-    const lifecycle: ContainerProvisionLifecycle = new Map();
 
-    provisionContainer(container, lifecycle);
+    provisionContainer(container);
     expect(events).toEqual(["activated", "provision"]);
 
     container.unbindAll();
@@ -79,7 +75,7 @@ describe("container operation edge cases", () => {
 
     const eventsAfterDisposal: Array<string> = [...events];
 
-    expect(() => deprovisionContainer(container, lifecycle)).not.toThrow();
+    expect(() => deprovisionContainer(container)).not.toThrow();
     expect(events).toEqual(eventsAfterDisposal);
     expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
   });

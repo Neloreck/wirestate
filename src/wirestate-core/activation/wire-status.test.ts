@@ -3,7 +3,6 @@ import { OnDeprovision, OnProvision } from "@wirestate/core";
 import { Container } from "../container/container";
 import { Injectable } from "../metadata/metadata-injectable";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
-import { ContainerProvisionLifecycle } from "../provision/provision-state";
 
 import { WireStatus } from "./wire-status";
 
@@ -38,7 +37,6 @@ describe("WireStatus", () => {
     class TestService {}
 
     const container: Container = new Container();
-    const lifecycle: ContainerProvisionLifecycle = new Map();
 
     container.bind(TestService);
 
@@ -54,7 +52,7 @@ describe("WireStatus", () => {
       provisionId: null,
     });
 
-    provisionContainer(container, lifecycle, [TestService]);
+    provisionContainer(container, [TestService]);
 
     expect(WireStatus.for(service)).toBe(status);
     expect(WireStatus.for(service)).toEqual({
@@ -64,7 +62,7 @@ describe("WireStatus", () => {
       provisionId: null,
     });
 
-    deprovisionContainer(container, lifecycle);
+    deprovisionContainer(container);
 
     expect(WireStatus.for(service)).toEqual({
       isDeactivated: false,
@@ -94,7 +92,6 @@ describe("WireStatus", () => {
     }
 
     const container: Container = new Container();
-    const lifecycle: ContainerProvisionLifecycle = new Map();
 
     container.bind(TestService);
 
@@ -110,7 +107,7 @@ describe("WireStatus", () => {
       provisionId: null,
     });
 
-    provisionContainer(container, lifecycle, [TestService]);
+    provisionContainer(container, [TestService]);
 
     expect(WireStatus.for(service)).toBe(status);
     expect(WireStatus.for(service)).toEqual({
@@ -120,7 +117,7 @@ describe("WireStatus", () => {
       provisionId: 1,
     });
 
-    deprovisionContainer(container, lifecycle);
+    deprovisionContainer(container);
 
     expect(WireStatus.for(service)).toEqual({
       isDeactivated: false,
@@ -129,7 +126,7 @@ describe("WireStatus", () => {
       provisionId: 1,
     });
 
-    provisionContainer(container, lifecycle, [TestService]);
+    provisionContainer(container, [TestService]);
 
     expect(WireStatus.for(service)).toBe(status);
     expect(WireStatus.for(service)).toEqual({
@@ -139,7 +136,7 @@ describe("WireStatus", () => {
       provisionId: 2,
     });
 
-    deprovisionContainer(container, lifecycle);
+    deprovisionContainer(container);
 
     expect(WireStatus.for(service)).toEqual({
       isDeactivated: false,

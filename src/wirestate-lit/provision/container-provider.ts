@@ -1,14 +1,6 @@
 import { ContextProvider } from "@lit/context";
 import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-element";
-import {
-  Container,
-  ContainerConfig,
-  ContainerProvisionLifecycle,
-  WirestateError,
-  deprovisionContainer,
-  provisionContainer,
-  validateContainerConfig,
-} from "@wirestate/core";
+import { Container, ContainerConfig, WirestateError, validateContainerConfig } from "@wirestate/core";
 
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
@@ -116,8 +108,6 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
   extends ContextProvider<typeof ContainerContext, E>
   implements ReactiveController
 {
-  protected readonly lifecycle: ContainerProvisionLifecycle = new Map();
-
   protected config: Maybe<ContainerConfig>;
   protected container: Maybe<Container>;
   protected scope: Maybe<ContainerProviderScopeValue>;
@@ -171,7 +161,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
       : (this.container as Container);
 
     try {
-      provisionContainer(container, this.lifecycle);
+      container.provision();
 
       super.setValue(container);
       super.hostConnected();
@@ -180,7 +170,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
         this.destroyManagedContainer(container);
       } else {
         // Expect container to be deprovisioned by this moment, but leaving deprovision as explicit operation.
-        deprovisionContainer(container, this.lifecycle);
+        container.deprovision();
       }
 
       throw error;
@@ -193,7 +183,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
     if (this.config) {
       this.destroyManagedContainer(container);
     } else {
-      deprovisionContainer(container, this.lifecycle);
+      container.deprovision();
     }
 
     this.clearCallbacks();
@@ -217,16 +207,16 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
         super.setValue(container, force);
       } else {
         if (previous) {
-          deprovisionContainer(previous, this.lifecycle);
+          previous.deprovision();
         }
 
         try {
-          provisionContainer(container, this.lifecycle);
+          container.provision();
 
           super.setValue(container, force);
         } catch (error) {
           // Expect container to be deprovisioned by this moment, but leaving deprovision as explicit operation.
-          deprovisionContainer(container, this.lifecycle);
+          container.deprovision();
 
           throw error;
         }
@@ -268,7 +258,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
       this.container = container;
 
       try {
-        provisionContainer(container, this.lifecycle);
+        container.provision();
 
         super.setValue(container);
       } catch (error) {
@@ -285,7 +275,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
    * @param container - Managed container to deprovision and dispose.
    */
   protected destroyManagedContainer(container: Container): void {
-    deprovisionContainer(container, this.lifecycle);
+    container.deprovision();
 
     dbg.info(prefix(__filename), "Destroying managed container:", {
       container,

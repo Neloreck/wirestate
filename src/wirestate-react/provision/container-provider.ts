@@ -1,4 +1,4 @@
-import { Container, ContainerConfig, deprovisionContainer, provisionContainer, WirestateError } from "@wirestate/core";
+import { Container, ContainerConfig, WirestateError } from "@wirestate/core";
 import { createElement, ReactNode, useEffect, useRef, useState } from "react";
 
 import { ContainerContext } from "../context/container-context";
@@ -163,7 +163,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
   const owned: boolean = Boolean(managedSource);
   const ownedRef = useRef<boolean>(owned);
 
-  const lifecycleRef = useRef<Optional<ReactContainerProvisionLifecycle>>(null);
+  const pendingDestructionRef = useRef<Optional<ReactContainerProvisionLifecycle>>(null);
   const normalizedSource: Maybe<ContainerConfig> = managedSource
     ? { ...managedSource, activate: managedSource.activate ?? true }
     : null;
@@ -211,21 +211,18 @@ export function ContainerProvider(props: ContainerProviderProps) {
   const activeContainer: Container = activeState ? activeState.container : (externalContainer as Container);
 
   useEffect(() => {
-    const lifecycle: ReactContainerProvisionLifecycle = (lifecycleRef.current ??= {
-      pendingDestruction: new Map(),
-      provisionedServices: new Map(),
-    } as ReactContainerProvisionLifecycle);
+    const pendingDestruction: ReactContainerProvisionLifecycle = (pendingDestructionRef.current ??= new Map());
 
-    retainContainer(activeContainer, lifecycle);
+    retainContainer(activeContainer, pendingDestruction);
 
     try {
-      provisionContainer(activeContainer, lifecycle.provisionedServices);
+      activeContainer.provision();
     } catch (error) {
       if (owned) {
-        scheduleContainerDestruction(activeContainer, lifecycle);
+        scheduleContainerDestruction(activeContainer, pendingDestruction);
       } else {
         // Expect container to be deprovisioned by this moment, but leaving deprovision as explicit operation.
-        deprovisionContainer(activeContainer, lifecycle.provisionedServices);
+        activeContainer.deprovision();
       }
 
       setError({ error });
@@ -235,9 +232,9 @@ export function ContainerProvider(props: ContainerProviderProps) {
 
     return () => {
       if (owned) {
-        scheduleContainerDestruction(activeContainer, lifecycle);
+        scheduleContainerDestruction(activeContainer, pendingDestruction);
       } else {
-        deprovisionContainer(activeContainer, lifecycle.provisionedServices);
+        activeContainer.deprovision();
       }
     };
   }, [activeContainer, owned]);

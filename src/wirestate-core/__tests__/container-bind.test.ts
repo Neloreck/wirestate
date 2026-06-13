@@ -13,6 +13,7 @@ import {
 } from "../binding/binding";
 import { Container } from "../container/container";
 import { inject } from "../container/container-context";
+import { ContainerKernel } from "../container/container-kernel";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { CommandBus } from "../messaging/commands/command-bus";
 import { OnCommand } from "../messaging/commands/on-command";
@@ -696,7 +697,7 @@ describe("container.bind", () => {
       const container: Container = new Container();
       const NAME_TOKEN: unique symbol = Symbol("name");
       const GREETING_TOKEN: unique symbol = Symbol("greeting");
-      const factory = jest.fn((current: Container) => `Hello, ${current.get<string>(NAME_TOKEN)}`);
+      const factory = jest.fn((current: ContainerKernel) => `Hello, ${current.get<string>(NAME_TOKEN)}`);
 
       container.bind({ token: NAME_TOKEN, value: "Ada" });
 

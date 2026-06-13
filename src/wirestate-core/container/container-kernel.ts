@@ -13,27 +13,6 @@ import { Factory } from "./container-factory";
 import { ActivationRecord, BindingMap, InstanceMap } from "./container-storage";
 
 /**
- * Intercepts container unbind operations before any value is deactivated.
- *
- * @remarks
- * Interceptors let external orchestration, such as provider deprovisioning,
- * run ahead of binding deactivation without the container importing it.
- */
-export interface UnbindInterceptor {
-  /**
-   * Called before a token's container-owned values are deactivated by `unbind`.
-   *
-   * @param token - Token being unbound.
-   */
-  onUnbind?(token: ServiceToken): void;
-
-  /**
-   * Called exactly once before container-owned values are deactivated by `unbindAll`.
-   */
-  onUnbindAll?(): void;
-}
-
-/**
  * Internal dependency injection (DI) engine: tracks bindings and holds the
  * resolved instances of your services.
  *
@@ -54,7 +33,6 @@ export class ContainerKernel {
   private readonly bindings: BindingMap = new Map();
   private readonly instances: InstanceMap = new Map();
   private readonly activated: Array<ActivationRecord> = [];
-  private readonly unbindInterceptors: Array<UnbindInterceptor> = [];
   private readonly factory: Factory;
 
   public constructor(parent?: ContainerKernel) {
@@ -93,16 +71,11 @@ export class ContainerKernel {
 
   /**
    * Unbinds a token, deactivating every container-owned value it constructed.
-   * Unbind interceptors run first, so deprovision orchestration precedes deactivation.
    *
    * @param token - Token to unbind.
    * @returns The same container for chaining.
    */
   public unbind<T>(token: ServiceToken<T>): this {
-    for (const interceptor of [...this.unbindInterceptors]) {
-      interceptor.onUnbind?.(token);
-    }
-
     this.deactivate(token);
 
     const binding = this.bindings.get(token);
@@ -118,17 +91,12 @@ export class ContainerKernel {
 
   /**
    * Unbinds all bindings, deactivating container-owned values in creation order.
-   * Unbind interceptors run first, so deprovision orchestration precedes
-   * deactivation. Bindings stay resolvable until every deactivation handler has
-   * run, so deactivating services can still talk to each other.
+   * Bindings stay resolvable until every deactivation handler has run, so
+   * deactivating services can still talk to each other.
    *
    * @returns The same container for chaining.
    */
   public unbindAll(): this {
-    for (const interceptor of [...this.unbindInterceptors]) {
-      interceptor.onUnbindAll?.();
-    }
-
     for (const record of [...this.activated]) {
       this.deactivateRecord(record);
     }
@@ -138,25 +106,6 @@ export class ContainerKernel {
     this.instances.clear();
 
     return this;
-  }
-
-  /**
-   * Registers an interceptor invoked before `unbind` and `unbindAll`
-   * deactivate container-owned values.
-   *
-   * @param interceptor - Interceptor to register.
-   * @returns A callback removing the interceptor.
-   */
-  public addUnbindInterceptor(interceptor: UnbindInterceptor): () => void {
-    this.unbindInterceptors.push(interceptor);
-
-    return () => {
-      const index = this.unbindInterceptors.indexOf(interceptor);
-
-      if (index !== -1) {
-        this.unbindInterceptors.splice(index, 1);
-      }
-    };
   }
 
   /**

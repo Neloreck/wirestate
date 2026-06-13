@@ -6,7 +6,7 @@ belong.
 | Application                 | Wirestate                                                                                  | Use it for                                                                                              |
 | --------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
 | Constructor resolution      | Service constructor and constructor dependencies.                                          | Assign injected dependencies and cheap field defaults. Avoid side effects that need cleanup.            |
-| Container activation        | `@OnActivated` after the service instance is resolved.                                     | Do cheap setup that can run before a UI boundary is committed.                    |
+| Container activation        | `@OnActivated` after the service instance is resolved.                                     | Do cheap setup that can run before a UI boundary is committed.                                          |
 | Provider mount/connect      | `@OnProvision` in binding order. Provider lifecycle participants are resolved first.       | Start provider-owned timers, subscriptions, sockets, observers, and async loops.                        |
 | Provider unmount/disconnect | `@OnDeprovision` in reverse provision order, then the provider releases the container.     | Stop every resource started in `@OnProvision`. Make cleanup complete and repeatable.                    |
 | Container disposal          | `container.unbind` or `container.unbindAll`, then `@OnDeactivation` for resolved services. | Tear down service-level registrations and final service state. Discard the container after `unbindAll`. |
@@ -87,6 +87,4 @@ export class SearchService {
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision),
 [`WireStatus`](/api/wirestate-core/classes/WireStatus),
 [`ProvisionId`](/api/wirestate-core/type-aliases/ProvisionId),
-[`provisionContainer`](/api/wirestate-core/functions/provisionContainer),
-[`deprovisionContainer`](/api/wirestate-core/functions/deprovisionContainer),
 [`Container`](/api/wirestate-core/classes/Container).

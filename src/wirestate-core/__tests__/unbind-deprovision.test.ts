@@ -4,13 +4,9 @@ import { WireStatus } from "../activation/wire-status";
 import { Container } from "../container/container";
 import { Injectable } from "../metadata/metadata-injectable";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
-import { ContainerProvisionLifecycle } from "../provision/provision-state";
+import { getProvisionState } from "../provision/provision-state";
 
 describe("container unbind deprovision", () => {
-  function createProvisionLifecycle(): ContainerProvisionLifecycle {
-    return new Map();
-  }
-
   it("should unbind a token and remove the container's own binding", () => {
     const { LifecycleService } = createLifecycleService();
     const container: Container = new Container({
@@ -58,18 +54,17 @@ describe("container unbind deprovision", () => {
     const container: Container = new Container({
       bindings: [LifecycleService],
     });
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
-    provisionContainer(container, lifecycle);
+    provisionContainer(container);
 
     expect(events).toEqual(["provision"]);
 
     container.unbind(LifecycleService);
 
     expect(events).toEqual(["provision", "deprovision", "deactivation"]);
-    expect(lifecycle.has(container)).toBe(false);
+    expect(getProvisionState(container)?.instances ?? null).toBeNull();
 
-    deprovisionContainer(container, lifecycle);
+    deprovisionContainer(container);
 
     expect(events).toEqual(["provision", "deprovision", "deactivation"]);
   });
@@ -87,18 +82,17 @@ describe("container unbind deprovision", () => {
       suffix: "b",
     });
     const container: Container = new Container({ bindings: [ServiceA, ServiceB] });
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
-    provisionContainer(container, lifecycle);
+    provisionContainer(container);
 
     expect(events).toEqual(["provision-a", "provision-b"]);
 
     container.unbind(ServiceA);
 
     expect(events).toEqual(["provision-a", "provision-b", "deprovision-a", "deactivation-a"]);
-    expect(lifecycle.has(container)).toBe(true);
+    expect(getProvisionState(container)?.instances).toHaveLength(1);
 
-    deprovisionContainer(container, lifecycle);
+    deprovisionContainer(container);
 
     expect(events).toEqual(["provision-a", "provision-b", "deprovision-a", "deactivation-a", "deprovision-b"]);
   });
@@ -108,9 +102,8 @@ describe("container unbind deprovision", () => {
     const { LifecycleService: ServiceA } = createLifecycleService({ events, suffix: "a" });
     const { LifecycleService: ServiceB } = createLifecycleService({ events, suffix: "b" });
     const container: Container = new Container({ bindings: [ServiceA, ServiceB] });
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
-    provisionContainer(container, lifecycle);
+    provisionContainer(container);
 
     expect(events).toEqual(["activated-a", "activated-b", "provision-a", "provision-b"]);
 
@@ -132,9 +125,8 @@ describe("container unbind deprovision", () => {
     const { LifecycleService, events } = createLifecycleService();
 
     const container: Container = new Container({ bindings: [LifecycleService] });
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
-    provisionContainer(container, lifecycle);
+    provisionContainer(container);
 
     expect(events).toEqual(["activated", "provision"]);
 
@@ -145,10 +137,10 @@ describe("container unbind deprovision", () => {
     expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
 
     // A later container deprovision must not re-fire teardown for the stale entry.
-    deprovisionContainer(container, lifecycle);
+    deprovisionContainer(container);
 
     expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
-    expect(lifecycle.has(container)).toBe(false);
+    expect(getProvisionState(container)?.instances ?? null).toBeNull();
   });
 
   it("should mark remaining active services deprovisioned after the last lifecycle binding is unbound", () => {
@@ -157,20 +149,19 @@ describe("container unbind deprovision", () => {
 
     const { LifecycleService, events } = createLifecycleService();
     const container: Container = new Container({ bindings: [PlainService, LifecycleService] });
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
     const plainService: PlainService = container.get(PlainService);
     const plainStatus: WireStatus = WireStatus.for(plainService);
 
-    provisionContainer(container, lifecycle);
+    provisionContainer(container);
 
     expect(plainStatus.isDeprovisioned).toBe(false);
 
-    // Unbinding the last lifecycle binding removes the container's lifecycle entry.
+    // Unbinding the last lifecycle binding clears the container's instances entry.
     container.unbind(LifecycleService);
 
-    expect(lifecycle.has(container)).toBe(false);
+    expect(getProvisionState(container)?.instances ?? null).toBeNull();
 
-    deprovisionContainer(container, lifecycle);
+    deprovisionContainer(container);
 
     expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
     expect(plainStatus.isDeprovisioned).toBe(true);
@@ -181,12 +172,11 @@ describe("container unbind deprovision", () => {
     class PlainService {}
 
     const container: Container = new Container({ bindings: [PlainService] });
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
     const status: WireStatus = WireStatus.for(container.get(PlainService));
 
     expect(status.isDeprovisioned).toBeNull();
 
-    deprovisionContainer(container, lifecycle);
+    deprovisionContainer(container);
 
     expect(status.isDeprovisioned).toBeNull();
   });
@@ -197,12 +187,11 @@ describe("container unbind deprovision", () => {
 
     const { LifecycleService, events } = createLifecycleService();
     const container: Container = new Container({ bindings: [PlainService, LifecycleService] });
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
     const plainStatus: WireStatus = WireStatus.for(container.get(PlainService));
 
-    provisionContainer(container, lifecycle);
+    provisionContainer(container);
     container.unbind(LifecycleService);
-    deprovisionContainer(container, lifecycle);
+    deprovisionContainer(container);
 
     expect(plainStatus.isDeprovisioned).toBe(true);
 
@@ -210,7 +199,7 @@ describe("container unbind deprovision", () => {
     // deprovisioned container does not re-mark active instances.
     plainStatus.isDeprovisioned = false;
 
-    deprovisionContainer(container, lifecycle);
+    deprovisionContainer(container);
 
     expect(plainStatus.isDeprovisioned).toBe(false);
     expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);

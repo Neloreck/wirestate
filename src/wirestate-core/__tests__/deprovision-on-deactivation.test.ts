@@ -2,19 +2,13 @@ import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { Container } from "../container/container";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
-import { ContainerProvisionLifecycle } from "../provision/provision-state";
 
 describe("deprovision on deactivation", () => {
-  function createProvisionLifecycle(): ContainerProvisionLifecycle {
-    return new Map();
-  }
-
   it("runs @OnDeprovision before @OnDeactivation when a provisioned instance is destroyed", () => {
     const { LifecycleService, events } = createLifecycleService();
     const container: Container = new Container({ bindings: [LifecycleService] });
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
-    provisionContainer(container, lifecycle);
+    provisionContainer(container);
     expect(events).toEqual(["activated", "provision"]);
 
     container.unbind(LifecycleService);
@@ -38,10 +32,9 @@ describe("deprovision on deactivation", () => {
   it("does not double-deprovision after an explicit container deprovision", () => {
     const { LifecycleService, events } = createLifecycleService();
     const container: Container = new Container({ bindings: [LifecycleService] });
-    const lifecycle: ContainerProvisionLifecycle = createProvisionLifecycle();
 
-    provisionContainer(container, lifecycle);
-    deprovisionContainer(container, lifecycle);
+    provisionContainer(container);
+    deprovisionContainer(container);
     expect(events).toEqual(["activated", "provision", "deprovision"]);
 
     // The instance is already deprovisioned, so unbinding only deactivates it.

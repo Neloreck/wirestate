@@ -2,7 +2,6 @@ import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { Container } from "../container/container";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
-import { ContainerProvisionLifecycle } from "../provision/provision-state";
 
 describe("cross-container provider lifecycle ownership", () => {
   it("shares a single parent-owned instance by reference with child containers", () => {
@@ -22,11 +21,9 @@ describe("cross-container provider lifecycle ownership", () => {
     const parent: Container = new Container({ bindings: [LifecycleService] });
     const child: Container = new Container({ parent });
 
-    const childLifecycle: ContainerProvisionLifecycle = new Map();
-
     expect(child.get(LifecycleService)).toBeInstanceOf(LifecycleService);
 
-    expect(() => provisionContainer(child, childLifecycle, [LifecycleService])).toThrow(
+    expect(() => provisionContainer(child, [LifecycleService])).toThrow(
       "Cannot provision binding 'LifecycleService' that is not bound on this container."
     );
     expect(events).toEqual([]);
@@ -47,14 +44,13 @@ describe("cross-container provider lifecycle ownership", () => {
 
     const parent: Container = new Container({ bindings: [ParentService] });
     const child: Container = new Container({ parent, bindings: [ChildService] });
-    const childLifecycle: ContainerProvisionLifecycle = new Map();
 
     // The child owns ChildService, so its provider lifecycle works normally and
     // does not touch the inherited parent binding.
-    provisionContainer(child, childLifecycle, [ChildService]);
+    provisionContainer(child, [ChildService]);
     expect(events).toEqual(["provision-child"]);
 
-    deprovisionContainer(child, childLifecycle);
+    deprovisionContainer(child);
     expect(events).toEqual(["provision-child", "deprovision-child"]);
   });
 
@@ -63,12 +59,11 @@ describe("cross-container provider lifecycle ownership", () => {
     const { LifecycleService } = createLifecycleService({ events, methods: ["provision", "deprovision"] });
 
     const parent: Container = new Container({ bindings: [LifecycleService] });
-    const parentLifecycle: ContainerProvisionLifecycle = new Map();
 
-    provisionContainer(parent, parentLifecycle);
+    provisionContainer(parent);
     expect(events).toEqual(["provision"]);
 
-    deprovisionContainer(parent, parentLifecycle);
+    deprovisionContainer(parent);
     expect(events).toEqual(["provision", "deprovision"]);
   });
 });

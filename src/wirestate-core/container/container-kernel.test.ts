@@ -1,4 +1,3 @@
-import { OnDeactivation } from "../activation/on-deactivation";
 import { InjectionToken } from "../binding/binding-tokens";
 import {
   ERROR_CODE_INVALID_ARGUMENTS,
@@ -209,82 +208,5 @@ describe("ContainerKernel API", () => {
     container.bind({ token: token, value: "second" });
 
     expect(container.get(token)).toBe("second");
-  });
-
-  describe("unbind interceptors", () => {
-    it("should run interceptors before deactivation on unbind", () => {
-      const events: Array<string> = [];
-
-      @Injectable()
-      class ServiceA {
-        @OnDeactivation()
-        public onDeactivation(): void {
-          events.push("deactivate-a");
-        }
-      }
-
-      const container = new ContainerKernel();
-
-      container.bind<ServiceA>({ token: "a", type: "Instance", value: ServiceA });
-      container.get("a");
-
-      container.addUnbindInterceptor({ onUnbind: (token) => events.push(`intercept-${String(token)}`) });
-      container.unbind("a");
-
-      expect(events).toEqual(["intercept-a", "deactivate-a"]);
-    });
-
-    it("should run onUnbindAll exactly once before deactivation", () => {
-      const events: Array<string> = [];
-
-      @Injectable()
-      class ServiceA {
-        @OnDeactivation()
-        public onDeactivation(): void {
-          events.push("deactivate-a");
-        }
-      }
-
-      @Injectable()
-      class ServiceB {
-        @OnDeactivation()
-        public onDeactivation(): void {
-          events.push("deactivate-b");
-        }
-      }
-
-      const container = new ContainerKernel();
-
-      container.bind<ServiceA>({ token: "a", type: "Instance", value: ServiceA });
-      container.bind<ServiceB>({ token: "b", type: "Instance", value: ServiceB });
-      container.get("a");
-      container.get("b");
-
-      container.addUnbindInterceptor({
-        onUnbind: (token) => events.push(`intercept-${String(token)}`),
-        onUnbindAll: () => events.push("intercept-all"),
-      });
-      container.unbindAll();
-
-      expect(events).toEqual(["intercept-all", "deactivate-a", "deactivate-b"]);
-    });
-
-    it("should stop calling removed interceptors", () => {
-      const events: Array<string> = [];
-      const container = new ContainerKernel();
-
-      container.bind({ token: "a", value: "A" });
-
-      const remove = container.addUnbindInterceptor({
-        onUnbind: () => events.push("intercept"),
-        onUnbindAll: () => events.push("intercept-all"),
-      });
-
-      remove();
-      container.unbind("a");
-      container.unbindAll();
-
-      expect(events).toEqual([]);
-    });
   });
 });

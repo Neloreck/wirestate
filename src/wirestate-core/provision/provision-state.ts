@@ -1,84 +1,93 @@
 import type { ProvisionId } from "../activation/wire-status";
 import type { ServiceToken } from "../binding/binding";
-import type { Container } from "../container/container";
 import type { ContainerKernel } from "../container/container-kernel";
-import type { Definable } from "../types/general";
+import type { Definable, Maybe } from "../types/general";
 
 /**
- * Represents provider lifecycle state keyed by container.
+ * Provider lifecycle state owned by a single container.
  *
- * Framework adapters keep one map per provider tree.
+ * @remarks
+ * One container is provisioned by at most one provider at a time, so this whole
+ * record is the single source of truth for that container's provider ownership.
+ * It is held in a {@link WeakMap} keyed by container today; a follow-up
+ * (ADR 0003 phase 2) upgrades it into a private `Container` field once the
+ * activation layer no longer reads it from inside the kernel.
  *
  * @group Container
+ * @internal
  */
-export type ContainerProvisionLifecycle = Map<Container, Array<object>>;
+export interface ProvisionState {
+  /**
+   * Tri-state provider ownership: `undefined` while never provisioned, `true`
+   * while provider-owned, and `false` after deprovisioning.
+   */
+  status: Definable<boolean>;
+
+  /**
+   * Resolved provider lifecycle participant instances, in provision order.
+   *
+   * @remarks
+   * `null` means no instances entry is currently tracked — either the container
+   * was never provisioned or its last lifecycle binding was unbound.
+   */
+  instances: Maybe<Array<object>>;
+
+  /**
+   * Binding tokens that caused each instance to enter provider lifecycle state.
+   */
+  tokensByInstance: Map<object, Set<ServiceToken>>;
+}
 
 /**
- * Internal storage for unbind interceptor removers registered while a provider
- * lifecycle owns a container, keyed by container and lifecycle.
+ * Internal storage for the provider lifecycle state of each container.
  *
  * @internal
  */
-export const UNBIND_INTERCEPTOR_REMOVERS: WeakMap<
-  ContainerKernel,
-  Map<ContainerProvisionLifecycle, () => void>
-> = new WeakMap();
-
-/**
- * Internal storage for provider lifecycle maps that currently own a container.
- *
- * @internal
- */
-export const PROVISION_LIFECYCLES_BY_CONTAINER: WeakMap<
-  ContainerKernel,
-  Set<ContainerProvisionLifecycle>
-> = new WeakMap();
-
-/**
- * Internal storage for provider lifecycle tokens represented by an instance.
- *
- * @internal
- */
-export const PROVISION_TOKENS_BY_INSTANCE: WeakMap<object, Set<ServiceToken>> = new WeakMap();
+const PROVISION_STATE: WeakMap<ContainerKernel, ProvisionState> = new WeakMap();
 
 /**
  * Internal storage for the latest provider provision cycle ID per instance.
+ *
+ * @remarks
+ * Kept per instance rather than on {@link ProvisionState} because it must
+ * outlive a single provision cycle (it survives a `null` reset of
+ * `WireStatus.provisionId` so reprovision keeps issuing unique IDs).
  *
  * @internal
  */
 export const PROVISION_IDS_BY_INSTANCE: WeakMap<object, ProvisionId> = new WeakMap();
 
 /**
- * Internal storage for current provider ownership state keyed by container.
- *
- * Tri-state: `true` while provider-owned, `false` after deprovisioning, and
- * absent for containers that never entered provider ownership.
- */
-const PROVISION_STATUS_BY_CONTAINER: WeakMap<ContainerKernel, boolean> = new WeakMap();
-
-/**
- * Stores the provider ownership state for a container.
+ * Returns the provider lifecycle state for a container, if any exists.
  *
  * @group Container
  * @internal
  *
- * @param container - ContainerKernel entering or leaving provider ownership.
- * @param provisioned - `true` when provisioned, `false` when deprovisioned.
+ * @param container - Container to inspect.
+ * @returns The container's provision state, or `undefined` when never provisioned.
  */
-export function setContainerProvisioned(container: ContainerKernel, provisioned: boolean): void {
-  PROVISION_STATUS_BY_CONTAINER.set(container, provisioned);
+export function getProvisionState(container: ContainerKernel): Maybe<ProvisionState> {
+  return PROVISION_STATE.get(container);
 }
 
 /**
- * Resets the provider ownership state for a container to never-provisioned.
+ * Returns the provider lifecycle state for a container, creating it on first use.
  *
  * @group Container
  * @internal
  *
- * @param container - ContainerKernel whose ownership state is reset.
+ * @param container - Container entering provider lifecycle.
+ * @returns The container's provision state.
  */
-export function clearContainerProvisionStatus(container: ContainerKernel): void {
-  PROVISION_STATUS_BY_CONTAINER.delete(container);
+export function getOrCreateProvisionState(container: ContainerKernel): ProvisionState {
+  let state: Maybe<ProvisionState> = PROVISION_STATE.get(container);
+
+  if (!state) {
+    state = { status: undefined, instances: null, tokensByInstance: new Map() };
+    PROVISION_STATE.set(container, state);
+  }
+
+  return state;
 }
 
 /**
@@ -87,10 +96,23 @@ export function clearContainerProvisionStatus(container: ContainerKernel): void 
  * @group Container
  * @internal
  *
- * @param container - ContainerKernel to inspect.
+ * @param container - Container to inspect.
  * @returns `true` while provider-owned, `false` after deprovisioning, or
  * `undefined` when the container never entered provider ownership.
  */
 export function getContainerProvisionStatus(container: ContainerKernel): Definable<boolean> {
-  return PROVISION_STATUS_BY_CONTAINER.get(container);
+  return PROVISION_STATE.get(container)?.status;
+}
+
+/**
+ * Stores the provider ownership state for a container.
+ *
+ * @group Container
+ * @internal
+ *
+ * @param container - Container entering or leaving provider ownership.
+ * @param provisioned - `true` when provisioned, `false` when deprovisioned.
+ */
+export function setContainerProvisioned(container: ContainerKernel, provisioned: boolean): void {
+  getOrCreateProvisionState(container).status = provisioned;
 }

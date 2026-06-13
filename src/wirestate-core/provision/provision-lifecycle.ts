@@ -14,14 +14,10 @@ import type { Maybe } from "../types/general";
 import { getDeprovisionHandlerMetadata } from "./on-deprovision";
 import { getProvisionHandlerMetadata } from "./on-provision";
 import {
-  clearContainerProvisionStatus,
-  ContainerProvisionLifecycle,
-  getContainerProvisionStatus,
+  getOrCreateProvisionState,
+  getProvisionState,
   PROVISION_IDS_BY_INSTANCE,
-  PROVISION_LIFECYCLES_BY_CONTAINER,
-  PROVISION_TOKENS_BY_INSTANCE,
-  setContainerProvisioned,
-  UNBIND_INTERCEPTOR_REMOVERS,
+  ProvisionState,
 } from "./provision-state";
 
 /**
@@ -32,78 +28,58 @@ import {
  * provision cycle. It also updates instance lifecycle status so
  * {@link WireStatus} reflects provider ownership.
  *
+ * A container is provisioned by at most one provider at a time. Provisioning a
+ * container that is already provisioned throws; deprovision it first.
+ *
  * @group Container
+ * @internal
  *
  * @param container - Container entering provider ownership.
- * @param lifecycle - Provider lifecycle state.
  * @param bindings - Bindings controlled by the provider.
  *
- * @example
- * ```typescript
- * import { Injectable, OnProvision, Container, provisionContainer } from "@wirestate/core";
- *
- * @Injectable()
- * class PanelService {
- *   @OnProvision()
- *   public connect(): void {}
- * }
- *
- * const container = new Container({ bindings: [PanelService] });
- * const lifecycle = new Map();
- *
- * provisionContainer(container, lifecycle);
- * ```
+ * @throws {@link WirestateError} If the container is already provisioned.
  */
-export function provisionContainer(
-  container: Container,
-  lifecycle: ContainerProvisionLifecycle,
-  bindings: Bindings = container.getOwnBindings()
-): void {
-  if (lifecycle.has(container)) {
-    return;
+export function provisionContainer(container: Container, bindings: Bindings = container.getOwnBindings()): void {
+  const state: ProvisionState = getOrCreateProvisionState(container);
+
+  if (state.status === true) {
+    throw new WirestateError(
+      "Container is already provisioned. Deprovision it before provisioning it again.",
+      ERROR_CODE_VALIDATION_ERROR
+    );
   }
 
   dbg.info(prefix(__filename), "Provisioning container:", { container });
 
-  clearContainerProvisionStatus(container);
-
-  lifecycle.set(container, provisionInstances(container, bindings));
-  trackProvisionLifecycle(container, lifecycle);
-
-  setContainerProvisioned(container, true);
+  state.status = undefined;
+  state.instances = provisionInstances(container, state, bindings);
+  state.status = true;
 }
 
 /**
  * Deprovisions a container for a framework provider.
  *
+ * @remarks
+ * Idempotent: a second deprovision of an already deprovisioned (or never
+ * provisioned) container is a no-op.
+ *
  * @group Container
+ * @internal
  *
  * @param container - Container leaving provider ownership.
- * @param lifecycle - Provider lifecycle state.
- *
- * @example
- * ```typescript
- * import { Injectable, OnDeprovision, Container, deprovisionContainer, provisionContainer } from "@wirestate/core";
- *
- * @Injectable()
- * class PanelService {
- *   @OnDeprovision()
- *   public disconnect(): void {}
- * }
- *
- * const container = new Container({ bindings: [PanelService] });
- * const lifecycle = new Map();
- *
- * provisionContainer(container, lifecycle, [PanelService]);
- * deprovisionContainer(container, lifecycle);
- * ```
  */
-export function deprovisionContainer(container: Container, lifecycle: ContainerProvisionLifecycle): void {
-  const wasProvisioned: boolean = getContainerProvisionStatus(container) === true;
+export function deprovisionContainer(container: Container): void {
+  const state: Maybe<ProvisionState> = getProvisionState(container);
 
-  setContainerProvisioned(container, false);
+  if (!state) {
+    return;
+  }
 
-  const instances: Maybe<Array<object>> = lifecycle.get(container);
+  const wasProvisioned: boolean = state.status === true;
+
+  state.status = false;
+
+  const instances: Maybe<Array<object>> = state.instances;
 
   if (instances) {
     dbg.info(prefix(__filename), "Deprovisioning container:", {
@@ -116,14 +92,12 @@ export function deprovisionContainer(container: Container, lifecycle: ContainerP
     markActiveInstancesDeprovisioned(container);
 
     for (const instance of instances) {
-      PROVISION_TOKENS_BY_INSTANCE.delete(instance);
+      state.tokensByInstance.delete(instance);
     }
 
-    lifecycle.delete(container);
-
-    untrackProvisionLifecycle(container, lifecycle);
+    state.instances = null;
   } else if (wasProvisioned) {
-    // Unbinding the last lifecycle binding already removed the lifecycle entry,
+    // Unbinding the last lifecycle binding already cleared the instances entry,
     // but the container itself is only leaving provider ownership now.
     markActiveInstancesDeprovisioned(container);
   }
@@ -152,78 +126,50 @@ function markActiveInstancesDeprovisioned(container: Container): void {
  * @param token - Binding token removed from the container.
  */
 export function deprovisionContainerBinding(container: Container, token: ServiceToken): void {
-  const lifecycles: Maybe<Set<ContainerProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
+  const state: Maybe<ProvisionState> = getProvisionState(container);
+  const instances: Maybe<Array<object>> = state?.instances;
 
-  if (!lifecycles) {
+  if (!state || !instances) {
     return;
   }
 
-  for (const lifecycle of Array.from(lifecycles)) {
-    const instances: Maybe<Array<object>> = lifecycle.get(container);
+  const removed: Array<object> = [];
+  const remaining: Array<object> = [];
 
-    if (!instances) {
-      continue;
-    }
-
-    const removed: Array<object> = [];
-    const remaining: Array<object> = [];
-
-    for (const instance of instances) {
-      if (isInstanceProvisionedForToken(instance, token)) {
-        removed.push(instance);
-      } else {
-        remaining.push(instance);
-      }
-    }
-
-    if (removed.length === 0) {
-      continue;
-    }
-
-    deprovisionInstances(removed);
-    untrackProvisionToken(removed, token);
-
-    if (remaining.length > 0) {
-      lifecycle.set(container, remaining);
+  for (const instance of instances) {
+    if (isInstanceProvisionedForToken(state, instance, token)) {
+      removed.push(instance);
     } else {
-      lifecycle.delete(container);
-      untrackProvisionLifecycle(container, lifecycle);
+      remaining.push(instance);
     }
   }
-}
 
-/**
- * Deprovisions all provider lifecycle instances owned by a container.
- *
- * @group Container
- * @internal
- *
- * @param container - Container leaving provider ownership.
- */
-export function deprovisionContainerBindings(container: Container): void {
-  const lifecycles: Maybe<Set<ContainerProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
-
-  if (!lifecycles) {
+  if (removed.length === 0) {
     return;
   }
 
-  for (const lifecycle of Array.from(lifecycles)) {
-    deprovisionContainer(container, lifecycle);
-  }
+  deprovisionInstances(removed);
+  untrackProvisionToken(state, removed, token);
+
+  state.instances = remaining.length > 0 ? remaining : null;
 }
 
 /**
  * Resolves provider lifecycle participants and calls provision hooks.
  *
  * @group Container
+ * @internal
  *
  * @param container - Container that owns the bindings.
+ * @param state - Provider lifecycle state for the container.
  * @param bindings - Bindings controlled by the provider.
  * @returns Instances that were resolved for provider lifecycle management.
- *
- * @internal
  */
-export function provisionInstances(container: Container, bindings: Bindings = []): Array<object> {
+export function provisionInstances(
+  container: Container,
+  state: ProvisionState,
+  bindings: Bindings = []
+): Array<object> {
   const instances: Array<object> = [];
   const trackedTokens: Array<readonly [object, ServiceToken]> = [];
   const visited: Set<ServiceToken> = new Set();
@@ -251,7 +197,7 @@ export function provisionInstances(container: Container, bindings: Bindings = []
 
       const instance: object = container.get(token) as object;
 
-      trackProvisionToken(instance, token);
+      trackProvisionToken(state, instance, token);
       trackedTokens.push([instance, token]);
       instances.push(instance);
     }
@@ -297,7 +243,7 @@ export function provisionInstances(container: Container, bindings: Bindings = []
     } catch (error) {
       const reachedInstances: Array<object> = instances.slice(0, index + 1);
 
-      setContainerProvisioned(container, false);
+      state.status = false;
 
       deprovisionInstances(reachedInstances);
 
@@ -307,8 +253,8 @@ export function provisionInstances(container: Container, bindings: Bindings = []
         activeStatus.isDeprovisioned = true;
       }
 
-      for (const [instance, token] of trackedTokens) {
-        untrackProvisionToken([instance], token);
+      for (const [trackedInstance, token] of trackedTokens) {
+        untrackProvisionToken(state, [trackedInstance], token);
       }
 
       throw error;
@@ -371,97 +317,20 @@ export function deprovisionInstances(instances: ReadonlyArray<object>): void {
 }
 
 /**
- * Tracks a provider lifecycle map that currently owns a container.
- *
- * @remarks
- * Also registers an unbind interceptor on the container, so raw
- * `container.unbind`/`container.unbindAll` calls deprovision owned instances
- * before binding deactivation.
- *
- * @internal
- *
- * @param container - Provisioned container.
- * @param lifecycle - Provider lifecycle state.
- */
-function trackProvisionLifecycle(container: Container, lifecycle: ContainerProvisionLifecycle): void {
-  let lifecycles: Maybe<Set<ContainerProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
-
-  if (!lifecycles) {
-    lifecycles = new Set();
-    PROVISION_LIFECYCLES_BY_CONTAINER.set(container, lifecycles);
-  }
-
-  lifecycles.add(lifecycle);
-
-  let removers: Maybe<Map<ContainerProvisionLifecycle, () => void>> = UNBIND_INTERCEPTOR_REMOVERS.get(container);
-
-  if (!removers) {
-    removers = new Map();
-    UNBIND_INTERCEPTOR_REMOVERS.set(container, removers);
-  }
-
-  if (!removers.has(lifecycle)) {
-    removers.set(
-      lifecycle,
-      container.addUnbindInterceptor({
-        onUnbind: (token) => {
-          if (container.hasOwn(token)) {
-            deprovisionContainerBinding(container, token);
-          }
-        },
-        onUnbindAll: () => deprovisionContainerBindings(container),
-      })
-    );
-  }
-}
-
-/**
- * Removes a provider lifecycle map from a container, together with the unbind
- * interceptor registered when the lifecycle took ownership.
- *
- * @internal
- *
- * @param container - Deprovisioned container.
- * @param lifecycle - Provider lifecycle state.
- */
-function untrackProvisionLifecycle(container: Container, lifecycle: ContainerProvisionLifecycle): void {
-  const lifecycles: Maybe<Set<ContainerProvisionLifecycle>> = PROVISION_LIFECYCLES_BY_CONTAINER.get(container);
-
-  if (lifecycles) {
-    lifecycles.delete(lifecycle);
-
-    if (lifecycles.size === 0) {
-      PROVISION_LIFECYCLES_BY_CONTAINER.delete(container);
-    }
-  }
-
-  const removers: Maybe<Map<ContainerProvisionLifecycle, () => void>> = UNBIND_INTERCEPTOR_REMOVERS.get(container);
-  const remove: Maybe<() => void> = removers?.get(lifecycle);
-
-  if (removers && remove) {
-    remove();
-    removers.delete(lifecycle);
-
-    if (removers.size === 0) {
-      UNBIND_INTERCEPTOR_REMOVERS.delete(container);
-    }
-  }
-}
-
-/**
  * Tracks which binding token caused an instance to enter provider lifecycle state.
  *
  * @internal
  *
+ * @param state - Provider lifecycle state for the owning container.
  * @param instance - Provisioned instance.
  * @param token - Binding token used to resolve the instance.
  */
-function trackProvisionToken(instance: object, token: ServiceToken): void {
-  let tokens: Maybe<Set<ServiceToken>> = PROVISION_TOKENS_BY_INSTANCE.get(instance);
+function trackProvisionToken(state: ProvisionState, instance: object, token: ServiceToken): void {
+  let tokens: Maybe<Set<ServiceToken>> = state.tokensByInstance.get(instance);
 
   if (!tokens) {
     tokens = new Set();
-    PROVISION_TOKENS_BY_INSTANCE.set(instance, tokens);
+    state.tokensByInstance.set(instance, tokens);
   }
 
   tokens.add(token);
@@ -472,12 +341,13 @@ function trackProvisionToken(instance: object, token: ServiceToken): void {
  *
  * @internal
  *
+ * @param state - Provider lifecycle state for the owning container.
  * @param instances - Instances losing a lifecycle token.
  * @param token - Binding token to remove.
  */
-function untrackProvisionToken(instances: ReadonlyArray<object>, token: ServiceToken): void {
+function untrackProvisionToken(state: ProvisionState, instances: ReadonlyArray<object>, token: ServiceToken): void {
   for (const instance of instances) {
-    const tokens: Maybe<Set<ServiceToken>> = PROVISION_TOKENS_BY_INSTANCE.get(instance);
+    const tokens: Maybe<Set<ServiceToken>> = state.tokensByInstance.get(instance);
 
     if (!tokens) {
       continue;
@@ -486,7 +356,7 @@ function untrackProvisionToken(instances: ReadonlyArray<object>, token: ServiceT
     tokens.delete(token);
 
     if (tokens.size === 0) {
-      PROVISION_TOKENS_BY_INSTANCE.delete(instance);
+      state.tokensByInstance.delete(instance);
     }
   }
 }
@@ -496,12 +366,13 @@ function untrackProvisionToken(instances: ReadonlyArray<object>, token: ServiceT
  *
  * @internal
  *
+ * @param state - Provider lifecycle state for the owning container.
  * @param instance - Provisioned instance.
  * @param token - Binding token to inspect.
  * @returns True when the instance was provisioned for the token.
  */
-function isInstanceProvisionedForToken(instance: object, token: ServiceToken): boolean {
-  return PROVISION_TOKENS_BY_INSTANCE.get(instance)?.has(token) ?? false;
+function isInstanceProvisionedForToken(state: ProvisionState, instance: object, token: ServiceToken): boolean {
+  return state.tokensByInstance.get(instance)?.has(token) ?? false;
 }
 
 /**

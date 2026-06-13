@@ -110,13 +110,11 @@ container.unbind(UserService);
 child.unbindAll();
 ```
 
-The container deactivates removed services and runs registered unbind interceptors first. If a provider owns the
-service, `@OnDeprovision` runs before service deactivation. After `unbindAll`, discard the container.
+The container deactivates removed services. If a provider owns the service, `@OnDeprovision` runs before service
+deactivation. After `unbindAll`, discard the container.
 
 ## API Reference
 
 [`Container`](/api/wirestate-core/classes/Container),
 [`ContainerConfig`](/api/wirestate-core/interfaces/ContainerConfig),
-[`ContainerOptions`](/api/wirestate-core/interfaces/ContainerOptions),
-[`provisionContainer`](/api/wirestate-core/functions/provisionContainer),
-[`deprovisionContainer`](/api/wirestate-core/functions/deprovisionContainer).
+[`ContainerOptions`](/api/wirestate-core/interfaces/ContainerOptions).

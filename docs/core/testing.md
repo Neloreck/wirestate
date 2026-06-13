@@ -41,7 +41,7 @@ test("increments count", () => {
 ## Several Services
 
 `new Container(...)` binds a group of services. Use `activate` when activation behavior needs to run before assertions.
-Use `provisionContainer` when the behavior under test lives in `@OnProvision` or `@OnDeprovision`.
+Use `container.provision()` when the behavior under test lives in `@OnProvision` or `@OnDeprovision`.
 
 ```ts
 import { Container, EventBus } from "@wirestate/core";

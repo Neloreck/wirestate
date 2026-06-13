@@ -50,10 +50,8 @@ export { OnQuery, OnQueryHandlerDecorator } from "./messaging/queries/on-query";
 
 export { Injectable, isInjectable } from "./metadata/metadata-injectable";
 
-export { deprovisionContainer, provisionContainer } from "./provision/provision-lifecycle";
 export { OnDeprovision } from "./provision/on-deprovision";
 export { OnProvision } from "./provision/on-provision";
-export { ContainerProvisionLifecycle } from "./provision/provision-state";
 
 export { WireScope } from "./scope/wire-scope";
 

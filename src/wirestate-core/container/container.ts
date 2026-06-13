@@ -13,6 +13,11 @@ import { CommandBus } from "../messaging/commands/command-bus";
 import { EventBus } from "../messaging/events/event-bus";
 import { messagingActivationAdapter } from "../messaging/messaging-activation";
 import { QueryBus } from "../messaging/queries/query-bus";
+import {
+  deprovisionContainer,
+  deprovisionContainerBinding,
+  provisionContainer,
+} from "../provision/provision-lifecycle";
 import { WireScope } from "../scope/wire-scope";
 import { Maybe } from "../types/general";
 
@@ -147,5 +152,58 @@ export class Container extends ContainerKernel {
     for (const binding of activate) {
       this.get(binding);
     }
+  }
+
+  /**
+   * Provisions this container for a framework provider.
+   *
+   * @remarks
+   * Resolves provider lifecycle participants and runs `@OnProvision` once for
+   * this provision cycle. A container is provisioned by at most one provider at
+   * a time: provisioning an already provisioned container throws — deprovision
+   * it first.
+   *
+   * @throws {@link WirestateError} If the container is already provisioned.
+   */
+  public provision(): void {
+    provisionContainer(this);
+  }
+
+  /**
+   * Deprovisions this container for a framework provider.
+   *
+   * @remarks
+   * Runs `@OnDeprovision` in reverse provision order. Idempotent: deprovisioning
+   * a container that is not currently provisioned is a no-op.
+   */
+  public deprovision(): void {
+    deprovisionContainer(this);
+  }
+
+  /**
+   * Unbinds a token, deprovisioning the owned provider lifecycle instance it
+   * represents before the kernel deactivates it.
+   *
+   * @param token - Token to unbind.
+   * @returns The same container for chaining.
+   */
+  public override unbind<T>(token: ServiceToken<T>): this {
+    if (this.hasOwn(token)) {
+      deprovisionContainerBinding(this, token);
+    }
+
+    return super.unbind(token);
+  }
+
+  /**
+   * Unbinds all bindings, deprovisioning owned provider lifecycle instances
+   * before the kernel deactivates them.
+   *
+   * @returns The same container for chaining.
+   */
+  public override unbindAll(): this {
+    deprovisionContainer(this);
+
+    return super.unbindAll();
   }
 }

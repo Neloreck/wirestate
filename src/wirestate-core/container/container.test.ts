@@ -10,7 +10,6 @@ import { WireScope } from "../scope/wire-scope";
 
 import { Container } from "./container";
 import { inject } from "./container-context";
-import { ContainerKernel } from "./container-kernel";
 
 describe("Container", () => {
   it("should create a container with default essentials", () => {
@@ -105,7 +104,7 @@ describe("Container", () => {
   });
 
   it("should respect parent container", () => {
-    const parent: ContainerKernel = new ContainerKernel();
+    const parent: Container = new Container();
     const PARENT_TOKEN: unique symbol = Symbol.for("PARENT_TOKEN");
 
     parent.bind({ token: PARENT_TOKEN, value: "parent-value" });

@@ -11,7 +11,6 @@ import { Injectable } from "../metadata/metadata-injectable";
 import { OnDeprovision } from "../provision/on-deprovision";
 import { OnProvision } from "../provision/on-provision";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
-import { ContainerProvisionLifecycle } from "../provision/provision-state";
 import { WireScope } from "../scope/wire-scope";
 
 /**
@@ -91,11 +90,10 @@ describe("dual-mode method decorators", () => {
     }
 
     const container: Container = new Container({ bindings: [LifecycleProbeService] });
-    const lifecycle: ContainerProvisionLifecycle = new Map();
 
     // Provision participation is decided from the bare class prototype before
     // any instance exists, so this exercises the static metadata read path.
-    provisionContainer(container, lifecycle);
+    provisionContainer(container);
     expect(log).toEqual(["activated", "provision"]);
 
     container.unbind(LifecycleProbeService);
@@ -121,10 +119,9 @@ describe("dual-mode method decorators", () => {
     }
 
     const container: Container = new Container({ bindings: [DeprovisionProbeService] });
-    const lifecycle: ContainerProvisionLifecycle = new Map();
 
-    provisionContainer(container, lifecycle);
-    deprovisionContainer(container, lifecycle);
+    provisionContainer(container);
+    deprovisionContainer(container);
 
     expect(log).toEqual(["provision", "deprovision"]);
   });
