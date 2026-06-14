@@ -29,14 +29,14 @@ export class SearchService {
 ## Execute a Command
 
 ```ts
-import { Injectable, WireScope, inject } from "@wirestate/core";
+import { CommandBus, Injectable, inject } from "@wirestate/core";
 
 @Injectable()
 export class HeaderService {
-  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+  public constructor(private readonly commands: CommandBus = inject(CommandBus)) {}
 
   public openSearch(): void {
-    const opened: boolean = this.scope.execute("OPEN_SEARCH");
+    const opened: boolean = this.commands.execute("OPEN_SEARCH");
 
     if (!opened) {
       console.error("Failed to open search");
@@ -50,7 +50,7 @@ export class HeaderService {
 ## Handle an Async Command
 
 ```ts
-import { Injectable, OnCommand, WireScope, inject } from "@wirestate/core";
+import { CommandBus, Injectable, OnCommand, inject } from "@wirestate/core";
 
 @Injectable()
 export class AuthService {
@@ -62,10 +62,10 @@ export class AuthService {
 
 @Injectable()
 export class HeaderService {
-  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+  public constructor(private readonly commands: CommandBus = inject(CommandBus)) {}
 
   public async logout(): Promise<void> {
-    await this.scope.executeAsync("LOGOUT");
+    await this.commands.executeAsync("LOGOUT");
   }
 }
 ```
@@ -77,9 +77,9 @@ export class HeaderService {
 Use optional commands when a missing handler is valid, such as an optional devtools integration.
 
 ```ts
-const refreshed: boolean | null = this.scope.executeOptional("REFRESH_DEVTOOLS");
+const refreshed: boolean | null = this.commands.executeOptional("REFRESH_DEVTOOLS");
 
-const uploaded: UploadReceipt | null = await this.scope.executeOptionalAsync("UPLOAD_DRAFT", draft);
+const uploaded: UploadReceipt | null = await this.commands.executeOptionalAsync("UPLOAD_DRAFT", draft);
 ```
 
 ## Register Directly
@@ -87,7 +87,7 @@ const uploaded: UploadReceipt | null = await this.scope.executeOptionalAsync("UP
 ```ts
 import { CommandBus, Container } from "@wirestate/core";
 
-const container = new Container();
+const container = new Container({ bindings: [CommandBus] });
 const bus = container.get(CommandBus);
 
 const unregister = bus.register("SAVE_CART", async (cart: Cart) => {
@@ -112,17 +112,17 @@ When a service owns a dynamic command handler, register it during provider lifec
 deprovision.
 
 ```ts
-import { CommandUnregister, Injectable, OnDeprovision, OnProvision, WireScope, inject } from "@wirestate/core";
+import { CommandBus, CommandUnregister, Injectable, OnDeprovision, OnProvision, inject } from "@wirestate/core";
 
 @Injectable()
 export class CartCommandService {
   private unregisterSaveCart: CommandUnregister | null = null;
 
-  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+  public constructor(private readonly commands: CommandBus = inject(CommandBus)) {}
 
   @OnProvision()
   public onProvision(): void {
-    this.unregisterSaveCart = this.scope.registerCommandHandler("SAVE_CART", async (cart: Cart) => {
+    this.unregisterSaveCart = this.commands.register("SAVE_CART", async (cart: Cart) => {
       await this.saveCart(cart);
     });
   }
@@ -143,6 +143,7 @@ Use this pattern when the command handler depends on runtime state or cannot be 
 
 ## API Reference
 
-[`CommandBus`](/api/wirestate-core/classes/CommandBus), [`WireScope`](/api/wirestate-core/classes/WireScope),
-[`OnCommand`](/api/wirestate-core/functions/OnCommand),
-[`CommandUnregister`](/api/wirestate-core/type-aliases/CommandUnregister).
+[`CommandBus`](/api/wirestate-core/classes/CommandBus), [`OnCommand`](/api/wirestate-core/functions/OnCommand),
+[`CommandUnregister`](/api/wirestate-core/type-aliases/CommandUnregister),
+[`OnProvision`](/api/wirestate-core/functions/OnProvision),
+[`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision).

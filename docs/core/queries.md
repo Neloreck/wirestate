@@ -27,14 +27,14 @@ export class CartSummaryService {
 ## Run a Query
 
 ```ts
-import { Injectable, WireScope, inject } from "@wirestate/core";
+import { Injectable, QueryBus, inject } from "@wirestate/core";
 
 @Injectable()
 export class HeaderCartService {
-  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+  public constructor(private readonly queries: QueryBus = inject(QueryBus)) {}
 
   public getCheckoutSummary(): { itemCount: number; total: number } {
-    return this.scope.query("CHECKOUT_SUMMARY");
+    return this.queries.query("CHECKOUT_SUMMARY");
   }
 }
 ```
@@ -54,7 +54,7 @@ whether the handler is sync or async.
 ```ts
 import { Container, QueryBus } from "@wirestate/core";
 
-const container = new Container();
+const container = new Container({ bindings: [QueryBus] });
 const bus = container.get(QueryBus);
 
 const unregister = bus.register("CURRENT_USER", () => ({ id: "u1" }));
@@ -69,18 +69,18 @@ When a service owns a dynamic query handler, register it during provider lifecyc
 deprovision.
 
 ```ts
-import { Injectable, OnDeprovision, OnProvision, QueryUnregister, WireScope, inject } from "@wirestate/core";
+import { Injectable, OnDeprovision, OnProvision, QueryBus, QueryUnregister, inject } from "@wirestate/core";
 
 @Injectable()
 export class ShippingQuoteQueryService {
   private unregisterShippingQuote: QueryUnregister | null = null;
   private quote = { etaDays: 3, price: 12 };
 
-  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+  public constructor(private readonly queries: QueryBus = inject(QueryBus)) {}
 
   @OnProvision()
   public onProvision(): void {
-    this.unregisterShippingQuote = this.scope.registerQueryHandler("SHIPPING_QUOTE", () => this.quote);
+    this.unregisterShippingQuote = this.queries.register("SHIPPING_QUOTE", () => this.quote);
   }
 
   @OnDeprovision()
@@ -95,6 +95,8 @@ Use this pattern when the query handler depends on runtime state or cannot be ex
 
 ## API Reference
 
-[`QueryBus`](/api/wirestate-core/classes/QueryBus), [`WireScope`](/api/wirestate-core/classes/WireScope),
-[`OnQuery`](/api/wirestate-core/functions/OnQuery), [`QueryHandler`](/api/wirestate-core/type-aliases/QueryHandler),
-[`QueryUnregister`](/api/wirestate-core/type-aliases/QueryUnregister).
+[`QueryBus`](/api/wirestate-core/classes/QueryBus), [`OnQuery`](/api/wirestate-core/functions/OnQuery),
+[`QueryHandler`](/api/wirestate-core/type-aliases/QueryHandler),
+[`QueryUnregister`](/api/wirestate-core/type-aliases/QueryUnregister),
+[`OnProvision`](/api/wirestate-core/functions/OnProvision),
+[`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision).

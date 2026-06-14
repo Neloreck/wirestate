@@ -1,9 +1,10 @@
 # Core Containers
 
-A [container](/api/wirestate-core/classes/Container) owns service instances, seed data, and one set of message buses.
+A [container](/api/wirestate-core/classes/Container) owns service instances and the message buses it binds.
 
-Services in the same container share the same `EventBus`, `CommandBus`, and `QueryBus`. Child containers inherit parent
-bindings, but keep their own buses.
+Messaging is opt-in: bind only the buses a container uses, as ordinary `bindings`. Services in the same container share
+the buses bound there. A child container that binds no buses resolves `EventBus`, `CommandBus`, and `QueryBus` from its
+parent chain.
 
 ## Root Container
 
@@ -64,28 +65,27 @@ const child: Container = new Container({
 });
 ```
 
-Child containers inherit parent bindings. Their buses stay local to the child.
+Child containers inherit parent bindings. A child that binds its own buses keeps messaging local; a child that binds none
+shares the parent's buses (see [Inherited Messaging](#inherited-messaging)).
 
 Use child containers for modal state, checkout flows, tenant scope, tests, or any branch that needs its own services or
 local messaging.
 
 ## Inherited Messaging
 
-Pass `{ skipMessaging: true }` as the second `Container` constructor argument when a child should use the parent's
-message buses instead of creating its own.
+A child shares the parent's message buses simply by not binding its own. Omit the bus tokens from the child's `bindings`
+and they resolve from the parent.
 
 ```ts
-const child = new Container(
-  {
-    parent: container,
-    bindings: [CartService],
-  },
-  { skipMessaging: true }
-);
+const child = new Container({
+  parent: container,
+  bindings: [CartService],
+});
 ```
 
-With `skipMessaging`, `WireScope`, `EventBus`, `CommandBus`, and `QueryBus` resolve from the parent. Use this only when
-the child should share event, command, and query handlers with the parent scope.
+Because the child binds no buses, `EventBus`, `CommandBus`, and `QueryBus` resolve from the parent, and sending walks up
+the parent chain. Use this when the child should share event, command, and query handlers with the parent. To give the
+child its own messaging instead, bind the buses on the child.
 
 ## Direct Container Work
 
@@ -116,5 +116,4 @@ deactivation. After `unbindAll`, discard the container.
 ## API Reference
 
 [`Container`](/api/wirestate-core/classes/Container),
-[`ContainerConfig`](/api/wirestate-core/interfaces/ContainerConfig),
-[`ContainerOptions`](/api/wirestate-core/interfaces/ContainerOptions).
+[`ContainerConfig`](/api/wirestate-core/interfaces/ContainerConfig).

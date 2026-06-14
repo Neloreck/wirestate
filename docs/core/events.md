@@ -7,14 +7,14 @@ Each container owns its own `EventBus`. Events stay in that container and do not
 ## Emit from a Service
 
 ```ts
-import { Injectable, WireScope, inject } from "@wirestate/core";
+import { EventBus, Injectable, inject } from "@wirestate/core";
 
 @Injectable()
 export class CartService {
-  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+  public constructor(private readonly events: EventBus = inject(EventBus)) {}
 
   public addItem(item: CartItem): void {
-    this.scope.emitEvent("CART_ITEM_ADDED", item, { source: this });
+    this.events.emit("CART_ITEM_ADDED", item, { source: this });
   }
 }
 ```
@@ -50,7 +50,7 @@ Use direct subscriptions when the handler is dynamic or created at runtime.
 ```ts
 import { Container, EventBus } from "@wirestate/core";
 
-const container = new Container();
+const container = new Container({ bindings: [EventBus] });
 const bus = container.get(EventBus);
 
 const unsubscribe = bus.subscribe((event) => {
@@ -75,17 +75,17 @@ const unsubscribe = bus.subscribe(["CART_VIEWED", "CART_CLEARED"], (event) => {
 When a service owns a dynamic subscription, attach it during provider lifecycle and remove it during deprovision.
 
 ```ts
-import { EventUnsubscribe, Injectable, OnDeprovision, OnProvision, WireScope, inject } from "@wirestate/core";
+import { EventBus, EventUnsubscribe, Injectable, OnDeprovision, OnProvision, inject } from "@wirestate/core";
 
 @Injectable()
 export class CartActivityService {
   private unsubscribe: EventUnsubscribe | null = null;
 
-  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+  public constructor(private readonly events: EventBus = inject(EventBus)) {}
 
   @OnProvision()
   public onProvision(): void {
-    this.unsubscribe = this.scope.subscribeToEvent("CART_VIEWED", () => {
+    this.unsubscribe = this.events.subscribe("CART_VIEWED", () => {
       this.recordView();
     });
   }
@@ -108,6 +108,8 @@ If an event handler throws, Wirestate logs the error and continues with the next
 
 ## API Reference
 
-[`EventBus`](/api/wirestate-core/classes/EventBus), [`WireScope`](/api/wirestate-core/classes/WireScope),
-[`OnEvent`](/api/wirestate-core/functions/OnEvent), [`WireEvent`](/api/wirestate-core/interfaces/WireEvent),
-[`EventUnsubscribe`](/api/wirestate-core/type-aliases/EventUnsubscribe).
+[`EventBus`](/api/wirestate-core/classes/EventBus), [`OnEvent`](/api/wirestate-core/functions/OnEvent),
+[`WireEvent`](/api/wirestate-core/interfaces/WireEvent),
+[`EventUnsubscribe`](/api/wirestate-core/type-aliases/EventUnsubscribe),
+[`OnProvision`](/api/wirestate-core/functions/OnProvision),
+[`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision).

@@ -53,18 +53,19 @@ function DebugFlag() {
 }
 ```
 
-## Scope
+## Messaging
 
-`useScope` returns the `WireScope` bound in the active container. Use it for events, commands, queries, or lazy
-resolution.
+Injection hooks resolve services and values. For messaging, use the dedicated hooks: `useEventEmitter` and `useEvent` for
+events, `useCommandExecutor` and `useCommandHandler` for commands, and `useQueryExecutor` and `useQueryHandler` for
+queries.
 
 ```tsx
-import { useScope } from "@wirestate/react";
+import { useEventEmitter } from "@wirestate/react";
 
 function DebugButton() {
-  const scope = useScope();
+  const emit = useEventEmitter();
 
-  return <button onClick={() => scope.emitEvent("DEBUG_CLICKED")}>Debug</button>;
+  return <button onClick={() => emit("DEBUG_CLICKED")}>Debug</button>;
 }
 ```
 
@@ -72,5 +73,4 @@ function DebugButton() {
 
 [`useInjection`](/api/wirestate-react/functions/useInjection),
 [`useOptionalInjection`](/api/wirestate-react/functions/useOptionalInjection),
-[`useContainer`](/api/wirestate-react/functions/useContainer),
-[`useScope`](/api/wirestate-react/functions/useScope).
+[`useContainer`](/api/wirestate-react/functions/useContainer).

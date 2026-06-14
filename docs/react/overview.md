@@ -79,7 +79,7 @@ fit together.
 ## React Package Surface
 
 - `ContainerProvider` publishes containers through React context.
-- `useInjection`, `useOptionalInjection`, `useContainer`, and `useScope` read from the active container.
+- `useInjection`, `useOptionalInjection`, and `useContainer` read from the active container.
 - `useEvent`, `useEvents`, `useAllEvents`, and `useEventEmitter` work with the event bus.
 - `useCommandExecutor`, `useAsyncCommandExecutor`, `useOptionalCommandExecutor`,
   `useOptionalAsyncCommandExecutor`, and `useCommandHandler` work with the command bus.

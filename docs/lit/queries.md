@@ -34,22 +34,24 @@ class CheckoutAnswer extends LitElement {
 
 ## Execute from an Element
 
+Inject `QueryBus` and bind it in the provider's `config.bindings`.
+
 ```ts
-import { WireScope } from "@wirestate/core";
+import { QueryBus } from "@wirestate/core";
 import { injection } from "@wirestate/lit";
 import { LitElement, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
 
 @customElement("checkout-summary-button")
 export class CheckoutSummaryButton extends LitElement {
-  @injection(WireScope)
-  private scope!: WireScope;
+  @injection(QueryBus)
+  private queries!: QueryBus;
 
   @state()
   private itemCount: number = 0;
 
   private readSummary(): void {
-    const summary = this.scope.query<{ itemCount: number; total: number }>("CHECKOUT_SUMMARY");
+    const summary = this.queries.query<{ itemCount: number; total: number }>("CHECKOUT_SUMMARY");
 
     this.itemCount = summary.itemCount;
   }

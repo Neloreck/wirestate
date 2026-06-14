@@ -41,7 +41,10 @@ test("increments count", () => {
 ## Several Services
 
 `new Container(...)` binds a group of services. Use `activate` when activation behavior needs to run before assertions.
-Use `container.provision()` when the behavior under test lives in `@OnProvision` or `@OnDeprovision`.
+Call `container.provision()` whenever the behavior under test relies on messaging: auto-wired `@OnEvent`, `@OnCommand`,
+and `@OnQuery` handlers subscribe at provision and unsubscribe at deprovision, so without a UI provider a plain-core test
+must provision the container first. Tear down with `container.deprovision()` (or `container.unbindAll()`, which
+deprovisions first).
 
 ```ts
 import { Container, EventBus } from "@wirestate/core";
@@ -49,9 +52,11 @@ import { CounterService, LoggerService } from "./services";
 
 test("counter emits event on increment", () => {
   const container = new Container({
-    activate: [CounterService],
-    bindings: [LoggerService, CounterService],
+    bindings: [EventBus, LoggerService, CounterService],
   });
+
+  // Subscribes the auto-wired @OnEvent handlers before the event is emitted.
+  container.provision();
 
   const counter = container.get(CounterService);
   const events: Array<string | symbol> = [];
@@ -61,6 +66,8 @@ test("counter emits event on increment", () => {
   counter.increment();
 
   expect(events).toContain("COUNTER_INCREMENTED");
+
+  container.deprovision();
 });
 ```
 

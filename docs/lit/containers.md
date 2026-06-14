@@ -30,13 +30,13 @@ Use `@OnProvision` for resource work tied to the connected provider lifetime. Us
 `@OnActivated` for cheap setup that does not open timers, subscriptions, or external handles. See
 [Core Lifecycle](/core/lifecycle).
 
-## Messaging Scope
+## Messaging
 
-Managed providers create container-local event, command, and query buses by default. Pass `scope: "parent"` when a child
-container should inherit those buses from `config.parent`.
+Messaging is opt-in and composable. A container only has the buses it binds, so add `EventBus`, `CommandBus`, or
+`QueryBus` to `config.bindings` when the element subtree needs them. There is no default trio.
 
 ```ts
-import { Container } from "@wirestate/core";
+import { Container, EventBus } from "@wirestate/core";
 import { ContainerProvider, provideContainer } from "@wirestate/lit";
 import { LitElement } from "lit";
 import { CheckoutService, RootService } from "./services";
@@ -45,14 +45,14 @@ const rootContainer: Container = new Container({ bindings: [RootService] });
 
 class CheckoutRoot extends LitElement {
   @provideContainer({
-    config: { parent: rootContainer, bindings: [CheckoutService] },
-    scope: "parent",
+    config: { parent: rootContainer, bindings: [CheckoutService, EventBus] },
   })
   private checkoutProvider!: ContainerProvider;
 }
 ```
 
-`scope: "parent"` affects only managed containers. External containers keep the buses they were created with.
+To share a parent's bus instead of binding a local one, set `config.parent` and leave the bus out of this container's
+`bindings`. Senders and handlers resolve buses up the parent chain, so a nested provider reuses an ancestor's bus.
 
 ## Controller Root Provider
 
@@ -90,5 +90,4 @@ class ApplicationRoot extends LitElement {
 
 [`provideContainer`](/api/wirestate-lit/functions/provideContainer),
 [`ContainerProvider`](/api/wirestate-lit/classes/ContainerProvider),
-[`ContainerProviderScope`](/api/wirestate-lit/enumerations/ContainerProviderScope),
 [`useContainerProvider`](/api/wirestate-lit/functions/useContainerProvider).

@@ -41,19 +41,20 @@ class CartLogger extends LitElement {
 
 ## Emit from an Element
 
-Inject `WireScope` when an element needs to emit.
+Inject `EventBus` when an element needs to emit. Bind `EventBus` in the provider's `config.bindings` so the active
+container exposes it.
 
 ```ts
-import { WireScope } from "@wirestate/core";
+import { EventBus } from "@wirestate/core";
 import { injection } from "@wirestate/lit";
 import { LitElement, html } from "lit";
 
 class CartButton extends LitElement {
-  @injection(WireScope)
-  private scope!: WireScope;
+  @injection(EventBus)
+  private events!: EventBus;
 
   protected render() {
-    return html`<button @click=${() => this.scope.emitEvent("CART_VIEWED", undefined, { source: this })}>Cart</button>`;
+    return html`<button @click=${() => this.events.emit("CART_VIEWED", undefined, { source: this })}>Cart</button>`;
   }
 }
 ```

@@ -58,16 +58,33 @@ class CartIcon extends LitElement {
 }
 ```
 
-`useContainer` and `useScope` expose the active container and `WireScope`.
+`useContainer` exposes the active container for container-level operations.
 
 ```ts
-import { useScope } from "@wirestate/lit";
+import { Container } from "@wirestate/core";
+import { useContainer } from "@wirestate/lit";
+
+class DebugPanel extends LitElement {
+  private readonly container = useContainer(this);
+
+  private hasDebug(): boolean {
+    return this.container.value.has("DEBUG");
+  }
+}
+```
+
+To emit events, execute commands, or run queries from an element, inject the bus you need with `useInjection` (or the
+`injection` decorator) and bind that bus in the provider's `config.bindings`.
+
+```ts
+import { EventBus } from "@wirestate/core";
+import { useInjection } from "@wirestate/lit";
 
 class DebugButton extends LitElement {
-  private readonly scope = useScope(this);
+  private readonly events = useInjection(this, EventBus);
 
   private emitDebug(): void {
-    this.scope.value.emitEvent("DEBUG_CLICKED");
+    this.events.value.emit("DEBUG_CLICKED");
   }
 }
 ```
@@ -76,5 +93,5 @@ class DebugButton extends LitElement {
 
 [`injection`](/api/wirestate-lit/functions/injection),
 [`optionalInjection`](/api/wirestate-lit/functions/optionalInjection), [`useInjection`](/api/wirestate-lit/functions/useInjection),
-[`useOptionalInjection`](/api/wirestate-lit/functions/useOptionalInjection), [`useContainer`](/api/wirestate-lit/functions/useContainer),
-[`useScope`](/api/wirestate-lit/functions/useScope).
+[`useOptionalInjection`](/api/wirestate-lit/functions/useOptionalInjection),
+[`useContainer`](/api/wirestate-lit/functions/useContainer).

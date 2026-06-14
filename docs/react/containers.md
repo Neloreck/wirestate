@@ -32,30 +32,32 @@ work in `@OnProvision`; clean them up in `@OnDeprovision`. See [Core Lifecycle](
 Managed providers recreate the container when `parent`, `onError`, `bindings`, or `activate` changes by
 shallow comparison. Keep config objects and arrays stable with `useMemo` when the container should not be replaced.
 
-## Messaging Scope
+## Messaging
 
-Managed providers create container-local event, command, and query buses by default. Pass `scope="parent"` when a child
-container should inherit those buses from `config.parent`.
+Messaging is opt-in and composable. A container only has the buses it binds, so add `EventBus`, `CommandBus`, or
+`QueryBus` to `config.bindings` when the subtree needs them. There is no default trio.
 
 ```tsx
-import { Container, ContainerConfig } from "@wirestate/core";
-import { ContainerProvider, useContainer } from "@wirestate/react";
+import { ContainerConfig, EventBus } from "@wirestate/core";
+import { ContainerProvider } from "@wirestate/react";
 import { useMemo } from "react";
 import { CheckoutService } from "./services";
 
 function CheckoutFlow() {
-  const parent: Container = useContainer();
-  const config: ContainerConfig = useMemo(() => ({ parent, bindings: [CheckoutService] }), [parent]);
+  const config: ContainerConfig = useMemo(() => ({ bindings: [CheckoutService, EventBus] }), []);
 
   return (
-    <ContainerProvider config={config} scope={"parent"}>
+    <ContainerProvider config={config}>
       <Checkout />
     </ContainerProvider>
   );
 }
 ```
 
-`scope="parent"` affects only managed containers. External containers keep the buses they were created with.
+To share a parent's bus instead of binding a local one, set `config.parent` and leave the bus out of this container's
+`bindings`. Senders, consumer hooks, and service-level `@OnEvent`, `@OnCommand`, and `@OnQuery` handlers all resolve
+buses up the parent chain, so a nested provider reuses an ancestor's bus and a child service can handle an ancestor's
+bus. Those handlers subscribe when the container is provisioned and unsubscribe when it is deprovisioned.
 
 ## External Root Container
 
@@ -83,18 +85,17 @@ caller's responsibility.
 
 ## Direct Access
 
-Prefer `useInjection` for normal service use. Use `useContainer` or `useScope` when a component needs container-level
-operations.
+Prefer `useInjection` for normal service use. Use `useContainer` when a component needs container-level operations.
 
 ```tsx
-import { Container, WireScope } from "@wirestate/core";
-import { useContainer, useScope } from "@wirestate/react";
+import { Container } from "@wirestate/core";
+import { useContainer, useEventEmitter } from "@wirestate/react";
 
 function DevTools() {
   const container: Container = useContainer();
-  const scope: WireScope = useScope();
+  const emit = useEventEmitter();
 
-  return <button onClick={() => scope.emitEvent("DEVTOOLS_OPENED")}>{String(container.has("DEBUG"))}</button>;
+  return <button onClick={() => emit("DEVTOOLS_OPENED")}>{String(container.has("DEBUG"))}</button>;
 }
 ```
 
@@ -102,6 +103,4 @@ function DevTools() {
 
 [`ContainerProvider`](/api/wirestate-react/functions/ContainerProvider),
 [`ContainerProviderProps`](/api/wirestate-react/interfaces/ContainerProviderProps),
-[`ContainerProviderScope`](/api/wirestate-react/enumerations/ContainerProviderScope),
-[`useContainer`](/api/wirestate-react/functions/useContainer),
-[`useScope`](/api/wirestate-react/functions/useScope).
+[`useContainer`](/api/wirestate-react/functions/useContainer).

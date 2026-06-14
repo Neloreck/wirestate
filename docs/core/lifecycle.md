@@ -18,14 +18,15 @@ owner.
 ## Service Layer
 
 Constructor resolution and activation belong to the container. A service can be resolved lazily through
-`container.get(Token)` or `scope.get(Token)`. It can also be resolved eagerly when `new Container({ activate })`
-or a managed provider activates bindings.
+`container.get(Token)`. It can also be resolved eagerly when `new Container({ activate })` or a managed provider
+activates bindings.
 
 `@OnActivated` runs during that first resolution. It is synchronous from the container's point of view: if the hook
 returns a promise, Wirestate reports rejections through the container error handler but does not block resolution.
 
 Use activation for work that does not depend on provider ownership, such as normalizing
-in-memory state. Do not open cleanup-requiring resources there.
+in-memory state. Do not open cleanup-requiring resources there. `@OnActivated` runs before provision, so it is
+outside the messaging window and cannot emit, execute, or query.
 
 ## Provider Layer
 
@@ -34,6 +35,14 @@ Provision and deprovision belong to the owner that exposes a container to an app
 `@OnProvision` and `@OnDeprovision` are the right place for provider-owned resources. Wirestate resolves provider
 lifecycle participants before calling provision hooks, calls provision hooks in binding order, and calls deprovision
 hooks in reverse order.
+
+Message handlers are also wired here. `@OnEvent`, `@OnCommand`, and `@OnQuery` subscribe at provision and unsubscribe
+at deprovision, so the messaging window is `[@OnProvision … @OnDeprovision]`. Provision force-activates every service
+that declares a handler, and a handler's bus resolves up the parent chain, so a child service can handle an ancestor's
+bus. Because subscriptions are provision-scoped, messaging requires the container to be provisioned: a UI provider does
+this automatically, while plain-core usage and tests call `container.provision()` (and `container.deprovision()`).
+`@OnActivated` runs before provision and `@OnDeactivation` runs after deprovision, so neither can emit, execute, or
+query; put setup and teardown messaging in `@OnProvision` and `@OnDeprovision`.
 
 Wirestate tracks lifecycle state for each resolved service instance. Use `WireStatus.for(this)` inside a service when
 async work needs to know whether the instance is still active.

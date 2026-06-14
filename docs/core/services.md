@@ -62,29 +62,59 @@ export class OrderService {
 }
 ```
 
-## WireScope
+## Messaging
 
-Inject [`WireScope`](/api/wirestate-core/classes/WireScope) when a service needs lazy resolution, events, commands,
-or queries from its container.
+Messaging is composable and opt-in. A service injects the specific bus it needs, and the container binds that bus.
+Inject [`EventBus`](/api/wirestate-core/classes/EventBus) to emit and subscribe to events,
+[`CommandBus`](/api/wirestate-core/classes/CommandBus) to execute commands, and
+[`QueryBus`](/api/wirestate-core/classes/QueryBus) to run queries.
 
 ```ts
-import { Injectable, WireScope, inject } from "@wirestate/core";
+import { EventBus, Injectable, inject } from "@wirestate/core";
 
 @Injectable()
 export class CartService {
-  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+  public constructor(private readonly events: EventBus = inject(EventBus)) {}
 
   public checkout(): void {
-    this.scope.emitEvent("CHECKOUT_STARTED");
+    this.events.emit("CHECKOUT_STARTED");
   }
 }
 ```
 
-`WireScope` is transient. Each service gets its own scope handle.
+Bind each bus explicitly alongside the services that use it. There is no default trio.
 
-`WireScope` depends on the container's `EventBus`, `QueryBus`, and `CommandBus`. Containers constructed with
-`new Container(config, { skipMessaging: true })` can only resolve `WireScope` when those buses are inherited from a
-parent container. Without inherited messaging, use direct container injection instead of `WireScope`.
+```ts
+import { Container, EventBus } from "@wirestate/core";
+
+const container: Container = new Container({
+  bindings: [CartService, EventBus],
+});
+```
+
+A child container that wants the parent's bus simply does not bind its own. Buses resolve up the parent chain, so a
+child service can reach an ancestor's bus.
+
+To handle messages, declare primary handlers with [`@OnEvent`](/api/wirestate-core/functions/OnEvent),
+[`@OnCommand`](/api/wirestate-core/functions/OnCommand), and [`@OnQuery`](/api/wirestate-core/functions/OnQuery) on
+service methods. They are auto-wired during container provision and torn down during deprovision.
+
+```ts
+import { EventBus, Injectable, OnEvent, WireEvent } from "@wirestate/core";
+
+@Injectable()
+export class AnalyticsService {
+  @OnEvent("CHECKOUT_STARTED")
+  public onCheckoutStarted(event: WireEvent): void {
+    // record the event
+  }
+}
+```
+
+Handler subscriptions are provision-scoped: they go live at provision and are removed at deprovision, not at
+activation. A UI provider provisions the container automatically; in plain-core usage or tests, call
+`container.provision()` (and `container.deprovision()`). See [Core Lifecycle](/core/lifecycle) for the messaging
+window.
 
 ## Lifecycle
 
@@ -152,18 +182,18 @@ export class ProfileService {
 
 ## Lazy Resolution
 
-Use `scope.get(Token)` when the dependency is only needed later. `scope.getOptional(Token)` returns `null` when
-the token is not bound.
+Inject [`Container`](/api/wirestate-core/classes/Container) and call `container.get(Token)` when the dependency is
+only needed later. Pass `{ optional: true }` to resolve `undefined` instead of throwing when the token is not bound.
 
 ```ts
-import { Injectable, WireScope, inject } from "@wirestate/core";
+import { Container, Injectable, inject } from "@wirestate/core";
 
 @Injectable()
 export class NotificationService {
-  public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+  public constructor(private readonly container: Container = inject(Container)) {}
 
   public notify(message: string): void {
-    const logger = this.scope.get(LoggerService);
+    const logger = this.container.get(LoggerService);
 
     logger.log(message);
   }
@@ -207,8 +237,9 @@ create a new one for future work.
 ## API Reference
 
 [`Injectable`](/api/wirestate-core/functions/Injectable), [`inject`](/api/wirestate-core/functions/inject),
-[`WireScope`](/api/wirestate-core/classes/WireScope), [`WireStatus`](/api/wirestate-core/classes/WireStatus),
+[`Container`](/api/wirestate-core/classes/Container), [`WireStatus`](/api/wirestate-core/classes/WireStatus),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision),
-[`BindingDescriptor`](/api/wirestate-core/type-aliases/BindingDescriptor),
-[`Container`](/api/wirestate-core/classes/Container).
+[`EventBus`](/api/wirestate-core/classes/EventBus), [`CommandBus`](/api/wirestate-core/classes/CommandBus),
+[`QueryBus`](/api/wirestate-core/classes/QueryBus),
+[`BindingDescriptor`](/api/wirestate-core/type-aliases/BindingDescriptor).

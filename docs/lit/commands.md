@@ -63,19 +63,19 @@ export class DraftCommands extends LitElement {
 
 ## Execute from an Element
 
-Use `execute` for synchronous handlers.
+Inject `CommandBus` and bind it in the provider's `config.bindings`. Use `execute` for synchronous handlers.
 
 ```ts
-import { WireScope } from "@wirestate/core";
+import { CommandBus } from "@wirestate/core";
 import { injection } from "@wirestate/lit";
 import { LitElement, html } from "lit";
 
 class SearchButton extends LitElement {
-  @injection(WireScope)
-  private scope!: WireScope;
+  @injection(CommandBus)
+  private commands!: CommandBus;
 
   protected render() {
-    return html`<button @click=${() => this.scope.execute("OPEN_SEARCH")}>Search</button>`;
+    return html`<button @click=${() => this.commands.execute("OPEN_SEARCH")}>Search</button>`;
   }
 }
 ```
@@ -83,14 +83,14 @@ class SearchButton extends LitElement {
 Use `executeAsync` for async work.
 
 ```ts
-import { WireScope } from "@wirestate/core";
+import { CommandBus } from "@wirestate/core";
 import { injection } from "@wirestate/lit";
 import { LitElement, html } from "lit";
 import { state } from "lit/decorators.js";
 
 class SaveButton extends LitElement {
-  @injection(WireScope)
-  private scope!: WireScope;
+  @injection(CommandBus)
+  private commands!: CommandBus;
 
   @state()
   private saving: boolean = false;
@@ -99,7 +99,7 @@ class SaveButton extends LitElement {
     this.saving = true;
 
     try {
-      await this.scope.executeAsync("SAVE_DOCUMENT");
+      await this.commands.executeAsync("SAVE_DOCUMENT");
     } finally {
       this.saving = false;
     }
@@ -114,7 +114,7 @@ class SaveButton extends LitElement {
 Use optional commands when a missing handler is valid.
 
 ```ts
-await this.scope.executeOptionalAsync("EXPORT_TRACE");
+await this.commands.executeOptionalAsync("EXPORT_TRACE");
 ```
 
 If several handlers use the same command type, the newest one handles the command.

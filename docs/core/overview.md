@@ -54,13 +54,17 @@ counter.increment();
 - Root and child containers.
 - [Lifecycle hooks](/core/lifecycle) for service activation, service deactivation, provider provision, and provider
   deprovision.
+- Composable, opt-in messaging buses: a container binds only the buses it uses, and a service injects the specific bus
+  it needs.
 - Events for broadcast notifications.
 - Commands for one-handler write operations.
 - Queries for one-handler read operations.
+- Provision-scoped message handlers: `@OnEvent`, `@OnCommand`, and `@OnQuery` subscribe at provision and unsubscribe at
+  deprovision.
 - Test helpers for service and container tests.
 
 ## API Reference
 
-[`Container`](/api/wirestate-core/classes/Container), [`WireScope`](/api/wirestate-core/classes/WireScope),
-[`WireStatus`](/api/wirestate-core/classes/WireStatus), [`EventBus`](/api/wirestate-core/classes/EventBus),
-[`CommandBus`](/api/wirestate-core/classes/CommandBus), [`QueryBus`](/api/wirestate-core/classes/QueryBus).
+[`Container`](/api/wirestate-core/classes/Container), [`WireStatus`](/api/wirestate-core/classes/WireStatus),
+[`EventBus`](/api/wirestate-core/classes/EventBus), [`CommandBus`](/api/wirestate-core/classes/CommandBus),
+[`QueryBus`](/api/wirestate-core/classes/QueryBus).

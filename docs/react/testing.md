@@ -35,7 +35,7 @@ import { ContainerProvider } from "@wirestate/react";
 import { render } from "@testing-library/react";
 
 test("opens search from command", async () => {
-  const container = new Container();
+  const container = new Container({ bindings: [CommandBus] });
 
   const { findByText } = render(
     <ContainerProvider container={container}>
@@ -57,7 +57,7 @@ import { ContainerProvider } from "@wirestate/react";
 import { render, screen } from "@testing-library/react";
 
 test("saves draft from command", async () => {
-  const container = new Container();
+  const container = new Container({ bindings: [CommandBus] });
 
   render(
     <ContainerProvider container={container}>
