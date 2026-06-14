@@ -1,5 +1,5 @@
 import type { ContainerKernel } from "../container/container-kernel";
-import type { WireEvent } from "../messaging/events/events";
+import type { WireEvent } from "../plugin/events/events";
 import type { Maybe } from "../types/general";
 
 /**

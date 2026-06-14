@@ -9,7 +9,7 @@ import type { Container } from "../container/container";
 import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { getMessagingRegistrations } from "../messaging/messaging-registration";
+import { getMessagingRegistrations } from "../plugin/messaging-registration";
 import {
   dispatchPluginContainerDeprovision,
   dispatchPluginContainerProvision,

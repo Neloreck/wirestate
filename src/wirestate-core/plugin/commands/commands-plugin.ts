@@ -1,4 +1,4 @@
-import { MessagingPlugin } from "../../plugin/messaging-plugin";
+import { MessagingPlugin } from "../messaging-plugin";
 
 import { COMMAND_REGISTRATION } from "./on-command";
 

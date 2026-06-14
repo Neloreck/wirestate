@@ -38,21 +38,20 @@ export {
 } from "./error/internal-error-handler";
 export { WirestateError } from "./error/wirestate-error";
 
-export { CommandBus } from "./messaging/commands/command-bus";
-export { CommandsPlugin } from "./messaging/commands/commands-plugin";
-export { CommandHandler, CommandType, CommandUnregister } from "./messaging/commands/commands";
-export { OnCommand, OnCommandHandlerDecorator } from "./messaging/commands/on-command";
-export { OnEvent, OnEventHandlerDecorator } from "./messaging/events/on-event";
-export { EventBus } from "./messaging/events/event-bus";
-export { EventsPlugin } from "./messaging/events/events-plugin";
-export { EventEmitOptions, EventHandler, EventType, EventUnsubscribe, WireEvent } from "./messaging/events/events";
-export { QueryHandler, QueryType, QueryUnregister } from "./messaging/queries/queries";
-export { QueryBus } from "./messaging/queries/query-bus";
-export { QueriesPlugin } from "./messaging/queries/queries-plugin";
-export { OnQuery, OnQueryHandlerDecorator } from "./messaging/queries/on-query";
-
 export { Injectable, isInjectable } from "./metadata/metadata-injectable";
 
+export { CommandBus } from "./plugin/commands/command-bus";
+export { CommandsPlugin } from "./plugin/commands/commands-plugin";
+export { CommandHandler, CommandType, CommandUnregister } from "./plugin/commands/commands";
+export { OnCommand, OnCommandHandlerDecorator } from "./plugin/commands/on-command";
+export { OnEvent, OnEventHandlerDecorator } from "./plugin/events/on-event";
+export { EventBus } from "./plugin/events/event-bus";
+export { EventsPlugin } from "./plugin/events/events-plugin";
+export { EventEmitOptions, EventHandler, EventType, EventUnsubscribe, WireEvent } from "./plugin/events/events";
+export { QueryHandler, QueryType, QueryUnregister } from "./plugin/queries/queries";
+export { QueryBus } from "./plugin/queries/query-bus";
+export { QueriesPlugin } from "./plugin/queries/queries-plugin";
+export { OnQuery, OnQueryHandlerDecorator } from "./plugin/queries/on-query";
 export { WirestatePlugin } from "./plugin/plugin";
 
 export { OnDeprovision } from "./provision/on-deprovision";

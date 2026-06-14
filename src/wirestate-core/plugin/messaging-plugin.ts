@@ -2,9 +2,9 @@ import type { ServiceToken } from "../binding/binding";
 import type { Container } from "../container/container";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { getMessagingRegistrations, type MessagingRegistration } from "../messaging/messaging-registration";
 import type { Definable, Newable } from "../types/general";
 
+import { getMessagingRegistrations, type MessagingRegistration } from "./messaging-registration";
 import type { WirestatePlugin } from "./plugin";
 
 /**

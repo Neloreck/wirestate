@@ -2,10 +2,10 @@ import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { BindingType } from "../binding/binding";
 import { getConfiguredInternalErrorHandler } from "../error/internal-error-handler";
-import { CommandBus } from "../messaging/commands/command-bus";
-import { EventBus } from "../messaging/events/event-bus";
-import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
+import { CommandBus } from "../plugin/commands/command-bus";
+import { EventBus } from "../plugin/events/event-bus";
+import { QueryBus } from "../plugin/queries/query-bus";
 
 import { Container } from "./container";
 import { inject } from "./container-context";

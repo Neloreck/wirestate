@@ -15,16 +15,16 @@ import { Container } from "../container/container";
 import { inject } from "../container/container-context";
 import { ContainerKernel } from "../container/container-kernel";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
-import { CommandBus } from "../messaging/commands/command-bus";
-import { CommandsPlugin } from "../messaging/commands/commands-plugin";
-import { OnCommand } from "../messaging/commands/on-command";
-import { EventBus } from "../messaging/events/event-bus";
-import { EventsPlugin } from "../messaging/events/events-plugin";
-import { OnEvent } from "../messaging/events/on-event";
-import { OnQuery } from "../messaging/queries/on-query";
-import { QueriesPlugin } from "../messaging/queries/queries-plugin";
-import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
+import { CommandBus } from "../plugin/commands/command-bus";
+import { CommandsPlugin } from "../plugin/commands/commands-plugin";
+import { OnCommand } from "../plugin/commands/on-command";
+import { EventBus } from "../plugin/events/event-bus";
+import { EventsPlugin } from "../plugin/events/events-plugin";
+import { OnEvent } from "../plugin/events/on-event";
+import { OnQuery } from "../plugin/queries/on-query";
+import { QueriesPlugin } from "../plugin/queries/queries-plugin";
+import { QueryBus } from "../plugin/queries/query-bus";
 import { AnyObject, Optional } from "../types/general";
 
 describe("container.bind", () => {

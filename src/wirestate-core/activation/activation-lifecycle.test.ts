@@ -1,13 +1,13 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
 import { Container } from "../container/container";
-import { CommandBus } from "../messaging/commands/command-bus";
-import { CommandsPlugin } from "../messaging/commands/commands-plugin";
-import { EventBus } from "../messaging/events/event-bus";
-import { EventsPlugin } from "../messaging/events/events-plugin";
-import { QueriesPlugin } from "../messaging/queries/queries-plugin";
-import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
+import { CommandBus } from "../plugin/commands/command-bus";
+import { CommandsPlugin } from "../plugin/commands/commands-plugin";
+import { EventBus } from "../plugin/events/event-bus";
+import { EventsPlugin } from "../plugin/events/events-plugin";
+import { QueriesPlugin } from "../plugin/queries/queries-plugin";
+import { QueryBus } from "../plugin/queries/query-bus";
 import { setContainerProvisioned } from "../provision/provision-state";
 
 import { getInstanceContainer, initializeInstanceStatus, finalizeInstanceStatus } from "./activation-lifecycle";
