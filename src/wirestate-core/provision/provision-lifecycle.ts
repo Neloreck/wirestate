@@ -9,6 +9,8 @@ import type { Container } from "../container/container";
 import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
+import { registerMessagingHandlers } from "../messaging/messaging-activation";
+import { getMessagingRegistrations } from "../messaging/messaging-registration";
 import type { Maybe } from "../types/general";
 
 import { getDeprovisionHandlerMetadata } from "./on-deprovision";
@@ -87,7 +89,7 @@ export function deprovisionContainer(container: Container): void {
       instances,
     });
 
-    deprovisionInstances(instances);
+    deprovisionInstances(instances, state);
 
     markActiveInstancesDeprovisioned(container);
 
@@ -148,7 +150,7 @@ export function deprovisionContainerBinding(container: Container, token: Service
     return;
   }
 
-  deprovisionInstances(removed);
+  deprovisionInstances(removed, state);
   untrackProvisionToken(state, removed, token);
 
   state.instances = remaining.length > 0 ? remaining : null;
@@ -213,7 +215,33 @@ export function provisionInstances(
     }
   }
 
-  // Phase 3: provision each participant and run its @OnProvision hook.
+  // Phase 3: subscribe every messaging handler before any @OnProvision runs, so
+  // cross-service emit/execute/query inside provision hooks is reliable
+  // regardless of binding order. Subscription is atomic: any failure
+  // unwinds the whole cycle, including handlers wired earlier this pass.
+  for (let index: number = 0; index < instances.length; index += 1) {
+    const instance: object = instances[index];
+    const disposers: Array<() => void> = [];
+
+    try {
+      registerMessagingHandlers(container, instance, disposers);
+    } catch (error) {
+      // Park whatever was wired before the throw so rollback can tear it down.
+      if (disposers.length > 0) {
+        state.disposers.set(instance, disposers);
+      }
+
+      rollbackProvision(container, state, instances, trackedTokens);
+
+      throw error;
+    }
+
+    if (disposers.length > 0) {
+      state.disposers.set(instance, disposers);
+    }
+  }
+
+  // Phase 4: provision each participant and run its @OnProvision hook.
   for (let index: number = 0; index < instances.length; index += 1) {
     const instance: object = instances[index];
     const methodName: Maybe<string | symbol> = getProvisionHandlerMetadata(instance);
@@ -241,27 +269,13 @@ export function provisionInstances(
         });
       }
     } catch (error) {
-      const reachedInstances: Array<object> = instances.slice(0, index + 1);
-
-      state.status = false;
-
-      deprovisionInstances(reachedInstances);
-
-      for (const activeInstance of container.getActiveInstances()) {
-        const activeStatus: WireStatus = WireStatus.for(activeInstance);
-
-        activeStatus.isDeprovisioned = true;
-      }
-
-      for (const [trackedInstance, token] of trackedTokens) {
-        untrackProvisionToken(state, [trackedInstance], token);
-      }
+      rollbackProvision(container, state, instances, trackedTokens);
 
       throw error;
     }
   }
 
-  // Phase 4: mark remaining active non-participants as provisioned.
+  // Phase 5: mark remaining active non-participants as provisioned.
   for (const instance of container.getActiveInstances()) {
     const status: WireStatus = WireStatus.for(instance);
 
@@ -274,14 +288,21 @@ export function provisionInstances(
 }
 
 /**
- * Calls deprovision hooks for provisioned instances.
+ * Runs deprovision hooks then unsubscribes messaging handlers for provisioned instances.
+ *
+ * @remarks
+ * Two phases: every `@OnDeprovision` runs first (reverse provision
+ * order, buses still live), then every handler is failsafe-unsubscribed.
  *
  * @group Container
  * @internal
  *
  * @param instances - Instances resolved during provider provisioning.
+ * @param state - Provider lifecycle state holding the cycle's messaging disposers.
  */
-export function deprovisionInstances(instances: ReadonlyArray<object>): void {
+export function deprovisionInstances(instances: ReadonlyArray<object>, state: ProvisionState): void {
+  // Phase 1: run every @OnDeprovision (reverse provision order) while buses are
+  // still live, so a "shutting down" emit in a deprovision hook still reaches handlers.
   for (let index: number = instances.length - 1; index >= 0; index -= 1) {
     const instance: object = instances[index];
     const status: WireStatus = WireStatus.for(instance);
@@ -313,6 +334,76 @@ export function deprovisionInstances(instances: ReadonlyArray<object>): void {
     if (provisionId !== undefined) {
       status.provisionId = provisionId;
     }
+  }
+
+  // Phase 2: unsubscribe messaging handlers after every @OnDeprovision has run.
+  for (const instance of instances) {
+    unsubscribeInstance(state, instance);
+  }
+}
+
+/**
+ * Runs and clears the provision-cycle messaging disposers for one instance.
+ *
+ * @remarks
+ * Failsafe by contract: a disposer that throws never aborts
+ * deprovision, so nested-provider teardown ordering can never error. No-op when
+ * the instance subscribed nothing this cycle.
+ *
+ * @internal
+ *
+ * @param state - Provider lifecycle state holding the cycle's disposers.
+ * @param instance - Instance whose handlers should be unsubscribed.
+ */
+function unsubscribeInstance(state: ProvisionState, instance: object): void {
+  const disposers: Maybe<Array<() => void>> = state.disposers.get(instance);
+
+  if (!disposers) {
+    return;
+  }
+
+  state.disposers.delete(instance);
+
+  for (const dispose of disposers) {
+    try {
+      dispose();
+    } catch (error) {
+      dbg.error(prefix(__filename), "Messaging unsubscribe threw during deprovision (ignored):", { error });
+    }
+  }
+}
+
+/**
+ * Unwinds a partially provisioned cycle after a subscribe or `@OnProvision` failure.
+ *
+ * @remarks
+ * Atomic provision: runs `@OnDeprovision` for instances that reached
+ * the hook, failsafe-unsubscribes every handler wired this cycle, marks active
+ * instances deprovisioned, and untracks the cycle's tokens.
+ *
+ * @internal
+ *
+ * @param container - Container being provisioned.
+ * @param state - Provider lifecycle state for the container.
+ * @param instances - All participant instances resolved this cycle.
+ * @param trackedTokens - Instance/token pairs tracked this cycle.
+ */
+function rollbackProvision(
+  container: Container,
+  state: ProvisionState,
+  instances: ReadonlyArray<object>,
+  trackedTokens: ReadonlyArray<readonly [object, ServiceToken]>
+): void {
+  state.status = false;
+
+  deprovisionInstances(instances, state);
+
+  for (const activeInstance of container.getActiveInstances()) {
+    WireStatus.for(activeInstance).isDeprovisioned = true;
+  }
+
+  for (const [trackedInstance, token] of trackedTokens) {
+    untrackProvisionToken(state, [trackedInstance], token);
   }
 }
 
@@ -407,6 +498,10 @@ function isProviderLifecycleParticipant(token: ServiceToken): boolean {
   const prototype: Maybe<object> = token.prototype as Maybe<object>;
 
   return prototype
-    ? Boolean(getProvisionHandlerMetadata(prototype) || getDeprovisionHandlerMetadata(prototype))
+    ? Boolean(
+        getProvisionHandlerMetadata(prototype) ||
+        getDeprovisionHandlerMetadata(prototype) ||
+        getMessagingRegistrations(prototype).length
+      )
     : false;
 }

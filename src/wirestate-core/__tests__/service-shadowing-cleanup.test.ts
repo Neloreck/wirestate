@@ -92,7 +92,7 @@ describe("core instance shadowing and cleanup integration", () => {
     const container: Container = new Container({
       activate: [PrimaryHandlerService, SecondaryHandlerService],
       bindings: [EventBus, CommandBus, QueryBus, PrimaryHandlerService, SecondaryHandlerService],
-    });
+    }).provision();
 
     expect(container.get(CommandBus).hasHandler(FORMAT_COMMAND)).toBe(true);
     expect(container.get(QueryBus).hasHandler(CURRENT_QUERY)).toBe(true);
@@ -124,7 +124,7 @@ describe("core instance shadowing and cleanup integration", () => {
     const container: Container = new Container({
       activate: [PrimaryHandlerService, SecondaryHandlerService],
       bindings: [EventBus, CommandBus, QueryBus, PrimaryHandlerService, SecondaryHandlerService],
-    });
+    }).provision();
 
     const bus: EventBus = container.get(EventBus);
 

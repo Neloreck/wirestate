@@ -53,7 +53,7 @@ class CounterView extends LitElement {
 - Container providers: `provideContainer`, `ContainerProvider`, and `useContainerProvider`.
 - Injection decorators and controllers.
 - Element-scoped event, command, and query decorators/controllers.
-- `useContainer` and `useScope` helpers.
+- `useContainer`, `useInjection`, and `useOptionalInjection` helpers.
 
 This package connects services to Lit. For reactive rendering, use
 [`@wirestate/lit-signals`](https://www.npmjs.com/package/@wirestate/lit-signals) or

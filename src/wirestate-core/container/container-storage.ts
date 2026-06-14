@@ -30,9 +30,4 @@ export interface ActivationRecord {
   token: ServiceToken;
   binding: BindingDescriptor;
   instance: unknown;
-  /**
-   * Cleanup callbacks collected while the value was activated,
-   * invoked when the value is deactivated or its activation rolls back.
-   */
-  disposers: Array<() => void>;
 }

@@ -78,9 +78,9 @@ describe("instance lifecycle tracking", () => {
   });
 
   it("should fully wire bare-class binds through the container", () => {
-    const container: Container = new Container({ bindings: [EventBus, QueryBus, CommandBus] });
-
-    container.bind(GenericService);
+    const container: Container = new Container({
+      bindings: [EventBus, QueryBus, CommandBus, GenericService],
+    }).provision();
 
     const instance: GenericService = container.get(GenericService);
 

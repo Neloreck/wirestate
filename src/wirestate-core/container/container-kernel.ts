@@ -226,7 +226,6 @@ export class ContainerKernel {
       token: binding.token,
       binding,
       instance: this.factory.construct(binding),
-      disposers: [],
     };
 
     if (isInstanceDescriptor(binding)) {

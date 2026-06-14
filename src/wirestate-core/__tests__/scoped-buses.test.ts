@@ -5,7 +5,7 @@ import {
   inject,
   Injectable,
   OnCommand,
-  OnDeactivation,
+  OnDeprovision,
   OnEvent,
   OnQuery,
   QueryBus,
@@ -93,7 +93,8 @@ describe("core scoped buses integration (parent-child separation)", () => {
         { token: PARENT_TOKEN, value: "root-value" },
         { token: SETTINGS_TOKEN, value: { label: "root-label", offset: 1 } },
       ],
-    });
+    }).provision();
+
     const child: Container = new Container({
       activate: [ChildCounterService],
       bindings: [
@@ -104,7 +105,7 @@ describe("core scoped buses integration (parent-child separation)", () => {
         { token: SETTINGS_TOKEN, value: { label: "child-label", offset: 10 } },
       ],
       parent: parent,
-    });
+    }).provision();
 
     expect(child.get(PARENT_TOKEN)).toBe("root-value");
     expect(child.get(EventBus)).not.toBe(parent.get(EventBus));
@@ -131,7 +132,7 @@ describe("core scoped buses integration (parent-child separation)", () => {
     expect(parent.get(ParentCounterService).events).toEqual(["parent:from-parent", "parent:from-parent"]);
   });
 
-  it("keeps scoped essentials available while services deactivate", async () => {
+  it("keeps scoped essentials available while services deprovision", async () => {
     const DEACTIVATE_COMMAND: string = "DEACTIVATE_COMMAND";
     const DEACTIVATE_EVENT: string = "DEACTIVATE_EVENT";
     const DEACTIVATE_QUERY: string = "DEACTIVATE_QUERY";
@@ -149,8 +150,8 @@ describe("core scoped buses integration (parent-child separation)", () => {
         private readonly commandBus: CommandBus = inject(CommandBus)
       ) {}
 
-      @OnDeactivation()
-      public onDeactivation(): void {
+      @OnDeprovision()
+      public onDeprovision(): void {
         const settings: SettingsData = this.container.get<SettingsData>(SETTINGS_TOKEN);
 
         logs.push(`settings:${settings.label}`);
@@ -189,9 +190,9 @@ describe("core scoped buses integration (parent-child separation)", () => {
         CleanupService,
         { token: SETTINGS_TOKEN, value: { label: "cleanup-label", offset: 0 } },
       ],
-    });
-
-    container.unbindAll();
+    })
+      .provision()
+      .unbindAll();
 
     expect(logs).toEqual(["settings:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
     expect(commandResult).not.toBeNull();
@@ -206,7 +207,7 @@ describe("core scoped buses integration (parent-child separation)", () => {
     expect(container.has(CommandBus)).toBe(false);
   });
 
-  it("keeps services able to communicate with each other while deactivating", async () => {
+  it("keeps services able to communicate with each other while deprovisioning", async () => {
     const PEER_DEACTIVATE_COMMAND: string = "PEER_DEACTIVATE_COMMAND";
     const PEER_DEACTIVATE_EVENT: string = "PEER_DEACTIVATE_EVENT";
     const PEER_DEACTIVATE_QUERY: string = "PEER_DEACTIVATE_QUERY";
@@ -221,9 +222,9 @@ describe("core scoped buses integration (parent-child separation)", () => {
     class DeactivationPeerService {
       public constructor(private readonly container: Container = inject(Container)) {}
 
-      @OnDeactivation()
-      public onDeactivation(): void {
-        logs.push("peer-deactivation");
+      @OnDeprovision()
+      public onDeprovision(): void {
+        logs.push("peer-deprovision");
 
         fromDeactivationPeerService.push(
           this.container.get(Container),
@@ -261,9 +262,9 @@ describe("core scoped buses integration (parent-child separation)", () => {
         private readonly commandBus: CommandBus = inject(CommandBus)
       ) {}
 
-      @OnDeactivation()
-      public onDeactivation(): void {
-        logs.push("coordinator-deactivation");
+      @OnDeprovision()
+      public onDeprovision(): void {
+        logs.push("coordinator-deprovision");
         this.eventBus.emit(PEER_DEACTIVATE_EVENT, "from-coordinator");
         logs.push(`coordinator-query:${this.queryBus.query(PEER_DEACTIVATE_QUERY, "from-coordinator")}`);
 
@@ -277,31 +278,31 @@ describe("core scoped buses integration (parent-child separation)", () => {
       }
     }
 
-    const container: Container = new Container({
+    new Container({
       activate: [DeactivationCoordinatorService, DeactivationPeerService],
-      bindings: [EventBus, CommandBus, QueryBus, DeactivationCoordinatorService, DeactivationPeerService],
-    });
-
-    container.unbindAll();
+      bindings: [EventBus, CommandBus, QueryBus, DeactivationPeerService, DeactivationCoordinatorService],
+    })
+      .provision()
+      .unbindAll();
 
     expect(logs).toEqual([
-      "coordinator-deactivation",
+      "coordinator-deprovision",
       "peer-event:from-coordinator",
       "peer-query:from-coordinator",
       "coordinator-query:peer-query-result",
       "peer-command:from-coordinator",
-      "peer-deactivation",
+      "peer-deprovision",
     ]);
     expect(commandResult).not.toBeNull();
 
     expect(await commandResult).toBe("peer-command-result");
     expect(logs).toEqual([
-      "coordinator-deactivation",
+      "coordinator-deprovision",
       "peer-event:from-coordinator",
       "peer-query:from-coordinator",
       "coordinator-query:peer-query-result",
       "peer-command:from-coordinator",
-      "peer-deactivation",
+      "peer-deprovision",
     ]);
 
     expect(fromDeactivationCoordinatorService).toHaveLength(3);

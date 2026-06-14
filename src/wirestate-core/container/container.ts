@@ -127,10 +127,14 @@ export class Container extends ContainerKernel {
    * a time: provisioning an already provisioned container throws — deprovision
    * it first.
    *
+   * @returns The same container for chaining.
+   *
    * @throws {@link WirestateError} If the container is already provisioned.
    */
-  public provision(): void {
+  public provision(): this {
     provisionContainer(this);
+
+    return this;
   }
 
   /**
@@ -139,9 +143,13 @@ export class Container extends ContainerKernel {
    * @remarks
    * Runs `@OnDeprovision` in reverse provision order. Idempotent: deprovisioning
    * a container that is not currently provisioned is a no-op.
+   *
+   * @returns The same container for chaining.
    */
-  public deprovision(): void {
+  public deprovision(): this {
     deprovisionContainer(this);
+
+    return this;
   }
 
   /**

@@ -42,7 +42,7 @@ export function Application() {
 
 ## What Is Included
 
-- `ContainerProvider`, `useContainer`, and `useScope`.
+- `ContainerProvider` and `useContainer`.
 - `useInjection` and `useOptionalInjection`.
 - Event hooks: `useEventEmitter`, `useEvent`, `useEvents`, and `useAllEvents`.
 - Command hooks and query hooks for executors and component-owned handlers.

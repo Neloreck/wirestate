@@ -48,7 +48,10 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = new Container({ bindings: [EventBus, QueryBus, CommandBus, MessagingService] });
+    const container: Container = new Container({
+      bindings: [EventBus, QueryBus, CommandBus, MessagingService],
+    }).provision();
+
     const service: MessagingService = container.get(MessagingService);
 
     container.get(EventBus).emit("PING", "one");
@@ -152,7 +155,7 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = new Container({ bindings: [EventBus, QueryBus, ChildMessagingService] });
+    const container: Container = new Container({ bindings: [EventBus, QueryBus, ChildMessagingService] }).provision();
     const child: ChildMessagingService = container.get(ChildMessagingService);
 
     expect(log).toEqual(["base-activated"]);
@@ -280,7 +283,7 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = new Container({ bindings: [EventBus, QueryBus, MultiHandlerService] });
+    const container: Container = new Container({ bindings: [EventBus, QueryBus, MultiHandlerService] }).provision();
     const service: MultiHandlerService = container.get(MultiHandlerService);
 
     container.get(EventBus).emit("FIRST_EVENT");
@@ -302,7 +305,7 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = new Container({ bindings: [EventBus, UnsubscribingService] });
+    const container: Container = new Container({ bindings: [EventBus, UnsubscribingService] }).provision();
     const service: UnsubscribingService = container.get(UnsubscribingService);
     const eventBus: EventBus = container.get(EventBus);
 

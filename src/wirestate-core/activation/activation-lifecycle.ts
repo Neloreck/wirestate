@@ -2,7 +2,6 @@ import type { InstanceBindingDescriptor } from "../binding/binding";
 import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
 import type { ContainerKernel } from "../container/container-kernel";
 import type { ActivationRecord } from "../container/container-storage";
-import { registerMessagingHandlers } from "../messaging/messaging-activation";
 import { getContainerProvisionStatus } from "../provision/provision-state";
 import type { Definable, Maybe } from "../types/general";
 
@@ -34,10 +33,10 @@ export function getInstanceContainer(instance: object): Definable<ContainerKerne
  *
  * @remarks
  * Installed by the {@link Container} composition root via `setActivationAdapter`.
- * It tracks the instance↔container mapping, initializes {@link WireStatus}
- * (including the container's current provision status), registers messaging
- * handlers, and invokes the `@OnActivated` / `@OnDeactivation` hooks. A bare
- * {@link ContainerKernel} without this adapter constructs and caches only.
+ * It tracks the instance-container mapping, initializes {@link WireStatus}
+ * (including the container's current provision status), and invokes the
+ * `@OnActivated` / `@OnDeactivation` hooks. Activation is render-safe: it opens
+ * no subscriptions or resources — messaging handlers subscribe during provision.
  *
  * @internal
  */
@@ -49,7 +48,6 @@ export const wirestateActivationAdapter: ActivationAdapter = {
     INSTANCE_CONTAINERS.set(instance, container);
 
     initializeInstanceStatus(container, instance);
-    registerMessagingHandlers(container, instance, record.disposers);
 
     const methodName: Maybe<string | symbol> = getActivatedHandlerMetadata(instance);
 
@@ -87,7 +85,6 @@ export const wirestateActivationAdapter: ActivationAdapter = {
     }
 
     finalizeInstanceStatus(instance);
-    runDisposers(record);
 
     INSTANCE_CONTAINERS.delete(instance);
   },
@@ -96,7 +93,6 @@ export const wirestateActivationAdapter: ActivationAdapter = {
     const instance: object = record.instance as object;
 
     finalizeInstanceStatus(instance);
-    runDisposers(record);
 
     INSTANCE_CONTAINERS.delete(instance);
   },
@@ -131,17 +127,4 @@ export function finalizeInstanceStatus(instance: object): void {
 
   status.isDeactivated = true;
   status.isDeprovisioned = true;
-}
-
-/**
- * Invokes and clears the disposers collected on an activation record.
- *
- * @param record - Activation record being deactivated or rolled back.
- */
-function runDisposers(record: ActivationRecord): void {
-  for (const dispose of record.disposers) {
-    dispose();
-  }
-
-  record.disposers.length = 0;
 }

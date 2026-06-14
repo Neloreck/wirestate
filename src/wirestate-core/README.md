@@ -5,7 +5,7 @@
 
 Framework-agnostic Wirestate runtime.
 
-Use this package to define injectable services, create scoped containers, run lifecycle hooks,
+Use this package to define injectable services, create containers, run lifecycle hooks,
 and communicate through container-local events, commands, and queries.
 
 ## Install
@@ -41,9 +41,8 @@ counterService.increment();
 
 - DI primitives such as `Injectable`, `inject`, `Container`, `ServiceToken`, and `InjectionToken`.
 - `Container` and container methods such as `bind`, `unbind`, `unbindAll`, `get`, `has`, and `getOwnBindings`.
-- `WireScope` for scoped resolution, events, commands, and queries.
 - `WireStatus` and `ProvisionId` for lifecycle guards on resolved service instances.
-- `EventBus`, `CommandBus`, `QueryBus`, and their decorators.
+- `EventBus`, `CommandBus`, `QueryBus`, and their decorators (`OnEvent`, `OnCommand`, `OnQuery`).
 - `OnActivated`, `OnDeactivation`, `OnProvision`, and `OnDeprovision`.
 
 React and Lit integration live in [`@wirestate/react`](https://www.npmjs.com/package/@wirestate/react) and

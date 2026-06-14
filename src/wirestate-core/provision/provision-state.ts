@@ -36,6 +36,12 @@ export interface ProvisionState {
    * Binding tokens that caused each instance to enter provider lifecycle state.
    */
   tokensByInstance: Map<object, Set<ServiceToken>>;
+
+  /**
+   * Messaging-handler unsubscribe callbacks collected for each provisioned
+   * instance during the current provision cycle.
+   */
+  disposers: Map<object, Array<() => void>>;
 }
 
 /**
@@ -83,7 +89,7 @@ export function getOrCreateProvisionState(container: ContainerKernel): Provision
   let state: Maybe<ProvisionState> = PROVISION_STATE.get(container);
 
   if (!state) {
-    state = { status: undefined, instances: null, tokensByInstance: new Map() };
+    state = { status: undefined, instances: null, tokensByInstance: new Map(), disposers: new Map() };
     PROVISION_STATE.set(container, state);
   }
 

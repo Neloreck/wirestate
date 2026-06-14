@@ -286,9 +286,8 @@ describe("container.bind", () => {
     it("should bind instances and handle lifecycle", async () => {
       const container: Container = new Container({ bindings: [EventBus, QueryBus, CommandBus] });
 
-      const result: Container = container.bind(GenericService);
-
-      expect(result).toBe(container);
+      expect(container.bind(GenericService)).toBe(container);
+      expect(container.provision()).toBe(container);
       expect(container.has(GenericService)).toBe(true);
 
       const instance: GenericService = container.get(GenericService);
@@ -296,9 +295,9 @@ describe("container.bind", () => {
       expect(instance.isActivated).toBe(true);
       expect(WireStatus.for(instance)).toEqual({
         isDeactivated: false,
-        isDeprovisioned: null,
+        isDeprovisioned: false,
         isInactive: false,
-        provisionId: null,
+        provisionId: 1,
       });
 
       // Test event from external source.
@@ -312,15 +311,17 @@ describe("container.bind", () => {
       // Test command from external source.
       expect(container.get(CommandBus).execute("TEST_SYNC_COMMAND", 800)).toBe(1800);
 
-      // Test deactivation.
+      // Test deactivation. Unbind deprovisions (unsubscribing handlers) before
+      // deactivating, so the provision id set above survives onto the status.
       container.unbind(GenericService);
+
       expect(instance.isActivated).toBe(false);
       expect(instance.container.get(Container)).toBe(container);
       expect(WireStatus.for(instance)).toEqual({
         isDeactivated: true,
         isDeprovisioned: true,
         isInactive: true,
-        provisionId: null,
+        provisionId: 1,
       });
 
       // Verify query handler is removed
@@ -502,10 +503,7 @@ describe("container.bind", () => {
     it("should catch and log failing @OnDeactivation methods while preserving cleanup", () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-      const container: Container = new Container({ bindings: [QueryBus] });
-
-      container.bind(SyncFailDeactivationService);
-
+      const container: Container = new Container({ bindings: [QueryBus, SyncFailDeactivationService] }).provision();
       const instance: SyncFailDeactivationService = container.get(SyncFailDeactivationService);
 
       expect(container.get(QueryBus).query("SYNC_FAIL_DEACTIVATION_QUERY")).toBe("query-response");
@@ -516,7 +514,7 @@ describe("container.bind", () => {
         isDeactivated: true,
         isDeprovisioned: true,
         isInactive: true,
-        provisionId: null,
+        provisionId: 1,
       });
 
       expect(container.get(QueryBus).hasHandler("SYNC_FAIL_DEACTIVATION_QUERY")).toBe(false);
@@ -594,7 +592,7 @@ describe("container.bind", () => {
         activate: true,
         bindings: [EventBus, FailingEventService],
         onError,
-      });
+      }).provision();
 
       container.get(EventBus).emit("FAILING_EVENT");
 
@@ -626,7 +624,7 @@ describe("container.bind", () => {
       const container: Container = new Container({
         activate: true,
         bindings: [EventBus, MultiDecoratedService],
-      });
+      }).provision();
 
       const bus: EventBus = container.get(EventBus);
 
