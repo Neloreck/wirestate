@@ -9,25 +9,7 @@ import type { Optional, Maybe } from "../types/general";
 import type { ActivationAdapter } from "./activation-adapter";
 import { getActivatedHandlerMetadata } from "./on-activated";
 import { getDeactivationHandlerMetadata } from "./on-deactivation";
-import { WireStatus } from "./wire-status";
-
-/**
- * Kernel-maintained mapping of activated service instances to their owning containers.
- *
- * Written at the container's activation commit point and cleared on deactivation,
- * so lookups never observe a partially activated instance.
- */
-const INSTANCE_CONTAINERS: WeakMap<object, ContainerKernel> = new WeakMap();
-
-/**
- * Returns the container that activated a service instance.
- *
- * @param instance - Resolved service instance to look up.
- * @returns The owning container, or `undefined` when the instance is not active.
- */
-export function getInstanceContainer(instance: object): Optional<ContainerKernel> {
-  return INSTANCE_CONTAINERS.get(instance);
-}
+import { getInstanceRecord, WireStatus } from "./wire-status";
 
 /**
  * The Wirestate instance lifecycle layered on the pure-DI kernel.
@@ -45,8 +27,6 @@ export const wirestateActivationAdapter: ActivationAdapter = {
   activate(container: ContainerKernel, record: ActivationRecord): void {
     const binding: InstanceBindingDescriptor<object> = record.binding as InstanceBindingDescriptor<object>;
     const instance: object = record.instance as object;
-
-    INSTANCE_CONTAINERS.set(instance, container);
 
     initializeInstanceStatus(container, instance);
 
@@ -93,16 +73,10 @@ export const wirestateActivationAdapter: ActivationAdapter = {
     dispatchPluginDeactivate(container, instance);
 
     finalizeInstanceStatus(instance);
-
-    INSTANCE_CONTAINERS.delete(instance);
   },
 
   rollback(_container: ContainerKernel, record: ActivationRecord): void {
-    const instance: object = record.instance as object;
-
-    finalizeInstanceStatus(instance);
-
-    INSTANCE_CONTAINERS.delete(instance);
+    finalizeInstanceStatus(record.instance as object);
   },
 };
 
@@ -115,6 +89,8 @@ export const wirestateActivationAdapter: ActivationAdapter = {
  */
 export function initializeInstanceStatus(container: ContainerKernel, instance: object): void {
   const status: WireStatus = WireStatus.for(instance, { initialize: true });
+
+  getInstanceRecord(status).container = container;
 
   status.isDeactivated = false;
 
@@ -135,4 +111,7 @@ export function finalizeInstanceStatus(instance: object): void {
 
   status.isDeactivated = true;
   status.isDeprovisioned = true;
+
+  // Release the container ref so a user-held deactivated instance does not pin it.
+  getInstanceRecord(status).container = undefined;
 }

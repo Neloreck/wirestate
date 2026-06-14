@@ -10,9 +10,9 @@ import { QueriesPlugin } from "../plugin/queries/queries-plugin";
 import { QueryBus } from "../plugin/queries/query-bus";
 import { setContainerProvisioned } from "../provision/provision-state";
 
-import { getInstanceContainer, initializeInstanceStatus, finalizeInstanceStatus } from "./activation-lifecycle";
+import { finalizeInstanceStatus, initializeInstanceStatus } from "./activation-lifecycle";
 import { OnActivated } from "./on-activated";
-import { WireStatus } from "./wire-status";
+import { getInstanceContainer, WireStatus } from "./wire-status";
 
 describe("instance lifecycle tracking", () => {
   it("should track activated instances by container at commit", () => {

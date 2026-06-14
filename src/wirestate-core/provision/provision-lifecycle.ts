@@ -1,8 +1,13 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import { getInstanceContainer } from "../activation/activation-lifecycle";
-import { ProvisionId, WireStatus } from "../activation/wire-status";
+import {
+  getInstanceContainer,
+  getInstanceRecord,
+  InstanceRecord,
+  ProvisionId,
+  WireStatus,
+} from "../activation/wire-status";
 import { Binding, Bindings, BindingType, ServiceToken } from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
 import type { Container } from "../container/container";
@@ -18,16 +23,11 @@ import {
   getEffectivePlugins,
   isPluginParticipant,
 } from "../plugin/plugin-registry";
-import type { Maybe } from "../types/general";
+import type { Maybe, Nullable, Optional } from "../types/general";
 
 import { getDeprovisionHandlerMetadata } from "./on-deprovision";
 import { getProvisionHandlerMetadata } from "./on-provision";
-import {
-  getOrCreateProvisionState,
-  getProvisionState,
-  PROVISION_IDS_BY_INSTANCE,
-  ProvisionState,
-} from "./provision-state";
+import { CycleEntry, getOrCreateProvisionState, getProvisionState, ProvisionState } from "./provision-state";
 
 /**
  * Provisions a container for a framework provider.
@@ -78,7 +78,7 @@ export function provisionContainer(container: Container, bindings: Bindings = co
  * @param container - Container leaving provider ownership.
  */
 export function deprovisionContainer(container: Container): void {
-  const state: Maybe<ProvisionState> = getProvisionState(container);
+  const state: Optional<ProvisionState> = getProvisionState(container);
 
   if (!state) {
     return;
@@ -88,7 +88,7 @@ export function deprovisionContainer(container: Container): void {
 
   state.status = false;
 
-  const instances: Maybe<Array<object>> = state.instances;
+  const instances: Nullable<Array<object>> = state.instances;
 
   if (instances) {
     dbg.info(prefix(__filename), "Deprovisioning container:", {
@@ -96,12 +96,12 @@ export function deprovisionContainer(container: Container): void {
       instances,
     });
 
-    deprovisionInstances(instances, state, container);
+    deprovisionInstances(container, state, instances);
 
     markActiveInstancesDeprovisioned(container);
 
     for (const instance of instances) {
-      state.tokensByInstance.delete(instance);
+      state.cycleByInstance.delete(instance);
     }
 
     state.instances = null;
@@ -140,7 +140,7 @@ function markActiveInstancesDeprovisioned(container: Container): void {
  * @param token - Binding token removed from the container.
  */
 export function deprovisionContainerBinding(container: Container, token: ServiceToken): void {
-  const state: Maybe<ProvisionState> = getProvisionState(container);
+  const state: Optional<ProvisionState> = getProvisionState(container);
   const instances: Maybe<Array<object>> = state?.instances;
 
   if (!state || !instances) {
@@ -162,7 +162,7 @@ export function deprovisionContainerBinding(container: Container, token: Service
     return;
   }
 
-  deprovisionInstances(removed, state, container);
+  deprovisionInstances(container, state, removed);
   untrackProvisionToken(state, removed, token);
 
   state.instances = remaining.length > 0 ? remaining : null;
@@ -184,13 +184,34 @@ export function provisionInstances(
   state: ProvisionState,
   bindings: Bindings = []
 ): Array<object> {
-  const instances: Array<object> = [];
-  const trackedTokens: Array<readonly [object, ServiceToken]> = [];
-  const visited: Set<ServiceToken> = new Set();
-
   // Plugins observe the provision cycle boundary before any instance wiring.
   dispatchPluginContainerProvision(container);
 
+  validateBindings(container, bindings);
+
+  const { instances, trackedTokens } = resolveParticipants(container, state, bindings);
+
+  markInFlight(container);
+  wirePlugins(container, state, instances, trackedTokens);
+  runProvisionHooks(container, state, instances, trackedTokens);
+  markProvisioned(container);
+
+  return instances;
+}
+
+/**
+ * Validates the bindings before provisioning: a provider-lifecycle participant must
+ * be bound on this container, and every declared messaging handler must have a
+ * registered plugin that handles its kind. Two passes, ordered so the ownership
+ * error wins over the unhandled-kind error.
+ *
+ * @internal
+ *
+ * @param container - Container being provisioned.
+ * @param bindings - Bindings controlled by the provider.
+ * @throws {@link WirestateError} If a participant is not owned, or a handler kind is unhandled.
+ */
+function validateBindings(container: Container, bindings: Bindings): void {
   // A container owns provider lifecycle only for the bindings it declares.
   for (const binding of bindings) {
     const token: ServiceToken = getBindingToken(binding);
@@ -231,8 +252,29 @@ export function provisionInstances(
       }
     }
   }
+}
 
-  // Phase 1: resolve each distinct participant so @OnActivated runs before hooks.
+/**
+ * Resolves each distinct provider-lifecycle participant, forcing activation so
+ * `@OnActivated` runs before any provision hook, and tracks the token that
+ * provisioned it.
+ *
+ * @internal
+ *
+ * @param container - Container being provisioned.
+ * @param state - Provider lifecycle state for the container.
+ * @param bindings - Bindings controlled by the provider.
+ * @returns The resolved participant instances and the instance/token pairs tracked this cycle.
+ */
+function resolveParticipants(
+  container: Container,
+  state: ProvisionState,
+  bindings: Bindings
+): { instances: Array<object>; trackedTokens: Array<readonly [object, ServiceToken]> } {
+  const instances: Array<object> = [];
+  const trackedTokens: Array<readonly [object, ServiceToken]> = [];
+  const visited: Set<ServiceToken> = new Set();
+
   for (const binding of bindings) {
     const token: ServiceToken = getBindingToken(binding);
     const metadataToken: ServiceToken = getProviderLifecycleMetadataToken(binding);
@@ -251,7 +293,18 @@ export function provisionInstances(
     }
   }
 
-  // Phase 2: reset active instances to in-flight markers before any hook runs.
+  return { instances, trackedTokens };
+}
+
+/**
+ * Resets every active instance to in-flight (deprovision/provisionId cleared)
+ * before any provision hook observes them.
+ *
+ * @internal
+ *
+ * @param container - Container being provisioned.
+ */
+function markInFlight(container: Container): void {
   for (const instance of container.getActiveInstances()) {
     const status: WireStatus = WireStatus.for(instance);
 
@@ -260,9 +313,26 @@ export function provisionInstances(
       status.provisionId = null;
     }
   }
+}
 
-  // Phase 3: run plugin onProvision wiring for every active instance, before any
-  // user @OnProvision (plugins are the framework layer that brackets user hooks:
+/**
+ * Runs every plugin's `onProvision` wiring for every active instance, before any
+ * user `@OnProvision` (plugins bracket the user layer). Atomic: a throw unwinds the
+ * whole cycle.
+ *
+ * @internal
+ *
+ * @param container - Container being provisioned.
+ * @param state - Provider lifecycle state for the container.
+ * @param instances - Participant instances resolved this cycle.
+ * @param trackedTokens - Instance/token pairs tracked this cycle (for rollback).
+ */
+function wirePlugins(
+  container: Container,
+  state: ProvisionState,
+  instances: ReadonlyArray<object>,
+  trackedTokens: ReadonlyArray<readonly [object, ServiceToken]>
+): void {
   for (const instance of container.getActiveInstances()) {
     try {
       dispatchPluginProvision(container, instance, (dispose: () => void): void =>
@@ -274,15 +344,32 @@ export function provisionInstances(
       throw error;
     }
   }
+}
 
-  // Phase 4: provision each participant and run its @OnProvision hook.
-  for (let index: number = 0; index < instances.length; index += 1) {
-    const instance: object = instances[index];
+/**
+ * Runs each participant's `@OnProvision` hook, stamping its provision id. Atomic: a
+ * throw unwinds the whole cycle.
+ *
+ * @internal
+ *
+ * @param container - Container being provisioned.
+ * @param state - Provider lifecycle state for the container.
+ * @param instances - Participant instances resolved this cycle.
+ * @param trackedTokens - Instance/token pairs tracked this cycle (for rollback).
+ */
+function runProvisionHooks(
+  container: Container,
+  state: ProvisionState,
+  instances: ReadonlyArray<object>,
+  trackedTokens: ReadonlyArray<readonly [object, ServiceToken]>
+): void {
+  for (const instance of instances) {
     const methodName: Maybe<string | symbol> = getProvisionHandlerMetadata(instance);
-    const provisionId: ProvisionId = (PROVISION_IDS_BY_INSTANCE.get(instance) ?? 0) + 1;
     const status: WireStatus = WireStatus.for(instance);
+    const record: InstanceRecord = getInstanceRecord(status);
+    const provisionId: ProvisionId = (record.provisionIdCounter ?? 0) + 1;
 
-    PROVISION_IDS_BY_INSTANCE.set(instance, provisionId);
+    record.provisionIdCounter = provisionId;
 
     status.isDeprovisioned = false;
     status.provisionId = provisionId;
@@ -308,8 +395,16 @@ export function provisionInstances(
       throw error;
     }
   }
+}
 
-  // Phase 5: mark remaining active non-participants as provisioned.
+/**
+ * Marks every remaining active instance as provisioned after all hooks have run.
+ *
+ * @internal
+ *
+ * @param container - Container being provisioned.
+ */
+function markProvisioned(container: Container): void {
   for (const instance of container.getActiveInstances()) {
     const status: WireStatus = WireStatus.for(instance);
 
@@ -317,8 +412,6 @@ export function provisionInstances(
       status.isDeprovisioned = false;
     }
   }
-
-  return instances;
 }
 
 /**
@@ -331,19 +424,40 @@ export function provisionInstances(
  * @group Container
  * @internal
  *
- * @param instances - Instances resolved during provider provisioning.
- * @param state - Provider lifecycle state holding the cycle's messaging disposers.
  * @param container - Container being deprovisioned (for plugin dispatch).
+ * @param state - Provider lifecycle state holding the cycle's messaging disposers.
+ * @param instances - Instances resolved during provider provisioning.
  */
 export function deprovisionInstances(
-  instances: ReadonlyArray<object>,
+  container: Container,
   state: ProvisionState,
-  container: Container
+  instances: ReadonlyArray<object>
 ): void {
+  // User @OnDeprovision first (buses still live), then plugin teardown (reverse,
+  // failsafe), then unsubscribe every handler.
+  const deprovisioned: ReadonlyArray<object> = runDeprovisionHooks(instances);
+
+  for (const instance of deprovisioned) {
+    dispatchPluginDeprovision(container, instance);
+  }
+
+  for (const instance of instances) {
+    unsubscribeInstance(state, instance);
+  }
+}
+
+/**
+ * Runs `@OnDeprovision` for every currently-provisioned instance in reverse
+ * provision order, while buses are still live.
+ *
+ * @internal
+ *
+ * @param instances - Instances resolved during provider provisioning.
+ * @returns The instances that were deprovisioned, in reverse provision order.
+ */
+function runDeprovisionHooks(instances: ReadonlyArray<object>): ReadonlyArray<object> {
   const deprovisioned: Array<object> = [];
 
-  // Phase 1: run every @OnDeprovision (reverse provision order) while buses are
-  // still live, so a "shutting down" emit in a deprovision hook still reaches handlers.
   for (let index: number = instances.length - 1; index >= 0; index -= 1) {
     const instance: object = instances[index];
     const status: WireStatus = WireStatus.for(instance);
@@ -354,7 +468,7 @@ export function deprovisionInstances(
     }
 
     const methodName: Maybe<string | symbol> = getDeprovisionHandlerMetadata(instance);
-    const provisionId: Maybe<ProvisionId> = PROVISION_IDS_BY_INSTANCE.get(instance);
+    const provisionId: Optional<ProvisionId> = getInstanceRecord(status).provisionIdCounter;
 
     if (methodName) {
       callLifecycleHandler({
@@ -379,15 +493,7 @@ export function deprovisionInstances(
     deprovisioned.push(instance);
   }
 
-  // Phase 1b: plugin onDeprovision, after every user @OnDeprovision, reverse, failsafe.
-  for (const instance of deprovisioned) {
-    dispatchPluginDeprovision(container, instance);
-  }
-
-  // Phase 2: unsubscribe messaging + plugin disposers after every @OnDeprovision has run.
-  for (const instance of instances) {
-    unsubscribeInstance(state, instance);
-  }
+  return deprovisioned;
 }
 
 /**
@@ -404,13 +510,16 @@ export function deprovisionInstances(
  * @param instance - Instance whose handlers should be unsubscribed.
  */
 function unsubscribeInstance(state: ProvisionState, instance: object): void {
-  const disposers: Maybe<Array<() => void>> = state.disposers.get(instance);
+  const entry: Optional<CycleEntry> = state.cycleByInstance.get(instance);
 
-  if (!disposers) {
+  if (!entry || entry.disposers.length === 0) {
     return;
   }
 
-  state.disposers.delete(instance);
+  // Detach before running so a re-entrant teardown cannot see or re-run them.
+  const disposers: Array<() => void> = entry.disposers;
+
+  entry.disposers = [];
 
   for (const dispose of disposers) {
     try {
@@ -444,7 +553,7 @@ function rollbackProvision(
 ): void {
   state.status = false;
 
-  deprovisionInstances(instances, state, container);
+  deprovisionInstances(container, state, instances);
 
   // Sweep any disposers a plugin parked on a non-participant instance this cycle,
   // so an aborted provision never leaks a subscription.
@@ -471,14 +580,7 @@ function rollbackProvision(
  * @param dispose - Teardown callback to run (reverse order, failsafe) at deprovision.
  */
 function appendDisposer(state: ProvisionState, instance: object, dispose: () => void): void {
-  let disposers: Maybe<Array<() => void>> = state.disposers.get(instance);
-
-  if (!disposers) {
-    disposers = [];
-    state.disposers.set(instance, disposers);
-  }
-
-  disposers.push(dispose);
+  getOrCreateCycleEntry(state, instance).disposers.push(dispose);
 }
 
 /**
@@ -489,7 +591,7 @@ function appendDisposer(state: ProvisionState, instance: object, dispose: () => 
  * @param state - Provider lifecycle state holding the cycle's disposers.
  */
 function clearRemainingDisposers(state: ProvisionState): void {
-  for (const instance of [...state.disposers.keys()]) {
+  for (const instance of [...state.cycleByInstance.keys()]) {
     unsubscribeInstance(state, instance);
   }
 }
@@ -504,14 +606,27 @@ function clearRemainingDisposers(state: ProvisionState): void {
  * @param token - Binding token used to resolve the instance.
  */
 function trackProvisionToken(state: ProvisionState, instance: object, token: ServiceToken): void {
-  let tokens: Maybe<Set<ServiceToken>> = state.tokensByInstance.get(instance);
+  getOrCreateCycleEntry(state, instance).tokens.add(token);
+}
 
-  if (!tokens) {
-    tokens = new Set();
-    state.tokensByInstance.set(instance, tokens);
+/**
+ * Returns the instance's provision-cycle entry, creating an empty one on first use.
+ *
+ * @internal
+ *
+ * @param state - Provider lifecycle state for the owning container.
+ * @param instance - Instance the entry belongs to.
+ * @returns The instance's cycle entry.
+ */
+function getOrCreateCycleEntry(state: ProvisionState, instance: object): CycleEntry {
+  let entry: Optional<CycleEntry> = state.cycleByInstance.get(instance);
+
+  if (!entry) {
+    entry = { tokens: new Set(), disposers: [] };
+    state.cycleByInstance.set(instance, entry);
   }
 
-  tokens.add(token);
+  return entry;
 }
 
 /**
@@ -525,16 +640,16 @@ function trackProvisionToken(state: ProvisionState, instance: object, token: Ser
  */
 function untrackProvisionToken(state: ProvisionState, instances: ReadonlyArray<object>, token: ServiceToken): void {
   for (const instance of instances) {
-    const tokens: Maybe<Set<ServiceToken>> = state.tokensByInstance.get(instance);
+    const entry: Optional<CycleEntry> = state.cycleByInstance.get(instance);
 
-    if (!tokens) {
+    if (!entry) {
       continue;
     }
 
-    tokens.delete(token);
+    entry.tokens.delete(token);
 
-    if (tokens.size === 0) {
-      state.tokensByInstance.delete(instance);
+    if (entry.tokens.size === 0) {
+      state.cycleByInstance.delete(instance);
     }
   }
 }
@@ -550,7 +665,7 @@ function untrackProvisionToken(state: ProvisionState, instances: ReadonlyArray<o
  * @returns True when the instance was provisioned for the token.
  */
 function isInstanceProvisionedForToken(state: ProvisionState, instance: object, token: ServiceToken): boolean {
-  return state.tokensByInstance.get(instance)?.has(token) ?? false;
+  return state.cycleByInstance.get(instance)?.tokens.has(token) ?? false;
 }
 
 /**
@@ -582,7 +697,7 @@ function isProviderLifecycleParticipant(token: ServiceToken): boolean {
     return false;
   }
 
-  const prototype: Maybe<object> = token.prototype as Maybe<object>;
+  const prototype: Optional<object> = token.prototype as Optional<object>;
 
   return prototype
     ? Boolean(getProvisionHandlerMetadata(prototype) || getDeprovisionHandlerMetadata(prototype))

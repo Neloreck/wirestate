@@ -1,7 +1,28 @@
-import type { ProvisionId } from "../activation/wire-status";
 import type { ServiceToken } from "../binding/binding";
 import type { ContainerKernel } from "../container/container-kernel";
-import type { Optional, Maybe } from "../types/general";
+import type { Nullable, Optional } from "../types/general";
+
+/**
+ * Per-instance state of a container's current provision cycle.
+ *
+ * @remarks
+ * `tokens` and `disposers` share an instance's lifetime within one provision
+ * cycle, so they live in one entry (ADR 0010) rather than two parallel maps.
+ *
+ * @group Container
+ * @internal
+ */
+export interface CycleEntry {
+  /**
+   * Binding tokens that caused the instance to enter provider lifecycle state.
+   */
+  tokens: Set<ServiceToken>;
+
+  /**
+   * Messaging-handler unsubscribe callbacks collected for the instance this cycle.
+   */
+  disposers: Array<() => void>;
+}
 
 /**
  * Provider lifecycle state owned by a single container.
@@ -27,18 +48,12 @@ export interface ProvisionState {
    * `null` means no instances entry is currently tracked: either the container
    * was never provisioned or its last lifecycle binding was unbound.
    */
-  instances: Maybe<Array<object>>;
+  instances: Nullable<Array<object>>;
 
   /**
-   * Binding tokens that caused each instance to enter provider lifecycle state.
+   * Per-instance provision-cycle state (tokens + disposers), keyed by instance.
    */
-  tokensByInstance: Map<object, Set<ServiceToken>>;
-
-  /**
-   * Messaging-handler unsubscribe callbacks collected for each provisioned
-   * instance during the current provision cycle.
-   */
-  disposers: Map<object, Array<() => void>>;
+  cycleByInstance: Map<object, CycleEntry>;
 }
 
 /**
@@ -49,18 +64,6 @@ export interface ProvisionState {
 const PROVISION_STATE: WeakMap<ContainerKernel, ProvisionState> = new WeakMap();
 
 /**
- * Internal storage for the latest provider provision cycle ID per instance.
- *
- * @remarks
- * Kept per instance rather than on {@link ProvisionState} because it must
- * outlive a single provision cycle (it survives a `null` reset of
- * `WireStatus.provisionId` so reprovision keeps issuing unique IDs).
- *
- * @internal
- */
-export const PROVISION_IDS_BY_INSTANCE: WeakMap<object, ProvisionId> = new WeakMap();
-
-/**
  * Returns the provider lifecycle state for a container, if any exists.
  *
  * @group Container
@@ -69,7 +72,7 @@ export const PROVISION_IDS_BY_INSTANCE: WeakMap<object, ProvisionId> = new WeakM
  * @param container - Container to inspect.
  * @returns The container's provision state, or `undefined` when never provisioned.
  */
-export function getProvisionState(container: ContainerKernel): Maybe<ProvisionState> {
+export function getProvisionState(container: ContainerKernel): Optional<ProvisionState> {
   return PROVISION_STATE.get(container);
 }
 
@@ -83,10 +86,10 @@ export function getProvisionState(container: ContainerKernel): Maybe<ProvisionSt
  * @returns The container's provision state.
  */
 export function getOrCreateProvisionState(container: ContainerKernel): ProvisionState {
-  let state: Maybe<ProvisionState> = PROVISION_STATE.get(container);
+  let state: Optional<ProvisionState> = PROVISION_STATE.get(container);
 
   if (!state) {
-    state = { status: undefined, instances: null, tokensByInstance: new Map(), disposers: new Map() };
+    state = { status: undefined, instances: null, cycleByInstance: new Map() };
     PROVISION_STATE.set(container, state);
   }
 

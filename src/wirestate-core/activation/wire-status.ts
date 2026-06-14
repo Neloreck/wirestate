@@ -1,5 +1,6 @@
+import type { ContainerKernel } from "../container/container-kernel";
 import { WirestateError } from "../error/wirestate-error";
-import { Nullable } from "../types/general";
+import { Nullable, Optional } from "../types/general";
 
 /**
  * Internal storage for service lifecycle status keyed by instance.
@@ -8,6 +9,38 @@ import { Nullable } from "../types/general";
  * which lets callers inspect lifecycle state by instance reference.
  */
 const INSTANCE_STATUSES_BY_INSTANCE: WeakMap<object, WireStatus> = new WeakMap();
+
+/**
+ * Module-private key for the internal lifecycle record carried on each {@link WireStatus}.
+ *
+ * @remarks
+ * The record is attached as a non-enumerable, symbol-keyed property so the public
+ * `WireStatus` shape (and `toEqual` comparisons) are unaffected and the symbol is
+ * unreachable outside this module.
+ *
+ * @internal
+ */
+const INSTANCE_RECORD: unique symbol = Symbol("@wirestate/core/wire-status/record");
+
+/**
+ * Internal per-instance lifecycle bookkeeping, carried on the instance's
+ * {@link WireStatus} behind {@link INSTANCE_RECORD}.
+ *
+ * @internal
+ */
+export interface InstanceRecord {
+  /**
+   * Container that activated the instance; nulled on deactivation so a
+   * user-held deactivated instance does not pin its container.
+   */
+  container: Optional<ContainerKernel>;
+
+  /**
+   * Monotonic provision-cycle counter for the instance. Survives the `null`
+   * reset of {@link WireStatus.provisionId} so reprovision keeps issuing unique IDs.
+   */
+  provisionIdCounter: Optional<ProvisionId>;
+}
 
 /**
  * Numeric ID for one provider provision cycle of a service instance.
@@ -122,5 +155,38 @@ export class WireStatus {
         return this.isDeactivated || this.isDeprovisioned === true;
       },
     });
+
+    // Non-enumerable so the public shape (and `toEqual`) ignore it; mutated in
+    // place (container set/cleared, counter bumped), never reassigned.
+    Object.defineProperty(this, INSTANCE_RECORD, {
+      enumerable: false,
+      value: { container: undefined, provisionIdCounter: undefined } satisfies InstanceRecord,
+    });
   }
+}
+
+/**
+ * Returns the internal lifecycle record carried on a status.
+ *
+ * @internal
+ *
+ * @param status - The status to read the internal record from.
+ * @returns The instance's internal lifecycle record.
+ */
+export function getInstanceRecord(status: WireStatus): InstanceRecord {
+  return (status as unknown as { [INSTANCE_RECORD]: InstanceRecord })[INSTANCE_RECORD];
+}
+
+/**
+ * Returns the container that activated a service instance.
+ *
+ * @internal
+ *
+ * @param instance - Resolved service instance to look up.
+ * @returns The owning container, or `undefined` when the instance is not active.
+ */
+export function getInstanceContainer(instance: object): Optional<ContainerKernel> {
+  const status: Optional<WireStatus> = INSTANCE_STATUSES_BY_INSTANCE.get(instance);
+
+  return status && getInstanceRecord(status).container;
 }
