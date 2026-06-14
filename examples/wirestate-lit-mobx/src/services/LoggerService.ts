@@ -2,7 +2,6 @@ import {
   Injectable,
   OnActivated,
   OnDeactivation,
-  WireScope,
   WireEvent,
   OnEvent,
   OnCommand,
@@ -10,6 +9,8 @@ import {
   OnProvision,
   OnDeprovision,
   inject,
+  EventBus,
+  Container,
 } from "@wirestate/core";
 import { Action, makeObservable, ShallowObservable } from "@wirestate/mobx";
 
@@ -36,7 +37,8 @@ export class LoggerService {
   private nextId: number = 1;
 
   public constructor(
-    private readonly scope: WireScope = inject(WireScope),
+    private readonly container: Container = inject(Container),
+    private readonly eventBus: EventBus = inject(EventBus),
     protected readonly globalConfig: object = inject(GLOBAL_CONFIG),
     protected readonly globalDynamicConfig: object = inject(GLOBAL_DYNAMIC_CONFIG),
     protected readonly globalNotExistingConfig: object | undefined = inject(GLOBAL_NOT_EXISTING_CONFIG, {
@@ -64,19 +66,16 @@ export class LoggerService {
 
   @OnProvision()
   public onProvision(): void {
-    console.info(
-      `[${this.constructor.name}] Provision — listening for events, seed:`,
-      this.scope.getSeed(LoggerService)
-    );
+    console.info(`[${this.constructor.name}] Provision — listening for events`);
 
-    this.scope.emitEvent(`provision/${this.constructor.name}`);
+    this.eventBus.emit(`provision/${this.constructor.name}`);
   }
 
   @OnDeprovision()
   public onDeprovision(): void {
     console.info(`[${this.constructor.name}] Deprovision`);
 
-    this.scope.emitEvent(`deprovision/${this.constructor.name}`);
+    this.eventBus.emit(`deprovision/${this.constructor.name}`);
 
     this.clear();
   }
@@ -113,8 +112,8 @@ export class LoggerService {
   public onDump(params: unknown): object {
     const dump = {
       params,
-      [ThemeService.name]: this.scope.resolve(ThemeService),
-      ["GLOBAL_CONFIG"]: this.scope.resolve(GLOBAL_CONFIG),
+      [ThemeService.name]: this.container.get(ThemeService),
+      ["GLOBAL_CONFIG"]: this.container.get(GLOBAL_CONFIG),
     };
 
     console.info(`[${this.constructor.name}] Dumping data:`, dump);

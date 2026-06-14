@@ -13,8 +13,6 @@ const container: Container = new Container({
 });
 ```
 
-> Plugin API names are provisional and may change before the API is frozen.
-
 ## Built-in Messaging Plugins
 
 The three message buses are themselves plugins. Register the plugin for each kind you use; its `install` contributes the

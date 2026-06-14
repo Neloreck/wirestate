@@ -1,4 +1,4 @@
-import { WireScope, WireEvent } from "@wirestate/core";
+import { CommandBus, EventBus, WireEvent } from "@wirestate/core";
 import { injection, onEvent } from "@wirestate/lit";
 import { MobxLitElement } from "@wirestate/lit-mobx";
 import { css, CSSResult, html } from "lit";
@@ -61,8 +61,11 @@ export class GeneralControls extends MobxLitElement {
     `,
   ];
 
-  @injection(WireScope)
-  private readonly scope!: WireScope;
+  @injection(EventBus)
+  private readonly eventBus!: EventBus;
+
+  @injection(CommandBus)
+  private readonly commandBus!: CommandBus;
 
   @injection(CounterService)
   private readonly counterService!: CounterService;
@@ -89,7 +92,7 @@ export class GeneralControls extends MobxLitElement {
   }
 
   public onDumpData(): void {
-    const result: unknown = this.scope.executeCommand(EGlobalCommand.DUMP_DATA, {
+    const result: unknown = this.commandBus.execute(EGlobalCommand.DUMP_DATA, {
       at: Date.now(),
     });
 
@@ -105,7 +108,7 @@ export class GeneralControls extends MobxLitElement {
           Increment — count: ${this.counterService.count} (${this.counterService.isEven ? "even" : "odd"})
         </button>
 
-        <button class="control ghost" @click="${() => this.scope.emitEvent(EGlobalEvent.COUNTER_INCREMENT, 3)}">
+        <button class="control ghost" @click="${() => this.eventBus.emit(EGlobalEvent.COUNTER_INCREMENT, 3)}">
           Increment +3 (emit event)
         </button>
 
