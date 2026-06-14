@@ -1,13 +1,16 @@
 import {
   CommandBus,
+  CommandsPlugin,
   Container,
   EventBus,
+  EventsPlugin,
   inject,
   Injectable,
   OnCommand,
   OnDeprovision,
   OnEvent,
   OnQuery,
+  QueriesPlugin,
   QueryBus,
 } from "../index";
 import { Optional } from "../types/general";
@@ -86,25 +89,21 @@ describe("core scoped buses integration (parent-child separation)", () => {
     const parent: Container = new Container({
       activate: [ParentCounterService],
       bindings: [
-        EventBus,
-        CommandBus,
-        QueryBus,
         ParentCounterService,
         { token: PARENT_TOKEN, value: "root-value" },
         { token: SETTINGS_TOKEN, value: { label: "root-label", offset: 1 } },
       ],
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
     }).provision();
 
     const child: Container = new Container({
       activate: [ChildCounterService],
       bindings: [
-        EventBus,
-        CommandBus,
-        QueryBus,
         ChildCounterService,
         { token: SETTINGS_TOKEN, value: { label: "child-label", offset: 10 } },
       ],
       parent: parent,
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
     }).provision();
 
     expect(child.get(PARENT_TOKEN)).toBe("root-value");
@@ -184,12 +183,10 @@ describe("core scoped buses integration (parent-child separation)", () => {
     const container: Container = new Container({
       activate: [CleanupService],
       bindings: [
-        EventBus,
-        CommandBus,
-        QueryBus,
         CleanupService,
         { token: SETTINGS_TOKEN, value: { label: "cleanup-label", offset: 0 } },
       ],
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
     })
       .provision()
       .unbindAll();
@@ -280,7 +277,8 @@ describe("core scoped buses integration (parent-child separation)", () => {
 
     new Container({
       activate: [DeactivationCoordinatorService, DeactivationPeerService],
-      bindings: [EventBus, CommandBus, QueryBus, DeactivationPeerService, DeactivationCoordinatorService],
+      bindings: [DeactivationPeerService, DeactivationCoordinatorService],
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
     })
       .provision()
       .unbindAll();

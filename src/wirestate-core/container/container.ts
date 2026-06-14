@@ -10,6 +10,8 @@ import {
   InternalErrorHandler,
   setInternalErrorHandler,
 } from "../error/internal-error-handler";
+import type { WirestatePlugin } from "../plugin/plugin";
+import { installOwnPlugins, setContainerPlugins } from "../plugin/plugin-registry";
 import {
   deprovisionContainer,
   deprovisionContainerBinding,
@@ -46,6 +48,15 @@ export interface ContainerConfig {
    * rethrowing, such as event handler failures and lifecycle rejections.
    */
   readonly onError?: InternalErrorHandler;
+
+  /**
+   * Lifecycle plugins registered on this container.
+   *
+   * @remarks
+   * Plugins observe or extend the container lifecycle and are inherited by
+   * descendant containers. `install` runs once, here, at construction.
+   */
+  readonly plugins?: ReadonlyArray<WirestatePlugin>;
 }
 
 /**
@@ -97,8 +108,13 @@ export class Container extends ContainerKernel {
     }
 
     // Installed before any binding activates: the Wirestate instance lifecycle
-    // (status, @OnActivated/@OnDeactivation, messaging) layered on the pure-DI kernel.
+    // (status, @OnActivated/@OnDeactivation) layered on the pure-DI kernel.
     setActivationAdapter(this, wirestateActivationAdapter);
+
+    // Registered before any binding activates so the activation/provision dispatch can resolve them.
+    if (config.plugins) {
+      setContainerPlugins(this, config.plugins);
+    }
 
     this.bind({ token: Container, value: this });
 
@@ -109,6 +125,9 @@ export class Container extends ContainerKernel {
         this.bind(binding);
       }
     }
+
+    // Plugins contribute their bindings after user bindings are registered, before anything activates.
+    installOwnPlugins(this);
 
     const activate: ReadonlyArray<ServiceToken> =
       (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];

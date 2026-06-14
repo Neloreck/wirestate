@@ -41,9 +41,10 @@ counterService.increment();
 
 - DI primitives such as `Injectable`, `inject`, `Container`, `ServiceToken`, and `InjectionToken`.
 - `Container` and container methods such as `bind`, `unbind`, `unbindAll`, `get`, `has`, and `getOwnBindings`.
-- `WireStatus` and `ProvisionId` for lifecycle guards on resolved service instances.
-- `EventBus`, `CommandBus`, `QueryBus`, and their decorators (`OnEvent`, `OnCommand`, `OnQuery`).
 - `OnActivated`, `OnDeactivation`, `OnProvision`, and `OnDeprovision`.
+- `WireStatus` and `ProvisionId` for lifecycle guards on resolved service instances.
+- `EventBus`, `CommandBus`, `QueryBus`, and their decorators (`OnEvent`, `OnCommand`, `OnQuery`), enabled by
+  registering `EventsPlugin`, `CommandsPlugin`, or `QueriesPlugin`.
 
 React and Lit integration live in [`@wirestate/react`](https://www.npmjs.com/package/@wirestate/react) and
 [`@wirestate/lit`](https://www.npmjs.com/package/@wirestate/lit).

@@ -7,22 +7,26 @@ import {
   appendStandardHandlerMetadata,
   collectHandlerMetadata,
 } from "../../metadata/metadata-handlers";
-import { MESSAGING_REGISTRATION_KEY, MESSAGING_REGISTRATIONS } from "../messaging-registration";
+import {
+  MESSAGING_REGISTRATION_KEY,
+  MESSAGING_REGISTRATIONS,
+  type MessagingRegistration,
+} from "../messaging-registration";
 
 import { CommandBus } from "./command-bus";
 import type { CommandHandler, CommandHandlerMetadata, CommandType } from "./commands";
 import { COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY } from "./commands-registry";
 
 /**
- * Wires an instance's `@OnCommand` methods onto the {@link CommandBus} at activation.
+ * Wires an instance's `@OnCommand` methods onto the {@link CommandBus}.
  *
  * @remarks
- * Declared beside the commands code so importing `@OnCommand` is what pulls
- * {@link CommandBus} into the bundle; the activation dispatcher stays bus-agnostic.
+ * Declared beside the commands code so importing `@OnCommand` (or {@link CommandsPlugin})
+ * is what pulls {@link CommandBus} into the bundle; the dispatcher stays bus-agnostic.
  *
  * @internal
  */
-const COMMAND_REGISTRATION = {
+export const COMMAND_REGISTRATION: MessagingRegistration = {
   kind: Symbol("@wirestate/core/messaging/command"),
   token: CommandBus,
   register: (bus: object, instance: object): Array<() => void> => {

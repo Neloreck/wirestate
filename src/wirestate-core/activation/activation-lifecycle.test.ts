@@ -2,7 +2,10 @@ import { GenericService } from "@/fixtures/services/generic-service";
 
 import { Container } from "../container/container";
 import { CommandBus } from "../messaging/commands/command-bus";
+import { CommandsPlugin } from "../messaging/commands/commands-plugin";
 import { EventBus } from "../messaging/events/event-bus";
+import { EventsPlugin } from "../messaging/events/events-plugin";
+import { QueriesPlugin } from "../messaging/queries/queries-plugin";
 import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
 import { setContainerProvisioned } from "../provision/provision-state";
@@ -79,7 +82,8 @@ describe("instance lifecycle tracking", () => {
 
   it("should fully wire bare-class binds through the container", () => {
     const container: Container = new Container({
-      bindings: [EventBus, QueryBus, CommandBus, GenericService],
+      bindings: [GenericService],
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
     }).provision();
 
     const instance: GenericService = container.get(GenericService);

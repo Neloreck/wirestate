@@ -2,6 +2,7 @@ import type { InstanceBindingDescriptor } from "../binding/binding";
 import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
 import type { ContainerKernel } from "../container/container-kernel";
 import type { ActivationRecord } from "../container/container-storage";
+import { dispatchPluginActivate, dispatchPluginDeactivate } from "../plugin/plugin-registry";
 import { getContainerProvisionStatus } from "../provision/provision-state";
 import type { Definable, Maybe } from "../types/general";
 
@@ -49,6 +50,10 @@ export const wirestateActivationAdapter: ActivationAdapter = {
 
     initializeInstanceStatus(container, instance);
 
+    // Plugins (framework layer) observe/extend activation before the user's
+    // @OnActivated. A throw here is atomic — the kernel rolls the activation back.
+    dispatchPluginActivate(container, instance);
+
     const methodName: Maybe<string | symbol> = getActivatedHandlerMetadata(instance);
 
     if (methodName) {
@@ -83,6 +88,9 @@ export const wirestateActivationAdapter: ActivationAdapter = {
         source: "instance-deactivation",
       });
     }
+
+    // Plugins (framework layer) tear down after the user's @OnDeactivation, in reverse order, failsafe.
+    dispatchPluginDeactivate(container, instance);
 
     finalizeInstanceStatus(instance);
 

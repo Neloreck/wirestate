@@ -3,11 +3,14 @@ import { OnDeactivation } from "../activation/on-deactivation";
 import { Container } from "../container/container";
 import { WirestateError } from "../error/wirestate-error";
 import { CommandBus } from "../messaging/commands/command-bus";
+import { CommandsPlugin } from "../messaging/commands/commands-plugin";
 import { OnCommand } from "../messaging/commands/on-command";
 import { EventBus } from "../messaging/events/event-bus";
 import { WireEvent } from "../messaging/events/events";
+import { EventsPlugin } from "../messaging/events/events-plugin";
 import { OnEvent } from "../messaging/events/on-event";
 import { OnQuery } from "../messaging/queries/on-query";
+import { QueriesPlugin } from "../messaging/queries/queries-plugin";
 import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
 import { OnDeprovision } from "../provision/on-deprovision";
@@ -49,7 +52,8 @@ describe("dual-mode method decorators", () => {
     }
 
     const container: Container = new Container({
-      bindings: [EventBus, QueryBus, CommandBus, MessagingService],
+      bindings: [MessagingService],
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
     }).provision();
 
     const service: MessagingService = container.get(MessagingService);
@@ -155,7 +159,10 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = new Container({ bindings: [EventBus, QueryBus, ChildMessagingService] }).provision();
+    const container: Container = new Container({
+      bindings: [ChildMessagingService],
+      plugins: [new EventsPlugin(), new QueriesPlugin()],
+    }).provision();
     const child: ChildMessagingService = container.get(ChildMessagingService);
 
     expect(log).toEqual(["base-activated"]);
@@ -283,7 +290,10 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = new Container({ bindings: [EventBus, QueryBus, MultiHandlerService] }).provision();
+    const container: Container = new Container({
+      bindings: [MultiHandlerService],
+      plugins: [new EventsPlugin(), new QueriesPlugin()],
+    }).provision();
     const service: MultiHandlerService = container.get(MultiHandlerService);
 
     container.get(EventBus).emit("FIRST_EVENT");
@@ -305,7 +315,10 @@ describe("dual-mode method decorators", () => {
       }
     }
 
-    const container: Container = new Container({ bindings: [EventBus, UnsubscribingService] }).provision();
+    const container: Container = new Container({
+      bindings: [UnsubscribingService],
+      plugins: [new EventsPlugin()],
+    }).provision();
     const service: UnsubscribingService = container.get(UnsubscribingService);
     const eventBus: EventBus = container.get(EventBus);
 

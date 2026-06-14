@@ -2,13 +2,14 @@ import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
 import {
   BindingType,
-  CommandBus,
+  CommandsPlugin,
   Container,
   EventBus,
+  EventsPlugin,
   Injectable,
   OnActivated,
   OnDeactivation,
-  QueryBus,
+  QueriesPlugin,
 } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
@@ -271,10 +272,10 @@ describe("ContainerProvider", () => {
   });
 
   it("should bind its own composed bus distinct from the parent's", () => {
-    const parent: Container = new Container({ bindings: [EventBus] });
+    const parent: Container = new Container({ plugins: [new EventsPlugin()] });
     const element: TestProviderElement = new TestProviderElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
-      config: { parent, bindings: [EventBus] },
+      config: { parent, plugins: [new EventsPlugin()] },
     });
 
     document.body.appendChild(element);
@@ -286,7 +287,7 @@ describe("ContainerProvider", () => {
   });
 
   it("should inherit a parent's bus when the managed container binds none", () => {
-    const parent: Container = new Container({ bindings: [EventBus] });
+    const parent: Container = new Container({ plugins: [new EventsPlugin()] });
     const element: TestProviderElement = new TestProviderElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
       config: { parent },
@@ -304,7 +305,7 @@ describe("ContainerProvider", () => {
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
-      config: { bindings: [EventBus, CommandBus, QueryBus, GenericService] },
+      config: { bindings: [GenericService], plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()] },
     });
 
     const injection = useInjection(child, GenericService);
@@ -386,7 +387,7 @@ describe("ContainerProvider", () => {
   it("should reject direct container replacement for managed providers", () => {
     const element: TestProviderElement = new TestProviderElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
-      config: { bindings: [EventBus, CommandBus, QueryBus, GenericService] },
+      config: { bindings: [GenericService], plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()] },
     });
 
     expect(() => controller.setValue(new Container())).toThrow(

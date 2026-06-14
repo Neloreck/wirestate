@@ -1,13 +1,16 @@
 import {
   CommandBus,
+  CommandsPlugin,
   Container,
   EventBus,
+  EventsPlugin,
   Injectable,
   OnActivated,
   OnCommand,
   OnDeactivation,
   OnEvent,
   OnQuery,
+  QueriesPlugin,
   QueryBus,
 } from "../index";
 
@@ -91,7 +94,8 @@ describe("core instance shadowing and cleanup integration", () => {
   it("restores previous command and query handlers after the shadowing instance is removed", async () => {
     const container: Container = new Container({
       activate: [PrimaryHandlerService, SecondaryHandlerService],
-      bindings: [EventBus, CommandBus, QueryBus, PrimaryHandlerService, SecondaryHandlerService],
+      bindings: [PrimaryHandlerService, SecondaryHandlerService],
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
     }).provision();
 
     expect(container.get(CommandBus).hasHandler(FORMAT_COMMAND)).toBe(true);
@@ -123,7 +127,8 @@ describe("core instance shadowing and cleanup integration", () => {
   it("broadcasts events to all active services and removes only disconnected listeners", () => {
     const container: Container = new Container({
       activate: [PrimaryHandlerService, SecondaryHandlerService],
-      bindings: [EventBus, CommandBus, QueryBus, PrimaryHandlerService, SecondaryHandlerService],
+      bindings: [PrimaryHandlerService, SecondaryHandlerService],
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
     }).provision();
 
     const bus: EventBus = container.get(EventBus);

@@ -5,7 +5,11 @@ import type { ContainerKernel } from "../../container/container-kernel";
 import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
 import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../../metadata/metadata-handlers";
 import type { Optional } from "../../types/general";
-import { MESSAGING_REGISTRATION_KEY, MESSAGING_REGISTRATIONS } from "../messaging-registration";
+import {
+  MESSAGING_REGISTRATION_KEY,
+  MESSAGING_REGISTRATIONS,
+  type MessagingRegistration,
+} from "../messaging-registration";
 
 import { buildEventDispatchers } from "./build-event-dispatchers";
 import { EventBus } from "./event-bus";
@@ -13,15 +17,15 @@ import type { EventType } from "./events";
 import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "./events-registry";
 
 /**
- * Wires an instance's `@OnEvent` methods onto the {@link EventBus} at activation.
+ * Wires an instance's `@OnEvent` methods onto the {@link EventBus}.
  *
  * @remarks
- * Declared beside the events code so importing `@OnEvent` is what pulls
- * {@link EventBus} into the bundle; the activation dispatcher stays bus-agnostic.
+ * Declared beside the events code so importing `@OnEvent` (or {@link EventsPlugin})
+ * is what pulls {@link EventBus} into the bundle; the dispatcher stays bus-agnostic.
  *
  * @internal
  */
-const EVENT_REGISTRATION = {
+export const EVENT_REGISTRATION: MessagingRegistration = {
   kind: Symbol("@wirestate/core/messaging/event"),
   token: EventBus,
   register: (bus: object, instance: object, container: ContainerKernel): Array<() => void> => {

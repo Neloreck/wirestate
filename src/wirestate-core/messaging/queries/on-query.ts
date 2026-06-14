@@ -7,22 +7,26 @@ import {
   appendStandardHandlerMetadata,
   collectHandlerMetadata,
 } from "../../metadata/metadata-handlers";
-import { MESSAGING_REGISTRATION_KEY, MESSAGING_REGISTRATIONS } from "../messaging-registration";
+import {
+  MESSAGING_REGISTRATION_KEY,
+  MESSAGING_REGISTRATIONS,
+  type MessagingRegistration,
+} from "../messaging-registration";
 
 import type { QueryHandler, QueryHandlerMetadata, QueryType } from "./queries";
 import { QUERY_HANDLER_METADATA, QUERY_METADATA_KEY } from "./queries-registry";
 import { QueryBus } from "./query-bus";
 
 /**
- * Wires an instance's `@OnQuery` methods onto the {@link QueryBus} at activation.
+ * Wires an instance's `@OnQuery` methods onto the {@link QueryBus}.
  *
  * @remarks
- * Declared beside the queries code so importing `@OnQuery` is what pulls
- * {@link QueryBus} into the bundle; the activation dispatcher stays bus-agnostic.
+ * Declared beside the queries code so importing `@OnQuery` (or {@link QueriesPlugin})
+ * is what pulls {@link QueryBus} into the bundle; the dispatcher stays bus-agnostic.
  *
  * @internal
  */
-const QUERY_REGISTRATION = {
+export const QUERY_REGISTRATION: MessagingRegistration = {
   kind: Symbol("@wirestate/core/messaging/query"),
   token: QueryBus,
   register: (bus: object, instance: object): Array<() => void> => {

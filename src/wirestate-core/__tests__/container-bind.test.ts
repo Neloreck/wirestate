@@ -16,10 +16,13 @@ import { inject } from "../container/container-context";
 import { ContainerKernel } from "../container/container-kernel";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { CommandBus } from "../messaging/commands/command-bus";
+import { CommandsPlugin } from "../messaging/commands/commands-plugin";
 import { OnCommand } from "../messaging/commands/on-command";
 import { EventBus } from "../messaging/events/event-bus";
+import { EventsPlugin } from "../messaging/events/events-plugin";
 import { OnEvent } from "../messaging/events/on-event";
 import { OnQuery } from "../messaging/queries/on-query";
+import { QueriesPlugin } from "../messaging/queries/queries-plugin";
 import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
 import { AnyObject, Optional } from "../types/general";
@@ -110,7 +113,9 @@ describe("container.bind", () => {
   });
 
   it("should bind an instance descriptor to its descriptor token", () => {
-    const container: Container = new Container({ bindings: [EventBus, QueryBus, CommandBus] });
+    const container: Container = new Container({
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
+    });
     const TOKEN: unique symbol = Symbol("token");
     const binding: BindingDescriptor = {
       type: BindingType.Instance,
@@ -284,7 +289,9 @@ describe("container.bind", () => {
     }
 
     it("should bind instances and handle lifecycle", async () => {
-      const container: Container = new Container({ bindings: [EventBus, QueryBus, CommandBus] });
+      const container: Container = new Container({
+        plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
+      });
 
       expect(container.bind(GenericService)).toBe(container);
       expect(container.provision()).toBe(container);
@@ -468,7 +475,10 @@ describe("container.bind", () => {
       }
 
       const onError = jest.fn();
-      const container: Container = new Container({ onError, bindings: [EventBus, QueryBus, CommandBus] });
+      const container: Container = new Container({
+        onError,
+        plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
+      });
 
       container.bind(SyncFailActivationWithHandlersService);
 
@@ -503,7 +513,10 @@ describe("container.bind", () => {
     it("should catch and log failing @OnDeactivation methods while preserving cleanup", () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-      const container: Container = new Container({ bindings: [QueryBus, SyncFailDeactivationService] }).provision();
+      const container: Container = new Container({
+        bindings: [SyncFailDeactivationService],
+        plugins: [new QueriesPlugin()],
+      }).provision();
       const instance: SyncFailDeactivationService = container.get(SyncFailDeactivationService);
 
       expect(container.get(QueryBus).query("SYNC_FAIL_DEACTIVATION_QUERY")).toBe("query-response");
@@ -559,8 +572,8 @@ describe("container.bind", () => {
       const onError = jest.fn();
       const container: Container = new Container({
         activate: true,
-        bindings: [QueryBus, SyncFailDeactivationService],
-
+        bindings: [SyncFailDeactivationService],
+        plugins: [new QueriesPlugin()],
         onError,
       });
 
@@ -590,7 +603,8 @@ describe("container.bind", () => {
 
       const container: Container = new Container({
         activate: true,
-        bindings: [EventBus, FailingEventService],
+        bindings: [FailingEventService],
+        plugins: [new EventsPlugin()],
         onError,
       }).provision();
 
@@ -623,7 +637,8 @@ describe("container.bind", () => {
 
       const container: Container = new Container({
         activate: true,
-        bindings: [EventBus, MultiDecoratedService],
+        bindings: [MultiDecoratedService],
+        plugins: [new EventsPlugin()],
       }).provision();
 
       const bus: EventBus = container.get(EventBus);
@@ -639,7 +654,7 @@ describe("container.bind", () => {
     });
 
     it("should handle non-function @OnQuery or @OnActivated properties during activation", () => {
-      const container: Container = new Container({ bindings: [QueryBus] });
+      const container: Container = new Container({ plugins: [new QueriesPlugin()] });
 
       container.bind(CorruptedService);
 
