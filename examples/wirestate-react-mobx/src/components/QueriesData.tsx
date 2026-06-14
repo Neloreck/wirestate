@@ -15,14 +15,14 @@ import { EGlobalQuery } from "@/constants/queries";
 import { ECounterServiceQuery, type ICounterSnapshot, type ICounterSummary } from "@/services/CounterService.query";
 import { LoggerService } from "@/services/LoggerService";
 import { ThemeService } from "@/services/ThemeService";
-import type { Optional, Theme } from "@/types";
+import type { Nullable, Theme } from "@/types";
 
 export const QueriesData = () => {
-  const [snapshot, setSnapshot] = useState<Optional<ICounterSnapshot>>(null);
-  const [summary, setSummary] = useState<Optional<ICounterSummary>>(null);
+  const [snapshot, setSnapshot] = useState<Nullable<ICounterSnapshot>>(null);
+  const [summary, setSummary] = useState<Nullable<ICounterSummary>>(null);
 
   const themeService: ThemeService = useInjection(ThemeService);
-  const loggerService: Optional<LoggerService> = useOptionalInjection(LoggerService);
+  const loggerService: Nullable<LoggerService> = useOptionalInjection(LoggerService);
 
   const query: QueryExecutor = useQueryExecutor();
   const queryAsync: AsyncQueryExecutor = useAsyncQueryExecutor();

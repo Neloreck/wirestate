@@ -1,4 +1,4 @@
-import type { Optional } from "@/types";
+import type { Nullable } from "@/types";
 
 export enum ECounterServiceQuery {
   GET_COUNTER_SUMMARY = "counter/summary",
@@ -8,7 +8,7 @@ export enum ECounterServiceQuery {
 export interface ICounterSummary {
   readonly count: number;
   readonly isEven: boolean;
-  readonly lastIncrementAt: Optional<number>;
+  readonly lastIncrementAt: Nullable<number>;
 }
 
 export interface ICounterSnapshot extends ICounterSummary {

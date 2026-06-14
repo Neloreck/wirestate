@@ -1,14 +1,5 @@
-import {
-  Injectable,
-  OnActivated,
-  OnDeactivation,
-  OnDeprovision,
-  OnProvision,
-  SEED,
-  WireScope,
-  inject,
-} from "@wirestate/core";
-import { Action, Observable, makeObservable } from "@wirestate/mobx";
+import { EventBus, Injectable, OnActivated, OnDeactivation, OnDeprovision, OnProvision, inject } from "@wirestate/core";
+import { Observable, makeObservable, BoundAction } from "@wirestate/mobx";
 
 import { EGlobalEvent } from "@/constants/events";
 import type { Theme } from "@/types";
@@ -18,13 +9,8 @@ export class ThemeService {
   @Observable()
   public theme: Theme = "light";
 
-  public constructor(
-    private readonly scope: WireScope = inject(WireScope),
-    protected readonly seed: object = inject(SEED),
-  ) {
+  public constructor(private readonly eventBus: EventBus = inject(EventBus)) {
     makeObservable(this);
-
-    console.info(`[${this.constructor.name}] Shared seed on construction:`, seed);
   }
 
   @OnActivated()
@@ -41,7 +27,7 @@ export class ThemeService {
   public onProvision(): void {
     console.info(`[${this.constructor.name}] Provision with theme:`, this.theme);
 
-    this.scope.emitEvent(`provision/${this.constructor.name}`, {
+    this.eventBus.emit(`provision/${this.constructor.name}`, {
       at: new Date(),
     });
   }
@@ -50,15 +36,15 @@ export class ThemeService {
   public onDeprovision(): void {
     console.info(`[${this.constructor.name}] Deprovision`);
 
-    this.scope.emitEvent(`deprovision/${this.constructor.name}`, {
+    this.eventBus.emit(`deprovision/${this.constructor.name}`, {
       at: new Date(),
     });
   }
 
-  @Action()
+  @BoundAction()
   public toggle(): void {
     this.theme = this.theme === "light" ? "dark" : "light";
 
-    this.scope.emitEvent(EGlobalEvent.THEME_TOGGLED, { theme: this.theme });
+    this.eventBus.emit(EGlobalEvent.THEME_TOGGLED, { theme: this.theme });
   }
 }

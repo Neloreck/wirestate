@@ -12,7 +12,7 @@ import { GLOBAL_CONFIG } from "@/constants/id";
 import { ThemeService } from "@/services/ThemeService";
 
 export const Application = () => {
-  const themeService: ThemeService = useInjection(ThemeService);
+  const { theme } = useInjection(ThemeService);
   const globalConfig: object = useInjection(GLOBAL_CONFIG);
 
   useEvent(EGlobalEvent.COUNTER_RESET, () => {
@@ -28,8 +28,8 @@ export const Application = () => {
   });
 
   useEffect(() => {
-    document.documentElement.dataset.theme = themeService.theme;
-  }, [themeService.theme]);
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
 
   return (
     <div className={"app"}>

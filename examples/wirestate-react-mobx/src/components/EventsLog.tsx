@@ -4,16 +4,16 @@ import { useInjection } from "@wirestate/react";
 
 import { LoggerService } from "@/services/LoggerService";
 
-export const EventsLog = () => {
-  const loggerService: LoggerService = useInjection(LoggerService);
+export function EventsLog() {
+  const { logs, clear } = useInjection(LoggerService);
 
   return (
     <div id={"logs"}>
       <div className={"event-log"}>
-        {loggerService.logs.length === 0 ? (
+        {logs.length === 0 ? (
           <div className={"event-log__empty"}>No events yet — try the buttons above.</div>
         ) : (
-          loggerService.logs.map((entry) => (
+          logs.map((entry) => (
             <div key={entry.id} className={"event-log__entry"}>
               <span className={"event-log__type"}>{JSON.stringify(entry.type)}</span>
               <span className={"event-log__payload"}>
@@ -24,9 +24,9 @@ export const EventsLog = () => {
         )}
       </div>
 
-      <button className={"counter ghost"} onClick={() => loggerService.clear()}>
+      <button className={"counter ghost"} onClick={clear}>
         Clear events
       </button>
     </div>
   );
-};
+}
