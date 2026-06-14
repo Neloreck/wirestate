@@ -5,15 +5,12 @@ import { OnDeactivation } from "../activation/on-deactivation";
 import { WireStatus } from "../activation/wire-status";
 import {
   BindingDescriptor,
-  BindingScope,
   BindingType,
   FactoryBindingDescriptor,
   InstanceBindingDescriptor,
-  ValueBindingDescriptor,
 } from "../binding/binding";
 import { Container } from "../container/container";
 import { inject } from "../container/container-context";
-import { ContainerKernel } from "../container/container-kernel";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
 import { CommandBus } from "../plugin/commands/command-bus";
@@ -25,79 +22,15 @@ import { OnEvent } from "../plugin/events/on-event";
 import { OnQuery } from "../plugin/queries/on-query";
 import { QueriesPlugin } from "../plugin/queries/queries-plugin";
 import { QueryBus } from "../plugin/queries/query-bus";
-import { AnyObject, Nullable } from "../types/general";
+import { Nullable } from "../types/general";
 
-describe("container.bind", () => {
+describe("container.bind instance", () => {
   it("should bind a class directly", () => {
     const container: Container = new Container();
     const result: Container = container.bind(GenericService);
 
     expect(result).toBe(container);
     expect(container.has(GenericService)).toBe(true);
-  });
-
-  it("should bind a value descriptor", () => {
-    const TOKEN: unique symbol = Symbol("config");
-
-    const container: Container = new Container();
-    const result: Container = container.bind({
-      token: TOKEN,
-      value: { key: "value" },
-      type: BindingType.Value,
-    });
-
-    expect(result).toBe(container);
-    expect(container.get(TOKEN)).toEqual({ key: "value" });
-  });
-
-  it("should bind a value when type is undefined", () => {
-    const container: Container = new Container();
-    const TOKEN: unique symbol = Symbol("config");
-
-    container.bind({ token: TOKEN, value: 42 });
-
-    expect(container.get(TOKEN)).toBe(42);
-  });
-
-  it("should bind a factory descriptor", () => {
-    const container: Container = new Container();
-    const TOKEN: unique symbol = Symbol("dynamic");
-
-    let callCount: number = 0;
-
-    container.bind({
-      token: TOKEN,
-      type: BindingType.Factory,
-      scope: BindingScope.Transient,
-      factory: () => {
-        callCount++;
-
-        return { count: callCount };
-      },
-    });
-
-    expect(container.get(TOKEN)).toEqual({ count: 1 });
-    expect(container.get(TOKEN)).toEqual({ count: 2 });
-    expect(container.get(TOKEN)).toEqual({ count: 3 });
-  });
-
-  it("should bind descriptors with string literal type and scope", () => {
-    const container: Container = new Container();
-    const TOKEN: unique symbol = Symbol("literal-factory");
-
-    const descriptor: FactoryBindingDescriptor = {
-      token: TOKEN,
-      type: "Factory",
-      scope: "Singleton",
-      factory: () => ({ value: "created" }),
-    };
-
-    container.bind(descriptor);
-
-    const first = container.get(TOKEN);
-
-    expect(first).toEqual({ value: "created" });
-    expect(container.get(TOKEN)).toBe(first);
   });
 
   it("should bind an instance descriptor", () => {
@@ -130,118 +63,103 @@ describe("container.bind", () => {
     expect(container.getOwnBindings()).toContainEqual(binding);
   });
 
-  it("should throw for instance descriptor without token", () => {
-    const container: Container = new Container();
-    const binding = {
-      type: BindingType.Instance,
-      value: GenericService,
-    } as unknown as InstanceBindingDescriptor;
+  // Shared descriptor-validation cases. These guard the generic `bind()` argument
+  // checks; they live with the instance suite rather than in their own file.
+  describe("descriptor validation", () => {
+    it("should throw for instance descriptor without token", () => {
+      const container: Container = new Container();
+      const binding = {
+        type: BindingType.Instance,
+        value: GenericService,
+      } as unknown as InstanceBindingDescriptor;
 
-    expect(() => container.bind(binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
-    expect(() => container.bind(binding)).toThrow("Binding descriptor must provide a 'token' property.");
-  });
+      expect(() => container.bind(binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
+      expect(() => container.bind(binding)).toThrow("Binding descriptor must provide a 'token' property.");
+    });
 
-  it("should throw for instance descriptor with unknown scope", () => {
-    const container: Container = new Container();
-    const binding = {
-      type: BindingType.Instance,
-      token: GenericService,
-      scope: "UNKNOWN",
-      value: GenericService,
-    } as unknown as BindingDescriptor;
-
-    expect(() => container.bind(binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_BINDING_SCOPE }));
-    expect(() => container.bind(binding)).toThrow("Binding descriptor has unknown scope 'UNKNOWN'.");
-  });
-
-  it("should throw for unknown type", () => {
-    const container: Container = new Container();
-    const binding = {
-      type: "UNKNOWN",
-      token: GenericService,
-      value: GenericService,
-    } as unknown as BindingDescriptor;
-
-    expect(() => container.bind(binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
-    expect(() => container.bind(binding)).toThrow("Binding descriptor has unknown type 'UNKNOWN'.");
-  });
-
-  it("should throw for removed ServiceRedirection type", () => {
-    const container: Container = new Container();
-    const binding = {
-      type: "ServiceRedirection",
-      token: "redirected",
-      service: GenericService,
-    } as unknown as BindingDescriptor;
-
-    expect(() => container.bind(binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
-    expect(() => container.bind(binding)).toThrow("Binding descriptor has unknown type 'ServiceRedirection'.");
-  });
-
-  it("should throw for missing descriptor token", () => {
-    const container: Container = new Container();
-    const binding = { value: "my-value" } as unknown as BindingDescriptor;
-
-    expect(() => container.bind(binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
-    expect(() => container.bind(binding)).toThrow("Binding descriptor must provide a 'token' property.");
-  });
-
-  it("should throw for unknown scope", () => {
-    const container: Container = new Container();
-
-    expect(() =>
-      container.bind({
-        token: "bad-scope",
+    it("should throw for instance descriptor with unknown scope", () => {
+      const container: Container = new Container();
+      const binding = {
+        type: BindingType.Instance,
+        token: GenericService,
         scope: "UNKNOWN",
-        value: "my-value",
-      } as unknown as BindingDescriptor)
-    ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_BINDING_SCOPE }));
-    expect(() =>
-      container.bind({
-        token: "bad-scope",
-        scope: "UNKNOWN",
-        value: "my-value",
-      } as unknown as BindingDescriptor)
-    ).toThrow("Binding descriptor has unknown scope 'UNKNOWN'.");
+        value: GenericService,
+      } as unknown as BindingDescriptor;
+
+      expect(() => container.bind(binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_BINDING_SCOPE }));
+      expect(() => container.bind(binding)).toThrow("Binding descriptor has unknown scope 'UNKNOWN'.");
+    });
+
+    it("should throw for unknown type", () => {
+      const container: Container = new Container();
+      const binding = {
+        type: "UNKNOWN",
+        token: GenericService,
+        value: GenericService,
+      } as unknown as BindingDescriptor;
+
+      expect(() => container.bind(binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
+      expect(() => container.bind(binding)).toThrow("Binding descriptor has unknown type 'UNKNOWN'.");
+    });
+
+    it("should throw for removed ServiceRedirection type", () => {
+      const container: Container = new Container();
+      const binding = {
+        type: "ServiceRedirection",
+        token: "redirected",
+        service: GenericService,
+      } as unknown as BindingDescriptor;
+
+      expect(() => container.bind(binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
+      expect(() => container.bind(binding)).toThrow("Binding descriptor has unknown type 'ServiceRedirection'.");
+    });
+
+    it("should throw for missing descriptor token", () => {
+      const container: Container = new Container();
+      const binding = { value: "my-value" } as unknown as BindingDescriptor;
+
+      expect(() => container.bind(binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
+      expect(() => container.bind(binding)).toThrow("Binding descriptor must provide a 'token' property.");
+    });
+
+    it("should throw for unknown scope", () => {
+      const container: Container = new Container();
+
+      expect(() =>
+        container.bind({
+          token: "bad-scope",
+          scope: "UNKNOWN",
+          value: "my-value",
+        } as unknown as BindingDescriptor)
+      ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_BINDING_SCOPE }));
+      expect(() =>
+        container.bind({
+          token: "bad-scope",
+          scope: "UNKNOWN",
+          value: "my-value",
+        } as unknown as BindingDescriptor)
+      ).toThrow("Binding descriptor has unknown scope 'UNKNOWN'.");
+    });
+
+    it("should throw for descriptors without value or factory", () => {
+      const container: Container = new Container();
+
+      expect(() =>
+        container.bind({
+          token: "missing-value",
+        } as BindingDescriptor)
+      ).toThrow("Value descriptor must provide a 'value' property.");
+
+      expect(() =>
+        container.bind({
+          type: BindingType.Factory,
+          token: "missing-factory",
+        } as FactoryBindingDescriptor)
+      ).toThrow("Factory descriptor 'factory' must be a function.");
+    });
   });
 
-  it("should throw for descriptors without value or factory", () => {
-    const container: Container = new Container();
-
-    expect(() =>
-      container.bind({
-        token: "missing-value",
-      } as BindingDescriptor)
-    ).toThrow("Value descriptor must provide a 'value' property.");
-
-    expect(() =>
-      container.bind({
-        type: BindingType.Factory,
-        token: "missing-factory",
-      } as FactoryBindingDescriptor)
-    ).toThrow("Factory descriptor 'factory' must be a function.");
-  });
-
-  it("should throw for factory descriptor with invalid factory", () => {
-    const container: Container = new Container();
-
-    expect(() =>
-      container.bind({
-        type: BindingType.Factory,
-        factory: "not-a-function",
-        token: "bad-factory",
-      } as unknown as FactoryBindingDescriptor)
-    ).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_ARGUMENTS }));
-    expect(() =>
-      container.bind({
-        type: BindingType.Factory,
-        factory: "not-a-function",
-        token: "bad-factory",
-      } as unknown as FactoryBindingDescriptor)
-    ).toThrow("Factory descriptor 'factory' must be a function.");
-  });
-
-  describe("instance", () => {
+  describe("activation lifecycle", () => {
     @Injectable()
     class AsyncFailService {
       @OnActivated()
@@ -665,110 +583,6 @@ describe("container.bind", () => {
       expect(() => container.get(QueryBus).query("CORRUPTED_QUERY")).toThrow(
         "No query handler registered in container for type: 'CORRUPTED_QUERY'."
       );
-    });
-  });
-
-  describe("factory", () => {
-    it("should bind a factory creator", () => {
-      const container: Container = new Container();
-      const TOKEN: unique symbol = Symbol("greeting-factory");
-      const binding: FactoryBindingDescriptor<() => string> = {
-        type: BindingType.Factory,
-        factory: () => () => "hello",
-        token: TOKEN,
-      };
-
-      const result: Container = container.bind(binding);
-
-      const factory: () => string = container.get(TOKEN);
-
-      expect(result).toBe(container);
-      expect(factory()).toBe("hello");
-      expect(container.getOwnBindings()).toContainEqual(binding);
-    });
-
-    it("should call factory once and cache the value by default", () => {
-      const container: Container = new Container();
-      const value: AnyObject = { c: 3, d: 4 };
-      const factory = jest.fn(() => value);
-
-      const result: Container = container.bind({
-        type: BindingType.Factory,
-        token: "factory-value",
-        factory,
-      });
-
-      expect(result).toBe(container);
-      expect(container.get("factory-value")).toEqual({ c: 3, d: 4 });
-      expect(container.get("factory-value")).toBe(value);
-
-      expect(factory).toHaveBeenCalledTimes(1);
-    });
-
-    it("should pass container to factory", () => {
-      const container: Container = new Container();
-      const NAME_TOKEN: unique symbol = Symbol("name");
-      const GREETING_TOKEN: unique symbol = Symbol("greeting");
-      const factory = jest.fn((current: ContainerKernel) => `Hello, ${current.get<string>(NAME_TOKEN)}`);
-
-      container.bind({ token: NAME_TOKEN, value: "Ada" });
-
-      container.bind({
-        type: BindingType.Factory,
-        factory,
-        token: GREETING_TOKEN,
-      });
-
-      expect(container.get(GREETING_TOKEN)).toBe("Hello, Ada");
-      expect(factory).toHaveBeenCalledTimes(1);
-    });
-
-    it("should respect Singleton scope", () => {
-      const container: Container = new Container();
-      const value: AnyObject = { c: 3, d: 4 };
-      const factory = jest.fn(() => value);
-
-      container.bind({
-        type: BindingType.Factory,
-        token: "factory-singleton",
-        factory,
-        scope: BindingScope.Singleton,
-      });
-
-      expect(container.get("factory-singleton")).toBe(value);
-      expect(container.get("factory-singleton")).toBe(value);
-      expect(container.get("factory-singleton")).toBe(value);
-
-      expect(factory).toHaveBeenCalledTimes(1);
-    });
-
-    it("should respect Transient scope", () => {
-      const container: Container = new Container();
-      let count: number = 0;
-
-      container.bind({
-        type: BindingType.Factory,
-        token: "factory-transient",
-        factory: () => count++,
-        scope: BindingScope.Transient,
-      });
-
-      expect(container.get("factory-transient")).toBe(0);
-      expect(container.get("factory-transient")).toBe(1);
-      expect(container.get("factory-transient")).toBe(2);
-    });
-  });
-
-  describe("value", () => {
-    it("should bind a value to the container", () => {
-      const container: Container = new Container();
-      const binding: ValueBindingDescriptor = { token: "my-token", value: "my-value" };
-
-      const result: Container = container.bind(binding);
-
-      expect(result).toBe(container);
-      expect(container.get("my-token")).toBe("my-value");
-      expect(container.getOwnBindings()).toContainEqual(binding);
     });
   });
 });
