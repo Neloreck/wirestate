@@ -5,6 +5,23 @@ Queries read data owned elsewhere. A query has one active handler and returns th
 Each query type uses a stack of handlers. The newest registration answers the query. When it unregisters, the previous
 handler becomes active again.
 
+## Register the Plugin
+
+The query bus is opt-in. Register `QueriesPlugin` on the container so `inject(QueryBus)`, direct registration, and
+`@OnQuery` handlers work. A service that declares `@OnQuery` throws at provision unless `QueriesPlugin` is registered
+somewhere in the container chain.
+
+```ts
+import { Container, QueriesPlugin } from "@wirestate/core";
+
+const container = new Container({
+  bindings: [CartSummaryService],
+  plugins: [new QueriesPlugin()],
+});
+```
+
+See [Core Plugins](/core/plugins) for inheritance and registering the plugin on a parent container.
+
 ## Handle a Query
 
 ```ts

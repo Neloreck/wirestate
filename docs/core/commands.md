@@ -8,6 +8,23 @@ handler may return a Promise or the caller should always receive a Promise.
 Each command type uses a stack of handlers. The newest registration handles the command. When it unregisters, the
 previous handler becomes active again.
 
+## Register the Plugin
+
+The command bus is opt-in. Register `CommandsPlugin` on the container so `inject(CommandBus)`, direct registration, and
+`@OnCommand` handlers work. A service that declares `@OnCommand` throws at provision unless `CommandsPlugin` is registered
+somewhere in the container chain.
+
+```ts
+import { CommandsPlugin, Container } from "@wirestate/core";
+
+const container = new Container({
+  bindings: [SearchService],
+  plugins: [new CommandsPlugin()],
+});
+```
+
+See [Core Plugins](/core/plugins) for inheritance and registering the plugin on a parent container.
+
 ## Handle a Command
 
 ```ts

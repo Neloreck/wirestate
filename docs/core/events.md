@@ -4,6 +4,23 @@ Events are broadcast notifications. They say "this happened" and do not return a
 
 Each container owns its own `EventBus`. Events stay in that container and do not bubble to a parent container.
 
+## Register the Plugin
+
+The event bus is opt-in. Register `EventsPlugin` on the container so `inject(EventBus)`, direct subscriptions, and
+`@OnEvent` handlers work. A service that declares `@OnEvent` throws at provision unless `EventsPlugin` is registered
+somewhere in the container chain.
+
+```ts
+import { Container, EventsPlugin } from "@wirestate/core";
+
+const container = new Container({
+  bindings: [CartService],
+  plugins: [new EventsPlugin()],
+});
+```
+
+See [Core Plugins](/core/plugins) for inheritance and registering the plugin on a parent container.
+
 ## Emit from a Service
 
 ```ts

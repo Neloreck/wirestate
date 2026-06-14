@@ -3,6 +3,11 @@
 Event hooks let React components emit and subscribe to events on the active container's `EventBus`. Subscriptions are
 tied to the component lifetime.
 
+## Register the Plugin
+
+These hooks use the active container's `EventBus`, which exists only when `EventsPlugin` is registered in your provider's
+`config.plugins`. See [React Containers › Messaging](/react/containers#messaging).
+
 ## Emit Events
 
 ```tsx

@@ -2,6 +2,11 @@
 
 Query helpers let Lit elements register query handlers on the active container while the element is connected.
 
+## Register the Plugin
+
+These helpers use the active container's `QueryBus`, which exists only when `QueriesPlugin` is registered in the
+provider's `config.plugins`. See [Lit Containers › Messaging](/lit/containers#messaging).
+
 ## Decorator Handler
 
 ```ts
@@ -34,8 +39,7 @@ class CheckoutAnswer extends LitElement {
 
 ## Execute from an Element
 
-Inject `QueryBus` and register `QueriesPlugin` in the provider's `config.plugins`
-(`plugins: [new QueriesPlugin()]`).
+Inject `QueryBus` when an element needs to run queries.
 
 ```ts
 import { QueryBus } from "@wirestate/core";

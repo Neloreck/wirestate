@@ -2,6 +2,11 @@
 
 Event helpers let Lit elements subscribe to events on the active container while the element is connected.
 
+## Register the Plugin
+
+These helpers use the active container's `EventBus`, which exists only when `EventsPlugin` is registered in the provider's
+`config.plugins`. See [Lit Containers › Messaging](/lit/containers#messaging).
+
 ## Decorator Handler
 
 ```ts
@@ -41,8 +46,7 @@ class CartLogger extends LitElement {
 
 ## Emit from an Element
 
-Inject `EventBus` when an element needs to emit. Register `EventsPlugin` in the provider's `config.plugins`
-(`plugins: [new EventsPlugin()]`) so the active container exposes the bus.
+Inject `EventBus` when an element needs to emit.
 
 ```ts
 import { EventBus } from "@wirestate/core";

@@ -5,6 +5,11 @@ Query hooks let React components ask the active container for data and register 
 Query execution can resolve services and run user handlers. Avoid calling query executors directly during render; call
 them from an effect, event handler, or memoized callback and render cached component state.
 
+## Register the Plugin
+
+These hooks use the active container's `QueryBus`, which exists only when `QueriesPlugin` is registered in your provider's
+`config.plugins`. See [React Containers › Messaging](/react/containers#messaging).
+
 ## Execute a Query
 
 ```tsx

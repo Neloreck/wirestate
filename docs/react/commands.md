@@ -3,6 +3,11 @@
 Command hooks let React components send commands to the active container and register handlers while the component is
 mounted.
 
+## Register the Plugin
+
+These hooks use the active container's `CommandBus`, which exists only when `CommandsPlugin` is registered in your
+provider's `config.plugins`. See [React Containers › Messaging](/react/containers#messaging).
+
 ## Execute a Command
 
 Use `useCommandExecutor` when the active handler is synchronous and the caller needs the result immediately.

@@ -2,6 +2,11 @@
 
 Command helpers let Lit elements register command handlers on the active container while the element is connected.
 
+## Register the Plugin
+
+These helpers use the active container's `CommandBus`, which exists only when `CommandsPlugin` is registered in the
+provider's `config.plugins`. See [Lit Containers › Messaging](/lit/containers#messaging).
+
 ## Decorator Handler
 
 ```ts
@@ -63,8 +68,7 @@ export class DraftCommands extends LitElement {
 
 ## Execute from an Element
 
-Inject `CommandBus` and register `CommandsPlugin` in the provider's `config.plugins`
-(`plugins: [new CommandsPlugin()]`). Use `execute` for synchronous handlers.
+Inject `CommandBus` when an element needs to send commands. Use `execute` for synchronous handlers.
 
 ```ts
 import { CommandBus } from "@wirestate/core";
