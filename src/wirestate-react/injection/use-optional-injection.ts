@@ -8,7 +8,7 @@ import { useContainer } from "../context/use-container";
 import { AnyObject } from "../types/general";
 
 /**
- * Safely resolves a value from the container, returning a fallback or null if not bound.
+ * Safely resolves a value from the container, returning a fallback or `undefined` if not bound.
  *
  * @remarks
  * Unlike {@link useInjection}, this hook does not throw if the dependency
@@ -22,14 +22,14 @@ import { AnyObject } from "../types/general";
  * @param token - The token (string, symbol, or constructor).
  * @param fallback - Optional function called to provide a value if the token is not bound.
  *
- * @returns The resolved value, the result of the fallback function, or `null` when no fallback is provided.
+ * @returns The resolved value, the result of the fallback function, or `undefined` when no fallback is provided.
  *
  * @example
  * ```tsx
  * const logger = useOptionalInjection(FileLogger, (container) => container.get(ConsoleLoggerService));
  * ```
  */
-export function useOptionalInjection<T, F = null>(
+export function useOptionalInjection<T, F = undefined>(
   token: ServiceToken<T>,
   fallback?: (container: Container) => F
 ): T | F {
@@ -56,14 +56,14 @@ export function useOptionalInjection<T, F = null>(
 
       return fallback(container);
     } else {
-      dbg.info(prefix(__filename), "Injection not found, returning null:", {
+      dbg.info(prefix(__filename), "Injection not found, returning undefined:", {
         token,
         name: (token as AnyObject)?.name ?? token,
         container,
         fallback,
       });
 
-      return null as F;
+      return undefined as F;
     }
   }, [container, token]);
 }

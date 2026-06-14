@@ -3,7 +3,7 @@ import { ReactiveElement } from "@lit/reactive-element";
 import { Container, ServiceToken } from "@wirestate/core";
 
 import { ContainerContext } from "../context/container-context";
-import { AnyObject, FieldMustMatchProvidedType, Interface, Optional, ProvidedTypeMustMatch } from "../types/general";
+import { AnyObject, Optional, FieldMustMatchProvidedType, Interface, ProvidedTypeMustMatch } from "../types/general";
 
 import type { OptionalInjectionFallback } from "./use-optional-injection";
 
@@ -15,7 +15,7 @@ import type { OptionalInjectionFallback } from "./use-optional-injection";
  *
  * @group Consumption
  */
-export interface OptionalInjectionDecorator<T, F = null> {
+export interface OptionalInjectionDecorator<T, F = undefined> {
   // Standard, `accessor` declarations. Wider accessor types are accepted; the
   // injected or fallback value must be assignable to the accessor type.
   <C extends Interface<Omit<ReactiveElement, "renderRoot">>, V>(
@@ -40,7 +40,7 @@ export interface OptionalInjectionDecorator<T, F = null> {
  *
  * @group Consumption
  */
-export interface OptionalInjectionOptions<T, F = null> {
+export interface OptionalInjectionOptions<T, F = undefined> {
   /**
    * The token to inject.
    */
@@ -65,7 +65,7 @@ export interface OptionalInjectionOptions<T, F = null> {
  * Injects a container value if it exists.
  *
  * @remarks
- * Missing token means fallback result, or `null` when no fallback exists.
+ * Missing token means fallback result, or `undefined` when no fallback exists.
  *
  * @group Consumption
  *
@@ -80,11 +80,11 @@ export interface OptionalInjectionOptions<T, F = null> {
  * ```typescript
  * class MyElement extends LitElement {
  *   @optionalInjection(FileLogger, (container) => container.get(ConsoleLoggerService))
- *   private logger: Logger | null = null;
+ *   private logger: Logger | undefined = undefined;
  * }
  * ```
  */
-export function optionalInjection<T, F = null>(
+export function optionalInjection<T, F = undefined>(
   optionsOrToken: OptionalInjectionOptions<T, F> | ServiceToken<T>,
   fallback?: OptionalInjectionFallback<F>
 ): OptionalInjectionDecorator<T, F> {
@@ -98,14 +98,14 @@ export function optionalInjection<T, F = null>(
     nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, T | F>
   ): void => {
     const { once, token } = options;
-    const resolvedFallback: Optional<OptionalInjectionFallback<F>> = options.fallback ?? fallback ?? null;
+    const resolvedFallback: Optional<OptionalInjectionFallback<F>> = options.fallback ?? fallback ?? undefined;
 
     const resolve = (container: Container): T | F => {
       if (container.has(token)) {
         return container.get(token);
       }
 
-      return resolvedFallback ? resolvedFallback(container) : (null as F);
+      return resolvedFallback ? resolvedFallback(container) : (undefined as F);
     };
 
     // Standard decorators branch.

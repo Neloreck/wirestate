@@ -3,6 +3,7 @@ import { Container, CommandBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
 import { OptionalCommandExecutor } from "../types/commands";
+import { Optional } from "../types/general";
 
 import { useOptionalCommandExecutor } from "./use-optional-command-executor";
 
@@ -11,7 +12,7 @@ describe("useOptionalCommandExecutor", () => {
     cleanup();
   });
 
-  it("should return null if no handler exists", () => {
+  it("should return undefined if no handler exists", () => {
     const container: Container = new Container({ bindings: [CommandBus] });
 
     let executor: OptionalCommandExecutor = null as unknown as OptionalCommandExecutor;
@@ -29,7 +30,7 @@ describe("useOptionalCommandExecutor", () => {
     );
 
     expect(executor as unknown).toBeInstanceOf(Function);
-    expect((executor as unknown as OptionalCommandExecutor)("MISSING_CMD")).toBeNull();
+    expect((executor as unknown as OptionalCommandExecutor)("MISSING_CMD")).toBeUndefined();
   });
 
   it("should return a command result if handler exists", () => {
@@ -51,7 +52,7 @@ describe("useOptionalCommandExecutor", () => {
       </ContainerProvider>
     );
 
-    const result: string | null = (executor as OptionalCommandExecutor)<string>("EXISTING_COMMAND");
+    const result: Optional<string> = (executor as OptionalCommandExecutor)<string>("EXISTING_COMMAND");
 
     expect(result).toBe("ok");
   });

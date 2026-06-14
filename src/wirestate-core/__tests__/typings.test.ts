@@ -6,7 +6,7 @@ import { InjectionToken } from "../binding/binding-tokens";
 import { inject } from "../container/container-context";
 import { ContainerKernel } from "../container/container-kernel";
 import { Injectable } from "../metadata/metadata-injectable";
-import { Definable } from "../types/general";
+import { Optional } from "../types/general";
 
 describe("Type-safety", () => {
   describe("Bindings API", () => {
@@ -150,14 +150,14 @@ describe("Type-safety", () => {
 
     it("inject() with optional", () => {
       class Foo {
-        private a = inject(FooService, { optional: true }) satisfies Definable<FooService>;
-        private b = inject(FooChildService, { optional: true }) satisfies Definable<FooService>;
+        private a = inject(FooService, { optional: true }) satisfies Optional<FooService>;
+        private b = inject(FooChildService, { optional: true }) satisfies Optional<FooService>;
         // @ts-expect-error
-        private c = inject(FooService, { optional: true }) satisfies Definable<FooChildService>;
+        private c = inject(FooService, { optional: true }) satisfies Optional<FooChildService>;
         // @ts-expect-error
-        private d = inject(FooService, { optional: true }) satisfies Promise<Definable<FooService>>;
+        private d = inject(FooService, { optional: true }) satisfies Promise<Optional<FooService>>;
         // @ts-expect-error
-        private e = inject(FooChildService, { optional: true }) satisfies Promise<Definable<FooService>>;
+        private e = inject(FooChildService, { optional: true }) satisfies Promise<Optional<FooService>>;
       }
     });
   });

@@ -1,5 +1,5 @@
 import type { ServiceToken } from "../binding/binding";
-import type { Definable } from "../types/general";
+import type { Optional } from "../types/general";
 
 import type { ContainerKernel } from "./container-kernel";
 
@@ -16,13 +16,13 @@ import type { ContainerKernel } from "./container-kernel";
  * @returns The resolved value, a lazy resolver, or `undefined` for optional misses.
  */
 export function inject<T>(token: ServiceToken<T>): T;
-export function inject<T>(token: ServiceToken<T>, options: { optional: true }): Definable<T>;
+export function inject<T>(token: ServiceToken<T>, options: { optional: true }): Optional<T>;
 export function inject<T>(token: ServiceToken<T>, options: { lazy: true }): () => T;
-export function inject<T>(token: ServiceToken<T>, options: { lazy: true; optional: true }): () => Definable<T>;
+export function inject<T>(token: ServiceToken<T>, options: { lazy: true; optional: true }): () => Optional<T>;
 export function inject<T>(
   token: ServiceToken<T>,
   options?: { optional?: boolean; lazy?: boolean }
-): Definable<T> | (() => Definable<T>) {
+): Optional<T> | (() => Optional<T>) {
   try {
     return currentContext.run((container) => container.get(token, options));
   } catch (error) {

@@ -187,10 +187,10 @@ describe("CommandBus", () => {
       expect(bus.executeOptional("TYPE")).toBe("value");
     });
 
-    it("should return null when no handler is registered", () => {
+    it("should return undefined when no handler is registered", () => {
       const bus: CommandBus = new CommandBus();
 
-      expect(bus.executeOptional("MISSING")).toBeNull();
+      expect(bus.executeOptional("MISSING")).toBeUndefined();
     });
 
     it("should return promise values from executeOptional when the handler returns a Promise", async () => {
@@ -221,10 +221,10 @@ describe("CommandBus", () => {
       await expect(bus.executeOptionalAsync("SYNC")).resolves.toBe("sync-value");
     });
 
-    it("should resolve null through executeOptionalAsync when no handler is registered", async () => {
+    it("should resolve undefined through executeOptionalAsync when no handler is registered", async () => {
       const bus: CommandBus = new CommandBus();
 
-      await expect(bus.executeOptionalAsync("MISSING")).resolves.toBeNull();
+      await expect(bus.executeOptionalAsync("MISSING")).resolves.toBeUndefined();
     });
 
     it("should support symbol command types", () => {
@@ -236,7 +236,7 @@ describe("CommandBus", () => {
       expect(bus.executeOptional(type)).toBe("symbol-result");
     });
 
-    it("should return null after unregistering last handler", () => {
+    it("should return undefined after unregistering last handler", () => {
       const bus: CommandBus = new CommandBus();
 
       const unregister: CommandUnregister = bus.register("TYPE", () => "value");
@@ -245,7 +245,7 @@ describe("CommandBus", () => {
 
       unregister();
 
-      expect(bus.executeOptional("TYPE")).toBeNull();
+      expect(bus.executeOptional("TYPE")).toBeUndefined();
     });
   });
 

@@ -1,5 +1,5 @@
 import { WirestateError } from "../error/wirestate-error";
-import { Optional } from "../types/general";
+import { Nullable } from "../types/general";
 
 /**
  * Internal storage for service lifecycle status keyed by instance.
@@ -91,7 +91,7 @@ export class WireStatus {
    * `false` means the instance is currently owned by a provider. `true` means
    * the provider deprovisioned it.
    */
-  public isDeprovisioned: Optional<boolean> = null;
+  public isDeprovisioned: Nullable<boolean> = null;
 
   /**
    * Whether the instance should stop work because its lifecycle ended.
@@ -108,7 +108,7 @@ export class WireStatus {
    * `null` means the instance has not entered a tracked provider provision
    * cycle.
    */
-  public provisionId: Optional<ProvisionId> = null;
+  public provisionId: Nullable<ProvisionId> = null;
 
   /**
    * Creates an empty status object for internal lifecycle tracking.

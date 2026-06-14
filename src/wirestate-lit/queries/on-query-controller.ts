@@ -6,7 +6,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { ContainerContext } from "../context/container-context";
-import { Optional } from "../types/general";
+import { Nullable } from "../types/general";
 
 /**
  * Reactive controller that registers a query handler.
@@ -35,8 +35,8 @@ export class OnQueryController<
   P = unknown,
   T extends QueryType = QueryType,
 > implements ReactiveController {
-  private bus: Optional<QueryBus> = null;
-  private unregister: Optional<QueryUnregister> = null;
+  private bus: Nullable<QueryBus> = null;
+  private unregister: Nullable<QueryUnregister> = null;
 
   private readonly type: T;
   private readonly handler: QueryHandler<R, P, T>;

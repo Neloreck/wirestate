@@ -2,14 +2,14 @@ import { render } from "@testing-library/react";
 import { Container } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { Optional } from "../types/general";
+import { Nullable } from "../types/general";
 
 import { useContainer } from "./use-container";
 
 describe("useContainer", () => {
   it("should return current container", () => {
     const container: Container = new Container();
-    let componentContainer: Optional<Container> = null as Optional<Container>;
+    let componentContainer: Nullable<Container> = null as Nullable<Container>;
 
     function TestComponent() {
       componentContainer = useContainer();

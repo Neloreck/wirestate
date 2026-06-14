@@ -12,7 +12,7 @@ import { OptionalQueryExecutor } from "../types/queries";
  *
  * @remarks
  * The returned executor is memoized using `useMemo` and stays stable
- * for the lifetime of the container. It returns `null` instead of throwing
+ * for the lifetime of the container. It returns `undefined` instead of throwing
  * if no handler is registered. Use {@link useOptionalAsyncQueryExecutor} when
  * consumers should consistently receive a Promise.
  *
@@ -23,7 +23,7 @@ import { OptionalQueryExecutor } from "../types/queries";
  * @example
  * ```tsx
  * const queryOptional: OptionalQueryExecutor = useOptionalQueryExecutor();
- * const [settings, setSettings] = useState<UserSettings | null>(null);
+ * const [settings, setSettings] = useState<UserSettings | undefined>(undefined);
  *
  * const refreshSettings = useCallback(() => {
  *   setSettings(queryOptional(GET_USER_SETTINGS, { id: 1 }));

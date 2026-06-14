@@ -16,7 +16,7 @@ describe("optionalInjection", () => {
     fixture.cleanup();
   });
 
-  it("should assign null when token is not bound", () => {
+  it("should assign undefined when token is not bound", () => {
     const container: Container = new Container();
     const token: ServiceToken<string> = Symbol("optional-token");
 
@@ -32,7 +32,7 @@ describe("optionalInjection", () => {
 
     fixture.provider.appendChild(element);
 
-    expect(element.value).toBeNull();
+    expect(element.value).toBeUndefined();
   });
 
   it("should inject bound instance", () => {
@@ -44,7 +44,7 @@ describe("optionalInjection", () => {
     @customElement("test-optional-injection-bound-element")
     class TestBoundElement extends ReactiveElement {
       @optionalInjection(GenericService)
-      public service: Optional<GenericService> = null;
+      public service: Optional<GenericService> = undefined;
     }
 
     const element: TestBoundElement = new TestBoundElement();
@@ -64,7 +64,7 @@ describe("optionalInjection", () => {
     @customElement("test-optional-injection-fallback-element")
     class TestFallbackElement extends ReactiveElement {
       @optionalInjection(token, () => "fallback-value")
-      public value: Optional<string> = null;
+      public value: Optional<string> = undefined;
     }
 
     const element: TestFallbackElement = new TestFallbackElement();
@@ -108,7 +108,7 @@ describe("optionalInjection", () => {
     @customElement("test-optional-injection-container-fallback-element")
     class TestContainerFallbackElement extends ReactiveElement {
       @optionalInjection(unboundToken, (container) => container.get(boundToken))
-      public value: Optional<string> = null;
+      public value: Optional<string> = undefined;
     }
 
     const element: TestContainerFallbackElement = new TestContainerFallbackElement();
@@ -130,7 +130,7 @@ describe("optionalInjection", () => {
         token,
         fallback: () => "options-fallback",
       })
-      public value: Optional<string> = null;
+      public value: Optional<string> = undefined;
     }
 
     const element: TestOptionsElement = new TestOptionsElement();
@@ -174,7 +174,7 @@ describe("optionalInjection", () => {
         },
         () => "parameter-fallback"
       )
-      public value: Optional<string> = null;
+      public value: Optional<string> = undefined;
     }
 
     const element: TestOptionsFallbackPriorityElement = new TestOptionsFallbackPriorityElement();

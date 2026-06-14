@@ -1,4 +1,4 @@
-import { Definable, Maybe } from "../types/general";
+import { Optional, Maybe } from "../types/general";
 
 import { METADATA_SYMBOL } from "./metadata-symbol-polyfill";
 
@@ -14,7 +14,7 @@ import { METADATA_SYMBOL } from "./metadata-symbol-polyfill";
  * @param metadataKey - Key under which the value is stored on the metadata object.
  * @returns The own metadata value, or `undefined` when none exists.
  */
-function getOwnStandardMetadata<T>(constructor: object, metadataKey: symbol): Definable<T> {
+function getOwnStandardMetadata<T>(constructor: object, metadataKey: symbol): Optional<T> {
   const descriptor: Maybe<PropertyDescriptor> = Object.getOwnPropertyDescriptor(constructor, METADATA_SYMBOL);
 
   if (descriptor?.value && Object.hasOwn(descriptor.value as object, metadataKey)) {
@@ -47,7 +47,7 @@ export function getPrototypeChainMetadata<T>(
   let constructor: unknown = instance.constructor;
 
   while (typeof constructor === "function" && constructor !== Object && constructor !== Function.prototype) {
-    const own: Definable<T> = metadataRegistry.get(constructor);
+    const own: Optional<T> = metadataRegistry.get(constructor);
 
     if (own !== undefined) {
       metadata.push(own);
@@ -55,7 +55,7 @@ export function getPrototypeChainMetadata<T>(
 
     // TC39 variant with 3rd parameter defined:
     if (metadataKey !== undefined) {
-      const standard: Definable<T> = getOwnStandardMetadata(constructor, metadataKey);
+      const standard: Optional<T> = getOwnStandardMetadata(constructor, metadataKey);
 
       if (standard !== undefined) {
         metadata.push(standard);

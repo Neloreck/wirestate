@@ -172,10 +172,10 @@ describe("QueryBus", () => {
       expect(bus.queryOptional("TYPE")).toBe("value");
     });
 
-    it("should return null when no handler is registered", () => {
+    it("should return undefined when no handler is registered", () => {
       const bus: QueryBus = new QueryBus();
 
-      expect(bus.queryOptional("MISSING")).toBeNull();
+      expect(bus.queryOptional("MISSING")).toBeUndefined();
     });
 
     it("should return promise values from queryOptional when the handler returns a Promise", async () => {
@@ -206,10 +206,10 @@ describe("QueryBus", () => {
       await expect(bus.queryOptionalAsync("SYNC")).resolves.toBe("sync-value");
     });
 
-    it("should resolve null through queryOptionalAsync when no handler is registered", async () => {
+    it("should resolve undefined through queryOptionalAsync when no handler is registered", async () => {
       const bus: QueryBus = new QueryBus();
 
-      await expect(bus.queryOptionalAsync("MISSING")).resolves.toBeNull();
+      await expect(bus.queryOptionalAsync("MISSING")).resolves.toBeUndefined();
     });
 
     it("should support symbol query types", () => {
@@ -221,7 +221,7 @@ describe("QueryBus", () => {
       expect(bus.queryOptional(type)).toBe("symbol-result");
     });
 
-    it("should return null after unregistering last handler", () => {
+    it("should return undefined after unregistering last handler", () => {
       const bus: QueryBus = new QueryBus();
 
       const unregister: QueryUnregister = bus.register("TYPE", () => "value");
@@ -230,7 +230,7 @@ describe("QueryBus", () => {
 
       unregister();
 
-      expect(bus.queryOptional("TYPE")).toBeNull();
+      expect(bus.queryOptional("TYPE")).toBeUndefined();
     });
   });
 

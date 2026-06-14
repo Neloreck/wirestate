@@ -34,14 +34,14 @@ describe("createSingleMethodDecoratorDescriptor", () => {
     expect(getMetadata(new Service())).toBe("onTest");
   });
 
-  it("should return null when no method is decorated", () => {
+  it("should return undefined when no method is decorated", () => {
     const {
       lifecycle: { getMetadata },
     } = buildLifecycle();
 
     class Service {}
 
-    expect(getMetadata(new Service())).toBeNull();
+    expect(getMetadata(new Service())).toBeUndefined();
   });
 
   it("should throw the duplicate message when a class declares the hook twice", () => {

@@ -160,6 +160,24 @@ export default [
           ],
         },
       ],
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "TSUnionType > TSNullKeyword",
+          message: "Use the Nullable<T> (or Maybe<T>) alias instead of an inline `| null` union.",
+        },
+        {
+          selector: "TSUnionType > TSUndefinedKeyword",
+          message: "Use the Optional<T> (or Maybe<T>) alias instead of an inline `| undefined` union.",
+        },
+      ],
+    },
+  },
+  {
+    // The alias definitions are the one place inline `| null` / `| undefined` is intended.
+    files: ["**/types/general.ts", "src/fixtures/types.ts"],
+    rules: {
+      "no-restricted-syntax": "off",
     },
   },
 ];

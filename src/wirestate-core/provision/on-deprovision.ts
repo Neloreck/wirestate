@@ -2,7 +2,7 @@ import {
   createSingleMethodDecoratorDescriptor,
   SingleMethodDecorator,
 } from "../metadata/metadata-single-method-decorator";
-import { Maybe } from "../types/general";
+import { Optional } from "../types/general";
 
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
   name: "OnDeprovision",
@@ -58,8 +58,8 @@ export function OnDeprovision(): SingleMethodDecorator {
  * @internal
  *
  * @param instance - The instance to scan for deprovision handlers.
- * @returns The method name, or `null` when no hook exists.
+ * @returns The method name, or `undefined` when no hook exists.
  */
-export function getDeprovisionHandlerMetadata(instance: object): Maybe<string | symbol> {
+export function getDeprovisionHandlerMetadata(instance: object): Optional<string | symbol> {
   return getMetadata(instance);
 }

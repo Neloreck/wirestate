@@ -3,7 +3,7 @@ import { Container, CommandBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
 import { CommandExecutor } from "../types/commands";
-import { Optional } from "../types/general";
+import { Nullable } from "../types/general";
 
 import { useCommandExecutor } from "./use-command-executor";
 
@@ -18,7 +18,7 @@ describe("useCommandExecutor", () => {
 
     container.get(CommandBus).register("TEST_COMMAND", handler);
 
-    let executor: Optional<CommandExecutor> = null;
+    let executor: Nullable<CommandExecutor> = null;
 
     function TestComponent() {
       executor = useCommandExecutor();

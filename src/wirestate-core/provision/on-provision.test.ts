@@ -10,10 +10,10 @@ describe("onProvision and getProvisionHandlerMetadata", () => {
     expect(getProvisionHandlerMetadata(new TestProvider())).toBe("provision");
   });
 
-  it("should return null when no provision handler exists", () => {
+  it("should return undefined when no provision handler exists", () => {
     class TestProvider {}
 
-    expect(getProvisionHandlerMetadata(new TestProvider())).toBeNull();
+    expect(getProvisionHandlerMetadata(new TestProvider())).toBeUndefined();
   });
 
   it("should reject multiple provision handlers on the same class", () => {

@@ -6,7 +6,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { ContainerContext } from "../context/container-context";
-import { Optional } from "../types/general";
+import { Nullable } from "../types/general";
 
 /**
  * Reactive controller that subscribes to container events.
@@ -30,10 +30,10 @@ import { Optional } from "../types/general";
  * ```
  */
 export class OnEventController<E extends WireEvent = WireEvent> implements ReactiveController {
-  private bus: Optional<EventBus> = null;
-  private unsubscriber: Optional<EventUnsubscribe> = null;
+  private bus: Nullable<EventBus> = null;
+  private unsubscriber: Nullable<EventUnsubscribe> = null;
 
-  private readonly types: Optional<ReadonlyArray<EventType>>;
+  private readonly types: Nullable<ReadonlyArray<EventType>>;
   private readonly handler: EventHandler<E>;
 
   /**
@@ -41,7 +41,7 @@ export class OnEventController<E extends WireEvent = WireEvent> implements React
    * @param types - Event types to listen for. If null, all events will be handled.
    * @param handler - The event handler function.
    */
-  public constructor(host: ReactiveElement, types: Optional<ReadonlyArray<EventType>>, handler: EventHandler<E>) {
+  public constructor(host: ReactiveElement, types: Nullable<ReadonlyArray<EventType>>, handler: EventHandler<E>) {
     dbg.info(prefix(__filename), "Constructing:", { host, types });
 
     host.addController(this);

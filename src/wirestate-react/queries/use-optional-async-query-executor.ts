@@ -12,7 +12,7 @@ import { OptionalAsyncQueryExecutor } from "../types/queries";
  *
  * @remarks
  * The returned executor is memoized using `useMemo` and stays stable
- * for the lifetime of the container. It returns `null` instead of throwing
+ * for the lifetime of the container. It returns `undefined` instead of throwing
  * if no handler is registered and uses {@link QueryBus.queryOptionalAsync} internally.
  *
  * @group Queries
@@ -22,7 +22,7 @@ import { OptionalAsyncQueryExecutor } from "../types/queries";
  * @example
  * ```tsx
  * const queryOptionalAsync: OptionalAsyncQueryExecutor = useOptionalAsyncQueryExecutor();
- * const [settings, setSettings] = useState<UserSettings | null>(null);
+ * const [settings, setSettings] = useState<UserSettings | undefined>(undefined);
  *
  * const refreshSettings = useCallback(async () => {
  *   setSettings(await queryOptionalAsync(GET_USER_SETTINGS, { id: 1 }));

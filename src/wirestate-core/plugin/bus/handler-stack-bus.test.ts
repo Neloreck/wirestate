@@ -73,11 +73,11 @@ describe("HandlerStackBus", () => {
     await expect(bus.runAsync("ASYNC")).resolves.toBe(42);
   });
 
-  it("should return null from optional dispatch when no handler is registered", async () => {
+  it("should return undefined from optional dispatch when no handler is registered", async () => {
     const bus: Bus = new Bus();
 
-    expect(bus.runOptional("MISSING")).toBeNull();
-    await expect(bus.runOptionalAsync("MISSING")).resolves.toBeNull();
+    expect(bus.runOptional("MISSING")).toBeUndefined();
+    await expect(bus.runOptionalAsync("MISSING")).resolves.toBeUndefined();
   });
 
   it("should remove exactly the registration returned by registerHandler", () => {

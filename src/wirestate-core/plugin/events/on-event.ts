@@ -4,7 +4,7 @@ import { prefix } from "@/macroses/prefix.macro";
 import type { ContainerKernel } from "../../container/container-kernel";
 import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
 import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../../metadata/metadata-handlers";
-import type { Optional } from "../../types/general";
+import type { Nullable } from "../../types/general";
 import {
   MESSAGING_REGISTRATION_KEY,
   MESSAGING_REGISTRATIONS,
@@ -85,7 +85,7 @@ export interface OnEventHandlerDecorator {
  */
 export function OnEvent(types?: EventType | ReadonlyArray<EventType>): OnEventHandlerDecorator {
   // Normalize types to a deduplicated array, or null for catch-all.
-  const normalized: Optional<ReadonlyArray<EventType>> =
+  const normalized: Nullable<ReadonlyArray<EventType>> =
     types === undefined
       ? null
       : Array.isArray(types)

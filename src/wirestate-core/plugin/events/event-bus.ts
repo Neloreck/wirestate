@@ -5,7 +5,7 @@ import { Container } from "../../container/container";
 import { inject } from "../../container/container-context";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
 import { Injectable } from "../../metadata/metadata-injectable";
-import type { Definable, Maybe, Optional } from "../../types/general";
+import type { Optional, Maybe, Nullable } from "../../types/general";
 
 import type { EventEmitOptions, EventHandler, EventType, EventUnsubscribe, WireEvent } from "./events";
 
@@ -60,7 +60,7 @@ export class EventBus {
    */
   private readonly handlers: Map<EventType, Set<EventSubscription>> = new Map();
 
-  public constructor(private readonly container: Definable<Container> = inject(Container, { optional: true })) {}
+  public constructor(private readonly container: Optional<Container> = inject(Container, { optional: true })) {}
 
   /**
    * Emits an event to matching subscribers.
@@ -149,16 +149,16 @@ export class EventBus {
    * });
    * ```
    */
-  public subscribe(types: Optional<EventType | ReadonlyArray<EventType>>, handler: EventHandler): EventUnsubscribe;
+  public subscribe(types: Nullable<EventType | ReadonlyArray<EventType>>, handler: EventHandler): EventUnsubscribe;
 
   public subscribe(
-    typesOrHandler: EventHandler | Optional<EventType | ReadonlyArray<EventType>>,
+    typesOrHandler: EventHandler | Nullable<EventType | ReadonlyArray<EventType>>,
     handler?: EventHandler
   ): EventUnsubscribe {
     // Resolve the overloads: a single function argument is a catch-all handler.
     const resolvedHandler: EventHandler = handler ?? (typesOrHandler as EventHandler);
-    const types: Optional<EventType | ReadonlyArray<EventType>> =
-      handler === undefined ? null : (typesOrHandler as Optional<EventType | ReadonlyArray<EventType>>);
+    const types: Nullable<EventType | ReadonlyArray<EventType>> =
+      handler === undefined ? null : (typesOrHandler as Nullable<EventType | ReadonlyArray<EventType>>);
 
     dbg.info(prefix(__filename), "Adding event subscription:", {
       handler: resolvedHandler,
@@ -212,16 +212,16 @@ export class EventBus {
    * @param types - Event type, list of event types, or `null` for catch-all.
    * @param handler - The handler function instance to remove.
    */
-  public unsubscribe(types: Optional<EventType | ReadonlyArray<EventType>>, handler: EventHandler): void;
+  public unsubscribe(types: Nullable<EventType | ReadonlyArray<EventType>>, handler: EventHandler): void;
 
   public unsubscribe(
-    typesOrHandler: EventHandler | Optional<EventType | ReadonlyArray<EventType>>,
+    typesOrHandler: EventHandler | Nullable<EventType | ReadonlyArray<EventType>>,
     handler?: EventHandler
   ): void {
     // Resolve the overloads: a single function argument targets catch-all.
     const resolvedHandler: EventHandler = handler ?? (typesOrHandler as EventHandler);
-    const types: Optional<EventType | ReadonlyArray<EventType>> =
-      handler === undefined ? null : (typesOrHandler as Optional<EventType | ReadonlyArray<EventType>>);
+    const types: Nullable<EventType | ReadonlyArray<EventType>> =
+      handler === undefined ? null : (typesOrHandler as Nullable<EventType | ReadonlyArray<EventType>>);
 
     dbg.info(prefix(__filename), "Removing event subscription:", {
       handler: resolvedHandler,
@@ -262,7 +262,7 @@ export class EventBus {
    * @param types - Event type, list of event types, or `null` for catch-all.
    * @returns The distinct bucket keys.
    */
-  private resolveKeys(types: Optional<EventType | ReadonlyArray<EventType>>): Set<EventType> {
+  private resolveKeys(types: Nullable<EventType | ReadonlyArray<EventType>>): Set<EventType> {
     if (types === null) {
       return new Set<EventType>([ALL_EVENTS_TYPE]);
     }

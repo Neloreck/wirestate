@@ -1,7 +1,7 @@
 import { ReactiveElement } from "@lit/reactive-element";
 import { EventType, WireEvent } from "@wirestate/core";
 
-import { AnyObject, Interface, Optional } from "../types/general";
+import { AnyObject, Interface, Nullable } from "../types/general";
 
 import { OnEventController } from "./on-event-controller";
 
@@ -67,7 +67,7 @@ export interface OnEventDecorator<E extends WireEvent = WireEvent> {
 export function onEvent<E extends WireEvent = WireEvent>(
   types?: EventType | ReadonlyArray<EventType>
 ): OnEventDecorator<E> {
-  const normalized: Optional<ReadonlyArray<EventType>> =
+  const normalized: Nullable<ReadonlyArray<EventType>> =
     types === undefined ? null : Array.isArray(types) ? [...(types as ReadonlyArray<EventType>)] : [types as EventType];
 
   return ((protoOrTarget: object, nameOrContext: PropertyKey | ClassMethodDecoratorContext) => {

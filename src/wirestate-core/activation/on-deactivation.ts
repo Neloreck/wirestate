@@ -2,7 +2,7 @@ import {
   createSingleMethodDecoratorDescriptor,
   SingleMethodDecorator,
 } from "../metadata/metadata-single-method-decorator";
-import { Maybe } from "../types/general";
+import { Optional } from "../types/general";
 
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
   name: "OnDeactivation",
@@ -57,7 +57,7 @@ export function OnDeactivation(): SingleMethodDecorator {
  * @internal
  *
  * @param instance - The instance to scan for deactivation handlers.
- * @returns The method name (string or symbol), or `null` when no hook exists.
+ * @returns The method name (string or symbol), or `undefined` when no hook exists.
  *
  * @example
  * ```typescript
@@ -65,6 +65,6 @@ export function OnDeactivation(): SingleMethodDecorator {
  * method && (myService as any)[method]();
  * ```
  */
-export function getDeactivationHandlerMetadata(instance: object): Maybe<string | symbol> {
+export function getDeactivationHandlerMetadata(instance: object): Optional<string | symbol> {
   return getMetadata(instance);
 }

@@ -13,8 +13,8 @@ function mockAdapter(overrides: Partial<ActivationAdapter> = {}): ActivationAdap
 }
 
 describe("container activation adapter registry", () => {
-  it("should return null when no adapter is installed", () => {
-    expect(getActivationAdapter(new ContainerKernel())).toBeNull();
+  it("should return undefined when no adapter is installed", () => {
+    expect(getActivationAdapter(new ContainerKernel())).toBeUndefined();
   });
 
   it("should return the installed adapter", () => {
@@ -67,7 +67,7 @@ describe("container activation adapter registry", () => {
 
     setActivationAdapter(first, mockAdapter());
 
-    expect(getActivationAdapter(second)).toBeNull();
+    expect(getActivationAdapter(second)).toBeUndefined();
   });
 });
 

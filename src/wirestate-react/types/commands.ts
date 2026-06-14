@@ -53,7 +53,7 @@ export type AsyncCommandExecutor = <R = unknown, P = unknown, T extends CommandT
  * Represents the function returned by {@link useOptionalCommandExecutor}.
  *
  * @remarks
- * Typically returned by {@link useOptionalCommandExecutor}. Returns `null` if no
+ * Typically returned by {@link useOptionalCommandExecutor}. Returns `undefined` if no
  * handler is registered for the command type, instead of throwing.
  *
  * @group Commands
@@ -65,7 +65,7 @@ export type AsyncCommandExecutor = <R = unknown, P = unknown, T extends CommandT
  * @param type - The command type.
  * @param payload - Optional payload for the command.
  *
- * @returns The command result if a handler was found, or `null` otherwise.
+ * @returns The command result if a handler was found, or `undefined` otherwise.
  */
 export type OptionalCommandExecutor = <R = unknown, P = unknown, T extends CommandType = CommandType>(
   type: T,
@@ -76,7 +76,7 @@ export type OptionalCommandExecutor = <R = unknown, P = unknown, T extends Comma
  * Represents the function returned by {@link useOptionalAsyncCommandExecutor}.
  *
  * @remarks
- * Typically returned by {@link useOptionalAsyncCommandExecutor}. Returns `null`
+ * Typically returned by {@link useOptionalAsyncCommandExecutor}. Returns `undefined`
  * if no handler is registered for the command type.
  *
  * @group Commands
@@ -88,7 +88,7 @@ export type OptionalCommandExecutor = <R = unknown, P = unknown, T extends Comma
  * @param type - The command type.
  * @param payload - Optional payload for the command.
  *
- * @returns A Promise resolving to the command result, or `null` if no handler was found.
+ * @returns A Promise resolving to the command result, or `undefined` if no handler was found.
  */
 export type OptionalAsyncCommandExecutor = <R = unknown, P = unknown, T extends CommandType = CommandType>(
   type: T,

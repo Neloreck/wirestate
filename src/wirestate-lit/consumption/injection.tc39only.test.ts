@@ -5,7 +5,7 @@ import { customElement } from "lit/decorators.js";
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Optional } from "../types/general";
+import { Nullable } from "../types/general";
 
 import { injection } from "./injection";
 
@@ -43,7 +43,7 @@ describe("injection on standard accessors", () => {
     @customElement("test-injection-accessor-options-element")
     class TestAccessorOptionsElement extends ReactiveElement {
       @injection({ token: GenericService })
-      public accessor service: Optional<GenericService> = null;
+      public accessor service: Nullable<GenericService> = null;
     }
 
     const element: TestAccessorOptionsElement = new TestAccessorOptionsElement();

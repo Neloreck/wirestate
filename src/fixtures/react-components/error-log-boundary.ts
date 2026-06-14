@@ -1,13 +1,13 @@
 import { Component, createElement, ReactNode } from "react";
 
-import { Optional } from "../types";
+import { Nullable } from "../types";
 
 interface ErrorLogBoundaryProps {
   readonly children?: ReactNode;
 }
 
 export class ErrorLogBoundary extends Component<ErrorLogBoundaryProps> {
-  public state = { error: null as Optional<Error> };
+  public state = { error: null as Nullable<Error> };
 
   public componentDidCatch(error: Error): void {
     this.setState({ error });

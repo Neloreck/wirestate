@@ -11,7 +11,7 @@ export type AnyObject = Record<string | symbol, any>;
  *
  * @group Types
  */
-export type Optional<T> = T | null;
+export type Nullable<T> = T | null;
 
 /**
  * Represents value that can be `T` or `undefined`.
@@ -19,7 +19,7 @@ export type Optional<T> = T | null;
  * @template T - The base type.
  * @group general-types
  */
-export type Definable<T> = T | undefined;
+export type Optional<T> = T | undefined;
 
 /**
  * Value or a promise of that value.
@@ -80,11 +80,11 @@ export type FieldMustMatchProvidedType<Obj, Key extends PropertyKey, ProvidedTyp
           consuming: ConsumingType;
         }
     : Obj extends Partial<Record<Key, infer ConsumingType>>
-      ? [ProvidedType] extends [Definable<ConsumingType>]
+      ? [ProvidedType] extends [Optional<ConsumingType>]
         ? DecoratorReturn
         : {
             message: "provided type not assignable to consuming field";
             provided: ProvidedType;
-            consuming: Definable<ConsumingType>;
+            consuming: Optional<ConsumingType>;
           }
       : DecoratorReturn;

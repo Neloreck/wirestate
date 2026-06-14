@@ -2,7 +2,7 @@ import type { ServiceToken } from "../binding/binding";
 import type { Container } from "../container/container";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import type { Definable, Newable } from "../types/general";
+import type { Optional, Newable } from "../types/general";
 
 import { getMessagingRegistrations, type MessagingRegistration } from "./messaging-registration";
 import type { WirestatePlugin } from "./plugin";
@@ -57,9 +57,9 @@ export abstract class MessagingPlugin implements WirestatePlugin {
       return;
     }
 
-    const bus: Definable<Newable<object> | object> = container.get(this.registration.token, {
+    const bus: Optional<Newable<object> | object> = container.get(this.registration.token, {
       optional: true,
-    }) as Definable<object>;
+    }) as Optional<object>;
 
     if (bus) {
       this.registration.register(bus, instance, container).forEach((it) => addDisposer(it));

@@ -1,4 +1,4 @@
-import type { Optional } from "../../types/general";
+import type { Nullable } from "../../types/general";
 
 /**
  * Represents the type used to emit and filter events.
@@ -58,7 +58,7 @@ export type EventUnsubscribe = () => void;
  * @internal
  */
 export interface EventDispatch {
-  readonly types: Optional<ReadonlyArray<EventType>>;
+  readonly types: Nullable<ReadonlyArray<EventType>>;
   readonly handler: EventHandler;
 }
 
@@ -74,5 +74,5 @@ export interface EventDispatch {
  */
 export interface EventHandlerMetadata {
   readonly methodName: string | symbol;
-  readonly types: Optional<ReadonlyArray<EventType>>;
+  readonly types: Nullable<ReadonlyArray<EventType>>;
 }

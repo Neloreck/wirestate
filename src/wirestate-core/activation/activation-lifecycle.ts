@@ -4,7 +4,7 @@ import type { ContainerKernel } from "../container/container-kernel";
 import type { ActivationRecord } from "../container/container-storage";
 import { dispatchPluginActivate, dispatchPluginDeactivate } from "../plugin/plugin-registry";
 import { getContainerProvisionStatus } from "../provision/provision-state";
-import type { Definable, Maybe } from "../types/general";
+import type { Optional, Maybe } from "../types/general";
 
 import type { ActivationAdapter } from "./activation-adapter";
 import { getActivatedHandlerMetadata } from "./on-activated";
@@ -25,7 +25,7 @@ const INSTANCE_CONTAINERS: WeakMap<object, ContainerKernel> = new WeakMap();
  * @param instance - Resolved service instance to look up.
  * @returns The owning container, or `undefined` when the instance is not active.
  */
-export function getInstanceContainer(instance: object): Definable<ContainerKernel> {
+export function getInstanceContainer(instance: object): Optional<ContainerKernel> {
   return INSTANCE_CONTAINERS.get(instance);
 }
 
@@ -118,7 +118,7 @@ export function initializeInstanceStatus(container: ContainerKernel, instance: o
 
   status.isDeactivated = false;
 
-  const isProvisioned: Definable<boolean> = getContainerProvisionStatus(container);
+  const isProvisioned: Optional<boolean> = getContainerProvisionStatus(container);
 
   status.isDeprovisioned = isProvisioned === undefined ? null : !isProvisioned;
   status.provisionId = null;

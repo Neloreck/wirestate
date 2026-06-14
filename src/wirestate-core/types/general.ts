@@ -12,7 +12,7 @@ export type AnyObject = Record<string | symbol, any>;
  * @template T - The base type.
  * @group general-types
  */
-export type Optional<T> = T | null;
+export type Nullable<T> = T | null;
 
 /**
  * Represents value that can be `T` or `undefined`.
@@ -20,7 +20,7 @@ export type Optional<T> = T | null;
  * @template T - The base type.
  * @group general-types
  */
-export type Definable<T> = T | undefined;
+export type Optional<T> = T | undefined;
 
 /**
  * Represents value that can be `T` or a Promise of `T`.

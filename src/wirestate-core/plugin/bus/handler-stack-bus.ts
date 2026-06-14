@@ -1,5 +1,5 @@
 import { WirestateError } from "../../error/wirestate-error";
-import type { Maybe, MaybePromise, Optional } from "../../types/general";
+import type { Optional, Maybe, MaybePromise } from "../../types/general";
 
 /**
  * @group Messaging
@@ -125,12 +125,12 @@ export abstract class HandlerStackBus<T extends string | symbol | number> {
    *
    * @param type - Token to dispatch.
    * @param payload - Payload passed to the handler.
-   * @returns The handler result, or `null` when no handler exists.
+   * @returns The handler result, or `undefined` when no handler exists.
    */
   protected dispatchOptional<R, P>(type: T, payload?: P): Optional<R> {
     const handler: Maybe<HandlerDescriptor["handler"]> = this.peek(type);
 
-    return handler ? (handler as (payload: P) => R)(payload as P) : null;
+    return handler ? (handler as (payload: P) => R)(payload as P) : undefined;
   }
 
   /**
@@ -142,12 +142,12 @@ export abstract class HandlerStackBus<T extends string | symbol | number> {
    *
    * @param type - Token to dispatch.
    * @param payload - Payload passed to the handler.
-   * @returns A Promise resolving to the handler result, or `null` when no handler exists.
+   * @returns A Promise resolving to the handler result, or `undefined` when no handler exists.
    */
   protected async dispatchOptionalAsync<R, P>(type: T, payload?: P): Promise<Optional<R>> {
     const handler: Maybe<HandlerDescriptor["handler"]> = this.peek(type);
 
-    return handler ? (handler as (payload: P) => MaybePromise<R>)(payload as P) : null;
+    return handler ? (handler as (payload: P) => MaybePromise<R>)(payload as P) : undefined;
   }
 
   /**

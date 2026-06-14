@@ -1,6 +1,6 @@
 import type { ContainerKernel } from "../container/container-kernel";
 import type { ActivationRecord } from "../container/container-storage";
-import type { Maybe } from "../types/general";
+import type { Optional, Maybe } from "../types/general";
 
 /**
  * Participates in the full instance lifecycle for one container.
@@ -75,9 +75,9 @@ export function setActivationAdapter(container: ContainerKernel, adapter: Activa
  * @internal
  *
  * @param container - Container being activated against.
- * @returns The nearest installed adapter, or `null`.
+ * @returns The nearest installed adapter, or `undefined`.
  */
-export function getActivationAdapter(container: ContainerKernel): Maybe<ActivationAdapter> {
+export function getActivationAdapter(container: ContainerKernel): Optional<ActivationAdapter> {
   let current: Maybe<ContainerKernel> = container;
 
   while (current) {
@@ -90,5 +90,5 @@ export function getActivationAdapter(container: ContainerKernel): Maybe<Activati
     current = current.parent;
   }
 
-  return null;
+  return undefined;
 }

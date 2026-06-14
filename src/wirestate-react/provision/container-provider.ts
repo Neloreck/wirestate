@@ -3,7 +3,7 @@ import { createElement, ReactNode, useEffect, useRef, useState } from "react";
 
 import { ContainerContext } from "../context/container-context";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
-import { Maybe, Optional } from "../types/general";
+import { Maybe, Nullable } from "../types/general";
 import { shallowEqualActivation, shallowEqualArrays } from "../utils/shallow-equal";
 
 import { ReactContainerProvisionLifecycle, retainContainer, scheduleContainerDestruction } from "./provision-lifecycle";
@@ -127,13 +127,13 @@ export function ContainerProvider(props: ContainerProviderProps) {
   const owned: boolean = Boolean(managedSource);
   const ownedRef = useRef<boolean>(owned);
 
-  const pendingDestructionRef = useRef<Optional<ReactContainerProvisionLifecycle>>(null);
+  const pendingDestructionRef = useRef<Nullable<ReactContainerProvisionLifecycle>>(null);
   const normalizedSource: Maybe<ContainerConfig> = managedSource
     ? { ...managedSource, activate: managedSource.activate ?? true }
     : null;
 
-  const [error, setError] = useState<Optional<ContainerProvisionError>>(null);
-  const [state, setState] = useState<Optional<ContainerProviderState>>(() =>
+  const [error, setError] = useState<Nullable<ContainerProvisionError>>(null);
+  const [state, setState] = useState<Nullable<ContainerProviderState>>(() =>
     normalizedSource
       ? {
           container: new Container(normalizedSource),
@@ -158,7 +158,7 @@ export function ContainerProvider(props: ContainerProviderProps) {
       !shallowEqualActivation(state.source.activate, normalizedSource.activate))
   );
 
-  let activeState: Optional<ContainerProviderState> = state;
+  let activeState: Nullable<ContainerProviderState> = state;
 
   if (needsReplacement && normalizedSource) {
     activeState = {

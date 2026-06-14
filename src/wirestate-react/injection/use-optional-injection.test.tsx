@@ -4,22 +4,26 @@ import { CommandsPlugin, Container, EventsPlugin, QueriesPlugin, ServiceToken } 
 import { GenericService } from "@/fixtures/services/generic-service";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { AnyObject, Optional } from "../types/general";
+import { AnyObject, Nullable } from "../types/general";
 
 import { useOptionalInjection } from "./use-optional-injection";
 
 describe("useOptionalInjection", () => {
   function TestComponent({ token = GenericService as ServiceToken<unknown> }) {
-    const value: Optional<unknown> = useOptionalInjection(token);
+    const value: Nullable<unknown> = useOptionalInjection(token);
 
-    return <div data-testid={"injectable-name"}>{value === null ? "null" : (value as AnyObject).constructor.name}</div>;
+    return (
+      <div data-testid={"injectable-name"}>
+        {value === undefined ? "undefined" : (value as AnyObject).constructor.name}
+      </div>
+    );
   }
 
   afterEach(() => {
     cleanup();
   });
 
-  it("should return null when token is not bound", () => {
+  it("should return undefined when token is not bound", () => {
     const container: Container = new Container();
 
     const { getByTestId } = render(
@@ -28,7 +32,7 @@ describe("useOptionalInjection", () => {
       </ContainerProvider>
     );
 
-    expect(getByTestId("injectable-name").textContent).toBe("null");
+    expect(getByTestId("injectable-name").textContent).toBe("undefined");
   });
 
   it("should resolve bound instance", () => {
@@ -51,7 +55,7 @@ describe("useOptionalInjection", () => {
     const token: unique symbol = Symbol("optional-token");
 
     function FallbackComponent() {
-      const data: Optional<string> = useOptionalInjection(token, () => "fallback-value");
+      const data: Nullable<string> = useOptionalInjection(token, () => "fallback-value");
 
       return <div data-testid={"result"}>{data}</div>;
     }
@@ -92,7 +96,7 @@ describe("useOptionalInjection", () => {
     container.bind({ token: boundToken, value: "bound-value" });
 
     function FallbackComponent() {
-      const data: Optional<string> = useOptionalInjection(unboundToken, (container) => container.get(boundToken));
+      const data: Nullable<string> = useOptionalInjection(unboundToken, (container) => container.get(boundToken));
 
       return <div data-testid={"result"}>{data}</div>;
     }
@@ -111,7 +115,7 @@ describe("useOptionalInjection", () => {
     const token: unique symbol = Symbol("optional-token");
 
     function FallbackComponent({ value }: { value: string }) {
-      const data: Optional<string> = useOptionalInjection(token, () => value);
+      const data: Nullable<string> = useOptionalInjection(token, () => value);
 
       return <div data-testid={"result"}>{data}</div>;
     }
@@ -150,7 +154,7 @@ describe("useOptionalInjection", () => {
     });
 
     function FallbackComponent({ value }: { value: string }) {
-      const data: Optional<string> = useOptionalInjection(token, () => value);
+      const data: Nullable<string> = useOptionalInjection(token, () => value);
 
       return <div data-testid={"result"}>{data}</div>;
     }

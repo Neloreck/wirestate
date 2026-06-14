@@ -1,7 +1,7 @@
 import { inject } from "../container/container-context";
 import { ContainerKernel } from "../container/container-kernel";
 import { Injectable } from "../metadata/metadata-injectable";
-import { Definable } from "../types/general";
+import { Optional } from "../types/general";
 
 const myServiceConstructorSpy = jest.fn();
 
@@ -267,7 +267,7 @@ describe("Bindings", () => {
       class FooService {
         public constructor(private readonly barService = inject(BarService, { lazy: true, optional: true })) {}
 
-        public doSomething(): Definable<string> {
+        public doSomething(): Optional<string> {
           return this.barService()?.getBar();
         }
       }

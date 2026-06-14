@@ -16,7 +16,7 @@ describe("useOptionalInjection", () => {
     fixture.cleanup();
   });
 
-  it("should return null when token is not bound", () => {
+  it("should return undefined when token is not bound", () => {
     const container: Container = new Container();
     const token: unique symbol = Symbol("optional-token");
 
@@ -31,7 +31,7 @@ describe("useOptionalInjection", () => {
 
     fixture.provider.appendChild(element);
 
-    expect(element.service.value).toBeNull();
+    expect(element.service.value).toBeUndefined();
   });
 
   it("should resolve bound service", () => {
@@ -225,6 +225,6 @@ describe("useOptionalInjection", () => {
     fixture.provider.appendChild(element);
 
     expect(initialValue).toBe("initial-value");
-    expect(element.data.value).toBeNull();
+    expect(element.data.value).toBeUndefined();
   });
 });

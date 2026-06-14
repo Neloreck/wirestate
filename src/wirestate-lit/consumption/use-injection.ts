@@ -6,7 +6,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { ContainerContext } from "../context/container-context";
-import { Optional } from "../types/general";
+import { Nullable } from "../types/general";
 
 /**
  * Describes options for {@link useInjection}.
@@ -26,7 +26,7 @@ export interface UseInjectionOptions<T> {
   /**
    * Initial value before the instance is fetched.
    */
-  value?: Optional<T>;
+  value?: Nullable<T>;
 
   /**
    * The token to inject.

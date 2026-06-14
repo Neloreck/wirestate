@@ -1,5 +1,5 @@
 import type { BindingDescriptor, ServiceToken } from "../binding/binding";
-import type { Definable } from "../types/general";
+import type { Optional } from "../types/general";
 
 /**
  * Token-keyed storage of registered binding descriptors.
@@ -7,7 +7,7 @@ import type { Definable } from "../types/general";
  * @internal
  */
 export interface BindingMap extends Map<ServiceToken, BindingDescriptor> {
-  get<T>(key: ServiceToken<T>): Definable<BindingDescriptor<T>>;
+  get<T>(key: ServiceToken<T>): Optional<BindingDescriptor<T>>;
   set<T>(key: ServiceToken<T>, value: BindingDescriptor<T>): this;
 }
 
@@ -17,7 +17,7 @@ export interface BindingMap extends Map<ServiceToken, BindingDescriptor> {
  * @internal
  */
 export interface InstanceMap extends Map<BindingDescriptor, unknown> {
-  get<T>(key: BindingDescriptor<T>): Definable<T>;
+  get<T>(key: BindingDescriptor<T>): Optional<T>;
   set<T>(key: BindingDescriptor<T>, value: T): this;
 }
 

@@ -10,10 +10,10 @@ describe("onDeprovision and getDeprovisionHandlerMetadata", () => {
     expect(getDeprovisionHandlerMetadata(new TestProvider())).toBe("deprovision");
   });
 
-  it("should return null when no deprovision handler exists", () => {
+  it("should return undefined when no deprovision handler exists", () => {
     class TestProvider {}
 
-    expect(getDeprovisionHandlerMetadata(new TestProvider())).toBeNull();
+    expect(getDeprovisionHandlerMetadata(new TestProvider())).toBeUndefined();
   });
 
   it("should reject multiple deprovision handlers on the same class", () => {

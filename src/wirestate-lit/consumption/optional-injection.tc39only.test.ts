@@ -16,7 +16,7 @@ describe("optionalInjection on standard accessors", () => {
     fixture.cleanup();
   });
 
-  it("should assign null for accessors when token is not bound", () => {
+  it("should assign undefined for accessors when token is not bound", () => {
     const container: Container = new Container();
     const token: ServiceToken<string> = Symbol("optional-token");
 
@@ -32,7 +32,7 @@ describe("optionalInjection on standard accessors", () => {
 
     fixture.provider.appendChild(element);
 
-    expect(element.value).toBeNull();
+    expect(element.value).toBeUndefined();
   });
 
   it("should inject bound instances into accessors", () => {
@@ -45,7 +45,7 @@ describe("optionalInjection on standard accessors", () => {
     @customElement("test-optional-injection-accessor-bound-element")
     class TestAccessorBoundElement extends ReactiveElement {
       @optionalInjection(GenericService)
-      public accessor service: Optional<GenericService> = null;
+      public accessor service: Optional<GenericService> = undefined;
     }
 
     const element: TestAccessorBoundElement = new TestAccessorBoundElement();
@@ -64,11 +64,11 @@ describe("optionalInjection on standard accessors", () => {
 
     @customElement("test-optional-injection-non-nullable-element")
     class TestNonNullableElement extends ReactiveElement {
-      // @ts-expect-error - the default `null` fallback is not assignable to a non-nullable accessor.
+      // @ts-expect-error - the default `undefined` value is not assignable to a non-nullable accessor.
       @optionalInjection(token)
       public accessor value: string = "";
 
-      // @ts-expect-error - the default `null` fallback is not assignable to a non-nullable field.
+      // @ts-expect-error - the default `undefined` value is not assignable to a non-nullable field.
       @optionalInjection(token)
       public field: string = "";
     }
@@ -85,7 +85,7 @@ describe("optionalInjection on standard accessors", () => {
     @customElement("test-optional-injection-accessor-fallback-element")
     class TestAccessorFallbackElement extends ReactiveElement {
       @optionalInjection(token, () => "fallback-value")
-      public accessor value: Optional<string> = null;
+      public accessor value: Optional<string> = undefined;
     }
 
     const element: TestAccessorFallbackElement = new TestAccessorFallbackElement();

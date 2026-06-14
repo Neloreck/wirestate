@@ -1,7 +1,7 @@
 import { ReactiveElement } from "@lit/reactive-element";
 import { EventHandler, EventType, WireEvent } from "@wirestate/core";
 
-import { Optional } from "../types/general";
+import { Nullable } from "../types/general";
 
 import { OnEventController } from "./on-event-controller";
 
@@ -18,7 +18,7 @@ export interface UseOnEventsOptions<E extends WireEvent = WireEvent> {
   /**
    * Event types to listen for. If null or undefined, all events will be handled.
    */
-  types?: Optional<EventType | ReadonlyArray<EventType>>;
+  types?: Nullable<EventType | ReadonlyArray<EventType>>;
 }
 
 /**
@@ -55,7 +55,7 @@ export function useOnEvents<E extends WireEvent = WireEvent>(
   host: ReactiveElement,
   { types, handler }: UseOnEventsOptions<E>
 ): OnEventController<E> {
-  const normalized: Optional<ReadonlyArray<EventType>> =
+  const normalized: Nullable<ReadonlyArray<EventType>> =
     types === null || types === undefined
       ? null
       : Array.isArray(types)

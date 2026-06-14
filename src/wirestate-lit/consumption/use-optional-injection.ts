@@ -20,7 +20,7 @@ export type OptionalInjectionFallback<T> = (container: Container) => T;
  *
  * @group Consumption
  */
-export interface UseOptionalInjectionOptions<T, F = null> {
+export interface UseOptionalInjectionOptions<T, F = undefined> {
   /**
    * Resolve only the first context value.
    *
@@ -51,13 +51,14 @@ export interface UseOptionalInjectionOptions<T, F = null> {
  *
  * @group Consumption
  */
-export interface UseOptionalInjectionValue<T, F = null> {
+export interface UseOptionalInjectionValue<T, F = undefined> {
   /**
    * The token used for injection.
    */
   token: ServiceToken<T>;
+
   /**
-   * The injected instance, fallback value, or `null`.
+   * The injected instance, fallback value, or `undefined`.
    */
   value: T | F;
 }
@@ -66,7 +67,7 @@ export interface UseOptionalInjectionValue<T, F = null> {
  * Consumes a token if the nearest container has it.
  *
  * @remarks
- * Missing token means fallback result, or `null` when no fallback exists.
+ * Missing token means fallback result, or `undefined` when no fallback exists.
  *
  * @group Consumption
  *
@@ -89,7 +90,7 @@ export interface UseOptionalInjectionValue<T, F = null> {
  * }
  * ```
  */
-export function useOptionalInjection<T, F = null>(
+export function useOptionalInjection<T, F = undefined>(
   host: ReactiveControllerHost & HTMLElement,
   optionsOrToken: UseOptionalInjectionOptions<T, F> | ServiceToken<T>,
   fallback?: OptionalInjectionFallback<F>
@@ -100,7 +101,7 @@ export function useOptionalInjection<T, F = null>(
       : { token: optionsOrToken as ServiceToken<T>, fallback: fallback };
 
   const { once, token, value } = options;
-  const resolvedFallback: Optional<OptionalInjectionFallback<F>> = options.fallback ?? fallback ?? null;
+  const resolvedFallback: Optional<OptionalInjectionFallback<F>> = options.fallback ?? fallback ?? undefined;
 
   dbg.info(prefix(__filename), "Creating:", {
     host,
@@ -109,7 +110,7 @@ export function useOptionalInjection<T, F = null>(
   });
 
   const current: UseOptionalInjectionValue<T, F> = {
-    value: (value === undefined ? null : value) as T | F,
+    value: value as T | F,
     token,
   };
 
@@ -136,14 +137,14 @@ export function useOptionalInjection<T, F = null>(
 
         current.value = resolvedFallback(container);
       } else {
-        dbg.info(prefix(__filename), "Injection not found, returning null:", {
+        dbg.info(prefix(__filename), "Injection not found, returning undefined:", {
           token,
           name: (token as AnyObject)?.name ?? token,
           container,
           fallback: resolvedFallback,
         });
 
-        current.value = null as F;
+        current.value = undefined as F;
       }
     },
   });

@@ -13,7 +13,7 @@ import {
   QueriesPlugin,
   QueryBus,
 } from "../index";
-import { Optional } from "../types/general";
+import { Nullable } from "../types/general";
 
 describe("core scoped buses integration (parent-child separation)", () => {
   const ADD_COMMAND: string = "ADD_COMMAND";
@@ -135,7 +135,7 @@ describe("core scoped buses integration (parent-child separation)", () => {
 
     const logs: Array<string> = [];
 
-    let commandResult: Optional<Promise<string>> = null as Optional<Promise<string>>;
+    let commandResult: Nullable<Promise<string>> = null as Nullable<Promise<string>>;
 
     @Injectable()
     class CleanupService {
@@ -188,7 +188,7 @@ describe("core scoped buses integration (parent-child separation)", () => {
     expect(logs).toEqual(["settings:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
     expect(commandResult).not.toBeNull();
 
-    const result: Optional<string> = await commandResult;
+    const result: Nullable<string> = await commandResult;
 
     expect(result).toBe("command-result");
     expect(logs).toEqual(["settings:cleanup-label", "event:cleanup", "query", "query-result:query-result", "command"]);
@@ -204,7 +204,7 @@ describe("core scoped buses integration (parent-child separation)", () => {
     const PEER_DEACTIVATE_QUERY: string = "PEER_DEACTIVATE_QUERY";
 
     const logs: Array<string> = [];
-    let commandResult: Optional<Promise<string>> = null as Optional<Promise<string>>;
+    let commandResult: Nullable<Promise<string>> = null as Nullable<Promise<string>>;
 
     const fromDeactivationPeerService: Array<unknown> = [];
     const fromDeactivationCoordinatorService: Array<unknown> = [];

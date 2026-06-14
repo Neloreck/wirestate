@@ -1,7 +1,7 @@
 import { Container } from "@wirestate/core";
 import { Context, createContext } from "react";
 
-import { Optional } from "../types/general";
+import { Nullable } from "../types/general";
 
 /**
  * React context carrying the container.
@@ -12,6 +12,6 @@ import { Optional } from "../types/general";
  *
  * @group Context
  */
-export const ContainerContext: Context<Optional<Container>> = createContext<Optional<Container>>(null);
+export const ContainerContext: Context<Nullable<Container>> = createContext<Nullable<Container>>(null);
 
 ContainerContext.displayName = "ContainerContext";

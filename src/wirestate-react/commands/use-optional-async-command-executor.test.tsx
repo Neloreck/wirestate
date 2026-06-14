@@ -12,7 +12,7 @@ describe("useOptionalAsyncCommandExecutor", () => {
     cleanup();
   });
 
-  it("should resolve null if no handler exists", async () => {
+  it("should resolve undefined if no handler exists", async () => {
     const container: Container = new Container({ bindings: [CommandBus] });
 
     let executor: OptionalAsyncCommandExecutor = null as unknown as OptionalAsyncCommandExecutor;
@@ -30,7 +30,7 @@ describe("useOptionalAsyncCommandExecutor", () => {
     );
 
     expect(executor as unknown).toBeInstanceOf(Function);
-    await expect(executor("MISSING_CMD")).resolves.toBeNull();
+    await expect(executor("MISSING_CMD")).resolves.toBeUndefined();
   });
 
   it("should return a command result if handler exists", async () => {

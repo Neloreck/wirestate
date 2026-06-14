@@ -1,4 +1,4 @@
-import type { Optional } from "../../types/general";
+import type { Nullable } from "../../types/general";
 
 import { buildEventDispatchers } from "./build-event-dispatchers";
 import { EventBus } from "./event-bus";
@@ -124,7 +124,7 @@ describe("buildEventDispatcher", () => {
     }
 
     const dispatches: ReadonlyArray<EventDispatch> = buildEventDispatchers(new TestService());
-    const dispatch: Optional<EventDispatch> = dispatches[0] ?? null;
+    const dispatch: Nullable<EventDispatch> = dispatches[0] ?? null;
 
     expect(() => dispatch?.handler({ type: "TEST" })).not.toThrow();
     expect(errorSpy).toHaveBeenCalledWith(
@@ -150,7 +150,7 @@ describe("buildEventDispatcher", () => {
     }
 
     const dispatches: ReadonlyArray<EventDispatch> = buildEventDispatchers(new TestService());
-    const types: Optional<ReadonlyArray<EventType>> = dispatches[0].types;
+    const types: Nullable<ReadonlyArray<EventType>> = dispatches[0].types;
 
     expect(types).toBeNull();
   });

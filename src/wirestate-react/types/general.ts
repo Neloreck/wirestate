@@ -22,7 +22,16 @@ export type Callable<T> = () => T;
  *
  * @template T - The base type.
  */
-export type Optional<T> = T | null;
+export type Nullable<T> = T | null;
+
+/**
+ * Represents value that can be `T` or `undefined`.
+ *
+ * @group general-types
+ *
+ * @template T - The base type.
+ */
+export type Optional<T> = T | undefined;
 
 /**
  * Represents value that can be `T` or a Promise of `T`.

@@ -3,7 +3,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { Maybe } from "../types/general";
+import { Optional } from "../types/general";
 
 import { validateStandardMethodContext } from "./metadata-decorator-context";
 import { getPrototypeChainMetadata } from "./metadata-prototype-chain";
@@ -77,9 +77,9 @@ export interface SingleMethodDecoratorDescriptor {
   readonly decorator: () => SingleMethodDecorator;
 
   /**
-   * Resolves the decorated method name for an instance, or `null` when none exists.
+   * Resolves the decorated method name for an instance, or `undefined` when none exists.
    */
-  readonly getMetadata: (instance: object) => Maybe<string | symbol>;
+  readonly getMetadata: (instance: object) => Optional<string | symbol>;
 }
 
 /**
@@ -146,10 +146,10 @@ export function createSingleMethodDecoratorDescriptor(
         }
       }) as SingleMethodDecorator;
     },
-    getMetadata: (instance: object): Maybe<string | symbol> => {
+    getMetadata: (instance: object): Optional<string | symbol> => {
       dbg.info(prefix(__filename), `Resolving ${name} metadata:`, { name: instance.constructor.name, instance });
 
-      let handler: Maybe<string | symbol> = null;
+      let handler: Optional<string | symbol> = undefined;
 
       for (const metadata of getPrototypeChainMetadata(instance, registry, metadataKey)) {
         if (handler && handler !== metadata) {

@@ -6,7 +6,7 @@ import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
 import { ContainerContext } from "../context/container-context";
-import { Optional } from "../types/general";
+import { Nullable } from "../types/general";
 
 /**
  * Reactive controller that registers a command handler.
@@ -34,8 +34,8 @@ export class OnCommandController<
   P = unknown,
   T extends CommandType = CommandType,
 > implements ReactiveController {
-  private bus: Optional<CommandBus> = null;
-  private unregister: Optional<CommandUnregister> = null;
+  private bus: Nullable<CommandBus> = null;
+  private unregister: Nullable<CommandUnregister> = null;
 
   private readonly type: T;
   private readonly handler: CommandHandler<R, P, T>;

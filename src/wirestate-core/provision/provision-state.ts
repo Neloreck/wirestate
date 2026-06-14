@@ -1,7 +1,7 @@
 import type { ProvisionId } from "../activation/wire-status";
 import type { ServiceToken } from "../binding/binding";
 import type { ContainerKernel } from "../container/container-kernel";
-import type { Definable, Maybe } from "../types/general";
+import type { Optional, Maybe } from "../types/general";
 
 /**
  * Provider lifecycle state owned by a single container.
@@ -18,7 +18,7 @@ export interface ProvisionState {
    * Tri-state provider ownership: `undefined` while never provisioned, `true`
    * while provider-owned, and `false` after deprovisioning.
    */
-  status: Definable<boolean>;
+  status: Optional<boolean>;
 
   /**
    * Resolved provider lifecycle participant instances, in provision order.
@@ -103,7 +103,7 @@ export function getOrCreateProvisionState(container: ContainerKernel): Provision
  * @returns `true` while provider-owned, `false` after deprovisioning, or
  * `undefined` when the container never entered provider ownership.
  */
-export function getContainerProvisionStatus(container: ContainerKernel): Definable<boolean> {
+export function getContainerProvisionStatus(container: ContainerKernel): Optional<boolean> {
   return PROVISION_STATE.get(container)?.status;
 }
 

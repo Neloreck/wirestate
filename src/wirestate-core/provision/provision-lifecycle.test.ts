@@ -6,7 +6,7 @@ import { BindingType } from "../binding/binding";
 import { Container } from "../container/container";
 import { inject } from "../container/container-context";
 import { Injectable } from "../metadata/metadata-injectable";
-import { Optional } from "../types/general";
+import { Nullable } from "../types/general";
 
 import { OnDeprovision } from "./on-deprovision";
 import { OnProvision } from "./on-provision";
@@ -310,8 +310,8 @@ describe("provision lifecycle", () => {
   it("should reset deprovision markers before reprovision and mark active instances one by one", () => {
     const events: Array<string> = [];
 
-    let first: Optional<object> = null as Optional<object>;
-    let second: Optional<object> = null as Optional<object>;
+    let first: Nullable<object> = null as Nullable<object>;
+    let second: Nullable<object> = null as Nullable<object>;
 
     const getScopeStates = (): string =>
       String(first ? WireStatus.for(first).isDeprovisioned : undefined) +
@@ -459,8 +459,8 @@ describe("provision lifecycle", () => {
   });
 
   it("should reset provision IDs before reprovision reaches each instance", () => {
-    let first: Optional<object> = null as Optional<object>;
-    let second: Optional<object> = null as Optional<object>;
+    let first: Nullable<object> = null as Nullable<object>;
+    let second: Nullable<object> = null as Nullable<object>;
 
     const events: Array<string> = [];
     const { LifecycleService: FirstService } = createLifecycleService({

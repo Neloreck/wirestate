@@ -109,7 +109,7 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    *
    * @param type - Query type.
    * @param payload - Optional payload for the handler.
-   * @returns The query handler result as-is, or `null` if no handler is found.
+   * @returns The query handler result as-is, or `undefined` if no handler is found.
    */
   public queryOptional<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): Optional<R> {
     dbg.info(prefix(__filename), "Query optional:", { type, payload });
@@ -126,7 +126,7 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    *
    * @param type - Query type.
    * @param payload - Optional payload for the handler.
-   * @returns A Promise resolving to the query result, or `null` if no handler is found.
+   * @returns A Promise resolving to the query result, or `undefined` if no handler is found.
    */
   public queryOptionalAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(
     type: T,

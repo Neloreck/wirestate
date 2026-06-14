@@ -105,7 +105,7 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    *
    * @param type - Command type.
    * @param payload - Optional payload for the handler.
-   * @returns The command result, or `null` when no handler exists.
+   * @returns The command result, or `undefined` when no handler exists.
    */
   public executeOptional<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,
@@ -125,7 +125,7 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    *
    * @param type - Command type.
    * @param payload - Optional payload for the handler.
-   * @returns A Promise resolving to the command result, or `null` if no handler is found.
+   * @returns A Promise resolving to the command result, or `undefined` if no handler is found.
    */
   public executeOptionalAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,

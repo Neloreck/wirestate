@@ -11,7 +11,7 @@ import { OptionalAsyncCommandExecutor } from "../types/commands";
  * Returns a stable function to dispatch optional commands with Promise-normalized results.
  *
  * @remarks
- * Similar to {@link useAsyncCommandExecutor}, but resolves to `null` instead of
+ * Similar to {@link useAsyncCommandExecutor}, but resolves to `undefined` instead of
  * rejecting with `WirestateError` if no handler is registered for the command type.
  *
  * @group Commands
@@ -23,7 +23,7 @@ import { OptionalAsyncCommandExecutor } from "../types/commands";
  * const executeOptionalAsync: OptionalAsyncCommandExecutor = useOptionalAsyncCommandExecutor();
  *
  * const onClick = useCallback(async () => {
- *   const result: string | null = await executeOptionalAsync("OPTIONAL_COMMAND", payload);
+ *   const result: string | undefined = await executeOptionalAsync("OPTIONAL_COMMAND", payload);
  * }, [payload, executeOptionalAsync]);
  * ```
  */

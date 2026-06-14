@@ -25,7 +25,7 @@ import { OnEvent } from "../plugin/events/on-event";
 import { OnQuery } from "../plugin/queries/on-query";
 import { QueriesPlugin } from "../plugin/queries/queries-plugin";
 import { QueryBus } from "../plugin/queries/query-bus";
-import { AnyObject, Optional } from "../types/general";
+import { AnyObject, Nullable } from "../types/general";
 
 describe("container.bind", () => {
   it("should bind a class directly", () => {
@@ -443,8 +443,8 @@ describe("container.bind", () => {
 
       let eventCalls: number = 0;
 
-      const instanceRef: { current: Optional<object> } = { current: null };
-      const containerRef: { current: Optional<Container> } = { current: null };
+      const instanceRef: { current: Nullable<object> } = { current: null };
+      const containerRef: { current: Nullable<Container> } = { current: null };
 
       @Injectable()
       class SyncFailActivationWithHandlersService {
