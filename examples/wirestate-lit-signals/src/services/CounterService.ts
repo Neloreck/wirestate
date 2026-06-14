@@ -3,22 +3,18 @@ import {
   OnActivated,
   OnDeactivation,
   OnEvent,
-  WireScope,
   WireEvent,
   OnQuery,
   OnProvision,
   OnDeprovision,
   inject,
+  EventBus,
 } from "@wirestate/core";
 import { Signal, computed, signal } from "@wirestate/signals";
 
 import { EGlobalEvent } from "@/constants/events";
 import { ECounterServiceQuery, ICounterSnapshot, ICounterSummary } from "@/services/CounterService.query";
 import { LoggerService } from "@/services/LoggerService";
-
-interface CounterServiceSeed {
-  count?: number;
-}
 
 @Injectable()
 export class CounterService {
@@ -28,20 +24,13 @@ export class CounterService {
   public isEven = computed(() => this.count.value % 2 === 0);
 
   public constructor(
-    private readonly scope: WireScope = inject(WireScope),
+    private readonly eventBus: EventBus = inject(EventBus),
     private readonly loggerService: LoggerService = inject(LoggerService)
   ) {}
 
   @OnActivated()
   public onActivated(): void {
     console.log(`[${this.constructor.name}] Activated`);
-
-    const seed = this.scope.getSeed<CounterServiceSeed>(CounterService);
-
-    if (typeof seed?.count === "number") {
-      console.log(`[${this.constructor.name}] Apply seed count:`, seed.count);
-      this.count.value = seed.count;
-    }
   }
 
   @OnDeactivation()
@@ -53,21 +42,21 @@ export class CounterService {
   public onProvision(): void {
     console.log(`[${this.constructor.name}] Provision`);
 
-    this.scope.emitEvent(`provision/${this.constructor.name}`);
+    this.eventBus.emit(`provision/${this.constructor.name}`);
   }
 
   @OnDeprovision()
   public onDeprovision(): void {
     console.log(`[${this.constructor.name}] Deprovision`);
 
-    this.scope.emitEvent(`deprovision/${this.constructor.name}`);
+    this.eventBus.emit(`deprovision/${this.constructor.name}`);
   }
 
   public reset(): void {
     console.info(`[${this.constructor.name}] Reset counter`);
 
     this.count.value = 0;
-    this.scope.emitEvent(EGlobalEvent.COUNTER_RESET);
+    this.eventBus.emit(EGlobalEvent.COUNTER_RESET);
   }
 
   public increment(): void {
@@ -88,7 +77,7 @@ export class CounterService {
    */
   @OnQuery(ECounterServiceQuery.GET_COUNTER_SUMMARY)
   public provideCounterSummary(data?: object): ICounterSummary {
-    this.scope.resolve(LoggerService).log(`[${this.constructor.name}][query] Fetching sync snapshot:`, data);
+    this.loggerService.log(`[${this.constructor.name}][query] Fetching sync snapshot:`, data);
 
     return {
       count: this.count.value,

@@ -4,7 +4,7 @@ import "@/components/general-controls";
 import "@/components/events-log";
 import "@/components/queries-data";
 
-import { BindingType, BindingScope } from "@wirestate/core";
+import { BindingType, BindingScope, EventsPlugin, CommandsPlugin, QueriesPlugin } from "@wirestate/core";
 import { ContainerProvider, provideContainer } from "@wirestate/lit";
 import { LitElement, html, CSSResult, TemplateResult, css } from "lit";
 import { customElement } from "lit/decorators.js";
@@ -86,10 +86,6 @@ export class Application extends LitElement {
 
   @provideContainer({
     config: {
-      seeds: [
-        [LoggerService, { enabled: true }],
-        [CounterService, { count: 25 }],
-      ],
       bindings: [
         LoggerService,
         CounterService,
@@ -105,6 +101,7 @@ export class Application extends LitElement {
           scope: BindingScope.Singleton,
         },
       ],
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
     },
   })
   public readonly containerProvider!: ContainerProvider;

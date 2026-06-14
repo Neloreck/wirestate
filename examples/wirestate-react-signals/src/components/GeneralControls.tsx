@@ -26,9 +26,7 @@ export function GeneralControls() {
       at: Date.now(),
     });
 
-    console.info("[GeneralControls] Dump data result:", {
-      result,
-    });
+    console.info("[GeneralControls] Dump data result:", result);
   }, [executeCommand]);
 
   const onUserPinged = useCallback(() => {

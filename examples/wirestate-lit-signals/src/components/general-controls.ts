@@ -1,4 +1,4 @@
-import { WireScope, WireEvent } from "@wirestate/core";
+import { CommandBus, EventBus, WireEvent } from "@wirestate/core";
 import { injection, onEvent } from "@wirestate/lit";
 import { watch } from "@wirestate/lit-signals";
 import { ReadonlySignal, computed } from "@wirestate/signals";
@@ -62,8 +62,11 @@ export class GeneralControls extends LitElement {
     `,
   ];
 
-  @injection(WireScope)
-  private readonly scope!: WireScope;
+  @injection(EventBus)
+  private readonly eventBus!: EventBus;
+
+  @injection(CommandBus)
+  private readonly commandBus!: CommandBus;
 
   @injection(CounterService)
   private readonly counterService!: CounterService;
@@ -94,13 +97,11 @@ export class GeneralControls extends LitElement {
   }
 
   public onDumpData(): void {
-    const result: unknown = this.scope.executeCommand(EGlobalCommand.DUMP_DATA, {
+    const result: unknown = this.commandBus.execute(EGlobalCommand.DUMP_DATA, {
       at: Date.now(),
     });
 
-    console.info("[general-controls] Dump data result:", {
-      result,
-    });
+    console.info("[general-controls] Dump data result:", result);
   }
 
   public render() {
@@ -110,7 +111,7 @@ export class GeneralControls extends LitElement {
           Increment — count: ${watch(this.counterService.count)} (${watch(this.isOddLabel)})
         </button>
 
-        <button class="control ghost" @click="${() => this.scope.emitEvent(EGlobalEvent.COUNTER_INCREMENT, 3)}">
+        <button class="control ghost" @click="${() => this.eventBus.emit(EGlobalEvent.COUNTER_INCREMENT, 3)}">
           Increment +3 (emit event)
         </button>
 

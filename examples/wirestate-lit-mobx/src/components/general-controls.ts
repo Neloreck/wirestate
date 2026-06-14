@@ -96,9 +96,7 @@ export class GeneralControls extends MobxLitElement {
       at: Date.now(),
     });
 
-    console.info("[general-controls] Dump data result:", {
-      result,
-    });
+    console.info("[general-controls] Dump data result:", result);
   }
 
   public render() {

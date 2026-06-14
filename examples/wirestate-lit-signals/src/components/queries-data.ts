@@ -1,4 +1,4 @@
-import { WireScope } from "@wirestate/core";
+import { QueryBus } from "@wirestate/core";
 import { injection } from "@wirestate/lit";
 import { html, LitElement, CSSResult, css } from "lit";
 import { customElement, state } from "lit/decorators.js";
@@ -56,11 +56,11 @@ export class QueriesData extends LitElement {
     `,
   ];
 
+  @injection(QueryBus)
+  private readonly queryBus!: QueryBus;
+
   @injection(LoggerService)
   private readonly loggerService!: LoggerService;
-
-  @injection(WireScope)
-  private readonly scope!: WireScope;
 
   @state()
   private snapshot: Optional<ICounterSnapshot> = null;
@@ -69,11 +69,11 @@ export class QueriesData extends LitElement {
   private summary: Optional<ICounterSnapshot> = null;
 
   public async onQuerySummary(): Promise<void> {
-    this.summary = await this.scope.query(ECounterServiceQuery.GET_COUNTER_SUMMARY, { value: "some-data" });
+    this.summary = await this.queryBus.query(ECounterServiceQuery.GET_COUNTER_SUMMARY, { value: "some-data" });
   }
 
   public async onQuerySnapshot(): Promise<void> {
-    this.snapshot = await this.scope.query<ICounterSnapshot>(ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT);
+    this.snapshot = await this.queryBus.queryAsync<ICounterSnapshot>(ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT);
   }
 
   public render() {
