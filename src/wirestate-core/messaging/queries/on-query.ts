@@ -7,9 +7,41 @@ import {
   appendStandardHandlerMetadata,
   collectHandlerMetadata,
 } from "../../metadata/metadata-handlers";
+import { MESSAGING_REGISTRATION_KEY, MESSAGING_REGISTRATIONS } from "../messaging-registration";
 
-import type { QueryHandlerMetadata, QueryType } from "./queries";
+import type { QueryHandler, QueryHandlerMetadata, QueryType } from "./queries";
 import { QUERY_HANDLER_METADATA, QUERY_METADATA_KEY } from "./queries-registry";
+import { QueryBus } from "./query-bus";
+
+/**
+ * Wires an instance's `@OnQuery` methods onto the {@link QueryBus} at activation.
+ *
+ * @remarks
+ * Declared beside the queries code so importing `@OnQuery` is what pulls
+ * {@link QueryBus} into the bundle; the activation dispatcher stays bus-agnostic.
+ *
+ * @internal
+ */
+const QUERY_REGISTRATION = {
+  kind: Symbol("@wirestate/core/messaging/query"),
+  token: QueryBus,
+  register: (bus: object, instance: object): Array<() => void> => {
+    const queryBus: QueryBus = bus as QueryBus;
+    const disposers: Array<() => void> = [];
+
+    for (const meta of getQueryHandlerMetadata(instance)) {
+      const method: unknown = (instance as Record<string | symbol, unknown>)[meta.methodName];
+
+      if (typeof method !== "function") {
+        continue;
+      }
+
+      disposers.push(queryBus.register(meta.type, (method as QueryHandler).bind(instance)));
+    }
+
+    return disposers;
+  },
+};
 
 /**
  * Describes the decorator returned by {@link OnQuery}.
@@ -69,6 +101,7 @@ export function OnQuery(type: QueryType): OnQueryHandlerDecorator {
       });
 
       appendStandardHandlerMetadata(metadata, QUERY_METADATA_KEY, { methodName: nameOrContext.name, type });
+      appendStandardHandlerMetadata(metadata, MESSAGING_REGISTRATION_KEY, QUERY_REGISTRATION);
     } else {
       // Experimental legacy decorators:
       dbg.info(prefix(__filename), "Attaching OnQuery metadata:", {
@@ -80,6 +113,7 @@ export function OnQuery(type: QueryType): OnQueryHandlerDecorator {
       });
 
       appendHandlerMetadata(QUERY_HANDLER_METADATA, target.constructor, { methodName: nameOrContext, type });
+      appendHandlerMetadata(MESSAGING_REGISTRATIONS, target.constructor, QUERY_REGISTRATION);
     }
   }) as OnQueryHandlerDecorator;
 }

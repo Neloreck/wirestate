@@ -7,9 +7,41 @@ import {
   appendStandardHandlerMetadata,
   collectHandlerMetadata,
 } from "../../metadata/metadata-handlers";
+import { MESSAGING_REGISTRATION_KEY, MESSAGING_REGISTRATIONS } from "../messaging-registration";
 
-import type { CommandHandlerMetadata, CommandType } from "./commands";
+import { CommandBus } from "./command-bus";
+import type { CommandHandler, CommandHandlerMetadata, CommandType } from "./commands";
 import { COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY } from "./commands-registry";
+
+/**
+ * Wires an instance's `@OnCommand` methods onto the {@link CommandBus} at activation.
+ *
+ * @remarks
+ * Declared beside the commands code so importing `@OnCommand` is what pulls
+ * {@link CommandBus} into the bundle; the activation dispatcher stays bus-agnostic.
+ *
+ * @internal
+ */
+const COMMAND_REGISTRATION = {
+  kind: Symbol("@wirestate/core/messaging/command"),
+  token: CommandBus,
+  register: (bus: object, instance: object): Array<() => void> => {
+    const commandBus: CommandBus = bus as CommandBus;
+    const disposers: Array<() => void> = [];
+
+    for (const meta of getCommandHandlerMetadata(instance)) {
+      const method: unknown = (instance as Record<string | symbol, unknown>)[meta.methodName];
+
+      if (typeof method !== "function") {
+        continue;
+      }
+
+      disposers.push(commandBus.register(meta.type, (method as CommandHandler).bind(instance)));
+    }
+
+    return disposers;
+  },
+};
 
 /**
  * Describes the decorator returned by {@link OnCommand}.
@@ -65,6 +97,7 @@ export function OnCommand(type: CommandType): OnCommandHandlerDecorator {
       });
 
       appendStandardHandlerMetadata(metadata, COMMAND_METADATA_KEY, { methodName: nameOrContext.name, type });
+      appendStandardHandlerMetadata(metadata, MESSAGING_REGISTRATION_KEY, COMMAND_REGISTRATION);
     } else {
       // Experimental legacy decorators:
       dbg.info(prefix(__filename), "Attaching OnCommand metadata:", {
@@ -76,6 +109,7 @@ export function OnCommand(type: CommandType): OnCommandHandlerDecorator {
       });
 
       appendHandlerMetadata(COMMAND_HANDLER_METADATA, target.constructor, { methodName: nameOrContext, type });
+      appendHandlerMetadata(MESSAGING_REGISTRATIONS, target.constructor, COMMAND_REGISTRATION);
     }
   }) as OnCommandHandlerDecorator;
 }

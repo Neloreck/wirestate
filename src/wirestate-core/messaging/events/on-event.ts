@@ -1,16 +1,37 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
+import type { ContainerKernel } from "../../container/container-kernel";
 import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
-import {
-  appendHandlerMetadata,
-  appendStandardHandlerMetadata,
-  collectHandlerMetadata,
-} from "../../metadata/metadata-handlers";
+import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../../metadata/metadata-handlers";
 import type { Optional } from "../../types/general";
+import { MESSAGING_REGISTRATION_KEY, MESSAGING_REGISTRATIONS } from "../messaging-registration";
 
-import type { EventHandlerMetadata, EventType } from "./events";
+import { buildEventDispatchers } from "./build-event-dispatchers";
+import { EventBus } from "./event-bus";
+import type { EventType } from "./events";
 import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "./events-registry";
+
+/**
+ * Wires an instance's `@OnEvent` methods onto the {@link EventBus} at activation.
+ *
+ * @remarks
+ * Declared beside the events code so importing `@OnEvent` is what pulls
+ * {@link EventBus} into the bundle; the activation dispatcher stays bus-agnostic.
+ *
+ * @internal
+ */
+const EVENT_REGISTRATION = {
+  kind: Symbol("@wirestate/core/messaging/event"),
+  token: EventBus,
+  register: (bus: object, instance: object, container: ContainerKernel): Array<() => void> => {
+    const eventBus: EventBus = bus as EventBus;
+
+    return buildEventDispatchers(instance, container).map((dispatch) =>
+      eventBus.subscribe(dispatch.types, dispatch.handler)
+    );
+  },
+};
 
 /**
  * Describes the decorator returned by {@link OnEvent}.
@@ -81,6 +102,7 @@ export function OnEvent(types?: EventType | ReadonlyArray<EventType>): OnEventHa
         methodName: nameOrContext.name,
         types: normalized,
       });
+      appendStandardHandlerMetadata(metadata, MESSAGING_REGISTRATION_KEY, EVENT_REGISTRATION);
     } else {
       // Experimental legacy decorators:
       dbg.info(prefix(__filename), "Attaching OnEvent metadata:", {
@@ -95,25 +117,7 @@ export function OnEvent(types?: EventType | ReadonlyArray<EventType>): OnEventHa
         methodName: nameOrContext,
         types: normalized,
       });
+      appendHandlerMetadata(MESSAGING_REGISTRATIONS, target.constructor, EVENT_REGISTRATION);
     }
   }) as OnEventHandlerDecorator;
-}
-
-/**
- * Retrieves `@OnEvent` metadata from the class hierarchy.
- *
- * @remarks
- * Traverses the prototype chain to collect all event handlers.
- * Returns metadata ordered from base class to derived class to ensure parent-first execution.
- *
- * @group Events
- * @internal
- *
- * @param instance - The instance to scan for event handlers.
- * @returns A read-only array of event handler metadata, ordered from base to derived class.
- */
-export function getEventHandlerMetadata(instance: object): ReadonlyArray<EventHandlerMetadata> {
-  dbg.info(prefix(__filename), "Retrieving event handler metadata:", { name: instance.constructor.name, instance });
-
-  return collectHandlerMetadata(instance, EVENT_HANDLER_METADATA, EVENT_METADATA_KEY);
 }

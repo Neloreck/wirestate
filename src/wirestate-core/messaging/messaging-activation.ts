@@ -1,28 +1,21 @@
 import type { ContainerKernel } from "../container/container-kernel";
-import type { Maybe } from "../types/general";
 
-import { CommandBus } from "./commands/command-bus";
-import type { CommandHandler } from "./commands/commands";
-import { getCommandHandlerMetadata } from "./commands/on-command";
-import { buildEventDispatchers } from "./events/build-event-dispatchers";
-import { EventBus } from "./events/event-bus";
-import type { EventDispatch, EventUnsubscribe } from "./events/events";
-import { getQueryHandlerMetadata } from "./queries/on-query";
-import type { QueryHandler } from "./queries/queries";
-import { QueryBus } from "./queries/query-bus";
+import { getMessagingRegistrations } from "./messaging-registration";
 
 /**
- * Registers decorated event, query, and command handlers for an instance.
+ * Registers an instance's decorated messaging handlers against the buses bound on its container.
  *
  * @remarks
  * The messaging side of instance Activation, called by the Wirestate activation
- * adapter. Buses are resolved by token with `{ optional: true }`, so containers
- * without messaging skip handler registration gracefully. Each registration's
- * unregister callback is collected into `disposers`.
+ * adapter. It is bus-agnostic: each kind's wiring is supplied by its decorator as
+ * a {@link MessagingRegistration}, so this module imports no bus and an unused
+ * bus is never pulled into the bundle by the activation path. A bus that is not
+ * bound is skipped — `{ optional: true }` resolves up the parent chain. Each
+ * registration's teardown callbacks are collected into `disposers`.
  *
  * @param container - Container that owns the instance.
  * @param instance - Activated instance.
- * @param disposers - Collector for handler unregister callbacks.
+ * @param disposers - Collector for handler teardown callbacks.
  * @internal
  */
 export function registerMessagingHandlers(
@@ -30,57 +23,11 @@ export function registerMessagingHandlers(
   instance: object,
   disposers: Array<() => void>
 ): void {
-  const dispatches: ReadonlyArray<EventDispatch> = buildEventDispatchers(instance, container);
+  for (const registration of getMessagingRegistrations(instance)) {
+    const bus: unknown = container.get(registration.token, { optional: true });
 
-  if (dispatches.length) {
-    const eventBus: Maybe<EventBus> = container.get(EventBus, { optional: true });
-
-    if (eventBus) {
-      const unsubscribers: Array<EventUnsubscribe> = dispatches.map((dispatch) =>
-        eventBus.subscribe(dispatch.types, dispatch.handler)
-      );
-
-      disposers.push(() => {
-        for (const unsubscribe of unsubscribers) {
-          unsubscribe();
-        }
-      });
-    }
-  }
-
-  const queryHandlers = getQueryHandlerMetadata(instance);
-
-  if (queryHandlers.length) {
-    const queryBus: Maybe<QueryBus> = container.get(QueryBus, { optional: true });
-
-    if (queryBus) {
-      for (const meta of queryHandlers) {
-        const method: unknown = (instance as Record<string | symbol, unknown>)[meta.methodName];
-
-        if (typeof method !== "function") {
-          continue;
-        }
-
-        disposers.push(queryBus.register(meta.type, (method as QueryHandler).bind(instance)));
-      }
-    }
-  }
-
-  const commandHandlers = getCommandHandlerMetadata(instance);
-
-  if (commandHandlers.length) {
-    const commandBus: Maybe<CommandBus> = container.get(CommandBus, { optional: true });
-
-    if (commandBus) {
-      for (const meta of commandHandlers) {
-        const method: unknown = (instance as Record<string | symbol, unknown>)[meta.methodName];
-
-        if (typeof method !== "function") {
-          continue;
-        }
-
-        disposers.push(commandBus.register(meta.type, (method as CommandHandler).bind(instance)));
-      }
+    if (bus) {
+      disposers.push(...registration.register(bus as object, instance, container));
     }
   }
 }
