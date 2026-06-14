@@ -6,21 +6,15 @@ import {
   OnEvent,
   OnProvision,
   OnQuery,
-  SEED,
-  WireScope,
   inject,
+  EventBus,
 } from "@wirestate/core";
-import { Action, Computed, Observable, makeObservable } from "@wirestate/mobx";
+import { Computed, Observable, makeObservable, BoundAction } from "@wirestate/mobx";
 
 import { EGlobalEvent } from "@/constants/events";
 import { ECounterServiceQuery, type ICounterSnapshot, type ICounterSummary } from "@/services/CounterService.query";
 import { LoggerService } from "@/services/LoggerService";
 import type { Optional } from "@/types";
-
-export interface ICounterSeed {
-  readonly count?: number;
-  readonly lastIncrementAt?: Optional<number>;
-}
 
 @Injectable()
 export class CounterService {
@@ -31,20 +25,15 @@ export class CounterService {
   public lastIncrementAt: Optional<number> = null;
 
   public constructor(
-    private readonly scope: WireScope = inject(WireScope),
+    private readonly eventBus: EventBus = inject(EventBus),
     private readonly loggerService: LoggerService = inject(LoggerService),
-    protected readonly seed: object = inject(SEED),
   ) {
     makeObservable(this);
-
-    console.info(`[${this.constructor.name}] Shared seed on construction:`, seed);
   }
 
   @OnActivated()
   public onActivated(): void {
     console.info(`[${this.constructor.name}] Activated`);
-
-    this.initializeFromSeed();
   }
 
   @OnDeactivation()
@@ -56,7 +45,7 @@ export class CounterService {
   public onProvision(): void {
     console.info(`[${this.constructor.name}] Provision`);
 
-    this.scope.emitEvent(`provision/${this.constructor.name}`, {
+    this.eventBus.emit(`provision/${this.constructor.name}`, {
       at: new Date(),
     });
   }
@@ -65,26 +54,9 @@ export class CounterService {
   public onDeprovision(): void {
     console.info(`[${this.constructor.name}] Deprovision`);
 
-    this.scope.emitEvent(`deprovision/${this.constructor.name}`, {
+    this.eventBus.emit(`deprovision/${this.constructor.name}`, {
       at: new Date(),
     });
-  }
-
-  @Action()
-  private initializeFromSeed(): void {
-    const seed: Optional<ICounterSeed> = this.scope.getSeed(CounterService);
-
-    console.info(`[${this.constructor.name}] Seed from current DI context:`, seed);
-
-    if (seed) {
-      if (typeof seed.count === "number") {
-        this.count = seed.count;
-      }
-
-      if (typeof seed.lastIncrementAt === "number") {
-        this.lastIncrementAt = seed.lastIncrementAt;
-      }
-    }
   }
 
   @Computed()
@@ -92,7 +64,7 @@ export class CounterService {
     return this.count % 2 === 0;
   }
 
-  @Action()
+  @BoundAction()
   public increment(): void {
     // or this.resolve(LoggerService) to avoid circular refs
     this.loggerService.log(`[${this.constructor.name}][action] Incrementing counter`);
@@ -100,19 +72,19 @@ export class CounterService {
     this.count += 1;
     this.lastIncrementAt = Date.now();
 
-    this.scope.emitEvent(EGlobalEvent.COUNTER_INCREMENTED, {
+    this.eventBus.emit(EGlobalEvent.COUNTER_INCREMENTED, {
       count: this.count,
     });
   }
 
-  @Action()
+  @BoundAction()
   public reset(): void {
     console.info(`[${this.constructor.name}] Reset counter`);
 
     this.count = 0;
     this.lastIncrementAt = null;
 
-    this.scope.emitEvent(EGlobalEvent.COUNTER_RESET);
+    this.eventBus.emit(EGlobalEvent.COUNTER_RESET);
   }
 
   @OnEvent(EGlobalEvent.USER_PINGED)

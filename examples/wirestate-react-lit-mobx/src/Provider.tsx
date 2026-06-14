@@ -1,24 +1,22 @@
-import { BindingType, BindingScope, type ContainerConfig } from "@wirestate/core";
+import {
+  BindingType,
+  BindingScope,
+  type ContainerConfig,
+  EventsPlugin,
+  CommandsPlugin,
+  QueriesPlugin,
+} from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
 import { type PropsWithChildren, useMemo } from "react";
 
 import { GLOBAL_CONFIG, GLOBAL_DYNAMIC_CONFIG } from "@/constants/id";
-import { CounterService, type ICounterSeed } from "@/services/CounterService";
+import { CounterService } from "@/services/CounterService";
 import { LoggerService } from "@/services/LoggerService";
 import { ThemeService } from "@/services/ThemeService";
 
 export function Provider({ children }: PropsWithChildren) {
   const config: ContainerConfig = useMemo(
     () => ({
-      seed: {
-        isShared: true,
-        // eslint-disable-next-line react-hooks/purity
-        initialisedAt: Date.now(),
-      },
-      seeds: [
-        [CounterService, { count: 10 } as ICounterSeed],
-        [LoggerService, { logs: [] }],
-      ],
       bindings: [
         LoggerService,
         CounterService,
@@ -35,6 +33,7 @@ export function Provider({ children }: PropsWithChildren) {
           factory: () => ({ random: Math.random(), another: true }),
         },
       ],
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
     }),
     [],
   );

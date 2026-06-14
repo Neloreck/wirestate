@@ -5,7 +5,6 @@ import {
   type QueryExecutor,
   useAsyncQueryExecutor,
   useInjection,
-  useOptionalInjection,
   useQueryExecutor,
   useQueryHandler,
 } from "@wirestate/react";
@@ -21,8 +20,8 @@ export function QueriesData() {
   const [snapshot, setSnapshot] = useState<Optional<ICounterSnapshot>>(null);
   const [summary, setSummary] = useState<Optional<ICounterSummary>>(null);
 
-  const themeService: ThemeService = useInjection(ThemeService);
-  const loggerService: Optional<LoggerService> = useOptionalInjection(LoggerService);
+  const { log } = useInjection(LoggerService);
+  const { theme } = useInjection(ThemeService);
 
   const query: QueryExecutor = useQueryExecutor();
   const queryAsync: AsyncQueryExecutor = useAsyncQueryExecutor();
@@ -40,12 +39,10 @@ export function QueriesData() {
 
     setSnapshot(value);
 
-    if (loggerService) {
-      loggerService.log(`[QueriesData] Fetched snapshot:`, value);
-    }
-  }, [queryAsync, loggerService]);
+    log(`[QueriesData] Fetched snapshot:`, value);
+  }, [log, queryAsync]);
 
-  useQueryHandler<Theme>(EGlobalQuery.GET_ACTIVE_THEME, () => themeService.theme);
+  useQueryHandler<Theme>(EGlobalQuery.GET_ACTIVE_THEME, () => theme);
 
   return (
     <div className={"queries"}>

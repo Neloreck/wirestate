@@ -15,36 +15,36 @@ import { CounterService } from "@/services/CounterService";
 import { ThemeService } from "@/services/ThemeService";
 
 export function GeneralControls() {
-  const counterService: CounterService = useInjection(CounterService);
-  const themeService: ThemeService = useInjection(ThemeService);
+  const { count, isEven, increment, reset } = useInjection(CounterService);
+  const { theme, toggle } = useInjection(ThemeService);
 
-  const executeCommand: CommandExecutor = useCommandExecutor();
-  const emitEvent: EventEmitter = useEventEmitter();
+  const execute: CommandExecutor = useCommandExecutor();
+  const emit: EventEmitter = useEventEmitter();
 
   const onDumpData = useCallback(() => {
-    const result = executeCommand(EGlobalCommand.DUMP_DATA, {
+    const result = execute(EGlobalCommand.DUMP_DATA, {
       at: Date.now(),
     });
 
     console.info("[GeneralControls] Dump data result:", result);
-  }, [executeCommand]);
+  }, [execute]);
 
   const onUserPinged = useCallback(() => {
-    emitEvent(EGlobalEvent.USER_PINGED, { at: Date.now() });
-  }, [emitEvent]);
+    emit(EGlobalEvent.USER_PINGED, { at: Date.now() });
+  }, [emit]);
 
   return (
     <div className={"general-controls"}>
       <div className={"counter-row"}>
-        <button className={"counter"} onClick={() => counterService.increment()}>
-          Increment — count: {counterService.count} ({counterService.isEven ? "even" : "odd"})
+        <button className={"counter"} onClick={increment}>
+          Increment — count: {count} ({isEven ? "even" : "odd"})
         </button>
-        <button className={"counter ghost"} onClick={() => counterService.reset()}>
+        <button className={"counter ghost"} onClick={reset}>
           Reset counter
         </button>
 
-        <button className={"counter ghost"} onClick={() => themeService.toggle()}>
-          Toggle theme ({themeService.theme})
+        <button className={"counter ghost"} onClick={toggle}>
+          Toggle theme ({theme})
         </button>
 
         <button className={"counter ghost"} onClick={() => onUserPinged()}>
