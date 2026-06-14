@@ -1,17 +1,18 @@
 import { getActivatedHandlerMetadata, OnActivated } from "../activation/on-activated";
 import { OnDeactivation } from "../activation/on-deactivation";
 import { Container } from "../container/container";
-import { inject } from "../container/container-context";
 import { WirestateError } from "../error/wirestate-error";
+import { CommandBus } from "../messaging/commands/command-bus";
 import { OnCommand } from "../messaging/commands/on-command";
+import { EventBus } from "../messaging/events/event-bus";
 import { WireEvent } from "../messaging/events/events";
 import { OnEvent } from "../messaging/events/on-event";
 import { OnQuery } from "../messaging/queries/on-query";
+import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
 import { OnDeprovision } from "../provision/on-deprovision";
 import { OnProvision } from "../provision/on-provision";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
-import { WireScope } from "../scope/wire-scope";
 
 /**
  * Shared dual-mode decorator behavior matrix.
@@ -28,8 +29,6 @@ describe("dual-mode method decorators", () => {
     @Injectable()
     class MessagingService {
       public received: Array<string> = [];
-
-      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
 
       @OnEvent("PING")
       public onPing(event: WireEvent<string>): void {
@@ -52,12 +51,12 @@ describe("dual-mode method decorators", () => {
     const container: Container = new Container({ bindings: [MessagingService] });
     const service: MessagingService = container.get(MessagingService);
 
-    service.scope.emitEvent("PING", "one");
-    service.scope.emitEvent("PING", "two");
+    container.get(EventBus).emit("PING", "one");
+    container.get(EventBus).emit("PING", "two");
 
     expect(service.received).toEqual(["one", "two"]);
-    expect(service.scope.query("GET_RECEIVED_COUNT")).toBe(2);
-    expect(service.scope.execute("APPEND_VALUE", "three")).toBe("appended:three");
+    expect(container.get(QueryBus).query("GET_RECEIVED_COUNT")).toBe(2);
+    expect(container.get(CommandBus).execute("APPEND_VALUE", "three")).toBe("appended:three");
     expect(service.received).toEqual(["one", "two", "three"]);
   });
 
@@ -66,8 +65,6 @@ describe("dual-mode method decorators", () => {
 
     @Injectable()
     class LifecycleProbeService {
-      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
-
       @OnActivated()
       public onActivated(): void {
         log.push("activated");
@@ -105,8 +102,6 @@ describe("dual-mode method decorators", () => {
 
     @Injectable()
     class DeprovisionProbeService {
-      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
-
       @OnProvision()
       public onProvision(): void {
         log.push("provision");
@@ -132,8 +127,6 @@ describe("dual-mode method decorators", () => {
     @Injectable()
     class BaseMessagingService {
       public events: Array<string> = [];
-
-      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
 
       @OnActivated()
       public onActivated(): void {
@@ -164,12 +157,12 @@ describe("dual-mode method decorators", () => {
 
     expect(log).toEqual(["base-activated"]);
 
-    child.scope.emitEvent("BASE_EVENT", "a");
-    child.scope.emitEvent("CHILD_EVENT", "b");
+    container.get(EventBus).emit("BASE_EVENT", "a");
+    container.get(EventBus).emit("CHILD_EVENT", "b");
 
     // Exactly one delivery per event: base metadata is not re-attributed to the child.
     expect(child.events).toEqual(["base:a", "child:b"]);
-    expect(child.scope.query("BASE_QUERY")).toBe("base-answer");
+    expect(container.get(QueryBus).query("BASE_QUERY")).toBe("base-answer");
   });
 
   it("should allow a subclass to redecorate the same lifecycle method name", () => {
@@ -177,8 +170,6 @@ describe("dual-mode method decorators", () => {
 
     @Injectable()
     class BaseLifecycleService {
-      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
-
       @OnActivated()
       public onActivated(): void {
         log.push("base-activated");
@@ -273,8 +264,6 @@ describe("dual-mode method decorators", () => {
     class MultiHandlerService {
       public events: Array<string> = [];
 
-      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
-
       @OnEvent(["FIRST_EVENT", "SECOND_EVENT"])
       public onEither(event: WireEvent<string>): void {
         this.events.push(String(event.type));
@@ -294,20 +283,18 @@ describe("dual-mode method decorators", () => {
     const container: Container = new Container({ bindings: [MultiHandlerService] });
     const service: MultiHandlerService = container.get(MultiHandlerService);
 
-    service.scope.emitEvent("FIRST_EVENT");
-    service.scope.emitEvent("SECOND_EVENT");
+    container.get(EventBus).emit("FIRST_EVENT");
+    container.get(EventBus).emit("SECOND_EVENT");
 
     expect(service.events).toEqual(["FIRST_EVENT", "SECOND_EVENT"]);
-    expect(service.scope.query("FIRST_QUERY")).toBe("first");
-    expect(service.scope.query("SECOND_QUERY")).toBe("second");
+    expect(container.get(QueryBus).query("FIRST_QUERY")).toBe("first");
+    expect(container.get(QueryBus).query("SECOND_QUERY")).toBe("second");
   });
 
   it("should stop delivering events after deactivation", () => {
     @Injectable()
     class UnsubscribingService {
       public events: Array<string> = [];
-
-      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
 
       @OnEvent("TRACKED_EVENT")
       public onTrackedEvent(event: WireEvent<string>): void {
@@ -317,11 +304,11 @@ describe("dual-mode method decorators", () => {
 
     const container: Container = new Container({ bindings: [UnsubscribingService] });
     const service: UnsubscribingService = container.get(UnsubscribingService);
-    const scope: WireScope = service.scope;
+    const eventBus: EventBus = container.get(EventBus);
 
-    scope.emitEvent("TRACKED_EVENT", "before");
+    eventBus.emit("TRACKED_EVENT", "before");
     container.unbind(UnsubscribingService);
-    scope.emitEvent("TRACKED_EVENT", "after");
+    eventBus.emit("TRACKED_EVENT", "after");
 
     expect(service.events).toEqual(["before"]);
   });

@@ -9,7 +9,6 @@ import {
   OnEvent,
   OnQuery,
   QueryBus,
-  WireScope,
 } from "../index";
 import { Optional } from "../types/general";
 
@@ -30,11 +29,11 @@ describe("core scoped buses integration (parent-child separation)", () => {
     public readonly events: Array<string> = [];
     private count: number = 0;
 
-    public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+    public constructor(private readonly container: Container = inject(Container)) {}
 
     @OnCommand(ADD_COMMAND)
     public add(value: number): number {
-      const settings: SettingsData = this.scope.get<SettingsData>(SETTINGS_TOKEN);
+      const settings: SettingsData = this.container.get<SettingsData>(SETTINGS_TOKEN);
 
       this.count += value + settings.offset;
 
@@ -43,7 +42,7 @@ describe("core scoped buses integration (parent-child separation)", () => {
 
     @OnQuery(COUNT_QUERY)
     public getCount(): string {
-      const settings: SettingsData = this.scope.get<SettingsData>(SETTINGS_TOKEN);
+      const settings: SettingsData = this.container.get<SettingsData>(SETTINGS_TOKEN);
 
       return `${settings.label}:${this.count}`;
     }
@@ -59,11 +58,11 @@ describe("core scoped buses integration (parent-child separation)", () => {
     public readonly events: Array<string> = [];
     private count: number = 100;
 
-    public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+    public constructor(private readonly container: Container = inject(Container)) {}
 
     @OnCommand(ADD_COMMAND)
     public add(value: number): number {
-      const settings: SettingsData = this.scope.get<SettingsData>(SETTINGS_TOKEN);
+      const settings: SettingsData = this.container.get<SettingsData>(SETTINGS_TOKEN);
 
       this.count += value + settings.offset;
 
@@ -72,7 +71,7 @@ describe("core scoped buses integration (parent-child separation)", () => {
 
     @OnQuery(COUNT_QUERY)
     public getCount(): string {
-      const settings: SettingsData = this.scope.get<SettingsData>(SETTINGS_TOKEN);
+      const settings: SettingsData = this.container.get<SettingsData>(SETTINGS_TOKEN);
 
       return `${settings.label}:${this.count}`;
     }
@@ -134,17 +133,22 @@ describe("core scoped buses integration (parent-child separation)", () => {
 
     @Injectable()
     class CleanupService {
-      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+      public constructor(
+        private readonly container: Container = inject(Container),
+        private readonly eventBus: EventBus = inject(EventBus),
+        private readonly queryBus: QueryBus = inject(QueryBus),
+        private readonly commandBus: CommandBus = inject(CommandBus)
+      ) {}
 
       @OnDeactivation()
       public onDeactivation(): void {
-        const settings: SettingsData = this.scope.get<SettingsData>(SETTINGS_TOKEN);
+        const settings: SettingsData = this.container.get<SettingsData>(SETTINGS_TOKEN);
 
         logs.push(`settings:${settings.label}`);
-        this.scope.emitEvent(DEACTIVATE_EVENT, "cleanup");
-        logs.push(`query-result:${this.scope.query(DEACTIVATE_QUERY)}`);
+        this.eventBus.emit(DEACTIVATE_EVENT, "cleanup");
+        logs.push(`query-result:${this.queryBus.query(DEACTIVATE_QUERY)}`);
 
-        commandResult = this.scope.executeAsync<string>(DEACTIVATE_COMMAND);
+        commandResult = this.commandBus.executeAsync<string>(DEACTIVATE_COMMAND);
       }
 
       @OnCommand(DEACTIVATE_COMMAND)
@@ -200,16 +204,16 @@ describe("core scoped buses integration (parent-child separation)", () => {
 
     @Injectable()
     class DeactivationPeerService {
-      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+      public constructor(private readonly container: Container = inject(Container)) {}
 
       @OnDeactivation()
       public onDeactivation(): void {
         logs.push("peer-deactivation");
 
         fromDeactivationPeerService.push(
-          this.scope.get(WireScope),
-          this.scope.get(DeactivationCoordinatorService),
-          this.scope.get(DeactivationPeerService)
+          this.container.get(Container),
+          this.container.get(DeactivationCoordinatorService),
+          this.container.get(DeactivationPeerService)
         );
       }
 
@@ -235,20 +239,25 @@ describe("core scoped buses integration (parent-child separation)", () => {
 
     @Injectable()
     class DeactivationCoordinatorService {
-      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+      public constructor(
+        private readonly container: Container = inject(Container),
+        private readonly eventBus: EventBus = inject(EventBus),
+        private readonly queryBus: QueryBus = inject(QueryBus),
+        private readonly commandBus: CommandBus = inject(CommandBus)
+      ) {}
 
       @OnDeactivation()
       public onDeactivation(): void {
         logs.push("coordinator-deactivation");
-        this.scope.emitEvent(PEER_DEACTIVATE_EVENT, "from-coordinator");
-        logs.push(`coordinator-query:${this.scope.query(PEER_DEACTIVATE_QUERY, "from-coordinator")}`);
+        this.eventBus.emit(PEER_DEACTIVATE_EVENT, "from-coordinator");
+        logs.push(`coordinator-query:${this.queryBus.query(PEER_DEACTIVATE_QUERY, "from-coordinator")}`);
 
-        commandResult = this.scope.executeAsync<string, string>(PEER_DEACTIVATE_COMMAND, "from-coordinator");
+        commandResult = this.commandBus.executeAsync<string, string>(PEER_DEACTIVATE_COMMAND, "from-coordinator");
 
         fromDeactivationCoordinatorService.push(
-          this.scope.get(WireScope),
-          this.scope.get(DeactivationCoordinatorService),
-          this.scope.get(DeactivationPeerService)
+          this.container.get(Container),
+          this.container.get(DeactivationCoordinatorService),
+          this.container.get(DeactivationPeerService)
         );
       }
     }

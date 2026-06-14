@@ -18,7 +18,6 @@ export {
   UseOptionalInjectionOptions,
   UseOptionalInjectionValue,
 } from "./consumption/use-optional-injection";
-export { useScope, UseScopeValue } from "./consumption/use-scope";
 
 export { onCommand, OnCommandDecorator } from "./commands/on-command";
 export { OnCommandController } from "./commands/on-command-controller";

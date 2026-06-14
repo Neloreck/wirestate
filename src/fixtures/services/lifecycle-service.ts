@@ -1,12 +1,4 @@
-import {
-  inject,
-  Injectable,
-  OnActivated,
-  OnDeactivation,
-  OnDeprovision,
-  OnProvision,
-  WireScope,
-} from "@wirestate/core";
+import { Injectable, OnActivated, OnDeactivation, OnDeprovision, OnProvision } from "@wirestate/core";
 
 /**
  * Lifecycle callback names supported by {@link createLifecycleService}.
@@ -92,8 +84,6 @@ export function createLifecycleService(options: CreateLifecycleServiceOptions = 
       "deprovision",
     ];
     public static readonly EVENTS: Array<string> = events ?? [];
-
-    public constructor(public readonly scope: WireScope = inject(WireScope)) {}
 
     @OnActivated()
     public onActivated(): void {

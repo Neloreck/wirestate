@@ -6,7 +6,6 @@ import { BindingType } from "../binding/binding";
 import { Container } from "../container/container";
 import { inject } from "../container/container-context";
 import { Injectable } from "../metadata/metadata-injectable";
-import { WireScope } from "../scope/wire-scope";
 import { Optional } from "../types/general";
 
 import { OnDeprovision } from "./on-deprovision";
@@ -39,7 +38,7 @@ describe("provision lifecycle", () => {
     }
 
     // The default provisioning scan walks every own binding: the container
-    // self-binding, buses, WireScope, and both services. Only the
+    // self-binding, buses, and both services. Only the
     // provision-decorated service may be resolved and provisioned.
     const container: Container = new Container({ bindings: [PlainService, ProvisionedService] });
 
@@ -246,11 +245,11 @@ describe("provision lifecycle", () => {
 
     @Injectable()
     class ResolvingLifecycleService {
-      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+      public constructor(private readonly container: Container = inject(Container)) {}
 
       @OnActivated()
       public onActivated(): void {
-        this.scope.get(PlainService);
+        this.container.get(PlainService);
       }
 
       @OnProvision()
@@ -385,8 +384,6 @@ describe("provision lifecycle", () => {
 
     @Injectable()
     class ScopedLifecycleService {
-      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
-
       @OnProvision()
       public onProvision(provisionId: ProvisionId): void {
         events.push("provision-" + provisionId + "-" + String(WireStatus.for(this).provisionId));
@@ -434,8 +431,6 @@ describe("provision lifecycle", () => {
 
     @Injectable()
     class ScopedLifecycleService {
-      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
-
       @OnProvision()
       public onProvision(provisionId: ProvisionId): void {
         events.push("provision-" + provisionId);

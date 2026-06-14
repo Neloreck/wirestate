@@ -18,7 +18,6 @@ import {
   deprovisionContainerBinding,
   provisionContainer,
 } from "../provision/provision-lifecycle";
-import { WireScope } from "../scope/wire-scope";
 import { Maybe } from "../types/general";
 
 import { validateContainerConfig } from "./container-config-validation";
@@ -62,9 +61,9 @@ export interface ContainerOptions {
    * Skip binding container-scoped event, query, and command buses.
    *
    * @remarks
-   * A child container can still inherit buses from its parent. Without inherited
-   * buses, resolving `WireScope` fails because it depends on `EventBus`,
-   * `QueryBus`, and `CommandBus`.
+   * A child container can still inherit buses from its parent. Without bound or
+   * inherited buses, resolving or injecting `EventBus`, `QueryBus`, and
+   * `CommandBus` fails.
    *
    * @default `false`
    */
@@ -125,12 +124,6 @@ export class Container extends ContainerKernel {
     setActivationAdapter(this, wirestateActivationAdapter);
 
     this.bind({ token: Container, value: this });
-
-    this.bind({
-      token: WireScope,
-      scope: "Transient",
-      factory: (): WireScope => new WireScope(this),
-    });
 
     if (!options.skipMessaging) {
       this.bind({ token: EventBus, value: new EventBus(this) });

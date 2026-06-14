@@ -45,7 +45,6 @@ describe("Library exported API from wirestate-core", () => {
     "ServiceToken",
     "ValueBindingDescriptor",
     "WireEvent",
-    "WireScope",
     "WireStatus",
     "WirestateError",
     "defaultInternalErrorHandler",

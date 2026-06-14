@@ -33,7 +33,7 @@ describe("Container provision", () => {
       const container: Container = new Container({ bindings: [PlainService, LifecycleService] });
 
       // The default scan walks every own binding (container self-binding, buses,
-      // WireScope, both services) but only resolves and provisions participants.
+      // both services) but only resolves and provisions participants.
       container.provision();
 
       expect(events).toEqual(["provision"]);

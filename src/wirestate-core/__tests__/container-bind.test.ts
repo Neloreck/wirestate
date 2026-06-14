@@ -22,7 +22,6 @@ import { OnEvent } from "../messaging/events/on-event";
 import { OnQuery } from "../messaging/queries/on-query";
 import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
-import { WireScope } from "../scope/wire-scope";
 import { AnyObject, Optional } from "../types/general";
 
 describe("container.bind", () => {
@@ -260,7 +259,7 @@ describe("container.bind", () => {
 
     @Injectable()
     class SyncFailDeactivationService {
-      public constructor(public readonly scope: WireScope = inject(WireScope)) {}
+      public constructor(public readonly container: Container = inject(Container)) {}
 
       @OnDeactivation()
       public onDeactivation(): void {
@@ -316,7 +315,7 @@ describe("container.bind", () => {
       // Test deactivation.
       container.unbind(GenericService);
       expect(instance.isActivated).toBe(false);
-      expect(instance.scope.get(Container)).toBe(container);
+      expect(instance.container.get(Container)).toBe(container);
       expect(WireStatus.for(instance)).toEqual({
         isDeactivated: true,
         isDeprovisioned: true,
@@ -429,7 +428,7 @@ describe("container.bind", () => {
       );
     });
 
-    it("should clean up handlers and scope when @OnActivated throws synchronously", () => {
+    it("should clean up handlers and container tracking when @OnActivated throws synchronously", () => {
       const ACTIVATION_FAILURE_EVENT: string = "ACTIVATION_FAILURE_EVENT";
       const ACTIVATION_FAILURE_COMMAND: string = "ACTIVATION_FAILURE_COMMAND";
       const ACTIVATION_FAILURE_QUERY: string = "ACTIVATION_FAILURE_QUERY";
@@ -437,13 +436,13 @@ describe("container.bind", () => {
       let eventCalls: number = 0;
 
       const instanceRef: { current: Optional<object> } = { current: null };
-      const scopeRef: { current: Optional<WireScope> } = { current: null };
+      const containerRef: { current: Optional<Container> } = { current: null };
 
       @Injectable()
       class SyncFailActivationWithHandlersService {
-        public constructor(public readonly scope: WireScope = inject(WireScope)) {
+        public constructor(public readonly container: Container = inject(Container)) {
           instanceRef.current = this;
-          scopeRef.current = scope;
+          containerRef.current = container;
         }
 
         @OnActivated()
@@ -478,9 +477,9 @@ describe("container.bind", () => {
       expect(container.get(QueryBus).hasHandler(ACTIVATION_FAILURE_QUERY)).toBe(false);
       expect(container.get(EventBus).hasSubscribers()).toBe(false);
       expect(instanceRef.current).not.toBeNull();
-      expect(scopeRef.current).not.toBeNull();
+      expect(containerRef.current).not.toBeNull();
 
-      expect((scopeRef.current as WireScope).get(Container)).toBe(container);
+      expect((containerRef.current as Container).get(Container)).toBe(container);
       expect(WireStatus.for(instanceRef.current as object)).toEqual({
         isDeactivated: true,
         isDeprovisioned: true,
@@ -512,7 +511,7 @@ describe("container.bind", () => {
       expect(container.get(QueryBus).query("SYNC_FAIL_DEACTIVATION_QUERY")).toBe("query-response");
       expect(() => container.unbind(SyncFailDeactivationService)).not.toThrow();
 
-      expect(instance.scope.get(Container)).toBe(container);
+      expect(instance.container.get(Container)).toBe(container);
       expect(WireStatus.for(instance)).toEqual({
         isDeactivated: true,
         isDeprovisioned: true,

@@ -12,7 +12,6 @@ export { useCommandHandler } from "./commands/use-command-handler";
 
 export { ContainerContext } from "./context/container-context";
 export { useContainer } from "./context/use-container";
-export { useScope } from "./context/use-scope";
 
 export { useAllEvents } from "./events/use-all-events";
 export { useEvent } from "./events/use-event";

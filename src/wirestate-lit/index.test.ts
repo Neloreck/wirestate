@@ -28,7 +28,6 @@ describe("Library exported API from wirestate/lit", () => {
     "UseOnQueryOptions",
     "UseOptionalInjectionOptions",
     "UseOptionalInjectionValue",
-    "UseScopeValue",
     "injection",
     "onCommand",
     "onEvent",
@@ -42,7 +41,6 @@ describe("Library exported API from wirestate/lit", () => {
     "useOnEvents",
     "useOnQuery",
     "useOptionalInjection",
-    "useScope",
   ];
 
   const assertListIntersection = (first: Array<string>, second: Array<string>) => {

@@ -1,4 +1,4 @@
-import { Container, inject, Injectable, OnActivated, WireScope } from "@wirestate/core";
+import { Container, inject, Injectable, OnActivated } from "@wirestate/core";
 import { renderToString } from "react-dom/server";
 
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
@@ -24,13 +24,13 @@ describe("React SSR", () => {
     class SeededService {
       public value: string = "pending";
 
-      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+      public constructor(private readonly container: Container = inject(Container)) {}
 
       @OnActivated()
       public initialize(): void {
-        const root: RootData = this.scope.get<RootData>(ROOT_TOKEN);
-        const service = this.scope.getOptional<ServiceData>(SERVICE_TOKEN);
-        const count: number = this.scope.get<number>(COUNT_TOKEN);
+        const root: RootData = this.container.get<RootData>(ROOT_TOKEN);
+        const service = this.container.get<ServiceData>(SERVICE_TOKEN, { optional: true });
+        const count: number = this.container.get<number>(COUNT_TOKEN);
 
         this.value = `${root.locale}:${service?.userId}:${String(service?.enabled)}:${String(count)}`;
       }
@@ -68,13 +68,13 @@ describe("React SSR", () => {
     class LazySeededService {
       public value: string = "pending";
 
-      public constructor(private readonly scope: WireScope = inject(WireScope)) {}
+      public constructor(private readonly container: Container = inject(Container)) {}
 
       @OnActivated()
       public onActivated(): void {
         events.push("activated");
 
-        this.value = this.scope.getOptional<ServiceData>(SERVICE_TOKEN)?.userId ?? "missing";
+        this.value = this.container.get<ServiceData>(SERVICE_TOKEN, { optional: true })?.userId ?? "missing";
       }
     }
 

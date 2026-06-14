@@ -6,7 +6,6 @@ import { CommandBus } from "../messaging/commands/command-bus";
 import { EventBus } from "../messaging/events/event-bus";
 import { QueryBus } from "../messaging/queries/query-bus";
 import { Injectable } from "../metadata/metadata-injectable";
-import { WireScope } from "../scope/wire-scope";
 
 import { Container } from "./container";
 import { inject } from "./container-context";
@@ -20,11 +19,9 @@ describe("Container", () => {
     expect(container.get(EventBus)).toBeInstanceOf(EventBus);
     expect(container.get(QueryBus)).toBeInstanceOf(QueryBus);
     expect(container.get(CommandBus)).toBeInstanceOf(CommandBus);
-    expect(container.get(WireScope)).toBeInstanceOf(WireScope);
     expect(container.hasOwn(EventBus)).toBe(true);
     expect(container.hasOwn(QueryBus)).toBe(true);
     expect(container.hasOwn(CommandBus)).toBe(true);
-    expect(container.hasOwn(WireScope)).toBe(true);
     expect(getConfiguredInternalErrorHandler(container)).toBeUndefined();
   });
 
@@ -46,7 +43,6 @@ describe("Container", () => {
     expect(container.hasOwn(QueryBus)).toBe(false);
     expect(container.hasOwn(CommandBus)).toBe(false);
     expect(container.hasOwn(Container)).toBe(true);
-    expect(container.hasOwn(WireScope)).toBe(true);
   });
 
   it("should let a skipMessaging child use parent messaging bindings", () => {
@@ -85,22 +81,6 @@ describe("Container", () => {
     child.get(ChildMessagingService).emit("from-child");
 
     expect(receivedEvents).toEqual(["from-child"]);
-  });
-
-  it("should bind WireScope in transient scope", () => {
-    const container: Container = new Container();
-
-    expect(container.get(WireScope)).toBeInstanceOf(WireScope);
-    expect(container.get(WireScope)).not.toBe(container.get(WireScope));
-  });
-
-  it("should bind WireScope with injected container", () => {
-    const container: Container = new Container();
-
-    expect(container.get(WireScope)).toBeInstanceOf(WireScope);
-    expect(container.get(WireScope)).not.toBe(container.get(WireScope));
-    expect(container.get(WireScope)["container"]).toBe(container);
-    expect(container.get(WireScope)["container"]).toBe(container);
   });
 
   it("should respect parent container", () => {

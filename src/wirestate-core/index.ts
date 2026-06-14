@@ -53,6 +53,4 @@ export { Injectable, isInjectable } from "./metadata/metadata-injectable";
 export { OnDeprovision } from "./provision/on-deprovision";
 export { OnProvision } from "./provision/on-provision";
 
-export { WireScope } from "./scope/wire-scope";
-
 export { Newable } from "./types/general";

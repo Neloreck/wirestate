@@ -33,7 +33,6 @@ describe("Library exported API from wirestate-react", () => {
     "useOptionalQueryExecutor",
     "useQueryExecutor",
     "useQueryHandler",
-    "useScope",
   ];
 
   const assertListIntersection = (first: Array<string>, second: Array<string>) => {

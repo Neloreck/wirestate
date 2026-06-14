@@ -1,5 +1,6 @@
 import {
   Container,
+  EventBus,
   inject,
   Injectable,
   OnActivated,
@@ -7,8 +8,8 @@ import {
   OnDeactivation,
   OnEvent,
   OnQuery,
+  QueryBus,
   WireEvent,
-  WireScope,
 } from "@wirestate/core";
 
 import { Maybe } from "../types";
@@ -23,7 +24,11 @@ export class GenericService {
 
   public value: string = "test-value";
 
-  public constructor(public readonly scope: WireScope = inject(WireScope)) {}
+  public constructor(
+    public readonly container: Container = inject(Container),
+    private readonly eventBus: EventBus = inject(EventBus),
+    private readonly queryBus: QueryBus = inject(QueryBus)
+  ) {}
 
   @OnActivated()
   public activate(): void {
@@ -40,27 +45,27 @@ export class GenericService {
   }
 
   public testResolveService(): GenericService {
-    return this.scope.get(GenericService);
+    return this.container.get(GenericService);
   }
 
   public testGetContainer(): Container {
-    return this.scope.get(Container);
+    return this.container.get(Container);
   }
 
   public testEmitEvent(): void {
-    this.scope.emitEvent("TEST_EVENT", 0);
+    this.eventBus.emit("TEST_EVENT", 0);
   }
 
   public testQueryData(): void {
-    this.scope.query("TEST_QUERY", { data: 1 });
+    this.queryBus.query("TEST_QUERY", { data: 1 });
   }
 
   public testSendSyncCommand(): void {
-    this.scope.query("TEST_SYNC_COMMAND", 100);
+    this.queryBus.query("TEST_SYNC_COMMAND", 100);
   }
 
   public testSendAsyncCommand(): void {
-    this.scope.query("TEST_ASYNC_COMMAND", 500);
+    this.queryBus.query("TEST_ASYNC_COMMAND", 500);
   }
 
   @OnQuery("TEST_QUERY")
