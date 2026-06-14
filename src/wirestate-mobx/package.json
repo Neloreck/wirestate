@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/mobx",
-  "version": "1.0.0-experimental.6",
+  "version": "1.0.0-experimental.7",
   "description": "Framework-agnostic MobX re-exports and decorator aliases for Wirestate services",
   "sideEffects": false,
   "author": "Syrotenko Igor",
