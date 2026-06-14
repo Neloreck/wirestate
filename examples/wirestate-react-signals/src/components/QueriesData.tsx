@@ -5,7 +5,6 @@ import {
   type QueryExecutor,
   useAsyncQueryExecutor,
   useInjection,
-  useOptionalInjection,
   useQueryExecutor,
   useQueryHandler,
 } from "@wirestate/react";
@@ -22,7 +21,7 @@ export function QueriesData() {
   const [summary, setSummary] = useState<Optional<ICounterSummary>>(null);
 
   const themeService: ThemeService = useInjection(ThemeService);
-  const loggerService: Optional<LoggerService> = useOptionalInjection(LoggerService);
+  const loggerService: LoggerService = useInjection(LoggerService);
 
   const query: QueryExecutor = useQueryExecutor();
   const queryAsync: AsyncQueryExecutor = useAsyncQueryExecutor();

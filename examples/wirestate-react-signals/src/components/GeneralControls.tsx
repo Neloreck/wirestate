@@ -18,20 +18,20 @@ export function GeneralControls() {
   const counterService: CounterService = useInjection(CounterService);
   const themeService: ThemeService = useInjection(ThemeService);
 
-  const executeCommand: CommandExecutor = useCommandExecutor();
-  const emitEvent: EventEmitter = useEventEmitter();
+  const execute: CommandExecutor = useCommandExecutor();
+  const emit: EventEmitter = useEventEmitter();
 
   const onDumpData = useCallback(() => {
-    const result = executeCommand(EGlobalCommand.DUMP_DATA, {
+    const result = execute(EGlobalCommand.DUMP_DATA, {
       at: Date.now(),
     });
 
     console.info("[GeneralControls] Dump data result:", result);
-  }, [executeCommand]);
+  }, [execute]);
 
   const onUserPinged = useCallback(() => {
-    emitEvent(EGlobalEvent.USER_PINGED, { at: Date.now() });
-  }, [emitEvent]);
+    emit(EGlobalEvent.USER_PINGED, { at: Date.now() });
+  }, [emit]);
 
   return (
     <div className={"general-controls"}>

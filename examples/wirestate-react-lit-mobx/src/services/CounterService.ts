@@ -66,7 +66,6 @@ export class CounterService {
 
   @BoundAction()
   public increment(): void {
-    // or this.resolve(LoggerService) to avoid circular refs
     this.loggerService.log(`[${this.constructor.name}][action] Incrementing counter`);
 
     this.count += 1;

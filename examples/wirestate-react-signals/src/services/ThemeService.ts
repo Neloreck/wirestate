@@ -1,13 +1,4 @@
-import {
-  Injectable,
-  OnActivated,
-  OnDeactivation,
-  OnDeprovision,
-  OnProvision,
-  SEED,
-  WireScope,
-  inject,
-} from "@wirestate/core";
+import { Injectable, OnActivated, OnDeactivation, OnDeprovision, OnProvision, inject, EventBus } from "@wirestate/core";
 import { Signal, signal } from "@wirestate/signals";
 
 import { EGlobalEvent } from "@/constants/events";
@@ -17,12 +8,7 @@ import type { Theme } from "@/types";
 export class ThemeService {
   public theme: Signal<Theme> = signal("light");
 
-  public constructor(
-    private readonly scope: WireScope = inject(WireScope),
-    protected readonly seed: object = inject(SEED),
-  ) {
-    console.info(`[${this.constructor.name}] Shared seed on construction:`, seed);
-  }
+  public constructor(private readonly eventBus: EventBus = inject(EventBus)) {}
 
   @OnActivated()
   public onActivated(): void {
@@ -38,7 +24,7 @@ export class ThemeService {
   public onProvision(): void {
     console.info(`[${this.constructor.name}] Provision with theme:`, this.theme);
 
-    this.scope.emitEvent(`provision/${this.constructor.name}`, {
+    this.eventBus.emit(`provision/${this.constructor.name}`, {
       at: new Date(),
     });
   }
@@ -47,7 +33,7 @@ export class ThemeService {
   public onDeprovision(): void {
     console.info(`[${this.constructor.name}] Deprovision`);
 
-    this.scope.emitEvent(`deprovision/${this.constructor.name}`, {
+    this.eventBus.emit(`deprovision/${this.constructor.name}`, {
       at: new Date(),
     });
   }
@@ -55,7 +41,7 @@ export class ThemeService {
   public toggle(): void {
     this.theme.value = this.theme.value === "light" ? "dark" : "light";
 
-    this.scope.emitEvent(EGlobalEvent.THEME_TOGGLED, {
+    this.eventBus.emit(EGlobalEvent.THEME_TOGGLED, {
       theme: this.theme.value,
     });
   }
