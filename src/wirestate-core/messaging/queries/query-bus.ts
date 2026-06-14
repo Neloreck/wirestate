@@ -3,6 +3,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "../../error/error-code";
 import { WirestateError } from "../../error/wirestate-error";
+import { Injectable } from "../../metadata/metadata-injectable";
 import type { Optional } from "../../types/general";
 import { HandlerStackBus } from "../bus/handler-stack-bus";
 
@@ -28,6 +29,7 @@ import { QueryHandler, QueryType, QueryUnregister } from "./queries";
  * const user = bus.query<{ id: string }>("CURRENT_USER");
  * ```
  */
+@Injectable()
 export class QueryBus extends HandlerStackBus<QueryType> {
   /**
    * Builds the error thrown when a required query dispatch finds no handler.

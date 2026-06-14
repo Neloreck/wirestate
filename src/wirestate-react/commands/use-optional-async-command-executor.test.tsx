@@ -13,7 +13,7 @@ describe("useOptionalAsyncCommandExecutor", () => {
   });
 
   it("should resolve null if no handler exists", async () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [CommandBus] });
 
     let executor: OptionalAsyncCommandExecutor = null as unknown as OptionalAsyncCommandExecutor;
 
@@ -34,7 +34,7 @@ describe("useOptionalAsyncCommandExecutor", () => {
   });
 
   it("should return a command result if handler exists", async () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [CommandBus] });
     const bus: CommandBus = container.get(CommandBus);
 
     bus.register("EXISTING_COMMAND", () => "ok");
@@ -61,7 +61,7 @@ describe("useOptionalAsyncCommandExecutor", () => {
   });
 
   it("should support async command handlers", async () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [CommandBus] });
 
     container.get(CommandBus).register("ASYNC_COMMAND", async () => "async-ok");
 

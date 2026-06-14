@@ -8,8 +8,6 @@ describe("Library exported API from wirestate-react", () => {
     "ContainerContext",
     "ContainerProvider",
     "ContainerProviderProps",
-    "ContainerProviderScope",
-    "ContainerProviderScopeValue",
     "EventEmitter",
     "OptionalAsyncCommandExecutor",
     "OptionalAsyncQueryExecutor",

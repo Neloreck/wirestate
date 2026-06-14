@@ -1,6 +1,15 @@
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
-import { BindingType, Container, EventBus, Injectable, OnActivated, OnDeactivation } from "@wirestate/core";
+import {
+  BindingType,
+  CommandBus,
+  Container,
+  EventBus,
+  Injectable,
+  OnActivated,
+  OnDeactivation,
+  QueryBus,
+} from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { GenericService } from "@/fixtures/services/generic-service";
@@ -10,7 +19,7 @@ import { useInjection } from "../consumption/use-injection";
 import { ContainerContext } from "../context/container-context";
 import { Maybe } from "../types/general";
 
-import { ContainerProvider, ContainerProviderScope } from "./container-provider";
+import { ContainerProvider } from "./container-provider";
 
 describe("ContainerProvider", () => {
   @customElement("ws-container-provider-host")
@@ -261,11 +270,11 @@ describe("ContainerProvider", () => {
     expect(controller.value).toBeUndefined();
   });
 
-  it("should create a managed messaging scope by default", () => {
-    const parent: Container = new Container();
+  it("should bind its own composed bus distinct from the parent's", () => {
+    const parent: Container = new Container({ bindings: [EventBus] });
     const element: TestProviderElement = new TestProviderElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
-      config: { parent },
+      config: { parent, bindings: [EventBus] },
     });
 
     document.body.appendChild(element);
@@ -276,12 +285,11 @@ describe("ContainerProvider", () => {
     element.remove();
   });
 
-  it("should inherit parent messaging scope when scope is parent", () => {
-    const parent: Container = new Container();
+  it("should inherit a parent's bus when the managed container binds none", () => {
+    const parent: Container = new Container({ bindings: [EventBus] });
     const element: TestProviderElement = new TestProviderElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
       config: { parent },
-      scope: "parent",
     });
 
     document.body.appendChild(element);
@@ -292,26 +300,11 @@ describe("ContainerProvider", () => {
     element.remove();
   });
 
-  it("should accept enum messaging scope values", () => {
-    const parent: Container = new Container();
-    const element: TestProviderElement = new TestProviderElement();
-    const controller: ContainerProvider = new ContainerProvider(element, {
-      config: { parent },
-      scope: ContainerProviderScope.Parent,
-    });
-
-    document.body.appendChild(element);
-
-    expect(controller.value.get(EventBus)).toBe(parent.get(EventBus));
-
-    element.remove();
-  });
-
   it("should not publish undefined to subscribed injection consumers on disconnect", () => {
     const element: TestProviderElement = new TestProviderElement();
     const child: TestChildElement = new TestChildElement();
     const controller: ContainerProvider = new ContainerProvider(element, {
-      config: { bindings: [GenericService] },
+      config: { bindings: [EventBus, CommandBus, QueryBus, GenericService] },
     });
 
     const injection = useInjection(child, GenericService);
@@ -392,7 +385,9 @@ describe("ContainerProvider", () => {
 
   it("should reject direct container replacement for managed providers", () => {
     const element: TestProviderElement = new TestProviderElement();
-    const controller: ContainerProvider = new ContainerProvider(element, { config: { bindings: [GenericService] } });
+    const controller: ContainerProvider = new ContainerProvider(element, {
+      config: { bindings: [EventBus, CommandBus, QueryBus, GenericService] },
+    });
 
     expect(() => controller.setValue(new Container())).toThrow(
       "ContainerProvider owns managed containers. Use `setConfig(config)` to replace the managed container."

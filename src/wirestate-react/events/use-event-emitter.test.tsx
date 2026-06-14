@@ -8,7 +8,7 @@ import { useEventEmitter } from "./use-event-emitter";
 
 describe("useEventEmitter", () => {
   it("should return an emitter that dispatches events", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus] });
     const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 

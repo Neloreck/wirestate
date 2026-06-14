@@ -9,7 +9,7 @@ import { useQueryHandler } from "./use-query-handler";
 
 describe("useQueryHandler", () => {
   it("should register and unregister a query handler", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((payload: string) => payload + "-result");
 
@@ -40,7 +40,7 @@ describe("useQueryHandler", () => {
   });
 
   it("should update handler ref when handler changes", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
 
     const handler1 = jest.fn(() => "result1");
@@ -70,7 +70,7 @@ describe("useQueryHandler", () => {
   });
 
   it("should re-register when query type changes", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn().mockReturnValue("value");
 
@@ -100,7 +100,7 @@ describe("useQueryHandler", () => {
   });
 
   it("should call latest handler registered during render", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
     const handler1 = jest.fn().mockReturnValue("value1");
     const handler2 = jest.fn().mockReturnValue("value2");
@@ -135,7 +135,7 @@ describe("useQueryHandler", () => {
   });
 
   it("should call latest handler when query is dispatched during rerender layout effects", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
 
     let result: unknown;
@@ -175,7 +175,7 @@ describe("useQueryHandler", () => {
   });
 
   it("should support async handlers", async () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn(async (payload: string) => payload + "-async");
 

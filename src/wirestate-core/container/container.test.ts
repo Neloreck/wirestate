@@ -11,22 +11,19 @@ import { Container } from "./container";
 import { inject } from "./container-context";
 
 describe("Container", () => {
-  it("should create a container with default essentials", () => {
+  it("should not bind messaging buses by default", () => {
     const container: Container = new Container();
 
     expect(container).toBeInstanceOf(Container);
     expect(container.get(Container)).toBe(container);
-    expect(container.get(EventBus)).toBeInstanceOf(EventBus);
-    expect(container.get(QueryBus)).toBeInstanceOf(QueryBus);
-    expect(container.get(CommandBus)).toBeInstanceOf(CommandBus);
-    expect(container.hasOwn(EventBus)).toBe(true);
-    expect(container.hasOwn(QueryBus)).toBe(true);
-    expect(container.hasOwn(CommandBus)).toBe(true);
+    expect(container.hasOwn(EventBus)).toBe(false);
+    expect(container.hasOwn(QueryBus)).toBe(false);
+    expect(container.hasOwn(CommandBus)).toBe(false);
     expect(getConfiguredInternalErrorHandler(container)).toBeUndefined();
   });
 
-  it("should bind core buses as singletons by default", () => {
-    const container: Container = new Container();
+  it("should bind composed buses as singletons", () => {
+    const container: Container = new Container({ bindings: [EventBus, QueryBus, CommandBus] });
 
     expect(container.get(EventBus)).toBeInstanceOf(EventBus);
     expect(container.get(EventBus)).toBe(container.get(EventBus));
@@ -36,16 +33,7 @@ describe("Container", () => {
     expect(container.get(CommandBus)).toBe(container.get(CommandBus));
   });
 
-  it("should skip core buses when skipMessaging is true", () => {
-    const container: Container = new Container({}, { skipMessaging: true });
-
-    expect(container.hasOwn(EventBus)).toBe(false);
-    expect(container.hasOwn(QueryBus)).toBe(false);
-    expect(container.hasOwn(CommandBus)).toBe(false);
-    expect(container.hasOwn(Container)).toBe(true);
-  });
-
-  it("should let a skipMessaging child use parent messaging bindings", () => {
+  it("should let a child inherit a parent's composed bus for sending", () => {
     const receivedEvents: Array<string> = [];
 
     @Injectable()
@@ -66,16 +54,12 @@ describe("Container", () => {
 
     const parent: Container = new Container({
       activate: true,
-      bindings: [ParentMessagingService],
+      bindings: [EventBus, ParentMessagingService],
     });
-    const child: Container = new Container({ parent, bindings: [ChildMessagingService] }, { skipMessaging: true });
+    const child: Container = new Container({ parent, bindings: [ChildMessagingService] });
 
     expect(child.hasOwn(EventBus)).toBe(false);
     expect(child.has(EventBus)).toBe(true);
-    expect(child.hasOwn(QueryBus)).toBe(false);
-    expect(child.has(QueryBus)).toBe(true);
-    expect(child.hasOwn(CommandBus)).toBe(false);
-    expect(child.has(CommandBus)).toBe(true);
     expect(child.get(EventBus)).toBe(parent.get(EventBus));
 
     child.get(ChildMessagingService).emit("from-child");
@@ -111,8 +95,8 @@ describe("Container", () => {
   });
 
   it("should isolate messaging from its parent", () => {
-    const parent: Container = new Container();
-    const container: Container = new Container({ parent });
+    const parent: Container = new Container({ bindings: [EventBus, QueryBus, CommandBus] });
+    const container: Container = new Container({ parent, bindings: [EventBus, QueryBus, CommandBus] });
 
     expect(container.get(EventBus)).not.toBe(parent.get(EventBus));
     expect(container.get(QueryBus)).not.toBe(parent.get(QueryBus));

@@ -78,7 +78,7 @@ describe("instance lifecycle tracking", () => {
   });
 
   it("should fully wire bare-class binds through the container", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus, QueryBus, CommandBus] });
 
     container.bind(GenericService);
 
@@ -112,12 +112,8 @@ describe("instance lifecycle tracking", () => {
     const bindings = container.getOwnBindings();
 
     expect(bindings[0]).toEqual({ token: Container, value: container });
-    expect(bindings[1]).toEqual({ token: EventBus, value: container.get(EventBus) });
-    expect(bindings[2]).toEqual({ token: QueryBus, value: container.get(QueryBus) });
-    expect(bindings[3]).toEqual({ token: CommandBus, value: container.get(CommandBus) });
-
-    expect(bindings[4]).toBe(valueBinding);
-    expect(bindings[5]).toBe(instanceBinding);
+    expect(bindings[1]).toBe(valueBinding);
+    expect(bindings[2]).toBe(instanceBinding);
   });
 });
 

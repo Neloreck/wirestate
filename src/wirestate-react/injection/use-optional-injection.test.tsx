@@ -1,5 +1,5 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, ServiceToken } from "@wirestate/core";
+import { CommandBus, Container, EventBus, QueryBus, ServiceToken } from "@wirestate/core";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
@@ -33,7 +33,7 @@ describe("useOptionalInjection", () => {
 
   it("should resolve bound instance", () => {
     const container: Container = new Container({
-      bindings: [GenericService],
+      bindings: [EventBus, CommandBus, QueryBus, GenericService],
     });
 
     const { getByTestId } = render(

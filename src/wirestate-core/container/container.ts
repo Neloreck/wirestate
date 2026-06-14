@@ -10,9 +10,6 @@ import {
   InternalErrorHandler,
   setInternalErrorHandler,
 } from "../error/internal-error-handler";
-import { CommandBus } from "../messaging/commands/command-bus";
-import { EventBus } from "../messaging/events/event-bus";
-import { QueryBus } from "../messaging/queries/query-bus";
 import {
   deprovisionContainer,
   deprovisionContainerBinding,
@@ -52,25 +49,6 @@ export interface ContainerConfig {
 }
 
 /**
- * Describes options for {@link Container} construction.
- *
- * @group Container
- */
-export interface ContainerOptions {
-  /**
-   * Skip binding container-scoped event, query, and command buses.
-   *
-   * @remarks
-   * A child container can still inherit buses from its parent. Without bound or
-   * inherited buses, resolving or injecting `EventBus`, `QueryBus`, and
-   * `CommandBus` fails.
-   *
-   * @default `false`
-   */
-  readonly skipMessaging?: boolean;
-}
-
-/**
  * A Wirestate-ready dependency injection container.
  *
  * @remarks
@@ -103,10 +81,9 @@ export class Container extends ContainerKernel {
    * Creates a Wirestate container.
    *
    * @param config - Container setup config.
-   * @param options - Container creation options.
    */
-  public constructor(config: ContainerConfig = {}, options: ContainerOptions = {}) {
-    dbg.info(prefix(__filename), "Creating container:", { config, options });
+  public constructor(config: ContainerConfig = {}) {
+    dbg.info(prefix(__filename), "Creating container:", { config });
 
     validateContainerConfig(config);
 
@@ -119,19 +96,13 @@ export class Container extends ContainerKernel {
       setInternalErrorHandler(this, errorHandler);
     }
 
-    // Installed before any binding activates; the adapter resolves buses with
-    // optional lookups, so it is installed even under `skipMessaging`.
+    // Installed before any binding activates: the Wirestate instance lifecycle
+    // (status, @OnActivated/@OnDeactivation, messaging) layered on the pure-DI kernel.
     setActivationAdapter(this, wirestateActivationAdapter);
 
     this.bind({ token: Container, value: this });
 
-    if (!options.skipMessaging) {
-      this.bind({ token: EventBus, value: new EventBus(this) });
-      this.bind({ token: QueryBus, value: new QueryBus() });
-      this.bind({ token: CommandBus, value: new CommandBus() });
-    }
-
-    dbg.info(prefix(__filename), "Injecting bindings on creation:", { container: this, config, options });
+    dbg.info(prefix(__filename), "Injecting bindings on creation:", { container: this, config });
 
     if (config.bindings) {
       for (const binding of config.bindings) {

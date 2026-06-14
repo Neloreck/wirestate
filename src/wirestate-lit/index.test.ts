@@ -5,8 +5,6 @@ describe("Library exported API from wirestate/lit", () => {
     "ContainerContext",
     "ContainerProvider",
     "ContainerProviderOptions",
-    "ContainerProviderScope",
-    "ContainerProviderScopeValue",
     "InjectionDecorator",
     "InjectionOptions",
     "OnCommandController",

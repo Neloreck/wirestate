@@ -13,7 +13,6 @@ describe("Library exported API from wirestate-core", () => {
     "CommandUnregister",
     "Container",
     "ContainerConfig",
-    "ContainerOptions",
     "EventBus",
     "EventEmitOptions",
     "EventHandler",

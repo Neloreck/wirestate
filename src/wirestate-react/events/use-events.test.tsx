@@ -12,7 +12,7 @@ describe("useEvents", () => {
   });
 
   it("should subscribe to multiple event types", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus] });
     const bus: EventBus = container.get(EventBus);
 
     const handler = jest.fn();
@@ -41,7 +41,7 @@ describe("useEvents", () => {
   });
 
   it("should unsubscribe on unmount", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus] });
     const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 
@@ -77,7 +77,7 @@ describe("useEvents", () => {
   });
 
   it("should resubscribe when the listened type membership changes", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus] });
     const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 
@@ -112,7 +112,7 @@ describe("useEvents", () => {
   });
 
   it("should not leak subscriptions when re-rendered with an equal inline type array", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus] });
     const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 
@@ -140,7 +140,7 @@ describe("useEvents", () => {
   });
 
   it("should use latest types and handler when event is emitted during rerender layout effects", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus] });
     const bus: EventBus = container.get(EventBus);
     const handler1 = jest.fn();
     const handler2 = jest.fn();

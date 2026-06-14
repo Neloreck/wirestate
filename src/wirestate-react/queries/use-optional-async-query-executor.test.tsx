@@ -9,7 +9,7 @@ import { useOptionalAsyncQueryExecutor } from "./use-optional-async-query-execut
 
 describe("useOptionalAsyncQueryExecutor", () => {
   it("should return an executor that dispatches sync queries as promises", async () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((payload: string) => payload + "-result");
 
@@ -39,7 +39,7 @@ describe("useOptionalAsyncQueryExecutor", () => {
   });
 
   it("should resolve null on unhandled queries", async () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
     let executor: Optional<OptionalAsyncQueryExecutor> = null as Optional<OptionalAsyncQueryExecutor>;
 
@@ -64,7 +64,7 @@ describe("useOptionalAsyncQueryExecutor", () => {
   });
 
   it("should resolve async handler results", async () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
 
     bus.register("ASYNC_QUERY", async (payload: string) => payload + "-async");
@@ -89,7 +89,7 @@ describe("useOptionalAsyncQueryExecutor", () => {
   });
 
   it("should return a stable executor between re-renders", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const executors: Array<OptionalAsyncQueryExecutor> = [];
 
     function TestComponent() {
@@ -115,7 +115,7 @@ describe("useOptionalAsyncQueryExecutor", () => {
   });
 
   it("should support symbol query types", async () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
     const type: unique symbol = Symbol("optional-query");
 

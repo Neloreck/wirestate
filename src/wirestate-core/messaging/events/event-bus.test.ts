@@ -166,7 +166,7 @@ describe("EventBus", () => {
   it("should report handler errors to container error handler", () => {
     const error = new Error("handler error");
     const onError = jest.fn();
-    const container = new Container({ onError });
+    const container = new Container({ onError, bindings: [EventBus] });
     const bus: EventBus = container.get(EventBus);
 
     bus.subscribe(() => {

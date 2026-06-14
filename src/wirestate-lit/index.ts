@@ -33,11 +33,6 @@ export { useOnQuery, UseOnQueryOptions } from "./queries/use-on-query";
 
 export { ContainerContext } from "./context/container-context";
 
-export {
-  ContainerProvider,
-  ContainerProviderOptions,
-  ContainerProviderScope,
-  ContainerProviderScopeValue,
-} from "./provision/container-provider";
+export { ContainerProvider, ContainerProviderOptions } from "./provision/container-provider";
 export { provideContainer, ProvideContainerDecorator } from "./provision/provide-container";
 export { useContainerProvider, UseContainerProviderOptions } from "./provision/use-container-provision";

@@ -8,7 +8,7 @@ import { useContainer } from "../context/use-container";
 import { useInjection } from "../injection/use-injection";
 import { AnyObject } from "../types/general";
 
-import { ContainerProvider, ContainerProviderScope } from "./container-provider";
+import { ContainerProvider } from "./container-provider";
 
 describe("ContainerProvider", () => {
   function Consumer() {
@@ -163,8 +163,29 @@ describe("ContainerProvider", () => {
     expect(getByTestId("value").textContent).toBe("second-parent");
   });
 
-  it("should create a managed messaging scope by default", () => {
-    const parent: Container = new Container();
+  it("should bind its own composed bus distinct from the parent's", () => {
+    const parent: Container = new Container({ bindings: [EventBus] });
+    const eventBuses: Array<EventBus> = [];
+
+    function TrackingConsumer() {
+      eventBuses.push(useContainer().get(EventBus));
+
+      return null;
+    }
+
+    render(
+      <ContainerProvider config={{ parent, bindings: [EventBus] }}>
+        <TrackingConsumer />
+      </ContainerProvider>
+    );
+
+    expect(eventBuses).toHaveLength(1);
+    expect(eventBuses[0]).toBeInstanceOf(EventBus);
+    expect(eventBuses[0]).not.toBe(parent.get(EventBus));
+  });
+
+  it("should let the managed container inherit a parent's bus when it binds none", () => {
+    const parent: Container = new Container({ bindings: [EventBus] });
     const eventBuses: Array<EventBus> = [];
 
     function TrackingConsumer() {
@@ -181,82 +202,7 @@ describe("ContainerProvider", () => {
 
     expect(eventBuses).toHaveLength(1);
     expect(eventBuses[0]).toBeInstanceOf(EventBus);
-    expect(eventBuses[0]).not.toBe(parent.get(EventBus));
-  });
-
-  it("should inherit parent messaging scope when scope is parent", () => {
-    const parent: Container = new Container();
-    const eventBuses: Array<EventBus> = [];
-
-    function TrackingConsumer() {
-      eventBuses.push(useContainer().get(EventBus));
-
-      return null;
-    }
-
-    render(
-      <ContainerProvider config={{ parent }} scope={"parent"}>
-        <TrackingConsumer />
-      </ContainerProvider>
-    );
-
-    expect(eventBuses).toHaveLength(1);
-    expect(eventBuses[0]).toBeInstanceOf(EventBus);
     expect(eventBuses[0]).toBe(parent.get(EventBus));
-  });
-
-  it("should accept enum messaging scope values", () => {
-    const parent: Container = new Container();
-    const eventBuses: Array<EventBus> = [];
-
-    function TrackingConsumer() {
-      eventBuses.push(useContainer().get(EventBus));
-
-      return null;
-    }
-
-    render(
-      <ContainerProvider config={{ parent }} scope={ContainerProviderScope.Parent}>
-        <TrackingConsumer />
-      </ContainerProvider>
-    );
-
-    expect(eventBuses).toHaveLength(1);
-    expect(eventBuses[0]).toBe(parent.get(EventBus));
-  });
-
-  it("should recreate managed container when scope changes", () => {
-    const parent: Container = new Container();
-    const containers: Array<Container> = [];
-    const eventBuses: Array<EventBus> = [];
-
-    function TrackingConsumer() {
-      const container: Container = useContainer();
-
-      containers.push(container);
-      eventBuses.push(container.get(EventBus));
-
-      return null;
-    }
-
-    const { rerender } = render(
-      <ContainerProvider config={{ parent }} scope={"parent"}>
-        <TrackingConsumer />
-      </ContainerProvider>
-    );
-
-    rerender(
-      <ContainerProvider config={{ parent }} scope={"container"}>
-        <TrackingConsumer />
-      </ContainerProvider>
-    );
-
-    expect(containers).toHaveLength(2);
-    expect(eventBuses[0]).toBeInstanceOf(EventBus);
-    expect(eventBuses[1]).toBeInstanceOf(EventBus);
-    expect(containers[1]).not.toBe(containers[0]);
-    expect(eventBuses[0]).toBe(parent.get(EventBus));
-    expect(eventBuses[1]).not.toBe(parent.get(EventBus));
   });
 
   it("should recreate managed container when activate changes", () => {

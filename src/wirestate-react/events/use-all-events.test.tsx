@@ -12,7 +12,7 @@ describe("useAllEvents", () => {
   });
 
   it("should subscribe to all events without filtering", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus] });
     const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 
@@ -39,7 +39,7 @@ describe("useAllEvents", () => {
   });
 
   it("should unsubscribe on unmount", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus] });
     const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 
@@ -73,7 +73,7 @@ describe("useAllEvents", () => {
   });
 
   it("should use latest handler when event is emitted during rerender layout effects", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus] });
     const bus: EventBus = container.get(EventBus);
 
     const handler1 = jest.fn();

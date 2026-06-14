@@ -10,30 +10,6 @@ import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { Maybe } from "../types/general";
 
 /**
- * Provider messaging scope modes.
- *
- * @group Provision
- */
-export enum ContainerProviderScope {
-  /**
-   * Create container-local message buses for managed containers.
-   */
-  Container = "container",
-
-  /**
-   * Inherit message buses from the managed container's parent.
-   */
-  Parent = "parent",
-}
-
-/**
- * String value accepted by {@link ContainerProviderOptions.scope}.
- *
- * @group Provision
- */
-export type ContainerProviderScopeValue = `${ContainerProviderScope}`;
-
-/**
  * Describes options for {@link ContainerProvider}.
  *
  * @remarks
@@ -62,16 +38,6 @@ export interface ContainerProviderOptions {
    * The provider value is `undefined` while the host is disconnected.
    */
   readonly config?: ContainerConfig;
-
-  /**
-   * Managed container messaging scope.
-   *
-   * @remarks
-   * Defaults to `"container"`. Pass `"parent"` with a parent container in
-   * `config.parent` to inherit the parent's `EventBus`, `CommandBus`, and
-   * `QueryBus`.
-   */
-  readonly scope?: Maybe<ContainerProviderScopeValue>;
 }
 
 /**
@@ -110,14 +76,12 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
 {
   protected config: Maybe<ContainerConfig>;
   protected container: Maybe<Container>;
-  protected scope: Maybe<ContainerProviderScopeValue>;
 
   /**
    * @param host - The host element.
    * @param options - Provisioning options.
    * @param options.container - External container instance to provide.
    * @param options.config - Managed container creation config.
-   * @param options.scope - Managed container messaging scope.
    */
   public constructor(host: E, options: ContainerProviderOptions) {
     if (!options.container && !options.config) {
@@ -143,21 +107,17 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
 
     this.config = options.config ? { ...options.config, activate: options.config.activate ?? true } : null;
     this.container = options.container;
-    this.scope = options.scope;
 
     dbg.info(prefix(__filename), "Constructed:", {
       host: this.host,
       container: this.container,
       options: this.config,
-      scope: this.scope,
     });
   }
 
   public hostConnected(): void {
     const container: Container = this.config
-      ? (this.container = new Container(this.config, {
-          skipMessaging: this.scope === ContainerProviderScope.Parent,
-        }))
+      ? (this.container = new Container(this.config))
       : (this.container as Container);
 
     try {
@@ -251,9 +211,7 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
         this.destroyManagedContainer(this.container);
       }
 
-      const container: Container = new Container(this.config, {
-        skipMessaging: this.scope === ContainerProviderScope.Parent,
-      });
+      const container: Container = new Container(this.config);
 
       this.container = container;
 

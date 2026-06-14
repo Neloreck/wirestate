@@ -12,7 +12,7 @@ describe("useEvent", () => {
   });
 
   it("should filter by single event type", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus] });
     const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 
@@ -37,7 +37,7 @@ describe("useEvent", () => {
   });
 
   it("should unsubscribe on unmount", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus] });
     const bus: EventBus = container.get(EventBus);
     const handler = jest.fn();
 
@@ -71,7 +71,7 @@ describe("useEvent", () => {
   });
 
   it("should use latest type and handler when event is emitted during rerender layout effects", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus] });
     const bus: EventBus = container.get(EventBus);
     const handler1 = jest.fn();
     const handler2 = jest.fn();

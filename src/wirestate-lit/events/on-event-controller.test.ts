@@ -81,7 +81,7 @@ describe("OnEventController", () => {
     const { provider, contextProvider, container: firstContainer } = fixture;
 
     const firstBus: EventBus = firstContainer.get(EventBus);
-    const secondContainer: Container = new Container();
+    const secondContainer: Container = new Container({ bindings: [EventBus] });
     const secondBus: EventBus = secondContainer.get(EventBus);
 
     const element: TestConsumerElement = new TestConsumerElement();

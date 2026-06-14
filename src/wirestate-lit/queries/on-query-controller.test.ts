@@ -70,7 +70,7 @@ describe("OnQueryController", () => {
     const QUERY: string = "TEST_QUERY";
 
     const firstBus: QueryBus = firstContainer.get(QueryBus);
-    const secondContainer: Container = new Container();
+    const secondContainer: Container = new Container({ bindings: [QueryBus] });
     const secondBus: QueryBus = secondContainer.get(QueryBus);
 
     const element: TestConsumerElement = new TestConsumerElement();

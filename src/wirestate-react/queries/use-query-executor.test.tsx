@@ -8,7 +8,7 @@ import { useQueryExecutor } from "./use-query-executor";
 
 describe("useQueryExecutor", () => {
   it("should return an executor that dispatches queries", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((payload: string) => payload + "-result");
 
@@ -38,7 +38,7 @@ describe("useQueryExecutor", () => {
   });
 
   it("should throw on unhandled queries", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
 
     jest.spyOn(bus, "query");
@@ -64,7 +64,7 @@ describe("useQueryExecutor", () => {
   });
 
   it("should return promise values when the active handler returns a Promise", async () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
 
     bus.register("ASYNC_QUERY", async (payload: string) => payload + "-async");
@@ -89,7 +89,7 @@ describe("useQueryExecutor", () => {
   });
 
   it("should return a stable executor between re-renders", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const executors: Array<QueryExecutor> = [];
 
     function TestComponent() {
@@ -115,7 +115,7 @@ describe("useQueryExecutor", () => {
   });
 
   it("should support symbol query types", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
     const type: unique symbol = Symbol("test-query");
 

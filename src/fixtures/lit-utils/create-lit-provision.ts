@@ -1,6 +1,6 @@
 import { ContextProvider } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container } from "@wirestate/core";
+import { CommandBus, Container, EventBus, QueryBus } from "@wirestate/core";
 import { ContainerContext } from "@wirestate/lit";
 
 let isProviderDefined: boolean = false;
@@ -15,7 +15,9 @@ export interface LitProvisionFixture {
   cleanup(): void;
 }
 
-export function createLitProvision(container: Container = new Container()): LitProvisionFixture {
+export function createLitProvision(
+  container: Container = new Container({ bindings: [EventBus, CommandBus, QueryBus] })
+): LitProvisionFixture {
   if (!isProviderDefined) {
     customElements.define("ws-test-provider", WsTestProviderElement);
     isProviderDefined = true;

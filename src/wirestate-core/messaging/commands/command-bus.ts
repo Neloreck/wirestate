@@ -3,6 +3,7 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER } from "../../error/error-code";
 import { WirestateError } from "../../error/wirestate-error";
+import { Injectable } from "../../metadata/metadata-injectable";
 import type { Optional } from "../../types/general";
 import { HandlerStackBus } from "../bus/handler-stack-bus";
 
@@ -27,6 +28,7 @@ import type { CommandHandler, CommandType, CommandUnregister } from "./commands"
  * await bus.executeAsync<void, User>("SAVE_USER", user);
  * ```
  */
+@Injectable()
 export class CommandBus extends HandlerStackBus<CommandType> {
   /**
    * Builds the error thrown when a required command dispatch finds no handler.

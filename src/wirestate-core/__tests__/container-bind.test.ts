@@ -110,7 +110,7 @@ describe("container.bind", () => {
   });
 
   it("should bind an instance descriptor to its descriptor token", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus, QueryBus, CommandBus] });
     const TOKEN: unique symbol = Symbol("token");
     const binding: BindingDescriptor = {
       type: BindingType.Instance,
@@ -284,7 +284,7 @@ describe("container.bind", () => {
     }
 
     it("should bind instances and handle lifecycle", async () => {
-      const container: Container = new Container();
+      const container: Container = new Container({ bindings: [EventBus, QueryBus, CommandBus] });
 
       const result: Container = container.bind(GenericService);
 
@@ -467,7 +467,7 @@ describe("container.bind", () => {
       }
 
       const onError = jest.fn();
-      const container: Container = new Container({ onError });
+      const container: Container = new Container({ onError, bindings: [EventBus, QueryBus, CommandBus] });
 
       container.bind(SyncFailActivationWithHandlersService);
 
@@ -502,7 +502,7 @@ describe("container.bind", () => {
     it("should catch and log failing @OnDeactivation methods while preserving cleanup", () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-      const container: Container = new Container();
+      const container: Container = new Container({ bindings: [QueryBus] });
 
       container.bind(SyncFailDeactivationService);
 
@@ -561,7 +561,7 @@ describe("container.bind", () => {
       const onError = jest.fn();
       const container: Container = new Container({
         activate: true,
-        bindings: [SyncFailDeactivationService],
+        bindings: [QueryBus, SyncFailDeactivationService],
 
         onError,
       });
@@ -592,7 +592,7 @@ describe("container.bind", () => {
 
       const container: Container = new Container({
         activate: true,
-        bindings: [FailingEventService],
+        bindings: [EventBus, FailingEventService],
         onError,
       });
 
@@ -625,7 +625,7 @@ describe("container.bind", () => {
 
       const container: Container = new Container({
         activate: true,
-        bindings: [MultiDecoratedService],
+        bindings: [EventBus, MultiDecoratedService],
       });
 
       const bus: EventBus = container.get(EventBus);
@@ -641,7 +641,7 @@ describe("container.bind", () => {
     });
 
     it("should handle non-function @OnQuery or @OnActivated properties during activation", () => {
-      const container: Container = new Container();
+      const container: Container = new Container({ bindings: [QueryBus] });
 
       container.bind(CorruptedService);
 

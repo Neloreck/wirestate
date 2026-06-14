@@ -12,7 +12,7 @@ describe("useAsyncCommandExecutor", () => {
   });
 
   it("should return an executor that dispatches sync commands as promises", async () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [CommandBus] });
     const bus: CommandBus = container.get(CommandBus);
     const handler = jest.fn((payload: string) => payload + "-result");
 
@@ -39,7 +39,7 @@ describe("useAsyncCommandExecutor", () => {
   });
 
   it("should dispatch async command handlers", async () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [CommandBus] });
 
     container.get(CommandBus).register("ASYNC_COMMAND", async (payload: string) => payload + "-result");
 
@@ -61,7 +61,7 @@ describe("useAsyncCommandExecutor", () => {
   });
 
   it("should reject on unhandled commands", async () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [CommandBus] });
     let executor: AsyncCommandExecutor = null as unknown as AsyncCommandExecutor;
 
     function TestComponent() {

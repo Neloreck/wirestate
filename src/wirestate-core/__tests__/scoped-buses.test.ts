@@ -86,6 +86,9 @@ describe("core scoped buses integration (parent-child separation)", () => {
     const parent: Container = new Container({
       activate: [ParentCounterService],
       bindings: [
+        EventBus,
+        CommandBus,
+        QueryBus,
         ParentCounterService,
         { token: PARENT_TOKEN, value: "root-value" },
         { token: SETTINGS_TOKEN, value: { label: "root-label", offset: 1 } },
@@ -93,7 +96,13 @@ describe("core scoped buses integration (parent-child separation)", () => {
     });
     const child: Container = new Container({
       activate: [ChildCounterService],
-      bindings: [ChildCounterService, { token: SETTINGS_TOKEN, value: { label: "child-label", offset: 10 } }],
+      bindings: [
+        EventBus,
+        CommandBus,
+        QueryBus,
+        ChildCounterService,
+        { token: SETTINGS_TOKEN, value: { label: "child-label", offset: 10 } },
+      ],
       parent: parent,
     });
 
@@ -173,7 +182,13 @@ describe("core scoped buses integration (parent-child separation)", () => {
 
     const container: Container = new Container({
       activate: [CleanupService],
-      bindings: [CleanupService, { token: SETTINGS_TOKEN, value: { label: "cleanup-label", offset: 0 } }],
+      bindings: [
+        EventBus,
+        CommandBus,
+        QueryBus,
+        CleanupService,
+        { token: SETTINGS_TOKEN, value: { label: "cleanup-label", offset: 0 } },
+      ],
     });
 
     container.unbindAll();
@@ -264,7 +279,7 @@ describe("core scoped buses integration (parent-child separation)", () => {
 
     const container: Container = new Container({
       activate: [DeactivationCoordinatorService, DeactivationPeerService],
-      bindings: [DeactivationCoordinatorService, DeactivationPeerService],
+      bindings: [EventBus, CommandBus, QueryBus, DeactivationCoordinatorService, DeactivationPeerService],
     });
 
     container.unbindAll();

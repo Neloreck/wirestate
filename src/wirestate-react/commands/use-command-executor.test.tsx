@@ -13,7 +13,7 @@ describe("useCommandExecutor", () => {
   });
 
   it("should return an executor that dispatches commands", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [CommandBus] });
     const handler = jest.fn((payload: string) => payload + "-result");
 
     container.get(CommandBus).register("TEST_COMMAND", handler);
@@ -39,7 +39,7 @@ describe("useCommandExecutor", () => {
   });
 
   it("should throw on unhandled commands", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [CommandBus] });
     let executor: CommandExecutor = null as unknown as CommandExecutor;
 
     function TestComponent() {

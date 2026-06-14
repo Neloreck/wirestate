@@ -1,5 +1,5 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { Container, ServiceToken } from "@wirestate/core";
+import { CommandBus, Container, EventBus, QueryBus, ServiceToken } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
@@ -36,7 +36,7 @@ describe("optionalInjection", () => {
   });
 
   it("should inject bound instance", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [EventBus, CommandBus, QueryBus] });
 
     container.bind(GenericService);
     fixture = createLitProvision(container);

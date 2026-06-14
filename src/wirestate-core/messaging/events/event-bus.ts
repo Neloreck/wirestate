@@ -1,9 +1,11 @@
 import { dbg } from "@/macroses/dbg.macro";
 import { prefix } from "@/macroses/prefix.macro";
 
-import type { Container } from "../../container/container";
+import { Container } from "../../container/container";
+import { inject } from "../../container/container-context";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
-import type { Maybe, Optional } from "../../types/general";
+import { Injectable } from "../../metadata/metadata-injectable";
+import type { Definable, Maybe, Optional } from "../../types/general";
 
 import type { EventEmitOptions, EventHandler, EventType, EventUnsubscribe, WireEvent } from "./events";
 
@@ -51,13 +53,14 @@ interface EventSubscription {
  * unsubscribe();
  * ```
  */
+@Injectable()
 export class EventBus {
   /**
    * Subscriptions indexed by event type.
    */
   private readonly handlers: Map<EventType, Set<EventSubscription>> = new Map();
 
-  public constructor(private readonly container?: Container) {}
+  public constructor(private readonly container: Definable<Container> = inject(Container, { optional: true })) {}
 
   /**
    * Broadcasts an event to all subscribers.

@@ -26,7 +26,7 @@ export {
 } from "./binding/binding";
 export { InjectionToken } from "./binding/binding-tokens";
 
-export { Container, ContainerConfig, ContainerOptions } from "./container/container";
+export { Container, ContainerConfig } from "./container/container";
 export { inject } from "./container/container-context";
 export { validateContainerConfig } from "./container/container-config-validation";
 

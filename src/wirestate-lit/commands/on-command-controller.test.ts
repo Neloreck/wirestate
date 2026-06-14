@@ -79,7 +79,7 @@ describe("OnCommandController", () => {
     const COMMAND: string = "TEST_COMMAND";
 
     const firstBus: CommandBus = firstContainer.get(CommandBus);
-    const secondContainer: Container = new Container();
+    const secondContainer: Container = new Container({ bindings: [CommandBus] });
     const secondBus: CommandBus = secondContainer.get(CommandBus);
 
     const element: TestConsumerElement = new TestConsumerElement();

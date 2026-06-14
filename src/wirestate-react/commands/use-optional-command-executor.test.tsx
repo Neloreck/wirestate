@@ -12,7 +12,7 @@ describe("useOptionalCommandExecutor", () => {
   });
 
   it("should return null if no handler exists", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [CommandBus] });
 
     let executor: OptionalCommandExecutor = null as unknown as OptionalCommandExecutor;
 
@@ -33,7 +33,7 @@ describe("useOptionalCommandExecutor", () => {
   });
 
   it("should return a command result if handler exists", () => {
-    const container: Container = new Container();
+    const container: Container = new Container({ bindings: [CommandBus] });
 
     container.get(CommandBus).register("EXISTING_COMMAND", () => "ok");
 
