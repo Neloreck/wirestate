@@ -90,9 +90,9 @@ parent. To give the child its own messaging instead, register the plugins on the
 
 ## Direct Container Work
 
-`Container` is the registration and disposal API. Binding a service class through `container.bind` wires the full
-Wirestate lifecycle: `@OnActivated`/`@OnDeactivation` hooks, `@OnEvent`/`@OnCommand`/`@OnQuery` handlers, and
-`WireStatus` tracking.
+`Container` is the registration and disposal API. Binding a service class through `container.bind` makes it available
+for Wirestate lifecycle handling. `@OnActivated` and `WireStatus` are applied when the service is resolved; messaging
+handlers are wired later when the container is provisioned.
 
 ```ts
 container.bind(UserService);

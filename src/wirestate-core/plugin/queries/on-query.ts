@@ -63,14 +63,15 @@ export interface OnQueryHandlerDecorator {
 }
 
 /**
- * Marks a method as a query handler.
+ * Marks a service method as a query handler.
  *
  * @remarks
- * The handler registers when the instance activates and unregisters when the
- * instance deactivates.
+ * The handler is registered when the owning container is provisioned and
+ * unregistered when that provision cycle ends. Register {@link QueriesPlugin}
+ * on the container, or on an ancestor container, to enable query handlers.
  *
- * Queries answer reads. If several handlers use the same token, the newest one
- * answers. Think stack of sticky notes: read the top note first.
+ * Queries answer read-oriented requests. If several handlers use the same
+ * token, the newest registered handler answers.
  *
  * @group Queries
  *

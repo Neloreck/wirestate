@@ -98,10 +98,7 @@ describe("core scoped buses integration (parent-child separation)", () => {
 
     const child: Container = new Container({
       activate: [ChildCounterService],
-      bindings: [
-        ChildCounterService,
-        { token: SETTINGS_TOKEN, value: { label: "child-label", offset: 10 } },
-      ],
+      bindings: [ChildCounterService, { token: SETTINGS_TOKEN, value: { label: "child-label", offset: 10 } }],
       parent: parent,
       plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
     }).provision();
@@ -182,10 +179,7 @@ describe("core scoped buses integration (parent-child separation)", () => {
 
     const container: Container = new Container({
       activate: [CleanupService],
-      bindings: [
-        CleanupService,
-        { token: SETTINGS_TOKEN, value: { label: "cleanup-label", offset: 0 } },
-      ],
+      bindings: [CleanupService, { token: SETTINGS_TOKEN, value: { label: "cleanup-label", offset: 0 } }],
       plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
     })
       .provision()

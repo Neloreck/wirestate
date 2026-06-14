@@ -10,19 +10,20 @@ import { HandlerStackBus } from "../bus/handler-stack-bus";
 import { QueryHandler, QueryType, QueryUnregister } from "./queries";
 
 /**
- * Dispatches named queries to one active handler.
+ * Dispatches queries to one active handler per query type.
  *
  * @remarks
- * Queries represent reads such as current user, labels, or cached state.
- * Handlers are stacked by type: the newest handler wins until it unregisters.
+ * Queries represent read-oriented work such as current user, labels, or cached
+ * state. Handlers are stacked by type: the newest handler is active until it
+ * unregisters.
  *
  * @group Queries
  *
  * @example
  * ```typescript
- * import { QueryBus, Container } from "@wirestate/core";
+ * import { Container, QueriesPlugin, QueryBus } from "@wirestate/core";
  *
- * const container = new Container();
+ * const container = new Container({ plugins: [new QueriesPlugin()] });
  * const bus = container.get(QueryBus);
  * bus.register("CURRENT_USER", () => ({ id: "u1" }));
  *
@@ -73,10 +74,11 @@ export class QueryBus extends HandlerStackBus<QueryType> {
   }
 
   /**
-   * Dispatches a query and Promise-wraps the result.
+   * Dispatches a query and returns a Promise for the result.
    *
    * @remarks
-   * Sync values are wrapped. Async values are passed through.
+   * Synchronous handler results are wrapped. Promises returned by handlers are
+   * passed through.
    *
    * @template R - Type of the expected query result.
    * @template P - Type of the query payload.

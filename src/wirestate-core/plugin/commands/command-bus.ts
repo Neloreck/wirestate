@@ -10,19 +10,21 @@ import { HandlerStackBus } from "../bus/handler-stack-bus";
 import type { CommandHandler, CommandType, CommandUnregister } from "./commands";
 
 /**
- * Dispatches named commands to one active handler.
+ * Dispatches commands to one active handler per command type.
  *
  * @remarks
- * Commands represent writes such as save, login, reset, or send. Handlers are
- * stacked by type: the newest handler wins until it unregisters.
+ * Commands represent write-oriented work such as save, login, reset, or send.
+ * Handlers are stacked by type: the newest handler is active until it
+ * unregisters.
  *
  * @group Commands
  *
  * @example
  * ```typescript
- * import { CommandBus } from "@wirestate/core";
+ * import { CommandBus, CommandsPlugin, Container } from "@wirestate/core";
  *
- * const bus = new CommandBus();
+ * const container = new Container({ plugins: [new CommandsPlugin()] });
+ * const bus = container.get(CommandBus);
  * bus.register("SAVE_USER", async (user: User) => saveUser(user));
  *
  * await bus.executeAsync<void, User>("SAVE_USER", user);
@@ -72,10 +74,11 @@ export class CommandBus extends HandlerStackBus<CommandType> {
   }
 
   /**
-   * Dispatches a command and Promise-wraps the result.
+   * Dispatches a command and returns a Promise for the result.
    *
    * @remarks
-   * Sync values are wrapped. Async values are passed through.
+   * Synchronous handler results are wrapped. Promises returned by handlers are
+   * passed through.
    *
    * @template R - Type of the command result.
    * @template P - Type of the command payload.

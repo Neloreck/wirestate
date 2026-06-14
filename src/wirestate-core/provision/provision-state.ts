@@ -9,9 +9,6 @@ import type { Definable, Maybe } from "../types/general";
  * @remarks
  * One container is provisioned by at most one provider at a time, so this whole
  * record is the single source of truth for that container's provider ownership.
- * It is held in a {@link WeakMap} keyed by container today; a follow-up
- * (ADR 0003 phase 2) upgrades it into a private `Container` field once the
- * activation layer no longer reads it from inside the kernel.
  *
  * @group Container
  * @internal
@@ -27,7 +24,7 @@ export interface ProvisionState {
    * Resolved provider lifecycle participant instances, in provision order.
    *
    * @remarks
-   * `null` means no instances entry is currently tracked — either the container
+   * `null` means no instances entry is currently tracked: either the container
    * was never provisioned or its last lifecycle binding was unbound.
    */
   instances: Maybe<Array<object>>;

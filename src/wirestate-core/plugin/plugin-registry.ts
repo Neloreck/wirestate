@@ -13,7 +13,7 @@ import type { WirestatePlugin } from "./plugin";
  *
  * @remarks
  * The effective set for a container is its own plugins unioned with every
- * ancestor's, resolved by walking the parent chain — mirroring the
+ * ancestor's, resolved by walking the parent chain, mirroring the
  * activation adapter's parent walk.
  *
  * @internal
@@ -47,12 +47,6 @@ export function getOwnPlugins(container: ContainerKernel): ReadonlyArray<Wiresta
 /**
  * Resolves the effective plugin set for a container: its own plugins unioned with
  * every ancestor's, nearest first, each plugin instance appearing once.
- *
- * @remarks
- * Dedup is split (ADR 0008): a kind-owning plugin fully shadowed by a nearer plugin
- * of the same kind(s) is dropped — so a child can locally override messaging (e.g.
- * bind a local bus) without double-wiring — while observer plugins (no kinds) are
- * never shadowed, so ancestors keep observing descendants.
  *
  * @internal
  *

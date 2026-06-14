@@ -61,7 +61,6 @@ counter.increment();
 - Queries for one-handler read operations.
 - Provision-scoped message handlers: `@OnEvent`, `@OnCommand`, and `@OnQuery` subscribe at provision and unsubscribe at
   deprovision.
-- Test helpers for service and container tests.
 
 ## API Reference
 

@@ -3,17 +3,34 @@
 import type { BindingDescriptor, ServiceToken } from "./binding";
 
 /**
- * A unique injection token object, that is used by reference. Can hold a generic type.
+ * Reference token for dependencies that do not have a class constructor token.
+ *
+ * @remarks
+ * Use an `InjectionToken<T>` for constants, external objects, interfaces, and
+ * other values that need a stable runtime token with a TypeScript value type.
+ *
+ * @group Bind
  */
 export class InjectionToken<T> {
   /**
    * Phantom field that ties the token to its value type.
-   * Never assigned at runtime — exists purely so `InjectionToken<A>` is not assignable to `InjectionToken<B>`.
+   * Never assigned at runtime. It exists so `InjectionToken<A>` is not
+   * assignable to `InjectionToken<B>`.
    */
   protected readonly _type?: T;
 
+  /**
+   * Creates an injection token with a human-readable description.
+   *
+   * @param description - Description used in diagnostics.
+   */
   public constructor(private readonly description: string | symbol) {}
 
+  /**
+   * Returns a diagnostic label for this token.
+   *
+   * @returns Human-readable token label.
+   */
   public toString(): string {
     return `InjectionToken "${String(this.description)}"`;
   }

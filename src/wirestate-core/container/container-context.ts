@@ -4,10 +4,16 @@ import type { Definable } from "../types/general";
 import type { ContainerKernel } from "./container-kernel";
 
 /**
- * Injects a service within the current injection context, using the token provided.
+ * Resolves a dependency from the container currently constructing a service.
+ *
+ * @remarks
+ * Use `inject()` in constructor defaults or field initializers of
+ * `@Injectable()` classes. Optional lookups return `undefined` instead of
+ * throwing, and lazy lookups return a function that resolves the dependency
+ * when called.
  *
  * @param token - Token to resolve from the current container.
- * @returns The resolved value, values, thunk, or `undefined` for optional misses.
+ * @returns The resolved value, a lazy resolver, or `undefined` for optional misses.
  */
 export function inject<T>(token: ServiceToken<T>): T;
 export function inject<T>(token: ServiceToken<T>, options: { optional: true }): Definable<T>;

@@ -37,7 +37,7 @@ export function getInstanceContainer(instance: object): Definable<ContainerKerne
  * It tracks the instance-container mapping, initializes {@link WireStatus}
  * (including the container's current provision status), and invokes the
  * `@OnActivated` / `@OnDeactivation` hooks. Activation is render-safe: it opens
- * no subscriptions or resources — messaging handlers subscribe during provision.
+ * no subscriptions or resources. Messaging handlers subscribe during provision.
  *
  * @internal
  */
@@ -51,7 +51,7 @@ export const wirestateActivationAdapter: ActivationAdapter = {
     initializeInstanceStatus(container, instance);
 
     // Plugins (framework layer) observe/extend activation before the user's
-    // @OnActivated. A throw here is atomic — the kernel rolls the activation back.
+    // @OnActivated. A throw here is atomic: the kernel rolls the activation back.
     dispatchPluginActivate(container, instance);
 
     const methodName: Maybe<string | symbol> = getActivatedHandlerMetadata(instance);

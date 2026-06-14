@@ -23,7 +23,7 @@ const INSTANCE_STATUSES_BY_INSTANCE: WeakMap<object, WireStatus> = new WeakMap()
 export type ProvisionId = number;
 
 /**
- * Options for {@link WireStatus.for}.
+ * Options reserved for Wirestate lifecycle internals.
  *
  * @group Container
  */
@@ -56,7 +56,7 @@ export class WireStatus {
    * @group Container
    *
    * @param instance - Resolved service instance to inspect.
-   * @param options - Internal lookup options used while Wirestate activates an instance.
+   * @param options - Reserved for Wirestate internals.
    * @returns The stable lifecycle status for the instance.
    *
    * @throws {@link WirestateError} If the object is not tracked by Wirestate.

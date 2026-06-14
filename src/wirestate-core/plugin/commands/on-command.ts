@@ -63,12 +63,15 @@ export interface OnCommandHandlerDecorator {
 }
 
 /**
- * Marks a method as a command handler.
+ * Marks a service method as a command handler.
  *
  * @remarks
- * The handler registers when the instance activates and unregisters when the
- * instance deactivates. One command call goes to one handler: the newest
- * registered handler for that token.
+ * The handler is registered when the owning container is provisioned and
+ * unregistered when that provision cycle ends. Register {@link CommandsPlugin}
+ * on the container, or on an ancestor container, to enable command handlers.
+ *
+ * One command call goes to one handler: the newest registered handler for that
+ * token.
  *
  * @group Commands
  *

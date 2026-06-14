@@ -54,13 +54,14 @@ export interface OnEventHandlerDecorator {
 }
 
 /**
- * Marks a method as an event handler.
+ * Marks a service method as an event handler.
  *
  * @remarks
- * The handler registers when the instance activates and unregisters when the
- * instance deactivates.
+ * The handler is registered when the owning container is provisioned and
+ * unregistered when that provision cycle ends. Register {@link EventsPlugin}
+ * on the container, or on an ancestor container, to enable event handlers.
  *
- * Omit `types` to receive every event in the container.
+ * Omit `types` to receive every event emitted on the active event bus.
  *
  * @group Events
  *

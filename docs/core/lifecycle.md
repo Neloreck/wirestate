@@ -37,10 +37,11 @@ lifecycle participants before calling provision hooks, calls provision hooks in 
 hooks in reverse order.
 
 Message handlers are also wired here. `@OnEvent`, `@OnCommand`, and `@OnQuery` subscribe at provision and unsubscribe
-at deprovision, so the messaging window is `[@OnProvision … @OnDeprovision]`. Provision force-activates every service
-that declares a handler, and a handler's bus resolves up the parent chain, so a child service can handle an ancestor's
-bus. Because subscriptions are provision-scoped, messaging requires the container to be provisioned: a UI provider does
-this automatically, while plain-core usage and tests call `container.provision()` (and `container.deprovision()`).
+at deprovision, so the messaging window is `@OnProvision` through `@OnDeprovision`. Provision force-activates every
+service that declares a handler, and a handler's bus resolves up the parent chain, so a child service can handle an
+ancestor's bus. Because subscriptions are provision-scoped, messaging requires the container to be provisioned: a UI
+provider does this automatically, while plain-core usage and tests call `container.provision()` (and
+`container.deprovision()`).
 `@OnActivated` runs before provision and `@OnDeactivation` runs after deprovision, so neither can emit, execute, or
 query; put setup and teardown messaging in `@OnProvision` and `@OnDeprovision`.
 

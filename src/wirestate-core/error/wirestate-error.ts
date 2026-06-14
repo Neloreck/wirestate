@@ -12,10 +12,12 @@ import { ERROR_CODE_GENERIC } from "./error-code";
  *
  * @example
  * ```typescript
- * import { WirestateError } from "@wirestate/core";
+ * import { Container, WirestateError } from "@wirestate/core";
+ *
+ * const container = new Container();
  *
  * try {
- *   scope.get(SomeService);
+ *   container.get(SomeService);
  * } catch (error) {
  *   if (error instanceof WirestateError) {
  *     console.error(error.code, error.message);

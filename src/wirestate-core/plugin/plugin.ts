@@ -15,9 +15,9 @@ import type { Container } from "../container/container";
  * the matching user hook; on teardown phases they run *after* it.
  *
  * Setup hooks (`install`, `onActivate`, `onContainerProvision`, `onProvision`) are
- * atomic — a throw unwinds the activation/provision cycle. Teardown hooks
+ * atomic: a throw unwinds the activation/provision cycle. Teardown hooks
  * (`onDeactivate`, `onDeprovision`, `onContainerDeprovision`) and disposers are
- * failsafe — a throw is swallowed and never aborts teardown.
+ * failsafe: a throw is swallowed and never aborts teardown.
  *
  * A plugin's effective reach is its container plus every descendant container
  * (plugins resolve up the parent chain), so a plugin registered on the root

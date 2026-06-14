@@ -15,13 +15,13 @@ import type { WirestatePlugin } from "./plugin";
  * Each concrete plugin supplies the {@link MessagingRegistration} for its kind
  * (`{ kind, token, register }`, declared beside the decorator). The base then:
  *
- * - **owns its bus binding** — `install` binds the bus token, so `inject(EventBus)`
+ * - **owns its bus binding**: `install` binds the bus token, so `inject(EventBus)`
  *   and chain-resolved sending work without a separate `bindings` entry;
  * - **declares its kind** via `handles`, so provision can match handler metadata to
  *   a plugin and throw on an unhandled kind;
- * - **force-activates participants** — `participates` is true for any class
+ * - **force-activates participants**: `participates` is true for any class
  *   declaring this kind, so a dormant handler service is resolved at provision;
- * - **wires handlers** at provision — `onProvision` resolves the bus up the chain
+ * - **wires handlers** at provision: `onProvision` resolves the bus up the chain
  *   and subscribes the instance's handlers of this kind, registering each
  *   unsubscribe as a disposer.
  *

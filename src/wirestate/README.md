@@ -5,6 +5,8 @@
 
 Compatibility package for the unscoped `wirestate` name.
 
+This package is React-oriented. Lit users should install the scoped Lit packages directly.
+
 New projects should prefer the scoped packages for the stack they use:
 [`@wirestate/core`](https://www.npmjs.com/package/@wirestate/core),
 [`@wirestate/react`](https://www.npmjs.com/package/@wirestate/react),
@@ -28,8 +30,7 @@ npm install wirestate
 - `wirestate/mobx` re-exports `@wirestate/mobx` and `@wirestate/react-mobx`.
 - `wirestate/signals` re-exports `@wirestate/signals` and `@wirestate/react-signals`.
 
-The React MobX rendering binding (`observer`) lives in
-[`@wirestate/react-mobx`](https://www.npmjs.com/package/@wirestate/react-mobx). Lit APIs are available from the scoped
+Lit APIs are available from the scoped
 [`@wirestate/lit`](https://www.npmjs.com/package/@wirestate/lit),
 [`@wirestate/lit-mobx`](https://www.npmjs.com/package/@wirestate/lit-mobx), and
 [`@wirestate/lit-signals`](https://www.npmjs.com/package/@wirestate/lit-signals) packages.

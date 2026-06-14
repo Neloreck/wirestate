@@ -29,7 +29,11 @@ import { ContainerKernel } from "./container-kernel";
  */
 export interface ContainerConfig {
   /**
-   * Bindings to resolve immediately.
+   * Controls eager resolution during container construction.
+   *
+   * @remarks
+   * Pass `true` to resolve every configured binding, an array to resolve
+   * selected tokens, or omit it to keep services lazy.
    */
   readonly activate?: boolean | ReadonlyArray<ServiceToken>;
 
@@ -60,10 +64,12 @@ export interface ContainerConfig {
 }
 
 /**
- * A Wirestate-ready dependency injection container.
+ * Dependency injection container for one Wirestate scope.
  *
  * @remarks
- * Extends the internal bare container kernel with the Wirestate composition.
+ * A container owns its local bindings and the instances created from them.
+ * Child containers inherit parent bindings while keeping their own local
+ * registrations, lifecycle state, and plugin-provided buses.
  *
  * @group Container
  *
@@ -143,8 +149,8 @@ export class Container extends ContainerKernel {
    * @remarks
    * Resolves provider lifecycle participants and runs `@OnProvision` once for
    * this provision cycle. A container is provisioned by at most one provider at
-   * a time: provisioning an already provisioned container throws — deprovision
-   * it first.
+   * a time. Provisioning an already provisioned container throws; deprovision it
+   * first.
    *
    * @returns The same container for chaining.
    *

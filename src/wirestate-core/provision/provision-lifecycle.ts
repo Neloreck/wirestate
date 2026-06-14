@@ -188,7 +188,7 @@ export function provisionInstances(
   const trackedTokens: Array<readonly [object, ServiceToken]> = [];
   const visited: Set<ServiceToken> = new Set();
 
-  // Plugins observe the provision cycle boundary before any instance wiring (ADR 0008).
+  // Plugins observe the provision cycle boundary before any instance wiring.
   dispatchPluginContainerProvision(container);
 
   // A container owns provider lifecycle only for the bindings it declares.
@@ -205,7 +205,7 @@ export function provisionInstances(
   }
 
   // Fail-fast: a class declaring a messaging handler whose kind no registered
-  // plugin handles — e.g. an @OnEvent service with no EventsPlugin registered.
+  // plugin handles, e.g. an @OnEvent service with no EventsPlugin registered.
   const handledKinds: Set<symbol> = new Set();
 
   for (const plugin of getEffectivePlugins(container)) {
@@ -262,9 +262,7 @@ export function provisionInstances(
   }
 
   // Phase 3: run plugin onProvision wiring for every active instance, before any
-  // user @OnProvision (plugins are the framework layer that brackets user hooks —
-  // ADR 0008). Messaging is wired here by the built-in messaging plugins. Atomic:
-  // a throw unwinds the whole cycle, including disposers collected earlier.
+  // user @OnProvision (plugins are the framework layer that brackets user hooks:
   for (const instance of container.getActiveInstances()) {
     try {
       dispatchPluginProvision(container, instance, (dispose: () => void): void =>

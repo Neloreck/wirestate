@@ -3,7 +3,7 @@ import type { WireEvent } from "../plugin/events/events";
 import type { Maybe } from "../types/general";
 
 /**
- * Internal Wirestate error source.
+ * Subsystem that isolated an internal Wirestate error.
  *
  * @group Error
  */
@@ -16,18 +16,19 @@ export type InternalErrorSource =
   | "provider-deprovision";
 
 /**
- * Describes an internal error that Wirestate isolates instead of rethrowing.
+ * Describes an internal error that Wirestate reports without aborting the
+ * current container operation.
  *
  * @group Error
  */
 export interface InternalErrorDescriptor {
   /**
-   * ContainerKernel that owns the failed internal work.
+   * Container that owns the failed work, when one is available.
    */
   readonly container?: ContainerKernel;
 
   /**
-   * Extra values printed between the message and error by the default handler.
+   * Extra diagnostic values provided by the failing subsystem.
    */
   readonly details?: ReadonlyArray<unknown>;
 
@@ -42,7 +43,7 @@ export interface InternalErrorDescriptor {
   readonly error: unknown;
 
   /**
-   * Message printed after the `[wirestate]` prefix by the default handler.
+   * Summary of the failure.
    */
   readonly message: string;
 
@@ -62,13 +63,13 @@ export interface InternalErrorDescriptor {
   readonly instanceName?: string;
 
   /**
-   * Internal subsystem that caught the failure.
+   * Subsystem that caught the failure.
    */
   readonly source: InternalErrorSource;
 }
 
 /**
- * Handles isolated internal Wirestate errors.
+ * Handles isolated Wirestate errors.
  *
  * @group Error
  */
@@ -80,7 +81,7 @@ export type InternalErrorHandler = (descriptor: InternalErrorDescriptor) => void
 const WIRESTATE_INTERNAL_ERROR_HANDLERS: WeakMap<ContainerKernel, InternalErrorHandler> = new WeakMap();
 
 /**
- * Handles internal Wirestate errors with the default console output.
+ * Reports isolated Wirestate errors to `console.error`.
  *
  * @group Error
  *

@@ -34,7 +34,7 @@ interface EventSubscription {
 }
 
 /**
- * Broadcasts events to every subscriber in one container.
+ * Broadcasts events to every subscriber registered on one container bus.
  *
  * @remarks
  * Events are fire-and-forget "this happened" notifications.
@@ -43,9 +43,9 @@ interface EventSubscription {
  *
  * @example
  * ```typescript
- * import { EventBus, Container } from "@wirestate/core";
+ * import { Container, EventBus, EventsPlugin } from "@wirestate/core";
  *
- * const container = new Container();
+ * const container = new Container({ plugins: [new EventsPlugin()] });
  * const bus = container.get(EventBus);
  * const unsubscribe = bus.subscribe((event) => console.log(event.type));
  *
@@ -63,12 +63,12 @@ export class EventBus {
   public constructor(private readonly container: Definable<Container> = inject(Container, { optional: true })) {}
 
   /**
-   * Broadcasts an event to all subscribers.
+   * Emits an event to matching subscribers.
    *
    * @remarks
-   * Each bucket is snapshotted before dispatch, so a handler can subscribe or
-   * unsubscribe while an event is being emitted. A thrown handler is logged and
-   * the next handler still runs. Catch-all handlers run before type-specific ones.
+   * Handlers are snapshotted before dispatch, so subscriptions can change while
+   * an event is being emitted. If a handler throws, Wirestate reports it through
+   * the container error handler and continues with the next subscriber.
    *
    * @template P - Type of the event payload.
    * @template T - Type of the event.
@@ -116,7 +116,7 @@ export class EventBus {
   }
 
   /**
-   * Subscribes to every event.
+   * Subscribes to every event on this bus.
    *
    * @param handler - Event handler invoked for every emitted event.
    * @returns Function that removes this subscription.
@@ -134,9 +134,9 @@ export class EventBus {
    * Subscribes to one or more event types.
    *
    * @remarks
-   * Pass `null` to subscribe to every event. Each call is independent: subscribing
-   * the same function twice delivers the event twice, and each returned
-   * unsubscriber removes only its own subscription.
+   * Pass `null` to subscribe to every event. Each call is independent:
+   * subscribing the same function twice delivers the event twice, and each
+   * returned unsubscriber removes only its own subscription.
    *
    * @param types - Event type, list of event types, or `null` for every event.
    * @param handler - Event handler invoked for matching events.
