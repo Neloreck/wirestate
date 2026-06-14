@@ -52,9 +52,9 @@ whether the handler is sync or async.
 ## Register Directly
 
 ```ts
-import { Container, QueryBus } from "@wirestate/core";
+import { Container, QueriesPlugin, QueryBus } from "@wirestate/core";
 
-const container = new Container({ bindings: [QueryBus] });
+const container = new Container({ plugins: [new QueriesPlugin()] });
 const bus = container.get(QueryBus);
 
 const unregister = bus.register("CURRENT_USER", () => ({ id: "u1" }));
@@ -95,8 +95,8 @@ Use this pattern when the query handler depends on runtime state or cannot be ex
 
 ## API Reference
 
-[`QueryBus`](/api/wirestate-core/classes/QueryBus), [`OnQuery`](/api/wirestate-core/functions/OnQuery),
-[`QueryHandler`](/api/wirestate-core/type-aliases/QueryHandler),
+[`QueryBus`](/api/wirestate-core/classes/QueryBus), [`QueriesPlugin`](/api/wirestate-core/classes/QueriesPlugin),
+[`OnQuery`](/api/wirestate-core/functions/OnQuery), [`QueryHandler`](/api/wirestate-core/type-aliases/QueryHandler),
 [`QueryUnregister`](/api/wirestate-core/type-aliases/QueryUnregister),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision).

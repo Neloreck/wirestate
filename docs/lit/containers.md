@@ -32,11 +32,12 @@ Use `@OnProvision` for resource work tied to the connected provider lifetime. Us
 
 ## Messaging
 
-Messaging is opt-in and composable. A container only has the buses it binds, so add `EventBus`, `CommandBus`, or
-`QueryBus` to `config.bindings` when the element subtree needs them. There is no default trio.
+Messaging is opt-in and composable. A container only has the buses contributed by the messaging plugins it registers, so
+add `EventsPlugin`, `CommandsPlugin`, or `QueriesPlugin` to `config.plugins` when the element subtree needs them. Each
+plugin's `install()` binds its bus. There is no default trio.
 
 ```ts
-import { Container, EventBus } from "@wirestate/core";
+import { Container, EventsPlugin } from "@wirestate/core";
 import { ContainerProvider, provideContainer } from "@wirestate/lit";
 import { LitElement } from "lit";
 import { CheckoutService, RootService } from "./services";
@@ -45,14 +46,15 @@ const rootContainer: Container = new Container({ bindings: [RootService] });
 
 class CheckoutRoot extends LitElement {
   @provideContainer({
-    config: { parent: rootContainer, bindings: [CheckoutService, EventBus] },
+    config: { parent: rootContainer, bindings: [CheckoutService], plugins: [new EventsPlugin()] },
   })
   private checkoutProvider!: ContainerProvider;
 }
 ```
 
-To share a parent's bus instead of binding a local one, set `config.parent` and leave the bus out of this container's
-`bindings`. Senders and handlers resolve buses up the parent chain, so a nested provider reuses an ancestor's bus.
+To share a parent's bus instead of contributing a local one, set `config.parent` and do not register the plugin on this
+container. Senders and handlers resolve buses up the parent chain, so a nested provider reuses an ancestor's bus.
+Registering a local plugin instead gives the subtree its own bus.
 
 ## Controller Root Provider
 

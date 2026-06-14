@@ -48,9 +48,9 @@ Useful forms:
 Use direct subscriptions when the handler is dynamic or created at runtime.
 
 ```ts
-import { Container, EventBus } from "@wirestate/core";
+import { Container, EventBus, EventsPlugin } from "@wirestate/core";
 
-const container = new Container({ bindings: [EventBus] });
+const container = new Container({ plugins: [new EventsPlugin()] });
 const bus = container.get(EventBus);
 
 const unsubscribe = bus.subscribe((event) => {
@@ -108,8 +108,8 @@ If an event handler throws, Wirestate logs the error and continues with the next
 
 ## API Reference
 
-[`EventBus`](/api/wirestate-core/classes/EventBus), [`OnEvent`](/api/wirestate-core/functions/OnEvent),
-[`WireEvent`](/api/wirestate-core/interfaces/WireEvent),
+[`EventBus`](/api/wirestate-core/classes/EventBus), [`EventsPlugin`](/api/wirestate-core/classes/EventsPlugin),
+[`OnEvent`](/api/wirestate-core/functions/OnEvent), [`WireEvent`](/api/wirestate-core/interfaces/WireEvent),
 [`EventUnsubscribe`](/api/wirestate-core/type-aliases/EventUnsubscribe),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision).

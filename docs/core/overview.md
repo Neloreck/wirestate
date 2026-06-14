@@ -54,8 +54,8 @@ counter.increment();
 - Root and child containers.
 - [Lifecycle hooks](/core/lifecycle) for service activation, service deactivation, provider provision, and provider
   deprovision.
-- Composable, opt-in messaging buses: a container binds only the buses it uses, and a service injects the specific bus
-  it needs.
+- Composable, opt-in messaging buses: a container registers only the plugins for the buses it uses, and a service
+  injects the specific bus it needs.
 - Events for broadcast notifications.
 - Commands for one-handler write operations.
 - Queries for one-handler read operations.
@@ -67,4 +67,6 @@ counter.increment();
 
 [`Container`](/api/wirestate-core/classes/Container), [`WireStatus`](/api/wirestate-core/classes/WireStatus),
 [`EventBus`](/api/wirestate-core/classes/EventBus), [`CommandBus`](/api/wirestate-core/classes/CommandBus),
-[`QueryBus`](/api/wirestate-core/classes/QueryBus).
+[`QueryBus`](/api/wirestate-core/classes/QueryBus), [`EventsPlugin`](/api/wirestate-core/classes/EventsPlugin),
+[`CommandsPlugin`](/api/wirestate-core/classes/CommandsPlugin),
+[`QueriesPlugin`](/api/wirestate-core/classes/QueriesPlugin).

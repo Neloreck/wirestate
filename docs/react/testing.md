@@ -30,12 +30,12 @@ Command, query, and event hooks register against the active container. Render th
 the behavior through user events or the container bus.
 
 ```tsx
-import { CommandBus, Container } from "@wirestate/core";
+import { CommandBus, CommandsPlugin, Container } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
 import { render } from "@testing-library/react";
 
 test("opens search from command", async () => {
-  const container = new Container({ bindings: [CommandBus] });
+  const container = new Container({ plugins: [new CommandsPlugin()] });
 
   const { findByText } = render(
     <ContainerProvider container={container}>
@@ -52,12 +52,12 @@ test("opens search from command", async () => {
 For async command handlers, use the async bus method so the test waits for the handler.
 
 ```tsx
-import { CommandBus, Container } from "@wirestate/core";
+import { CommandBus, CommandsPlugin, Container } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
 import { render, screen } from "@testing-library/react";
 
 test("saves draft from command", async () => {
-  const container = new Container({ bindings: [CommandBus] });
+  const container = new Container({ plugins: [new CommandsPlugin()] });
 
   render(
     <ContainerProvider container={container}>

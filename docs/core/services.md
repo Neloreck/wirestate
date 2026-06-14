@@ -64,9 +64,9 @@ export class OrderService {
 
 ## Messaging
 
-Messaging is composable and opt-in. A service injects the specific bus it needs, and the container binds that bus.
-Inject [`EventBus`](/api/wirestate-core/classes/EventBus) to emit and subscribe to events,
-[`CommandBus`](/api/wirestate-core/classes/CommandBus) to execute commands, and
+Messaging is composable and opt-in. A service injects the specific bus it needs, and the container registers the
+plugin that contributes that bus. Inject [`EventBus`](/api/wirestate-core/classes/EventBus) to emit and subscribe to
+events, [`CommandBus`](/api/wirestate-core/classes/CommandBus) to execute commands, and
 [`QueryBus`](/api/wirestate-core/classes/QueryBus) to run queries.
 
 ```ts
@@ -82,18 +82,23 @@ export class CartService {
 }
 ```
 
-Bind each bus explicitly alongside the services that use it. There is no default trio.
+Register the matching plugin for each bus a container uses. The plugin's `install()` contributes the bus binding, so
+the services resolve it normally. There is no default trio.
 
 ```ts
-import { Container, EventBus } from "@wirestate/core";
+import { Container, EventsPlugin } from "@wirestate/core";
 
 const container: Container = new Container({
-  bindings: [CartService, EventBus],
+  bindings: [CartService],
+  plugins: [new EventsPlugin()],
 });
 ```
 
-A child container that wants the parent's bus simply does not bind its own. Buses resolve up the parent chain, so a
-child service can reach an ancestor's bus.
+A child container that wants the parent's bus simply does not register its own plugin. Buses resolve up the parent
+chain, so a child service can reach an ancestor's bus.
+
+A service that declares an `@OnEvent`, `@OnCommand`, or `@OnQuery` handler throws at provision unless the matching
+plugin is registered, so a missing bus fails fast instead of silently dropping handlers.
 
 To handle messages, declare primary handlers with [`@OnEvent`](/api/wirestate-core/functions/OnEvent),
 [`@OnCommand`](/api/wirestate-core/functions/OnCommand), and [`@OnQuery`](/api/wirestate-core/functions/OnQuery) on
@@ -241,5 +246,7 @@ create a new one for future work.
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision),
 [`EventBus`](/api/wirestate-core/classes/EventBus), [`CommandBus`](/api/wirestate-core/classes/CommandBus),
-[`QueryBus`](/api/wirestate-core/classes/QueryBus),
+[`QueryBus`](/api/wirestate-core/classes/QueryBus), [`EventsPlugin`](/api/wirestate-core/classes/EventsPlugin),
+[`CommandsPlugin`](/api/wirestate-core/classes/CommandsPlugin),
+[`QueriesPlugin`](/api/wirestate-core/classes/QueriesPlugin),
 [`BindingDescriptor`](/api/wirestate-core/type-aliases/BindingDescriptor).

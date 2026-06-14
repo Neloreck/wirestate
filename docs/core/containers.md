@@ -1,10 +1,11 @@
 # Core Containers
 
-A [container](/api/wirestate-core/classes/Container) owns service instances and the message buses it binds.
+A [container](/api/wirestate-core/classes/Container) owns service instances and the message buses its plugins
+contribute.
 
-Messaging is opt-in: bind only the buses a container uses, as ordinary `bindings`. Services in the same container share
-the buses bound there. A child container that binds no buses resolves `EventBus`, `CommandBus`, and `QueryBus` from its
-parent chain.
+Messaging is opt-in: register only the plugins for the buses a container uses, as ordinary `plugins`. Each plugin's
+`install()` binds its bus, so services in the same container share the buses contributed there. A child container that
+registers no messaging plugins resolves `EventBus`, `CommandBus`, and `QueryBus` from its parent chain.
 
 ## Root Container
 
@@ -65,16 +66,16 @@ const child: Container = new Container({
 });
 ```
 
-Child containers inherit parent bindings. A child that binds its own buses keeps messaging local; a child that binds none
-shares the parent's buses (see [Inherited Messaging](#inherited-messaging)).
+Child containers inherit parent bindings. A child that registers its own messaging plugins keeps messaging local; a
+child that registers none shares the parent's buses (see [Inherited Messaging](#inherited-messaging)).
 
 Use child containers for modal state, checkout flows, tenant scope, tests, or any branch that needs its own services or
 local messaging.
 
 ## Inherited Messaging
 
-A child shares the parent's message buses simply by not binding its own. Omit the bus tokens from the child's `bindings`
-and they resolve from the parent.
+A child shares the parent's message buses simply by not registering its own plugins. Omit the messaging plugins from the
+child's `plugins` and the buses resolve from the parent.
 
 ```ts
 const child = new Container({
@@ -83,9 +84,9 @@ const child = new Container({
 });
 ```
 
-Because the child binds no buses, `EventBus`, `CommandBus`, and `QueryBus` resolve from the parent, and sending walks up
-the parent chain. Use this when the child should share event, command, and query handlers with the parent. To give the
-child its own messaging instead, bind the buses on the child.
+Because the child registers no messaging plugins, `EventBus`, `CommandBus`, and `QueryBus` resolve from the parent, and
+sending walks up the parent chain. Use this when the child should share event, command, and query handlers with the
+parent. To give the child its own messaging instead, register the plugins on the child.
 
 ## Direct Container Work
 

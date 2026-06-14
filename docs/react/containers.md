@@ -34,17 +34,18 @@ shallow comparison. Keep config objects and arrays stable with `useMemo` when th
 
 ## Messaging
 
-Messaging is opt-in and composable. A container only has the buses it binds, so add `EventBus`, `CommandBus`, or
-`QueryBus` to `config.bindings` when the subtree needs them. There is no default trio.
+Messaging is opt-in and composable. A container only has the buses contributed by its registered plugins, so add
+`EventsPlugin`, `CommandsPlugin`, or `QueriesPlugin` to `config.plugins` when the subtree needs them. Each plugin's
+`install` binds its bus. There is no default trio.
 
 ```tsx
-import { ContainerConfig, EventBus } from "@wirestate/core";
+import { ContainerConfig, EventsPlugin } from "@wirestate/core";
 import { ContainerProvider } from "@wirestate/react";
 import { useMemo } from "react";
 import { CheckoutService } from "./services";
 
 function CheckoutFlow() {
-  const config: ContainerConfig = useMemo(() => ({ bindings: [CheckoutService, EventBus] }), []);
+  const config: ContainerConfig = useMemo(() => ({ bindings: [CheckoutService], plugins: [new EventsPlugin()] }), []);
 
   return (
     <ContainerProvider config={config}>
@@ -54,10 +55,13 @@ function CheckoutFlow() {
 }
 ```
 
-To share a parent's bus instead of binding a local one, set `config.parent` and leave the bus out of this container's
-`bindings`. Senders, consumer hooks, and service-level `@OnEvent`, `@OnCommand`, and `@OnQuery` handlers all resolve
-buses up the parent chain, so a nested provider reuses an ancestor's bus and a child service can handle an ancestor's
-bus. Those handlers subscribe when the container is provisioned and unsubscribe when it is deprovisioned.
+To share a parent's bus instead of giving the subtree a local one, set `config.parent` and do not register the matching
+plugin on this container; the child then inherits the bus up the parent chain. Registering a local plugin instead gives
+the subtree its own bus. Senders, consumer hooks, and service-level `@OnEvent`, `@OnCommand`, and `@OnQuery` handlers all
+resolve buses up the parent chain, so a nested provider reuses an ancestor's bus and a child service can handle an
+ancestor's bus. Those handlers subscribe when the container is provisioned and unsubscribe when it is deprovisioned. A
+service that declares an `@On*` handler fails fast at provision unless the matching plugin is registered somewhere in the
+chain.
 
 ## External Root Container
 

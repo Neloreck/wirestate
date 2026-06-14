@@ -41,8 +41,8 @@ class CartLogger extends LitElement {
 
 ## Emit from an Element
 
-Inject `EventBus` when an element needs to emit. Bind `EventBus` in the provider's `config.bindings` so the active
-container exposes it.
+Inject `EventBus` when an element needs to emit. Register `EventsPlugin` in the provider's `config.plugins`
+(`plugins: [new EventsPlugin()]`) so the active container exposes the bus.
 
 ```ts
 import { EventBus } from "@wirestate/core";

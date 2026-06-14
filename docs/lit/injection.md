@@ -74,7 +74,8 @@ class DebugPanel extends LitElement {
 ```
 
 To emit events, execute commands, or run queries from an element, inject the bus you need with `useInjection` (or the
-`injection` decorator) and bind that bus in the provider's `config.bindings`.
+`injection` decorator) and register that bus's plugin in the provider's `config.plugins` (`new EventsPlugin()`,
+`new CommandsPlugin()`, or `new QueriesPlugin()`).
 
 ```ts
 import { EventBus } from "@wirestate/core";

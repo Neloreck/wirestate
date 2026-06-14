@@ -47,12 +47,13 @@ must provision the container first. Tear down with `container.deprovision()` (or
 deprovisions first).
 
 ```ts
-import { Container, EventBus } from "@wirestate/core";
+import { Container, EventBus, EventsPlugin } from "@wirestate/core";
 import { CounterService, LoggerService } from "./services";
 
 test("counter emits event on increment", () => {
   const container = new Container({
-    bindings: [EventBus, LoggerService, CounterService],
+    bindings: [LoggerService, CounterService],
+    plugins: [new EventsPlugin()],
   });
 
   // Subscribes the auto-wired @OnEvent handlers before the event is emitted.
@@ -123,4 +124,5 @@ test("cart uses mocked api client", async () => {
 
 ## API Reference
 
-[`Container`](/api/wirestate-core/classes/Container).
+[`Container`](/api/wirestate-core/classes/Container), [`EventBus`](/api/wirestate-core/classes/EventBus),
+[`EventsPlugin`](/api/wirestate-core/classes/EventsPlugin).

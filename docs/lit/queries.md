@@ -34,7 +34,8 @@ class CheckoutAnswer extends LitElement {
 
 ## Execute from an Element
 
-Inject `QueryBus` and bind it in the provider's `config.bindings`.
+Inject `QueryBus` and register `QueriesPlugin` in the provider's `config.plugins`
+(`plugins: [new QueriesPlugin()]`).
 
 ```ts
 import { QueryBus } from "@wirestate/core";

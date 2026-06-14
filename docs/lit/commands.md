@@ -63,7 +63,8 @@ export class DraftCommands extends LitElement {
 
 ## Execute from an Element
 
-Inject `CommandBus` and bind it in the provider's `config.bindings`. Use `execute` for synchronous handlers.
+Inject `CommandBus` and register `CommandsPlugin` in the provider's `config.plugins`
+(`plugins: [new CommandsPlugin()]`). Use `execute` for synchronous handlers.
 
 ```ts
 import { CommandBus } from "@wirestate/core";

@@ -85,9 +85,9 @@ const uploaded: UploadReceipt | null = await this.commands.executeOptionalAsync(
 ## Register Directly
 
 ```ts
-import { CommandBus, Container } from "@wirestate/core";
+import { CommandBus, CommandsPlugin, Container } from "@wirestate/core";
 
-const container = new Container({ bindings: [CommandBus] });
+const container = new Container({ plugins: [new CommandsPlugin()] });
 const bus = container.get(CommandBus);
 
 const unregister = bus.register("SAVE_CART", async (cart: Cart) => {
@@ -143,7 +143,9 @@ Use this pattern when the command handler depends on runtime state or cannot be 
 
 ## API Reference
 
-[`CommandBus`](/api/wirestate-core/classes/CommandBus), [`OnCommand`](/api/wirestate-core/functions/OnCommand),
+[`CommandBus`](/api/wirestate-core/classes/CommandBus),
+[`CommandsPlugin`](/api/wirestate-core/classes/CommandsPlugin),
+[`OnCommand`](/api/wirestate-core/functions/OnCommand),
 [`CommandUnregister`](/api/wirestate-core/type-aliases/CommandUnregister),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision).

@@ -53,6 +53,7 @@ export default defineConfig({
           { text: "Events", link: "/core/events" },
           { text: "Commands", link: "/core/commands" },
           { text: "Queries", link: "/core/queries" },
+          { text: "Plugins", link: "/core/plugins" },
           { text: "Testing", link: "/core/testing" },
         ],
       },
