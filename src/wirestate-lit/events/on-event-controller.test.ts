@@ -20,6 +20,14 @@ describe("OnEventController", () => {
     fixture.cleanup();
   });
 
+  it("tolerates hostDisconnected when nothing was ever subscribed", () => {
+    const element: TestConsumerElement = new TestConsumerElement();
+    const controller = new OnEventController(element, ["NOOP_EVENT"], () => undefined);
+
+    // Disconnect before any container resolution: cleanup runs with no active subscription.
+    expect(() => controller.hostDisconnected()).not.toThrow();
+  });
+
   it("should subscribe when host connects / unsubscribe on disconnect", () => {
     const { provider, container } = fixture;
 

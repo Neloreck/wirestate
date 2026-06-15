@@ -20,6 +20,14 @@ describe("OnQueryController", () => {
     fixture.cleanup();
   });
 
+  it("tolerates hostDisconnected when nothing was ever registered", () => {
+    const element: TestConsumerElement = new TestConsumerElement();
+    const controller = new OnQueryController(element, "NOOP_QUERY", () => undefined);
+
+    // Disconnect before any container resolution: cleanup runs with no active registration.
+    expect(() => controller.hostDisconnected()).not.toThrow();
+  });
+
   it("should register handler when host connects", () => {
     const { provider, container } = fixture;
 

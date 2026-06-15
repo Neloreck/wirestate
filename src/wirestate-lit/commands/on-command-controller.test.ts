@@ -20,6 +20,14 @@ describe("OnCommandController", () => {
     fixture.cleanup();
   });
 
+  it("tolerates hostDisconnected when nothing was ever registered", () => {
+    const element: TestConsumerElement = new TestConsumerElement();
+    const controller = new OnCommandController(element, "NOOP_COMMAND", () => undefined);
+
+    // Disconnect before any container resolution: cleanup runs with no active registration.
+    expect(() => controller.hostDisconnected()).not.toThrow();
+  });
+
   it("should register handler when host connects / unregister on disconnect", () => {
     const { provider, container } = fixture;
 
