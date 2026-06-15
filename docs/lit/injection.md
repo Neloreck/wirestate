@@ -42,6 +42,20 @@ class DiagnosticsPanel extends LitElement {
 }
 ```
 
+Provide a `fallback` for the unbound case — either a raw value or a `(container) => value` factory.
+
+```ts
+class DiagnosticsPanel extends LitElement {
+  // Raw value: returned as-is when the token is not bound.
+  @optionalInjection(UserName, "guest")
+  private name: string = "guest";
+
+  // Factory: lazy, receives the container, runs only when the token is missing.
+  @optionalInjection(FileLogger, (container) => container.get(ConsoleLogger))
+  private logger: Logger | undefined = undefined;
+}
+```
+
 ## Controller Helpers
 
 `useInjection` returns a mutable holder. Read `holder.value` in element methods and templates.

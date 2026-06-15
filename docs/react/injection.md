@@ -33,9 +33,13 @@ function Diagnostics() {
 }
 ```
 
-You can provide a fallback resolver.
+Provide a `fallback` for the unbound case — either a raw value or a `(container) => value` factory.
 
 ```tsx
+// Raw value: returned as-is when the token is not bound.
+const name = useOptionalInjection(UserName, "guest");
+
+// Factory: lazy, receives the container, runs only when the token is missing.
 const logger = useOptionalInjection(FileLogger, (container) => container.get(ConsoleLogger));
 ```
 
