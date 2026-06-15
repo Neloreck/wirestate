@@ -16,6 +16,7 @@ import {
   installDevtoolsHook,
 } from "./devtools-hook";
 import { normalizeBinding, normalizeInstance, normalizePlugin } from "./devtools-normalize";
+import { tapContainerBuses } from "./devtools-tap";
 
 /**
  * Read-only observer plugin that exposes a container subtree to an inspector
@@ -35,8 +36,9 @@ import { normalizeBinding, normalizeInstance, normalizePlugin } from "./devtools
  * and a container the app has dropped falls out of the next snapshot. Still
  * development-time only — the global hook and observation overhead are dev concerns.
  *
- * The plugin observes lifecycle only (activation and provision); message-flow
- * observation is a later increment.
+ * It observes both lifecycle (activation and provision) and messaging traffic —
+ * events via a catch-all subscription, commands and queries by wrapping their
+ * dispatch methods — and streams both as normalized deltas to the hook.
  *
  * @group DevTools
  *
@@ -66,6 +68,7 @@ export class DevToolsPlugin implements WirestatePlugin {
 
   public onContainerProvision(container: Container): void {
     this.report(container, "containerProvision");
+    this.tapMessages(container);
   }
 
   public onContainerDeprovision(container: Container): void {
@@ -105,11 +108,30 @@ export class DevToolsPlugin implements WirestatePlugin {
     this.track(containerId, container);
 
     this.hook.emit({
+      kind: "lifecycle",
       rootId: this.rootId,
       containerId,
       phase,
       instance: instance && normalizeInstance(instance),
     });
+  }
+
+  /**
+   * Taps the container's messaging buses so dispatches flow to the hook (idempotent).
+   *
+   * @param container - Container being provisioned.
+   */
+  private tapMessages(container: Container): void {
+    if (!this.hook) {
+      return;
+    }
+
+    const hook: DevtoolsHook = this.hook;
+    const containerId: DevtoolsContainerId = hook.idForContainer(container);
+
+    tapContainerBuses(container, (message) =>
+      hook.emit({ kind: "message", rootId: this.rootId, containerId, message })
+    );
   }
 
   /**

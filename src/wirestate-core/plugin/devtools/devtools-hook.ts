@@ -199,7 +199,7 @@ export interface DevtoolsRootSnapshot {
 }
 
 /**
- * Lifecycle phase a {@link DevtoolsEvent} reports.
+ * Lifecycle phase a {@link DevtoolsLifecycleEvent} reports.
  *
  * @group DevTools
  */
@@ -212,11 +212,16 @@ export type DevtoolsLifecyclePhase =
   | "deprovision";
 
 /**
- * One lifecycle delta emitted to listening backends.
+ * A container/instance lifecycle delta.
  *
  * @group DevTools
  */
-export interface DevtoolsEvent {
+export interface DevtoolsLifecycleEvent {
+  /**
+   * Discriminant.
+   */
+  readonly kind: "lifecycle";
+
   /**
    * Root the event originated from.
    */
@@ -237,6 +242,87 @@ export interface DevtoolsEvent {
    */
   readonly instance: Optional<DevtoolsInstance>;
 }
+
+/**
+ * Messaging channel a {@link DevtoolsMessage} flowed through.
+ *
+ * @group DevTools
+ */
+export type DevtoolsMessageChannel = "event" | "command" | "query";
+
+/**
+ * One observed message: an event emitted, or a command/query dispatched.
+ *
+ * @remarks
+ * `payload` and `source` are the **raw** in-page values — the in-page backend
+ * serializes them when bridging to the panel.
+ *
+ * @group DevTools
+ */
+export interface DevtoolsMessage {
+  /**
+   * Which bus the message flowed through.
+   */
+  readonly channel: DevtoolsMessageChannel;
+
+  /**
+   * Stringified message type (event type, command type, or query type).
+   */
+  readonly type: string;
+
+  /**
+   * Raw message payload.
+   */
+  readonly payload: unknown;
+
+  /**
+   * Raw event source (events only); `undefined` for commands and queries.
+   */
+  readonly source: Optional<unknown>;
+
+  /**
+   * Epoch milliseconds when the message was observed.
+   */
+  readonly timestamp: number;
+}
+
+/**
+ * One observed message delta, attributed to the bus-owning container.
+ *
+ * @remarks
+ * Attribution is **bus-scoped**: a message on an inherited bus is attributed to the
+ * container that first tapped that bus (typically the root), not the emitting service.
+ *
+ * @group DevTools
+ */
+export interface DevtoolsMessageEvent {
+  /**
+   * Discriminant.
+   */
+  readonly kind: "message";
+
+  /**
+   * Root the message originated from.
+   */
+  readonly rootId: DevtoolsRootId;
+
+  /**
+   * Container the tapped bus is attributed to.
+   */
+  readonly containerId: DevtoolsContainerId;
+
+  /**
+   * The observed message.
+   */
+  readonly message: DevtoolsMessage;
+}
+
+/**
+ * One delta emitted to listening backends: a lifecycle change or an observed message.
+ *
+ * @group DevTools
+ */
+export type DevtoolsEvent = DevtoolsLifecycleEvent | DevtoolsMessageEvent;
 
 /**
  * What a plugin hands the hook to register a root: a way to snapshot the root's

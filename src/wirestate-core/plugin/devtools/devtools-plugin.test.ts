@@ -1,4 +1,12 @@
-import { Container, EventsPlugin, Injectable, OnProvision } from "../../index";
+import { Container } from "../../container/container";
+import { Injectable } from "../../metadata/metadata-injectable";
+import { OnProvision } from "../../provision/on-provision";
+import { CommandBus } from "../commands/command-bus";
+import { CommandsPlugin } from "../commands/commands-plugin";
+import { EventBus } from "../events/event-bus";
+import { EventsPlugin } from "../events/events-plugin";
+import { QueriesPlugin } from "../queries/queries-plugin";
+import { QueryBus } from "../queries/query-bus";
 
 import { DEVTOOLS_HOOK_KEY, type DevtoolsHook, getDevtoolsHook } from "./devtools-hook";
 import { DevToolsPlugin } from "./devtools-plugin";
@@ -62,7 +70,11 @@ describe("DevToolsPlugin", () => {
     const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
     const phases: Array<string> = [];
 
-    hook.subscribe((event) => phases.push(event.instance ? `${event.phase}:${event.instance.className}` : event.phase));
+    hook.subscribe((event) => {
+      if (event.kind === "lifecycle") {
+        phases.push(event.instance ? `${event.phase}:${event.instance.className}` : event.phase);
+      }
+    });
 
     container.get(Svc);
     container.provision();
@@ -149,5 +161,63 @@ describe("DevToolsPlugin", () => {
     expect(plugins.find((plugin) => plugin.name === "EventsPlugin")?.handles.length).toBeGreaterThan(0);
     expect(plugins.find((plugin) => plugin.name === "DevToolsPlugin")?.handles).toEqual([]);
     expect(container).toBeInstanceOf(Container);
+  });
+
+  it("streams messaging traffic across events, commands, and queries", () => {
+    const container: Container = new Container({
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin(), new DevToolsPlugin()],
+    });
+
+    // Provision taps the buses; subscribe afterwards, before any dispatch.
+    container.provision();
+
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+    const messages: Array<{ channel: string; type: string; payload: unknown }> = [];
+
+    hook.subscribe((event) => {
+      if (event.kind === "message") {
+        messages.push({ channel: event.message.channel, type: event.message.type, payload: event.message.payload });
+      }
+    });
+
+    container.get(CommandBus).register("SAVE", () => "saved");
+    container.get(QueryBus).register("FIND", () => 42);
+    container.get(EventBus).emit("PING", { n: 1 });
+    container.get(CommandBus).execute("SAVE", { id: 7 });
+    container.get(QueryBus).query("FIND");
+
+    expect(messages.map((message) => `${message.channel}:${message.type}`)).toEqual(
+      expect.arrayContaining(["event:PING", "command:SAVE", "query:FIND"])
+    );
+    expect(messages.find((message) => message.type === "PING")?.payload).toEqual({ n: 1 });
+
+    container.deprovision();
+  });
+
+  it("observes messaging regardless of plugin registration order", () => {
+    // DevToolsPlugin is registered BEFORE the messaging plugins. The tap happens at
+    // provision (not install), by which point every bus is bound — so order is irrelevant.
+    const container: Container = new Container({
+      plugins: [new DevToolsPlugin(), new EventsPlugin(), new CommandsPlugin()],
+    });
+
+    container.provision();
+
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+    const seen: Array<string> = [];
+
+    hook.subscribe((event) => {
+      if (event.kind === "message") {
+        seen.push(`${event.message.channel}:${event.message.type}`);
+      }
+    });
+
+    container.get(CommandBus).register("DO", () => undefined);
+    container.get(EventBus).emit("TICK");
+    container.get(CommandBus).execute("DO");
+
+    expect(seen).toEqual(expect.arrayContaining(["event:TICK", "command:DO"]));
+
+    container.deprovision();
   });
 });
