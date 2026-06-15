@@ -3,8 +3,11 @@ import { Injectable } from "../../metadata/metadata-injectable";
 import { OnProvision } from "../../provision/on-provision";
 import { CommandBus } from "../commands/command-bus";
 import { CommandsPlugin } from "../commands/commands-plugin";
+import { OnCommand } from "../commands/on-command";
 import { EventBus } from "../events/event-bus";
 import { EventsPlugin } from "../events/events-plugin";
+import { OnEvent } from "../events/on-event";
+import { OnQuery } from "../queries/on-query";
 import { QueriesPlugin } from "../queries/queries-plugin";
 import { QueryBus } from "../queries/query-bus";
 
@@ -217,6 +220,41 @@ describe("DevToolsPlugin", () => {
     container.get(CommandBus).execute("DO");
 
     expect(seen).toEqual(expect.arrayContaining(["event:TICK", "command:DO"]));
+
+    container.deprovision();
+  });
+
+  it("snapshots declared message handlers on an instance", () => {
+    @Injectable()
+    class Feature {
+      @OnCommand("SAVE")
+      public save(): void {}
+
+      @OnQuery("FIND")
+      public find(): number {
+        return 1;
+      }
+
+      @OnEvent("PING")
+      public onPing(): void {}
+    }
+
+    const container: Container = new Container({
+      bindings: [Feature],
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin(), new DevToolsPlugin()],
+    });
+
+    // Provision force-activates the handler-bearing service and wires its handlers.
+    container.provision();
+
+    const snapshot = (getDevtoolsHook() as DevtoolsHook).getRoots()[0].snapshot();
+    const feature = snapshot.containers
+      .flatMap((entry) => entry.instances)
+      .find((instance) => instance.className === "Feature");
+
+    const handlers: Array<string> = (feature?.handlers ?? []).map((handler) => `${handler.channel}:${handler.type}`);
+
+    expect(handlers).toEqual(expect.arrayContaining(["command:SAVE", "query:FIND", "event:PING"]));
 
     container.deprovision();
   });

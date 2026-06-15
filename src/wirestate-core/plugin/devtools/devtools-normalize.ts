@@ -4,10 +4,14 @@ import { isInstanceDescriptor } from "../../binding/binding-guards";
 import { getBindingScope } from "../../binding/binding-lifecycle";
 import { InjectionToken, getBindingToken, tokenToString } from "../../binding/binding-tokens";
 import type { Optional } from "../../types/general";
+import { getCommandHandlerMetadata } from "../commands/on-command";
+import { getEventHandlerMetadata } from "../events/events-registry";
 import type { WirestatePlugin } from "../plugin";
+import { getQueryHandlerMetadata } from "../queries/on-query";
 
 import type {
   DevtoolsBinding,
+  DevtoolsHandler,
   DevtoolsInstance,
   DevtoolsInstanceStatus,
   DevtoolsPluginInfo,
@@ -81,7 +85,36 @@ export function normalizeInstance(instance: object): DevtoolsInstance {
     token: normalizeToken(instance.constructor as ServiceToken),
     className: instance.constructor.name,
     status: readStatus(instance),
+    handlers: normalizeHandlers(instance),
   };
+}
+
+/**
+ * Reads the message handlers/subscribers a service instance declares via decorators.
+ *
+ * @param instance - Service instance to inspect.
+ * @returns The declared handlers, one record per channel/type.
+ */
+function normalizeHandlers(instance: object): ReadonlyArray<DevtoolsHandler> {
+  const handlers: Array<DevtoolsHandler> = [];
+
+  for (const meta of getCommandHandlerMetadata(instance)) {
+    handlers.push({ channel: "command", type: String(meta.type), method: String(meta.methodName) });
+  }
+
+  for (const meta of getQueryHandlerMetadata(instance)) {
+    handlers.push({ channel: "query", type: String(meta.type), method: String(meta.methodName) });
+  }
+
+  for (const meta of getEventHandlerMetadata(instance)) {
+    const types: ReadonlyArray<string> = meta.types ? meta.types.map((type) => String(type)) : ["*"];
+
+    for (const type of types) {
+      handlers.push({ channel: "event", type, method: String(meta.methodName) });
+    }
+  }
+
+  return handlers;
 }
 
 /**

@@ -106,6 +106,33 @@ export interface DevtoolsInstanceStatus {
 }
 
 /**
+ * A message handler/subscriber a service declares via `@OnEvent` / `@OnCommand` /
+ * `@OnQuery`.
+ *
+ * @remarks
+ * Reflects **declared** (decorated) handlers only; handlers registered imperatively
+ * (`bus.register` / `bus.subscribe`) are not included.
+ *
+ * @group DevTools
+ */
+export interface DevtoolsHandler {
+  /**
+   * Channel the handler is on.
+   */
+  readonly channel: DevtoolsMessageChannel;
+
+  /**
+   * Stringified message type the handler covers; `"*"` for a catch-all event handler.
+   */
+  readonly type: string;
+
+  /**
+   * Handler method name on the service.
+   */
+  readonly method: string;
+}
+
+/**
  * Normalized description of one active service instance.
  *
  * @group DevTools
@@ -125,6 +152,11 @@ export interface DevtoolsInstance {
    * Lifecycle status, or `undefined` when the instance is not tracked.
    */
   readonly status: Optional<DevtoolsInstanceStatus>;
+
+  /**
+   * Message handlers/subscribers this instance declares (decorated handlers only).
+   */
+  readonly handlers: ReadonlyArray<DevtoolsHandler>;
 }
 
 /**

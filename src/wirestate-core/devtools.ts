@@ -23,6 +23,7 @@ export type {
   DevtoolsContainerId,
   DevtoolsContainerSnapshot,
   DevtoolsEvent,
+  DevtoolsHandler,
   DevtoolsHook,
   DevtoolsInstance,
   DevtoolsInstanceStatus,
