@@ -13,6 +13,7 @@
       "@/fixtures/*": ["./src/fixtures/*"],
       "@/macroses/*": ["./src/macroses/*"],
       "@wirestate/core": ["./src/wirestate-core"],
+      "@wirestate/core/devtools": ["./src/wirestate-core/devtools"],
       "@wirestate/lit": ["./src/wirestate-lit"],
       "@wirestate/lit-mobx": ["./src/wirestate-lit-mobx"],
       "@wirestate/lit-signals": ["./src/wirestate-lit-signals"],
