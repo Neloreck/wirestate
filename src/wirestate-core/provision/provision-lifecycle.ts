@@ -179,11 +179,7 @@ export function deprovisionContainerBinding(container: Container, token: Service
  * @param bindings - Bindings controlled by the provider.
  * @returns Instances that were resolved for provider lifecycle management.
  */
-export function provisionInstances(
-  container: Container,
-  state: ProvisionState,
-  bindings: Bindings
-): Array<object> {
+export function provisionInstances(container: Container, state: ProvisionState, bindings: Bindings): Array<object> {
   // Plugins observe the provision cycle boundary before any instance wiring.
   dispatchPluginContainerProvision(container);
 

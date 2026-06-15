@@ -131,9 +131,9 @@ describe("provision lifecycle errors", () => {
     const container: Container = new Container();
 
     // The participant resolves to a lifecycle class but its token is not owned by the container.
-    expect(() => provisionContainer(container, [{ token: token, type: "Instance", value: SymbolBoundProvider }])).toThrow(
-      "Cannot provision binding 'Symbol(symbol-provider)' that is not bound on this container."
-    );
+    expect(() =>
+      provisionContainer(container, [{ token: token, type: "Instance", value: SymbolBoundProvider }])
+    ).toThrow("Cannot provision binding 'Symbol(symbol-provider)' that is not bound on this container.");
   });
 
   it("isolates parent and child provision cycles when a child teardown hook throws", () => {
