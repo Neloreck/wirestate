@@ -296,4 +296,72 @@ describe("DevToolsPlugin", () => {
     expect(registrations).toContain("unregistered:command:MANUAL");
     expect(registrations).toContain("unregistered:command:SAVE");
   });
+
+  it("streams deactivation on unbindAll and drops the instance from the snapshot", () => {
+    @Injectable()
+    class Svc {
+      @OnProvision()
+      public onProvision(): void {}
+    }
+
+    const container: Container = new Container({ bindings: [Svc], plugins: [new DevToolsPlugin()] });
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+
+    container.get(Svc);
+    container.provision();
+
+    // The instance is present before teardown.
+    expect(
+      hook
+        .getRoots()[0]
+        .snapshot()
+        .containers[0].instances.map((instance) => instance.className)
+    ).toContain("Svc");
+
+    const phases: Array<string> = [];
+
+    hook.subscribe((event) => {
+      if (event.kind === "lifecycle" && event.instance) {
+        phases.push(`${event.phase}:${event.instance.className}`);
+      }
+    });
+
+    // unbindAll deprovisions then deactivates (ADR 0003 ordering).
+    container.unbindAll();
+
+    expect(phases).toContain("deprovision:Svc");
+    expect(phases).toContain("deactivate:Svc");
+
+    // Cleanup is reflected: the deactivated instance is gone from a fresh snapshot.
+    expect(
+      hook
+        .getRoots()[0]
+        .snapshot()
+        .containers[0].instances.map((instance) => instance.className)
+    ).not.toContain("Svc");
+  });
+
+  it("taps a bus exactly once across provision cycles (no double observation)", () => {
+    const container: Container = new Container({ plugins: [new EventsPlugin(), new DevToolsPlugin()] });
+
+    // Provision/deprovision/provision: the bus must be tapped once, not once per cycle.
+    container.provision();
+    container.deprovision();
+    container.provision();
+
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+    let pings: number = 0;
+
+    hook.subscribe((event) => {
+      if (event.kind === "message" && event.message.type === "PING") {
+        pings += 1;
+      }
+    });
+
+    container.get(EventBus).emit("PING");
+
+    expect(pings).toBe(1);
+
+    container.deprovision();
+  });
 });
