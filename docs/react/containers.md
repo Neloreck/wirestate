@@ -36,7 +36,7 @@ shallow comparison. Keep config objects and arrays stable with `useMemo` when th
 
 Messaging is opt-in and composable. A container only has the buses contributed by its registered plugins, so add
 `EventsPlugin`, `CommandsPlugin`, or `QueriesPlugin` to `config.plugins` when the subtree needs them. Each plugin's
-`install` binds its bus. There is no default trio.
+`install` binds its bus.
 
 ```tsx
 import { ContainerConfig, EventsPlugin } from "@wirestate/core";

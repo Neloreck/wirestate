@@ -98,14 +98,14 @@ import { Container, InjectionToken, Injectable, inject } from "@wirestate/core";
 
 const API_CONFIG = new InjectionToken<{ apiUrl: string; locale: string }>("API_CONFIG");
 
-const container = new Container({
-  bindings: [ApiClient, { token: API_CONFIG, value: { apiUrl, locale } }],
-});
-
 @Injectable()
 class ApiClient {
   public constructor(private readonly config = inject(API_CONFIG)) {}
 }
+
+const container = new Container({
+  bindings: [ApiClient, { token: API_CONFIG, value: { apiUrl: "https://api.example.com", locale: "en-US" } }],
+});
 ```
 
 `inject(API_CONFIG)` is typed, so reads need no cast. A child resolves a parent-bound token through the normal
@@ -119,15 +119,14 @@ indirection earns its place.
 ```ts
 const SEEDS = new InjectionToken<Map<Function, unknown>>("SEEDS");
 
-new Container({
-  bindings: [CounterService, { token: SEEDS, value: new Map([[CounterService, { count: 10 }]]) }],
-});
-
-
 @Injectable()
 class CounterService {
   private readonly data = inject(SEEDS).get(this.constructor) as { count: number };
 }
+
+new Container({
+  bindings: [CounterService, { token: SEEDS, value: new Map([[CounterService, { count: 10 }]]) }],
+});
 ```
 
 ## Direct Container Work

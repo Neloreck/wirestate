@@ -111,7 +111,7 @@ export class CartService {
 ```
 
 Register the matching plugin for each bus a container uses. The plugin's `install()` contributes the bus binding, so
-the services resolve it normally. There is no default trio.
+the services resolve it normally.
 
 ```ts
 import { Container, EventsPlugin } from "@wirestate/core";
@@ -126,7 +126,7 @@ A child container that wants the parent's bus simply does not register its own p
 chain, so a child service can reach an ancestor's bus.
 
 A service that declares an `@OnEvent`, `@OnCommand`, or `@OnQuery` handler throws at provision unless the matching
-plugin is registered, so a missing bus fails fast instead of silently dropping handlers.
+plugin is registered, so a missing bus fails fast on UI provision phase.
 
 To handle messages, declare primary handlers with [`@OnEvent`](/api/wirestate-core/functions/OnEvent),
 [`@OnCommand`](/api/wirestate-core/functions/OnCommand), and [`@OnQuery`](/api/wirestate-core/functions/OnQuery) on
@@ -188,30 +188,8 @@ export class PollingService {
 }
 ```
 
-Use `WireStatus.for(this)` when async work needs a lifecycle guard.
-
-```ts
-import { Injectable, OnProvision, ProvisionId, WireStatus } from "@wirestate/core";
-
-@Injectable()
-export class ProfileService {
-  @OnProvision()
-  public async onProvision(provisionId: ProvisionId): Promise<void> {
-    const profile = await fetch("/api/profile").then((response) => response.json());
-    const status = WireStatus.for(this);
-
-    if (status.isInactive || status.provisionId !== provisionId) {
-      return;
-    }
-
-    this.setProfile(profile);
-  }
-
-  private setProfile(profile: unknown): void {
-    // update service state
-  }
-}
-```
+When async work in a provider hook needs to know whether the instance is still active, guard it with
+`WireStatus.for(this)`. See [WireStatus](/core/lifecycle#wirestatus).
 
 ## Lazy Resolution
 
@@ -250,7 +228,7 @@ container.bind({ token: API_URL, value: "https://api.example.com" });
 container.bind({
   token: DATE_NOW,
   type: BindingType.Factory,
-  scope: BindingScope.Singleton,
+  scope: BindingScope.Transient,
   factory: () => new Date(),
 });
 ```

@@ -45,9 +45,6 @@ provider does this automatically, while plain-core usage and tests call `contain
 `@OnActivated` runs before provision and `@OnDeactivation` runs after deprovision, so neither can emit, execute, or
 query; put setup and teardown messaging in `@OnProvision` and `@OnDeprovision`.
 
-Wirestate tracks lifecycle state for each resolved service instance. Use `WireStatus.for(this)` inside a service when
-async work needs to know whether the instance is still active.
-
 ## Ownership
 
 Managed providers own the container they create from `config`. They provision it while mounted or connected,
@@ -56,6 +53,12 @@ deprovision it when that boundary ends, and then dispose it with `container.unbi
 External providers publish a container passed through `container`. They provision and deprovision it for their own
 boundary, but they never dispose it. The code that created the external container remains responsible for
 `container.unbind` or `container.unbindAll`.
+
+## WireStatus
+
+Wirestate tracks lifecycle state for each resolved service instance. Use `WireStatus.for(this)` inside a service when
+async work needs to know whether the instance is still active — typically to drop a late `await` result after the
+service has been deprovisioned or disposed.
 
 [`WireStatus`](/api/wirestate-core/classes/WireStatus) exposes lifecycle state for late async guards:
 
@@ -88,6 +91,11 @@ export class SearchService {
   }
 }
 ```
+
+Capture the `provisionId` passed to `@OnProvision` before awaiting, then after the await bail when `isInactive` is
+`true` (the service was disposed or deprovisioned) or when `provisionId` no longer matches — a newer provision cycle
+has superseded this one, for example a Strict Mode remount or a DOM move. This stops a stale response from overwriting
+current state.
 
 ## API Reference
 

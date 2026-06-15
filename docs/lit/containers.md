@@ -34,7 +34,7 @@ Use `@OnProvision` for resource work tied to the connected provider lifetime. Us
 
 Messaging is opt-in and composable. A container only has the buses contributed by the messaging plugins it registers, so
 add `EventsPlugin`, `CommandsPlugin`, or `QueriesPlugin` to `config.plugins` when the element subtree needs them. Each
-plugin's `install()` binds its bus. There is no default trio.
+plugin's `install()` binds its bus.
 
 ```ts
 import { Container, EventsPlugin } from "@wirestate/core";
