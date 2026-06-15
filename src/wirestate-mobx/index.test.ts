@@ -126,4 +126,16 @@ describe("Library exported API from wirestate/mobx", () => {
     assertListIntersection(Object.keys(libRoot), expectedLibExports);
     expect(Object.keys(libRoot)).toHaveLength(expectedLibExports.length);
   });
+
+  it("should expose decorator-alias factories returning the underlying MobX primitives", () => {
+    const mobx = require("mobx");
+
+    expect(libRoot.Action()).toBe(mobx.action);
+    expect(libRoot.BoundAction()).toBe(mobx.action.bound);
+    expect(libRoot.Computed()).toBe(mobx.computed);
+    expect(libRoot.Observable()).toBe(mobx.observable);
+    expect(libRoot.ShallowObservable()).toBe(mobx.observable.shallow);
+    expect(libRoot.RefObservable()).toBe(mobx.observable.ref);
+    expect(libRoot.DeepObservable()).toBe(mobx.observable.deep);
+  });
 });

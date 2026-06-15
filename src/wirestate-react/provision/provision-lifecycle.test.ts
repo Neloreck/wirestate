@@ -1,10 +1,6 @@
 import { Container } from "@wirestate/core";
 
-import {
-  ReactContainerProvisionLifecycle,
-  retainContainer,
-  scheduleContainerDestruction,
-} from "./provision-lifecycle";
+import { ReactContainerProvisionLifecycle, retainContainer, scheduleContainerDestruction } from "./provision-lifecycle";
 
 describe("react container provision lifecycle", () => {
   beforeEach(() => {
