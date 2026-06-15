@@ -87,6 +87,38 @@ export function Application() {
 External containers are provisioned while the provider is mounted, but they are not disposed. Disposal remains the
 caller's responsibility.
 
+## SSR and Hydration
+
+To hydrate a managed container with server-serialized state, fold that state into `bindings` as a value binding, exactly
+like any other [construction-time data](/core/containers#construction-time-data). The provider reads it while creating
+the container.
+
+```tsx
+import { ContainerConfig, InjectionToken } from "@wirestate/core";
+import { ContainerProvider } from "@wirestate/react";
+import { useMemo } from "react";
+import { AppState, StoreService } from "./services";
+
+const INITIAL_STATE = new InjectionToken<AppState>("INITIAL_STATE");
+
+export function Application() {
+  const config: ContainerConfig = useMemo(
+    () => ({ bindings: [StoreService, { token: INITIAL_STATE, value: window.__APP_STATE__ }] }),
+    []
+  );
+
+  return (
+    <ContainerProvider config={config}>
+      <App />
+    </ContainerProvider>
+  );
+}
+```
+
+`bindings` is shallow-compared, so an inline hydration object recreates the container on every render. Keep the config
+stable with `useMemo`, or hoist it to module scope — the same rule that applies to every managed container (see
+[Managed Root Container](#managed-root-container)).
+
 ## Direct Access
 
 Prefer `useInjection` for normal service use. Use `useContainer` when a component needs container-level operations.

@@ -88,6 +88,48 @@ Because the child registers no messaging plugins, `EventBus`, `CommandBus`, and 
 sending walks up the parent chain. Use this when the child should share event, command, and query handlers with the
 parent. To give the child its own messaging instead, register the plugins on the child.
 
+## Construction-time Data
+
+Pass configuration or server-hydrated state into a container as ordinary value bindings. Use an
+[`InjectionToken<T>`](/core/services#injection-tokens) so the value keeps its type at every read site.
+
+```ts
+import { Container, InjectionToken, Injectable, inject } from "@wirestate/core";
+
+const API_CONFIG = new InjectionToken<{ apiUrl: string; locale: string }>("API_CONFIG");
+
+const container = new Container({
+  bindings: [ApiClient, { token: API_CONFIG, value: { apiUrl, locale } }],
+});
+
+@Injectable()
+class ApiClient {
+  public constructor(private readonly config = inject(API_CONFIG)) {}
+}
+```
+
+`inject(API_CONFIG)` is typed, so reads need no cast. A child resolves a parent-bound token through the normal
+resolution chain, so bind the data once on the root and every descendant injects the same value. Data is just a binding:
+there is no separate construction step and no merge.
+
+To avoid declaring a token per value, bind one `Map` keyed by service class and read it with `this.constructor`. This
+trades type safety for fewer tokens — reads are `unknown` and need a cast — so prefer typed `InjectionToken`s unless the
+indirection earns its place.
+
+```ts
+const SEEDS = new InjectionToken<Map<Function, unknown>>("SEEDS");
+
+new Container({
+  bindings: [CounterService, { token: SEEDS, value: new Map([[CounterService, { count: 10 }]]) }],
+});
+
+
+@Injectable()
+class CounterService {
+  private readonly data = inject(SEEDS).get(this.constructor) as { count: number };
+}
+```
+
 ## Direct Container Work
 
 `Container` is the registration and disposal API. Binding a service class through `container.bind` makes it available

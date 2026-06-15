@@ -46,7 +46,7 @@ container.bind(UserService);
 ## Constructor Injection
 
 Use `inject(token)` in constructor parameter defaults or field initializers. A token can be a class, string, symbol,
-or `InjectionToken`. Pass `{ optional: true }` to resolve `undefined` instead of throwing when the token is not
+or [`InjectionToken`](#injection-tokens). Pass `{ optional: true }` to resolve `undefined` instead of throwing when the token is not
 bound. Because `inject()` is a plain function call, dependency declarations do not need parameter decorators or
 `emitDecoratorMetadata`.
 
@@ -61,6 +61,34 @@ export class OrderService {
   ) {}
 }
 ```
+
+## Injection Tokens
+
+Use an `InjectionToken<T>` for any dependency without a class constructor — constants, external objects, or
+interface-typed values — when you want the resolved value to keep its TypeScript type. A bare string or symbol token
+resolves as `unknown` and forces a cast; `InjectionToken<T>` resolves as `T`.
+
+```ts
+import { Container, InjectionToken, Injectable, inject } from "@wirestate/core";
+
+const API_URL = new InjectionToken<string>("API_URL");
+
+const container = new Container({
+  bindings: [{ token: API_URL, value: "https://api.example.com" }],
+});
+
+@Injectable()
+class ApiClient {
+  // Typed as string, no cast:
+  public constructor(private readonly url = inject(API_URL)) {}
+}
+```
+
+The constructor argument is a human-readable label used only in diagnostics; it does not identify the token. Each
+`InjectionToken` is identified by reference, so two tokens never collide even with the same description, and it is
+nominal at the type level — `InjectionToken<A>` is not assignable to `InjectionToken<B>`. Prefer a class token for
+services, an `InjectionToken<T>` for typed values, and a plain string or symbol only for interop or when a type is not
+needed.
 
 ## Messaging
 
@@ -208,13 +236,14 @@ export class NotificationService {
 ## Constants and Factories
 
 Use descriptors when a binding needs an explicit token or binding strategy. This includes constants, factories, and
-service classes registered behind a token that is different from the class itself.
+service classes registered behind a token that is different from the class itself. Reach for a typed
+[`InjectionToken`](#injection-tokens) so the resolved value keeps its type.
 
 ```ts
-import { BindingScope, BindingType, Container } from "@wirestate/core";
+import { BindingScope, BindingType, Container, InjectionToken } from "@wirestate/core";
 
-const API_URL = Symbol("API_URL");
-const DATE_NOW = Symbol("DATE_NOW");
+const API_URL = new InjectionToken<string>("API_URL");
+const DATE_NOW = new InjectionToken<Date>("DATE_NOW");
 const container = new Container();
 
 container.bind({ token: API_URL, value: "https://api.example.com" });
@@ -225,6 +254,9 @@ container.bind({
   factory: () => new Date(),
 });
 ```
+
+A plain string or symbol works as a token too, but resolves as `unknown`; use one only for interop or when you do not
+need the value typed.
 
 ## Remove Services
 
@@ -242,6 +274,7 @@ create a new one for future work.
 ## API Reference
 
 [`Injectable`](/api/wirestate-core/functions/Injectable), [`inject`](/api/wirestate-core/functions/inject),
+[`InjectionToken`](/api/wirestate-core/classes/InjectionToken),
 [`Container`](/api/wirestate-core/classes/Container), [`WireStatus`](/api/wirestate-core/classes/WireStatus),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision),
