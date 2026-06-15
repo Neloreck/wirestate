@@ -770,9 +770,10 @@ describe("ContainerProvider", () => {
       }
     }
 
+    const onError = jest.fn();
     const element: TestProviderElement = new TestProviderElement();
     const goodContainer: Container = new Container();
-    const failingContainer: Container = new Container({ bindings: [FailingService] });
+    const failingContainer: Container = new Container({ bindings: [FailingService], onError });
     const deprovisionSpy = jest.spyOn(failingContainer, "deprovision");
     const controller: ContainerProvider = new ContainerProvider(element, { container: goodContainer });
 
@@ -781,6 +782,7 @@ describe("ContainerProvider", () => {
     expect(() => controller.setValue(failingContainer)).toThrow("replacement provision boom");
     // The failed replacement is deprovisioned as the failure unwinds.
     expect(deprovisionSpy).toHaveBeenCalled();
+    expect(onError).toHaveBeenCalled();
 
     element.remove();
   });
@@ -794,12 +796,14 @@ describe("ContainerProvider", () => {
       }
     }
 
+    const onError = jest.fn();
     const element: TestProviderElement = new TestProviderElement();
     const controller: ContainerProvider = new ContainerProvider(element, { config: { bindings: [] } });
 
     document.body.appendChild(element);
 
-    expect(() => controller.setConfig({ bindings: [FailingService] })).toThrow("managed config boom");
+    expect(() => controller.setConfig({ bindings: [FailingService], onError })).toThrow("managed config boom");
+    expect(onError).toHaveBeenCalled();
 
     // The failed managed container was destroyed; restore a valid one so teardown stays safe.
     controller.setConfig({ bindings: [] });
