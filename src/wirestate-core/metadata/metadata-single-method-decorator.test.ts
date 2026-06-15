@@ -112,6 +112,50 @@ describe("createSingleMethodDecoratorDescriptor", () => {
     expect(() => getMetadata(new Child())).toThrow("conflict across 'Child'.");
   });
 
+  it("should throw the hierarchy message when a mid-hierarchy class decorates a different method (3 levels)", () => {
+    const {
+      lifecycle: { decorator: Decorator, getMetadata },
+    } = buildLifecycle();
+
+    class Base {
+      @Decorator()
+      public alpha(): void {}
+    }
+
+    class Middle extends Base {
+      @Decorator()
+      public beta(): void {}
+    }
+
+    // Base and Leaf agree on "alpha", but Middle's "beta" still makes the hierarchy ambiguous.
+    class Leaf extends Middle {
+      @Decorator()
+      public override alpha(): void {}
+    }
+
+    expect(() => getMetadata(new Leaf())).toThrow("conflict across 'Leaf'.");
+  });
+
+  it("should throw when used as a TC39 decorator without a configured metadata key", () => {
+    const {
+      lifecycle: { decorator: Decorator },
+    } = buildLifecycle();
+
+    // A standard (TC39) method context: passes context validation, but the hook
+    // was built without a `metadataKey`, so it cannot store standard metadata.
+    const context: ClassMethodDecoratorContext = {
+      kind: "method",
+      name: "onTest",
+      static: false,
+      private: false,
+      metadata: {},
+    } as unknown as ClassMethodDecoratorContext;
+
+    expect(() => Decorator()(() => undefined, context)).toThrow(
+      "@OnTest() is not configured for TC39 standard decorators: missing metadata key."
+    );
+  });
+
   it("should support symbol method keys", () => {
     const {
       lifecycle: { decorator: Decorator, getMetadata },
