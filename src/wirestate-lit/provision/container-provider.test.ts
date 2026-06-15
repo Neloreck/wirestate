@@ -9,6 +9,7 @@ import {
   Injectable,
   OnActivated,
   OnDeactivation,
+  OnProvision,
   QueriesPlugin,
 } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
@@ -56,6 +57,22 @@ describe("ContainerProvider", () => {
 
     expect(() => new ContainerProvider(element, { container: {} as Container })).toThrow(
       "ContainerProvider requires a valid container instance or creation config."
+    );
+  });
+
+  it("should reject construction without a container or config", () => {
+    const element: TestProviderElement = new TestProviderElement();
+
+    expect(() => new ContainerProvider(element, {})).toThrow(
+      "ContainerProvider requires a valid container instance or creation config."
+    );
+  });
+
+  it("should reject construction with both a container and a config", () => {
+    const element: TestProviderElement = new TestProviderElement();
+
+    expect(() => new ContainerProvider(element, { container: new Container(), config: {} })).toThrow(
+      "ContainerProvider requires only container or valid config object to be provided."
     );
   });
 
@@ -719,6 +736,73 @@ describe("ContainerProvider", () => {
     document.body.appendChild(element);
 
     expect(events).toEqual([]);
+
+    element.remove();
+  });
+
+  it("should re-publish the same external container without re-provisioning it", () => {
+    const element: TestProviderElement = new TestProviderElement();
+    const { LifecycleService, events } = createLifecycleService({ methods: ["provision", "deprovision"] });
+    const container: Container = new Container({ bindings: [LifecycleService] });
+    const controller: ContainerProvider = new ContainerProvider(element, { container });
+
+    document.body.appendChild(element);
+
+    expect(events).toEqual(["provision"]);
+
+    // Setting the identical container re-publishes the value without a deprovision/provision cycle.
+    controller.setValue(container);
+
+    expect(events).toEqual(["provision"]);
+    expect(controller.value).toBe(container);
+
+    element.remove();
+
+    expect(events).toEqual(["provision", "deprovision"]);
+  });
+
+  it("should roll back and rethrow when a replacement external container fails to provision", () => {
+    @Injectable()
+    class FailingService {
+      @OnProvision()
+      public onProvision(): void {
+        throw new Error("replacement provision boom");
+      }
+    }
+
+    const element: TestProviderElement = new TestProviderElement();
+    const goodContainer: Container = new Container();
+    const failingContainer: Container = new Container({ bindings: [FailingService] });
+    const deprovisionSpy = jest.spyOn(failingContainer, "deprovision");
+    const controller: ContainerProvider = new ContainerProvider(element, { container: goodContainer });
+
+    document.body.appendChild(element);
+
+    expect(() => controller.setValue(failingContainer)).toThrow("replacement provision boom");
+    // The failed replacement is deprovisioned as the failure unwinds.
+    expect(deprovisionSpy).toHaveBeenCalled();
+
+    element.remove();
+  });
+
+  it("should roll back and rethrow when replacement managed config fails to provision", () => {
+    @Injectable()
+    class FailingService {
+      @OnProvision()
+      public onProvision(): void {
+        throw new Error("managed config boom");
+      }
+    }
+
+    const element: TestProviderElement = new TestProviderElement();
+    const controller: ContainerProvider = new ContainerProvider(element, { config: { bindings: [] } });
+
+    document.body.appendChild(element);
+
+    expect(() => controller.setConfig({ bindings: [FailingService] })).toThrow("managed config boom");
+
+    // The failed managed container was destroyed; restore a valid one so teardown stays safe.
+    controller.setConfig({ bindings: [] });
 
     element.remove();
   });

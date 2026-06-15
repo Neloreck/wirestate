@@ -27,4 +27,20 @@ describe("useContainer", () => {
     expect(componentContainer).toBeInstanceOf(Container);
     expect(componentContainer).toBe(container);
   });
+
+  it("should throw when used outside a ContainerProvider", () => {
+    const errorSpy = jest.spyOn(window.console, "error").mockImplementation(() => {});
+
+    function Orphan() {
+      useContainer();
+
+      return null;
+    }
+
+    expect(() => render(<Orphan />)).toThrow(
+      "Trying to access container context from React subtree not wrapped in <ContainerProvider>."
+    );
+
+    errorSpy.mockRestore();
+  });
 });

@@ -63,6 +63,28 @@ describe("ContainerProvider", () => {
     }
   });
 
+  it("should reject a container prop that is not a Container instance", () => {
+    expect(() => render(<ContainerProvider container={{} as Container} />)).toThrow(
+      "ContainerProvider requires a valid container instance or creation config."
+    );
+  });
+
+  it("should reject switching between managed and external container modes on rerender", () => {
+    const { rerender } = render(
+      <ContainerProvider config={{}}>
+        <Consumer />
+      </ContainerProvider>
+    );
+
+    expect(() =>
+      rerender(
+        <ContainerProvider container={new Container()}>
+          <Consumer />
+        </ContainerProvider>
+      )
+    ).toThrow("ContainerProvider cannot switch between external and managed container modes.");
+  });
+
   it("should recreate managed container when bindings change", () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
     const containers: Array<Container> = [];
