@@ -10,6 +10,23 @@ import type { BindingDescriptor, ServiceToken } from "./binding";
  * other values that need a stable runtime token with a TypeScript value type.
  *
  * @group Bind
+ *
+ * @example
+ * ```typescript
+ * import { Container, InjectionToken, Injectable, inject } from "@wirestate/core";
+ *
+ * const API_URL = new InjectionToken<string>("API_URL");
+ *
+ * const container = new Container({
+ *   bindings: [{ token: API_URL, value: "https://api.example.com" }],
+ * });
+ *
+ * @Injectable()
+ * class ApiClient {
+ *   // `url` is typed as string, no cast needed.
+ *   public constructor(private readonly url = inject(API_URL)) {}
+ * }
+ * ```
  */
 export class InjectionToken<T> {
   /**
