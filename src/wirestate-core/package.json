@@ -22,6 +22,17 @@
         "production": "./cjs/production/index.js",
         "default": "./cjs/development/index.js"
       }
+    },
+    "./devtools": {
+      "types": "./devtools.d.ts",
+      "import": {
+        "production": "./esm/production/devtools.js",
+        "default": "./esm/development/devtools.js"
+      },
+      "require": {
+        "production": "./cjs/production/devtools.js",
+        "default": "./cjs/development/devtools.js"
+      }
     }
   },
   "repository": {

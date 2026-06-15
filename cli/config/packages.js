@@ -7,7 +7,10 @@ export const STABLE_PACKAGE_VERSION_PATTERN = /^\d+\.\d+\.\d+$/;
 export const PACKAGES = [
   {
     name: "wirestate-core",
-    entries: [path.resolve(SRC_PATH, "wirestate-core/index.ts")],
+    entries: [
+      path.resolve(SRC_PATH, "wirestate-core/index.ts"),
+      path.resolve(SRC_PATH, "wirestate-core/devtools.ts"),
+    ],
     external: EXTERNAL_DEPENDENCIES,
   },
   {
