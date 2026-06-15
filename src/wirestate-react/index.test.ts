@@ -12,6 +12,7 @@ describe("Library exported API from wirestate-react", () => {
     "OptionalAsyncCommandExecutor",
     "OptionalAsyncQueryExecutor",
     "OptionalCommandExecutor",
+    "OptionalInjectionFallback",
     "OptionalQueryExecutor",
     "QueryExecutor",
     "useAllEvents",
