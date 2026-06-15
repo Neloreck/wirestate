@@ -1,10 +1,11 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { Container } from "../container/container";
 import { Injectable } from "../metadata/metadata-injectable";
 import { OnProvision } from "../provision/on-provision";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
 import { getProvisionState } from "../provision/provision-state";
+
+import { Container } from "./container";
 
 describe("container operation edge cases", () => {
   it("treats deprovision of a never-provisioned container as a no-op", () => {

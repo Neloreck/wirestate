@@ -1,5 +1,6 @@
 import { BindingType, ValueBindingDescriptor } from "../binding/binding";
-import { Container } from "../container/container";
+
+import { Container } from "./container";
 
 describe("container.bind value", () => {
   it("should bind a value descriptor", () => {

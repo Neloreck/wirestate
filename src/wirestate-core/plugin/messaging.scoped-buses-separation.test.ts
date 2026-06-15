@@ -11,7 +11,7 @@ import {
   OnQuery,
   QueriesPlugin,
   QueryBus,
-} from "../index";
+} from "@wirestate/core";
 
 describe("core scoped buses integration (parent-child separation)", () => {
   const ADD_COMMAND: string = "ADD_COMMAND";

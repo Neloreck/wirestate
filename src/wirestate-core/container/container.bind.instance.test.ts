@@ -9,8 +9,6 @@ import {
   FactoryBindingDescriptor,
   InstanceBindingDescriptor,
 } from "../binding/binding";
-import { Container } from "../container/container";
-import { inject } from "../container/container-context";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
 import { CommandBus } from "../plugin/commands/command-bus";
@@ -23,6 +21,9 @@ import { OnQuery } from "../plugin/queries/on-query";
 import { QueriesPlugin } from "../plugin/queries/queries-plugin";
 import { QueryBus } from "../plugin/queries/query-bus";
 import { Nullable } from "../types/general";
+
+import { Container } from "./container";
+import { inject } from "./container-context";
 
 describe("container.bind instance", () => {
   it("should bind a class directly", () => {
@@ -86,7 +87,9 @@ describe("container.bind instance", () => {
         value: GenericService,
       } as unknown as BindingDescriptor;
 
-      expect(() => container.bind(binding)).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_BINDING_SCOPE }));
+      expect(() => container.bind(binding)).toThrow(
+        expect.objectContaining({ code: ERROR_CODE_INVALID_BINDING_SCOPE })
+      );
       expect(() => container.bind(binding)).toThrow("Binding descriptor has unknown scope 'UNKNOWN'.");
     });
 

@@ -12,7 +12,7 @@ import {
   OnQuery,
   QueriesPlugin,
   QueryBus,
-} from "../index";
+} from "@wirestate/core";
 
 describe("core instance shadowing and cleanup integration", () => {
   const FORMAT_COMMAND: string = "FORMAT_COMMAND";

@@ -12,7 +12,8 @@ import {
   OnQuery,
   QueriesPlugin,
   QueryBus,
-} from "../index";
+} from "@wirestate/core";
+
 import { Nullable } from "../types/general";
 
 describe("core scoped buses integration (deprovision messaging)", () => {

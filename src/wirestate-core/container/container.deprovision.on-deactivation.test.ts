@@ -1,7 +1,8 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { Container } from "../container/container";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
+
+import { Container } from "./container";
 
 describe("deprovision on deactivation", () => {
   it("runs @OnDeprovision before @OnDeactivation when a provisioned instance is destroyed", () => {

@@ -1,9 +1,10 @@
 import { OnActivated } from "../activation/on-activated";
 import { OnDeactivation } from "../activation/on-deactivation";
 import { InjectionToken } from "../binding/binding-tokens";
-import { Container } from "../container/container";
-import { inject } from "../container/container-context";
 import { Injectable } from "../metadata/metadata-injectable";
+
+import { Container } from "./container";
+import { inject } from "./container-context";
 
 describe("instance lifecycle guarantees", () => {
   it("should activate singleton instance bindings exactly once", () => {

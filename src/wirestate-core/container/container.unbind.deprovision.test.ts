@@ -1,10 +1,11 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { WireStatus } from "../activation/wire-status";
-import { Container } from "../container/container";
 import { Injectable } from "../metadata/metadata-injectable";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
 import { getProvisionState } from "../provision/provision-state";
+
+import { Container } from "./container";
 
 describe("container unbind deprovision", () => {
   it("should unbind a token and remove the container's own binding", () => {

@@ -1,8 +1,9 @@
 import { OnDeactivation } from "../activation/on-deactivation";
 import { InjectionToken } from "../binding/binding-tokens";
-import { Container } from "../container/container";
 import { ERROR_CODE_NO_BINDING_FOUND } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
+
+import { Container } from "./container";
 
 describe("ContainerKernel hierarchy", () => {
   it("should share singleton identity between parent and child containers", () => {

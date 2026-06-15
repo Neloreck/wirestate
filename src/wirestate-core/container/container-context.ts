@@ -4,6 +4,17 @@ import type { Optional } from "../types/general";
 import type { ContainerKernel } from "./container-kernel";
 
 /**
+ * An error that occurs when `inject()` is used outside an injection context.
+ *
+ * @internal
+ */
+class NeedsInjectionContextError extends Error {
+  public constructor() {
+    super(`You can only invoke inject() within an injection context`);
+  }
+}
+
+/**
  * Resolves a dependency from the container currently constructing a service.
  *
  * @remarks
@@ -87,15 +98,4 @@ let currentContext: GlobalContext | InjectionContext = new GlobalContext();
  */
 export function injectionContext(container: ContainerKernel): Context {
   return new InjectionContext(container);
-}
-
-/**
- * An error that occurs when `inject()` is used outside an injection context.
- *
- * @internal
- */
-class NeedsInjectionContextError extends Error {
-  public constructor() {
-    super(`You can only invoke inject() within an injection context`);
-  }
 }
