@@ -182,7 +182,7 @@ export function deprovisionContainerBinding(container: Container, token: Service
 export function provisionInstances(
   container: Container,
   state: ProvisionState,
-  bindings: Bindings = []
+  bindings: Bindings
 ): Array<object> {
   // Plugins observe the provision cycle boundary before any instance wiring.
   dispatchPluginContainerProvision(container);

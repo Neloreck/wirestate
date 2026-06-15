@@ -215,4 +215,43 @@ describe("core event messaging integration", () => {
 
     expect(logs).toEqual(["coordinator-deprovision", "peer-event:from-coordinator", "peer-deprovision"]);
   });
+
+  it("subscribes and tears down a catch-all @OnEvent handler through the container", () => {
+    const ALPHA: string = "ALPHA";
+    const BETA: string = "BETA";
+
+    @Injectable()
+    class AuditService {
+      public readonly seen: Array<string> = [];
+
+      @OnEvent()
+      public onAny(event: { readonly type: string }): void {
+        this.seen.push(event.type);
+      }
+    }
+
+    const container: Container = new Container({
+      activate: [AuditService],
+      bindings: [AuditService],
+      plugins: [new EventsPlugin()],
+    }).provision();
+
+    const bus: EventBus = container.get(EventBus);
+    const audit: AuditService = container.get(AuditService);
+
+    bus.emit(ALPHA);
+    bus.emit(BETA);
+
+    expect(audit.seen).toEqual([ALPHA, BETA]);
+    expect(bus.hasSubscribers()).toBe(true);
+
+    container.deprovision();
+
+    // The catch-all subscription is unwired at deprovision, so later emits are ignored.
+    expect(bus.hasSubscribers()).toBe(false);
+
+    bus.emit(ALPHA);
+
+    expect(audit.seen).toEqual([ALPHA, BETA]);
+  });
 });

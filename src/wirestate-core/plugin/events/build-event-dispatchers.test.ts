@@ -16,6 +16,24 @@ describe("buildEventDispatcher", () => {
     expect(buildEventDispatchers(new PlainService())).toEqual([]);
   });
 
+  it("should skip a non-function member decorated as an event handler", () => {
+    class CorruptedService {
+      @OnEvent("VALID")
+      public onValid(): void {
+        return void 0;
+      }
+
+      // @ts-ignore - Sabotage with a non-function member.
+      @OnEvent("CORRUPTED")
+      public corrupted: string = "not-a-function";
+    }
+
+    const dispatches: ReadonlyArray<EventDispatch> = buildEventDispatchers(new CorruptedService());
+
+    expect(dispatches).toHaveLength(1);
+    expect(dispatches[0].types).toEqual(["VALID"]);
+  });
+
   it("should produce one descriptor per decorated method with its declared types", () => {
     class TestService {
       @OnEvent("FIRST")

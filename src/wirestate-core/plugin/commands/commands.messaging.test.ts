@@ -251,4 +251,50 @@ describe("core command messaging integration", () => {
 
     expect(await commandResult).toBe("peer-command-result");
   });
+
+  it("dispatches a symbol-typed command handler through a provisioned container", () => {
+    const ADD: unique symbol = Symbol("ADD");
+
+    @Injectable()
+    class SymbolCommandService {
+      @OnCommand(ADD)
+      public add(value: number): number {
+        return value + 1;
+      }
+    }
+
+    const container: Container = new Container({
+      activate: [SymbolCommandService],
+      bindings: [SymbolCommandService],
+      plugins: [new CommandsPlugin()],
+    }).provision();
+
+    expect(container.get(CommandBus).execute(ADD, 41)).toBe(42);
+  });
+
+  it("skips a non-function member decorated as a command handler", () => {
+    const HANDLE_COMMAND: string = "HANDLE_COMMAND";
+
+    @Injectable()
+    class PartiallyCorruptedService {
+      @OnCommand(HANDLE_COMMAND)
+      public handle(value: number): number {
+        return value + 1;
+      }
+
+      // @ts-ignore - Sabotage with a non-function member.
+      @OnCommand("CORRUPTED_COMMAND")
+      public corrupted: string = "not-a-function";
+    }
+
+    const container: Container = new Container({
+      activate: [PartiallyCorruptedService],
+      bindings: [PartiallyCorruptedService],
+      plugins: [new CommandsPlugin()],
+    }).provision();
+
+    // The valid handler is wired; the non-function member is skipped without error.
+    expect(container.get(CommandBus).execute(HANDLE_COMMAND, 1)).toBe(2);
+    expect(container.get(CommandBus).hasHandler("CORRUPTED_COMMAND")).toBe(false);
+  });
 });
