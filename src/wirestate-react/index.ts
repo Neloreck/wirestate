@@ -19,7 +19,7 @@ export { useEvents } from "./events/use-events";
 export { useEventEmitter } from "./events/use-event-emitter";
 
 export { useInjection } from "./injection/use-injection";
-export { useOptionalInjection } from "./injection/use-optional-injection";
+export { OptionalInjectionFallback, useOptionalInjection } from "./injection/use-optional-injection";
 
 export { ContainerProvider, ContainerProviderProps } from "./provision/container-provider";
 

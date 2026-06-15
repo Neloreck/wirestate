@@ -65,20 +65,28 @@ export interface OptionalInjectionOptions<T, F = undefined> {
  * Injects a container value if it exists.
  *
  * @remarks
- * Missing token means fallback result, or `undefined` when no fallback exists.
+ * Missing token means the fallback result, or `undefined` when no fallback exists.
+ * The fallback is a raw value (returned as-is) or a `(container) => value` factory
+ * (called lazily). A bare function is always treated as the factory — wrap a
+ * function fallback value as `() => fn`.
  *
  * @group Consumption
  *
  * @template T - The type of the value being resolved.
- * @template F - The type returned by the fallback function.
+ * @template F - The fallback value type (a raw value or a factory result).
  *
  * @param optionsOrToken - Service token or options.
- * @param fallback - Fallback for missing bindings.
+ * @param fallback - Raw value or `(container) => value` factory, used when the token is not bound.
  * @returns Lit property decorator.
  *
  * @example
  * ```typescript
  * class MyElement extends LitElement {
+ *   // Raw value fallback.
+ *   @optionalInjection(UserName, "guest")
+ *   private name: string = "guest";
+ *
+ *   // Factory fallback (lazy, receives the container).
  *   @optionalInjection(FileLogger, (container) => container.get(ConsoleLoggerService))
  *   private logger: Logger | undefined = undefined;
  * }
@@ -98,14 +106,21 @@ export function optionalInjection<T, F = undefined>(
     nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, T | F>
   ): void => {
     const { once, token } = options;
-    const resolvedFallback: Optional<OptionalInjectionFallback<F>> = options.fallback ?? fallback ?? undefined;
+    const resolvedFallback: Optional<OptionalInjectionFallback<F>> =
+      options.fallback !== undefined ? options.fallback : fallback;
 
     const resolve = (container: Container): T | F => {
       if (container.has(token)) {
         return container.get(token);
       }
 
-      return resolvedFallback ? resolvedFallback(container) : (undefined as F);
+      if (resolvedFallback !== undefined) {
+        return typeof resolvedFallback === "function"
+          ? (resolvedFallback as (container: Container) => F)(container)
+          : (resolvedFallback as F);
+      }
+
+      return undefined as F;
     };
 
     // Standard decorators branch.

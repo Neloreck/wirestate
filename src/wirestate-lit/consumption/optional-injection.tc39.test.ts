@@ -5,7 +5,7 @@ import { customElement } from "lit/decorators.js";
 import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Optional } from "../types/general";
+import { Nullable, Optional } from "../types/general";
 
 import { optionalInjection } from "./optional-injection";
 
@@ -204,5 +204,63 @@ describe("optionalInjection", () => {
     fixture.provider.appendChild(element);
 
     expect(element.value).toBe(20);
+  });
+
+  it("should use a raw value fallback when token is not bound", () => {
+    const container: Container = new Container();
+    const token: ServiceToken<string> = Symbol("optional-token");
+
+    fixture = createLitProvision(container);
+
+    @customElement("test-optional-injection-raw-fallback-element")
+    class TestRawFallbackElement extends ReactiveElement {
+      @optionalInjection(token, "guest")
+      public value: Optional<string> = undefined;
+    }
+
+    const element: TestRawFallbackElement = new TestRawFallbackElement();
+
+    fixture.provider.appendChild(element);
+
+    expect(element.value).toBe("guest");
+  });
+
+  it("should preserve a null raw fallback as a deliberate value", () => {
+    const container: Container = new Container();
+    const token: ServiceToken<string> = Symbol("optional-token");
+
+    fixture = createLitProvision(container);
+
+    @customElement("test-optional-injection-null-fallback-element")
+    class TestNullFallbackElement extends ReactiveElement {
+      // `null` is a deliberate value (ADR 0009), not a structural miss.
+      @optionalInjection(token, null)
+      public value: Nullable<string> = null;
+    }
+
+    const element: TestNullFallbackElement = new TestNullFallbackElement();
+
+    fixture.provider.appendChild(element);
+
+    expect(element.value).toBeNull();
+  });
+
+  it("should use a raw value fallback from the options object", () => {
+    const container: Container = new Container();
+    const token: ServiceToken<string> = Symbol("optional-token");
+
+    fixture = createLitProvision(container);
+
+    @customElement("test-optional-injection-raw-options-element")
+    class TestRawOptionsElement extends ReactiveElement {
+      @optionalInjection({ token, fallback: "options-raw" })
+      public value: Optional<string> = undefined;
+    }
+
+    const element: TestRawOptionsElement = new TestRawOptionsElement();
+
+    fixture.provider.appendChild(element);
+
+    expect(element.value).toBe("options-raw");
   });
 });

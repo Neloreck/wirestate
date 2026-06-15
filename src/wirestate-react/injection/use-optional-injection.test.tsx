@@ -177,4 +177,101 @@ describe("useOptionalInjection", () => {
     expect(getByTestId("result").textContent).toBe("bound-value");
     expect(resolveCount).toBe(1);
   });
+
+  it("should return a raw value fallback when the token is not bound", () => {
+    const container: Container = new Container();
+    const token: ServiceToken<string> = Symbol("optional-token");
+
+    let captured: unknown;
+
+    function RawComponent() {
+      captured = useOptionalInjection(token, "guest");
+
+      return null;
+    }
+
+    render(
+      <ContainerProvider container={container}>
+        <RawComponent />
+      </ContainerProvider>
+    );
+
+    expect(captured).toBe("guest");
+  });
+
+  it("should preserve falsy raw fallbacks instead of returning undefined", () => {
+    const container: Container = new Container();
+
+    const resolveFallback = (fallback: unknown): unknown => {
+      let captured: unknown;
+
+      function Probe(): null {
+        captured = useOptionalInjection(Symbol("optional-token") as ServiceToken<unknown>, fallback);
+
+        return null;
+      }
+
+      const view = render(
+        <ContainerProvider container={container}>
+          <Probe />
+        </ContainerProvider>
+      );
+
+      view.unmount();
+
+      return captured;
+    };
+
+    expect(resolveFallback(0)).toBe(0);
+    expect(resolveFallback("")).toBe("");
+    expect(resolveFallback(false)).toBe(false);
+    // `null` is a deliberate value (ADR 0009), not a structural miss — it must survive.
+    expect(resolveFallback(null)).toBeNull();
+  });
+
+  it("should treat a wrapped function as a fallback value", () => {
+    const container: Container = new Container();
+    const token: ServiceToken<() => string> = Symbol("optional-token");
+    const fallbackFn = (): string => "fn-value";
+
+    let captured: unknown;
+
+    function RawComponent() {
+      // A bare function is the factory; wrap it to fall back to a function value.
+      captured = useOptionalInjection<() => string, () => string>(token, () => fallbackFn);
+
+      return null;
+    }
+
+    render(
+      <ContainerProvider container={container}>
+        <RawComponent />
+      </ContainerProvider>
+    );
+
+    expect(captured).toBe(fallbackFn);
+  });
+
+  it("should ignore the raw fallback when the token is bound", () => {
+    const container: Container = new Container();
+    const token: ServiceToken<string> = Symbol("optional-token");
+
+    container.bind({ token, value: "bound-value" });
+
+    let captured: unknown;
+
+    function RawComponent() {
+      captured = useOptionalInjection(token, "raw-fallback");
+
+      return null;
+    }
+
+    render(
+      <ContainerProvider container={container}>
+        <RawComponent />
+      </ContainerProvider>
+    );
+
+    expect(captured).toBe("bound-value");
+  });
 });

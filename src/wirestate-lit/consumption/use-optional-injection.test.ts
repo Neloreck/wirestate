@@ -227,4 +227,59 @@ describe("useOptionalInjection", () => {
     expect(initialValue).toBe("initial-value");
     expect(element.data.value).toBeUndefined();
   });
+
+  it("should use a raw value fallback when token is not bound", () => {
+    const container: Container = new Container();
+    const token: ServiceToken<string> = Symbol("optional-token");
+
+    fixture = createLitProvision(container);
+
+    @customElement("test-use-optional-injection-raw-fallback-element")
+    class TestRawFallbackElement extends ReactiveElement {
+      public data = useOptionalInjection(this, token, "guest");
+    }
+
+    const element = new TestRawFallbackElement();
+
+    fixture.provider.appendChild(element);
+
+    expect(element.data.value).toBe("guest");
+  });
+
+  it("should preserve a null raw fallback as a deliberate value", () => {
+    const container: Container = new Container();
+    const token: ServiceToken<string> = Symbol("optional-token");
+
+    fixture = createLitProvision(container);
+
+    @customElement("test-use-optional-injection-null-fallback-element")
+    class TestNullFallbackElement extends ReactiveElement {
+      // `null` is a deliberate value (ADR 0009), not a structural miss.
+      public data = useOptionalInjection(this, token, null);
+    }
+
+    const element = new TestNullFallbackElement();
+
+    fixture.provider.appendChild(element);
+
+    expect(element.data.value).toBeNull();
+  });
+
+  it("should accept a raw value fallback from the options object", () => {
+    const container: Container = new Container();
+    const token: ServiceToken<string> = Symbol("optional-token");
+
+    fixture = createLitProvision(container);
+
+    @customElement("test-use-optional-injection-raw-options-element")
+    class TestRawOptionsElement extends ReactiveElement {
+      public data = useOptionalInjection(this, { token, fallback: "options-raw" });
+    }
+
+    const element = new TestRawOptionsElement();
+
+    fixture.provider.appendChild(element);
+
+    expect(element.data.value).toBe("options-raw");
+  });
 });
