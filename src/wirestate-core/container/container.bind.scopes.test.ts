@@ -1,4 +1,7 @@
+import { InstanceBindingDescriptor } from "@wirestate/core";
+
 import { InjectionToken } from "../binding/binding-tokens";
+import { ERROR_CODE_INVALID_BINDING_SCOPE } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
 
 import { ContainerKernel } from "./container-kernel";
@@ -70,6 +73,41 @@ describe("Binding scopes", () => {
     parent.bind({ token: MyService, scope: "Transient", factory: () => new MyService() });
 
     expect(child.get(MyService)).not.toBe(child.get(MyService));
+  });
+
+  it("should reject a value binding declared with a non-singleton scope", () => {
+    const container = new ContainerKernel();
+    const token = new InjectionToken<number>("value-transient");
+
+    // A value is always a singleton; a Transient (or any non-Singleton) scope is nonsensical for it.
+    expect(() => container.bind({ token: token, value: 1, scope: "Transient" })).toThrow(
+      expect.objectContaining({ code: ERROR_CODE_INVALID_BINDING_SCOPE })
+    );
+    expect(() => container.bind({ token: token, value: 1, scope: "Transient" })).toThrow(
+      "Provided unexpected binding scope for value."
+    );
+  });
+
+  it("should reject an explicit Value-type binding declared with a non-singleton scope", () => {
+    const container = new ContainerKernel();
+    const token = new InjectionToken<number>("value-typed-transient");
+
+    expect(() =>
+      container.bind({
+        token: token,
+        type: "Value",
+        value: 1,
+        scope: "Transient",
+      } as unknown as InstanceBindingDescriptor)
+    ).toThrow("Provided unexpected binding scope for value.");
+  });
+
+  it("should allow a value binding declared with an explicit Singleton scope", () => {
+    const container = new ContainerKernel();
+    const token = new InjectionToken<number>("value-singleton");
+
+    expect(() => container.bind({ token: token, value: 7, scope: "Singleton" })).not.toThrow();
+    expect(container.get(token)).toBe(7);
   });
 
   it("should not block rebinding for transient bindings", () => {

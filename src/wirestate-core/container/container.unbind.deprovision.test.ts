@@ -144,6 +144,33 @@ describe("container unbind deprovision", () => {
     expect(getProvisionState(container)?.instances ?? null).toBeNull();
   });
 
+  it("is a no-op when unbinding a non-participant token while a participant stays provisioned", () => {
+    @Injectable()
+    class PlainService {}
+
+    const { LifecycleService, events } = createLifecycleService({
+      methods: ["provision", "deprovision", "deactivation"],
+    });
+    const container: Container = new Container({ bindings: [PlainService, LifecycleService] });
+
+    provisionContainer(container);
+
+    expect(events).toEqual(["provision"]);
+
+    // PlainService is not a provider-lifecycle participant, so unbinding it must not
+    // deprovision the still-provisioned LifecycleService.
+    container.unbind(PlainService);
+
+    expect(events).toEqual(["provision"]);
+    expect(container.hasOwn(PlainService)).toBe(false);
+    expect(getProvisionState(container)?.instances).toHaveLength(1);
+
+    // A container deprovision runs @OnDeprovision (not @OnDeactivation, which is unbind-only).
+    deprovisionContainer(container);
+
+    expect(events).toEqual(["provision", "deprovision"]);
+  });
+
   it("should mark remaining active services deprovisioned after the last lifecycle binding is unbound", () => {
     @Injectable()
     class PlainService {}

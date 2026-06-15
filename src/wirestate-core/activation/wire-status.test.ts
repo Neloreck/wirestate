@@ -154,4 +154,29 @@ describe("WireStatus", () => {
       provisionId: 2,
     });
   });
+
+  it("initializes isDeprovisioned from the container's provision status at activation time", () => {
+    @Injectable()
+    class Service {}
+
+    // (a) Activated on a never-provisioned container: status is unknown -> null.
+    const neverProvisioned: Container = new Container({ bindings: [Service] });
+
+    expect(WireStatus.for(neverProvisioned.get(Service)).isDeprovisioned).toBeNull();
+
+    // (b) Activated while the container is provisioned -> false (live).
+    const provisioned: Container = new Container({ bindings: [Service] });
+
+    provisionContainer(provisioned);
+
+    expect(WireStatus.for(provisioned.get(Service)).isDeprovisioned).toBe(false);
+
+    // (c) Activated after the container was deprovisioned -> true.
+    const deprovisioned: Container = new Container({ bindings: [Service] });
+
+    provisionContainer(deprovisioned);
+    deprovisionContainer(deprovisioned);
+
+    expect(WireStatus.for(deprovisioned.get(Service)).isDeprovisioned).toBe(true);
+  });
 });

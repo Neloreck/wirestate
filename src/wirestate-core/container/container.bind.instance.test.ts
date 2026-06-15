@@ -574,12 +574,16 @@ describe("container.bind instance", () => {
       expect(onEvent).toHaveBeenCalledTimes(2);
     });
 
-    it("should handle non-function @OnQuery or @OnActivated properties during activation", () => {
-      const container: Container = new Container({ plugins: [new QueriesPlugin()] });
+    it("should skip non-function @OnQuery and @OnActivated members through activation and provision", () => {
+      const container: Container = new Container({
+        bindings: [CorruptedService],
+        plugins: [new QueriesPlugin()],
+      });
 
-      container.bind(CorruptedService);
+      // Provision force-activates the participant and runs the messaging registration:
+      // both the sabotaged @OnActivated and the sabotaged @OnQuery members are skipped, no throw.
+      expect(() => container.provision()).not.toThrow();
 
-      // This should not throw exceptions with corrupted 'activation' handlers.
       const instance: CorruptedService = container.get(CorruptedService);
 
       expect(instance).toBeDefined();
