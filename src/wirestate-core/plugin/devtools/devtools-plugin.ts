@@ -117,7 +117,8 @@ export class DevToolsPlugin implements WirestatePlugin {
   }
 
   /**
-   * Taps the container's messaging buses so dispatches flow to the hook (idempotent).
+   * Taps the container's messaging buses so dispatches and handler registrations flow to
+   * the hook (idempotent).
    *
    * @param container - Container being provisioned.
    */
@@ -129,9 +130,11 @@ export class DevToolsPlugin implements WirestatePlugin {
     const hook: DevtoolsHook = this.hook;
     const containerId: DevtoolsContainerId = hook.idForContainer(container);
 
-    tapContainerBuses(container, (message) =>
-      hook.emit({ kind: "message", rootId: this.rootId, containerId, message })
-    );
+    tapContainerBuses(container, {
+      message: (message) => hook.emit({ kind: "message", rootId: this.rootId, containerId, message }),
+      registration: (registration) =>
+        hook.emit({ kind: "registration", rootId: this.rootId, containerId, registration }),
+    });
   }
 
   /**

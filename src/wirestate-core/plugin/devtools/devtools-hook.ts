@@ -350,11 +350,73 @@ export interface DevtoolsMessageEvent {
 }
 
 /**
- * One delta emitted to listening backends: a lifecycle change or an observed message.
+ * Whether a handler/subscriber was registered or unregistered.
  *
  * @group DevTools
  */
-export type DevtoolsEvent = DevtoolsLifecycleEvent | DevtoolsMessageEvent;
+export type DevtoolsRegistrationPhase = "registered" | "unregistered";
+
+/**
+ * One observed handler/subscriber registration change.
+ *
+ * @remarks
+ * Captures both decorated handlers (wired at provision) and imperative `bus.register` /
+ * `bus.subscribe` registrations. `type` is `"*"` for a catch-all event subscriber.
+ *
+ * @group DevTools
+ */
+export interface DevtoolsRegistration {
+  /**
+   * Channel the handler is on.
+   */
+  readonly channel: DevtoolsMessageChannel;
+
+  /**
+   * Stringified message type the handler covers; `"*"` for a catch-all event subscriber.
+   */
+  readonly type: string;
+
+  /**
+   * Whether the handler was registered or unregistered.
+   */
+  readonly phase: DevtoolsRegistrationPhase;
+}
+
+/**
+ * One registration delta, attributed to the bus-owning container (bus-scoped, like
+ * {@link DevtoolsMessageEvent}).
+ *
+ * @group DevTools
+ */
+export interface DevtoolsRegistrationEvent {
+  /**
+   * Discriminant.
+   */
+  readonly kind: "registration";
+
+  /**
+   * Root the registration originated from.
+   */
+  readonly rootId: DevtoolsRootId;
+
+  /**
+   * Container the tapped bus is attributed to.
+   */
+  readonly containerId: DevtoolsContainerId;
+
+  /**
+   * The observed registration change.
+   */
+  readonly registration: DevtoolsRegistration;
+}
+
+/**
+ * One delta emitted to listening backends: a lifecycle change, an observed message, or a
+ * handler registration change.
+ *
+ * @group DevTools
+ */
+export type DevtoolsEvent = DevtoolsLifecycleEvent | DevtoolsMessageEvent | DevtoolsRegistrationEvent;
 
 /**
  * What a plugin hands the hook to register a root: a way to snapshot the root's

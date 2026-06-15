@@ -258,4 +258,42 @@ describe("DevToolsPlugin", () => {
 
     container.deprovision();
   });
+
+  it("streams handler registration and unregistration deltas (decorated and imperative)", () => {
+    @Injectable()
+    class Feature {
+      @OnCommand("SAVE")
+      public save(): void {}
+    }
+
+    const container: Container = new Container({
+      bindings: [Feature],
+      plugins: [new CommandsPlugin(), new DevToolsPlugin()],
+    });
+
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+    const registrations: Array<string> = [];
+
+    // Subscribe before provision so the decorated handler's wiring is observed.
+    hook.subscribe((event) => {
+      if (event.kind === "registration") {
+        registrations.push(`${event.registration.phase}:${event.registration.channel}:${event.registration.type}`);
+      }
+    });
+
+    // Provision wires the decorated @OnCommand handler through the (now-tapped) register.
+    container.provision();
+
+    // An imperative registration is observed live too.
+    const unregister = container.get(CommandBus).register("MANUAL", () => undefined);
+
+    unregister();
+
+    container.deprovision();
+
+    expect(registrations).toContain("registered:command:SAVE");
+    expect(registrations).toContain("registered:command:MANUAL");
+    expect(registrations).toContain("unregistered:command:MANUAL");
+    expect(registrations).toContain("unregistered:command:SAVE");
+  });
 });
