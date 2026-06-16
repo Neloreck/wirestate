@@ -6,42 +6,24 @@
   "author": "Syrotenko Igor",
   "homepage": "https://github.com/Neloreck/wirestate#readme",
   "license": "MIT",
-  "main": "./cjs/development/index.js",
-  "module": "./esm/development/index.js",
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
   "types": "./index.d.ts",
   "exports": {
     ".": {
       "types": "./index.d.ts",
-      "import": {
-        "production": "./esm/production/index.js",
-        "default": "./esm/development/index.js"
-      },
-      "require": {
-        "production": "./cjs/production/index.js",
-        "default": "./cjs/development/index.js"
-      }
+      "import": "./esm/index.js",
+      "require": "./cjs/index.js"
     },
     "./mobx": {
       "types": "./mobx.d.ts",
-      "import": {
-        "production": "./esm/production/mobx.js",
-        "default": "./esm/development/mobx.js"
-      },
-      "require": {
-        "production": "./cjs/production/mobx.js",
-        "default": "./cjs/development/mobx.js"
-      }
+      "import": "./esm/mobx.js",
+      "require": "./cjs/mobx.js"
     },
     "./signals": {
       "types": "./signals.d.ts",
-      "import": {
-        "production": "./esm/production/signals.js",
-        "default": "./esm/development/signals.js"
-      },
-      "require": {
-        "production": "./cjs/production/signals.js",
-        "default": "./cjs/development/signals.js"
-      }
+      "import": "./esm/signals.js",
+      "require": "./cjs/signals.js"
     }
   },
   "repository": {

@@ -18,6 +18,7 @@ export default [
       "examples/**/*",
       "node_modules/**/*",
       "target/**/*",
+      "**/dist/**/*",
     ],
   },
   jsdocPlugin.configs["flat/recommended"],

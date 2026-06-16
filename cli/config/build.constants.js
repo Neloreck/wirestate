@@ -1,12 +1,5 @@
 import * as path from "node:path";
 
-export const EEnvironment = {
-  PRODUCTION: "production",
-  DEVELOPMENT: "development",
-};
-
-export const ENV = process.env.NODE_ENV || "development";
-
 export const EXTERNAL_DEPENDENCIES = [
   "react",
   "mobx",
