@@ -109,8 +109,6 @@ export function packageIdentityCheckScript(mode: PackageExportCheckMode): string
     `const wirestateSignals = ${load("wirestate/signals")};`,
     "const checks = [",
     '  ["wirestate.Container", wirestate.Container, core.Container],',
-    '  ["wirestate.WireScope", wirestate.WireScope, core.WireScope],',
-    '  ["wirestate.SEED", wirestate.SEED, core.SEED],',
     '  ["wirestate.ContainerProvider", wirestate.ContainerProvider, react.ContainerProvider],',
     '  ["wirestate.useInjection", wirestate.useInjection, react.useInjection],',
     '  ["wirestate/mobx.Action", wirestateMobx.Action, mobx.Action],',

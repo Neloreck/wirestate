@@ -47,8 +47,6 @@ jobs:
 
       - run: pnpm build:esm
 
-      - run: pnpm build:ptb
-
       - run: pnpm build:pkg
 
       - run: pnpm test:e2e
