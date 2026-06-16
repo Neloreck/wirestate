@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/lit-mobx",
-  "version": "1.0.0-experimental.8",
+  "version": "1.0.0-experimental.9",
   "description": "MobX Lit reactivity binding (@adobe/lit-mobx) for Wirestate Lit services",
   "sideEffects": false,
   "author": "Syrotenko Igor",
