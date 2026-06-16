@@ -7,7 +7,7 @@ import type { Theme } from "@/types";
 @Injectable()
 export class ThemeService {
   @Observable()
-  public theme: Theme = "light";
+  public theme: Theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 
   public constructor(private readonly eventBus: EventBus = inject(EventBus)) {
     makeObservable(this);

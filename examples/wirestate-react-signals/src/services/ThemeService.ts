@@ -6,7 +6,7 @@ import type { Theme } from "@/types";
 
 @Injectable()
 export class ThemeService {
-  public theme: Signal<Theme> = signal("light");
+  public theme: Signal<Theme> = signal(window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
 
   public constructor(private readonly eventBus: EventBus = inject(EventBus)) {}
 
