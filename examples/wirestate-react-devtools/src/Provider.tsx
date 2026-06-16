@@ -6,6 +6,7 @@ import {
   CommandsPlugin,
   QueriesPlugin,
 } from "@wirestate/core";
+import { DevToolsPlugin } from "@wirestate/core/devtools";
 import { ContainerProvider } from "@wirestate/react";
 import { type PropsWithChildren, useMemo } from "react";
 
@@ -33,7 +34,7 @@ export function Provider({ children }: PropsWithChildren) {
           factory: () => ({ random: Math.random(), another: true }),
         },
       ],
-      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
+      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin(), new DevToolsPlugin()],
     }),
     [],
   );

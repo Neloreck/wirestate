@@ -151,4 +151,28 @@ describe("devtools protocol — React-driven consumer e2e", () => {
 
     expect(hook().getRoots()).toHaveLength(2);
   });
+
+  it("registers one root under StrictMode with a managed provider (no throwaway duplication)", () => {
+    // A managed provider under StrictMode: React double-invokes the useState initializer,
+    // so the same config (and its DevToolsPlugin instance) constructs a throwaway container
+    // alongside the committed one. Only the committed container provisions, so the inspector
+    // must see exactly one root and one live container — not the pre-fix duplicate roots /
+    // phantom throwaway.
+    const config: ContainerConfig = createConfig();
+
+    render(
+      <StrictMode>
+        <ContainerProvider config={config} />
+      </StrictMode>
+    );
+
+    const roots = hook().getRoots();
+
+    expect(roots).toHaveLength(1);
+
+    const snapshot = roots[0].snapshot();
+
+    expect(snapshot.containers).toHaveLength(1);
+    expect(snapshot.containers[0].instances.map((instance) => instance.className)).toContain("Feature");
+  });
 });

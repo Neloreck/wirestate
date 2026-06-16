@@ -1,0 +1,106 @@
+.devtools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+@media (max-width: 720px) {
+  .devtools {
+    grid-template-columns: 1fr;
+  }
+}
+
+.devtools__tree,
+.devtools__log {
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--code-bg);
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 8px;
+}
+
+.devtools__container {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+
+.devtools__container:last-child {
+  margin-bottom: 0;
+}
+
+.devtools__container-head {
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.devtools__row {
+  display: flex;
+  gap: 8px;
+  padding: 2px 0;
+  color: var(--text);
+}
+
+.devtools__label {
+  color: var(--accent);
+  flex: 0 0 64px;
+  opacity: 0.8;
+}
+
+.devtools__instances {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+}
+
+.devtools__instance {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+  color: var(--text);
+}
+
+.devtools__instance-name {
+  font-weight: 600;
+}
+
+.devtools__handlers {
+  text-align: right;
+  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+.devtools__event {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.devtools__event:last-child {
+  border-bottom: none;
+}
+
+.devtools__event--message {
+  color: var(--accent);
+}
+
+.devtools__event--registration {
+  font-style: italic;
+}
+
+.devtools__empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--text);
+  opacity: 0.7;
+}

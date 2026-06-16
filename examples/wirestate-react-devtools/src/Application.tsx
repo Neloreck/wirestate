@@ -3,16 +3,15 @@ import "./Application.css";
 import { useAllEvents, useEvent, useEvents, useInjection } from "@wirestate/react";
 import { useEffect } from "react";
 
+import { DevToolsPanel } from "@/components/DevToolsPanel";
 import { EventsLog } from "@/components/EventsLog";
 import { GeneralControls } from "@/components/GeneralControls";
 import { QueriesData } from "@/components/QueriesData";
 import { EGlobalEvent } from "@/constants/events";
-import { GLOBAL_CONFIG } from "@/constants/id";
 import { ThemeService } from "@/services/ThemeService";
 
 export const Application = () => {
   const { theme } = useInjection(ThemeService);
-  const globalConfig: object = useInjection(GLOBAL_CONFIG);
 
   useEvent(EGlobalEvent.COUNTER_RESET, () => {
     console.info("[Application] Counter was reset (specific event)");
@@ -60,10 +59,13 @@ export const Application = () => {
         <QueriesData />
       </section>
 
-      <section id={"global-config"} className={"panel"}>
-        <h2>Container config</h2>
-        <p className={"panel__desc"}>A constant value bound in the dependency-injection container.</p>
-        <code className={"config"}>{JSON.stringify(globalConfig)}</code>
+      <section id={"devtools"} className={"panel"}>
+        <h2>DevTools inspector</h2>
+        <p className={"panel__desc"}>
+          A consumer reading the in-page devtools hook: the container tree on the left, the live lifecycle / message /
+          registration stream on the right.
+        </p>
+        <DevToolsPanel />
       </section>
     </div>
   );

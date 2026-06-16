@@ -26,19 +26,20 @@ import { tapContainerBuses } from "./devtools-tap";
  * Installing this plugin is the **only** thing that puts the devtools hook on
  * `globalThis`; an application that never registers it has zero footprint and the
  * plugin tree-shakes away. Register it on a root container and, by plugin chain
- * inheritance, it observes the whole subtree — reconstructing the container tree
- * from the lifecycle stream rather than from reverse child-pointers.
+ * inheritance, it observes the whole subtree — reconstructing the container tree from
+ * the lifecycle stream rather than from reverse child-pointers.
  *
- * It owns nothing it observes: every container is held **weakly** (`WeakRef`), so
- * devtools never extends a container's lifetime and the panel reflects what the app
- * actually holds. A provisioned (mounted) container stays reachable because the app
- * holds it — whatever will `deprovision()` it pins it for the whole provision window —
- * and a container the app has dropped falls out of the next snapshot. Still
- * development-time only — the global hook and observation overhead are dev concerns.
+ * It owns nothing it observes: every live container is held **weakly** (`WeakRef`), so
+ * devtools never extends a container's lifetime. The tree tracks **currently-provisioned**
+ * containers — added when a container provisions, removed when it deprovisions — so a
+ * container the app has torn down, or a **discarded render** (e.g. a React StrictMode
+ * throwaway that constructs but never commits), never appears. Exactly **one root** is
+ * registered per plugin instance, even when a managed provider constructs more than one
+ * container from the same config. Development-time only.
  *
- * It observes both lifecycle (activation and provision) and messaging traffic —
- * events via a catch-all subscription, commands and queries by wrapping their
- * dispatch methods — and streams both as normalized deltas to the hook.
+ * It observes both lifecycle (activation and provision) and messaging traffic — events
+ * via a catch-all subscription, commands and queries by wrapping their dispatch methods —
+ * and streams both as normalized deltas to the hook.
  *
  * @group DevTools
  *
@@ -55,24 +56,33 @@ export class DevToolsPlugin implements WirestatePlugin {
   private rootId: DevtoolsRootId = 0;
 
   /**
-   * Weak backstop for every observed container, keyed by id for dedupe. Never
-   * extends a container's lifetime; dead entries are pruned lazily on snapshot.
+   * Currently-provisioned (live) containers, keyed by id for dedupe and held weakly so
+   * the plugin never extends a container's lifetime. Populated on provision, drained on
+   * deprovision; dead entries are pruned lazily on snapshot as a backstop.
    */
   private readonly observed: Map<DevtoolsContainerId, WeakRef<ContainerKernel>> = new Map();
 
-  public install(container: Container): void {
+  public install(): void {
     this.hook = installDevtoolsHook();
-    this.track(this.hook.idForContainer(container), container);
-    this.rootId = this.hook.registerRoot({ snapshot: () => this.snapshot() });
+
+    // Register exactly one root per plugin instance. A managed provider may `install`
+    // the same instance on more than one container from one config — React StrictMode
+    // double-invokes the `useState` initializer, constructing a throwaway alongside the
+    // committed container — and only the committed one ever provisions.
+    if (this.rootId === 0) {
+      this.rootId = this.hook.registerRoot({ snapshot: () => this.snapshot() });
+    }
   }
 
   public onContainerProvision(container: Container): void {
+    this.observe(container);
     this.report(container, "containerProvision");
     this.tapMessages(container);
   }
 
   public onContainerDeprovision(container: Container): void {
     this.report(container, "containerDeprovision");
+    this.unobserve(container);
   }
 
   public onActivate(instance: object, container: Container): void {
@@ -92,7 +102,7 @@ export class DevToolsPlugin implements WirestatePlugin {
   }
 
   /**
-   * Records the container weakly and emits one lifecycle delta to the hook.
+   * Emits one lifecycle delta to the hook.
    *
    * @param container - Container the phase fired on.
    * @param phase - Lifecycle phase being reported.
@@ -103,14 +113,10 @@ export class DevToolsPlugin implements WirestatePlugin {
       return;
     }
 
-    const containerId: DevtoolsContainerId = this.hook.idForContainer(container);
-
-    this.track(containerId, container);
-
     this.hook.emit({
       kind: "lifecycle",
       rootId: this.rootId,
-      containerId,
+      containerId: this.hook.idForContainer(container),
       phase,
       instance: instance && normalizeInstance(instance),
     });
@@ -138,19 +144,38 @@ export class DevToolsPlugin implements WirestatePlugin {
   }
 
   /**
-   * Records a weak reference to a container so it appears in snapshots while alive.
+   * Adds a provisioned container to the live set so it appears in snapshots.
    *
-   * @param containerId - Stable id of the container.
-   * @param container - Container to track.
+   * @param container - Container that just provisioned.
    */
-  private track(containerId: DevtoolsContainerId, container: ContainerKernel): void {
+  private observe(container: ContainerKernel): void {
+    if (!this.hook) {
+      return;
+    }
+
+    const containerId: DevtoolsContainerId = this.hook.idForContainer(container);
+
     if (!this.observed.has(containerId)) {
       this.observed.set(containerId, new WeakRef(container));
     }
   }
 
   /**
-   * Snapshots every still-live observed container, pruning ones the app has dropped.
+   * Removes a container from the live set when it deprovisions, so a torn-down (or
+   * discarded) container drops out of snapshots immediately.
+   *
+   * @param container - Container that just deprovisioned.
+   */
+  private unobserve(container: ContainerKernel): void {
+    if (!this.hook) {
+      return;
+    }
+
+    this.observed.delete(this.hook.idForContainer(container));
+  }
+
+  /**
+   * Snapshots every still-live observed container, pruning any the app has dropped.
    *
    * @returns The root snapshot.
    */

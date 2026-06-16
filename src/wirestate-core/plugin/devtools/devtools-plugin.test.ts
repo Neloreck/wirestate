@@ -34,9 +34,10 @@ describe("DevToolsPlugin", () => {
     @Injectable()
     class Svc {}
 
-    // Held for the test's duration: the plugin observes containers weakly, so an
-    // unprovisioned container needs a live reference to stay in the snapshot.
     const container: Container = new Container({ bindings: [Svc], activate: [Svc], plugins: [new DevToolsPlugin()] });
+
+    // The tree tracks provisioned (live) containers, so provision before snapshotting.
+    container.provision();
 
     const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
 
@@ -60,6 +61,29 @@ describe("DevToolsPlugin", () => {
     new Container({ plugins: [new DevToolsPlugin()] });
 
     expect((getDevtoolsHook() as DevtoolsHook).getRoots()).toHaveLength(2);
+  });
+
+  it("registers one root and tracks only the live container when a plugin instance is installed twice", () => {
+    @Injectable()
+    class Svc {}
+
+    // A managed provider reuses one config (and its plugin instance) for a StrictMode
+    // throwaway plus the committed container; only the committed one provisions.
+    const plugin: DevToolsPlugin = new DevToolsPlugin();
+
+    new Container({ bindings: [Svc], plugins: [plugin] }); // throwaway — never provisioned
+
+    const committed: Container = new Container({ bindings: [Svc], plugins: [plugin] });
+
+    committed.provision();
+
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+
+    // One root, not one per install; and only the provisioned container is in the tree.
+    expect(hook.getRoots()).toHaveLength(1);
+    expect(hook.getRoots()[0].snapshot().containers).toHaveLength(1);
+
+    committed.deprovision();
   });
 
   it("streams lifecycle deltas to a subscribed backend", () => {
@@ -105,6 +129,9 @@ describe("DevToolsPlugin", () => {
 
     const child: Container = new Container({ parent, bindings: [ChildSvc], activate: [ChildSvc] });
 
+    parent.provision();
+    child.provision();
+
     const snapshot = (getDevtoolsHook() as DevtoolsHook).getRoots()[0].snapshot();
 
     expect(snapshot.containers).toHaveLength(2);
@@ -140,6 +167,8 @@ describe("DevToolsPlugin", () => {
       plugins: [new DevToolsPlugin()],
     });
 
+    container.provision();
+
     const snapshot = (getDevtoolsHook() as DevtoolsHook).getRoots()[0].snapshot();
     const bindings = snapshot.containers[0].bindings;
 
@@ -153,6 +182,8 @@ describe("DevToolsPlugin", () => {
 
   it("snapshots the own plugins registered on a container", () => {
     const container: Container = new Container({ plugins: [new EventsPlugin(), new DevToolsPlugin()] });
+
+    container.provision();
 
     const snapshot = (getDevtoolsHook() as DevtoolsHook).getRoots()[0].snapshot();
     const plugins = snapshot.containers[0].plugins;
@@ -332,13 +363,13 @@ describe("DevToolsPlugin", () => {
     expect(phases).toContain("deprovision:Svc");
     expect(phases).toContain("deactivate:Svc");
 
-    // Cleanup is reflected: the deactivated instance is gone from a fresh snapshot.
-    expect(
-      hook
-        .getRoots()[0]
-        .snapshot()
-        .containers[0].instances.map((instance) => instance.className)
-    ).not.toContain("Svc");
+    // Cleanup is reflected: the deprovisioned container drops out of a fresh snapshot.
+    const remaining: Array<string> = hook
+      .getRoots()[0]
+      .snapshot()
+      .containers.flatMap((node) => node.instances.map((instance) => instance.className));
+
+    expect(remaining).not.toContain("Svc");
   });
 
   it("taps a bus exactly once across provision cycles (no double observation)", () => {
