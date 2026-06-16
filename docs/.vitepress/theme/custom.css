@@ -1,0 +1,96 @@
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./fonts/space-grotesk-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./fonts/space-grotesk-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./fonts/ibm-plex-mono-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./fonts/ibm-plex-mono-600.woff2") format("woff2");
+}
+
+:root {
+  --vp-c-brand-1: #cb4626;
+  --vp-c-brand-2: #e0563b;
+  --vp-c-brand-3: #cf4a24;
+  --vp-c-brand-soft: rgba(255, 122, 89, 0.16);
+
+  /* Code font. Body font is intentionally left default. */
+  --vp-font-family-mono: "IBM Plex Mono", ui-monospace, "SF Mono", "Menlo", "Monaco",
+    "Consolas", "Liberation Mono", "Courier New", monospace;
+
+  /* Display font used for headings + hero (applied via selectors below). */
+  --ws-font-display: "Space Grotesk", var(--vp-font-family-base);
+
+  /* Hero wordmark gradient: coral -> teal. Vibrant coral leads; a gradient has
+     no text-contrast constraint so the bright coral is fine here. */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #ff4733 30%, #12b8a8);
+
+  /* Soft glow blob behind the hero logo image. Low-saturation coral haze: keeps
+     the warmth but stays muted so the vibrant coral cog still pops against it. */
+  --vp-home-hero-image-background-image: linear-gradient(-45deg, #e9c5bb 30%, #f8e2db 95%);
+  --vp-home-hero-image-filter: blur(48px);
+}
+
+.dark {
+  /* Brighter coral so links/accents stay vivid on dark backgrounds. */
+  --vp-c-brand-1: #ff8e6e;
+  --vp-c-brand-2: #f0734f;
+  --vp-c-brand-3: #cf4a24;
+  --vp-c-brand-soft: rgba(255, 142, 110, 0.16);
+
+  --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #ff4733 30%, #34e0cf);
+  --vp-home-hero-image-background-image: linear-gradient(-45deg, #957169 30%, #b8968c 95%);
+}
+
+@media (min-width: 960px) {
+  :root {
+    --vp-home-hero-image-filter: blur(68px);
+  }
+}
+
+/* Display font for documentation headings and the hero text. */
+.VPHero .name,
+.VPHero .text,
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3,
+.VPFeature .title {
+  font-family: var(--ws-font-display);
+  letter-spacing: -0.02em;
+}
+
+/* Feature cards: lift + teal border on hover so the landing feels alive. */
+.VPFeatures .VPFeature {
+  transition:
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.VPFeatures .VPFeature:hover {
+  border-color: var(--vp-c-brand-1);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px -12px var(--vp-c-brand-soft);
+}

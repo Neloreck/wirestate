@@ -4,6 +4,9 @@ layout: home
 hero:
   name: "Wirestate"
   tagline: "A DI foundation for service-owned state"
+  image:
+    src: /logo.svg
+    alt: Wirestate
   actions:
     - theme: brand
       text: Get Started
@@ -13,10 +16,16 @@ hero:
       link: /api/
 
 features:
-  - title: Dependency Injection
+  - icon:
+      src: /icons/dependency-injection.svg
+    title: Dependency Injection
     details: Built-in DI containers with Wirestate services and scoped buses.
-  - title: Scoped Messaging
+  - icon:
+      src: /icons/scoped-messaging.svg
+    title: Scoped Messaging
     details: Events broadcast. Commands write. Queries read. Containers keep their own buses.
-  - title: Bring Reactivity
+  - icon:
+      src: /icons/reactivity.svg
+    title: Bring Reactivity
     details: Use MobX, Preact Signals, or another state bridge.
 ---

@@ -5,6 +5,9 @@ export default defineConfig({
   title: "Wirestate",
   description: "Dependency-injected service state for React and Lit applications",
   head: [["link", { rel: "icon", type: "image/svg+xml", href: "/wirestate/logo.svg" }]],
+  markdown: {
+    theme: { light: "github-light", dark: "night-owl" },
+  },
   async transformPageData(pageData) {
     if (pageData.relativePath.startsWith("api/wirestate-")) {
       pageData.frontmatter.prev = false;
