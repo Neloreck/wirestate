@@ -2,11 +2,8 @@ import { ContextConsumer } from "@lit/context";
 import { ReactiveControllerHost } from "@lit/reactive-element";
 import { Container, ServiceToken } from "@wirestate/core";
 
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { ContainerContext } from "../context/container-context";
-import { AnyObject, Optional } from "../types/general";
+import { Optional } from "../types/general";
 
 /**
  * A fallback for an optional injection: either a raw value or a
@@ -116,12 +113,6 @@ export function useOptionalInjection<T, F = undefined>(
   const resolvedFallback: Optional<OptionalInjectionFallback<F>> =
     options.fallback !== undefined ? options.fallback : fallback;
 
-  dbg.info(prefix(__filename), "Creating:", {
-    host,
-    once,
-    token,
-  });
-
   const current: UseOptionalInjectionValue<T, F> = {
     value: value as T | F,
     token,
@@ -132,34 +123,13 @@ export function useOptionalInjection<T, F = undefined>(
     subscribe: !once,
     callback: (container) => {
       if (container.has(token)) {
-        dbg.info(prefix(__filename), "Resolving injection:", {
-          token,
-          name: (token as AnyObject)?.name ?? token,
-          container,
-          fallback: resolvedFallback,
-        });
-
         current.value = container.get(token);
       } else if (resolvedFallback !== undefined) {
-        dbg.info(prefix(__filename), "Injection not found, using fallback:", {
-          token,
-          name: (token as AnyObject)?.name ?? token,
-          container,
-          fallback: resolvedFallback,
-        });
-
         current.value =
           typeof resolvedFallback === "function"
             ? (resolvedFallback as (container: Container) => F)(container)
             : (resolvedFallback as F);
       } else {
-        dbg.info(prefix(__filename), "Injection not found, returning undefined:", {
-          token,
-          name: (token as AnyObject)?.name ?? token,
-          container,
-          fallback: resolvedFallback,
-        });
-
         current.value = undefined as F;
       }
     },

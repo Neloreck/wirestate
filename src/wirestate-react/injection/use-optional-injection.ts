@@ -1,11 +1,7 @@
 import { Container, ServiceToken } from "@wirestate/core";
 import { useMemo } from "react";
 
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { useContainer } from "../context/use-container";
-import { AnyObject } from "../types/general";
 
 /**
  * A fallback for {@link useOptionalInjection}: either a raw value or a
@@ -59,31 +55,10 @@ export function useOptionalInjection<T, F = undefined>(
   // Revision bump forces a container reset; force re-resolution to drop stale instances.
   return useMemo(() => {
     if (container.has(token)) {
-      dbg.info(prefix(__filename), "Resolving injection:", {
-        token,
-        name: (token as AnyObject)?.name ?? token,
-        container,
-        fallback,
-      });
-
       return container.get<T>(token);
     } else if (fallback !== undefined) {
-      dbg.info(prefix(__filename), "Injection not found, using fallback:", {
-        token,
-        name: (token as AnyObject)?.name ?? token,
-        container,
-        fallback,
-      });
-
       return typeof fallback === "function" ? (fallback as (container: Container) => F)(container) : (fallback as F);
     } else {
-      dbg.info(prefix(__filename), "Injection not found, returning undefined:", {
-        token,
-        name: (token as AnyObject)?.name ?? token,
-        container,
-        fallback,
-      });
-
       return undefined as F;
     }
   }, [container, token]);

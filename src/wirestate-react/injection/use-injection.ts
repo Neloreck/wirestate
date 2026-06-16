@@ -1,11 +1,7 @@
 import { Container, ServiceToken } from "@wirestate/core";
 import { useMemo } from "react";
 
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { useContainer } from "../context/use-container";
-import { AnyObject } from "../types/general";
 
 /**
  * Resolves a value from the active container.
@@ -34,12 +30,6 @@ export function useInjection<T>(token: ServiceToken<T>): T {
 
   // Revision bump causes a container reset; force re-resolution to drop stale instances.
   return useMemo(() => {
-    dbg.info(prefix(__filename), "Resolving injection:", {
-      token,
-      name: (token as AnyObject)?.name ?? token,
-      container,
-    });
-
     return container.get<T>(token);
   }, [container, token]);
 }

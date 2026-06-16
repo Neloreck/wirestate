@@ -1,6 +1,3 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
 import {
   appendHandlerMetadata,
@@ -97,23 +94,10 @@ export function OnCommand(type: CommandType): OnCommandHandlerDecorator {
       // Standard decorators:
       const metadata: DecoratorMetadataObject = validateStandardMethodContext("OnCommand", nameOrContext);
 
-      dbg.info(prefix(__filename), "Attaching OnCommand metadata (TC39):", {
-        type,
-        propertyKey: nameOrContext.name,
-        context: nameOrContext,
-      });
-
       appendStandardHandlerMetadata(metadata, COMMAND_METADATA_KEY, { methodName: nameOrContext.name, type });
       appendStandardHandlerMetadata(metadata, MESSAGING_REGISTRATION_KEY, COMMAND_REGISTRATION);
     } else {
       // Experimental legacy decorators:
-      dbg.info(prefix(__filename), "Attaching OnCommand metadata:", {
-        name: target.constructor.name,
-        type,
-        propertyKey: nameOrContext,
-        target,
-        constructor: target.constructor,
-      });
 
       appendHandlerMetadata(COMMAND_HANDLER_METADATA, target.constructor, { methodName: nameOrContext, type });
       appendHandlerMetadata(MESSAGING_REGISTRATIONS, target.constructor, COMMAND_REGISTRATION);
@@ -135,10 +119,5 @@ export function OnCommand(type: CommandType): OnCommandHandlerDecorator {
  * @returns A read-only array of metadata for all discovered command handlers.
  */
 export function getCommandHandlerMetadata(instance: object): ReadonlyArray<CommandHandlerMetadata> {
-  dbg.info(prefix(__filename), "Resolving instance command metadata:", {
-    name: instance.constructor.name,
-    instance,
-  });
-
   return collectHandlerMetadata(instance, COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY);
 }

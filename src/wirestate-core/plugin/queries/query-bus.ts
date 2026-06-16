@@ -1,6 +1,3 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "../../error/error-code";
 import { WirestateError } from "../../error/wirestate-error";
 import { Injectable } from "../../metadata/metadata-injectable";
@@ -68,8 +65,6 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    * ```
    */
   public query<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): R {
-    dbg.info(prefix(__filename), "Query:", { type, payload });
-
     return this.dispatch<R, P>(type, payload);
   }
 
@@ -91,8 +86,6 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    * @throws {@link WirestateError} If no handler is registered for the given type.
    */
   public queryAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): Promise<R> {
-    dbg.info(prefix(__filename), "Async query:", { type, payload });
-
     return this.dispatchAsync<R, P>(type, payload);
   }
 
@@ -112,8 +105,6 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    * @returns The query handler result as-is, or `undefined` if no handler is found.
    */
   public queryOptional<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): Optional<R> {
-    dbg.info(prefix(__filename), "Query optional:", { type, payload });
-
     return this.dispatchOptional<R, P>(type, payload);
   }
 
@@ -132,8 +123,6 @@ export class QueryBus extends HandlerStackBus<QueryType> {
     type: T,
     payload?: P
   ): Promise<Optional<R>> {
-    dbg.info(prefix(__filename), "Optional async query:", { type, payload });
-
     return this.dispatchOptionalAsync<R, P>(type, payload);
   }
 
@@ -160,12 +149,6 @@ export class QueryBus extends HandlerStackBus<QueryType> {
     type: T,
     handler: QueryHandler<R, P, T>
   ): QueryUnregister {
-    dbg.info(prefix(__filename), "Registering query handler:", {
-      type,
-      handler,
-      bus: this,
-    });
-
     return this.registerHandler<R, P>(type, handler);
   }
 
@@ -186,12 +169,6 @@ export class QueryBus extends HandlerStackBus<QueryType> {
     type: T,
     handler: QueryHandler<R, P, T>
   ): void {
-    dbg.info(prefix(__filename), "Unregistering query handler:", {
-      type,
-      handler,
-      bus: this,
-    });
-
     this.unregisterHandler<R, P>(type, handler);
   }
 }

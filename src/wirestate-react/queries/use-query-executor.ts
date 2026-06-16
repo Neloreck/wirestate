@@ -1,9 +1,6 @@
 import { Container, QueryBus, QueryType } from "@wirestate/core";
 import { useMemo } from "react";
 
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { useContainer } from "../context/use-container";
 import { QueryExecutor } from "../types/queries";
 
@@ -36,11 +33,6 @@ export function useQueryExecutor(): QueryExecutor {
     const bus: QueryBus = container.get(QueryBus);
 
     return ((type: QueryType, payload?: unknown) => {
-      dbg.info(prefix(__filename), "Query payload:", {
-        type,
-        payload,
-      });
-
       return bus.query(type, payload);
     }) as QueryExecutor;
   }, [container]);

@@ -1,6 +1,3 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { Container } from "../../container/container";
 import { inject } from "../../container/container-context";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
@@ -98,8 +95,6 @@ export class EventBus {
       (event as { source: S }).source = options.source;
     }
 
-    dbg.info(prefix(__filename), "Emit event:", { event });
-
     // Snapshot each bucket so subscriptions may change during emit.
     // Catch-all subscriptions run before type-specific ones.
     const allEventsSubscriptions: Maybe<Set<EventSubscription>> = this.handlers.get(ALL_EVENTS_TYPE);
@@ -160,12 +155,6 @@ export class EventBus {
     const types: Nullable<EventType | ReadonlyArray<EventType>> =
       handler === undefined ? null : (typesOrHandler as Nullable<EventType | ReadonlyArray<EventType>>);
 
-    dbg.info(prefix(__filename), "Adding event subscription:", {
-      handler: resolvedHandler,
-      types,
-      bus: this,
-    });
-
     // One subscription identity is shared across every bucket it registers in,
     // so the returned unsubscriber removes exactly this subscription and nothing
     // that another call registered for the same handler.
@@ -222,12 +211,6 @@ export class EventBus {
     const resolvedHandler: EventHandler = handler ?? (typesOrHandler as EventHandler);
     const types: Nullable<EventType | ReadonlyArray<EventType>> =
       handler === undefined ? null : (typesOrHandler as Nullable<EventType | ReadonlyArray<EventType>>);
-
-    dbg.info(prefix(__filename), "Removing event subscription:", {
-      handler: resolvedHandler,
-      types,
-      bus: this,
-    });
 
     for (const key of this.resolveKeys(types)) {
       this.removeByHandler(key, resolvedHandler);

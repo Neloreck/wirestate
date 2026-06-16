@@ -2,9 +2,6 @@ import { ContextConsumer } from "@lit/context";
 import { ReactiveControllerHost } from "@lit/reactive-element";
 import { ServiceToken } from "@wirestate/core";
 
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { ContainerContext } from "../context/container-context";
 import { Nullable } from "../types/general";
 
@@ -92,12 +89,6 @@ export function useInjection<T>(
       : { token: optionsOrToken as ServiceToken<T> };
 
   const { once, token, value } = options;
-
-  dbg.info(prefix(__filename), "Creating:", {
-    host,
-    once,
-    token,
-  });
 
   const current: UseInjectionValue<T> = { value: value as unknown as T, token };
 

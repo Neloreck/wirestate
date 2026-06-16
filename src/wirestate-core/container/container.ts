@@ -1,6 +1,3 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { setActivationAdapter } from "../activation/activation-adapter";
 import { wirestateActivationAdapter } from "../activation/activation-lifecycle";
 import {
@@ -108,8 +105,6 @@ export class Container extends ContainerKernel {
    * @param config - Container setup config.
    */
   public constructor(config: ContainerConfig = {}) {
-    dbg.info(prefix(__filename), "Creating container:", { config });
-
     validateContainerConfig(config);
 
     super(config.parent);
@@ -129,8 +124,6 @@ export class Container extends ContainerKernel {
     if (config.plugins) {
       setContainerPlugins(this, config.plugins);
     }
-
-    dbg.info(prefix(__filename), "Injecting bindings on creation:", { container: this, config });
 
     this.bind({ token: Container, value: this });
 

@@ -1,6 +1,3 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { Optional } from "../types/general";
@@ -103,11 +100,6 @@ export function createSingleMethodDecoratorDescriptor(
           // Standard decorators:
           const metadata: DecoratorMetadataObject = validateStandardMethodContext(name, nameOrContext);
 
-          dbg.info(prefix(__filename), `Attaching ${name} metadata (TC39):`, {
-            propertyKey: nameOrContext.name,
-            context: nameOrContext,
-          });
-
           if (metadataKey === undefined) {
             throw new WirestateError(
               `@${name}() is not configured for TC39 standard decorators: missing metadata key.`,
@@ -126,12 +118,6 @@ export function createSingleMethodDecoratorDescriptor(
           metadata[metadataKey] = nameOrContext.name;
         } else {
           // Experimental legacy decorators:
-          dbg.info(prefix(__filename), `Attaching ${name} metadata:`, {
-            name: target.constructor.name,
-            propertyKey: nameOrContext,
-            target,
-            constructor: target.constructor,
-          });
 
           const constructor: object = target.constructor;
 
@@ -147,8 +133,6 @@ export function createSingleMethodDecoratorDescriptor(
       }) as SingleMethodDecorator;
     },
     getMetadata: (instance: object): Optional<string | symbol> => {
-      dbg.info(prefix(__filename), `Resolving ${name} metadata:`, { name: instance.constructor.name, instance });
-
       let handler: Optional<string | symbol> = undefined;
 
       for (const metadata of getPrototypeChainMetadata(instance, registry, metadataKey)) {

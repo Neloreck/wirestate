@@ -37,11 +37,6 @@ export default defineConfig([
           pathGroups: [
             {
               group: "external",
-              pattern: "@/macroses/**",
-              position: "after",
-            },
-            {
-              group: "external",
               pattern: "@/**",
               position: "after",
             },

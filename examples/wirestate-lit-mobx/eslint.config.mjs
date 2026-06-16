@@ -76,11 +76,6 @@ export default [
           pathGroups: [
             {
               group: "external",
-              pattern: "@/macroses/**",
-              position: "after",
-            },
-            {
-              group: "external",
               pattern: "@/**",
               position: "after",
             },

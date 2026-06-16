@@ -28,7 +28,6 @@ module.exports = {
         root: ["./"],
         alias: {
           "@/fixtures": "./src/fixtures",
-          "@/macroses": "./src/macroses",
           "@wirestate/core": "./src/wirestate-core",
           "@wirestate/lit": "./src/wirestate-lit",
           "@wirestate/lit-mobx": "./src/wirestate-lit-mobx",
@@ -41,6 +40,5 @@ module.exports = {
         },
       },
     ],
-    "macros",
   ],
 };

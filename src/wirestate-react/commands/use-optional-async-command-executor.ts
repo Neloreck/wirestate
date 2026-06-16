@@ -1,9 +1,6 @@
 import { Container, CommandBus, CommandType } from "@wirestate/core";
 import { useMemo } from "react";
 
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { useContainer } from "../context/use-container";
 import { OptionalAsyncCommandExecutor } from "../types/commands";
 
@@ -34,11 +31,6 @@ export function useOptionalAsyncCommandExecutor(): OptionalAsyncCommandExecutor 
     const bus: CommandBus = container.get(CommandBus);
 
     return ((type: CommandType, payload?: unknown) => {
-      dbg.info(prefix(__filename), "Optional async command:", {
-        type,
-        payload,
-      });
-
       return bus.executeOptionalAsync(type, payload);
     }) as OptionalAsyncCommandExecutor;
   }, [container]);

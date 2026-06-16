@@ -1,6 +1,3 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import type { ContainerKernel } from "../../container/container-kernel";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
 import type { Maybe } from "../../types/general";
@@ -55,8 +52,6 @@ export function buildEventDispatchers<T extends object>(
   instance: T,
   container?: ContainerKernel
 ): ReadonlyArray<EventDispatch> {
-  dbg.info(prefix(__filename), "Build event dispatchers for:", { name: instance.constructor.name, instance });
-
   // Merge every @OnEvent decoration of the same method into one plan, keyed by
   // method name in parent-to-child first-seen order.
   const plans: Map<string | symbol, DispatcherPlan> = new Map();
@@ -113,12 +108,6 @@ export function buildEventDispatchers<T extends object>(
       },
     });
   }
-
-  dbg.info(prefix(__filename), "Built event dispatchers for:", {
-    name: instance.constructor.name,
-    instance,
-    dispatchers,
-  });
 
   return dispatchers;
 }

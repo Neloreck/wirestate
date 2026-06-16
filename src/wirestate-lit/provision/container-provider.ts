@@ -2,9 +2,6 @@ import { ContextProvider } from "@lit/context";
 import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-element";
 import { Container, ContainerConfig, WirestateError, validateContainerConfig } from "@wirestate/core";
 
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { ContainerContext } from "../context/container-context";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { Maybe } from "../types/general";
@@ -107,12 +104,6 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
 
     this.config = options.config ? { ...options.config, activate: options.config.activate ?? true } : null;
     this.container = options.container;
-
-    dbg.info(prefix(__filename), "Constructed:", {
-      host: this.host,
-      container: this.container,
-      options: this.config,
-    });
   }
 
   public hostConnected(): void {
@@ -234,10 +225,6 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
    */
   protected destroyManagedContainer(container: Container): void {
     container.deprovision();
-
-    dbg.info(prefix(__filename), "Destroying managed container:", {
-      container,
-    });
 
     this.container = null;
 

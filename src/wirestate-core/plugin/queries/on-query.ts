@@ -1,6 +1,3 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
 import {
   appendHandlerMetadata,
@@ -99,23 +96,10 @@ export function OnQuery(type: QueryType): OnQueryHandlerDecorator {
       // Standard decorators:
       const metadata: DecoratorMetadataObject = validateStandardMethodContext("OnQuery", nameOrContext);
 
-      dbg.info(prefix(__filename), "Attaching OnQuery metadata (TC39):", {
-        type,
-        propertyKey: nameOrContext.name,
-        context: nameOrContext,
-      });
-
       appendStandardHandlerMetadata(metadata, QUERY_METADATA_KEY, { methodName: nameOrContext.name, type });
       appendStandardHandlerMetadata(metadata, MESSAGING_REGISTRATION_KEY, QUERY_REGISTRATION);
     } else {
       // Experimental legacy decorators:
-      dbg.info(prefix(__filename), "Attaching OnQuery metadata:", {
-        name: target.constructor.name,
-        type,
-        propertyKey: nameOrContext,
-        target,
-        constructor: target.constructor,
-      });
 
       appendHandlerMetadata(QUERY_HANDLER_METADATA, target.constructor, { methodName: nameOrContext, type });
       appendHandlerMetadata(MESSAGING_REGISTRATIONS, target.constructor, QUERY_REGISTRATION);
@@ -137,7 +121,5 @@ export function OnQuery(type: QueryType): OnQueryHandlerDecorator {
  * @returns A read-only array of query handler metadata, ordered from base to derived class.
  */
 export function getQueryHandlerMetadata(instance: object): ReadonlyArray<QueryHandlerMetadata> {
-  dbg.info(prefix(__filename), "Resolving instance query metadata:", { name: instance.constructor.name, instance });
-
   return collectHandlerMetadata(instance, QUERY_HANDLER_METADATA, QUERY_METADATA_KEY);
 }

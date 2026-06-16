@@ -1,8 +1,5 @@
 import { Container } from "@wirestate/core";
 
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { Maybe } from "../types/general";
 
 /**
@@ -32,8 +29,6 @@ export function retainContainer(container: Container, pendingDestruction: ReactC
   const timeout: Maybe<ReturnType<typeof setTimeout>> = pendingDestruction.get(container);
 
   if (timeout) {
-    dbg.info(prefix(__filename), "Retaining container:", { container });
-
     clearTimeout(timeout);
     pendingDestruction.delete(container);
   }
@@ -58,13 +53,9 @@ export function scheduleContainerDestruction(
 
   container.deprovision();
 
-  dbg.info(prefix(__filename), "Scheduling container destruction:", { container });
-
   pendingDestruction.set(
     container,
     setTimeout(() => {
-      dbg.info(prefix(__filename), "Destroying container:", { container });
-
       pendingDestruction.delete(container);
       container.unbindAll();
     }, 0)

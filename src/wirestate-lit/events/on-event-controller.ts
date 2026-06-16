@@ -2,9 +2,6 @@ import { ContextConsumer } from "@lit/context";
 import { ReactiveController, ReactiveElement } from "@lit/reactive-element";
 import { EventBus, EventHandler, EventType, EventUnsubscribe, WireEvent } from "@wirestate/core";
 
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { ContainerContext } from "../context/container-context";
 import { Nullable } from "../types/general";
 
@@ -42,8 +39,6 @@ export class OnEventController<E extends WireEvent = WireEvent> implements React
    * @param handler - The event handler function.
    */
   public constructor(host: ReactiveElement, types: Nullable<ReadonlyArray<EventType>>, handler: EventHandler<E>) {
-    dbg.info(prefix(__filename), "Constructing:", { host, types });
-
     host.addController(this);
 
     this.types = types;
@@ -64,12 +59,10 @@ export class OnEventController<E extends WireEvent = WireEvent> implements React
   }
 
   public hostConnected(): void {
-    dbg.info(prefix(__filename), "Host connected:", { types: this.types });
     this.resubscribe();
   }
 
   public hostDisconnected(): void {
-    dbg.info(prefix(__filename), "Host disconnected:", { types: this.types });
     this.cleanup();
   }
 
@@ -77,14 +70,11 @@ export class OnEventController<E extends WireEvent = WireEvent> implements React
     this.cleanup();
 
     if (this.bus) {
-      dbg.info(prefix(__filename), "Registering events handler:", { types: this.types });
       this.unsubscriber = this.bus.subscribe(this.types, this.handler as EventHandler);
     }
   }
 
   private cleanup(): void {
-    dbg.info(prefix(__filename), "Cleanup:", { types: this.types });
-
     this.unsubscriber?.();
     this.unsubscriber = null;
   }

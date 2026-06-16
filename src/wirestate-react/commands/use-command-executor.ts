@@ -1,9 +1,6 @@
 import { Container, CommandBus, CommandType } from "@wirestate/core";
 import { useMemo } from "react";
 
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { useContainer } from "../context/use-container";
 import { CommandExecutor } from "../types/commands";
 
@@ -34,11 +31,6 @@ export function useCommandExecutor(): CommandExecutor {
     const bus: CommandBus = container.get(CommandBus);
 
     return <R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R => {
-      dbg.info(prefix(__filename), "Command:", {
-        type,
-        payload,
-      });
-
       return bus.execute<R, P, T>(type, payload);
     };
   }, [container]);

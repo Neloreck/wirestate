@@ -1,6 +1,3 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { InternalErrorSource, reportWirestateInternalError } from "../error/internal-error-handler";
 import type { MaybePromise } from "../types/general";
 
@@ -81,14 +78,6 @@ export function callLifecycleHandler(options: CallLifecycleHandlerOptions): void
   if (typeof method !== "function") {
     return;
   }
-
-  dbg.info(prefix(__filename), "Calling lifecycle handler:", {
-    name: instanceName,
-    instance,
-    methodName,
-    decoratorName: name,
-    source,
-  });
 
   try {
     const result: MaybePromise<void> = (method as (...args: Array<unknown>) => MaybePromise<void>).call(

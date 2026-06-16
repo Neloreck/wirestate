@@ -2,9 +2,6 @@ import { ContextConsumer } from "@lit/context";
 import { ReactiveControllerHost } from "@lit/reactive-element";
 import { Container } from "@wirestate/core";
 
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { ContainerContext } from "../context/container-context";
 
 /**
@@ -42,10 +39,6 @@ export interface UseContainerValue {
  * ```
  */
 export function useContainer<E extends ReactiveControllerHost & HTMLElement>(host: E): UseContainerValue {
-  dbg.info(prefix(__filename), "Creating:", {
-    host,
-  });
-
   const current: UseContainerValue = { value: null as unknown as Container };
 
   new ContextConsumer(host, {

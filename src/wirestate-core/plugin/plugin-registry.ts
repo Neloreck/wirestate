@@ -1,6 +1,3 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import type { ServiceToken } from "../binding/binding";
 import type { Container } from "../container/container";
 import type { ContainerKernel } from "../container/container-kernel";
@@ -229,7 +226,7 @@ function reversed(plugins: ReadonlyArray<WirestatePlugin>): ReadonlyArray<Wirest
 function runFailsafe(run: () => void): void {
   try {
     run();
-  } catch (error) {
-    dbg.error(prefix(__filename), "Plugin teardown hook threw (ignored):", { error });
+  } catch {
+    // Failsafe: teardown errors are swallowed so teardown never aborts.
   }
 }

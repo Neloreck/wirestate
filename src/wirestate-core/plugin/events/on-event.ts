@@ -1,6 +1,3 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import type { ContainerKernel } from "../../container/container-kernel";
 import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
 import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../../metadata/metadata-handlers";
@@ -97,12 +94,6 @@ export function OnEvent(types?: EventType | ReadonlyArray<EventType>): OnEventHa
       // Standard decorators:
       const metadata: DecoratorMetadataObject = validateStandardMethodContext("OnEvent", nameOrContext);
 
-      dbg.info(prefix(__filename), "Attaching OnEvent metadata (TC39):", {
-        types,
-        propertyKey: nameOrContext.name,
-        context: nameOrContext,
-      });
-
       appendStandardHandlerMetadata(metadata, EVENT_METADATA_KEY, {
         methodName: nameOrContext.name,
         types: normalized,
@@ -110,13 +101,6 @@ export function OnEvent(types?: EventType | ReadonlyArray<EventType>): OnEventHa
       appendStandardHandlerMetadata(metadata, MESSAGING_REGISTRATION_KEY, EVENT_REGISTRATION);
     } else {
       // Experimental legacy decorators:
-      dbg.info(prefix(__filename), "Attaching OnEvent metadata:", {
-        name: target.constructor.name,
-        types,
-        propertyKey: nameOrContext,
-        target,
-        constructor: target.constructor,
-      });
 
       appendHandlerMetadata(EVENT_HANDLER_METADATA, target.constructor, {
         methodName: nameOrContext,

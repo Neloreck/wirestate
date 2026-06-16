@@ -1,6 +1,3 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import {
   getInstanceContainer,
   getInstanceRecord,
@@ -58,8 +55,6 @@ export function provisionContainer(container: Container, bindings: Bindings = co
     );
   }
 
-  dbg.info(prefix(__filename), "Provisioning container:", { container });
-
   state.status = undefined;
   state.instances = provisionInstances(container, state, bindings);
   state.status = true;
@@ -91,11 +86,6 @@ export function deprovisionContainer(container: Container): void {
   const instances: Nullable<Array<object>> = state.instances;
 
   if (instances) {
-    dbg.info(prefix(__filename), "Deprovisioning container:", {
-      container,
-      instances,
-    });
-
     deprovisionInstances(container, state, instances);
 
     markActiveInstancesDeprovisioned(container);
@@ -475,6 +465,7 @@ function runDeprovisionHooks(instances: ReadonlyArray<object>): ReadonlyArray<ob
         instance,
         instanceName: instance.constructor.name,
         methodName,
+        rethrowSync: false,
         source: "provider-deprovision",
         syncFailureMessage: "@OnDeprovision failed for",
       });
@@ -520,8 +511,8 @@ function unsubscribeInstance(state: ProvisionState, instance: object): void {
   for (const dispose of disposers) {
     try {
       dispose();
-    } catch (error) {
-      dbg.error(prefix(__filename), "Messaging unsubscribe threw during deprovision (ignored):", { error });
+    } catch {
+      // Failsafe: a disposer that throws must not abort the remaining disposers.
     }
   }
 }

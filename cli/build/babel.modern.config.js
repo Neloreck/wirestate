@@ -25,13 +25,5 @@ export const BABEL_CONFIG = {
         },
       },
     ],
-    [
-      "macros",
-      {
-        "babel-plugin-macros": {
-          configName: "macros",
-        },
-      },
-    ],
   ],
 };

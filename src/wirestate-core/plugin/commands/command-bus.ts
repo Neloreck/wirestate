@@ -1,6 +1,3 @@
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER } from "../../error/error-code";
 import { WirestateError } from "../../error/wirestate-error";
 import { Injectable } from "../../metadata/metadata-injectable";
@@ -68,8 +65,6 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    * ```
    */
   public execute<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R {
-    dbg.info(prefix(__filename), "Execute command:", { type, payload });
-
     return this.dispatch<R, P>(type, payload);
   }
 
@@ -91,8 +86,6 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    * @throws {@link WirestateError} If no handler is registered.
    */
   public executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): Promise<R> {
-    dbg.info(prefix(__filename), "Execute async command:", { type, payload });
-
     return this.dispatchAsync<R, P>(type, payload);
   }
 
@@ -111,8 +104,6 @@ export class CommandBus extends HandlerStackBus<CommandType> {
     type: T,
     payload?: P
   ): Optional<R> {
-    dbg.info(prefix(__filename), "Execute optional command:", { type, payload });
-
     return this.dispatchOptional<R, P>(type, payload);
   }
 
@@ -131,8 +122,6 @@ export class CommandBus extends HandlerStackBus<CommandType> {
     type: T,
     payload?: P
   ): Promise<Optional<R>> {
-    dbg.info(prefix(__filename), "Execute optional async command:", { type, payload });
-
     return this.dispatchOptionalAsync<R, P>(type, payload);
   }
 
@@ -161,12 +150,6 @@ export class CommandBus extends HandlerStackBus<CommandType> {
     type: T,
     handler: CommandHandler<R, P, T>
   ): CommandUnregister {
-    dbg.info(prefix(__filename), "Registering command handler:", {
-      type,
-      handler,
-      bus: this,
-    });
-
     return this.registerHandler<R, P>(type, handler);
   }
 
@@ -187,12 +170,6 @@ export class CommandBus extends HandlerStackBus<CommandType> {
     type: T,
     handler: CommandHandler<R, P, T>
   ): void {
-    dbg.info(prefix(__filename), "Unregistering command handler:", {
-      type,
-      handler,
-      bus: this,
-    });
-
     this.unregisterHandler<R, P>(type, handler);
   }
 }

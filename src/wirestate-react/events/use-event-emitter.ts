@@ -1,9 +1,6 @@
 import { Container, EventBus, EventEmitOptions, EventType } from "@wirestate/core";
 import { useMemo } from "react";
 
-import { dbg } from "@/macroses/dbg.macro";
-import { prefix } from "@/macroses/prefix.macro";
-
 import { useContainer } from "../context/use-container";
 import { EventEmitter } from "../types/events";
 
@@ -36,12 +33,6 @@ export function useEventEmitter<P = unknown, T extends EventType = EventType, S 
     const bus: EventBus = container.get(EventBus);
 
     return <P, T extends EventType>(type: T, payload?: P, options?: EventEmitOptions<S>) => {
-      dbg.info(prefix(__filename), "Emit event:", {
-        type,
-        payload,
-        options,
-      });
-
       bus.emit(type, payload, options);
     };
   }, [container]);
