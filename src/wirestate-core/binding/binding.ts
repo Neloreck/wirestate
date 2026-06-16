@@ -81,9 +81,21 @@ export interface InstanceBindingDescriptor<T = unknown> {
   readonly token: ServiceToken<T>;
 
   /**
-   * Service constructor to bind. Instances are singletons.
+   * Service constructor to bind.
    */
   readonly value: Newable<NoInfer<T>>;
+
+  /**
+   * Lifetime scope for the instance.
+   *
+   * @remarks
+   * Defaults to `Singleton` (constructed once, cached, owned by the container with
+   * full instance lifecycle). A `Transient` instance is constructed fresh on every
+   * resolution and never owned or tracked — construct-and-forget — so its class must
+   * declare no wirestate lifecycle or messaging handlers (rejected at bind time
+   * otherwise).
+   */
+  readonly scope?: BindingScopeValue;
 }
 
 /**

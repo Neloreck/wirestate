@@ -188,9 +188,10 @@ export class ContainerKernel {
   }
 
   /**
-   * Returns the service instances this container constructed for instance bindings,
-   * in creation order. Values constructed for value and factory bindings are not
-   * service instances and are not included.
+   * Returns the service instances this container constructed for singleton instance
+   * bindings, in creation order. Values constructed for value and factory bindings are
+   * not service instances and are not included; neither are transient instances, which
+   * are construct-and-forget and never owned or tracked by the container.
    *
    * @returns Snapshot of this container's active service instances.
    */

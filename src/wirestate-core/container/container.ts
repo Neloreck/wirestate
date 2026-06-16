@@ -3,7 +3,14 @@ import { prefix } from "@/macroses/prefix.macro";
 
 import { setActivationAdapter } from "../activation/activation-adapter";
 import { wirestateActivationAdapter } from "../activation/activation-lifecycle";
-import type { Bindings, ServiceToken } from "../binding/binding";
+import {
+  BindingScope,
+  BindingType,
+  type BindingDescriptor,
+  type Bindings,
+  type InstanceBindingDescriptor,
+  type ServiceToken,
+} from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
 import {
   getConfiguredInternalErrorHandler,
@@ -17,10 +24,11 @@ import {
   deprovisionContainerBinding,
   provisionContainer,
 } from "../provision/provision-lifecycle";
-import { Maybe } from "../types/general";
+import { Maybe, Newable } from "../types/general";
 
 import { validateContainerConfig } from "./container-config-validation";
 import { ContainerKernel } from "./container-kernel";
+import { validateTransientInstanceBinding } from "./container-transient-binding-validation";
 
 /**
  * Describes reusable {@link Container} construction config.
@@ -122,9 +130,9 @@ export class Container extends ContainerKernel {
       setContainerPlugins(this, config.plugins);
     }
 
-    this.bind({ token: Container, value: this });
-
     dbg.info(prefix(__filename), "Injecting bindings on creation:", { container: this, config });
+
+    this.bind({ token: Container, value: this });
 
     if (config.bindings) {
       for (const binding of config.bindings) {
@@ -141,6 +149,34 @@ export class Container extends ContainerKernel {
     for (const binding of activate) {
       this.get(binding);
     }
+  }
+
+  /**
+   * Binds a service class or a binding descriptor, then delegates to the kernel.
+   *
+   * @remarks
+   * Adds the lifecycle-aware guard the pure kernel cannot carry (ADR 0004): a
+   * `Transient` instance binding must declare no wirestate lifecycle or messaging
+   * handlers, since the container never owns the fresh-per-resolution instance for
+   * them to fire against. Every other binding passes straight through to
+   * {@link ContainerKernel.bind}.
+   *
+   * @param binding - Service class or binding descriptor to register.
+   * @returns The same container for chaining.
+   *
+   * @throws {@link WirestateError} If the binding is invalid, or a transient instance
+   * binding's class declares a lifecycle or messaging handler.
+   */
+  public override bind<T>(binding: Newable<object> | BindingDescriptor<T>): this {
+    if (
+      typeof binding !== "function" &&
+      binding.type === BindingType.Instance &&
+      (binding as InstanceBindingDescriptor<T>).scope === BindingScope.Transient
+    ) {
+      validateTransientInstanceBinding(binding as InstanceBindingDescriptor<T>);
+    }
+
+    return super.bind(binding);
   }
 
   /**

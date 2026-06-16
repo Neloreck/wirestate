@@ -1,5 +1,6 @@
 import { InstanceBindingDescriptor } from "@wirestate/core";
 
+import { OnDeactivation } from "../activation/on-deactivation";
 import { InjectionToken } from "../binding/binding-tokens";
 import { ERROR_CODE_INVALID_BINDING_SCOPE } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
@@ -122,5 +123,57 @@ describe("Binding scopes", () => {
     container.bind({ token: token, scope: "Transient", factory: () => "second" });
 
     expect(container.get(token)).toBe("second");
+  });
+
+  it("should construct a transient instance descriptor fresh on every resolution", () => {
+    const container = new ContainerKernel();
+    const constructed = jest.fn();
+
+    @Injectable()
+    class MyService {
+      public constructor() {
+        constructed();
+      }
+    }
+
+    container.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient" });
+
+    const first = container.get(MyService);
+    const second = container.get(MyService);
+
+    expect(first).toBeInstanceOf(MyService);
+    expect(first).not.toBe(second);
+    expect(constructed).toHaveBeenCalledTimes(2);
+  });
+
+  it("should resolve a transient instance descriptor fresh through a child container", () => {
+    const parent = new ContainerKernel();
+    const child = new ContainerKernel(parent);
+
+    @Injectable()
+    class MyService {}
+
+    parent.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient" });
+
+    expect(child.get(MyService)).toBeInstanceOf(MyService);
+    expect(child.get(MyService)).not.toBe(child.get(MyService));
+  });
+
+  it("should not enforce the lifecycle-handler guard on a bare kernel", () => {
+    // The guard lives on Container.bind: a bare kernel runs no activation
+    // adapter and no provision, so a transient instance binding whose class declares a
+    // handler is allowed here — the handler simply never fires.
+    const container = new ContainerKernel();
+
+    @Injectable()
+    class MyService {
+      @OnDeactivation()
+      public onDeactivation(): void {}
+    }
+
+    expect(() =>
+      container.bind({ token: MyService, type: "Instance", value: MyService, scope: "Transient" })
+    ).not.toThrow();
+    expect(container.get(MyService)).not.toBe(container.get(MyService));
   });
 });
