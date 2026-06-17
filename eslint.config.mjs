@@ -55,6 +55,7 @@ export default [
       "@typescript-eslint/array-type": ["error", { default: "generic" }],
       "@typescript-eslint/no-require-imports": "off",
       "react/prop-types": "off",
+      "react/jsx-curly-brace-presence": ["error", { props: "always", children: "ignore" }],
       "import/no-unresolved": "off",
       "jsdoc/tag-lines": [
         "error",
@@ -174,6 +175,13 @@ export default [
     files: ["**/types/general.ts", "src/fixtures/types.ts"],
     rules: {
       "no-restricted-syntax": "off",
+    },
+  },
+  {
+    files: ["**/*.tsx"],
+    rules: {
+      "jsdoc/require-param": "off",
+      "jsdoc/require-returns": "off",
     },
   },
 ];
