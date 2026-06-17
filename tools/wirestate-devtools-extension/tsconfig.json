@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "types": ["chrome", "node"],
+    "paths": {
+      "@/*": ["./src/*"],
+      // Dev-time shortcut: resolve the public devtools specifier straight to the protocol source so
+      // a change to the RC protocol reflects here immediately. Pointed at devtools-hook directly
+      // (not devtools.ts) to keep the heavyweight DevToolsPlugin module graph out of the type program.
+      // The published-barrel compile is covered by examples/wirestate-react-devtools (ADR 0011).
+      "@wirestate/core/devtools": ["../../src/wirestate-core/plugin/devtools/devtools-hook.ts"]
+    }
+  },
+  "include": ["src", "vite.config.ts", "manifest.config.ts"]
+}

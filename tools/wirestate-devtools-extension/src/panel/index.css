@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+/* Drive dark mode from a `.dark` class on <html> (set from chrome.devtools.panels.themeName)
+   instead of prefers-color-scheme, so the panel follows the DevTools theme, not the OS. */
+@custom-variant dark (&:where(.dark, .dark *));
