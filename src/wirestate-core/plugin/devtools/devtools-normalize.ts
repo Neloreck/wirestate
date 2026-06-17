@@ -9,7 +9,7 @@ import { getEventHandlerMetadata } from "../events/events-registry";
 import type { WirestatePlugin } from "../plugin";
 import { getQueryHandlerMetadata } from "../queries/on-query";
 
-import type {
+import {
   DevtoolsBinding,
   DevtoolsHandler,
   DevtoolsInstance,
@@ -17,7 +17,7 @@ import type {
   DevtoolsInstanceStatus,
   DevtoolsPluginInfo,
   DevtoolsToken,
-} from "./devtools-hook";
+} from "./devtools-hook.types";
 
 /**
  * Normalizes a service token into a display-ready record.
@@ -127,18 +127,16 @@ function normalizeHandlers(instance: object): ReadonlyArray<DevtoolsHandler> {
  * @returns The normalized status, or `undefined` when the instance is not tracked.
  */
 function readStatus(instance: object): Optional<DevtoolsInstanceStatus> {
-  let status: Optional<WireStatus>;
-
   try {
-    status = WireStatus.for(instance);
+    const status: Optional<WireStatus> = WireStatus.for(instance);
+
+    return {
+      isDeactivated: status.isDeactivated,
+      isDeprovisioned: status.isDeprovisioned,
+      isInactive: status.isInactive,
+      provisionId: status.provisionId,
+    };
   } catch {
     return undefined;
   }
-
-  return {
-    isDeactivated: status.isDeactivated,
-    isDeprovisioned: status.isDeprovisioned,
-    isInactive: status.isInactive,
-    provisionId: status.provisionId,
-  };
 }

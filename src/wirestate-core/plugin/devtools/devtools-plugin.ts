@@ -4,19 +4,17 @@ import type { Optional } from "../../types/general";
 import type { WirestatePlugin } from "../plugin";
 import { getOwnPlugins } from "../plugin-registry";
 
+import { DEVTOOLS_PROTOCOL_VERSION, type DevtoolsHook, installDevtoolsHook } from "./devtools-hook";
 import {
-  DEVTOOLS_PROTOCOL_VERSION,
-  type DevtoolsContainerId,
-  type DevtoolsContainerSnapshot,
-  type DevtoolsHook,
-  type DevtoolsInspectPath,
-  type DevtoolsInstance,
-  type DevtoolsInstanceId,
-  type DevtoolsLifecyclePhase,
-  type DevtoolsRootId,
-  type DevtoolsRootSnapshot,
-  installDevtoolsHook,
-} from "./devtools-hook";
+  DevtoolsContainerId,
+  DevtoolsContainerSnapshot,
+  DevtoolsInspectPath,
+  DevtoolsInstance,
+  DevtoolsInstanceId,
+  DevtoolsLifecyclePhase,
+  DevtoolsRootId,
+  DevtoolsRootSnapshot,
+} from "./devtools-hook.types";
 import { normalizeBinding, normalizeInstance, normalizePlugin } from "./devtools-normalize";
 import { tapContainerBuses } from "./devtools-tap";
 

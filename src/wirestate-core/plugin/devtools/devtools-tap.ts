@@ -10,7 +10,7 @@ import type {
   DevtoolsMessageChannel,
   DevtoolsMessageResult,
   DevtoolsRegistration,
-} from "./devtools-hook";
+} from "./devtools-hook.types";
 
 /**
  * Where a tapped bus reports observed traffic.
