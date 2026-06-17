@@ -1,6 +1,7 @@
 import type { DevtoolsEvent, DevtoolsRootSnapshot } from "@wirestate/core/devtools";
 import { useEffect, useRef } from "react";
 
+import type { InspectFn } from "@/bridge/messages";
 import { type ResolvedEntity, resolveSelection } from "@/panel/selectors";
 import { type Selection, sameSelection } from "@/panel/types";
 import type { PanelActions } from "@/panel/use-panel-state";
@@ -17,10 +18,11 @@ interface DetailProps {
   readonly log: ReadonlyArray<DevtoolsEvent>;
   readonly selection: Optional<Selection>;
   readonly actions: PanelActions;
+  readonly inspect: InspectFn;
 }
 
 /** Detail pane: routes the current selection to its view, with breadcrumb + dead-entity tombstone. */
-export function Detail({ roots, log, selection, actions }: DetailProps) {
+export function Detail({ roots, log, selection, actions, inspect }: DetailProps) {
   const cache = useRef<Optional<{ selection: Selection; resolved: ResolvedEntity }>>(undefined);
   const resolved: Optional<ResolvedEntity> = selection ? resolveSelection(roots, selection) : undefined;
 
@@ -45,7 +47,7 @@ export function Detail({ roots, log, selection, actions }: DetailProps) {
       return (
         <>
           <Breadcrumb resolved={resolved} actions={actions} />
-          <View resolved={resolved} roots={roots} log={log} actions={actions} />
+          <View resolved={resolved} roots={roots} log={log} actions={actions} inspect={inspect} />
         </>
       );
     }
@@ -68,7 +70,7 @@ export function Detail({ roots, log, selection, actions }: DetailProps) {
         </div>
         {dead ? (
           <div className={"pointer-events-none opacity-60"}>
-            <View resolved={dead} roots={roots} log={log} actions={actions} />
+            <View resolved={dead} roots={roots} log={log} actions={actions} inspect={inspect} />
           </div>
         ) : null}
       </div>
@@ -112,17 +114,28 @@ function View({
   roots,
   log,
   actions,
+  inspect,
 }: {
   resolved: ResolvedEntity;
   roots: ReadonlyArray<DevtoolsRootSnapshot>;
   log: ReadonlyArray<DevtoolsEvent>;
   actions: PanelActions;
+  inspect: InspectFn;
 }) {
   switch (resolved.kind) {
     case "container":
       return <ContainerDetail container={resolved.container} roots={roots} log={log} actions={actions} />;
     case "instance":
-      return <InstanceDetail container={resolved.container} instance={resolved.instance} log={log} actions={actions} />;
+      return (
+        <InstanceDetail
+          container={resolved.container}
+          instance={resolved.instance}
+          log={log}
+          actions={actions}
+          roots={roots}
+          inspect={inspect}
+        />
+      );
     case "binding":
       return <BindingDetail container={resolved.container} binding={resolved.binding} actions={actions} />;
     case "plugin":

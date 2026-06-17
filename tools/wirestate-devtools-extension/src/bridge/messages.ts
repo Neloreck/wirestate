@@ -13,6 +13,25 @@ export const CONTENT_PORT = "wirestate-content" as const;
 export const PANEL_PORT_PREFIX = "wirestate-panel:" as const;
 
 /**
+ * One level of a dehydrated instance value, returned by `inspect`. Objects/arrays expose their
+ * children's keys/length so the panel can lazily request the next level. `unsupported` means the
+ * inspected page's wirestate build predates on-demand inspection.
+ */
+export type InspectNode =
+  | { readonly t: "primitive"; readonly value: string | number | boolean | null }
+  | { readonly t: "leaf"; readonly preview: string }
+  | { readonly t: "object"; readonly preview: string; readonly keys: ReadonlyArray<string> }
+  | { readonly t: "array"; readonly preview: string; readonly length: number }
+  | { readonly t: "unsupported" };
+
+/** Lazily reads one level of an instance's state at a path. Resolves over the bridge. */
+export type InspectFn = (
+  rootId: number,
+  instanceId: number,
+  path: ReadonlyArray<string | number>
+) => Promise<InspectNode>;
+
+/**
  * A message the backend sends toward the panel.
  *
  * @remarks
@@ -28,10 +47,20 @@ export type BackendToPanel =
       readonly events: ReadonlyArray<DevtoolsEvent>;
     }
   | { readonly type: "snapshot"; readonly roots: ReadonlyArray<DevtoolsRootSnapshot> }
-  | { readonly type: "event"; readonly event: DevtoolsEvent };
+  | { readonly type: "event"; readonly event: DevtoolsEvent }
+  | { readonly type: "inspectResult"; readonly requestId: number; readonly node: InspectNode };
 
 /** A message the panel sends toward the backend. */
-export type PanelToBackend = { readonly type: "attach" } | { readonly type: "refresh" };
+export type PanelToBackend =
+  | { readonly type: "attach" }
+  | { readonly type: "refresh" }
+  | {
+      readonly type: "inspect";
+      readonly requestId: number;
+      readonly rootId: number;
+      readonly instanceId: number;
+      readonly path: ReadonlyArray<string | number>;
+    };
 
 /** Envelope carried over `window.postMessage` between the two content-script worlds. */
 export type PageMessage =

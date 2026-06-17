@@ -1,4 +1,4 @@
-import type { DevtoolsEvent } from "@wirestate/core/devtools";
+import type { DevtoolsEvent, DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
 import { useEffect, useRef } from "react";
 
 import { summarize } from "@/panel/format";
@@ -18,6 +18,7 @@ interface TimelineProps {
   readonly ui: PanelUi;
   readonly actions: PanelActions;
   readonly onClear: () => void;
+  readonly results: ReadonlyMap<number, DevtoolsMessageResultEvent>;
 }
 
 interface CollapsedRow {
@@ -26,7 +27,7 @@ interface CollapsedRow {
 }
 
 /** Timeline dock body: filter bar + the (frozen-on-pause, dedup-collapsed, autoscrolled) delta list. */
-export function Timeline({ events, roots, containerIds, filter, ui, actions, onClear }: TimelineProps) {
+export function Timeline({ events, roots, containerIds, filter, ui, actions, onClear, results }: TimelineProps) {
   const frozen = useRef<ReadonlyArray<DevtoolsEvent>>(events);
 
   if (!ui.paused) {
@@ -60,7 +61,15 @@ export function Timeline({ events, roots, containerIds, filter, ui, actions, onC
             No deltas match the current filter — interact with the page.
           </p>
         ) : (
-          rows.map((row, index) => <TimelineRow key={index} event={row.event} count={row.count} actions={actions} />)
+          rows.map((row, index) => (
+            <TimelineRow
+              key={index}
+              event={row.event}
+              count={row.count}
+              actions={actions}
+              result={row.event.kind === "message" ? results.get(row.event.message.id) : undefined}
+            />
+          ))
         )}
       </div>
     </div>

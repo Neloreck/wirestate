@@ -3,7 +3,7 @@ import type { DevtoolsEvent, DevtoolsMessageChannel } from "@wirestate/core/devt
 import type { Optional } from "@/types/general";
 
 /** The kinds of timeline delta the panel can filter by. */
-export type EventKind = DevtoolsEvent["kind"];
+export type EventKind = Exclude<DevtoolsEvent["kind"], "messageResult">;
 
 /** The single entity selected in the Navigator, identified within its container. */
 export type Selection =

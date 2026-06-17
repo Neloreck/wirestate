@@ -21,7 +21,8 @@ import {
 } from "@/panel/selectors";
 import { type TimelineFilter, sameSelection } from "@/panel/types";
 
-const instance = (className: string, token: string = className): DevtoolsInstance => ({
+const instance = (className: string, token: string = className, instanceId = 1): DevtoolsInstance => ({
+  instanceId,
   token: { name: token, kind: "class" },
   className,
   status: undefined,
@@ -50,9 +51,14 @@ const container = (
   ...extra,
 });
 
-const root = (rootId: number, containers: ReadonlyArray<DevtoolsContainerSnapshot>): DevtoolsRootSnapshot => ({
+const root = (
+  rootId: number,
+  containers: ReadonlyArray<DevtoolsContainerSnapshot>,
+  label?: string
+): DevtoolsRootSnapshot => ({
   rootId,
   protocolVersion: 1,
+  label,
   containers,
 });
 
@@ -65,6 +71,7 @@ const lifecycleEvent = (
   kind: "lifecycle",
   rootId,
   containerId,
+  timestamp: 0,
   phase,
   instance: className ? instance(className) : undefined,
 });
@@ -78,7 +85,7 @@ const messageEvent = (
   kind: "message",
   rootId,
   containerId,
-  message: { channel, type, payload: null, source: undefined, timestamp: 0 },
+  message: { id: 0, channel, type, payload: null, source: undefined, timestamp: 0 },
 });
 
 const registrationEvent = (
@@ -90,6 +97,7 @@ const registrationEvent = (
   kind: "registration",
   rootId,
   containerId,
+  timestamp: 0,
   registration: { channel, type, phase: "registered" },
 });
 
@@ -120,6 +128,10 @@ describe("buildRoots", () => {
 
     expect(built[0].label).toContain("#1");
     expect(built[0].label).toContain("2 containers");
+  });
+
+  it("prefers a configured root label over the derived hint", () => {
+    expect(buildRoots([root(1, [container(1, null)], "My App")])[0].label).toBe("My App");
   });
 });
 
@@ -180,10 +192,35 @@ describe("lifecycleHistory", () => {
     messageEvent(1, "event", "ping"),
   ];
 
-  it("filters by container, and optionally by instance class", () => {
+  it("filters by container, and optionally by instance (className fallback)", () => {
     expect(lifecycleHistory(log, 1)).toHaveLength(2);
-    expect(lifecycleHistory(log, 1, "Foo")).toHaveLength(2);
-    expect(lifecycleHistory(log, 1, "Other")).toHaveLength(0);
+    expect(lifecycleHistory(log, 1, { className: "Foo" })).toHaveLength(2);
+    expect(lifecycleHistory(log, 1, { className: "Other" })).toHaveLength(0);
+  });
+
+  it("narrows by instanceId when the target carries one", () => {
+    const discriminated: ReadonlyArray<DevtoolsEvent> = [
+      {
+        kind: "lifecycle",
+        rootId: 1,
+        containerId: 1,
+        timestamp: 0,
+        phase: "activate",
+        instance: instance("Foo", "Foo", 1),
+      },
+      {
+        kind: "lifecycle",
+        rootId: 1,
+        containerId: 1,
+        timestamp: 0,
+        phase: "provision",
+        instance: instance("Foo", "Foo", 2),
+      },
+    ];
+
+    expect(lifecycleHistory(discriminated, 1, { instanceId: 1, className: "Foo" })).toHaveLength(1);
+    expect(lifecycleHistory(discriminated, 1, { instanceId: 2, className: "Foo" })).toHaveLength(1);
+    expect(lifecycleHistory(discriminated, 1, { className: "Foo" })).toHaveLength(2);
   });
 });
 

@@ -1,7 +1,13 @@
 import type { DevtoolsEvent, DevtoolsRootSnapshot } from "@wirestate/core/devtools";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import { PANEL_PORT_PREFIX, type BackendToPanel, type PanelToBackend } from "@/bridge/messages";
+import {
+  PANEL_PORT_PREFIX,
+  type BackendToPanel,
+  type InspectFn,
+  type InspectNode,
+  type PanelToBackend,
+} from "@/bridge/messages";
 import type { Optional } from "@/types/general";
 
 const MAX_LOG = 500;
@@ -13,6 +19,7 @@ export interface BridgeState {
   readonly roots: ReadonlyArray<DevtoolsRootSnapshot>;
   readonly log: ReadonlyArray<DevtoolsEvent>;
   clear(): void;
+  readonly inspect: InspectFn;
 }
 
 /**
@@ -28,6 +35,8 @@ export function useBridge(): BridgeState {
   const [roots, setRoots] = useState<ReadonlyArray<DevtoolsRootSnapshot>>([]);
   const [log, setLog] = useState<ReadonlyArray<DevtoolsEvent>>([]);
   const portRef = useRef<Optional<chrome.runtime.Port>>(undefined);
+  const pendingRef = useRef<Map<number, (node: InspectNode) => void>>(new Map());
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     const tabId: number = chrome.devtools.inspectedWindow.tabId;
@@ -58,12 +67,22 @@ export function useBridge(): BridgeState {
             }
 
             break;
+          case "inspectResult":
+            pendingRef.current.get(message.requestId)?.(message.node);
+            pendingRef.current.delete(message.requestId);
+            break;
         }
       });
 
       port.onDisconnect.addListener((): void => {
         portRef.current = undefined;
         setConnected(false);
+        // Fail any in-flight inspect requests rather than leaving the panel spinning.
+        for (const resolve of pendingRef.current.values()) {
+          resolve({ t: "unsupported" });
+        }
+
+        pendingRef.current.clear();
         if (!disposed) {
           reconnectTimer = setTimeout(connect, 250);
         }
@@ -102,11 +121,30 @@ export function useBridge(): BridgeState {
     };
   }, []);
 
+  const inspect: InspectFn = useCallback(
+    (rootId: number, instanceId: number, path: ReadonlyArray<string | number>): Promise<InspectNode> => {
+      const port: Optional<chrome.runtime.Port> = portRef.current;
+
+      if (!port) {
+        return Promise.resolve({ t: "unsupported" });
+      }
+
+      const requestId: number = (requestIdRef.current += 1);
+
+      return new Promise((resolve) => {
+        pendingRef.current.set(requestId, resolve);
+        port.postMessage({ type: "inspect", requestId, rootId, instanceId, path } satisfies PanelToBackend);
+      });
+    },
+    []
+  );
+
   return {
     connected,
     protocolVersion,
     roots,
     log,
     clear: () => setLog([]),
+    inspect,
   };
 }

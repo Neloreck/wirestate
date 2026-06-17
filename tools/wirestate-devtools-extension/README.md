@@ -17,12 +17,12 @@ Four execution contexts (declared in [`manifest.config.ts`](manifest.config.ts))
 
 ```
 PAGE (MAIN world)              ISOLATED world        extension processes
-┌────────────────────────┐    ┌──────────────┐    ┌────────────┐   ┌──────────────┐
-│ app + DevToolsHook     │    │ content      │    │ background │   │ DevTools     │
-│ + backend (pre-seeds   │◄──►│ script       │◄──►│ worker     │◄─►│ panel (React)│
+┌────────────────────────┐    ┌──────────────┐    ┌────────────┐    ┌──────────────┐
+│ app + DevToolsHook     │    │ content      │    │ background │    │ DevTools     │
+│ + backend (pre-seeds   │◄──►│ script       │◄──►│ worker     │◄──►│ panel (React)│
 │   hook, ring buffer,   │win │ (relay)      │port│ (pair by   │port│              │
-│   serializes payloads) │msg │              │    │  tab id)   │   │              │
-└────────────────────────┘    └──────────────┘    └────────────┘   └──────────────┘
+│   serializes payloads) │msg │              │    │  tab id)   │    │              │
+└────────────────────────┘    └──────────────┘    └────────────┘    └──────────────┘
         the BRIDGE ────────────────────────────────────────────────────────►
 ```
 
@@ -40,7 +40,7 @@ PAGE (MAIN world)              ISOLATED world        extension processes
   inline payload expansion). `use-bridge.ts` owns the connection; `use-panel-state.ts` holds
   selection + filter + view prefs; `selectors.ts` derives the tree/history/filtered views;
   `format.ts` renders deltas. Read-only (no state restoration / time-travel). See
-  [plan.md](plan.md) for the full UI design + the protocol-gap findings ledger.
+  [plan.md](../../plan.md) for the full UI design + the protocol-gap findings ledger.
 - `src/devtools/` — `devtools.html` + `devtools.ts`, the DevTools page that registers the panel.
 - `src/types/general.ts` — `Optional` / `Nullable` / `Maybe`, mirroring core's vocabulary (ADR 0009).
 - Pure logic (`selectors.ts`, `dehydrate.ts`, …) has Vitest coverage: `pnpm test`.

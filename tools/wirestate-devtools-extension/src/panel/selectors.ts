@@ -61,7 +61,7 @@ export function buildRoots(roots: ReadonlyArray<DevtoolsRootSnapshot>): Readonly
       (container) => container.parentContainerId === null || !ids.has(container.parentContainerId)
     );
 
-    return { rootId: root.rootId, label: rootLabel(root), nodes: tops.map(build) };
+    return { rootId: root.rootId, label: root.label ?? rootLabel(root), nodes: tops.map(build) };
   });
 }
 
@@ -202,23 +202,41 @@ export function channelOf(event: DevtoolsEvent): Optional<DevtoolsMessageChannel
 }
 
 /**
- * Lifecycle deltas for one container (and one instance, when a class name is given).
+ * Lifecycle deltas for one container, optionally narrowed to one instance. Narrowing prefers the
+ * exact `instanceId`, falling back to `className` when the target has no id (an older core that
+ * predates the instance handle — target and deltas come from the same core, so either both carry
+ * ids or neither does).
  *
  * @param log
  * @param containerId
- * @param className
+ * @param instance
+ * @param instance.instanceId
+ * @param instance.className
  */
 export function lifecycleHistory(
   log: ReadonlyArray<DevtoolsEvent>,
   containerId: number,
-  className?: string
+  instance?: { readonly instanceId?: number; readonly className?: string }
 ): ReadonlyArray<DevtoolsEvent> {
-  return log.filter(
-    (event) =>
-      event.kind === "lifecycle" &&
-      event.containerId === containerId &&
-      (className === undefined || event.instance?.className === className)
-  );
+  return log.filter((event) => {
+    if (event.kind !== "lifecycle" || event.containerId !== containerId) {
+      return false;
+    }
+
+    if (!instance) {
+      return true;
+    }
+
+    const subject = event.instance;
+
+    if (!subject) {
+      return false;
+    }
+
+    return instance.instanceId !== undefined
+      ? subject.instanceId === instance.instanceId
+      : subject.className === instance.className;
+  });
 }
 
 /**
@@ -231,6 +249,11 @@ export function filterLog(log: ReadonlyArray<DevtoolsEvent>, filter: TimelineFil
   const needle: string = filter.text.trim().toLowerCase();
 
   return log.filter((event) => {
+    // Result deltas aren't standalone rows — they attach to their message's accordion.
+    if (event.kind === "messageResult") {
+      return false;
+    }
+
     if (!filter.kinds[event.kind]) {
       return false;
     }

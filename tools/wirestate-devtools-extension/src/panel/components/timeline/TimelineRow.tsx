@@ -1,26 +1,28 @@
-import type { DevtoolsEvent, DevtoolsMessageEvent } from "@wirestate/core/devtools";
+import type { DevtoolsEvent, DevtoolsMessageEvent, DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
 import { useState } from "react";
 
-import { summarize } from "@/panel/format";
-import type { EventKind } from "@/panel/types";
+import { formatClock, summarize, timestampOf } from "@/panel/format";
 import type { PanelActions } from "@/panel/use-panel-state";
 
-const TAG_COLOR: Record<EventKind, string> = {
+const TAG_COLOR: Record<DevtoolsEvent["kind"], string> = {
   lifecycle: "text-sky-600 dark:text-sky-400",
   message: "text-fuchsia-600 dark:text-fuchsia-400",
   registration: "text-amber-600 dark:text-amber-400",
+  messageResult: "text-neutral-500 dark:text-neutral-400",
 };
 
 interface TimelineRowProps {
   readonly event: DevtoolsEvent;
   readonly count: number;
   readonly actions: PanelActions;
+  readonly result?: DevtoolsMessageResultEvent;
 }
 
-/** One Timeline delta. Message rows expand inline to show the dehydrated payload. */
-export function TimelineRow({ event, count, actions }: TimelineRowProps) {
+/** One Timeline delta. Message rows expand inline to show the dehydrated payload (and any result). */
+export function TimelineRow({ event, count, actions, result }: TimelineRowProps) {
   const [open, setOpen] = useState(false);
   const expandable: boolean = event.kind === "message";
+  const timestamp = timestampOf(event);
 
   return (
     <div className={"border-b border-black/5 dark:border-white/5"}>
@@ -28,6 +30,9 @@ export function TimelineRow({ event, count, actions }: TimelineRowProps) {
         className={`flex items-center gap-2 px-2.5 py-0.5 ${expandable ? "cursor-pointer" : ""}`}
         onClick={expandable ? () => setOpen((value) => !value) : undefined}
       >
+        <span className={"w-[88px] shrink-0 text-neutral-400 tabular-nums dark:text-neutral-500"}>
+          {timestamp === undefined ? "" : formatClock(timestamp)}
+        </span>
         <span className={`min-w-[84px] shrink-0 ${TAG_COLOR[event.kind]}`}>{event.kind}</span>
         <span className={"flex-1 truncate"}>{summarize(event)}</span>
         {count > 1 ? (
@@ -52,14 +57,14 @@ export function TimelineRow({ event, count, actions }: TimelineRowProps) {
             "overflow-auto bg-neutral-50 px-2.5 py-1 text-[11px] text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
           }
         >
-          {messageDetail(event)}
+          {messageDetail(event, result)}
         </pre>
       ) : null}
     </div>
   );
 }
 
-function messageDetail(event: DevtoolsMessageEvent): string {
+function messageDetail(event: DevtoolsMessageEvent, result?: DevtoolsMessageResultEvent): string {
   const message = event.message;
   const lines: Array<string> = [
     `type: ${message.type}`,
@@ -70,6 +75,10 @@ function messageDetail(event: DevtoolsMessageEvent): string {
 
   if (message.source !== undefined) {
     lines.push(`source: ${stringify(message.source, 0)}`);
+  }
+
+  if (result) {
+    lines.push(`result (${result.outcome}): ${stringify(result.value, 0)}`);
   }
 
   return lines.join("\n");

@@ -1,22 +1,38 @@
-import type { DevtoolsContainerSnapshot, DevtoolsEvent, DevtoolsInstance } from "@wirestate/core/devtools";
+import type {
+  DevtoolsContainerSnapshot,
+  DevtoolsEvent,
+  DevtoolsInstance,
+  DevtoolsRootSnapshot,
+} from "@wirestate/core/devtools";
 
+import type { InspectFn } from "@/bridge/messages";
 import { lifecycleHistory } from "@/panel/selectors";
 import type { PanelActions } from "@/panel/use-panel-state";
+import type { Optional } from "@/types/general";
 
 import { History } from "./History";
 import { Field, LinkButton, Section } from "./parts";
+import { StateTree } from "./StateTree";
 
 interface InstanceDetailProps {
   readonly container: DevtoolsContainerSnapshot;
   readonly instance: DevtoolsInstance;
   readonly log: ReadonlyArray<DevtoolsEvent>;
   readonly actions: PanelActions;
+  readonly roots: ReadonlyArray<DevtoolsRootSnapshot>;
+  readonly inspect: InspectFn;
 }
 
-/** Detail view for a selected instance: status, declared handlers, history, and the state-gap placeholder. */
-export function InstanceDetail({ container, instance, log, actions }: InstanceDetailProps) {
-  const history: ReadonlyArray<DevtoolsEvent> = lifecycleHistory(log, container.containerId, instance.className);
+/** Detail view for a selected instance: status, declared handlers, history, and on-demand state. */
+export function InstanceDetail({ container, instance, log, actions, roots, inspect }: InstanceDetailProps) {
+  const history: ReadonlyArray<DevtoolsEvent> = lifecycleHistory(log, container.containerId, {
+    instanceId: instance.instanceId,
+    className: instance.className,
+  });
   const status = instance.status;
+  const rootId: Optional<number> = roots.find((root) =>
+    root.containers.some((entry) => entry.containerId === container.containerId)
+  )?.rootId;
 
   return (
     <div className={"space-y-3"}>
@@ -59,14 +75,7 @@ export function InstanceDetail({ container, instance, log, actions }: InstanceDe
       </Section>
 
       <Section title={"state"}>
-        <div
-          className={
-            "rounded border border-dashed border-neutral-300 p-2 text-neutral-500 dark:border-neutral-600 dark:text-neutral-400"
-          }
-        >
-          Not carried by protocol v1 (planned). The hook exposes structure, lifecycle, and messages — not an
-          instance&#39;s field values.
-        </div>
+        <StateTree rootId={rootId} instanceId={instance.instanceId} inspect={inspect} />
       </Section>
 
       <div>

@@ -1,4 +1,4 @@
-import type { DevtoolsEvent } from "@wirestate/core/devtools";
+import type { DevtoolsEvent, DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
 import { useMemo, useState } from "react";
 
 import { Detail } from "@/panel/components/detail/Detail";
@@ -11,7 +11,7 @@ import { usePanelState } from "@/panel/use-panel-state";
 
 /** The inspector panel: master–detail (Navigator + Detail) over a collapsible, cross-linked Timeline. */
 export function Panel() {
-  const { connected, protocolVersion, roots, log, clear } = useBridge();
+  const { connected, protocolVersion, roots, log, clear, inspect } = useBridge();
   const { state, actions } = usePanelState();
   const [timelineOpen, setTimelineOpen] = useState(true);
 
@@ -21,6 +21,17 @@ export function Panel() {
     [roots]
   );
   const filtered: ReadonlyArray<DevtoolsEvent> = useMemo(() => filterLog(log, state.filter), [log, state.filter]);
+  const messageResults: ReadonlyMap<number, DevtoolsMessageResultEvent> = useMemo(() => {
+    const map: Map<number, DevtoolsMessageResultEvent> = new Map();
+
+    for (const event of log) {
+      if (event.kind === "messageResult") {
+        map.set(event.messageId, event);
+      }
+    }
+
+    return map;
+  }, [log]);
   const containerCount: number = roots.reduce((total, root) => total + root.containers.length, 0);
 
   return (
@@ -38,7 +49,7 @@ export function Panel() {
 
       <div className={"flex min-h-0 flex-1"}>
         <Navigator roots={builtRoots} selection={state.selection} collapsed={state.ui.collapsed} actions={actions} />
-        <Detail roots={roots} log={log} selection={state.selection} actions={actions} />
+        <Detail roots={roots} log={log} selection={state.selection} actions={actions} inspect={inspect} />
       </div>
 
       <div
@@ -64,6 +75,7 @@ export function Panel() {
               ui={state.ui}
               actions={actions}
               onClear={clear}
+              results={messageResults}
             />
           </div>
         ) : null}

@@ -1,6 +1,31 @@
 import type { DevtoolsEvent } from "@wirestate/core/devtools";
 
 import type { DehydratedRef } from "@/backend/dehydrate";
+import type { Optional } from "@/types/general";
+
+/**
+ * Epoch-ms timestamp of a delta, if it has one (older cores may omit lifecycle/registration times).
+ *
+ * @param event
+ */
+export function timestampOf(event: DevtoolsEvent): Optional<number> {
+  if (event.kind === "message") {
+    return event.message.timestamp;
+  }
+
+  return (event as { timestamp?: number }).timestamp;
+}
+
+/**
+ * Formats an epoch-ms timestamp as a 24h clock time with milliseconds.
+ *
+ * @param timestamp
+ */
+export function formatClock(timestamp: number): string {
+  const date: Date = new Date(timestamp);
+
+  return `${date.toLocaleTimeString(undefined, { hour12: false })}.${String(date.getMilliseconds()).padStart(3, "0")}`;
+}
 
 /**
  * One-line summary of a delta, used for both display and text filtering.

@@ -2,6 +2,7 @@ import type {
   DevtoolsContainerId,
   DevtoolsEvent,
   DevtoolsHook,
+  DevtoolsInstanceId,
   DevtoolsListener,
   DevtoolsRoot,
   DevtoolsRootId,
@@ -53,9 +54,11 @@ function createHook(): DevtoolsHook {
   const roots: Map<DevtoolsRootId, DevtoolsRootRegister> = new Map();
   const listeners: Set<DevtoolsListener> = new Set();
   const containerIds: WeakMap<object, DevtoolsContainerId> = new WeakMap();
+  const instanceIds: WeakMap<object, DevtoolsInstanceId> = new WeakMap();
 
   let nextRootId: DevtoolsRootId = 1;
   let nextContainerId: DevtoolsContainerId = 1;
+  let nextInstanceId: DevtoolsInstanceId = 1;
 
   return {
     protocolVersion: FALLBACK_PROTOCOL_VERSION,
@@ -79,6 +82,16 @@ function createHook(): DevtoolsHook {
 
       return id;
     },
+    idForInstance(instance: object): DevtoolsInstanceId {
+      let id: Optional<DevtoolsInstanceId> = instanceIds.get(instance);
+
+      if (id === undefined) {
+        id = nextInstanceId++;
+        instanceIds.set(instance, id);
+      }
+
+      return id;
+    },
     emit(event: DevtoolsEvent): void {
       for (const listener of listeners) {
         listener(event);
@@ -92,7 +105,11 @@ function createHook(): DevtoolsHook {
       };
     },
     getRoots(): ReadonlyArray<DevtoolsRoot> {
-      return Array.from(roots, ([rootId, register]) => ({ rootId, snapshot: register.snapshot }));
+      return Array.from(roots, ([rootId, register]) => ({
+        rootId,
+        snapshot: register.snapshot,
+        inspect: register.inspect,
+      }));
     },
   };
 }
