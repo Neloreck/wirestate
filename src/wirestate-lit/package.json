@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/lit",
-  "version": "1.0.0-experimental.9",
+  "version": "1.0.0-experimental.10",
   "description": "Lit providers, decorators, and controllers for Wirestate services",
   "sideEffects": false,
   "author": "Syrotenko Igor",
@@ -40,7 +40,7 @@
   ],
   "dependencies": {},
   "peerDependencies": {
-    "@wirestate/core": "1.0.0-experimental.9",
+    "@wirestate/core": "1.0.0-experimental.10",
     "@lit/reactive-element": ">=2.0.0",
     "@lit/context": ">=1.0.0",
     "tslib": ">=2.5.0"
