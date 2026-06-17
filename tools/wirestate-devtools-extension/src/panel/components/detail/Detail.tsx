@@ -30,12 +30,12 @@ export function Detail({ roots, log, selection, actions }: DetailProps) {
     }
   });
 
-  return <section className="flex-1 overflow-auto p-3">{body()}</section>;
+  return <section className={"flex-1 overflow-auto p-3"}>{body()}</section>;
 
   function body() {
     if (!selection) {
       return (
-        <p className="text-neutral-500 dark:text-neutral-400">
+        <p className={"text-neutral-500 dark:text-neutral-400"}>
           Select a container, instance, binding, or plugin in the Navigator.
         </p>
       );
@@ -55,15 +55,19 @@ export function Detail({ roots, log, selection, actions }: DetailProps) {
       cache.current && sameSelection(cache.current.selection, selection) ? cache.current.resolved : undefined;
 
     return (
-      <div className="space-y-3">
-        <div className="rounded border border-amber-400/50 bg-amber-50 p-2 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+      <div className={"space-y-3"}>
+        <div
+          className={
+            "rounded border border-amber-400/50 bg-amber-50 p-2 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+          }
+        >
           This {selection.kind} is no longer live (deprovisioned / deactivated). Showing last-known data.
-          <div className="mt-1">
+          <div className={"mt-1"}>
             <LinkButton onClick={actions.clearSelection}>Clear selection</LinkButton>
           </div>
         </div>
         {dead ? (
-          <div className="pointer-events-none opacity-60">
+          <div className={"pointer-events-none opacity-60"}>
             <View resolved={dead} roots={roots} log={log} actions={actions} />
           </div>
         ) : null}
@@ -76,12 +80,14 @@ function Breadcrumb({ resolved, actions }: { resolved: ResolvedEntity; actions: 
   const containerId: number = resolved.container.containerId;
 
   return (
-    <div className="mb-2 flex flex-wrap items-center gap-1 text-neutral-500 dark:text-neutral-400">
-      <LinkButton onClick={() => actions.select({ kind: "container", containerId })}>container #{containerId}</LinkButton>
+    <div className={"mb-2 flex flex-wrap items-center gap-1 text-neutral-500 dark:text-neutral-400"}>
+      <LinkButton onClick={() => actions.select({ kind: "container", containerId })}>
+        container #{containerId}
+      </LinkButton>
       {resolved.kind === "container" ? null : (
         <>
           <span>▸</span>
-          <span className="text-neutral-700 dark:text-neutral-200">{entityLabel(resolved)}</span>
+          <span className={"text-neutral-700 dark:text-neutral-200"}>{entityLabel(resolved)}</span>
         </>
       )}
     </div>

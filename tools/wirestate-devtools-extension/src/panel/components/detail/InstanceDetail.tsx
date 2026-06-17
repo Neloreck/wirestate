@@ -19,53 +19,53 @@ export function InstanceDetail({ container, instance, log, actions }: InstanceDe
   const status = instance.status;
 
   return (
-    <div className="space-y-3">
-      <Section title="instance">
-        <Field label="class">{instance.className}</Field>
-        <Field label="token">
-          {instance.token.name} <span className="text-neutral-500">({instance.token.kind})</span>
+    <div className={"space-y-3"}>
+      <Section title={"instance"}>
+        <Field label={"class"}>{instance.className}</Field>
+        <Field label={"token"}>
+          {instance.token.name} <span className={"text-neutral-500"}>({instance.token.kind})</span>
         </Field>
       </Section>
 
-      <Section title="status">
+      <Section title={"status"}>
         {status ? (
           <>
-            <Field label="active">{status.isInactive ? "inactive" : "active"}</Field>
-            <Field label="provision">
-              {status.isDeprovisioned === null
-                ? "not provisioned"
-                : status.isDeprovisioned
-                  ? "deprovisioned"
-                  : "owned"}
+            <Field label={"active"}>{status.isInactive ? "inactive" : "active"}</Field>
+            <Field label={"provision"}>
+              {status.isDeprovisioned === null ? "not provisioned" : status.isDeprovisioned ? "deprovisioned" : "owned"}
             </Field>
-            <Field label="provisionId">{status.provisionId ?? "—"}</Field>
+            <Field label={"provisionId"}>{status.provisionId ?? "—"}</Field>
           </>
         ) : (
-          <span className="text-neutral-500">untracked</span>
+          <span className={"text-neutral-500"}>untracked</span>
         )}
       </Section>
 
       <Section title={`declared handlers (${instance.handlers.length})`}>
         {instance.handlers.length === 0 ? (
-          <span className="text-neutral-500">none</span>
+          <span className={"text-neutral-500"}>none</span>
         ) : (
           instance.handlers.map((handler, index) => (
             <div key={index}>
-              <span className="text-fuchsia-600 dark:text-fuchsia-400">{handler.channel}</span> {handler.type} →{" "}
+              <span className={"text-fuchsia-600 dark:text-fuchsia-400"}>{handler.channel}</span> {handler.type} →{" "}
               {handler.method}()
             </div>
           ))
         )}
       </Section>
 
-      <Section title="lifecycle history">
+      <Section title={"lifecycle history"}>
         <History events={history} />
       </Section>
 
-      <Section title="state">
-        <div className="rounded border border-dashed border-neutral-300 p-2 text-neutral-500 dark:border-neutral-600 dark:text-neutral-400">
-          Not carried by protocol v1 (planned). The hook exposes structure, lifecycle, and messages — not an instance's
-          field values.
+      <Section title={"state"}>
+        <div
+          className={
+            "rounded border border-dashed border-neutral-300 p-2 text-neutral-500 dark:border-neutral-600 dark:text-neutral-400"
+          }
+        >
+          Not carried by protocol v1 (planned). The hook exposes structure, lifecycle, and messages — not an
+          instance&#39;s field values.
         </div>
       </Section>
 

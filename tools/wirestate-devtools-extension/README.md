@@ -33,12 +33,17 @@ PAGE (MAIN world)              ISOLATED world        extension processes
 - `src/bridge/` — the **bridge**: `messages.ts` (shared types/constants), `content-script.ts` (the
   ISOLATED relay), `background.ts` (the worker that pairs a page with its panel by tab id). Both
   ends reconnect after the worker sleeps.
-- `src/panel/` — the **panel** (React, **Tailwind**). `panel.html` + `main.tsx` boot it;
-  `Panel.tsx` composes `components/` (`Toolbar`, `Tree` → `ContainerCard`, `Timeline`); `format.ts`
-  renders deltas; `use-bridge.ts` owns the connection. Container tree + filterable
-  lifecycle/message/registration timeline, read-only (no state restoration / time-travel).
+- `src/panel/` — the **panel** (React, **Tailwind**): a **master–detail** UI over a docked
+  Timeline. `panel.html` + `main.tsx` boot it; `Panel.tsx` composes `StatusBar`, `Navigator` (the
+  container-hierarchy tree), `detail/` (per-entity Detail views — container/instance/binding/plugin,
+  with breadcrumb + dead-entity tombstone), and `timeline/` (filterable, cross-linked deltas with
+  inline payload expansion). `use-bridge.ts` owns the connection; `use-panel-state.ts` holds
+  selection + filter + view prefs; `selectors.ts` derives the tree/history/filtered views;
+  `format.ts` renders deltas. Read-only (no state restoration / time-travel). See
+  [plan.md](plan.md) for the full UI design + the protocol-gap findings ledger.
 - `src/devtools/` — `devtools.html` + `devtools.ts`, the DevTools page that registers the panel.
 - `src/types/general.ts` — `Optional` / `Nullable` / `Maybe`, mirroring core's vocabulary (ADR 0009).
+- Pure logic (`selectors.ts`, `dehydrate.ts`, …) has Vitest coverage: `pnpm test`.
 
 Conventions: imports use the **`@/` alias** for `src` (e.g. `@/bridge/messages`); HTML entries live
 **inside `src/`** next to their context (not the root, and not `public/` — which is copied verbatim
@@ -55,6 +60,8 @@ immediately. The published-barrel compile is covered by `examples/wirestate-reac
 pnpm install
 pnpm build          # emits dist/ (the unpacked extension)
 # or: pnpm dev       # vite + crx HMR
+pnpm test           # vitest — pure-logic unit tests
+pnpm typecheck      # tsc --noEmit
 ```
 
 Then in Chrome: `chrome://extensions` → enable Developer mode → **Load unpacked** → pick `dist/`

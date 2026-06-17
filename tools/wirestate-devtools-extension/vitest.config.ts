@@ -1,0 +1,20 @@
+import { fileURLToPath } from "node:url";
+
+import { defineConfig } from "vitest/config";
+
+// Standalone from vite.config.ts on purpose: the crx/tailwind plugins expect a browser build
+// context and aren't needed to unit-test pure logic. We only need the path aliases.
+export default defineConfig({
+  resolve: {
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "@wirestate/core/devtools": fileURLToPath(
+        new URL("../../src/wirestate-core/plugin/devtools/devtools-hook.ts", import.meta.url)
+      ),
+    },
+  },
+  test: {
+    environment: "node",
+    include: ["src/**/*.test.ts"],
+  },
+});

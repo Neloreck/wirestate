@@ -23,20 +23,20 @@ export function TimelineRow({ event, count, actions }: TimelineRowProps) {
   const expandable: boolean = event.kind === "message";
 
   return (
-    <div className="border-b border-black/5 dark:border-white/5">
+    <div className={"border-b border-black/5 dark:border-white/5"}>
       <div
         className={`flex items-center gap-2 px-2.5 py-0.5 ${expandable ? "cursor-pointer" : ""}`}
         onClick={expandable ? () => setOpen((value) => !value) : undefined}
       >
         <span className={`min-w-[84px] shrink-0 ${TAG_COLOR[event.kind]}`}>{event.kind}</span>
-        <span className="flex-1 truncate">{summarize(event)}</span>
+        <span className={"flex-1 truncate"}>{summarize(event)}</span>
         {count > 1 ? (
-          <span className="rounded bg-neutral-200 px-1 text-[10px] dark:bg-neutral-700">×{count}</span>
+          <span className={"rounded bg-neutral-200 px-1 text-[10px] dark:bg-neutral-700"}>×{count}</span>
         ) : null}
         <button
-          type="button"
-          title="Select this container"
-          className="shrink-0 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"
+          type={"button"}
+          title={"Select this container"}
+          className={"shrink-0 text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-200"}
           onClick={(domEvent) => {
             domEvent.stopPropagation();
             actions.select({ kind: "container", containerId: event.containerId });
@@ -47,7 +47,11 @@ export function TimelineRow({ event, count, actions }: TimelineRowProps) {
       </div>
 
       {open && event.kind === "message" ? (
-        <pre className="overflow-auto bg-neutral-50 px-2.5 py-1 text-[11px] text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
+        <pre
+          className={
+            "overflow-auto bg-neutral-50 px-2.5 py-1 text-[11px] text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
+          }
+        >
           {messageDetail(event)}
         </pre>
       ) : null}
@@ -91,6 +95,7 @@ function stringify(value: unknown, depth: number): string {
     if (value.length === 0) {
       return "[]";
     }
+
     return `[\n${value.map((item) => `${pad}  ${stringify(item, depth + 1)}`).join(",\n")}\n${pad}]`;
   }
 
@@ -101,16 +106,20 @@ function stringify(value: unknown, depth: number): string {
       if (ref.__wsType === "undefined") {
         return "undefined";
       }
+
       if (ref.__wsType === "instance") {
         return `${ref.className ?? "Object"} ${stringify(ref.value ?? {}, depth)}`;
       }
+
       return ref.preview ?? ref.__wsType;
     }
 
     const entries: Array<[string, unknown]> = Object.entries(value as Record<string, unknown>);
+
     if (entries.length === 0) {
       return "{}";
     }
+
     return `{\n${entries.map(([key, item]) => `${pad}  ${key}: ${stringify(item, depth + 1)}`).join(",\n")}\n${pad}}`;
   }
 

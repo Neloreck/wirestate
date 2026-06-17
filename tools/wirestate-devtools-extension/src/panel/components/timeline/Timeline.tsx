@@ -28,13 +28,16 @@ interface CollapsedRow {
 /** Timeline dock body: filter bar + the (frozen-on-pause, dedup-collapsed, autoscrolled) delta list. */
 export function Timeline({ events, roots, containerIds, filter, ui, actions, onClear }: TimelineProps) {
   const frozen = useRef<ReadonlyArray<DevtoolsEvent>>(events);
+
   if (!ui.paused) {
     frozen.current = events;
   }
+
   const shown: ReadonlyArray<DevtoolsEvent> = ui.paused ? frozen.current : events;
   const rows: ReadonlyArray<CollapsedRow> = collapse(shown);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     if (ui.autoscroll && !ui.paused && scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -42,7 +45,7 @@ export function Timeline({ events, roots, containerIds, filter, ui, actions, onC
   }, [rows.length, ui.autoscroll, ui.paused]);
 
   return (
-    <div className="flex h-full flex-col">
+    <div className={"flex h-full flex-col"}>
       <TimelineFilters
         roots={roots}
         containerIds={containerIds}
@@ -51,15 +54,13 @@ export function Timeline({ events, roots, containerIds, filter, ui, actions, onC
         actions={actions}
         onClear={onClear}
       />
-      <div ref={scrollRef} className="flex-1 overflow-auto">
+      <div ref={scrollRef} className={"flex-1 overflow-auto"}>
         {rows.length === 0 ? (
-          <p className="p-2 text-neutral-500 dark:text-neutral-400">
+          <p className={"p-2 text-neutral-500 dark:text-neutral-400"}>
             No deltas match the current filter — interact with the page.
           </p>
         ) : (
-          rows.map((row, index) => (
-            <TimelineRow key={index} event={row.event} count={row.count} actions={actions} />
-          ))
+          rows.map((row, index) => <TimelineRow key={index} event={row.event} count={row.count} actions={actions} />)
         )}
       </div>
     </div>
@@ -72,6 +73,7 @@ function collapse(events: ReadonlyArray<DevtoolsEvent>): ReadonlyArray<Collapsed
 
   for (const event of events) {
     const last: CollapsedRow | undefined = rows[rows.length - 1];
+
     if (last && summarize(last.event) === summarize(event)) {
       last.count += 1;
     } else {

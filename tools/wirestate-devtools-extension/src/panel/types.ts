@@ -21,7 +21,12 @@ export interface TimelineFilter {
   readonly text: string;
 }
 
-/** True when two selections point at the same entity (used to detect a survived selection). */
+/**
+ * True when two selections point at the same entity (used to detect a survived selection).
+ *
+ * @param a
+ * @param b
+ */
 export function sameSelection(a: Selection, b: Selection): boolean {
   if (a.kind !== b.kind || a.containerId !== b.containerId) {
     return false;

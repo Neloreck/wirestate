@@ -17,17 +17,17 @@ export function BindingDetail({ container, binding, actions }: BindingDetailProp
   const instance: Optional<DevtoolsInstance> = realizingInstance(container, binding);
 
   return (
-    <div className="space-y-3">
-      <Section title="binding">
-        <Field label="token">
-          {binding.token.name} <span className="text-neutral-500">({binding.token.kind})</span>
+    <div className={"space-y-3"}>
+      <Section title={"binding"}>
+        <Field label={"token"}>
+          {binding.token.name} <span className={"text-neutral-500"}>({binding.token.kind})</span>
         </Field>
-        <Field label="type">{binding.type}</Field>
-        <Field label="scope">{binding.scope}</Field>
-        <Field label="impl">{binding.implementation ?? "—"}</Field>
+        <Field label={"type"}>{binding.type}</Field>
+        <Field label={"scope"}>{binding.scope}</Field>
+        <Field label={"impl"}>{binding.implementation ?? "—"}</Field>
       </Section>
 
-      <Section title="realized by">
+      <Section title={"realized by"}>
         {instance ? (
           <LinkButton
             onClick={() =>
@@ -37,7 +37,7 @@ export function BindingDetail({ container, binding, actions }: BindingDetailProp
             {instance.className}
           </LinkButton>
         ) : (
-          <span className="text-neutral-500">no active instance</span>
+          <span className={"text-neutral-500"}>no active instance</span>
         )}
       </Section>
     </div>

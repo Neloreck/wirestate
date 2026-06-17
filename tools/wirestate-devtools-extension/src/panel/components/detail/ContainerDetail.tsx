@@ -19,19 +19,21 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
   const history: ReadonlyArray<DevtoolsEvent> = lifecycleHistory(log, container.containerId);
 
   return (
-    <div className="space-y-3">
-      <Section title="container">
-        <Field label="id">#{container.containerId}</Field>
-        <Field label="parent">
+    <div className={"space-y-3"}>
+      <Section title={"container"}>
+        <Field label={"id"}>#{container.containerId}</Field>
+        <Field label={"parent"}>
           {container.parentContainerId === null ? (
             "— (root)"
           ) : (
-            <LinkButton onClick={() => actions.select({ kind: "container", containerId: container.parentContainerId as number })}>
+            <LinkButton
+              onClick={() => actions.select({ kind: "container", containerId: container.parentContainerId as number })}
+            >
               #{container.parentContainerId}
             </LinkButton>
           )}
         </Field>
-        <Field label="children">
+        <Field label={"children"}>
           {children.length === 0
             ? "—"
             : children.map((child) => (
@@ -47,7 +49,7 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
 
       <Section title={`bindings (${container.bindings.length})`}>
         {container.bindings.length === 0 ? (
-          <span className="text-neutral-500">—</span>
+          <span className={"text-neutral-500"}>—</span>
         ) : (
           container.bindings.map((binding) => (
             <div key={binding.token.name}>
@@ -57,7 +59,7 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
                 }
               >
                 {binding.token.name}{" "}
-                <span className="text-neutral-500">
+                <span className={"text-neutral-500"}>
                   ({binding.type}/{binding.scope})
                 </span>
               </LinkButton>
@@ -68,13 +70,17 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
 
       <Section title={`instances (${container.instances.length})`}>
         {container.instances.length === 0 ? (
-          <span className="text-neutral-500">—</span>
+          <span className={"text-neutral-500"}>—</span>
         ) : (
           container.instances.map((instance) => (
             <div key={instance.className}>
               <LinkButton
                 onClick={() =>
-                  actions.select({ kind: "instance", containerId: container.containerId, className: instance.className })
+                  actions.select({
+                    kind: "instance",
+                    containerId: container.containerId,
+                    className: instance.className,
+                  })
                 }
               >
                 {instance.className}
@@ -86,12 +92,14 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
 
       <Section title={`plugins (${container.plugins.length})`}>
         {container.plugins.length === 0 ? (
-          <span className="text-neutral-500">—</span>
+          <span className={"text-neutral-500"}>—</span>
         ) : (
           container.plugins.map((plugin) => (
             <div key={plugin.name}>
               <LinkButton
-                onClick={() => actions.select({ kind: "plugin", containerId: container.containerId, name: plugin.name })}
+                onClick={() =>
+                  actions.select({ kind: "plugin", containerId: container.containerId, name: plugin.name })
+                }
               >
                 {plugin.name}
               </LinkButton>
@@ -100,7 +108,7 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
         )}
       </Section>
 
-      <Section title="lifecycle history">
+      <Section title={"lifecycle history"}>
         <History events={history} />
       </Section>
 

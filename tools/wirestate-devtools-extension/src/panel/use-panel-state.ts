@@ -73,11 +73,13 @@ function reducer(state: PanelState, action: Action): PanelState {
       return { ...state, ui: { ...state.ui, autoscroll: !state.ui.autoscroll } };
     case "toggleCollapsed": {
       const collapsed: Set<number> = new Set(state.ui.collapsed);
+
       if (collapsed.has(action.containerId)) {
         collapsed.delete(action.containerId);
       } else {
         collapsed.add(action.containerId);
       }
+
       return { ...state, ui: { ...state.ui, collapsed } };
     }
     default:
@@ -99,7 +101,9 @@ export interface PanelActions {
   toggleCollapsed(containerId: number): void;
 }
 
-/** Owns the panel's UI state (selection, Timeline filter, view prefs). */
+/**
+ * Owns the panel's UI state (selection, Timeline filter, view prefs).
+ */
 export function usePanelState(): { state: PanelState; actions: PanelActions } {
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -116,7 +120,7 @@ export function usePanelState(): { state: PanelState; actions: PanelActions } {
       toggleAutoscroll: () => dispatch({ type: "toggleAutoscroll" }),
       toggleCollapsed: (containerId) => dispatch({ type: "toggleCollapsed", containerId }),
     }),
-    [],
+    []
   );
 
   return { state, actions };
