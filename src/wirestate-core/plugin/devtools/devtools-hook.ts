@@ -35,6 +35,15 @@ export type DevtoolsRootId = number;
 export type DevtoolsContainerId = number;
 
 /**
+ * Identifier for one service instance. Stable for the instance's lifetime and unique within (and
+ * across) containers. The target of on-demand inspection and the key for exact event↔instance
+ * correlation.
+ *
+ * @group DevTools
+ */
+export type DevtoolsInstanceId = number;
+
+/**
  * Normalized, display-ready description of a binding token.
  *
  * @group DevTools
@@ -139,6 +148,12 @@ export interface DevtoolsHandler {
  */
 export interface DevtoolsInstance {
   /**
+   * Stable id for this instance — the target of on-demand inspection and the key for exact
+   * event↔instance correlation.
+   */
+  readonly instanceId: DevtoolsInstanceId;
+
+  /**
    * Token the instance was resolved under.
    */
   readonly token: DevtoolsToken;
@@ -228,6 +243,12 @@ export interface DevtoolsRootSnapshot {
    * Every container observed under this root, root container first.
    */
   readonly containers: ReadonlyArray<DevtoolsContainerSnapshot>;
+
+  /**
+   * Optional human label for the root, set via `new DevToolsPlugin({ label })`; `undefined` when
+   * the app did not name it (a consumer may derive a hint instead).
+   */
+  readonly label: Optional<string>;
 }
 
 /**
@@ -265,6 +286,11 @@ export interface DevtoolsLifecycleEvent {
   readonly containerId: DevtoolsContainerId;
 
   /**
+   * Epoch milliseconds when the delta was emitted.
+   */
+  readonly timestamp: number;
+
+  /**
    * Which lifecycle phase fired.
    */
   readonly phase: DevtoolsLifecyclePhase;
@@ -292,6 +318,12 @@ export type DevtoolsMessageChannel = "event" | "command" | "query";
  * @group DevTools
  */
 export interface DevtoolsMessage {
+  /**
+   * Correlation id, unique per dispatch; a {@link DevtoolsMessageResultEvent} references it via
+   * `messageId`. Events carry an id too, but never produce a result.
+   */
+  readonly id: number;
+
   /**
    * Which bus the message flowed through.
    */
@@ -350,6 +382,56 @@ export interface DevtoolsMessageEvent {
 }
 
 /**
+ * The settled outcome of a command/query dispatch, reported by the bus tap.
+ *
+ * @group DevTools
+ */
+export interface DevtoolsMessageResult {
+  /**
+   * Id of the {@link DevtoolsMessage} this result belongs to.
+   */
+  readonly messageId: number;
+
+  /**
+   * Whether the dispatch resolved or rejected/threw.
+   */
+  readonly outcome: "resolved" | "rejected";
+
+  /**
+   * Raw resolved value or thrown error — serialized by the backend when bridging.
+   */
+  readonly value: unknown;
+}
+
+/**
+ * A command/query **result** delta, correlated to its dispatch by `messageId` (bus-scoped, like
+ * {@link DevtoolsMessageEvent}). Events do not produce results.
+ *
+ * @group DevTools
+ */
+export interface DevtoolsMessageResultEvent extends DevtoolsMessageResult {
+  /**
+   * Discriminant.
+   */
+  readonly kind: "messageResult";
+
+  /**
+   * Root the dispatch originated from.
+   */
+  readonly rootId: DevtoolsRootId;
+
+  /**
+   * Container the tapped bus is attributed to.
+   */
+  readonly containerId: DevtoolsContainerId;
+
+  /**
+   * Epoch milliseconds when the result settled.
+   */
+  readonly timestamp: number;
+}
+
+/**
  * Whether a handler/subscriber was registered or unregistered.
  *
  * @group DevTools
@@ -405,6 +487,11 @@ export interface DevtoolsRegistrationEvent {
   readonly containerId: DevtoolsContainerId;
 
   /**
+   * Epoch milliseconds when the delta was emitted.
+   */
+  readonly timestamp: number;
+
+  /**
    * The observed registration change.
    */
   readonly registration: DevtoolsRegistration;
@@ -416,11 +503,22 @@ export interface DevtoolsRegistrationEvent {
  *
  * @group DevTools
  */
-export type DevtoolsEvent = DevtoolsLifecycleEvent | DevtoolsMessageEvent | DevtoolsRegistrationEvent;
+export type DevtoolsEvent =
+  | DevtoolsLifecycleEvent
+  | DevtoolsMessageEvent
+  | DevtoolsMessageResultEvent
+  | DevtoolsRegistrationEvent;
+
+/**
+ * A path from a service instance to a nested value: object keys and array indices.
+ *
+ * @group DevTools
+ */
+export type DevtoolsInspectPath = ReadonlyArray<string | number>;
 
 /**
  * What a plugin hands the hook to register a root: a way to snapshot the root's
- * tree on demand.
+ * tree on demand, and (optionally) to read a live value on demand.
  *
  * @group DevTools
  */
@@ -429,6 +527,17 @@ export interface DevtoolsRootRegister {
    * Produces the current snapshot of the root's whole observed subtree.
    */
   snapshot(): DevtoolsRootSnapshot;
+
+  /**
+   * Reads the **raw** live value at `path` within the instance identified by `instanceId`, or
+   * `undefined` when the instance is not in this root. Read-only; the consumer serializes the
+   * result. Absent on a root whose plugin predates on-demand inspection.
+   *
+   * @param instanceId - Instance to read from.
+   * @param path - Object keys / array indices from the instance to the value.
+   * @returns The raw value at the path.
+   */
+  inspect?(instanceId: DevtoolsInstanceId, path: DevtoolsInspectPath): unknown;
 }
 
 /**
@@ -493,6 +602,15 @@ export interface DevtoolsHook {
   idForContainer(container: object): DevtoolsContainerId;
 
   /**
+   * Allocates (or returns) the stable id for a service instance.
+   *
+   * @param instance - Instance to identify; keyed by object identity, so copies from any library
+   *   version share one allocator.
+   * @returns The instance's stable id.
+   */
+  idForInstance(instance: object): DevtoolsInstanceId;
+
+  /**
    * Emits a lifecycle delta to all subscribed backends.
    *
    * @param event - The delta to broadcast.
@@ -525,9 +643,11 @@ function createDevtoolsHook(): DevtoolsHook {
   const roots: Map<DevtoolsRootId, DevtoolsRootRegister> = new Map();
   const listeners: Set<DevtoolsListener> = new Set();
   const containerIds: WeakMap<object, DevtoolsContainerId> = new WeakMap();
+  const instanceIds: WeakMap<object, DevtoolsInstanceId> = new WeakMap();
 
   let nextRootId: DevtoolsRootId = 1;
   let nextContainerId: DevtoolsContainerId = 1;
+  let nextInstanceId: DevtoolsInstanceId = 1;
 
   return {
     protocolVersion: DEVTOOLS_PROTOCOL_VERSION,
@@ -555,6 +675,17 @@ function createDevtoolsHook(): DevtoolsHook {
       return id;
     },
 
+    idForInstance(instance: object): DevtoolsInstanceId {
+      let id: Optional<DevtoolsInstanceId> = instanceIds.get(instance);
+
+      if (id === undefined) {
+        id = nextInstanceId++;
+        instanceIds.set(instance, id);
+      }
+
+      return id;
+    },
+
     emit(event: DevtoolsEvent): void {
       for (const listener of listeners) {
         listener(event);
@@ -570,7 +701,11 @@ function createDevtoolsHook(): DevtoolsHook {
     },
 
     getRoots(): ReadonlyArray<DevtoolsRoot> {
-      return Array.from(roots, ([rootId, register]) => ({ rootId, snapshot: register.snapshot }));
+      return Array.from(roots, ([rootId, register]) => ({
+        rootId,
+        snapshot: register.snapshot,
+        inspect: register.inspect,
+      }));
     },
   };
 }

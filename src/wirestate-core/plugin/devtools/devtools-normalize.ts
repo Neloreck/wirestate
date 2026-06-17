@@ -13,6 +13,7 @@ import type {
   DevtoolsBinding,
   DevtoolsHandler,
   DevtoolsInstance,
+  DevtoolsInstanceId,
   DevtoolsInstanceStatus,
   DevtoolsPluginInfo,
   DevtoolsToken,
@@ -78,10 +79,12 @@ export function normalizePlugin(plugin: WirestatePlugin): DevtoolsPluginInfo {
  * Normalizes a service instance into a display-ready record.
  *
  * @param instance - Service instance to normalize.
+ * @param instanceId - Stable id the hook allocated for this instance.
  * @returns The normalized instance.
  */
-export function normalizeInstance(instance: object): DevtoolsInstance {
+export function normalizeInstance(instance: object, instanceId: DevtoolsInstanceId): DevtoolsInstance {
   return {
+    instanceId,
     token: normalizeToken(instance.constructor as ServiceToken),
     className: instance.constructor.name,
     status: readStatus(instance),
