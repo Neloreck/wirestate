@@ -1,5 +1,3 @@
-import { type Optional } from "../../types/general";
-
 import {
   type DevtoolsContainerId,
   type DevtoolsEvent,
@@ -9,36 +7,18 @@ import {
   type DevtoolsRoot,
   type DevtoolsRootId,
   type DevtoolsRootRegister,
-} from "./devtools-hook.types";
+} from "@wirestate/core/devtools";
+
+import { FALLBACK_PROTOCOL_VERSION, HOOK_KEY } from "@/backend/backend.config";
+import { type Optional } from "@/types/general";
 
 /**
- * Global key the in-page inspector backend reads to find the devtools hook.
- *
- * @remarks
- * The property is added to `globalThis` **only** when a {@link DevToolsPlugin} is
- * installed (see {@link installDevtoolsHook}). An application that never registers
- * the plugin never touches `globalThis`.
- *
- * @group DevTools
+ * Mirrors core's `DevtoolsHookHost` so a hook this backend pre-seeds is interchangeable with the one
+ * the app's `DevToolsPlugin` would install. Kept structurally parallel to core's class so any drift
+ * from the protocol is obvious on review.
  */
-export const DEVTOOLS_HOOK_KEY = "__WIRESTATE_DEVTOOLS_HOOK__" as const;
-
-/**
- * Version of the normalized devtools protocol the hook speaks.
- *
- * @group DevTools
- */
-export const DEVTOOLS_PROTOCOL_VERSION = 1 as const;
-
-/**
- * In-page host implementing the devtools hook: owns the registered roots, the subscriber listeners,
- * and the stable id allocators. One instance is created by {@link installDevtoolsHook} and shared by
- * every Wirestate copy on the page (so ids stay consistent across library versions).
- *
- * @group DevTools
- */
-class DevtoolsHookHost implements DevtoolsHook {
-  public readonly protocolVersion: number = DEVTOOLS_PROTOCOL_VERSION;
+class BackendHookHost implements DevtoolsHook {
+  public readonly protocolVersion: number = FALLBACK_PROTOCOL_VERSION;
 
   private readonly roots: Map<DevtoolsRootId, DevtoolsRootRegister> = new Map();
   private readonly listeners: Set<DevtoolsListener> = new Set();
@@ -108,42 +88,23 @@ class DevtoolsHookHost implements DevtoolsHook {
 }
 
 /**
- * Returns the existing devtools hook on `globalThis`, or installs a fresh one.
+ * Pre-seeds the devtools hook, or reuses one already present — the first-writer-wins handshake from
+ * the backend side: win the race and the app's plugin reuses our hook; lose it and we attach to the
+ * plugin's. Either way every plugin/library-copy on the page converges on one hook.
  *
- * @remarks
- * The **only** place that writes to `globalThis`. Called from a plugin's `install`,
- * never by core, so the global appears exactly when (and only when) a
- * {@link DevToolsPlugin} is registered. First-installer wins; later plugins reuse it.
- *
- * @group DevTools
- *
- * @returns The shared devtools hook.
+ * @returns The devtools hook shared across every Wirestate copy on the page.
  */
-export function installDevtoolsHook(): DevtoolsHook {
+export function ensureHook(): DevtoolsHook {
   const host: Record<string, unknown> = globalThis as Record<string, unknown>;
-  const existing: Optional<DevtoolsHook> = host[DEVTOOLS_HOOK_KEY] as Optional<DevtoolsHook>;
+  const existing: Optional<DevtoolsHook> = host[HOOK_KEY] as Optional<DevtoolsHook>;
 
   if (existing) {
     return existing;
-  } else {
-    const hook: DevtoolsHook = new DevtoolsHookHost();
-
-    host[DEVTOOLS_HOOK_KEY] = hook;
-
-    return hook;
   }
-}
 
-/**
- * Returns the devtools hook if one is installed, without creating it.
- *
- * @remarks
- * For backends and tests that must not cause the global to appear as a side effect.
- *
- * @group DevTools
- *
- * @returns The installed hook, or `undefined` when none is present.
- */
-export function getDevtoolsHook(): Optional<DevtoolsHook> {
-  return (globalThis as Record<string, unknown>)[DEVTOOLS_HOOK_KEY] as Optional<DevtoolsHook>;
+  const hook: DevtoolsHook = new BackendHookHost();
+
+  host[HOOK_KEY] = hook;
+
+  return hook;
 }

@@ -3,8 +3,8 @@ import { type DevtoolsServiceRef } from "@wirestate/core/devtools";
 import { type InspectNode } from "@/bridge/messages";
 import { type Optional } from "@/types/general";
 
-const MAX_KEYS = 100;
-const MAX_STRING = 200;
+const MAX_KEYS: number = 100;
+const MAX_STRING: number = 200;
 
 /**
  * Builds the descriptor for a field whose value is another container-managed instance, so the panel

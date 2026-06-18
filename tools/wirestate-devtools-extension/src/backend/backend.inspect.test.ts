@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { describeNode, serviceNode } from "@/backend/inspect";
+import { describeNode, serviceNode } from "@/backend/backend.inspect";
 
 describe("describeNode", () => {
   it("describes primitives inline", () => {

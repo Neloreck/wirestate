@@ -15,10 +15,6 @@
     "types": ["chrome", "node"],
     "paths": {
       "@/*": ["./src/*"],
-      // Dev-time shortcut: resolve the public devtools specifier straight to the barrel source so a
-      // change to the RC protocol reflects here immediately. Points at the published barrel
-      // (devtools.ts) so the extension type-checks against the exact public surface consumers get.
-      // Core now uses verbatimModuleSyntax, so pulling its graph into this strict program is clean.
       "@wirestate/core/devtools": ["../../src/wirestate-core/devtools.ts"]
     }
   },

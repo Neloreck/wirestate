@@ -1,6 +1,6 @@
 import { type DevtoolsEvent } from "@wirestate/core/devtools";
 
-import { type DehydratedRef } from "@/backend/dehydrate";
+import { type DehydratedRef } from "@/backend/backend.dehydrate";
 import { type Optional } from "@/types/general";
 
 /**
