@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import { Container, EventBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { EventEmitter } from "../types/events";
+import { type EventEmitter } from "../types/events";
 
 import { useEventEmitter } from "./use-event-emitter";
 

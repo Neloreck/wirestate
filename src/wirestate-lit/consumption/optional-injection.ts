@@ -1,11 +1,17 @@
 import { ContextConsumer } from "@lit/context";
-import { ReactiveElement } from "@lit/reactive-element";
-import { Container, ServiceToken } from "@wirestate/core";
+import { type ReactiveElement } from "@lit/reactive-element";
+import { type Container, type ServiceToken } from "@wirestate/core";
 
 import { ContainerContext } from "../context/container-context";
-import { AnyObject, Optional, FieldMustMatchProvidedType, Interface, ProvidedTypeMustMatch } from "../types/general";
+import {
+  type AnyObject,
+  type Optional,
+  type FieldMustMatchProvidedType,
+  type Interface,
+  type ProvidedTypeMustMatch,
+} from "../types/general";
 
-import type { OptionalInjectionFallback } from "./use-optional-injection";
+import { type OptionalInjectionFallback } from "./use-optional-injection";
 
 /**
  * Describes type returned by {@link optionalInjection}.

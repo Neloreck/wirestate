@@ -1,8 +1,8 @@
-import { Container, EventBus, EventEmitOptions, EventType } from "@wirestate/core";
+import { type Container, type EventEmitOptions, type EventType, EventBus } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { EventEmitter } from "../types/events";
+import { type EventEmitter } from "../types/events";
 
 /**
  * Returns a stable function to emit events via the {@link EventBus}.

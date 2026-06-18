@@ -1,6 +1,6 @@
-import { ReactiveControllerHost } from "@lit/reactive-element";
+import { type ReactiveControllerHost } from "@lit/reactive-element";
 
-import { ContainerProvider, ContainerProviderOptions } from "./container-provider";
+import { type ContainerProviderOptions, ContainerProvider } from "./container-provider";
 
 /**
  * Describes options for {@link useContainerProvider}.

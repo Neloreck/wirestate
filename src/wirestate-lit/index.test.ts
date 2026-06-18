@@ -1,61 +1,49 @@
+import { assertExportedApi } from "#/test/exported-api.utils";
+
 describe("Library exported API from wirestate/lit", () => {
-  const libRoot = require("./index");
-
-  const expectedLibExports: Array<string> = [
-    "ContainerContext",
-    "ContainerProvider",
-    "ContainerProviderOptions",
-    "InjectionDecorator",
-    "InjectionOptions",
-    "OnCommandController",
-    "OnCommandDecorator",
-    "OnEventController",
-    "OnEventDecorator",
-    "OnQueryController",
-    "OnQueryDecorator",
-    "OptionalInjectionDecorator",
-    "OptionalInjectionFallback",
-    "OptionalInjectionOptions",
-    "ProvideContainerDecorator",
-    "UseContainerProviderOptions",
-    "UseContainerValue",
-    "UseInjectionOptions",
-    "UseInjectionValue",
-    "UseOnCommandOptions",
-    "UseOnEventsOptions",
-    "UseOnQueryOptions",
-    "UseOptionalInjectionOptions",
-    "UseOptionalInjectionValue",
-    "injection",
-    "onCommand",
-    "onEvent",
-    "onQuery",
-    "optionalInjection",
-    "provideContainer",
-    "useContainer",
-    "useContainerProvider",
-    "useInjection",
-    "useOnCommand",
-    "useOnEvents",
-    "useOnQuery",
-    "useOptionalInjection",
-  ];
-
-  const assertListIntersection = (first: Array<string>, second: Array<string>) => {
-    first.forEach((it: string) => {
-      if (!second.includes(it)) {
-        throw new Error("Item missing in expected list: " + it);
-      }
+  it("should export exactly the documented lit API surface", () => {
+    assertExportedApi(require.resolve("./index"), {
+      values: [
+        "ContainerContext",
+        "ContainerProvider",
+        "OnCommandController",
+        "OnEventController",
+        "OnQueryController",
+        "injection",
+        "onCommand",
+        "onEvent",
+        "onQuery",
+        "optionalInjection",
+        "provideContainer",
+        "useContainer",
+        "useContainerProvider",
+        "useInjection",
+        "useOnCommand",
+        "useOnEvents",
+        "useOnQuery",
+        "useOptionalInjection",
+      ],
+      types: [
+        "ContainerProviderOptions",
+        "InjectionDecorator",
+        "InjectionOptions",
+        "OnCommandDecorator",
+        "OnEventDecorator",
+        "OnQueryDecorator",
+        "OptionalInjectionDecorator",
+        "OptionalInjectionFallback",
+        "OptionalInjectionOptions",
+        "ProvideContainerDecorator",
+        "UseContainerProviderOptions",
+        "UseContainerValue",
+        "UseInjectionOptions",
+        "UseInjectionValue",
+        "UseOnCommandOptions",
+        "UseOnEventsOptions",
+        "UseOnQueryOptions",
+        "UseOptionalInjectionOptions",
+        "UseOptionalInjectionValue",
+      ],
     });
-    second.forEach((it: string) => {
-      if (!first.includes(it)) {
-        throw new Error("Item missing in library root: " + it);
-      }
-    });
-  };
-
-  it("should export correct core API methods", () => {
-    assertListIntersection(Object.keys(libRoot), expectedLibExports);
-    expect(Object.keys(libRoot)).toHaveLength(expectedLibExports.length);
   });
 });

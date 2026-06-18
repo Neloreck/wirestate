@@ -1,12 +1,12 @@
 import { render } from "@testing-library/react";
-import { BindingType, Container, ContainerConfig, EventBus } from "@wirestate/core";
+import { type ContainerConfig, BindingType, Container, EventBus } from "@wirestate/core";
 import { StrictMode } from "react";
 
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { useContainer } from "../context/use-container";
 import { useInjection } from "../injection/use-injection";
-import { AnyObject } from "../types/general";
+import { type AnyObject } from "../types/general";
 
 import { ContainerProvider } from "./container-provider";
 

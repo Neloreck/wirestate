@@ -4,35 +4,44 @@
  * @packageDocumentation
  */
 
-export { injection, InjectionDecorator, InjectionOptions } from "./consumption/injection";
+export { type InjectionDecorator, type InjectionOptions } from "./consumption/injection";
+export { injection } from "./consumption/injection";
+export { type OptionalInjectionDecorator, type OptionalInjectionOptions } from "./consumption/optional-injection";
+export { optionalInjection } from "./consumption/optional-injection";
+export { type UseContainerValue } from "./consumption/use-container";
+export { useContainer } from "./consumption/use-container";
+export { type UseInjectionOptions, type UseInjectionValue } from "./consumption/use-injection";
+export { useInjection } from "./consumption/use-injection";
 export {
-  optionalInjection,
-  OptionalInjectionDecorator,
-  OptionalInjectionOptions,
-} from "./consumption/optional-injection";
-export { useContainer, UseContainerValue } from "./consumption/use-container";
-export { useInjection, UseInjectionOptions, UseInjectionValue } from "./consumption/use-injection";
-export {
-  OptionalInjectionFallback,
-  useOptionalInjection,
-  UseOptionalInjectionOptions,
-  UseOptionalInjectionValue,
+  type OptionalInjectionFallback,
+  type UseOptionalInjectionOptions,
+  type UseOptionalInjectionValue,
 } from "./consumption/use-optional-injection";
+export { useOptionalInjection } from "./consumption/use-optional-injection";
 
-export { onCommand, OnCommandDecorator } from "./commands/on-command";
+export { type OnCommandDecorator } from "./commands/on-command";
+export { onCommand } from "./commands/on-command";
 export { OnCommandController } from "./commands/on-command-controller";
-export { useOnCommand, UseOnCommandOptions } from "./commands/use-on-command";
+export { type UseOnCommandOptions } from "./commands/use-on-command";
+export { useOnCommand } from "./commands/use-on-command";
 
-export { onEvent, OnEventDecorator } from "./events/on-event";
+export { type OnEventDecorator } from "./events/on-event";
+export { onEvent } from "./events/on-event";
 export { OnEventController } from "./events/on-event-controller";
-export { useOnEvents, UseOnEventsOptions } from "./events/use-on-events";
+export { type UseOnEventsOptions } from "./events/use-on-events";
+export { useOnEvents } from "./events/use-on-events";
 
-export { onQuery, OnQueryDecorator } from "./queries/on-query";
+export { type OnQueryDecorator } from "./queries/on-query";
+export { onQuery } from "./queries/on-query";
 export { OnQueryController } from "./queries/on-query-controller";
-export { useOnQuery, UseOnQueryOptions } from "./queries/use-on-query";
+export { type UseOnQueryOptions } from "./queries/use-on-query";
+export { useOnQuery } from "./queries/use-on-query";
 
 export { ContainerContext } from "./context/container-context";
 
-export { ContainerProvider, ContainerProviderOptions } from "./provision/container-provider";
-export { provideContainer, ProvideContainerDecorator } from "./provision/provide-container";
-export { useContainerProvider, UseContainerProviderOptions } from "./provision/use-container-provision";
+export { type ContainerProviderOptions } from "./provision/container-provider";
+export { ContainerProvider } from "./provision/container-provider";
+export { type ProvideContainerDecorator } from "./provision/provide-container";
+export { provideContainer } from "./provision/provide-container";
+export { type UseContainerProviderOptions } from "./provision/use-container-provision";
+export { useContainerProvider } from "./provision/use-container-provision";

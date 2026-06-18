@@ -1,6 +1,6 @@
 import {
+  type SingleMethodDecoratorDescriptor,
   createSingleMethodDecoratorDescriptor,
-  SingleMethodDecoratorDescriptor,
 } from "./metadata-single-method-decorator";
 
 describe("createSingleMethodDecoratorDescriptor", () => {

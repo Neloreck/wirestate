@@ -1,8 +1,8 @@
-import type { Nullable } from "../../types/general";
+import { type Nullable } from "../../types/general";
 
 import { buildEventDispatchers } from "./build-event-dispatchers";
 import { EventBus } from "./event-bus";
-import type { EventDispatch, EventType } from "./events";
+import { type EventType, type EventDispatch } from "./events";
 import { OnEvent } from "./on-event";
 
 describe("buildEventDispatcher", () => {

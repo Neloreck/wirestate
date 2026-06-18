@@ -11,4 +11,5 @@
  * @group MobX Lit
  * @see {@link https://www.npmjs.com/package/@adobe/lit-mobx}
  */
-export { MobxLitElement, MobxReactionUpdate, ReactiveElementConstructor } from "@adobe/lit-mobx";
+export { type ReactiveElementConstructor } from "@adobe/lit-mobx";
+export { MobxLitElement, MobxReactionUpdate } from "@adobe/lit-mobx";

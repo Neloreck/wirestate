@@ -1,7 +1,7 @@
-import type { ContainerKernel } from "../container/container-kernel";
-import type { AbstractClass, Newable } from "../types/general";
+import { type ContainerKernel } from "../container/container-kernel";
+import { type AbstractClass, type Newable } from "../types/general";
 
-import type { InjectionToken } from "./binding-tokens";
+import { type InjectionToken } from "./binding-tokens";
 
 /**
  * Binding strategy names accepted by binding descriptors.

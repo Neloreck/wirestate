@@ -2,7 +2,7 @@ import { ReactiveElement } from "@lit/reactive-element";
 import { Container, EventBus } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
-import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
+import { type LitProvisionFixture, createLitProvision } from "@/fixtures/lit-utils/create-lit-provision";
 
 import { OnEventController } from "./on-event-controller";
 

@@ -3,43 +3,44 @@
  * hook/protocol an inspector backend (a Chrome extension or a standalone dev panel)
  * reads.
  *
- * @remarks
- * Kept out of the everyday `@wirestate/core` barrel on purpose — installing
- * {@link DevToolsPlugin} is a development-time integration, and the protocol below is
- * provisional and version-stamped. Import these from `@wirestate/core/devtools`.
- *
  * @packageDocumentation
  */
 
-export { DevToolsPlugin } from "./plugin/devtools/devtools-plugin";
+export { DevToolsPlugin, type DevToolsPluginConfig } from "./plugin/devtools/devtools-plugin";
 export {
   DEVTOOLS_HOOK_KEY,
   DEVTOOLS_PROTOCOL_VERSION,
   getDevtoolsHook,
   installDevtoolsHook,
 } from "./plugin/devtools/devtools-hook";
-export type {
-  DevtoolsBinding,
-  DevtoolsContainerId,
-  DevtoolsContainerSnapshot,
-  DevtoolsEvent,
-  DevtoolsHandler,
-  DevtoolsHook,
-  DevtoolsInstance,
-  DevtoolsInstanceStatus,
-  DevtoolsLifecycleEvent,
-  DevtoolsLifecyclePhase,
-  DevtoolsListener,
-  DevtoolsMessage,
-  DevtoolsMessageChannel,
-  DevtoolsMessageEvent,
-  DevtoolsPluginInfo,
-  DevtoolsRegistration,
-  DevtoolsRegistrationEvent,
-  DevtoolsRegistrationPhase,
-  DevtoolsRoot,
-  DevtoolsRootId,
-  DevtoolsRootRegister,
-  DevtoolsRootSnapshot,
-  DevtoolsToken,
-} from "./plugin/devtools/devtools-hook";
+
+export {
+  type DevtoolsBinding,
+  type DevtoolsContainerId,
+  type DevtoolsContainerSnapshot,
+  type DevtoolsEvent,
+  type DevtoolsHandler,
+  type DevtoolsHook,
+  type DevtoolsInspectPath,
+  type DevtoolsInstance,
+  type DevtoolsInstanceId,
+  type DevtoolsInstanceStatus,
+  type DevtoolsLifecycleEvent,
+  type DevtoolsLifecyclePhase,
+  type DevtoolsListener,
+  type DevtoolsMessage,
+  type DevtoolsMessageChannel,
+  type DevtoolsMessageEvent,
+  type DevtoolsMessageResult,
+  type DevtoolsMessageResultEvent,
+  type DevtoolsPluginInfo,
+  type DevtoolsRegistration,
+  type DevtoolsRegistrationEvent,
+  type DevtoolsRegistrationPhase,
+  type DevtoolsRoot,
+  type DevtoolsRootId,
+  type DevtoolsRootRegister,
+  type DevtoolsRootSnapshot,
+  type DevtoolsServiceRef,
+  type DevtoolsToken,
+} from "./plugin/devtools/devtools-hook.types";

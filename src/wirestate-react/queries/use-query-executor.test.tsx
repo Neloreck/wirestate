@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import { Container, QueryBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { QueryExecutor } from "../types/queries";
+import { type QueryExecutor } from "../types/queries";
 
 import { useQueryExecutor } from "./use-query-executor";
 

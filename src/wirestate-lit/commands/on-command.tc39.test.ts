@@ -2,7 +2,7 @@ import { ReactiveElement } from "@lit/reactive-element";
 import { CommandBus } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
-import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
+import { type LitProvisionFixture, createLitProvision } from "@/fixtures/lit-utils/create-lit-provision";
 
 import { onCommand } from "./on-command";
 

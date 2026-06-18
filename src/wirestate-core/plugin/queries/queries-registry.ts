@@ -1,4 +1,4 @@
-import type { QueryHandlerMetadata } from "./queries";
+import { type QueryHandlerMetadata } from "./queries";
 
 /**
  * Registry of class constructors to their declared query handlers.

@@ -1,6 +1,6 @@
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { Optional } from "../types/general";
+import { type Optional } from "../types/general";
 
 import { validateStandardMethodContext } from "./metadata-decorator-context";
 import { getPrototypeChainMetadata } from "./metadata-prototype-chain";

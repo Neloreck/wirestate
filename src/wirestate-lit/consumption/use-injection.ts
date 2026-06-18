@@ -1,9 +1,9 @@
 import { ContextConsumer } from "@lit/context";
-import { ReactiveControllerHost } from "@lit/reactive-element";
-import { ServiceToken } from "@wirestate/core";
+import { type ReactiveControllerHost } from "@lit/reactive-element";
+import { type ServiceToken } from "@wirestate/core";
 
 import { ContainerContext } from "../context/container-context";
-import { Nullable } from "../types/general";
+import { type Nullable } from "../types/general";
 
 /**
  * Describes options for {@link useInjection}.

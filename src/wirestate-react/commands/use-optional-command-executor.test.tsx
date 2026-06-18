@@ -2,8 +2,8 @@ import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { OptionalCommandExecutor } from "../types/commands";
-import { Optional } from "../types/general";
+import { type OptionalCommandExecutor } from "../types/commands";
+import { type Optional } from "../types/general";
 
 import { useOptionalCommandExecutor } from "./use-optional-command-executor";
 

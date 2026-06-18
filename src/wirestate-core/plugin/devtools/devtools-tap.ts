@@ -1,11 +1,16 @@
-import type { Container } from "../../container/container";
-import type { Newable, Optional } from "../../types/general";
+import { type Container } from "../../container/container";
+import { type Newable, type Optional } from "../../types/general";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
-import type { WireEvent } from "../events/events";
+import { type WireEvent } from "../events/events";
 import { QueryBus } from "../queries/query-bus";
 
-import type { DevtoolsMessage, DevtoolsMessageChannel, DevtoolsRegistration } from "./devtools-hook";
+import {
+  type DevtoolsMessage,
+  type DevtoolsMessageChannel,
+  type DevtoolsMessageResult,
+  type DevtoolsRegistration,
+} from "./devtools-hook.types";
 
 /**
  * Where a tapped bus reports observed traffic.
@@ -22,6 +27,11 @@ export interface DevtoolsTapSink {
    * Reports one handler/subscriber registration or unregistration.
    */
   registration(registration: DevtoolsRegistration): void;
+
+  /**
+   * Reports the settled outcome of a command/query dispatch.
+   */
+  result(result: DevtoolsMessageResult): void;
 }
 
 /**
@@ -34,6 +44,11 @@ type BusMethod = (...args: Array<unknown>) => unknown;
  * across every container and plugin instance on the page.
  */
 const TAPPED: WeakSet<object> = new WeakSet();
+
+/**
+ * Monotonic id correlating a dispatch with its result, across every tapped bus.
+ */
+let nextMessageId = 0;
 
 /**
  * `CommandBus` public dispatch methods wrapped to observe traffic.
@@ -91,6 +106,7 @@ function tapEventBus(container: Container, sink: DevtoolsTapSink): void {
 
   originalSubscribe(null, (event: WireEvent): void => {
     sink.message({
+      id: nextMessageId++,
       channel: "event",
       type: String(event.type),
       payload: event.payload,
@@ -153,9 +169,31 @@ function tapDispatchBus(
     const original: BusMethod = target[name].bind(bus);
 
     target[name] = (type: unknown, payload?: unknown): unknown => {
-      sink.message({ channel, type: String(type), payload, source: undefined, timestamp: Date.now() });
+      const id: number = nextMessageId++;
 
-      return original(type, payload);
+      sink.message({ id, channel, type: String(type), payload, source: undefined, timestamp: Date.now() });
+
+      let result: unknown;
+
+      try {
+        result = original(type, payload);
+      } catch (error: unknown) {
+        sink.result({ messageId: id, outcome: "rejected", value: error });
+        throw error;
+      }
+
+      if (isPromiseLike(result)) {
+        // Observe settlement without disturbing the caller's promise; both handlers are provided,
+        // so this observer chain can never surface as an unhandled rejection.
+        void Promise.resolve(result).then(
+          (value: unknown): void => sink.result({ messageId: id, outcome: "resolved", value }),
+          (error: unknown): void => sink.result({ messageId: id, outcome: "rejected", value: error })
+        );
+      } else {
+        sink.result({ messageId: id, outcome: "resolved", value: result });
+      }
+
+      return result;
     };
   }
 
@@ -177,6 +215,20 @@ function tapDispatchBus(
     sink.registration({ channel, type: String(type), phase: "unregistered" });
     originalUnregister(type, handler);
   };
+}
+
+/**
+ * Whether a value is thenable, so an async dispatch result can be observed on settlement.
+ *
+ * @param value - Value returned by a dispatch.
+ * @returns `true` for a promise-like value.
+ */
+function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
+  return (
+    value !== null &&
+    (typeof value === "object" || typeof value === "function") &&
+    typeof (value as { then?: unknown }).then === "function"
+  );
 }
 
 /**

@@ -1,5 +1,5 @@
-import type { BindingDescriptor, ServiceToken } from "../binding/binding";
-import type { Optional } from "../types/general";
+import { type BindingDescriptor, type ServiceToken } from "../binding/binding";
+import { type Optional } from "../types/general";
 
 /**
  * Token-keyed storage of registered binding descriptors.

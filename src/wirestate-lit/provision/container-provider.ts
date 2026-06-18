@@ -1,10 +1,10 @@
 import { ContextProvider } from "@lit/context";
-import { ReactiveController, ReactiveControllerHost } from "@lit/reactive-element";
-import { Container, ContainerConfig, WirestateError, validateContainerConfig } from "@wirestate/core";
+import { type ReactiveController, type ReactiveControllerHost } from "@lit/reactive-element";
+import { type ContainerConfig, Container, WirestateError, validateContainerConfig } from "@wirestate/core";
 
 import { ContainerContext } from "../context/container-context";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
-import { Maybe } from "../types/general";
+import { type Maybe } from "../types/general";
 
 /**
  * Describes options for {@link ContainerProvider}.

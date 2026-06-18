@@ -11,16 +11,5 @@
  * @group Signals
  * @see {@link https://preactjs.com/guide/v10/signals/}
  */
-export {
-  Model,
-  ModelConstructor,
-  ReadonlySignal,
-  Signal,
-  action,
-  batch,
-  computed,
-  createModel,
-  effect,
-  signal,
-  untracked,
-} from "@preact/signals-core";
+export { type Model, type ModelConstructor, type ReadonlySignal } from "@preact/signals-core";
+export { Signal, action, batch, computed, createModel, effect, signal, untracked } from "@preact/signals-core";

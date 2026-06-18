@@ -1,9 +1,9 @@
-import type { ServiceToken } from "../binding/binding";
-import type { Container } from "../container/container";
-import type { ContainerKernel } from "../container/container-kernel";
-import type { Maybe } from "../types/general";
+import { type ServiceToken } from "../binding/binding";
+import { type Container } from "../container/container";
+import { type ContainerKernel } from "../container/container-kernel";
+import { type Maybe } from "../types/general";
 
-import type { WirestatePlugin } from "./plugin";
+import { type WirestatePlugin } from "./plugin";
 
 /**
  * Plugins registered directly on a container (its own `config.plugins`).

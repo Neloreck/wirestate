@@ -11,7 +11,8 @@ import { OnQuery } from "../queries/on-query";
 import { QueriesPlugin } from "../queries/queries-plugin";
 import { QueryBus } from "../queries/query-bus";
 
-import { DEVTOOLS_HOOK_KEY, type DevtoolsHook, getDevtoolsHook } from "./devtools-hook";
+import { DEVTOOLS_HOOK_KEY, getDevtoolsHook } from "./devtools-hook";
+import { type DevtoolsHook } from "./devtools-hook.types";
 import { DevToolsPlugin } from "./devtools-plugin";
 
 describe("DevToolsPlugin", () => {
@@ -112,6 +113,165 @@ describe("DevToolsPlugin", () => {
     expect(phases).toContain("provision:Svc");
     expect(phases).toContain("deprovision:Svc");
     expect(phases).toContain("containerDeprovision");
+  });
+
+  it("stamps a stable instanceId on snapshots that matches its lifecycle deltas", () => {
+    @Injectable()
+    class Svc {
+      @OnProvision()
+      public onProvision(): void {}
+    }
+
+    const container: Container = new Container({ bindings: [Svc], plugins: [new DevToolsPlugin()] });
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+    const provisionIds: Array<number> = [];
+
+    hook.subscribe((event) => {
+      if (event.kind === "lifecycle" && event.phase === "provision" && event.instance) {
+        provisionIds.push(event.instance.instanceId);
+      }
+    });
+
+    container.get(Svc);
+    container.provision();
+
+    const instance = hook
+      .getRoots()[0]
+      .snapshot()
+      .containers[0].instances.find((entry) => entry.className === "Svc");
+
+    expect(instance?.instanceId).toEqual(expect.any(Number));
+    // The provision delta carries the same id as the snapshot — exact correlation, not by class name.
+    expect(provisionIds).toContain(instance?.instanceId);
+
+    // The id is stable across snapshots.
+    const again = hook
+      .getRoots()[0]
+      .snapshot()
+      .containers[0].instances.find((entry) => entry.className === "Svc");
+
+    expect(again?.instanceId).toBe(instance?.instanceId);
+
+    container.deprovision();
+  });
+
+  it("stamps timestamps on lifecycle/registration deltas and carries a configured root label", () => {
+    @Injectable()
+    class Feature {
+      @OnCommand("SAVE")
+      public save(): void {}
+    }
+
+    const container: Container = new Container({
+      bindings: [Feature],
+      plugins: [new CommandsPlugin(), new DevToolsPlugin({ label: "main" })],
+    });
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+    const stamped: Array<boolean> = [];
+
+    hook.subscribe((event) => {
+      if (event.kind === "lifecycle" || event.kind === "registration") {
+        stamped.push(typeof event.timestamp === "number");
+      }
+    });
+
+    container.provision();
+
+    expect(stamped.length).toBeGreaterThan(0);
+    expect(stamped.every(Boolean)).toBe(true);
+    expect(hook.getRoots()[0].snapshot().label).toBe("main");
+
+    container.deprovision();
+  });
+
+  it("reads a live instance value on demand via inspect, safely", () => {
+    @Injectable()
+    class Counter {
+      public count: number = 5;
+      public nested: { deep: { value: string } } = { deep: { value: "x" } };
+    }
+
+    const container: Container = new Container({
+      bindings: [Counter],
+      activate: [Counter],
+      plugins: [new DevToolsPlugin()],
+    });
+
+    container.provision();
+
+    const root = (getDevtoolsHook() as DevtoolsHook).getRoots()[0];
+    const counter = root.snapshot().containers[0].instances.find((entry) => entry.className === "Counter");
+    const id: number = counter?.instanceId as number;
+
+    expect(root.inspect?.(id, ["count"])).toBe(5);
+    expect(root.inspect?.(id, ["nested", "deep", "value"])).toBe("x");
+    // Unknown instance / missing path → undefined, never throws.
+    expect(root.inspect?.(999_999, ["count"])).toBeUndefined();
+    expect(root.inspect?.(id, ["nope", "deeper"])).toBeUndefined();
+
+    container.deprovision();
+  });
+
+  it("captures command/query results, correlated to their dispatch", async () => {
+    const container: Container = new Container({
+      plugins: [new CommandsPlugin(), new QueriesPlugin(), new DevToolsPlugin()],
+    });
+
+    container.provision();
+
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+    const ids: Map<string, number> = new Map();
+    const results: Array<{ messageId: number; outcome: string; value: unknown }> = [];
+
+    hook.subscribe((event) => {
+      if (event.kind === "message") {
+        ids.set(event.message.type, event.message.id);
+      } else if (event.kind === "messageResult") {
+        results.push({ messageId: event.messageId, outcome: event.outcome, value: event.value });
+      }
+    });
+
+    container.get(CommandBus).register("SAVE", () => "saved");
+    container.get(QueryBus).register("SLOW", () => Promise.resolve(42));
+
+    container.get(CommandBus).execute("SAVE");
+    await container.get(QueryBus).query("SLOW");
+    // Flush the async result observer (a microtask attached to the resolved promise).
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+    expect(results.find((entry) => entry.messageId === ids.get("SAVE"))).toMatchObject({
+      outcome: "resolved",
+      value: "saved",
+    });
+    expect(results.find((entry) => entry.messageId === ids.get("SLOW"))).toMatchObject({
+      outcome: "resolved",
+      value: 42,
+    });
+
+    container.deprovision();
+  });
+
+  it("identifies a tracked service instance by identity via serviceRefOf", () => {
+    @Injectable()
+    class Logger {}
+
+    const container: Container = new Container({
+      bindings: [Logger],
+      activate: [Logger],
+      plugins: [new DevToolsPlugin()],
+    });
+
+    container.provision();
+
+    const root = (getDevtoolsHook() as DevtoolsHook).getRoots()[0];
+    const logger: Logger = container.get(Logger);
+
+    expect(root.serviceRefOf?.(logger)?.className).toBe("Logger");
+    expect(root.serviceRefOf?.(logger)?.instanceId).toEqual(expect.any(Number));
+    // A plain object (or any value the container doesn't manage) is not a service.
+    expect(root.serviceRefOf?.({ not: "a service" })).toBeUndefined();
+
+    container.deprovision();
   });
 
   it("reconstructs the subtree from inherited observation, linking child to parent", () => {

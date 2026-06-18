@@ -1,8 +1,8 @@
-import { Container, CommandBus, CommandType } from "@wirestate/core";
+import { type Container, type CommandType, CommandBus } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { OptionalAsyncCommandExecutor } from "../types/commands";
+import { type OptionalAsyncCommandExecutor } from "../types/commands";
 
 /**
  * Returns a stable function to dispatch optional commands with Promise-normalized results.

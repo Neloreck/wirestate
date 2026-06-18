@@ -1,8 +1,8 @@
-import { Container, WirestateError } from "@wirestate/core";
+import { type Container, WirestateError } from "@wirestate/core";
 import { useContext } from "react";
 
 import { ERROR_CODE_INVALID_CONTEXT } from "../error/error-code";
-import { Nullable } from "../types/general";
+import { type Nullable } from "../types/general";
 
 import { ContainerContext } from "./container-context";
 

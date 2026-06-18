@@ -1,9 +1,9 @@
-import { BindingScope, BindingType, FactoryBindingDescriptor } from "../binding/binding";
+import { type FactoryBindingDescriptor, BindingScope, BindingType } from "../binding/binding";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
-import { AnyObject } from "../types/general";
+import { type AnyObject } from "../types/general";
 
 import { Container } from "./container";
-import { ContainerKernel } from "./container-kernel";
+import { type ContainerKernel } from "./container-kernel";
 
 describe("container.bind factory", () => {
   it("should bind a factory descriptor", () => {

@@ -4,10 +4,10 @@ import { OnActivated } from "../activation/on-activated";
 import { OnDeactivation } from "../activation/on-deactivation";
 import { WireStatus } from "../activation/wire-status";
 import {
-  BindingDescriptor,
+  type BindingDescriptor,
+  type FactoryBindingDescriptor,
+  type InstanceBindingDescriptor,
   BindingType,
-  FactoryBindingDescriptor,
-  InstanceBindingDescriptor,
 } from "../binding/binding";
 import { ERROR_CODE_INVALID_BINDING_SCOPE, ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
@@ -20,7 +20,7 @@ import { OnEvent } from "../plugin/events/on-event";
 import { OnQuery } from "../plugin/queries/on-query";
 import { QueriesPlugin } from "../plugin/queries/queries-plugin";
 import { QueryBus } from "../plugin/queries/query-bus";
-import { Nullable } from "../types/general";
+import { type Nullable } from "../types/general";
 
 import { Container } from "./container";
 import { inject } from "./container-context";

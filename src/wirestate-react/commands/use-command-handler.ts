@@ -1,4 +1,4 @@
-import { Container, CommandBus, CommandHandler, CommandType } from "@wirestate/core";
+import { type Container, type CommandHandler, type CommandType, CommandBus } from "@wirestate/core";
 import { useRef } from "react";
 
 import { useContainer } from "../context/use-container";

@@ -1,6 +1,6 @@
-import type { ContainerKernel } from "../container/container-kernel";
+import { type ContainerKernel } from "../container/container-kernel";
 import { WirestateError } from "../error/wirestate-error";
-import { Nullable, Optional } from "../types/general";
+import { type Nullable, type Optional } from "../types/general";
 
 /**
  * Internal storage for service lifecycle status keyed by instance.

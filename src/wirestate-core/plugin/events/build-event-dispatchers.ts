@@ -1,8 +1,8 @@
-import type { ContainerKernel } from "../../container/container-kernel";
+import { type ContainerKernel } from "../../container/container-kernel";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
-import type { Maybe } from "../../types/general";
+import { type Maybe } from "../../types/general";
 
-import { EventDispatch, EventHandler, EventType } from "./events";
+import { type EventDispatch, type EventHandler, type EventType } from "./events";
 import { getEventHandlerMetadata } from "./events-registry";
 
 /**

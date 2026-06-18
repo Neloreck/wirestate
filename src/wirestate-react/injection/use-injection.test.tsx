@@ -1,5 +1,5 @@
 import { render } from "@testing-library/react";
-import { Container, Injectable, Newable } from "@wirestate/core";
+import { type Newable, Container, Injectable } from "@wirestate/core";
 
 import { ErrorLogBoundary } from "@/fixtures/react-components/error-log-boundary";
 

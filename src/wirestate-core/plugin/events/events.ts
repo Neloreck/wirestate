@@ -1,4 +1,4 @@
-import type { Nullable } from "../../types/general";
+import { type Nullable } from "../../types/general";
 
 /**
  * Represents the type used to emit and filter events.

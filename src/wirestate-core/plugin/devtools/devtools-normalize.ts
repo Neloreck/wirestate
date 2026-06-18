@@ -1,22 +1,23 @@
 import { WireStatus } from "../../activation/wire-status";
-import type { BindingDescriptor, ServiceToken } from "../../binding/binding";
+import { type BindingDescriptor, type ServiceToken } from "../../binding/binding";
 import { isInstanceDescriptor } from "../../binding/binding-guards";
 import { getBindingScope } from "../../binding/binding-lifecycle";
 import { InjectionToken, getBindingToken, tokenToString } from "../../binding/binding-tokens";
-import type { Optional } from "../../types/general";
+import { type Optional } from "../../types/general";
 import { getCommandHandlerMetadata } from "../commands/on-command";
 import { getEventHandlerMetadata } from "../events/events-registry";
-import type { WirestatePlugin } from "../plugin";
+import { type WirestatePlugin } from "../plugin";
 import { getQueryHandlerMetadata } from "../queries/on-query";
 
-import type {
-  DevtoolsBinding,
-  DevtoolsHandler,
-  DevtoolsInstance,
-  DevtoolsInstanceStatus,
-  DevtoolsPluginInfo,
-  DevtoolsToken,
-} from "./devtools-hook";
+import {
+  type DevtoolsBinding,
+  type DevtoolsHandler,
+  type DevtoolsInstance,
+  type DevtoolsInstanceId,
+  type DevtoolsInstanceStatus,
+  type DevtoolsPluginInfo,
+  type DevtoolsToken,
+} from "./devtools-hook.types";
 
 /**
  * Normalizes a service token into a display-ready record.
@@ -78,10 +79,12 @@ export function normalizePlugin(plugin: WirestatePlugin): DevtoolsPluginInfo {
  * Normalizes a service instance into a display-ready record.
  *
  * @param instance - Service instance to normalize.
+ * @param instanceId - Stable id the hook allocated for this instance.
  * @returns The normalized instance.
  */
-export function normalizeInstance(instance: object): DevtoolsInstance {
+export function normalizeInstance(instance: object, instanceId: DevtoolsInstanceId): DevtoolsInstance {
   return {
+    instanceId,
     token: normalizeToken(instance.constructor as ServiceToken),
     className: instance.constructor.name,
     status: readStatus(instance),
@@ -124,18 +127,16 @@ function normalizeHandlers(instance: object): ReadonlyArray<DevtoolsHandler> {
  * @returns The normalized status, or `undefined` when the instance is not tracked.
  */
 function readStatus(instance: object): Optional<DevtoolsInstanceStatus> {
-  let status: Optional<WireStatus>;
-
   try {
-    status = WireStatus.for(instance);
+    const status: Optional<WireStatus> = WireStatus.for(instance);
+
+    return {
+      isDeactivated: status.isDeactivated,
+      isDeprovisioned: status.isDeprovisioned,
+      isInactive: status.isInactive,
+      provisionId: status.provisionId,
+    };
   } catch {
     return undefined;
   }
-
-  return {
-    isDeactivated: status.isDeactivated,
-    isDeprovisioned: status.isDeprovisioned,
-    isInactive: status.isInactive,
-    provisionId: status.provisionId,
-  };
 }

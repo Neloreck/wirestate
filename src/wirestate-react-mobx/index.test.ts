@@ -1,35 +1,22 @@
+import { assertExportedApi } from "#/test/exported-api.utils";
+
 describe("Library exported API from wirestate/react-mobx", () => {
-  const libRoot = require("./index");
-
-  const expectedLibExports: Array<string> = [
-    "Observer",
-    "clearTimers",
-    "enableStaticRendering",
-    "isObserverBatched",
-    "isUsingStaticRendering",
-    "observer",
-    "observerBatching",
-    "useAsObservableSource",
-    "useLocalObservable",
-    "useLocalStore",
-    "useObserver",
-  ];
-
-  const assertListIntersection = (first: Array<string>, second: Array<string>) => {
-    first.forEach((it: string) => {
-      if (!second.includes(it)) {
-        throw new Error("Item missing in expected list: " + it);
-      }
+  it("should export exactly the documented react-mobx API surface", () => {
+    assertExportedApi(require.resolve("./index"), {
+      values: [
+        "Observer",
+        "clearTimers",
+        "enableStaticRendering",
+        "isObserverBatched",
+        "isUsingStaticRendering",
+        "observer",
+        "observerBatching",
+        "useAsObservableSource",
+        "useLocalObservable",
+        "useLocalStore",
+        "useObserver",
+      ],
+      types: [],
     });
-    second.forEach((it: string) => {
-      if (!first.includes(it)) {
-        throw new Error("Item missing in library root: " + it);
-      }
-    });
-  };
-
-  it("should export correct core API methods", () => {
-    assertListIntersection(Object.keys(libRoot), expectedLibExports);
-    expect(Object.keys(libRoot)).toHaveLength(expectedLibExports.length);
   });
 });

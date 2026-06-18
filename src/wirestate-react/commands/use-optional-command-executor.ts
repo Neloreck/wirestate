@@ -1,9 +1,9 @@
-import { Container, CommandBus, CommandType } from "@wirestate/core";
+import { type Container, type CommandType, CommandBus } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { OptionalCommandExecutor } from "../types/commands";
-import { Optional } from "../types/general";
+import { type OptionalCommandExecutor } from "../types/commands";
+import { type Optional } from "../types/general";
 
 /**
  * Returns a stable function to dispatch optional commands on the active container.

@@ -1,7 +1,7 @@
 import { inject } from "../container/container-context";
 import { ContainerKernel } from "../container/container-kernel";
 import { Injectable } from "../metadata/metadata-injectable";
-import { Optional } from "../types/general";
+import { type Optional } from "../types/general";
 
 const myServiceConstructorSpy = jest.fn();
 

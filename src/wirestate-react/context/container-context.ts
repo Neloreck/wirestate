@@ -1,7 +1,7 @@
-import { Container } from "@wirestate/core";
-import { Context, createContext } from "react";
+import { type Container } from "@wirestate/core";
+import { type Context, createContext } from "react";
 
-import { Nullable } from "../types/general";
+import { type Nullable } from "../types/general";
 
 /**
  * React context carrying the container.

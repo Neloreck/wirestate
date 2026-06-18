@@ -3,7 +3,7 @@ import { Container, QueryBus } from "@wirestate/core";
 import { useLayoutEffect } from "react";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { AnyObject } from "../types/general";
+import { type AnyObject } from "../types/general";
 
 import { useQueryHandler } from "./use-query-handler";
 

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // noinspection JSUnusedLocalSymbols
 
-import type { Optional } from "../types/general";
+import { type Optional } from "../types/general";
 
 import { inject } from "./container-context";
 

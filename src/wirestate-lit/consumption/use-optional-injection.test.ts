@@ -1,11 +1,11 @@
 import { ReactiveElement } from "@lit/reactive-element";
-import { CommandBus, Container, EventBus, QueryBus, ServiceToken } from "@wirestate/core";
+import { type ServiceToken, CommandBus, Container, EventBus, QueryBus } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
-import { createLitProvision, LitProvisionFixture } from "@/fixtures/lit-utils/create-lit-provision";
+import { type LitProvisionFixture, createLitProvision } from "@/fixtures/lit-utils/create-lit-provision";
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { Optional } from "../types/general";
+import { type Optional } from "../types/general";
 
 import { useOptionalInjection } from "./use-optional-injection";
 

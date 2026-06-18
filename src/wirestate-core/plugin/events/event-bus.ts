@@ -2,9 +2,15 @@ import { Container } from "../../container/container";
 import { inject } from "../../container/container-context";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
 import { Injectable } from "../../metadata/metadata-injectable";
-import type { Optional, Maybe, Nullable } from "../../types/general";
+import { type Optional, type Maybe, type Nullable } from "../../types/general";
 
-import type { EventEmitOptions, EventHandler, EventType, EventUnsubscribe, WireEvent } from "./events";
+import {
+  type EventEmitOptions,
+  type EventHandler,
+  type EventType,
+  type EventUnsubscribe,
+  type WireEvent,
+} from "./events";
 
 /**
  * Private key under which catch-all handlers are stored.

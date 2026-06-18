@@ -1,5 +1,5 @@
-import { ReactiveElement } from "@lit/reactive-element";
-import { QueryHandler, QueryType } from "@wirestate/core";
+import { type ReactiveElement } from "@lit/reactive-element";
+import { type QueryHandler, type QueryType } from "@wirestate/core";
 
 import { OnQueryController } from "./on-query-controller";
 

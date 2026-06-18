@@ -1,10 +1,10 @@
 import { render, cleanup } from "@testing-library/react";
-import { CommandsPlugin, Container, EventsPlugin, QueriesPlugin, ServiceToken } from "@wirestate/core";
+import { type ServiceToken, CommandsPlugin, Container, EventsPlugin, QueriesPlugin } from "@wirestate/core";
 
 import { GenericService } from "@/fixtures/services/generic-service";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { AnyObject, Nullable } from "../types/general";
+import { type AnyObject, type Nullable } from "../types/general";
 
 import { useOptionalInjection } from "./use-optional-injection";
 

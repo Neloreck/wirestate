@@ -1,4 +1,4 @@
-import type { CommandHandlerMetadata } from "./commands";
+import { type CommandHandlerMetadata } from "./commands";
 
 /**
  * Registry of class constructors to their declared command handlers.

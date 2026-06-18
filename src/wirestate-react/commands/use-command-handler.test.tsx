@@ -1,5 +1,5 @@
 import { render, cleanup } from "@testing-library/react";
-import { Container, CommandBus, CommandHandler } from "@wirestate/core";
+import { type CommandHandler, Container, CommandBus } from "@wirestate/core";
 import { useLayoutEffect } from "react";
 
 import { ContainerProvider } from "../provision/container-provider";

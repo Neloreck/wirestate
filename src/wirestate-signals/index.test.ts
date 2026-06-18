@@ -1,35 +1,10 @@
+import { assertExportedApi } from "#/test/exported-api.utils";
+
 describe("Library exported API from wirestate/signals", () => {
-  const libRoot = require("./index");
-
-  const expectedLibExports: Array<string> = [
-    "Model",
-    "ModelConstructor",
-    "ReadonlySignal",
-    "Signal",
-    "action",
-    "batch",
-    "computed",
-    "createModel",
-    "effect",
-    "signal",
-    "untracked",
-  ];
-
-  const assertListIntersection = (first: Array<string>, second: Array<string>) => {
-    first.forEach((it: string) => {
-      if (!second.includes(it)) {
-        throw new Error("Item missing in expected list: " + it);
-      }
+  it("should export exactly the documented signals API surface", () => {
+    assertExportedApi(require.resolve("./index"), {
+      values: ["Signal", "action", "batch", "computed", "createModel", "effect", "signal", "untracked"],
+      types: ["Model", "ModelConstructor", "ReadonlySignal"],
     });
-    second.forEach((it: string) => {
-      if (!first.includes(it)) {
-        throw new Error("Item missing in library root: " + it);
-      }
-    });
-  };
-
-  it("should export correct core API methods", () => {
-    assertListIntersection(Object.keys(libRoot), expectedLibExports);
-    expect(Object.keys(libRoot)).toHaveLength(expectedLibExports.length);
   });
 });

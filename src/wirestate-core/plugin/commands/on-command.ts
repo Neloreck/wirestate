@@ -11,7 +11,7 @@ import {
 } from "../messaging-registration";
 
 import { CommandBus } from "./command-bus";
-import type { CommandHandler, CommandHandlerMetadata, CommandType } from "./commands";
+import { type CommandHandler, type CommandHandlerMetadata, type CommandType } from "./commands";
 import { COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY } from "./commands-registry";
 
 /**

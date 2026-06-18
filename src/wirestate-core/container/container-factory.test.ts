@@ -1,4 +1,4 @@
-import type { BindingDescriptor, FactoryBindingDescriptor } from "../binding/binding";
+import { type BindingDescriptor, type FactoryBindingDescriptor } from "../binding/binding";
 import { ERROR_CODE_CIRCULAR_DEPENDENCY } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 

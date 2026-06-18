@@ -1,8 +1,8 @@
-import type {
-  BindingDescriptor,
-  FactoryBindingDescriptor,
-  InstanceBindingDescriptor,
-  ValueBindingDescriptor,
+import {
+  type BindingDescriptor,
+  type FactoryBindingDescriptor,
+  type InstanceBindingDescriptor,
+  type ValueBindingDescriptor,
 } from "./binding";
 
 /**

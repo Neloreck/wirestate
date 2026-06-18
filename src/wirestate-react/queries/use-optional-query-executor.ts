@@ -1,8 +1,8 @@
-import { Container, QueryBus, QueryType } from "@wirestate/core";
+import { type Container, type QueryType, QueryBus } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { OptionalQueryExecutor } from "../types/queries";
+import { type OptionalQueryExecutor } from "../types/queries";
 
 /**
  * Returns a stable function to dispatch optional synchronous queries on the active container.

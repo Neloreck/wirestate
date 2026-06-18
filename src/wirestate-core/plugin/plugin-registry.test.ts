@@ -1,6 +1,6 @@
 import { ContainerKernel } from "../container/container-kernel";
 
-import type { WirestatePlugin } from "./plugin";
+import { type WirestatePlugin } from "./plugin";
 import { getEffectivePlugins, setContainerPlugins } from "./plugin-registry";
 
 describe("getEffectivePlugins", () => {

@@ -1,6 +1,6 @@
-import { QueryType } from "@wirestate/core";
+import { type QueryType } from "@wirestate/core";
 
-import { Optional } from "./general";
+import { type Optional } from "./general";
 
 /**
  * Represents the function returned by {@link useQueryExecutor}.

@@ -1,8 +1,8 @@
-import { Container, QueryBus, QueryType } from "@wirestate/core";
+import { type Container, type QueryType, QueryBus } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { AsyncQueryExecutor } from "../types/queries";
+import { type AsyncQueryExecutor } from "../types/queries";
 
 /**
  * Returns a stable function to dispatch queries with Promise-normalized results.

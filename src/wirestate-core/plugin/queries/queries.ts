@@ -1,4 +1,4 @@
-import type { MaybePromise } from "../../types/general";
+import { type MaybePromise } from "../../types/general";
 
 /**
  * Represents the type used to dispatch and handle queries.

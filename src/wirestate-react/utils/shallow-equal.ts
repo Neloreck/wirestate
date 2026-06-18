@@ -1,6 +1,6 @@
-import { ServiceToken } from "@wirestate/core";
+import { type ServiceToken } from "@wirestate/core";
 
-import { AnyObject, Maybe } from "../types/general";
+import { type AnyObject, type Maybe } from "../types/general";
 
 /**
  * Checks whether two objects are shallowly equal.

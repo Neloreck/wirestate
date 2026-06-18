@@ -10,18 +10,18 @@ import {
 } from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
 import {
+  type InternalErrorHandler,
   getConfiguredInternalErrorHandler,
-  InternalErrorHandler,
   setInternalErrorHandler,
 } from "../error/internal-error-handler";
-import type { WirestatePlugin } from "../plugin/plugin";
+import { type WirestatePlugin } from "../plugin/plugin";
 import { installOwnPlugins, setContainerPlugins } from "../plugin/plugin-registry";
 import {
   deprovisionContainer,
   deprovisionContainerBinding,
   provisionContainer,
 } from "../provision/provision-lifecycle";
-import { Maybe, Newable } from "../types/general";
+import { type Maybe, type Newable } from "../types/general";
 
 import { validateContainerConfig } from "./container-config-validation";
 import { ContainerKernel } from "./container-kernel";

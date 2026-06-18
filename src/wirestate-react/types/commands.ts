@@ -1,6 +1,6 @@
-import { CommandType } from "@wirestate/core";
+import { type CommandType } from "@wirestate/core";
 
-import { Optional } from "./general";
+import { type Optional } from "./general";
 
 /**
  * Represents the function returned by {@link useCommandExecutor}.

@@ -1,4 +1,4 @@
-import { InstanceBindingDescriptor } from "@wirestate/core";
+import { type InstanceBindingDescriptor } from "@wirestate/core";
 
 import { OnDeactivation } from "../activation/on-deactivation";
 import { InjectionToken } from "../binding/binding-tokens";

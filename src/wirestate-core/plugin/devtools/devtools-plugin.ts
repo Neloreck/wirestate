@@ -1,22 +1,38 @@
-import type { Container } from "../../container/container";
-import type { ContainerKernel } from "../../container/container-kernel";
-import type { Optional } from "../../types/general";
-import type { WirestatePlugin } from "../plugin";
+import { type Container } from "../../container/container";
+import { type ContainerKernel } from "../../container/container-kernel";
+import { type Optional } from "../../types/general";
+import { type WirestatePlugin } from "../plugin";
 import { getOwnPlugins } from "../plugin-registry";
 
+import { DEVTOOLS_PROTOCOL_VERSION, installDevtoolsHook } from "./devtools-hook";
 import {
-  DEVTOOLS_PROTOCOL_VERSION,
   type DevtoolsContainerId,
   type DevtoolsContainerSnapshot,
   type DevtoolsHook,
+  type DevtoolsInspectPath,
   type DevtoolsInstance,
+  type DevtoolsInstanceId,
   type DevtoolsLifecyclePhase,
   type DevtoolsRootId,
   type DevtoolsRootSnapshot,
-  installDevtoolsHook,
-} from "./devtools-hook";
+  type DevtoolsServiceRef,
+} from "./devtools-hook.types";
 import { normalizeBinding, normalizeInstance, normalizePlugin } from "./devtools-normalize";
 import { tapContainerBuses } from "./devtools-tap";
+
+/**
+ * Configuration for {@link DevToolsPlugin}.
+ *
+ * @group DevTools
+ */
+export interface DevToolsPluginConfig {
+  /**
+   * Optional human label for this root, shown by the inspector to tell it apart from other roots on
+   * the page (a root is otherwise identified only by a numeric id). When omitted, a consumer may
+   * derive a hint from the root's contents instead.
+   */
+  readonly label?: string;
+}
 
 /**
  * Read-only observer plugin that exposes a container subtree to an inspector
@@ -62,6 +78,18 @@ export class DevToolsPlugin implements WirestatePlugin {
    */
   private readonly observed: Map<DevtoolsContainerId, WeakRef<ContainerKernel>> = new Map();
 
+  /**
+   * Optional human label for this root, surfaced in the snapshot. See {@link DevToolsPluginConfig.label}.
+   */
+  private readonly label: Optional<string>;
+
+  /**
+   * @param config - Optional plugin configuration (see {@link DevToolsPluginConfig}).
+   */
+  public constructor(config?: DevToolsPluginConfig) {
+    this.label = config?.label;
+  }
+
   public install(): void {
     this.hook = installDevtoolsHook();
 
@@ -70,7 +98,11 @@ export class DevToolsPlugin implements WirestatePlugin {
     // double-invokes the `useState` initializer, constructing a throwaway alongside the
     // committed container — and only the committed one ever provisions.
     if (this.rootId === 0) {
-      this.rootId = this.hook.registerRoot({ snapshot: () => this.snapshot() });
+      this.rootId = this.hook.registerRoot({
+        snapshot: () => this.snapshot(),
+        inspect: (instanceId, path) => this.inspect(instanceId, path),
+        serviceRefOf: (value) => this.serviceRefOf(value),
+      });
     }
   }
 
@@ -117,8 +149,9 @@ export class DevToolsPlugin implements WirestatePlugin {
       kind: "lifecycle",
       rootId: this.rootId,
       containerId: this.hook.idForContainer(container),
+      timestamp: Date.now(),
       phase,
-      instance: instance && normalizeInstance(instance),
+      instance: instance ? normalizeInstance(instance, this.hook.idForInstance(instance)) : undefined,
     });
   }
 
@@ -139,7 +172,9 @@ export class DevToolsPlugin implements WirestatePlugin {
     tapContainerBuses(container, {
       message: (message) => hook.emit({ kind: "message", rootId: this.rootId, containerId, message }),
       registration: (registration) =>
-        hook.emit({ kind: "registration", rootId: this.rootId, containerId, registration }),
+        hook.emit({ kind: "registration", rootId: this.rootId, containerId, timestamp: Date.now(), registration }),
+      result: (result) =>
+        hook.emit({ kind: "messageResult", rootId: this.rootId, containerId, timestamp: Date.now(), ...result }),
     });
   }
 
@@ -192,7 +227,7 @@ export class DevToolsPlugin implements WirestatePlugin {
       }
     }
 
-    return { rootId: this.rootId, protocolVersion: DEVTOOLS_PROTOCOL_VERSION, containers };
+    return { rootId: this.rootId, protocolVersion: DEVTOOLS_PROTOCOL_VERSION, label: this.label, containers };
   }
 
   /**
@@ -212,8 +247,97 @@ export class DevToolsPlugin implements WirestatePlugin {
       bindings: container.getOwnBindings().map(normalizeBinding),
       instances: container
         .getActiveInstances()
-        .map((instance: object): DevtoolsInstance => normalizeInstance(instance)),
+        .map((instance: object): DevtoolsInstance => normalizeInstance(instance, hook.idForInstance(instance))),
       plugins: getOwnPlugins(container).map(normalizePlugin),
     };
   }
+
+  /**
+   * Reads the raw live value at `path` within the instance identified by `instanceId`, scanning the
+   * observed containers' active instances. Read-only — never mutates.
+   *
+   * @param instanceId - Instance to read from.
+   * @param path - Object keys / array indices from the instance to the value.
+   * @returns The raw value, or `undefined` when the instance is not (or no longer) live.
+   */
+  private inspect(instanceId: DevtoolsInstanceId, path: DevtoolsInspectPath): unknown {
+    if (!this.hook) {
+      return undefined;
+    }
+
+    for (const reference of this.observed.values()) {
+      const container: Optional<ContainerKernel> = reference.deref();
+
+      if (!container) {
+        continue;
+      }
+
+      for (const instance of container.getActiveInstances()) {
+        if (this.hook.idForInstance(instance) === instanceId) {
+          return readPath(instance, path);
+        }
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
+   * If `value` is one of this root's tracked active instances, returns a reference to it (so the
+   * inspector can mark a field that points at another service and offer a jump); else `undefined`.
+   *
+   * @param value - Raw value at an inspected field.
+   * @returns A service reference, or `undefined`.
+   */
+  private serviceRefOf(value: object): Optional<DevtoolsServiceRef> {
+    if (!this.hook) {
+      return undefined;
+    }
+
+    for (const reference of this.observed.values()) {
+      const container: Optional<ContainerKernel> = reference.deref();
+
+      if (!container) {
+        continue;
+      }
+
+      for (const instance of container.getActiveInstances()) {
+        if (instance === value) {
+          return {
+            instanceId: this.hook.idForInstance(instance),
+            containerId: this.hook.idForContainer(container),
+            className: instance.constructor.name,
+          };
+        }
+      }
+    }
+
+    return undefined;
+  }
+}
+
+/**
+ * Walks object keys / array indices from a root value, returning the value at the path — or
+ * `undefined` if a step is missing or its getter throws (a getter must never crash devtools).
+ *
+ * @param root - Value to walk from.
+ * @param path - Keys / indices to follow.
+ * @returns The value at the path.
+ */
+function readPath(root: unknown, path: DevtoolsInspectPath): unknown {
+  let current: unknown = root;
+
+  for (const key of path) {
+    if (current === null || (typeof current !== "object" && typeof current !== "function")) {
+      return undefined;
+    }
+
+    try {
+      current = (current as Record<PropertyKey, unknown>)[key];
+    } catch {
+      return undefined;
+    }
+  }
+
+  return current;
 }

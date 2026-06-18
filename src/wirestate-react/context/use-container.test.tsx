@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import { Container } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { Nullable } from "../types/general";
+import { type Nullable } from "../types/general";
 
 import { useContainer } from "./use-container";
 

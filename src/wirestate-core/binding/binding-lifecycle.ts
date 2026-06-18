@@ -1,4 +1,4 @@
-import type { BindingDescriptor, BindingScopeValue } from "./binding";
+import { type BindingDescriptor, type BindingScopeValue } from "./binding";
 import { isFactoryDescriptor, isInstanceDescriptor } from "./binding-guards";
 
 /**

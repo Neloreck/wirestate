@@ -1,4 +1,6 @@
 import {
+  type ServiceToken,
+  type WirestatePlugin,
   Container,
   EventsPlugin,
   Injectable,
@@ -7,8 +9,6 @@ import {
   OnDeprovision,
   OnEvent,
   OnProvision,
-  ServiceToken,
-  WirestatePlugin,
 } from "../index";
 
 describe("container plugins", () => {

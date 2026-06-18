@@ -1,6 +1,6 @@
 import { ContextConsumer } from "@lit/context";
-import { ReactiveControllerHost } from "@lit/reactive-element";
-import { Container } from "@wirestate/core";
+import { type ReactiveControllerHost } from "@lit/reactive-element";
+import { type Container } from "@wirestate/core";
 
 import { ContainerContext } from "../context/container-context";
 

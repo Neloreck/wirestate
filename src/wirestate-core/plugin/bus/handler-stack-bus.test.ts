@@ -1,5 +1,5 @@
 import { WirestateError } from "../../error/wirestate-error";
-import type { Optional } from "../../types/general";
+import { type Optional } from "../../types/general";
 
 import { HandlerStackBus } from "./handler-stack-bus";
 

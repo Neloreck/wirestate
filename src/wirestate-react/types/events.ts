@@ -1,4 +1,4 @@
-import { EventEmitOptions, EventType } from "@wirestate/core";
+import { type EventEmitOptions, type EventType } from "@wirestate/core";
 
 /**
  * Represents the function returned by {@link useEventEmitter}.

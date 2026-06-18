@@ -1,6 +1,6 @@
-import { Component, createElement, ReactNode } from "react";
+import { Component, createElement, type ReactNode } from "react";
 
-import { Nullable } from "../types";
+import { type Nullable } from "../types";
 
 interface ErrorLogBoundaryProps {
   readonly children?: ReactNode;

@@ -1,6 +1,6 @@
 import { getActivatedHandlerMetadata } from "../activation/on-activated";
 import { getDeactivationHandlerMetadata } from "../activation/on-deactivation";
-import type { InstanceBindingDescriptor } from "../binding/binding";
+import { type InstanceBindingDescriptor } from "../binding/binding";
 import { tokenToString } from "../binding/binding-tokens";
 import { ERROR_CODE_INVALID_BINDING_SCOPE } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
