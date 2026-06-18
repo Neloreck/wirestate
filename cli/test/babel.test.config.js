@@ -24,6 +24,7 @@ module.exports = {
       {
         root: ["./"],
         alias: {
+          "#": "./cli",
           "@/fixtures": "./src/fixtures",
           "@wirestate/core": "./src/wirestate-core",
           "@wirestate/lit": "./src/wirestate-lit",

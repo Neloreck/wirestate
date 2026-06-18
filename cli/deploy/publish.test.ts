@@ -1,4 +1,9 @@
-import { assertCanPublishPackageVersions, PublishPackage, publishPackages, resolvePublishTag } from "./publish.utils";
+import {
+  type PublishPackage,
+  assertCanPublishPackageVersions,
+  publishPackages,
+  resolvePublishTag,
+} from "./publish.utils";
 
 describe("publish package version guard", () => {
   function createPackage(name: string, version: string): PublishPackage {
