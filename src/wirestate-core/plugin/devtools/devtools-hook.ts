@@ -31,80 +31,80 @@ export const DEVTOOLS_HOOK_KEY = "__WIRESTATE_DEVTOOLS_HOOK__" as const;
 export const DEVTOOLS_PROTOCOL_VERSION = 1 as const;
 
 /**
- * Builds a fresh devtools hook.
+ * In-page host implementing the devtools hook: owns the registered roots, the subscriber listeners,
+ * and the stable id allocators. One instance is created by {@link installDevtoolsHook} and shared by
+ * every Wirestate copy on the page (so ids stay consistent across library versions).
  *
- * @returns A new, empty hook.
+ * @group DevTools
  */
-function createDevtoolsHook(): DevtoolsHook {
-  const roots: Map<DevtoolsRootId, DevtoolsRootRegister> = new Map();
-  const listeners: Set<DevtoolsListener> = new Set();
-  const containerIds: WeakMap<object, DevtoolsContainerId> = new WeakMap();
-  const instanceIds: WeakMap<object, DevtoolsInstanceId> = new WeakMap();
+class DevtoolsHookHost implements DevtoolsHook {
+  public readonly protocolVersion: number = DEVTOOLS_PROTOCOL_VERSION;
 
-  let nextRootId: DevtoolsRootId = 1;
-  let nextContainerId: DevtoolsContainerId = 1;
-  let nextInstanceId: DevtoolsInstanceId = 1;
+  private readonly roots: Map<DevtoolsRootId, DevtoolsRootRegister> = new Map();
+  private readonly listeners: Set<DevtoolsListener> = new Set();
+  private readonly containerIds: WeakMap<object, DevtoolsContainerId> = new WeakMap();
+  private readonly instanceIds: WeakMap<object, DevtoolsInstanceId> = new WeakMap();
 
-  return {
-    protocolVersion: DEVTOOLS_PROTOCOL_VERSION,
+  private nextRootId: DevtoolsRootId = 1;
+  private nextContainerId: DevtoolsContainerId = 1;
+  private nextInstanceId: DevtoolsInstanceId = 1;
 
-    registerRoot(register: DevtoolsRootRegister): DevtoolsRootId {
-      const rootId: DevtoolsRootId = nextRootId++;
+  public registerRoot(register: DevtoolsRootRegister): DevtoolsRootId {
+    const rootId: DevtoolsRootId = this.nextRootId++;
 
-      roots.set(rootId, register);
+    this.roots.set(rootId, register);
 
-      return rootId;
-    },
+    return rootId;
+  }
 
-    deregisterRoot(rootId: DevtoolsRootId): void {
-      roots.delete(rootId);
-    },
+  public deregisterRoot(rootId: DevtoolsRootId): void {
+    this.roots.delete(rootId);
+  }
 
-    idForContainer(container: object): DevtoolsContainerId {
-      let id: Optional<DevtoolsContainerId> = containerIds.get(container);
+  public idForContainer(container: object): DevtoolsContainerId {
+    let id: Optional<DevtoolsContainerId> = this.containerIds.get(container);
 
-      if (id === undefined) {
-        id = nextContainerId++;
-        containerIds.set(container, id);
-      }
+    if (id === undefined) {
+      id = this.nextContainerId++;
+      this.containerIds.set(container, id);
+    }
 
-      return id;
-    },
+    return id;
+  }
 
-    idForInstance(instance: object): DevtoolsInstanceId {
-      let id: Optional<DevtoolsInstanceId> = instanceIds.get(instance);
+  public idForInstance(instance: object): DevtoolsInstanceId {
+    let id: Optional<DevtoolsInstanceId> = this.instanceIds.get(instance);
 
-      if (id === undefined) {
-        id = nextInstanceId++;
-        instanceIds.set(instance, id);
-      }
+    if (id === undefined) {
+      id = this.nextInstanceId++;
+      this.instanceIds.set(instance, id);
+    }
 
-      return id;
-    },
+    return id;
+  }
 
-    emit(event: DevtoolsEvent): void {
-      for (const listener of listeners) {
-        listener(event);
-      }
-    },
+  public emit(event: DevtoolsEvent): void {
+    for (const listener of this.listeners) {
+      listener(event);
+    }
+  }
 
-    subscribe(listener: DevtoolsListener): () => void {
-      listeners.add(listener);
+  public subscribe(listener: DevtoolsListener): () => void {
+    this.listeners.add(listener);
 
-      return () => {
-        listeners.delete(listener);
-      };
-    },
+    return () => {
+      this.listeners.delete(listener);
+    };
+  }
 
-    getRoots(): ReadonlyArray<DevtoolsRoot> {
-      return Array.from(roots, ([rootId, register]) => ({
-        rootId,
-        snapshot: register.snapshot,
-        inspect: register.inspect,
-        serviceRefOf: register.serviceRefOf,
-      }));
-    },
-  };
+  public getRoots(): ReadonlyArray<DevtoolsRoot> {
+    return Array.from(this.roots, ([rootId, register]) => ({
+      rootId,
+      snapshot: register.snapshot,
+      inspect: register.inspect,
+      serviceRefOf: register.serviceRefOf,
+    }));
+  }
 }
 
 /**
@@ -125,13 +125,13 @@ export function installDevtoolsHook(): DevtoolsHook {
 
   if (existing) {
     return existing;
+  } else {
+    const hook: DevtoolsHook = new DevtoolsHookHost();
+
+    host[DEVTOOLS_HOOK_KEY] = hook;
+
+    return hook;
   }
-
-  const hook: DevtoolsHook = createDevtoolsHook();
-
-  host[DEVTOOLS_HOOK_KEY] = hook;
-
-  return hook;
 }
 
 /**
