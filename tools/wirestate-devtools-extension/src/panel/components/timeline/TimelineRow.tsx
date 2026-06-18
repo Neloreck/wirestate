@@ -5,8 +5,10 @@ import {
 } from "@wirestate/core/devtools";
 import { useState } from "react";
 
-import { formatClock, summarize, timestampOf } from "@/panel/format";
+import { EventSummary } from "@/panel/components/EventSummary";
+import { formatClock, formatDelta, timestampOf } from "@/panel/format";
 import { type PanelActions } from "@/panel/use-panel-state";
+import { type Optional } from "@/types/general";
 
 const TAG_COLOR: Record<DevtoolsEvent["kind"], string> = {
   lifecycle: "text-sky-600 dark:text-sky-400",
@@ -20,13 +22,17 @@ interface TimelineRowProps {
   readonly count: number;
   readonly actions: PanelActions;
   readonly result?: DevtoolsMessageResultEvent;
+  /** Timestamp of the first row shown, for the relative offset; `undefined` disables the Δ column. */
+  readonly baseline?: Optional<number>;
 }
 
 /** One Timeline delta. Message rows expand inline to show the dehydrated payload (and any result). */
-export function TimelineRow({ event, count, actions, result }: TimelineRowProps) {
+export function TimelineRow({ event, count, actions, result, baseline }: TimelineRowProps) {
   const [open, setOpen] = useState(false);
   const expandable: boolean = event.kind === "message";
-  const timestamp = timestampOf(event);
+  const timestamp: Optional<number> = timestampOf(event);
+  const delta: Optional<number> =
+    timestamp !== undefined && baseline !== undefined ? timestamp - baseline : undefined;
 
   return (
     <div className={"border-b border-divider-subtle"}>
@@ -37,8 +43,16 @@ export function TimelineRow({ event, count, actions, result }: TimelineRowProps)
         <span className={"w-[88px] shrink-0 text-fg-subtle tabular-nums"}>
           {timestamp === undefined ? "" : formatClock(timestamp)}
         </span>
+        <span className={"w-[56px] shrink-0 text-fg-muted tabular-nums"}>
+          {delta === undefined ? "" : formatDelta(delta)}
+        </span>
         <span className={`min-w-[84px] shrink-0 ${TAG_COLOR[event.kind]}`}>{event.kind}</span>
-        <span className={"flex-1 truncate"}>{summarize(event)}</span>
+        <span className={"flex-1 truncate"}>
+          <EventSummary
+            event={event}
+            onSelectInstance={(containerId, className) => actions.select({ kind: "instance", containerId, className })}
+          />
+        </span>
         {count > 1 ? (
           <span className={"rounded bg-selected px-1 text-[10px]"}>×{count}</span>
         ) : null}

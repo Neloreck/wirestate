@@ -1,10 +1,11 @@
 import { type DevtoolsEvent, type DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
 import { useEffect, useRef } from "react";
 
-import { summarize } from "@/panel/format";
+import { summarize, timestampOf } from "@/panel/format";
 import { type RootModel } from "@/panel/selectors";
 import { type TimelineFilter } from "@/panel/types";
 import { type PanelActions, type PanelUi } from "@/panel/use-panel-state";
+import { type Optional } from "@/types/general";
 
 import { TimelineFilters } from "./TimelineFilters";
 import { TimelineRow } from "./TimelineRow";
@@ -36,6 +37,8 @@ export function Timeline({ events, roots, containerIds, filter, ui, actions, onC
 
   const shown: ReadonlyArray<DevtoolsEvent> = ui.paused ? frozen.current : events;
   const rows: ReadonlyArray<CollapsedRow> = collapse(shown);
+  // Relative offsets are measured from the first row currently shown (resets with the filter/pause).
+  const baseline: Optional<number> = rows.length > 0 ? timestampOf(rows[0].event) : undefined;
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
@@ -67,6 +70,7 @@ export function Timeline({ events, roots, containerIds, filter, ui, actions, onC
               event={row.event}
               count={row.count}
               actions={actions}
+              baseline={baseline}
               result={row.event.kind === "message" ? results.get(row.event.message.id) : undefined}
             />
           ))

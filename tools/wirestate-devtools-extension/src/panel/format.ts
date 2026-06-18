@@ -6,7 +6,8 @@ import { type Optional } from "@/types/general";
 /**
  * Epoch-ms timestamp of a delta, if it has one (older cores may omit lifecycle/registration times).
  *
- * @param event
+ * @param event - The devtools delta to read the timestamp from.
+ * @returns The epoch-ms timestamp, or `undefined` when the delta carries none.
  */
 export function timestampOf(event: DevtoolsEvent): Optional<number> {
   if (event.kind === "message") {
@@ -19,12 +20,23 @@ export function timestampOf(event: DevtoolsEvent): Optional<number> {
 /**
  * Formats an epoch-ms timestamp as a 24h clock time with milliseconds.
  *
- * @param timestamp
+ * @param timestamp - Epoch milliseconds to format.
+ * @returns The clock time as `HH:MM:SS.mmm`.
  */
 export function formatClock(timestamp: number): string {
   const date: Date = new Date(timestamp);
 
   return `${date.toLocaleTimeString(undefined, { hour12: false })}.${String(date.getMilliseconds()).padStart(3, "0")}`;
+}
+
+/**
+ * Formats a millisecond gap as a compact, signed delta (`+0ms`, `+12ms`, `+1.4s`).
+ *
+ * @param ms - Milliseconds elapsed since the reference event.
+ * @returns A short relative-time label.
+ */
+export function formatDelta(ms: number): string {
+  return ms < 1000 ? `+${ms}ms` : `+${(ms / 1000).toFixed(1)}s`;
 }
 
 /**

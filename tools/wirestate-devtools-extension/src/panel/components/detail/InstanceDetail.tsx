@@ -2,6 +2,7 @@ import {
   type DevtoolsContainerSnapshot,
   type DevtoolsEvent,
   type DevtoolsInstance,
+  type DevtoolsMethod,
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
 
@@ -33,6 +34,18 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
   const rootId: Optional<number> = roots.find((root) =>
     root.containers.some((entry) => entry.containerId === container.containerId)
   )?.rootId;
+
+  // Older cores predate `methods`; treat absence as empty. Map each handler method to its channel(s)
+  // so the methods list can badge the ones wired to the message stream.
+  const methods: ReadonlyArray<DevtoolsMethod> = instance.methods ?? [];
+  const handlerChannels: Map<string, Set<string>> = new Map();
+
+  for (const handler of instance.handlers) {
+    const channels: Set<string> = handlerChannels.get(handler.method) ?? new Set();
+
+    channels.add(handler.channel);
+    handlerChannels.set(handler.method, channels);
+  }
 
   return (
     <div className={"space-y-3"}>
@@ -70,8 +83,31 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
         )}
       </Section>
 
+      <Section title={`methods (${methods.length})`}>
+        {methods.length === 0 ? (
+          <span className={"text-fg-muted"}>none</span>
+        ) : (
+          methods.map((method) => {
+            const channels: Optional<Set<string>> = handlerChannels.get(method.name);
+
+            return (
+              <div key={method.name}>
+                {method.name}
+                <span className={"text-fg-muted"}>({method.arity})</span>
+                {channels ? (
+                  <span className={"text-fuchsia-600 dark:text-fuchsia-400"}> {Array.from(channels).join(", ")}</span>
+                ) : null}
+              </div>
+            );
+          })
+        )}
+      </Section>
+
       <Section title={"lifecycle history"}>
-        <History events={history} />
+        <History
+          events={history}
+          onSelectInstance={(containerId, className) => actions.select({ kind: "instance", containerId, className })}
+        />
       </Section>
 
       <Section title={"state"}>

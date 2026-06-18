@@ -26,7 +26,7 @@ export function mockInstance(
   token: string = className,
   instanceId: number = 1
 ): DevtoolsInstance {
-  return { instanceId, token: { name: token, kind: "class" }, className, status: undefined, handlers: [] };
+  return { instanceId, token: { name: token, kind: "class" }, className, status: undefined, handlers: [], methods: [] };
 }
 
 /**

@@ -113,7 +113,10 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
       </Section>
 
       <Section title={"lifecycle history"}>
-        <History events={history} />
+        <History
+          events={history}
+          onSelectInstance={(containerId, className) => actions.select({ kind: "instance", containerId, className })}
+        />
       </Section>
 
       <div>
