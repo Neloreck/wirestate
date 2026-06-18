@@ -14,7 +14,7 @@ interface NavigatorProps {
 export function Navigator({ roots, selection, collapsed, actions }: NavigatorProps) {
   if (roots.length === 0) {
     return (
-      <nav className={"w-[42%] min-w-[220px] overflow-auto border-r border-divider p-2"}>
+      <nav className={"h-full w-full overflow-auto p-2"}>
         <p className={"text-fg-muted"}>
           No Wirestate roots detected on this page. Is a <code>DevToolsPlugin</code> registered and a provider mounted?
         </p>
@@ -23,7 +23,7 @@ export function Navigator({ roots, selection, collapsed, actions }: NavigatorPro
   }
 
   return (
-    <nav className={"w-[42%] min-w-[220px] overflow-auto border-r border-divider p-1"}>
+    <nav className={"h-full w-full overflow-auto p-1"}>
       {roots.map((root) => (
         <div key={root.rootId} className={"mb-1"}>
           <div className={"px-1 py-0.5 font-semibold text-[#ff4733]"}>{root.label}</div>

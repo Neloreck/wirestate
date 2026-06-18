@@ -12,6 +12,7 @@ export default defineManifest({
     "128": "icons/icon-128.png",
   },
   minimum_chrome_version: "111",
+  permissions: ["storage"],
   devtools_page: "src/devtools/devtools.html",
   background: {
     service_worker: "src/bridge/background.ts",

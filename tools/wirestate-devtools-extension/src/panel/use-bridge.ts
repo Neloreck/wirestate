@@ -71,6 +71,11 @@ export function useBridge(): BridgeState {
             pendingRef.current.get(message.requestId)?.(message.node);
             pendingRef.current.delete(message.requestId);
             break;
+          case "page-connected":
+            // A fresh page backend just paired (reload/first load/worker wake). Re-pull its snapshot
+            // + buffered deltas; the onNavigated reset has already cleared the previous page's tree.
+            port.postMessage({ type: "attach" } satisfies PanelToBackend);
+            break;
         }
       });
 

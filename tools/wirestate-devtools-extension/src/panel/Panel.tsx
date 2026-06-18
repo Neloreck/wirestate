@@ -1,19 +1,26 @@
 import { type DevtoolsEvent, type DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
-import { useMemo, useState } from "react";
+import { type CSSProperties, useMemo, useRef } from "react";
 
 import { Detail } from "@/panel/components/detail/Detail";
 import { Navigator } from "@/panel/components/Navigator";
+import { ResizeHandle } from "@/panel/components/ResizeHandle";
 import { StatusBar } from "@/panel/components/StatusBar";
 import { Timeline } from "@/panel/components/timeline/Timeline";
 import { type RootModel, buildRoots, filterLog } from "@/panel/selectors";
 import { useBridge } from "@/panel/use-bridge";
+import { useLayout } from "@/panel/use-layout";
 import { usePanelState } from "@/panel/use-panel-state";
 
 /** The inspector panel: master–detail (Navigator + Detail) over a collapsible, cross-linked Timeline. */
 export function Panel() {
   const { connected, protocolVersion, roots, log, clear, inspect } = useBridge();
   const { state, actions } = usePanelState();
-  const [timelineOpen, setTimelineOpen] = useState(true);
+  const { layout, actions: layoutActions } = useLayout();
+
+  // Resizable splits write their live fraction straight to these containers' CSS vars during a drag
+  // (see ResizeHandle), so dragging never re-renders the panel.
+  const columnRef = useRef<HTMLDivElement>(null);
+  const rowRef = useRef<HTMLDivElement>(null);
 
   const builtRoots: ReadonlyArray<RootModel> = useMemo(() => buildRoots(roots), [roots]);
   const containerIds: ReadonlyArray<number> = useMemo(
@@ -36,9 +43,9 @@ export function Panel() {
 
   return (
     <div
-      className={
-        "flex h-screen flex-col bg-surface font-mono text-xs text-fg"
-      }
+      ref={columnRef}
+      className={"flex h-screen flex-col bg-surface font-mono text-xs text-fg"}
+      style={{ "--timeline-h": `${(layout.timelineFraction * 100).toFixed(3)}%` } as CSSProperties}
     >
       <StatusBar
         connected={connected}
@@ -47,25 +54,53 @@ export function Panel() {
         containerCount={containerCount}
       />
 
-      <div className={"flex min-h-0 flex-1"}>
-        <Navigator roots={builtRoots} selection={state.selection} collapsed={state.ui.collapsed} actions={actions} />
+      <div
+        ref={rowRef}
+        className={"flex min-h-0 flex-1"}
+        style={{ "--nav-w": `${(layout.navFraction * 100).toFixed(3)}%` } as CSSProperties}
+      >
+        <div className={"min-w-[220px] overflow-hidden"} style={{ flex: "0 0 var(--nav-w)" }}>
+          <Navigator roots={builtRoots} selection={state.selection} collapsed={state.ui.collapsed} actions={actions} />
+        </div>
+
+        <ResizeHandle
+          orientation={"x"}
+          controls={"start"}
+          containerRef={rowRef}
+          cssVar={"--nav-w"}
+          minStartPx={220}
+          minEndPx={240}
+          onCommit={layoutActions.setNavFraction}
+        />
+
         <Detail roots={roots} log={log} selection={state.selection} actions={actions} inspect={inspect} />
       </div>
 
+      {layout.timelineOpen ? (
+        <ResizeHandle
+          orientation={"y"}
+          controls={"end"}
+          containerRef={columnRef}
+          cssVar={"--timeline-h"}
+          minStartPx={150}
+          minEndPx={80}
+          onCommit={layoutActions.setTimelineFraction}
+        />
+      ) : null}
+
       <div
-        className={`flex flex-col border-t border-divider ${timelineOpen ? "h-2/5" : ""}`}
+        className={`flex min-h-0 flex-col ${layout.timelineOpen ? "" : "border-t border-divider"}`}
+        style={layout.timelineOpen ? { flex: "0 0 var(--timeline-h)" } : undefined}
       >
         <button
           type={"button"}
-          onClick={() => setTimelineOpen((open) => !open)}
-          className={
-            "flex items-center gap-1 bg-elevated px-2.5 py-0.5 text-left text-fg-muted"
-          }
+          onClick={layoutActions.toggleTimeline}
+          className={"flex items-center gap-1 bg-elevated px-2.5 py-0.5 text-left text-fg-muted"}
         >
-          {timelineOpen ? "▾" : "▸"} Timeline <span className={"text-fg-subtle"}>({filtered.length})</span>
+          {layout.timelineOpen ? "▾" : "▸"} Timeline <span className={"text-fg-subtle"}>({filtered.length})</span>
         </button>
 
-        {timelineOpen ? (
+        {layout.timelineOpen ? (
           <div className={"min-h-0 flex-1"}>
             <Timeline
               events={filtered}

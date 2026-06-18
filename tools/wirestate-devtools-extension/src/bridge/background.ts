@@ -1,4 +1,4 @@
-import { CONTENT_PORT, PANEL_PORT_PREFIX } from "@/bridge/messages";
+import { type BackendToPanel, CONTENT_PORT, PANEL_PORT_PREFIX } from "@/bridge/messages";
 import { type Optional } from "@/types/general";
 
 /**
@@ -42,6 +42,9 @@ chrome.runtime.onConnect.addListener((port: chrome.runtime.Port): void => {
     const pair: Pair = pairFor(tabId);
 
     pair.content = port;
+
+    // A fresh page relay just paired.
+    pair.panel?.postMessage({ type: "page-connected" } satisfies BackendToPanel);
 
     // Backend -> panel.
     port.onMessage.addListener((message: unknown): void => {

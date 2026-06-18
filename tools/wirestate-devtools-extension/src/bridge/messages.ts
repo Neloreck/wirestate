@@ -40,7 +40,7 @@ export type InspectFn = (
 ) => Promise<InspectNode>;
 
 /**
- * A message the backend sends toward the panel.
+ * A message the panel receives on its background port.
  *
  * @remarks
  * `roots` are already normalized to clone-safe primitives by the protocol. In `event`, a
@@ -56,7 +56,8 @@ export type BackendToPanel =
     }
   | { readonly type: "snapshot"; readonly roots: ReadonlyArray<DevtoolsRootSnapshot> }
   | { readonly type: "event"; readonly event: DevtoolsEvent }
-  | { readonly type: "inspectResult"; readonly requestId: number; readonly node: InspectNode };
+  | { readonly type: "inspectResult"; readonly requestId: number; readonly node: InspectNode }
+  | { readonly type: "page-connected" };
 
 /** A message the panel sends toward the backend. */
 export type PanelToBackend =
