@@ -23,14 +23,14 @@ export function GeneralControls() {
 
   const onDumpData = useCallback(() => {
     const result = execute(EGlobalCommand.DUMP_DATA, {
-      at: Date.now(),
+      at: new Date(),
     });
 
     console.info("[GeneralControls] Dump data result:", result);
   }, [execute]);
 
   const onUserPinged = useCallback(() => {
-    emit(EGlobalEvent.USER_PINGED, { at: Date.now() });
+    emit(EGlobalEvent.USER_PINGED, { at: new Date() });
   }, [emit]);
 
   return (

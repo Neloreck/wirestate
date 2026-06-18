@@ -13,7 +13,7 @@ import { type ReadonlySignal, Signal, computed, signal } from "@wirestate/signal
 
 import { EGlobalEvent } from "@/constants/events";
 import { LoggerService } from "@/services/LoggerService";
-import type { Optional } from "@/types";
+import { type Optional } from "@/types";
 
 import { ECounterServiceQuery, type ICounterSnapshot, type ICounterSummary } from "./CounterService.query";
 

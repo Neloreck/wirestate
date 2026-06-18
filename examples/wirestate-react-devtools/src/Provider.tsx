@@ -34,7 +34,14 @@ export function Provider({ children }: PropsWithChildren) {
           factory: () => ({ random: Math.random(), another: true }),
         },
       ],
-      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin(), new DevToolsPlugin()],
+      plugins: [
+        new EventsPlugin(),
+        new CommandsPlugin(),
+        new QueriesPlugin(),
+        new DevToolsPlugin({
+          label: "wirestate-react-devtools",
+        }),
+      ],
     }),
     [],
   );

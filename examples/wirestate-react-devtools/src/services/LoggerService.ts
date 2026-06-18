@@ -24,7 +24,7 @@ export interface ILogEntry {
   readonly id: number;
   readonly type: string;
   readonly payload: unknown;
-  readonly at: number;
+  readonly at: Date;
 }
 
 @Injectable()
@@ -97,7 +97,7 @@ export class LoggerService {
         id: this.nextId++,
         type: String(event.type),
         payload: event.payload,
-        at: Date.now(),
+        at: new Date(),
       },
       ...this.logs,
     ];

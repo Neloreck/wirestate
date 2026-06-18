@@ -23,6 +23,32 @@
   padding: 8px;
 }
 
+.devtools__root {
+  margin-bottom: 12px;
+}
+
+.devtools__root:last-child {
+  margin-bottom: 0;
+}
+
+.devtools__root-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 2px 6px;
+}
+
+.devtools__root-label {
+  color: var(--text-h);
+  font-weight: 700;
+}
+
+.devtools__root-meta {
+  opacity: 0.6;
+  font-size: 11px;
+}
+
 .devtools__container {
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -68,7 +94,37 @@
 }
 
 .devtools__instance-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-weight: 600;
+}
+
+.devtools__badge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+
+.devtools__badge--active {
+  color: #1a7f37;
+  background: rgba(26, 127, 55, 0.12);
+  border-color: rgba(26, 127, 55, 0.4);
+}
+
+.devtools__badge--inactive {
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.devtools__badge--muted {
+  opacity: 0.6;
+  border-color: var(--border);
 }
 
 .devtools__handlers {
@@ -90,12 +146,51 @@
   border-bottom: none;
 }
 
-.devtools__event--message {
+.devtools__event-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.devtools__time {
+  flex: 0 0 96px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.55;
+}
+
+.devtools__kind {
+  flex: 0 0 88px;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+.devtools__summary {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.devtools__event--message .devtools__kind {
   color: var(--accent);
 }
 
-.devtools__event--registration {
+.devtools__event--registration .devtools__summary {
   font-style: italic;
+}
+
+.devtools__result {
+  margin: 2px 0 0 104px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.devtools__result--resolved {
+  color: #1a7f37;
+}
+
+.devtools__result--rejected {
+  color: var(--accent);
 }
 
 .devtools__empty {
