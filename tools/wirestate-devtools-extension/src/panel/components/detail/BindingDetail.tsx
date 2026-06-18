@@ -1,8 +1,8 @@
-import type { DevtoolsBinding, DevtoolsContainerSnapshot, DevtoolsInstance } from "@wirestate/core/devtools";
+import { type DevtoolsBinding, type DevtoolsContainerSnapshot, type DevtoolsInstance } from "@wirestate/core/devtools";
 
-import { realizingInstance } from "@/panel/selectors";
-import type { PanelActions } from "@/panel/use-panel-state";
-import type { Optional } from "@/types/general";
+import { mayRealizeInstance, realizingInstance } from "@/panel/selectors";
+import { type PanelActions } from "@/panel/use-panel-state";
+import { type Optional } from "@/types/general";
 
 import { Field, LinkButton, Section } from "./parts";
 
@@ -14,7 +14,11 @@ interface BindingDetailProps {
 
 /** Detail view for a selected binding, with a derived link to its realizing instance. */
 export function BindingDetail({ container, binding, actions }: BindingDetailProps) {
-  const instance: Optional<DevtoolsInstance> = realizingInstance(container, binding);
+  // Only singleton instance bindings produce a single tracked instance; Value/Factory/Transient
+  // bindings have nothing for "realized by" to point at, so the section is omitted for them.
+  const instance: Optional<DevtoolsInstance> = mayRealizeInstance(binding)
+    ? realizingInstance(container, binding)
+    : undefined;
 
   return (
     <div className={"space-y-3"}>
@@ -27,19 +31,21 @@ export function BindingDetail({ container, binding, actions }: BindingDetailProp
         <Field label={"impl"}>{binding.implementation ?? "—"}</Field>
       </Section>
 
-      <Section title={"realized by"}>
-        {instance ? (
-          <LinkButton
-            onClick={() =>
-              actions.select({ kind: "instance", containerId: container.containerId, className: instance.className })
-            }
-          >
-            {instance.className}
-          </LinkButton>
-        ) : (
-          <span className={"text-neutral-500"}>no active instance</span>
-        )}
-      </Section>
+      {mayRealizeInstance(binding) ? (
+        <Section title={"realized by"}>
+          {instance ? (
+            <LinkButton
+              onClick={() =>
+                actions.select({ kind: "instance", containerId: container.containerId, className: instance.className })
+              }
+            >
+              {instance.className}
+            </LinkButton>
+          ) : (
+            <span className={"text-neutral-500"}>not yet realized</span>
+          )}
+        </Section>
+      ) : null}
     </div>
   );
 }

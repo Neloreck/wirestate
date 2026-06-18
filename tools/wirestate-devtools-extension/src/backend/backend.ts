@@ -1,8 +1,8 @@
-import type { DevtoolsEvent, DevtoolsHook, DevtoolsRootSnapshot } from "@wirestate/core/devtools";
+import { type DevtoolsEvent, type DevtoolsHook, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
 
 import { ensureHook, FALLBACK_PROTOCOL_VERSION } from "@/backend/create-hook";
 import { dehydrate } from "@/backend/dehydrate";
-import { describeNode } from "@/backend/inspect";
+import { describeNode, serviceNode } from "@/backend/inspect";
 import {
   BRIDGE_SOURCE,
   type BackendToPanel,
@@ -10,7 +10,7 @@ import {
   type PageMessage,
   type PanelToBackend,
 } from "@/bridge/messages";
-import type { Optional } from "@/types/general";
+import { type Optional } from "@/types/general";
 
 /**
  * Upper bound on buffered events replayed to a late-attaching / reconnecting panel.
@@ -84,7 +84,19 @@ function inspectAt(rootId: number, instanceId: number, path: ReadonlyArray<strin
     return { t: "unsupported" };
   }
 
-  return describeNode(root.inspect(instanceId, path));
+  const value: unknown = root.inspect(instanceId, path);
+
+  // When a nested field holds another tracked instance, mark it as a service so the panel can jump
+  // to it. `path.length === 0` is the inspected instance itself — never flag that as a reference.
+  if (path.length > 0 && value !== null && typeof value === "object" && typeof root.serviceRefOf === "function") {
+    const ref = root.serviceRefOf(value);
+
+    if (ref) {
+      return serviceNode(ref);
+    }
+  }
+
+  return describeNode(value);
 }
 
 function post(payload: BackendToPanel): void {

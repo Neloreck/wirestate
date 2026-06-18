@@ -1,5 +1,5 @@
 import { CONTENT_PORT, PANEL_PORT_PREFIX } from "@/bridge/messages";
-import type { Optional } from "@/types/general";
+import { type Optional } from "@/types/general";
 
 /**
  * Background half of the bridge. Pairs a page's ISOLATED relay with the DevTools panel inspecting

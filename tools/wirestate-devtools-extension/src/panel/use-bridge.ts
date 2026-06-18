@@ -1,4 +1,4 @@
-import type { DevtoolsEvent, DevtoolsRootSnapshot } from "@wirestate/core/devtools";
+import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
@@ -8,7 +8,7 @@ import {
   type InspectNode,
   type PanelToBackend,
 } from "@/bridge/messages";
-import type { Optional } from "@/types/general";
+import { type Optional } from "@/types/general";
 
 const MAX_LOG = 500;
 

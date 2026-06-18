@@ -1,5 +1,5 @@
 import { BRIDGE_SOURCE, CONTENT_PORT, type PageMessage } from "@/bridge/messages";
-import type { Optional } from "@/types/general";
+import { type Optional } from "@/types/general";
 
 /**
  * ISOLATED-world relay. Bridges the MAIN-world backend (`window.postMessage`) to the background

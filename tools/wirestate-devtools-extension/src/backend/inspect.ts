@@ -1,8 +1,27 @@
-import type { InspectNode } from "@/bridge/messages";
-import type { Optional } from "@/types/general";
+import { type DevtoolsServiceRef } from "@wirestate/core/devtools";
+
+import { type InspectNode } from "@/bridge/messages";
+import { type Optional } from "@/types/general";
 
 const MAX_KEYS = 100;
 const MAX_STRING = 200;
+
+/**
+ * Builds the descriptor for a field whose value is another container-managed instance, so the panel
+ * can mark it and offer a jump to that instance instead of expanding it inline.
+ *
+ * @param ref - The service reference the in-page hook resolved for the field's value.
+ * @returns A clone-safe `service` node.
+ */
+export function serviceNode(ref: DevtoolsServiceRef): InspectNode {
+  return {
+    t: "service",
+    preview: ref.className,
+    className: ref.className,
+    containerId: ref.containerId,
+    instanceId: ref.instanceId,
+  };
+}
 
 /**
  * Describes **one level** of a raw in-page value for the panel: primitives and non-clonable leaves

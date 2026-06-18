@@ -1,8 +1,8 @@
-import type { DevtoolsMessageChannel } from "@wirestate/core/devtools";
+import { type DevtoolsMessageChannel } from "@wirestate/core/devtools";
 import { useMemo, useReducer } from "react";
 
-import type { EventKind, Selection, TimelineFilter } from "@/panel/types";
-import type { Optional } from "@/types/general";
+import { type EventKind, type Selection, type TimelineFilter } from "@/panel/types";
+import { type Optional } from "@/types/general";
 
 /** Panel-local view preferences (not data — data lives in the bridge). */
 export interface PanelUi {

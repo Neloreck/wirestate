@@ -1,4 +1,4 @@
-import type { DevtoolsEvent } from "@wirestate/core/devtools";
+import { type DevtoolsEvent } from "@wirestate/core/devtools";
 
 /** Renders a derived lifecycle history (ordered, not timestamped — v1 lifecycle deltas carry no time). */
 export function History({ events }: { events: ReadonlyArray<DevtoolsEvent> }) {

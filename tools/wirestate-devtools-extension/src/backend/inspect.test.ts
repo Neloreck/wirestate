@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { describeNode } from "@/backend/inspect";
+import { describeNode, serviceNode } from "@/backend/inspect";
 
 describe("describeNode", () => {
   it("describes primitives inline", () => {
@@ -41,5 +41,17 @@ describe("describeNode", () => {
     expect(describeNode(undefined)).toEqual({ t: "leaf", preview: "undefined" });
     expect(describeNode(new Map([["k", 1]])).t).toBe("leaf");
     expect(describeNode(new Set([1])).t).toBe("leaf");
+  });
+});
+
+describe("serviceNode", () => {
+  it("describes a field that references another tracked instance, carrying jump coordinates", () => {
+    expect(serviceNode({ className: "Logger", containerId: 2, instanceId: 7 })).toEqual({
+      t: "service",
+      preview: "Logger",
+      className: "Logger",
+      containerId: 2,
+      instanceId: 7,
+    });
   });
 });

@@ -1,7 +1,7 @@
-import type { DevtoolsEvent } from "@wirestate/core/devtools";
+import { type DevtoolsEvent } from "@wirestate/core/devtools";
 
-import type { DehydratedRef } from "@/backend/dehydrate";
-import type { Optional } from "@/types/general";
+import { type DehydratedRef } from "@/backend/dehydrate";
+import { type Optional } from "@/types/general";
 
 /**
  * Epoch-ms timestamp of a delta, if it has one (older cores may omit lifecycle/registration times).

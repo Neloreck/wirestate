@@ -1,6 +1,6 @@
-import type { DevtoolsEvent, DevtoolsMessageChannel } from "@wirestate/core/devtools";
+import { type DevtoolsEvent, type DevtoolsMessageChannel } from "@wirestate/core/devtools";
 
-import type { Optional } from "@/types/general";
+import { type Optional } from "@/types/general";
 
 /** The kinds of timeline delta the panel can filter by. */
 export type EventKind = Exclude<DevtoolsEvent["kind"], "messageResult">;

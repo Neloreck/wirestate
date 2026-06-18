@@ -1,4 +1,4 @@
-import type { Optional } from "@/types/general";
+import { type Optional } from "@/types/general";
 
 /**
  * Lossy, bounded, cycle-safe serializer for raw in-page message payloads.

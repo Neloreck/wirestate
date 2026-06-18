@@ -1,4 +1,4 @@
-import type { DevtoolsEvent, DevtoolsRootSnapshot } from "@wirestate/core/devtools";
+import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
 
 /**
  * Tag stamped on every `window.postMessage` between the MAIN-world backend and the
@@ -14,14 +14,22 @@ export const PANEL_PORT_PREFIX = "wirestate-panel:" as const;
 
 /**
  * One level of a dehydrated instance value, returned by `inspect`. Objects/arrays expose their
- * children's keys/length so the panel can lazily request the next level. `unsupported` means the
- * inspected page's wirestate build predates on-demand inspection.
+ * children's keys/length so the panel can lazily request the next level. A `service` node marks a
+ * field whose value is itself another container-managed instance, carrying enough to jump to it.
+ * `unsupported` means the inspected page's wirestate build predates on-demand inspection.
  */
 export type InspectNode =
   | { readonly t: "primitive"; readonly value: string | number | boolean | null }
   | { readonly t: "leaf"; readonly preview: string }
   | { readonly t: "object"; readonly preview: string; readonly keys: ReadonlyArray<string> }
   | { readonly t: "array"; readonly preview: string; readonly length: number }
+  | {
+      readonly t: "service";
+      readonly preview: string;
+      readonly className: string;
+      readonly containerId: number;
+      readonly instanceId: number;
+    }
   | { readonly t: "unsupported" };
 
 /** Lazily reads one level of an instance's state at a path. Resolves over the bridge. */

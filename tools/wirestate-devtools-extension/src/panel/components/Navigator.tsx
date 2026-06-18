@@ -1,7 +1,7 @@
-import type { ContainerNodeModel, RootModel } from "@/panel/selectors";
-import type { Selection } from "@/panel/types";
-import type { PanelActions } from "@/panel/use-panel-state";
-import type { Optional } from "@/types/general";
+import { type ContainerNodeModel, type RootModel } from "@/panel/selectors";
+import { type Selection } from "@/panel/types";
+import { type PanelActions } from "@/panel/use-panel-state";
+import { type Optional } from "@/types/general";
 
 interface NavigatorProps {
   readonly roots: ReadonlyArray<RootModel>;

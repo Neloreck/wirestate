@@ -1,14 +1,14 @@
-import type {
-  DevtoolsContainerSnapshot,
-  DevtoolsEvent,
-  DevtoolsInstance,
-  DevtoolsRootSnapshot,
+import {
+  type DevtoolsContainerSnapshot,
+  type DevtoolsEvent,
+  type DevtoolsInstance,
+  type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
 
-import type { InspectFn } from "@/bridge/messages";
+import { type InspectFn } from "@/bridge/messages";
 import { lifecycleHistory } from "@/panel/selectors";
-import type { PanelActions } from "@/panel/use-panel-state";
-import type { Optional } from "@/types/general";
+import { type PanelActions } from "@/panel/use-panel-state";
+import { type Optional } from "@/types/general";
 
 import { History } from "./History";
 import { Field, LinkButton, Section } from "./parts";
@@ -75,7 +75,12 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
       </Section>
 
       <Section title={"state"}>
-        <StateTree rootId={rootId} instanceId={instance.instanceId} inspect={inspect} />
+        <StateTree
+          rootId={rootId}
+          instanceId={instance.instanceId}
+          inspect={inspect}
+          onNavigate={(containerId, className) => actions.select({ kind: "instance", containerId, className })}
+        />
       </Section>
 
       <div>

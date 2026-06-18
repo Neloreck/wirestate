@@ -1,4 +1,4 @@
-import type { DevtoolsEvent, DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
+import { type DevtoolsEvent, type DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
 import { useMemo, useState } from "react";
 
 import { Detail } from "@/panel/components/detail/Detail";

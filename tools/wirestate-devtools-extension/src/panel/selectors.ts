@@ -1,16 +1,16 @@
-import type {
-  DevtoolsBinding,
-  DevtoolsContainerSnapshot,
-  DevtoolsEvent,
-  DevtoolsInstance,
-  DevtoolsMessageChannel,
-  DevtoolsPluginInfo,
-  DevtoolsRootSnapshot,
+import {
+  type DevtoolsBinding,
+  type DevtoolsContainerSnapshot,
+  type DevtoolsEvent,
+  type DevtoolsInstance,
+  type DevtoolsMessageChannel,
+  type DevtoolsPluginInfo,
+  type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
 
 import { summarize } from "@/panel/format";
-import type { Selection, TimelineFilter } from "@/panel/types";
-import type { Optional } from "@/types/general";
+import { type Selection, type TimelineFilter } from "@/panel/types";
+import { type Optional } from "@/types/general";
 
 /** One container plus its nested child containers, for the Navigator tree. */
 export interface ContainerNodeModel {
@@ -165,6 +165,19 @@ export function childContainers(
   }
 
   return children;
+}
+
+/**
+ * Whether a binding can ever be realized by a single container-tracked instance — true only for a
+ * singleton `Instance` binding. A `Value` binding is a constant, a `Factory` produces values the
+ * container doesn't track, and a `Transient` binding yields a fresh instance per resolution (no
+ * single "the" instance), so "realized by" is meaningless for those.
+ *
+ * @param binding - The binding to classify.
+ * @returns `true` when a singleton instance binding, else `false`.
+ */
+export function mayRealizeInstance(binding: DevtoolsBinding): boolean {
+  return binding.type === "Instance" && binding.scope === "Singleton";
 }
 
 /**

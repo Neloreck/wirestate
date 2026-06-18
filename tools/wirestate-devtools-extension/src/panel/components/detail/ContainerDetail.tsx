@@ -1,7 +1,11 @@
-import type { DevtoolsContainerSnapshot, DevtoolsEvent, DevtoolsRootSnapshot } from "@wirestate/core/devtools";
+import {
+  type DevtoolsContainerSnapshot,
+  type DevtoolsEvent,
+  type DevtoolsRootSnapshot,
+} from "@wirestate/core/devtools";
 
 import { childContainers, lifecycleHistory } from "@/panel/selectors";
-import type { PanelActions } from "@/panel/use-panel-state";
+import { type PanelActions } from "@/panel/use-panel-state";
 
 import { History } from "./History";
 import { Field, LinkButton, Section } from "./parts";

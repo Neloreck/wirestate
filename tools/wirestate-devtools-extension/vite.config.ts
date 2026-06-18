@@ -10,10 +10,8 @@ import manifest from "./manifest.config";
 const srcDir: string = fileURLToPath(new URL("./src", import.meta.url));
 
 // All `@wirestate/core/devtools` imports here are type-only (erased before bundling); this alias
-// mirrors the tsconfig `paths` entry and points the public specifier at the protocol source.
-const protocolSource: string = fileURLToPath(
-  new URL("../../src/wirestate-core/plugin/devtools/devtools-hook.ts", import.meta.url)
-);
+// mirrors the tsconfig `paths` entry and points the public specifier at the published barrel.
+const protocolSource: string = fileURLToPath(new URL("../../src/wirestate-core/devtools.ts", import.meta.url));
 
 // https://crxjs.dev / https://tailwindcss.com / https://vite.dev/config
 export default defineConfig({

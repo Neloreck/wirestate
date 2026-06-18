@@ -1,4 +1,4 @@
-import type { PropsWithChildren, ReactNode } from "react";
+import { type PropsWithChildren, type ReactNode } from "react";
 
 /** A titled block within a Detail view. */
 export function Section({ title, children }: PropsWithChildren<{ title: string }>) {

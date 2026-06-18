@@ -1,10 +1,10 @@
-import type { DevtoolsEvent, DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
+import { type DevtoolsEvent, type DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
 import { useEffect, useRef } from "react";
 
 import { summarize } from "@/panel/format";
-import type { RootModel } from "@/panel/selectors";
-import type { TimelineFilter } from "@/panel/types";
-import type { PanelActions, PanelUi } from "@/panel/use-panel-state";
+import { type RootModel } from "@/panel/selectors";
+import { type TimelineFilter } from "@/panel/types";
+import { type PanelActions, type PanelUi } from "@/panel/use-panel-state";
 
 import { TimelineFilters } from "./TimelineFilters";
 import { TimelineRow } from "./TimelineRow";

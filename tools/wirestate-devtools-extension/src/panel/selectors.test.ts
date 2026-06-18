@@ -1,12 +1,12 @@
-import type {
-  DevtoolsBinding,
-  DevtoolsContainerSnapshot,
-  DevtoolsEvent,
-  DevtoolsInstance,
-  DevtoolsLifecyclePhase,
-  DevtoolsMessageChannel,
-  DevtoolsPluginInfo,
-  DevtoolsRootSnapshot,
+import {
+  type DevtoolsBinding,
+  type DevtoolsContainerSnapshot,
+  type DevtoolsEvent,
+  type DevtoolsInstance,
+  type DevtoolsLifecyclePhase,
+  type DevtoolsMessageChannel,
+  type DevtoolsPluginInfo,
+  type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
 import { describe, expect, it } from "vitest";
 
@@ -16,6 +16,7 @@ import {
   childContainers,
   filterLog,
   lifecycleHistory,
+  mayRealizeInstance,
   realizingInstance,
   resolveSelection,
 } from "@/panel/selectors";
@@ -173,6 +174,20 @@ describe("derived links", () => {
     expect(realizingInstance(c, binding("Svc"))?.className).toBe("SvcImpl");
     expect(realizingInstance(c, binding("Other", "SvcImpl"))?.className).toBe("SvcImpl");
     expect(realizingInstance(c, binding("None", "Nope"))).toBeUndefined();
+  });
+
+  it("mayRealizeInstance is true only for singleton instance bindings", () => {
+    const make = (type: DevtoolsBinding["type"], scope: DevtoolsBinding["scope"]): DevtoolsBinding => ({
+      token: { name: "Svc", kind: "class" },
+      type,
+      scope,
+      implementation: undefined,
+    });
+
+    expect(mayRealizeInstance(make("Instance", "Singleton"))).toBe(true);
+    expect(mayRealizeInstance(make("Instance", "Transient"))).toBe(false);
+    expect(mayRealizeInstance(make("Factory", "Singleton"))).toBe(false);
+    expect(mayRealizeInstance(make("Value", "Singleton"))).toBe(false);
   });
 });
 

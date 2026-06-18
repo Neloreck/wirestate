@@ -1,8 +1,12 @@
-import type { DevtoolsEvent, DevtoolsMessageEvent, DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
+import {
+  type DevtoolsMessageEvent,
+  type DevtoolsMessageResultEvent,
+  type DevtoolsEvent,
+} from "@wirestate/core/devtools";
 import { useState } from "react";
 
 import { formatClock, summarize, timestampOf } from "@/panel/format";
-import type { PanelActions } from "@/panel/use-panel-state";
+import { type PanelActions } from "@/panel/use-panel-state";
 
 const TAG_COLOR: Record<DevtoolsEvent["kind"], string> = {
   lifecycle: "text-sky-600 dark:text-sky-400",

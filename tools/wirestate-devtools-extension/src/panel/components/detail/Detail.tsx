@@ -1,11 +1,11 @@
-import type { DevtoolsEvent, DevtoolsRootSnapshot } from "@wirestate/core/devtools";
+import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
 import { useEffect, useRef } from "react";
 
-import type { InspectFn } from "@/bridge/messages";
+import { type InspectFn } from "@/bridge/messages";
 import { type ResolvedEntity, resolveSelection } from "@/panel/selectors";
 import { type Selection, sameSelection } from "@/panel/types";
-import type { PanelActions } from "@/panel/use-panel-state";
-import type { Optional } from "@/types/general";
+import { type PanelActions } from "@/panel/use-panel-state";
+import { type Optional } from "@/types/general";
 
 import { BindingDetail } from "./BindingDetail";
 import { ContainerDetail } from "./ContainerDetail";

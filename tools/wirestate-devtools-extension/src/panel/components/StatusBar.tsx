@@ -1,4 +1,4 @@
-import type { Optional } from "@/types/general";
+import { type Optional } from "@/types/general";
 
 interface StatusBarProps {
   readonly connected: boolean;

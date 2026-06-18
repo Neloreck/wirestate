@@ -1,15 +1,15 @@
-import type {
-  DevtoolsContainerId,
-  DevtoolsEvent,
-  DevtoolsHook,
-  DevtoolsInstanceId,
-  DevtoolsListener,
-  DevtoolsRoot,
-  DevtoolsRootId,
-  DevtoolsRootRegister,
+import {
+  type DevtoolsContainerId,
+  type DevtoolsEvent,
+  type DevtoolsHook,
+  type DevtoolsInstanceId,
+  type DevtoolsListener,
+  type DevtoolsRoot,
+  type DevtoolsRootId,
+  type DevtoolsRootRegister,
 } from "@wirestate/core/devtools";
 
-import type { Optional } from "@/types/general";
+import { type Optional } from "@/types/general";
 
 /**
  * Well-known global key the devtools hook lives under. Hardcoded (not imported from
@@ -109,6 +109,7 @@ function createHook(): DevtoolsHook {
         rootId,
         snapshot: register.snapshot,
         inspect: register.inspect,
+        serviceRefOf: register.serviceRefOf,
       }));
     },
   };
