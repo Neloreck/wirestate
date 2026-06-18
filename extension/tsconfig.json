@@ -15,7 +15,7 @@
     "types": ["chrome", "node"],
     "paths": {
       "@/*": ["./src/*"],
-      "@wirestate/core/devtools": ["../../src/wirestate-core/devtools.ts"]
+      "@wirestate/core/devtools": ["../src/wirestate-core/devtools.ts"]
     }
   },
   "include": ["src", "vite.config.ts", "manifest.config.ts"]

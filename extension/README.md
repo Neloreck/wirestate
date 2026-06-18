@@ -25,6 +25,6 @@ pnpm typecheck
 `pnpm build` writes the unpacked Chrome extension to `dist/`.
 
 To run it locally, open `chrome://extensions`, enable Developer mode, choose **Load unpacked**, and
-select `tools/wirestate-devtools-extension/dist`.
+select `extension/dist`.
 
 Use `pnpm dev` while working on the panel or bridge.

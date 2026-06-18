@@ -8,7 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
-      "@wirestate/core/devtools": fileURLToPath(new URL("../../src/wirestate-core/devtools.ts", import.meta.url)),
+      "@wirestate/core/devtools": fileURLToPath(new URL("../src/wirestate-core/devtools.ts", import.meta.url)),
     },
   },
   test: {

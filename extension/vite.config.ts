@@ -8,7 +8,7 @@ import { defineConfig } from "vite";
 import { default as manifest } from "./manifest.config";
 
 const SRC_DIR: string = fileURLToPath(new URL("./src", import.meta.url));
-const PROTOCOL_SRC: string = fileURLToPath(new URL("../../src/wirestate-core/devtools.ts", import.meta.url));
+const PROTOCOL_SRC: string = fileURLToPath(new URL("../src/wirestate-core/devtools.ts", import.meta.url));
 
 const CHROME_TARGET: string = "chrome99";
 
