@@ -1,4 +1,4 @@
-import type { Nullable } from "@/types";
+import { type Nullable } from "@/types";
 
 export enum ECounterServiceQuery {
   GET_COUNTER_SUMMARY = "counter/summary",

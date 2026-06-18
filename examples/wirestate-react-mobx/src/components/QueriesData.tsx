@@ -15,7 +15,7 @@ import { EGlobalQuery } from "@/constants/queries";
 import { ECounterServiceQuery, type ICounterSnapshot, type ICounterSummary } from "@/services/CounterService.query";
 import { LoggerService } from "@/services/LoggerService";
 import { ThemeService } from "@/services/ThemeService";
-import type { Nullable, Theme } from "@/types";
+import { type Nullable, type Theme } from "@/types";
 
 export const QueriesData = () => {
   const [snapshot, setSnapshot] = useState<Nullable<ICounterSnapshot>>(null);

@@ -2,7 +2,7 @@ import { EventBus, Injectable, OnActivated, OnDeactivation, OnDeprovision, OnPro
 import { Observable, makeObservable, BoundAction } from "@wirestate/mobx";
 
 import { EGlobalEvent } from "@/constants/events";
-import type { Theme } from "@/types";
+import { type Theme } from "@/types";
 
 @Injectable()
 export class ThemeService {

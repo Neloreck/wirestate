@@ -2,7 +2,7 @@ import { Injectable, OnActivated, OnDeactivation, OnDeprovision, OnProvision, in
 import { Signal, signal } from "@wirestate/signals";
 
 import { EGlobalEvent } from "@/constants/events";
-import type { Theme } from "@/types";
+import { type Theme } from "@/types";
 
 @Injectable()
 export class ThemeService {

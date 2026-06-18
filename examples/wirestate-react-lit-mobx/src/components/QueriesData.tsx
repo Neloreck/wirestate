@@ -14,7 +14,7 @@ import { EGlobalQuery } from "@/constants/queries";
 import { ECounterServiceQuery, type ICounterSnapshot, type ICounterSummary } from "@/services/CounterService.query";
 import { LoggerService } from "@/services/LoggerService";
 import { ThemeService } from "@/services/ThemeService";
-import type { Optional, Theme } from "@/types";
+import { type Optional, type Theme } from "@/types";
 
 export function QueriesData() {
   const [snapshot, setSnapshot] = useState<Optional<ICounterSnapshot>>(null);

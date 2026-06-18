@@ -14,7 +14,7 @@ import { Computed, Observable, makeObservable, BoundAction } from "@wirestate/mo
 import { EGlobalEvent } from "@/constants/events";
 import { ECounterServiceQuery, type ICounterSnapshot, type ICounterSummary } from "@/services/CounterService.query";
 import { LoggerService } from "@/services/LoggerService";
-import type { Nullable } from "@/types";
+import { type Nullable } from "@/types";
 
 @Injectable()
 export class CounterService {

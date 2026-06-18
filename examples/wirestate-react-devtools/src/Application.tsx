@@ -10,7 +10,7 @@ import { QueriesData } from "@/components/QueriesData";
 import { EGlobalEvent } from "@/constants/events";
 import { ThemeService } from "@/services/ThemeService";
 
-export const Application = () => {
+export function Application() {
   const { theme } = useInjection(ThemeService);
 
   useEvent(EGlobalEvent.COUNTER_RESET, () => {
@@ -62,11 +62,12 @@ export const Application = () => {
       <section id={"devtools"} className={"panel"}>
         <h2>DevTools inspector</h2>
         <p className={"panel__desc"}>
-          A consumer reading the in-page devtools hook: the container tree on the left, the live lifecycle / message /
-          registration stream on the right.
+          A consumer reading the in-page devtools hook: the labelled root + container tree with per-instance lifecycle
+          status on the left, and a timestamped lifecycle / message / registration stream — with correlated
+          command/query results — on the right.
         </p>
         <DevToolsPanel />
       </section>
     </div>
   );
-};
+}
