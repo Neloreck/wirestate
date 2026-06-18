@@ -14,7 +14,15 @@ const shared = {
 module.exports = {
   rootDir: path.resolve(__dirname, "../.."),
   collectCoverage: true,
-  coveragePathIgnorePatterns: ["/node_modules/", "/fixtures/", "/types/", "/examples/", "/target/", "/__tests__/"],
+  coveragePathIgnorePatterns: [
+    "/node_modules/",
+    "/fixtures/",
+    "/types/",
+    "/examples/",
+    "/target/",
+    "/__tests__/",
+    "/cli/test/",
+  ],
   coverageDirectory: "<rootDir>/target/coverage",
   coverageReporters: ["json", "lcov", "clover"],
   projects: [

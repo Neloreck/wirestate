@@ -1,8 +1,8 @@
 import * as process from "node:process";
 
 import {
+  type PackageRecord,
   ensureLockstepVersions,
-  PackageRecord,
   printUsage,
   readPackages,
   readRootPackage,
