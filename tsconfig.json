@@ -10,6 +10,7 @@
     "moduleResolution": "bundler",
     "noImplicitAny": true,
     "paths": {
+      "#/*": ["./cli/*"],
       "@/fixtures/*": ["./src/fixtures/*"],
       "@wirestate/core": ["./src/wirestate-core"],
       "@wirestate/core/devtools": ["./src/wirestate-core/devtools"],
@@ -27,7 +28,14 @@
     "sourceMap": true,
     "strict": true,
     "target": "es2022",
-    "types": ["node", "jest"]
+    "types": ["node", "jest"],
+    "verbatimModuleSyntax": true
+  },
+  "ts-node": {
+    "comment": "cli/* deploy scripts run through ts-node as CommonJS;",
+    "compilerOptions": {
+      "verbatimModuleSyntax": false
+    }
   },
   "exclude": ["node_modules"],
   "include": ["src/"]
