@@ -7,7 +7,7 @@ import {
 } from "../activation/wire-status";
 import { type Binding, type Bindings, type ServiceToken, BindingType } from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
-import { type Container } from "../container/container";
+import type { Container } from "../container/container";
 import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";

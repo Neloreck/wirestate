@@ -1,7 +1,7 @@
-import { type ServiceToken } from "../binding/binding";
-import { type Optional } from "../types/general";
+import type { ServiceToken } from "../binding/binding";
+import type { Optional } from "../types/general";
 
-import { type ContainerKernel } from "./container-kernel";
+import type { ContainerKernel } from "./container-kernel";
 
 /**
  * An error that occurs when `inject()` is used outside an injection context.
