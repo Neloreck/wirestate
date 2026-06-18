@@ -26,7 +26,7 @@ export default defineManifest({
     },
     {
       matches: ["<all_urls>"],
-      js: ["src/bridge/content-script.ts"],
+      js: ["src/bridge/bridge.ts"],
       run_at: "document_start",
       world: "ISOLATED",
     },
