@@ -24,7 +24,7 @@ export function BindingDetail({ container, binding, actions }: BindingDetailProp
     <div className={"space-y-3"}>
       <Section title={"binding"}>
         <Field label={"token"}>
-          {binding.token.name} <span className={"text-neutral-500"}>({binding.token.kind})</span>
+          {binding.token.name} <span className={"text-fg-muted"}>({binding.token.kind})</span>
         </Field>
         <Field label={"type"}>{binding.type}</Field>
         <Field label={"scope"}>{binding.scope}</Field>
@@ -42,7 +42,7 @@ export function BindingDetail({ container, binding, actions }: BindingDetailProp
               {instance.className}
             </LinkButton>
           ) : (
-            <span className={"text-neutral-500"}>not yet realized</span>
+            <span className={"text-fg-muted"}>not yet realized</span>
           )}
         </Section>
       ) : null}

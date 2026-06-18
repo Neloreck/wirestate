@@ -37,7 +37,7 @@ export function Panel() {
   return (
     <div
       className={
-        "flex h-screen flex-col bg-white font-mono text-xs text-neutral-800 dark:bg-neutral-900 dark:text-neutral-200"
+        "flex h-screen flex-col bg-surface font-mono text-xs text-fg"
       }
     >
       <StatusBar
@@ -53,16 +53,16 @@ export function Panel() {
       </div>
 
       <div
-        className={`flex flex-col border-t border-neutral-200 dark:border-neutral-700 ${timelineOpen ? "h-2/5" : ""}`}
+        className={`flex flex-col border-t border-divider ${timelineOpen ? "h-2/5" : ""}`}
       >
         <button
           type={"button"}
           onClick={() => setTimelineOpen((open) => !open)}
           className={
-            "flex items-center gap-1 bg-neutral-100 px-2.5 py-0.5 text-left text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400"
+            "flex items-center gap-1 bg-elevated px-2.5 py-0.5 text-left text-fg-muted"
           }
         >
-          {timelineOpen ? "▾" : "▸"} Timeline <span className={"text-neutral-400"}>({filtered.length})</span>
+          {timelineOpen ? "▾" : "▸"} Timeline <span className={"text-fg-subtle"}>({filtered.length})</span>
         </button>
 
         {timelineOpen ? (

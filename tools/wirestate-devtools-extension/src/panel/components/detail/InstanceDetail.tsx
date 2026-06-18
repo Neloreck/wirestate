@@ -39,7 +39,7 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
       <Section title={"instance"}>
         <Field label={"class"}>{instance.className}</Field>
         <Field label={"token"}>
-          {instance.token.name} <span className={"text-neutral-500"}>({instance.token.kind})</span>
+          {instance.token.name} <span className={"text-fg-muted"}>({instance.token.kind})</span>
         </Field>
       </Section>
 
@@ -53,13 +53,13 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
             <Field label={"provisionId"}>{status.provisionId ?? "—"}</Field>
           </>
         ) : (
-          <span className={"text-neutral-500"}>untracked</span>
+          <span className={"text-fg-muted"}>untracked</span>
         )}
       </Section>
 
       <Section title={`declared handlers (${instance.handlers.length})`}>
         {instance.handlers.length === 0 ? (
-          <span className={"text-neutral-500"}>none</span>
+          <span className={"text-fg-muted"}>none</span>
         ) : (
           instance.handlers.map((handler, index) => (
             <div key={index}>

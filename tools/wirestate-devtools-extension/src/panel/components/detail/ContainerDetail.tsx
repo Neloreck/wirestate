@@ -53,7 +53,7 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
 
       <Section title={`bindings (${container.bindings.length})`}>
         {container.bindings.length === 0 ? (
-          <span className={"text-neutral-500"}>—</span>
+          <span className={"text-fg-muted"}>—</span>
         ) : (
           container.bindings.map((binding) => (
             <div key={binding.token.name}>
@@ -63,7 +63,7 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
                 }
               >
                 {binding.token.name}{" "}
-                <span className={"text-neutral-500"}>
+                <span className={"text-fg-muted"}>
                   ({binding.type}/{binding.scope})
                 </span>
               </LinkButton>
@@ -74,7 +74,7 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
 
       <Section title={`instances (${container.instances.length})`}>
         {container.instances.length === 0 ? (
-          <span className={"text-neutral-500"}>—</span>
+          <span className={"text-fg-muted"}>—</span>
         ) : (
           container.instances.map((instance) => (
             <div key={instance.className}>
@@ -96,7 +96,7 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
 
       <Section title={`plugins (${container.plugins.length})`}>
         {container.plugins.length === 0 ? (
-          <span className={"text-neutral-500"}>—</span>
+          <span className={"text-fg-muted"}>—</span>
         ) : (
           container.plugins.map((plugin) => (
             <div key={plugin.name}>

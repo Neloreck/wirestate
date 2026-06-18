@@ -21,11 +21,11 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
   return (
     <div
       className={
-        "flex flex-wrap items-center gap-2 border-b border-neutral-200 bg-neutral-50 px-2.5 py-1 dark:border-neutral-700 dark:bg-neutral-800"
+        "flex flex-wrap items-center gap-2 border-b border-divider bg-elevated px-2.5 py-1"
       }
     >
       <select
-        className={"rounded border border-neutral-300 bg-white px-1 py-0.5 dark:border-neutral-600 dark:bg-neutral-900"}
+        className={"rounded border border-divider bg-surface px-1 py-0.5"}
         value={filter.rootId ?? ""}
         onChange={(event) => actions.setRootFilter(event.target.value === "" ? undefined : Number(event.target.value))}
       >
@@ -38,7 +38,7 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
       </select>
 
       <select
-        className={"rounded border border-neutral-300 bg-white px-1 py-0.5 dark:border-neutral-600 dark:bg-neutral-900"}
+        className={"rounded border border-divider bg-surface px-1 py-0.5"}
         value={filter.containerId ?? ""}
         onChange={(event) =>
           actions.setContainerFilter(event.target.value === "" ? undefined : Number(event.target.value))
@@ -55,19 +55,19 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
       {KINDS.map((kind) => (
         <label
           key={kind}
-          className={"inline-flex cursor-pointer items-center gap-1 text-neutral-500 dark:text-neutral-400"}
+          className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}
         >
           <input type={"checkbox"} checked={filter.kinds[kind]} onChange={() => actions.toggleKind(kind)} />
           {kind}
         </label>
       ))}
 
-      <span className={"text-neutral-300 dark:text-neutral-600"}>|</span>
+      <span className={"text-fg-subtle"}>|</span>
 
       {CHANNELS.map((channel) => (
         <label
           key={channel}
-          className={"inline-flex cursor-pointer items-center gap-1 text-neutral-500 dark:text-neutral-400"}
+          className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}
         >
           <input type={"checkbox"} checked={filter.channels[channel]} onChange={() => actions.toggleChannel(channel)} />
           {channel}
@@ -76,7 +76,7 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
 
       <input
         className={
-          "rounded border border-neutral-300 bg-white px-1.5 py-0.5 dark:border-neutral-600 dark:bg-neutral-900"
+          "rounded border border-divider bg-surface px-1.5 py-0.5"
         }
         placeholder={"filter…"}
         value={filter.text}
@@ -91,7 +91,7 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
         type={"button"}
         onClick={onClear}
         className={
-          "rounded border border-neutral-300 px-2 py-0.5 hover:bg-neutral-100 dark:border-neutral-600 dark:hover:bg-neutral-700"
+          "rounded border border-divider px-2 py-0.5 hover:bg-hover"
         }
       >
         clear
@@ -108,7 +108,7 @@ function Toggle({ on, label, onClick }: { on: boolean; label: string; onClick: (
       className={`rounded border px-2 py-0.5 ${
         on
           ? "border-emerald-400 text-emerald-600 dark:text-emerald-400"
-          : "border-neutral-300 text-neutral-500 dark:border-neutral-600 dark:text-neutral-400"
+          : "border-divider text-fg-muted"
       }`}
     >
       {label}

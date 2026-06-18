@@ -14,8 +14,8 @@ interface NavigatorProps {
 export function Navigator({ roots, selection, collapsed, actions }: NavigatorProps) {
   if (roots.length === 0) {
     return (
-      <nav className={"w-[42%] min-w-[220px] overflow-auto border-r border-neutral-200 p-2 dark:border-neutral-700"}>
-        <p className={"text-neutral-500 dark:text-neutral-400"}>
+      <nav className={"w-[42%] min-w-[220px] overflow-auto border-r border-divider p-2"}>
+        <p className={"text-fg-muted"}>
           No Wirestate roots detected on this page. Is a <code>DevToolsPlugin</code> registered and a provider mounted?
         </p>
       </nav>
@@ -23,7 +23,7 @@ export function Navigator({ roots, selection, collapsed, actions }: NavigatorPro
   }
 
   return (
-    <nav className={"w-[42%] min-w-[220px] overflow-auto border-r border-neutral-200 p-1 dark:border-neutral-700"}>
+    <nav className={"w-[42%] min-w-[220px] overflow-auto border-r border-divider p-1"}>
       {roots.map((root) => (
         <div key={root.rootId} className={"mb-1"}>
           <div className={"px-1 py-0.5 font-semibold text-[#ff4733]"}>{root.label}</div>
@@ -60,8 +60,8 @@ function ContainerNode({ node, depth, selection, collapsed, actions }: Container
   return (
     <div>
       <div
-        className={`flex cursor-pointer items-center gap-1 rounded px-1 py-0.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 ${
-          isSelected ? "bg-neutral-200 dark:bg-neutral-700" : ""
+        className={`flex cursor-pointer items-center gap-1 rounded px-1 py-0.5 hover:bg-hover ${
+          isSelected ? "bg-selected" : ""
         }`}
         style={{ paddingLeft: `${depth * 12 + 4}px` }}
         onClick={() => actions.select({ kind: "container", containerId })}
@@ -69,7 +69,7 @@ function ContainerNode({ node, depth, selection, collapsed, actions }: Container
         {hasChildren ? (
           <button
             type={"button"}
-            className={"w-3 text-neutral-500"}
+            className={"w-3 text-fg-muted"}
             onClick={(event) => {
               event.stopPropagation();
               actions.toggleCollapsed(containerId);
@@ -81,7 +81,7 @@ function ContainerNode({ node, depth, selection, collapsed, actions }: Container
           <span className={"w-3"} />
         )}
         <span>container #{containerId}</span>
-        <span className={"text-neutral-400 dark:text-neutral-500"}>
+        <span className={"text-fg-subtle"}>
           · {node.container.instances.length} inst · {node.container.bindings.length} bind
         </span>
       </div>

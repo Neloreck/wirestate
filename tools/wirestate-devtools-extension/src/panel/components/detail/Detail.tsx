@@ -37,7 +37,7 @@ export function Detail({ roots, log, selection, actions, inspect }: DetailProps)
   function body() {
     if (!selection) {
       return (
-        <p className={"text-neutral-500 dark:text-neutral-400"}>
+        <p className={"text-fg-muted"}>
           Select a container, instance, binding, or plugin in the Navigator.
         </p>
       );
@@ -82,14 +82,14 @@ function Breadcrumb({ resolved, actions }: { resolved: ResolvedEntity; actions: 
   const containerId: number = resolved.container.containerId;
 
   return (
-    <div className={"mb-2 flex flex-wrap items-center gap-1 text-neutral-500 dark:text-neutral-400"}>
+    <div className={"mb-2 flex flex-wrap items-center gap-1 text-fg-muted"}>
       <LinkButton onClick={() => actions.select({ kind: "container", containerId })}>
         container #{containerId}
       </LinkButton>
       {resolved.kind === "container" ? null : (
         <>
           <span>▸</span>
-          <span className={"text-neutral-700 dark:text-neutral-200"}>{entityLabel(resolved)}</span>
+          <span className={"text-fg"}>{entityLabel(resolved)}</span>
         </>
       )}
     </div>

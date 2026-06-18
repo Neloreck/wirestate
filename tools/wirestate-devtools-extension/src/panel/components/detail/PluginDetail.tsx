@@ -12,7 +12,7 @@ export function PluginDetail({ plugin }: { plugin: DevtoolsPluginInfo }) {
 
       <Section title={`handles (${plugin.handles.length})`}>
         {plugin.handles.length === 0 ? (
-          <span className={"text-neutral-500"}>— (pure observer)</span>
+          <span className={"text-fg-muted"}>— (pure observer)</span>
         ) : (
           plugin.handles.map((kind, index) => <div key={index}>{kind}</div>)
         )}

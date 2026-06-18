@@ -4,7 +4,7 @@ import { type PropsWithChildren, type ReactNode } from "react";
 export function Section({ title, children }: PropsWithChildren<{ title: string }>) {
   return (
     <section className={"space-y-1"}>
-      <h4 className={"text-[10px] uppercase tracking-wide text-neutral-500 dark:text-neutral-400"}>{title}</h4>
+      <h4 className={"text-[10px] uppercase tracking-wide text-fg-muted"}>{title}</h4>
       <div className={"space-y-0.5"}>{children}</div>
     </section>
   );
@@ -14,7 +14,7 @@ export function Section({ title, children }: PropsWithChildren<{ title: string }
 export function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className={"flex gap-2"}>
-      <span className={"min-w-[72px] shrink-0 text-neutral-500 dark:text-neutral-400"}>{label}</span>
+      <span className={"min-w-[72px] shrink-0 text-fg-muted"}>{label}</span>
       <span className={"break-words"}>{children}</span>
     </div>
   );

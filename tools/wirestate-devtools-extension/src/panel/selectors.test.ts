@@ -1,14 +1,16 @@
-import {
-  type DevtoolsBinding,
-  type DevtoolsContainerSnapshot,
-  type DevtoolsEvent,
-  type DevtoolsInstance,
-  type DevtoolsLifecyclePhase,
-  type DevtoolsMessageChannel,
-  type DevtoolsPluginInfo,
-  type DevtoolsRootSnapshot,
-} from "@wirestate/core/devtools";
+import { type DevtoolsBinding, type DevtoolsEvent } from "@wirestate/core/devtools";
 import { describe, expect, it } from "vitest";
+
+import {
+  mockBinding,
+  mockContainerSnapshot,
+  mockInstance,
+  mockLifecycleEvent,
+  mockMessageEvent,
+  mockPluginInfo,
+  mockRegistrationEvent,
+  mockRootSnapshot,
+} from "@/fixtures/devtools";
 
 import {
   buildRoots,
@@ -22,86 +24,6 @@ import {
 } from "@/panel/selectors";
 import { type TimelineFilter, sameSelection } from "@/panel/types";
 
-const instance = (className: string, token: string = className, instanceId = 1): DevtoolsInstance => ({
-  instanceId,
-  token: { name: token, kind: "class" },
-  className,
-  status: undefined,
-  handlers: [],
-});
-
-const binding = (name: string, implementation?: string): DevtoolsBinding => ({
-  token: { name, kind: "class" },
-  type: "Instance",
-  scope: "Singleton",
-  implementation,
-});
-
-const plugin = (name: string): DevtoolsPluginInfo => ({ name, handles: [] });
-
-const container = (
-  containerId: number,
-  parentContainerId: number | null,
-  extra: Partial<DevtoolsContainerSnapshot> = {}
-): DevtoolsContainerSnapshot => ({
-  containerId,
-  parentContainerId,
-  bindings: [],
-  instances: [],
-  plugins: [],
-  ...extra,
-});
-
-const root = (
-  rootId: number,
-  containers: ReadonlyArray<DevtoolsContainerSnapshot>,
-  label?: string
-): DevtoolsRootSnapshot => ({
-  rootId,
-  protocolVersion: 1,
-  label,
-  containers,
-});
-
-const lifecycleEvent = (
-  containerId: number,
-  phase: DevtoolsLifecyclePhase,
-  className?: string,
-  rootId = 1
-): DevtoolsEvent => ({
-  kind: "lifecycle",
-  rootId,
-  containerId,
-  timestamp: 0,
-  phase,
-  instance: className ? instance(className) : undefined,
-});
-
-const messageEvent = (
-  containerId: number,
-  channel: DevtoolsMessageChannel,
-  type: string,
-  rootId = 1
-): DevtoolsEvent => ({
-  kind: "message",
-  rootId,
-  containerId,
-  message: { id: 0, channel, type, payload: null, source: undefined, timestamp: 0 },
-});
-
-const registrationEvent = (
-  containerId: number,
-  channel: DevtoolsMessageChannel,
-  type: string,
-  rootId = 1
-): DevtoolsEvent => ({
-  kind: "registration",
-  rootId,
-  containerId,
-  timestamp: 0,
-  registration: { channel, type, phase: "registered" },
-});
-
 const filterWith = (partial: Partial<TimelineFilter> = {}): TimelineFilter => ({
   rootId: undefined,
   containerId: undefined,
@@ -113,7 +35,14 @@ const filterWith = (partial: Partial<TimelineFilter> = {}): TimelineFilter => ({
 
 describe("buildRoots", () => {
   it("nests containers by parentContainerId and treats orphans as top-level", () => {
-    const roots = [root(1, [container(1, null), container(2, 1), container(3, 1), container(4, 99)])];
+    const roots = [
+      mockRootSnapshot(1, [
+        mockContainerSnapshot(1, null),
+        mockContainerSnapshot(2, 1),
+        mockContainerSnapshot(3, 1),
+        mockContainerSnapshot(4, 99),
+      ]),
+    ];
     const built = buildRoots(roots);
 
     expect(built).toHaveLength(1);
@@ -125,21 +54,25 @@ describe("buildRoots", () => {
   });
 
   it("derives a label with id and container count", () => {
-    const built = buildRoots([root(1, [container(1, null), container(2, 1)])]);
+    const built = buildRoots([mockRootSnapshot(1, [mockContainerSnapshot(1, null), mockContainerSnapshot(2, 1)])]);
 
     expect(built[0].label).toContain("#1");
     expect(built[0].label).toContain("2 containers");
   });
 
   it("prefers a configured root label over the derived hint", () => {
-    expect(buildRoots([root(1, [container(1, null)], "My App")])[0].label).toBe("My App");
+    expect(buildRoots([mockRootSnapshot(1, [mockContainerSnapshot(1, null)], "My App")])[0].label).toBe("My App");
   });
 });
 
 describe("resolveSelection", () => {
   const roots = [
-    root(1, [
-      container(1, null, { instances: [instance("Foo")], bindings: [binding("Bar")], plugins: [plugin("Baz")] }),
+    mockRootSnapshot(1, [
+      mockContainerSnapshot(1, null, {
+        instances: [mockInstance("Foo")],
+        bindings: [mockBinding("Bar")],
+        plugins: [mockPluginInfo("Baz")],
+      }),
     ]),
   ];
 
@@ -157,7 +90,9 @@ describe("resolveSelection", () => {
 });
 
 describe("derived links", () => {
-  const roots = [root(1, [container(1, null), container(2, 1), container(3, 1)])];
+  const roots = [
+    mockRootSnapshot(1, [mockContainerSnapshot(1, null), mockContainerSnapshot(2, 1), mockContainerSnapshot(3, 1)]),
+  ];
 
   it("childContainers finds children by parent", () => {
     expect(
@@ -169,11 +104,11 @@ describe("derived links", () => {
   });
 
   it("realizingInstance matches by token name or implementation class", () => {
-    const c = container(1, null, { instances: [instance("SvcImpl", "Svc")] });
+    const c = mockContainerSnapshot(1, null, { instances: [mockInstance("SvcImpl", "Svc")] });
 
-    expect(realizingInstance(c, binding("Svc"))?.className).toBe("SvcImpl");
-    expect(realizingInstance(c, binding("Other", "SvcImpl"))?.className).toBe("SvcImpl");
-    expect(realizingInstance(c, binding("None", "Nope"))).toBeUndefined();
+    expect(realizingInstance(c, mockBinding("Svc"))?.className).toBe("SvcImpl");
+    expect(realizingInstance(c, mockBinding("Other", "SvcImpl"))?.className).toBe("SvcImpl");
+    expect(realizingInstance(c, mockBinding("None", "Nope"))).toBeUndefined();
   });
 
   it("mayRealizeInstance is true only for singleton instance bindings", () => {
@@ -193,18 +128,20 @@ describe("derived links", () => {
 
 describe("channelOf", () => {
   it("reads the channel for message/registration and undefined for lifecycle", () => {
-    expect(channelOf(messageEvent(1, "command", "X"))).toBe("command");
-    expect(channelOf(registrationEvent(1, "event", "Y"))).toBe("event");
-    expect(channelOf(lifecycleEvent(1, "activate"))).toBeUndefined();
+    expect(channelOf(mockMessageEvent({ containerId: 1, message: { channel: "command", type: "X" } }))).toBe("command");
+    expect(channelOf(mockRegistrationEvent({ containerId: 1, registration: { channel: "event", type: "Y" } }))).toBe(
+      "event"
+    );
+    expect(channelOf(mockLifecycleEvent({ containerId: 1, phase: "activate" }))).toBeUndefined();
   });
 });
 
 describe("lifecycleHistory", () => {
   const log = [
-    lifecycleEvent(1, "activate", "Foo"),
-    lifecycleEvent(1, "provision", "Foo"),
-    lifecycleEvent(2, "activate", "Bar"),
-    messageEvent(1, "event", "ping"),
+    mockLifecycleEvent({ containerId: 1, phase: "activate", className: "Foo" }),
+    mockLifecycleEvent({ containerId: 1, phase: "provision", className: "Foo" }),
+    mockLifecycleEvent({ containerId: 2, phase: "activate", className: "Bar" }),
+    mockMessageEvent({ containerId: 1, message: { channel: "event", type: "ping" } }),
   ];
 
   it("filters by container, and optionally by instance (className fallback)", () => {
@@ -215,22 +152,8 @@ describe("lifecycleHistory", () => {
 
   it("narrows by instanceId when the target carries one", () => {
     const discriminated: ReadonlyArray<DevtoolsEvent> = [
-      {
-        kind: "lifecycle",
-        rootId: 1,
-        containerId: 1,
-        timestamp: 0,
-        phase: "activate",
-        instance: instance("Foo", "Foo", 1),
-      },
-      {
-        kind: "lifecycle",
-        rootId: 1,
-        containerId: 1,
-        timestamp: 0,
-        phase: "provision",
-        instance: instance("Foo", "Foo", 2),
-      },
+      mockLifecycleEvent({ instance: mockInstance("Foo", "Foo", 1) }),
+      mockLifecycleEvent({ phase: "provision", instance: mockInstance("Foo", "Foo", 2) }),
     ];
 
     expect(lifecycleHistory(discriminated, 1, { instanceId: 1, className: "Foo" })).toHaveLength(1);
@@ -240,7 +163,11 @@ describe("lifecycleHistory", () => {
 });
 
 describe("filterLog", () => {
-  const log = [lifecycleEvent(1, "activate"), messageEvent(1, "command", "X"), registrationEvent(2, "event", "Y", 2)];
+  const log = [
+    mockLifecycleEvent({ containerId: 1, phase: "activate" }),
+    mockMessageEvent({ containerId: 1, message: { channel: "command", type: "X" } }),
+    mockRegistrationEvent({ rootId: 2, containerId: 2, registration: { channel: "event", type: "Y" } }),
+  ];
 
   it("passes everything by default", () => {
     expect(filterLog(log, filterWith())).toHaveLength(3);
