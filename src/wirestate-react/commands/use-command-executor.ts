@@ -1,8 +1,8 @@
-import { Container, CommandBus, CommandType } from "@wirestate/core";
+import { type Container, type CommandType, CommandBus } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { CommandExecutor } from "../types/commands";
+import { type CommandExecutor } from "../types/commands";
 
 /**
  * Returns a stable function to dispatch commands on the active container.

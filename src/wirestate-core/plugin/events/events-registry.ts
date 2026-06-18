@@ -1,6 +1,6 @@
 import { collectHandlerMetadata } from "../../metadata/metadata-handlers";
 
-import type { EventHandlerMetadata } from "./events";
+import { type EventHandlerMetadata } from "./events";
 
 /**
  * Registry of class constructors to their declared event handlers.

@@ -1,5 +1,5 @@
-import { ReactiveElement } from "@lit/reactive-element";
-import { CommandHandler, CommandType } from "@wirestate/core";
+import { type ReactiveElement } from "@lit/reactive-element";
+import { type CommandHandler, type CommandType } from "@wirestate/core";
 
 import { OnCommandController } from "./on-command-controller";
 

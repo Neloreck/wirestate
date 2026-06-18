@@ -2,7 +2,7 @@ import { render } from "@testing-library/react";
 import { Container, QueryBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { AsyncQueryExecutor } from "../types/queries";
+import { type AsyncQueryExecutor } from "../types/queries";
 
 import { useAsyncQueryExecutor } from "./use-async-query-executor";
 

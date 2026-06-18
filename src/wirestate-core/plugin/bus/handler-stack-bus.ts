@@ -1,5 +1,5 @@
-import { WirestateError } from "../../error/wirestate-error";
-import type { Optional, Maybe, MaybePromise } from "../../types/general";
+import { type WirestateError } from "../../error/wirestate-error";
+import { type Optional, type Maybe, type MaybePromise } from "../../types/general";
 
 /**
  * @group Messaging

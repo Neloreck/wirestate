@@ -1,5 +1,4 @@
-import { getCommandHandlerMetadata } from "./on-command";
-import { OnCommand } from "./on-command";
+import { getCommandHandlerMetadata, OnCommand } from "./on-command";
 
 describe("OnCommand and getCommandHandlerMetadata", () => {
   it("should collect metadata for a single class", () => {

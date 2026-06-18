@@ -1,9 +1,9 @@
 import { ContextConsumer } from "@lit/context";
-import { ReactiveControllerHost } from "@lit/reactive-element";
-import { Container, ServiceToken } from "@wirestate/core";
+import { type ReactiveControllerHost } from "@lit/reactive-element";
+import { type Container, type ServiceToken } from "@wirestate/core";
 
 import { ContainerContext } from "../context/container-context";
-import { Optional } from "../types/general";
+import { type Optional } from "../types/general";
 
 /**
  * A fallback for an optional injection: either a raw value or a

@@ -1,10 +1,10 @@
 import { ERROR_CODE_FAILED_TO_RESOLVE_COMMAND_HANDLER } from "../../error/error-code";
 import { WirestateError } from "../../error/wirestate-error";
 import { Injectable } from "../../metadata/metadata-injectable";
-import type { Optional } from "../../types/general";
+import { type Optional } from "../../types/general";
 import { HandlerStackBus } from "../bus/handler-stack-bus";
 
-import type { CommandHandler, CommandType, CommandUnregister } from "./commands";
+import { type CommandHandler, type CommandType, type CommandUnregister } from "./commands";
 
 /**
  * Dispatches commands to one active handler per command type.

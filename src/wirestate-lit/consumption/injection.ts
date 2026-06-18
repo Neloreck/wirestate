@@ -1,9 +1,14 @@
 import { ContextConsumer } from "@lit/context";
-import { ReactiveElement } from "@lit/reactive-element";
-import { ServiceToken } from "@wirestate/core";
+import { type ReactiveElement } from "@lit/reactive-element";
+import { type ServiceToken } from "@wirestate/core";
 
 import { ContainerContext } from "../context/container-context";
-import { AnyObject, FieldMustMatchProvidedType, Interface, ProvidedTypeMustMatch } from "../types/general";
+import {
+  type AnyObject,
+  type FieldMustMatchProvidedType,
+  type Interface,
+  type ProvidedTypeMustMatch,
+} from "../types/general";
 
 /**
  * Describes type returned by {@link injection}.

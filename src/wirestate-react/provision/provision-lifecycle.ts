@@ -1,6 +1,6 @@
-import { Container } from "@wirestate/core";
+import { type Container } from "@wirestate/core";
 
-import { Maybe } from "../types/general";
+import { type Maybe } from "../types/general";
 
 /**
  * Containers waiting for delayed destruction after React cleanup, keyed by container.

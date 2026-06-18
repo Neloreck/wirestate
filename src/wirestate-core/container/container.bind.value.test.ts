@@ -1,4 +1,4 @@
-import { BindingType, ValueBindingDescriptor } from "../binding/binding";
+import { type ValueBindingDescriptor, BindingType } from "../binding/binding";
 
 import { Container } from "./container";
 

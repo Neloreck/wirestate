@@ -5,9 +5,9 @@ import {
 } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { isInjectable } from "../metadata/metadata-injectable";
-import type { Newable } from "../types/general";
+import { type Newable } from "../types/general";
 
-import { BindingScope, BindingType, type BindingDescriptor, ServiceToken } from "./binding";
+import { type ServiceToken, BindingScope, BindingType, type BindingDescriptor } from "./binding";
 import { isFactoryDescriptor } from "./binding-guards";
 import { tokenToString } from "./binding-tokens";
 

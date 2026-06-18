@@ -1,4 +1,4 @@
-import { Maybe } from "../types/general";
+import { type Maybe } from "../types/general";
 
 import { getPrototypeChainMetadata } from "./metadata-prototype-chain";
 

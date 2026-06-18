@@ -1,12 +1,12 @@
-import type { InstanceBindingDescriptor } from "../binding/binding";
+import { type InstanceBindingDescriptor } from "../binding/binding";
 import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
-import type { ContainerKernel } from "../container/container-kernel";
-import type { ActivationRecord } from "../container/container-storage";
+import { type ContainerKernel } from "../container/container-kernel";
+import { type ActivationRecord } from "../container/container-storage";
 import { dispatchPluginActivate, dispatchPluginDeactivate } from "../plugin/plugin-registry";
 import { getContainerProvisionStatus } from "../provision/provision-state";
-import type { Optional, Maybe } from "../types/general";
+import { type Optional, type Maybe } from "../types/general";
 
-import type { ActivationAdapter } from "./activation-adapter";
+import { type ActivationAdapter } from "./activation-adapter";
 import { getActivatedHandlerMetadata } from "./on-activated";
 import { getDeactivationHandlerMetadata } from "./on-deactivation";
 import { getInstanceRecord, WireStatus } from "./wire-status";

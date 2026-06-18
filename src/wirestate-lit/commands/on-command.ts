@@ -1,7 +1,7 @@
-import { ReactiveElement } from "@lit/reactive-element";
-import { CommandType } from "@wirestate/core";
+import { type ReactiveElement } from "@lit/reactive-element";
+import { type CommandType } from "@wirestate/core";
 
-import { AnyObject, Interface, MaybePromise } from "../types/general";
+import { type AnyObject, type Interface, type MaybePromise } from "../types/general";
 
 import { OnCommandController } from "./on-command-controller";
 

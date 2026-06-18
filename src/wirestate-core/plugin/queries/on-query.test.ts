@@ -1,5 +1,4 @@
-import { getQueryHandlerMetadata } from "./on-query";
-import { OnQuery } from "./on-query";
+import { getQueryHandlerMetadata, OnQuery } from "./on-query";
 
 describe("OnQuery and getQueryHandlerMetadata", () => {
   it("should collect metadata for a single class", () => {

@@ -2,8 +2,8 @@ import { render } from "@testing-library/react";
 import { Container, QueryBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { Optional, Nullable } from "../types/general";
-import { OptionalAsyncQueryExecutor } from "../types/queries";
+import { type Optional, type Nullable } from "../types/general";
+import { type OptionalAsyncQueryExecutor } from "../types/queries";
 
 import { useOptionalAsyncQueryExecutor } from "./use-optional-async-query-executor";
 

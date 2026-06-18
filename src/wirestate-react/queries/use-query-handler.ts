@@ -1,4 +1,4 @@
-import { Container, QueryBus, QueryHandler, QueryType } from "@wirestate/core";
+import { type Container, type QueryHandler, type QueryType, QueryBus } from "@wirestate/core";
 import { useRef } from "react";
 
 import { useContainer } from "../context/use-container";

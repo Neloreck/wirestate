@@ -2,7 +2,7 @@ import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { AsyncCommandExecutor } from "../types/commands";
+import { type AsyncCommandExecutor } from "../types/commands";
 
 import { useAsyncCommandExecutor } from "./use-async-command-executor";
 

@@ -1,7 +1,7 @@
 import { ContainerKernel } from "../container/container-kernel";
 import { Injectable } from "../metadata/metadata-injectable";
 
-import { ActivationAdapter, getActivationAdapter, setActivationAdapter } from "./activation-adapter";
+import { type ActivationAdapter, getActivationAdapter, setActivationAdapter } from "./activation-adapter";
 
 function mockAdapter(overrides: Partial<ActivationAdapter> = {}): ActivationAdapter {
   return {

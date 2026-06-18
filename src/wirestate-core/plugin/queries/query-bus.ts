@@ -1,10 +1,10 @@
 import { ERROR_CODE_FAILED_TO_RESOLVE_QUERY_HANDLER } from "../../error/error-code";
 import { WirestateError } from "../../error/wirestate-error";
 import { Injectable } from "../../metadata/metadata-injectable";
-import type { Optional } from "../../types/general";
+import { type Optional } from "../../types/general";
 import { HandlerStackBus } from "../bus/handler-stack-bus";
 
-import { QueryHandler, QueryType, QueryUnregister } from "./queries";
+import { type QueryHandler, type QueryType, type QueryUnregister } from "./queries";
 
 /**
  * Dispatches queries to one active handler per query type.

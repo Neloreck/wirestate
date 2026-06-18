@@ -1,6 +1,6 @@
-﻿import type { Newable } from "../types/general";
+﻿import { type Newable } from "../types/general";
 
-import type { BindingDescriptor, ServiceToken } from "./binding";
+import { type BindingDescriptor, type ServiceToken } from "./binding";
 
 /**
  * Reference token for dependencies that do not have a class constructor token.

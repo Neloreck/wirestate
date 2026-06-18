@@ -1,8 +1,8 @@
 import {
+  type SingleMethodDecorator,
   createSingleMethodDecoratorDescriptor,
-  SingleMethodDecorator,
 } from "../metadata/metadata-single-method-decorator";
-import { Optional } from "../types/general";
+import { type Optional } from "../types/general";
 
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
   name: "OnDeactivation",

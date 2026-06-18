@@ -1,7 +1,7 @@
-import { InternalErrorSource, reportWirestateInternalError } from "../error/internal-error-handler";
-import type { MaybePromise } from "../types/general";
+import { type InternalErrorSource, reportWirestateInternalError } from "../error/internal-error-handler";
+import { type MaybePromise } from "../types/general";
 
-import type { ContainerKernel } from "./container-kernel";
+import { type ContainerKernel } from "./container-kernel";
 
 export interface CallLifecycleHandlerOptions {
   /**

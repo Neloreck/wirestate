@@ -10,7 +10,7 @@ import {
   OnDeprovision,
 } from "@wirestate/core";
 
-import { Nullable } from "../../types/general";
+import { type Nullable } from "../../types/general";
 
 describe("core command messaging integration", () => {
   it("keeps parent and child command buses separate", () => {

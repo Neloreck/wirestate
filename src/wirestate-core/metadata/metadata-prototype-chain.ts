@@ -1,4 +1,4 @@
-import { Optional, Maybe } from "../types/general";
+import { type Optional, type Maybe } from "../types/general";
 
 import { METADATA_SYMBOL } from "./metadata-symbol-polyfill";
 

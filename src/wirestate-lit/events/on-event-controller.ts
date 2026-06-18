@@ -1,9 +1,9 @@
 import { ContextConsumer } from "@lit/context";
-import { ReactiveController, ReactiveElement } from "@lit/reactive-element";
-import { EventBus, EventHandler, EventType, EventUnsubscribe, WireEvent } from "@wirestate/core";
+import { type ReactiveController, type ReactiveElement } from "@lit/reactive-element";
+import { type EventHandler, type EventType, type EventUnsubscribe, type WireEvent, EventBus } from "@wirestate/core";
 
 import { ContainerContext } from "../context/container-context";
-import { Nullable } from "../types/general";
+import { type Nullable } from "../types/general";
 
 /**
  * Reactive controller that subscribes to container events.

@@ -9,10 +9,10 @@ import {
   OnEvent,
   OnQuery,
   QueryBus,
-  WireEvent,
+  type WireEvent,
 } from "@wirestate/core";
 
-import { Maybe } from "../types";
+import { type Maybe } from "../types";
 
 @Injectable()
 export class GenericService {

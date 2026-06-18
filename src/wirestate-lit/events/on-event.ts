@@ -1,7 +1,7 @@
-import { ReactiveElement } from "@lit/reactive-element";
-import { EventType, WireEvent } from "@wirestate/core";
+import { type ReactiveElement } from "@lit/reactive-element";
+import { type EventType, type WireEvent } from "@wirestate/core";
 
-import { AnyObject, Interface, Nullable } from "../types/general";
+import { type AnyObject, type Interface, type Nullable } from "../types/general";
 
 import { OnEventController } from "./on-event-controller";
 

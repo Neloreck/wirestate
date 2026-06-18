@@ -1,9 +1,9 @@
 import { ContextConsumer } from "@lit/context";
-import { ReactiveController, ReactiveElement } from "@lit/reactive-element";
-import { QueryBus, QueryHandler, QueryType, QueryUnregister } from "@wirestate/core";
+import { type ReactiveController, type ReactiveElement } from "@lit/reactive-element";
+import { type QueryHandler, type QueryType, type QueryUnregister, QueryBus } from "@wirestate/core";
 
 import { ContainerContext } from "../context/container-context";
-import { Nullable } from "../types/general";
+import { type Nullable } from "../types/general";
 
 /**
  * Reactive controller that registers a query handler.

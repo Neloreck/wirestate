@@ -1,5 +1,5 @@
-import type { ServiceToken } from "../binding/binding";
-import type { ContainerKernel } from "../container/container-kernel";
+import { type ServiceToken } from "../binding/binding";
+import { type ContainerKernel } from "../container/container-kernel";
 import { collectHandlerMetadata } from "../metadata/metadata-handlers";
 
 /**

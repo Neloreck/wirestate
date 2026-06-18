@@ -1,4 +1,4 @@
-import { Optional } from "../types/general";
+import { type Optional } from "../types/general";
 
 interface SymbolWithMetadata {
   metadata?: symbol;

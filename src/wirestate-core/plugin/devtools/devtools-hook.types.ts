@@ -1,4 +1,4 @@
-import type { Nullable, Optional } from "../../types/general";
+import { type Nullable, type Optional } from "../../types/general";
 
 /**
  * Identifier for one registered root (one installed {@link DevToolsPlugin}).
@@ -496,6 +496,29 @@ export type DevtoolsEvent =
 export type DevtoolsInspectPath = ReadonlyArray<string | number>;
 
 /**
+ * A reference to a tracked service instance, returned when an inspected field turns out to be
+ * another instance the container manages — so the inspector can mark it and jump to it.
+ *
+ * @group DevTools
+ */
+export interface DevtoolsServiceRef {
+  /**
+   * Stable id of the referenced instance.
+   */
+  readonly instanceId: DevtoolsInstanceId;
+
+  /**
+   * Id of the container that owns the referenced instance.
+   */
+  readonly containerId: DevtoolsContainerId;
+
+  /**
+   * Concrete class name of the referenced instance.
+   */
+  readonly className: string;
+}
+
+/**
  * What a plugin hands the hook to register a root: a way to snapshot the root's
  * tree on demand, and (optionally) to read a live value on demand.
  *
@@ -517,6 +540,16 @@ export interface DevtoolsRootRegister {
    * @returns The raw value at the path.
    */
   inspect?(instanceId: DevtoolsInstanceId, path: DevtoolsInspectPath): unknown;
+
+  /**
+   * If `value` is a service instance this root tracks, returns a reference to it (so the inspector
+   * can mark a field that points at another service and offer a jump); otherwise `undefined`.
+   * Absent on a root whose plugin predates this capability.
+   *
+   * @param value - The raw value at an inspected field.
+   * @returns A service reference, or `undefined` when the value isn't a tracked instance.
+   */
+  serviceRefOf?(value: object): Optional<DevtoolsServiceRef>;
 }
 
 /**
@@ -537,3 +570,78 @@ export interface DevtoolsRoot extends DevtoolsRootRegister {
  * @group DevTools
  */
 export type DevtoolsListener = (event: DevtoolsEvent) => void;
+
+/**
+ * The in-page meeting point between installed {@link DevToolsPlugin}s and an
+ * inspector backend.
+ *
+ * @remarks
+ * Created lazily on `globalThis` by the first plugin to install and shared by every
+ * later plugin (including ones from other library copies on the page). The plugin
+ * registers a root and emits lifecycle deltas; the backend snapshots current roots
+ * on attach and subscribes for deltas thereafter.
+ *
+ * @group DevTools
+ */
+export interface DevtoolsHook {
+  /**
+   * Protocol version this hook speaks.
+   */
+  readonly protocolVersion: number;
+
+  /**
+   * Registers a root and returns its allocated id.
+   *
+   * @param register - How to snapshot the root's tree.
+   * @returns The new root's id.
+   */
+  registerRoot(register: DevtoolsRootRegister): DevtoolsRootId;
+
+  /**
+   * Removes a root registration.
+   *
+   * @param rootId - Root to remove.
+   */
+  deregisterRoot(rootId: DevtoolsRootId): void;
+
+  /**
+   * Allocates (or returns) the stable id for a container.
+   *
+   * @param container - Container to identify; keyed by object identity, so copies
+   *   from any library version share one allocator.
+   * @returns The container's stable id.
+   */
+  idForContainer(container: object): DevtoolsContainerId;
+
+  /**
+   * Allocates (or returns) the stable id for a service instance.
+   *
+   * @param instance - Instance to identify; keyed by object identity, so copies from any library
+   *   version share one allocator.
+   * @returns The instance's stable id.
+   */
+  idForInstance(instance: object): DevtoolsInstanceId;
+
+  /**
+   * Emits a lifecycle delta to all subscribed backends.
+   *
+   * @param event - The delta to broadcast.
+   */
+  emit(event: DevtoolsEvent): void;
+
+  /**
+   * Subscribes a backend listener.
+   *
+   * @param listener - Invoked for each emitted event.
+   * @returns A function that removes the listener.
+   */
+  subscribe(listener: DevtoolsListener): () => void;
+
+  /**
+   * Returns the currently registered roots, so a late-attaching backend can
+   * snapshot existing state before subscribing for deltas.
+   *
+   * @returns The registered roots.
+   */
+  getRoots(): ReadonlyArray<DevtoolsRoot>;
+}

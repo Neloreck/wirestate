@@ -1,19 +1,21 @@
-import type { Container } from "../../container/container";
-import type { ContainerKernel } from "../../container/container-kernel";
-import type { Optional } from "../../types/general";
-import type { WirestatePlugin } from "../plugin";
+import { type Container } from "../../container/container";
+import { type ContainerKernel } from "../../container/container-kernel";
+import { type Optional } from "../../types/general";
+import { type WirestatePlugin } from "../plugin";
 import { getOwnPlugins } from "../plugin-registry";
 
-import { DEVTOOLS_PROTOCOL_VERSION, type DevtoolsHook, installDevtoolsHook } from "./devtools-hook";
+import { DEVTOOLS_PROTOCOL_VERSION, installDevtoolsHook } from "./devtools-hook";
 import {
-  DevtoolsContainerId,
-  DevtoolsContainerSnapshot,
-  DevtoolsInspectPath,
-  DevtoolsInstance,
-  DevtoolsInstanceId,
-  DevtoolsLifecyclePhase,
-  DevtoolsRootId,
-  DevtoolsRootSnapshot,
+  type DevtoolsContainerId,
+  type DevtoolsContainerSnapshot,
+  type DevtoolsHook,
+  type DevtoolsInspectPath,
+  type DevtoolsInstance,
+  type DevtoolsInstanceId,
+  type DevtoolsLifecyclePhase,
+  type DevtoolsRootId,
+  type DevtoolsRootSnapshot,
+  type DevtoolsServiceRef,
 } from "./devtools-hook.types";
 import { normalizeBinding, normalizeInstance, normalizePlugin } from "./devtools-normalize";
 import { tapContainerBuses } from "./devtools-tap";
@@ -99,6 +101,7 @@ export class DevToolsPlugin implements WirestatePlugin {
       this.rootId = this.hook.registerRoot({
         snapshot: () => this.snapshot(),
         inspect: (instanceId, path) => this.inspect(instanceId, path),
+        serviceRefOf: (value) => this.serviceRefOf(value),
       });
     }
   }
@@ -272,6 +275,39 @@ export class DevToolsPlugin implements WirestatePlugin {
       for (const instance of container.getActiveInstances()) {
         if (this.hook.idForInstance(instance) === instanceId) {
           return readPath(instance, path);
+        }
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
+   * If `value` is one of this root's tracked active instances, returns a reference to it (so the
+   * inspector can mark a field that points at another service and offer a jump); else `undefined`.
+   *
+   * @param value - Raw value at an inspected field.
+   * @returns A service reference, or `undefined`.
+   */
+  private serviceRefOf(value: object): Optional<DevtoolsServiceRef> {
+    if (!this.hook) {
+      return undefined;
+    }
+
+    for (const reference of this.observed.values()) {
+      const container: Optional<ContainerKernel> = reference.deref();
+
+      if (!container) {
+        continue;
+      }
+
+      for (const instance of container.getActiveInstances()) {
+        if (instance === value) {
+          return {
+            instanceId: this.hook.idForInstance(instance),
+            containerId: this.hook.idForContainer(container),
+            className: instance.constructor.name,
+          };
         }
       }
     }

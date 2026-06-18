@@ -17,4 +17,5 @@ export { useComputed, useModel, useSignal, useSignalEffect } from "@preact/signa
  * @group Signals React
  * @see {@link https://www.npmjs.com/package/@preact/signals-react}
  */
-export { EffectStore, wrapJsx, useSignals, ensureFinalCleanup } from "@preact/signals-react/runtime";
+export { type EffectStore } from "@preact/signals-react/runtime";
+export { wrapJsx, useSignals, ensureFinalCleanup } from "@preact/signals-react/runtime";

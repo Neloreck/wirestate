@@ -1,13 +1,13 @@
 import {
+  type InstanceRecord,
+  type ProvisionId,
   getInstanceContainer,
   getInstanceRecord,
-  InstanceRecord,
-  ProvisionId,
   WireStatus,
 } from "../activation/wire-status";
-import { Binding, Bindings, BindingType, ServiceToken } from "../binding/binding";
+import { type Binding, type Bindings, type ServiceToken, BindingType } from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
-import type { Container } from "../container/container";
+import { type Container } from "../container/container";
 import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
@@ -20,11 +20,11 @@ import {
   getEffectivePlugins,
   isPluginParticipant,
 } from "../plugin/plugin-registry";
-import type { Maybe, Nullable, Optional } from "../types/general";
+import { type Maybe, type Nullable, type Optional } from "../types/general";
 
 import { getDeprovisionHandlerMetadata } from "./on-deprovision";
 import { getProvisionHandlerMetadata } from "./on-provision";
-import { CycleEntry, getOrCreateProvisionState, getProvisionState, ProvisionState } from "./provision-state";
+import { type CycleEntry, type ProvisionState, getOrCreateProvisionState, getProvisionState } from "./provision-state";
 
 /**
  * Provisions a container for a framework provider.

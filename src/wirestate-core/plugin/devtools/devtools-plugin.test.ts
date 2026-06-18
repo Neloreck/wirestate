@@ -11,7 +11,8 @@ import { OnQuery } from "../queries/on-query";
 import { QueriesPlugin } from "../queries/queries-plugin";
 import { QueryBus } from "../queries/query-bus";
 
-import { DEVTOOLS_HOOK_KEY, type DevtoolsHook, getDevtoolsHook } from "./devtools-hook";
+import { DEVTOOLS_HOOK_KEY, getDevtoolsHook } from "./devtools-hook";
+import { type DevtoolsHook } from "./devtools-hook.types";
 import { DevToolsPlugin } from "./devtools-plugin";
 
 describe("DevToolsPlugin", () => {
@@ -246,6 +247,29 @@ describe("DevToolsPlugin", () => {
       outcome: "resolved",
       value: 42,
     });
+
+    container.deprovision();
+  });
+
+  it("identifies a tracked service instance by identity via serviceRefOf", () => {
+    @Injectable()
+    class Logger {}
+
+    const container: Container = new Container({
+      bindings: [Logger],
+      activate: [Logger],
+      plugins: [new DevToolsPlugin()],
+    });
+
+    container.provision();
+
+    const root = (getDevtoolsHook() as DevtoolsHook).getRoots()[0];
+    const logger: Logger = container.get(Logger);
+
+    expect(root.serviceRefOf?.(logger)?.className).toBe("Logger");
+    expect(root.serviceRefOf?.(logger)?.instanceId).toEqual(expect.any(Number));
+    // A plain object (or any value the container doesn't manage) is not a service.
+    expect(root.serviceRefOf?.({ not: "a service" })).toBeUndefined();
 
     container.deprovision();
   });

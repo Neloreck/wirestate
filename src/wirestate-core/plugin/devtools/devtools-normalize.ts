@@ -1,22 +1,22 @@
 import { WireStatus } from "../../activation/wire-status";
-import type { BindingDescriptor, ServiceToken } from "../../binding/binding";
+import { type BindingDescriptor, type ServiceToken } from "../../binding/binding";
 import { isInstanceDescriptor } from "../../binding/binding-guards";
 import { getBindingScope } from "../../binding/binding-lifecycle";
 import { InjectionToken, getBindingToken, tokenToString } from "../../binding/binding-tokens";
-import type { Optional } from "../../types/general";
+import { type Optional } from "../../types/general";
 import { getCommandHandlerMetadata } from "../commands/on-command";
 import { getEventHandlerMetadata } from "../events/events-registry";
-import type { WirestatePlugin } from "../plugin";
+import { type WirestatePlugin } from "../plugin";
 import { getQueryHandlerMetadata } from "../queries/on-query";
 
 import {
-  DevtoolsBinding,
-  DevtoolsHandler,
-  DevtoolsInstance,
-  DevtoolsInstanceId,
-  DevtoolsInstanceStatus,
-  DevtoolsPluginInfo,
-  DevtoolsToken,
+  type DevtoolsBinding,
+  type DevtoolsHandler,
+  type DevtoolsInstance,
+  type DevtoolsInstanceId,
+  type DevtoolsInstanceStatus,
+  type DevtoolsPluginInfo,
+  type DevtoolsToken,
 } from "./devtools-hook.types";
 
 /**

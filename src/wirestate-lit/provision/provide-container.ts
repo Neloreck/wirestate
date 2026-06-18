@@ -1,8 +1,13 @@
-import { ReactiveElement } from "@lit/reactive-element";
+import { type ReactiveElement } from "@lit/reactive-element";
 
-import { FieldMustMatchProvidedType, Interface, Maybe, ProvidedTypeMustMatch } from "../types/general";
+import {
+  type FieldMustMatchProvidedType,
+  type Interface,
+  type Maybe,
+  type ProvidedTypeMustMatch,
+} from "../types/general";
 
-import { ContainerProvider, ContainerProviderOptions } from "./container-provider";
+import { type ContainerProviderOptions, ContainerProvider } from "./container-provider";
 
 /**
  * Describes the type returned by {@link provideContainer}.

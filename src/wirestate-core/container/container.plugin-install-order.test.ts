@@ -1,6 +1,6 @@
 import { BindingType, Container, EventBus, EventsPlugin, inject, Injectable } from "@wirestate/core";
 
-import { Optional } from "../types/general";
+import { type Optional } from "../types/general";
 
 describe("container plugin install order", () => {
   it("installs plugins after user bindings, so a bind-if-absent plugin defers to the user's binding", () => {

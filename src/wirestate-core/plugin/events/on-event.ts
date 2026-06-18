@@ -1,7 +1,7 @@
-import type { ContainerKernel } from "../../container/container-kernel";
+import { type ContainerKernel } from "../../container/container-kernel";
 import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
 import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../../metadata/metadata-handlers";
-import type { Nullable } from "../../types/general";
+import { type Nullable } from "../../types/general";
 import {
   MESSAGING_REGISTRATION_KEY,
   MESSAGING_REGISTRATIONS,
@@ -10,7 +10,7 @@ import {
 
 import { buildEventDispatchers } from "./build-event-dispatchers";
 import { EventBus } from "./event-bus";
-import type { EventType } from "./events";
+import { type EventType } from "./events";
 import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "./events-registry";
 
 /**

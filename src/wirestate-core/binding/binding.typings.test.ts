@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // noinspection JSUnusedLocalSymbols
 
-import type { FactoryBindingDescriptor, InstanceBindingDescriptor, ValueBindingDescriptor } from "./binding";
+import { type FactoryBindingDescriptor, type InstanceBindingDescriptor, type ValueBindingDescriptor } from "./binding";
 
 describe("binding descriptor typings", () => {
   class FooService {

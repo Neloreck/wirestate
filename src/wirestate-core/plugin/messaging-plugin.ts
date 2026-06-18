@@ -1,11 +1,11 @@
-import type { ServiceToken } from "../binding/binding";
-import type { Container } from "../container/container";
+import { type ServiceToken } from "../binding/binding";
+import { type Container } from "../container/container";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import type { Optional, Newable } from "../types/general";
+import { type Optional, type Newable } from "../types/general";
 
 import { getMessagingRegistrations, type MessagingRegistration } from "./messaging-registration";
-import type { WirestatePlugin } from "./plugin";
+import { type WirestatePlugin } from "./plugin";
 
 /**
  * Built-in base for the messaging plugins (`EventsPlugin` / `CommandsPlugin` /

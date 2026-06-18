@@ -7,7 +7,7 @@ import { CommandBus } from "../plugin/commands/command-bus";
 import { CommandsPlugin } from "../plugin/commands/commands-plugin";
 import { OnCommand } from "../plugin/commands/on-command";
 import { EventBus } from "../plugin/events/event-bus";
-import { WireEvent } from "../plugin/events/events";
+import { type WireEvent } from "../plugin/events/events";
 import { EventsPlugin } from "../plugin/events/events-plugin";
 import { OnEvent } from "../plugin/events/on-event";
 import { OnQuery } from "../plugin/queries/on-query";

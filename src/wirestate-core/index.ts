@@ -9,52 +9,62 @@
 // Kept as the first statement on purpose.
 import "./metadata/metadata-symbol-polyfill";
 
-export { ProvisionId, WireStatus } from "./activation/wire-status";
+export { type ProvisionId } from "./activation/wire-status";
+export { WireStatus } from "./activation/wire-status";
 export { OnActivated } from "./activation/on-activated";
 export { OnDeactivation } from "./activation/on-deactivation";
 
 export {
-  Binding,
-  BindingDescriptor,
-  BindingScope,
-  BindingType,
-  Bindings,
-  FactoryBindingDescriptor,
-  ServiceToken,
-  InstanceBindingDescriptor,
-  ValueBindingDescriptor,
+  type Binding,
+  type BindingDescriptor,
+  type Bindings,
+  type FactoryBindingDescriptor,
+  type ServiceToken,
+  type InstanceBindingDescriptor,
+  type ValueBindingDescriptor,
 } from "./binding/binding";
+export { BindingScope, BindingType } from "./binding/binding";
 export { InjectionToken } from "./binding/binding-tokens";
 
-export { Container, ContainerConfig } from "./container/container";
+export { type ContainerConfig } from "./container/container";
+export { Container } from "./container/container";
 export { inject } from "./container/container-context";
 export { validateContainerConfig } from "./container/container-config-validation";
 
 export {
-  defaultInternalErrorHandler,
-  InternalErrorDescriptor,
-  InternalErrorHandler,
-  InternalErrorSource,
+  type InternalErrorDescriptor,
+  type InternalErrorHandler,
+  type InternalErrorSource,
 } from "./error/internal-error-handler";
+export { defaultInternalErrorHandler } from "./error/internal-error-handler";
 export { WirestateError } from "./error/wirestate-error";
 
 export { Injectable, isInjectable } from "./metadata/metadata-injectable";
 
 export { CommandBus } from "./plugin/commands/command-bus";
 export { CommandsPlugin } from "./plugin/commands/commands-plugin";
-export { CommandHandler, CommandType, CommandUnregister } from "./plugin/commands/commands";
-export { OnCommand, OnCommandHandlerDecorator } from "./plugin/commands/on-command";
-export { OnEvent, OnEventHandlerDecorator } from "./plugin/events/on-event";
+export { type CommandHandler, type CommandType, type CommandUnregister } from "./plugin/commands/commands";
+export { type OnCommandHandlerDecorator } from "./plugin/commands/on-command";
+export { OnCommand } from "./plugin/commands/on-command";
+export { type OnEventHandlerDecorator } from "./plugin/events/on-event";
+export { OnEvent } from "./plugin/events/on-event";
 export { EventBus } from "./plugin/events/event-bus";
 export { EventsPlugin } from "./plugin/events/events-plugin";
-export { EventEmitOptions, EventHandler, EventType, EventUnsubscribe, WireEvent } from "./plugin/events/events";
-export { QueryHandler, QueryType, QueryUnregister } from "./plugin/queries/queries";
+export {
+  type EventEmitOptions,
+  type EventHandler,
+  type EventType,
+  type EventUnsubscribe,
+  type WireEvent,
+} from "./plugin/events/events";
+export { type QueryHandler, type QueryType, type QueryUnregister } from "./plugin/queries/queries";
 export { QueryBus } from "./plugin/queries/query-bus";
 export { QueriesPlugin } from "./plugin/queries/queries-plugin";
-export { OnQuery, OnQueryHandlerDecorator } from "./plugin/queries/on-query";
-export { WirestatePlugin } from "./plugin/plugin";
+export { type OnQueryHandlerDecorator } from "./plugin/queries/on-query";
+export { OnQuery } from "./plugin/queries/on-query";
+export { type WirestatePlugin } from "./plugin/plugin";
 
 export { OnDeprovision } from "./provision/on-deprovision";
 export { OnProvision } from "./provision/on-provision";
 
-export { Newable } from "./types/general";
+export { type Newable } from "./types/general";

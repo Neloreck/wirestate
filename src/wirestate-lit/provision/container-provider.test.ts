@@ -19,7 +19,7 @@ import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { useInjection } from "../consumption/use-injection";
 import { ContainerContext } from "../context/container-context";
-import { Maybe } from "../types/general";
+import { type Maybe } from "../types/general";
 
 import { ContainerProvider } from "./container-provider";
 

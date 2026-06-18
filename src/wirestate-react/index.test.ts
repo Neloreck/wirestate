@@ -1,54 +1,42 @@
+import { assertExportedApi } from "#/test/exported-api.utils";
+
 describe("Library exported API from wirestate-react", () => {
-  const libRoot = require("./index");
-
-  const expectedLibExports: Array<string> = [
-    "AsyncCommandExecutor",
-    "AsyncQueryExecutor",
-    "CommandExecutor",
-    "ContainerContext",
-    "ContainerProvider",
-    "ContainerProviderProps",
-    "EventEmitter",
-    "OptionalAsyncCommandExecutor",
-    "OptionalAsyncQueryExecutor",
-    "OptionalCommandExecutor",
-    "OptionalInjectionFallback",
-    "OptionalQueryExecutor",
-    "QueryExecutor",
-    "useAllEvents",
-    "useAsyncCommandExecutor",
-    "useAsyncQueryExecutor",
-    "useCommandExecutor",
-    "useCommandHandler",
-    "useContainer",
-    "useEvent",
-    "useEventEmitter",
-    "useEvents",
-    "useInjection",
-    "useOptionalAsyncCommandExecutor",
-    "useOptionalAsyncQueryExecutor",
-    "useOptionalCommandExecutor",
-    "useOptionalInjection",
-    "useOptionalQueryExecutor",
-    "useQueryExecutor",
-    "useQueryHandler",
-  ];
-
-  const assertListIntersection = (first: Array<string>, second: Array<string>) => {
-    first.forEach((it: string) => {
-      if (!second.includes(it)) {
-        throw new Error("Item missing in expected list: " + it);
-      }
+  it("should export exactly the documented react API surface", () => {
+    assertExportedApi(require.resolve("./index"), {
+      values: [
+        "ContainerContext",
+        "ContainerProvider",
+        "useAllEvents",
+        "useAsyncCommandExecutor",
+        "useAsyncQueryExecutor",
+        "useCommandExecutor",
+        "useCommandHandler",
+        "useContainer",
+        "useEvent",
+        "useEventEmitter",
+        "useEvents",
+        "useInjection",
+        "useOptionalAsyncCommandExecutor",
+        "useOptionalAsyncQueryExecutor",
+        "useOptionalCommandExecutor",
+        "useOptionalInjection",
+        "useOptionalQueryExecutor",
+        "useQueryExecutor",
+        "useQueryHandler",
+      ],
+      types: [
+        "AsyncCommandExecutor",
+        "AsyncQueryExecutor",
+        "CommandExecutor",
+        "ContainerProviderProps",
+        "EventEmitter",
+        "OptionalAsyncCommandExecutor",
+        "OptionalAsyncQueryExecutor",
+        "OptionalCommandExecutor",
+        "OptionalInjectionFallback",
+        "OptionalQueryExecutor",
+        "QueryExecutor",
+      ],
     });
-    second.forEach((it: string) => {
-      if (!first.includes(it)) {
-        throw new Error("Item missing in library root: " + it);
-      }
-    });
-  };
-
-  it("should export correct core API methods", () => {
-    assertListIntersection(Object.keys(libRoot), expectedLibExports);
-    expect(Object.keys(libRoot)).toHaveLength(expectedLibExports.length);
   });
 });

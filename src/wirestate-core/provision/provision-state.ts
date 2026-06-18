@@ -1,6 +1,6 @@
-import type { ServiceToken } from "../binding/binding";
-import type { ContainerKernel } from "../container/container-kernel";
-import type { Nullable, Optional } from "../types/general";
+import { type ServiceToken } from "../binding/binding";
+import { type ContainerKernel } from "../container/container-kernel";
+import { type Nullable, type Optional } from "../types/general";
 
 /**
  * Per-instance state of a container's current provision cycle.

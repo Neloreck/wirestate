@@ -2,8 +2,8 @@ import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { CommandExecutor } from "../types/commands";
-import { Nullable } from "../types/general";
+import { type CommandExecutor } from "../types/commands";
+import { type Nullable } from "../types/general";
 
 import { useCommandExecutor } from "./use-command-executor";
 

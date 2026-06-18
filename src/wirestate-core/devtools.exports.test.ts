@@ -1,53 +1,46 @@
+import { assertExportedApi } from "#/test/exported-api.utils";
+
 describe("Library exported API from wirestate-core/devtools", () => {
-  const devtoolsRoot = require("./devtools");
-
-  const expectedExports: Array<string> = [
-    "DEVTOOLS_HOOK_KEY",
-    "DEVTOOLS_PROTOCOL_VERSION",
-    "DevToolsPlugin",
-    "DevToolsPluginConfig",
-    "DevtoolsBinding",
-    "DevtoolsContainerId",
-    "DevtoolsContainerSnapshot",
-    "DevtoolsEvent",
-    "DevtoolsHandler",
-    "DevtoolsHook",
-    "DevtoolsInstance",
-    "DevtoolsInstanceStatus",
-    "DevtoolsLifecycleEvent",
-    "DevtoolsLifecyclePhase",
-    "DevtoolsListener",
-    "DevtoolsMessage",
-    "DevtoolsMessageChannel",
-    "DevtoolsMessageEvent",
-    "DevtoolsPluginInfo",
-    "DevtoolsRegistration",
-    "DevtoolsRegistrationEvent",
-    "DevtoolsRegistrationPhase",
-    "DevtoolsRoot",
-    "DevtoolsRootId",
-    "DevtoolsRootRegister",
-    "DevtoolsRootSnapshot",
-    "DevtoolsToken",
-    "getDevtoolsHook",
-    "installDevtoolsHook",
-  ];
-
-  const assertListIntersection = (first: Array<string>, second: Array<string>) => {
-    first.forEach((it: string) => {
-      if (!second.includes(it)) {
-        throw new Error("Item missing in expected list: " + it);
-      }
+  it("should export exactly the documented devtools API surface", () => {
+    assertExportedApi(require.resolve("./devtools"), {
+      values: [
+        "DEVTOOLS_HOOK_KEY",
+        "DEVTOOLS_PROTOCOL_VERSION",
+        "DevToolsPlugin",
+        "getDevtoolsHook",
+        "installDevtoolsHook",
+      ],
+      types: [
+        "DevToolsPluginConfig",
+        "DevtoolsBinding",
+        "DevtoolsContainerId",
+        "DevtoolsContainerSnapshot",
+        "DevtoolsEvent",
+        "DevtoolsHandler",
+        "DevtoolsHook",
+        "DevtoolsInspectPath",
+        "DevtoolsInstance",
+        "DevtoolsInstanceId",
+        "DevtoolsInstanceStatus",
+        "DevtoolsLifecycleEvent",
+        "DevtoolsLifecyclePhase",
+        "DevtoolsListener",
+        "DevtoolsMessage",
+        "DevtoolsMessageChannel",
+        "DevtoolsMessageEvent",
+        "DevtoolsMessageResult",
+        "DevtoolsMessageResultEvent",
+        "DevtoolsPluginInfo",
+        "DevtoolsRegistration",
+        "DevtoolsRegistrationEvent",
+        "DevtoolsRegistrationPhase",
+        "DevtoolsRoot",
+        "DevtoolsRootId",
+        "DevtoolsRootRegister",
+        "DevtoolsRootSnapshot",
+        "DevtoolsServiceRef",
+        "DevtoolsToken",
+      ],
     });
-    second.forEach((it: string) => {
-      if (!first.includes(it)) {
-        throw new Error("Item missing in devtools root: " + it);
-      }
-    });
-  };
-
-  it("should export the devtools API (type-only exports erase at runtime)", () => {
-    assertListIntersection(Object.keys(devtoolsRoot), expectedExports);
-    expect(Object.keys(devtoolsRoot)).toHaveLength(expectedExports.length);
   });
 });

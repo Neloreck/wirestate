@@ -1,7 +1,7 @@
-import { ReactiveElement } from "@lit/reactive-element";
-import { QueryType } from "@wirestate/core";
+import { type ReactiveElement } from "@lit/reactive-element";
+import { type QueryType } from "@wirestate/core";
 
-import { AnyObject, Interface, MaybePromise } from "../types/general";
+import { type AnyObject, type Interface, type MaybePromise } from "../types/general";
 
 import { OnQueryController } from "./on-query-controller";
 

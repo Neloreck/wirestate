@@ -1,9 +1,9 @@
 import { act, render } from "@testing-library/react";
 import {
+  type ContainerConfig,
   CommandBus,
   CommandsPlugin,
   Container,
-  ContainerConfig,
   EventBus,
   EventsPlugin,
   Injectable,

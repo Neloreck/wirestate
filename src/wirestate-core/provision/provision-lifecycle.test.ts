@@ -1,12 +1,12 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { OnActivated } from "../activation/on-activated";
-import { ProvisionId, WireStatus } from "../activation/wire-status";
+import { type ProvisionId, WireStatus } from "../activation/wire-status";
 import { BindingType } from "../binding/binding";
 import { Container } from "../container/container";
 import { inject } from "../container/container-context";
 import { Injectable } from "../metadata/metadata-injectable";
-import { Nullable } from "../types/general";
+import { type Nullable } from "../types/general";
 
 import { OnDeprovision } from "./on-deprovision";
 import { OnProvision } from "./on-provision";

@@ -10,7 +10,7 @@ import {
   type MessagingRegistration,
 } from "../messaging-registration";
 
-import type { QueryHandler, QueryHandlerMetadata, QueryType } from "./queries";
+import { type QueryHandler, type QueryHandlerMetadata, type QueryType } from "./queries";
 import { QUERY_HANDLER_METADATA, QUERY_METADATA_KEY } from "./queries-registry";
 import { QueryBus } from "./query-bus";
 

@@ -1,8 +1,8 @@
 import { Container } from "../container/container";
 
 import {
+  type InternalErrorDescriptor,
   defaultInternalErrorHandler,
-  InternalErrorDescriptor,
   reportWirestateInternalError,
 } from "./internal-error-handler";
 

@@ -1,15 +1,15 @@
-import type { Container } from "../../container/container";
-import type { Newable, Optional } from "../../types/general";
+import { type Container } from "../../container/container";
+import { type Newable, type Optional } from "../../types/general";
 import { CommandBus } from "../commands/command-bus";
 import { EventBus } from "../events/event-bus";
-import type { WireEvent } from "../events/events";
+import { type WireEvent } from "../events/events";
 import { QueryBus } from "../queries/query-bus";
 
-import type {
-  DevtoolsMessage,
-  DevtoolsMessageChannel,
-  DevtoolsMessageResult,
-  DevtoolsRegistration,
+import {
+  type DevtoolsMessage,
+  type DevtoolsMessageChannel,
+  type DevtoolsMessageResult,
+  type DevtoolsRegistration,
 } from "./devtools-hook.types";
 
 /**

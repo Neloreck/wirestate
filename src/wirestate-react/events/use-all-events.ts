@@ -1,8 +1,8 @@
-import { Container, EventBus, EventHandler } from "@wirestate/core";
-import { RefObject, useRef } from "react";
+import { type Container, type EventHandler, EventBus } from "@wirestate/core";
+import { type RefObject, useRef } from "react";
 
 import { useContainer } from "../context/use-container";
-import { Maybe } from "../types/general";
+import { type Maybe } from "../types/general";
 import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect";
 
 /**

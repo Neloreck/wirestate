@@ -1,5 +1,5 @@
 import { createContext } from "@lit/context";
-import { Container } from "@wirestate/core";
+import { type Container } from "@wirestate/core";
 
 /**
  * Unique symbol used as a key for the IoC context.

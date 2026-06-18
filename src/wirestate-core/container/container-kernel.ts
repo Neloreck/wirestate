@@ -1,16 +1,16 @@
 import { getActivationAdapter } from "../activation/activation-adapter";
-import type { BindingDescriptor, ServiceToken } from "../binding/binding";
+import { type BindingDescriptor, type ServiceToken } from "../binding/binding";
 import { isInstanceDescriptor } from "../binding/binding-guards";
 import { getBindingScope } from "../binding/binding-lifecycle";
 import { tokenToString } from "../binding/binding-tokens";
 import { validateBinding } from "../binding/binding-validation";
 import { ERROR_CODE_NO_BINDING_FOUND } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import type { Optional, Newable } from "../types/general";
+import { type Optional, type Newable } from "../types/general";
 
 import { injectionContext } from "./container-context";
 import { Factory } from "./container-factory";
-import { ActivationRecord, BindingMap, InstanceMap } from "./container-storage";
+import { type ActivationRecord, type BindingMap, type InstanceMap } from "./container-storage";
 
 /**
  * Internal dependency injection (DI) engine: tracks bindings and holds the
