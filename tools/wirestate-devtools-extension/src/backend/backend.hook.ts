@@ -1,4 +1,5 @@
 import {
+  DEVTOOLS_HOOK_KEY,
   type DevtoolsContainerId,
   type DevtoolsEvent,
   type DevtoolsHook,
@@ -9,7 +10,7 @@ import {
   type DevtoolsRootRegister,
 } from "@wirestate/core/devtools";
 
-import { FALLBACK_PROTOCOL_VERSION, HOOK_KEY } from "@/backend/backend.config";
+import { FALLBACK_PROTOCOL_VERSION } from "@/backend/backend.config";
 import { type Optional } from "@/types/general";
 
 /**
@@ -96,7 +97,7 @@ class BackendHookHost implements DevtoolsHook {
  */
 export function ensureHook(): DevtoolsHook {
   const host: Record<string, unknown> = globalThis as Record<string, unknown>;
-  const existing: Optional<DevtoolsHook> = host[HOOK_KEY] as Optional<DevtoolsHook>;
+  const existing: Optional<DevtoolsHook> = host[DEVTOOLS_HOOK_KEY] as Optional<DevtoolsHook>;
 
   if (existing) {
     return existing;
@@ -104,7 +105,7 @@ export function ensureHook(): DevtoolsHook {
 
   const hook: DevtoolsHook = new BackendHookHost();
 
-  host[HOOK_KEY] = hook;
+  host[DEVTOOLS_HOOK_KEY] = hook;
 
   return hook;
 }
