@@ -1,5 +1,5 @@
-import { type ServiceToken } from "../binding/binding";
-import { type Container } from "../container/container";
+import type { ServiceToken } from "../binding/binding";
+import type { Container } from "../container/container";
 
 /**
  * A container lifecycle plugin.

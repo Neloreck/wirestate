@@ -1,6 +1,6 @@
-import { type ContainerKernel } from "../container/container-kernel";
-import { type ActivationRecord } from "../container/container-storage";
-import { type Optional, type Maybe } from "../types/general";
+import type { ContainerKernel } from "../container/container-kernel";
+import type { ActivationRecord } from "../container/container-storage";
+import type { Optional, Maybe } from "../types/general";
 
 /**
  * Participates in the full instance lifecycle for one container.

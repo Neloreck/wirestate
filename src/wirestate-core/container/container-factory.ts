@@ -1,10 +1,10 @@
-import { type BindingDescriptor } from "../binding/binding";
+import type { BindingDescriptor } from "../binding/binding";
 import { isFactoryDescriptor, isInstanceDescriptor, isValueDescriptor } from "../binding/binding-guards";
 import { tokenToString } from "../binding/binding-tokens";
 import { ERROR_CODE_CIRCULAR_DEPENDENCY } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 
-import { type ContainerKernel } from "./container-kernel";
+import type { ContainerKernel } from "./container-kernel";
 
 /**
  * Constructs values for binding descriptors, tracking the chain of descriptors

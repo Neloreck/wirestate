@@ -1,9 +1,9 @@
-import { type ServiceToken } from "../binding/binding";
+import type { ServiceToken } from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 
-import { type ContainerConfig } from "./container";
+import type { ContainerConfig } from "./container";
 
 /**
  * Checks a container config before creating a container.
