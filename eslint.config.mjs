@@ -59,16 +59,6 @@ export default [
         { prefer: "type-imports", fixStyle: "inline-type-imports" },
       ],
       "import/no-duplicates": ["error", { "prefer-inline": true }],
-      // Forbid the standalone `import type { ... }` form everywhere; the inline `import { type X }`
-      // group is the one allowed style. (The src override repeats this alongside its own selectors,
-      // since a flat-config rule is replaced wholesale per file, not merged.)
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector: "ImportDeclaration[importKind='type']",
-          message: "Use an inline `import { type X }` instead of a standalone `import type { ... }` statement.",
-        },
-      ],
       "react/prop-types": "off",
       "react/jsx-curly-brace-presence": ["error", { props: "always", children: "ignore" }],
       "import/no-unresolved": "off",
@@ -174,10 +164,6 @@ export default [
       ],
       "no-restricted-syntax": [
         "error",
-        {
-          selector: "ImportDeclaration[importKind='type']",
-          message: "Use an inline `import { type X }` instead of a standalone `import type { ... }` statement.",
-        },
         {
           selector: "TSUnionType > TSNullKeyword",
           message: "Use the Nullable<T> (or Maybe<T>) alias instead of an inline `| null` union.",
