@@ -33,6 +33,7 @@ export {
   type DevtoolsMessageEvent,
   type DevtoolsMessageResult,
   type DevtoolsMessageResultEvent,
+  type DevtoolsMethod,
   type DevtoolsPluginInfo,
   type DevtoolsRegistration,
   type DevtoolsRegistrationEvent,

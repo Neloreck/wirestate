@@ -30,6 +30,7 @@ describe("Library exported API from wirestate-core/devtools", () => {
         "DevtoolsMessageEvent",
         "DevtoolsMessageResult",
         "DevtoolsMessageResultEvent",
+        "DevtoolsMethod",
         "DevtoolsPluginInfo",
         "DevtoolsRegistration",
         "DevtoolsRegistrationEvent",

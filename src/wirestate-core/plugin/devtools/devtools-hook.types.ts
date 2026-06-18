@@ -6,6 +6,7 @@ import { type Nullable, type Optional } from "../../types/general";
  * @group DevTools
  */
 export type DevtoolsRootId = number;
+
 /**
  * Identifier for one container within a root's subtree. Stable for a container's
  * lifetime and shared across roots that observe the same container.
@@ -13,6 +14,7 @@ export type DevtoolsRootId = number;
  * @group DevTools
  */
 export type DevtoolsContainerId = number;
+
 /**
  * Identifier for one service instance. Stable for the instance's lifetime and unique within (and
  * across) containers. The target of on-demand inspection and the key for exact event↔instance
@@ -121,6 +123,28 @@ export interface DevtoolsHandler {
 }
 
 /**
+ * A method declared on a service instance's class (or an inherited base class).
+ *
+ * @remarks
+ * Enumerated from the instance's prototype chain — accessors, statics, the constructor, and
+ * arrow-function instance fields are excluded. The inspector cross-references {@link DevtoolsHandler}
+ * to mark which methods are message handlers.
+ *
+ * @group DevTools
+ */
+export interface DevtoolsMethod {
+  /**
+   * Method name.
+   */
+  readonly name: string;
+
+  /**
+   * Declared parameter count (`Function.length` — params before the first default/rest).
+   */
+  readonly arity: number;
+}
+
+/**
  * Normalized description of one active service instance.
  *
  * @group DevTools
@@ -151,6 +175,11 @@ export interface DevtoolsInstance {
    * Message handlers/subscribers this instance declares (decorated handlers only).
    */
   readonly handlers: ReadonlyArray<DevtoolsHandler>;
+
+  /**
+   * Methods declared on the instance's class and its base classes.
+   */
+  readonly methods: ReadonlyArray<DevtoolsMethod>;
 }
 
 /**

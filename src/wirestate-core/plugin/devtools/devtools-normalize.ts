@@ -15,6 +15,7 @@ import {
   type DevtoolsInstance,
   type DevtoolsInstanceId,
   type DevtoolsInstanceStatus,
+  type DevtoolsMethod,
   type DevtoolsPluginInfo,
   type DevtoolsToken,
 } from "./devtools-hook.types";
@@ -89,6 +90,7 @@ export function normalizeInstance(instance: object, instanceId: DevtoolsInstance
     className: instance.constructor.name,
     status: readStatus(instance),
     handlers: normalizeHandlers(instance),
+    methods: normalizeMethods(instance),
   };
 }
 
@@ -118,6 +120,40 @@ function normalizeHandlers(instance: object): ReadonlyArray<DevtoolsHandler> {
   }
 
   return handlers;
+}
+
+/**
+ * Enumerates the methods declared on a service instance's class and its base classes.
+ *
+ * @param instance - Service instance to inspect.
+ * @returns The declared methods (name + arity), in prototype-walk order.
+ */
+function normalizeMethods(instance: object): ReadonlyArray<DevtoolsMethod> {
+  const methods: Array<DevtoolsMethod> = [];
+  const seen: Set<string> = new Set();
+
+  let prototype: Optional<object> = Object.getPrototypeOf(instance) as Optional<object>;
+
+  while (prototype && prototype !== Object.prototype) {
+    for (const name of Object.getOwnPropertyNames(prototype)) {
+      if (name === "constructor" || seen.has(name)) {
+        continue;
+      }
+
+      // Mark the name seen even for accessors/non-functions, so a base method it shadows is skipped.
+      seen.add(name);
+
+      const descriptor: Optional<PropertyDescriptor> = Object.getOwnPropertyDescriptor(prototype, name);
+
+      if (descriptor && typeof descriptor.value === "function") {
+        methods.push({ name, arity: (descriptor.value as (...args: ReadonlyArray<unknown>) => unknown).length });
+      }
+    }
+
+    prototype = Object.getPrototypeOf(prototype) as Optional<object>;
+  }
+
+  return methods;
 }
 
 /**
