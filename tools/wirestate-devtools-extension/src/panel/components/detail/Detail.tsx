@@ -36,11 +36,7 @@ export function Detail({ roots, log, selection, actions, inspect }: DetailProps)
 
   function body() {
     if (!selection) {
-      return (
-        <p className={"text-fg-muted"}>
-          Select a container, instance, binding, or plugin in the Navigator.
-        </p>
-      );
+      return <p className={"text-fg-muted"}>Select a container, instance, binding, or plugin in the Navigator.</p>;
     }
 
     if (resolved) {

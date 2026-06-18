@@ -31,8 +31,7 @@ export function TimelineRow({ event, count, actions, result, baseline }: Timelin
   const [open, setOpen] = useState(false);
   const expandable: boolean = event.kind === "message";
   const timestamp: Optional<number> = timestampOf(event);
-  const delta: Optional<number> =
-    timestamp !== undefined && baseline !== undefined ? timestamp - baseline : undefined;
+  const delta: Optional<number> = timestamp !== undefined && baseline !== undefined ? timestamp - baseline : undefined;
 
   return (
     <div className={"border-b border-divider-subtle"}>
@@ -53,9 +52,7 @@ export function TimelineRow({ event, count, actions, result, baseline }: Timelin
             onSelectInstance={(containerId, className) => actions.select({ kind: "instance", containerId, className })}
           />
         </span>
-        {count > 1 ? (
-          <span className={"rounded bg-selected px-1 text-[10px]"}>×{count}</span>
-        ) : null}
+        {count > 1 ? <span className={"rounded bg-selected px-1 text-[10px]"}>×{count}</span> : null}
         <button
           type={"button"}
           title={"Select this container"}
@@ -70,11 +67,7 @@ export function TimelineRow({ event, count, actions, result, baseline }: Timelin
       </div>
 
       {open && event.kind === "message" ? (
-        <pre
-          className={
-            "overflow-auto bg-elevated px-2.5 py-1 text-[11px] text-fg"
-          }
-        >
+        <pre className={"overflow-auto bg-elevated px-2.5 py-1 text-[11px] text-fg"}>
           {messageDetail(event, result)}
         </pre>
       ) : null}

@@ -60,9 +60,7 @@ export function Timeline({ events, roots, containerIds, filter, ui, actions, onC
       />
       <div ref={scrollRef} className={"flex-1 overflow-auto"}>
         {rows.length === 0 ? (
-          <p className={"p-2 text-fg-muted"}>
-            No deltas match the current filter — interact with the page.
-          </p>
+          <p className={"p-2 text-fg-muted"}>No deltas match the current filter — interact with the page.</p>
         ) : (
           rows.map((row, index) => (
             <TimelineRow

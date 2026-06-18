@@ -19,11 +19,7 @@ interface TimelineFiltersProps {
 /** The Timeline's filter + control bar. */
 export function TimelineFilters({ roots, containerIds, filter, ui, actions, onClear }: TimelineFiltersProps) {
   return (
-    <div
-      className={
-        "flex flex-wrap items-center gap-2 border-b border-divider bg-elevated px-2.5 py-1"
-      }
-    >
+    <div className={"flex flex-wrap items-center gap-2 border-b border-divider bg-elevated px-2.5 py-1"}>
       <select
         className={"rounded border border-divider bg-surface px-1 py-0.5"}
         value={filter.rootId ?? ""}
@@ -53,10 +49,7 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
       </select>
 
       {KINDS.map((kind) => (
-        <label
-          key={kind}
-          className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}
-        >
+        <label key={kind} className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}>
           <input type={"checkbox"} checked={filter.kinds[kind]} onChange={() => actions.toggleKind(kind)} />
           {kind}
         </label>
@@ -65,19 +58,14 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
       <span className={"text-fg-subtle"}>|</span>
 
       {CHANNELS.map((channel) => (
-        <label
-          key={channel}
-          className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}
-        >
+        <label key={channel} className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}>
           <input type={"checkbox"} checked={filter.channels[channel]} onChange={() => actions.toggleChannel(channel)} />
           {channel}
         </label>
       ))}
 
       <input
-        className={
-          "rounded border border-divider bg-surface px-1.5 py-0.5"
-        }
+        className={"rounded border border-divider bg-surface px-1.5 py-0.5"}
         placeholder={"filter…"}
         value={filter.text}
         onChange={(event) => actions.setText(event.target.value)}
@@ -87,13 +75,7 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
 
       <Toggle on={ui.paused} label={ui.paused ? "paused" : "live"} onClick={actions.togglePaused} />
       <Toggle on={ui.autoscroll} label={"autoscroll"} onClick={actions.toggleAutoscroll} />
-      <button
-        type={"button"}
-        onClick={onClear}
-        className={
-          "rounded border border-divider px-2 py-0.5 hover:bg-hover"
-        }
-      >
+      <button type={"button"} onClick={onClear} className={"rounded border border-divider px-2 py-0.5 hover:bg-hover"}>
         clear
       </button>
     </div>
@@ -106,9 +88,7 @@ function Toggle({ on, label, onClick }: { on: boolean; label: string; onClick: (
       type={"button"}
       onClick={onClick}
       className={`rounded border px-2 py-0.5 ${
-        on
-          ? "border-emerald-400 text-emerald-600 dark:text-emerald-400"
-          : "border-divider text-fg-muted"
+        on ? "border-emerald-400 text-emerald-600 dark:text-emerald-400" : "border-divider text-fg-muted"
       }`}
     >
       {label}

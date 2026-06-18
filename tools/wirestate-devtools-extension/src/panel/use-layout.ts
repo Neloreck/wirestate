@@ -40,6 +40,7 @@ export function useLayout(): { layout: PanelLayout; actions: LayoutActions } {
     if (!storage) {
       // No `storage` permission / API unavailable — run session-only rather than crash the panel.
       hydrated.current = true;
+
       return;
     }
 
