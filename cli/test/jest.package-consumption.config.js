@@ -9,7 +9,7 @@ module.exports = {
   testTimeout: 120000,
   modulePathIgnorePatterns: ["<rootDir>/target"],
   transform: {
-    "^.+\\.[t|j]sx?$": ["babel-jest", { configFile: path.resolve(__dirname, "babel.test.config.js") }],
+    "^.+\\.[t|j]sx?$": ["babel-jest", { configFile: path.resolve(__dirname, "babel.e2e.config.js") }],
   },
   transformIgnorePatterns: ["/node_modules/"],
 };

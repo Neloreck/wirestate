@@ -58,8 +58,7 @@
     "@wirestate/react-signals": "1.0.0-experimental.10"
   },
   "peerDependencies": {
-    "react": ">=16.8.0 <20.0.0",
-    "tslib": ">=2.5.0"
+    "react": ">=16.8.0 <20.0.0"
   },
   "optionalDependencies": {
     "@preact/signals-core": ">=1.3.0",

@@ -1,5 +1,28 @@
 const path = require("path");
 
+function swcTransform(decoratorOptions) {
+  return [
+    "@swc/jest",
+    {
+      jsc: {
+        parser: {
+          syntax: "typescript",
+          tsx: true,
+          decorators: true,
+        },
+        transform: {
+          react: { runtime: "automatic" },
+          useDefineForClassFields: false,
+          ...decoratorOptions,
+        },
+        target: "es2022",
+        keepClassNames: true,
+      },
+      module: { type: "commonjs" },
+    },
+  ];
+}
+
 /**
  * Shared project options for both decorator transform modes.
  */
@@ -9,11 +32,30 @@ const shared = {
   roots: ["<rootDir>/cli", "<rootDir>/src"],
   transformIgnorePatterns: ["node_modules/.pnpm/(?!@preact|@lit-labs|@adobe|lit|lit-html|@lit)"],
   testEnvironment: "jsdom",
+  moduleNameMapper: {
+    "^#/(.*)$": "<rootDir>/cli/$1",
+    "^@/fixtures/(.*)$": "<rootDir>/src/fixtures/$1",
+    "^@wirestate/core/devtools$": "<rootDir>/src/wirestate-core/devtools",
+    "^@wirestate/core$": "<rootDir>/src/wirestate-core/index",
+    "^@wirestate/lit$": "<rootDir>/src/wirestate-lit/index",
+    "^@wirestate/lit-mobx$": "<rootDir>/src/wirestate-lit-mobx/index",
+    "^@wirestate/lit-signals$": "<rootDir>/src/wirestate-lit-signals/index",
+    "^@wirestate/mobx$": "<rootDir>/src/wirestate-mobx/index",
+    "^@wirestate/react$": "<rootDir>/src/wirestate-react/index",
+    "^@wirestate/react-mobx$": "<rootDir>/src/wirestate-react-mobx/index",
+    "^@wirestate/react-signals$": "<rootDir>/src/wirestate-react-signals/index",
+    "^@wirestate/signals$": "<rootDir>/src/wirestate-signals/index",
+  },
 };
 
 module.exports = {
   rootDir: path.resolve(__dirname, "../.."),
-  collectCoverage: true,
+  // Default to half the cores locally; CI overrides this with `--maxWorkers=100%`.
+  maxWorkers: "50%",
+  // Coverage is opt-in (`pnpm test:coverage` / CI's `--coverage`), never collected by the default run.
+  // The v8 provider is required: @swc/jest does no Babel pass, so the default Istanbul instrumenter
+  // would report nothing for SWC-transformed files.
+  coverageProvider: "v8",
   coveragePathIgnorePatterns: [
     "/node_modules/",
     "/fixtures/",
@@ -34,7 +76,7 @@ module.exports = {
       displayName: "legacy",
       testPathIgnorePatterns: ["\\.tc39only\\.test\\.[jt]sx?$"],
       transform: {
-        "^.+\\.[t|j]sx?$": ["babel-jest", { configFile: path.resolve(__dirname, "babel.test.config.js") }],
+        "^.+\\.[tj]sx?$": swcTransform({ legacyDecorator: true }),
       },
     },
     {
@@ -44,7 +86,11 @@ module.exports = {
       displayName: "tc39",
       testMatch: ["**/*.tc39.test.ts", "**/*.tc39.test.tsx", "**/*.tc39only.test.ts", "**/*.tc39only.test.tsx"],
       transform: {
-        "^.+\\.[t|j]sx?$": ["babel-jest", { configFile: path.resolve(__dirname, "babel.tc39.config.js") }],
+        "\\.tc39only\\.test\\.[tj]sx?$": [
+          "babel-jest",
+          { configFile: path.resolve(__dirname, "babel.tc39.config.js") },
+        ],
+        "^.+\\.[tj]sx?$": swcTransform({ legacyDecorator: false, decoratorVersion: "2023-11" }),
       },
     },
   ],

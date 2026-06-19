@@ -46,25 +46,42 @@ function sorted(names: Iterable<string>): Array<string> {
   return Array.from(new Set(names)).sort();
 }
 
-// Every export the type system sees for `entryPath` — values *and* type-only names. A scoped
-// `Program` lazily pulls just this entry's reachable import graph; we never run a diagnostics pass,
-// so this stays cheap.
-function fullExportsOf(entryPath: string): Array<string> {
-  const program = ts.createProgram([entryPath], compilerOptions());
+// A shared compiler host + the previous program let each `createProgram` call reuse already-parsed
+// source files (passed as `oldProgram`) instead of re-parsing the whole import graph every time. This
+// matters for the aggregator barrels, whose graph spans the entire library.
+let compilerHost: ts.CompilerHost | undefined;
+let priorProgram: ts.Program | undefined;
+
+function createProgram(rootNames: Array<string>): ts.Program {
+  const options = compilerOptions();
+
+  compilerHost ??= ts.createCompilerHost(options);
+  priorProgram = ts.createProgram(rootNames, options, compilerHost, priorProgram);
+
+  return priorProgram;
+}
+
+// Every export the type system sees for `filePath` — values *and* type-only names. No diagnostics
+// pass is run, so this stays cheap.
+function exportsOfModule(program: ts.Program, filePath: string): Array<string> {
   const checker = program.getTypeChecker();
-  const source = program.getSourceFile(entryPath);
+  const source = program.getSourceFile(filePath);
 
   if (!source) {
-    throw new Error(`Could not load source file for ${entryPath}`);
+    throw new Error(`Could not load source file for ${filePath}`);
   }
 
   const moduleSymbol = checker.getSymbolAtLocation(source);
 
   if (!moduleSymbol) {
-    throw new Error(`No module symbol for ${entryPath} — is it a module (does it export anything)?`);
+    throw new Error(`No module symbol for ${filePath} — is it a module (does it export anything)?`);
   }
 
   return sorted(checker.getExportsOfModule(moduleSymbol).map((symbol) => symbol.name));
+}
+
+function fullExportsOf(entryPath: string): Array<string> {
+  return exportsOfModule(createProgram([entryPath]), entryPath);
 }
 
 // The names actually present on the emitted module at runtime — i.e. the value exports.
@@ -126,9 +143,13 @@ export function assertExportedApi(entryPath: string, expected: ExpectedExports):
 // forwards its children faithfully: its full and runtime surfaces equal the union of the children's.
 // No curated list to drift — when a child gains an export, the barrel follows automatically.
 export function assertAggregatedApi(entryPath: string, childPaths: Array<string>): void {
-  const childFull = sorted(childPaths.flatMap(fullExportsOf));
+  // One program covering the barrel and all of its children — the children already sit in the barrel's
+  // import graph, so a single parse serves every `exportsOfModule` query below.
+  const program = createProgram([entryPath, ...childPaths]);
+
+  const childFull = sorted(childPaths.flatMap((childPath) => exportsOfModule(program, childPath)));
   const childRuntime = sorted(childPaths.flatMap(runtimeExportsOf));
 
-  expect(fullExportsOf(entryPath)).toEqual(childFull);
+  expect(exportsOfModule(program, entryPath)).toEqual(childFull);
   expect(runtimeExportsOf(entryPath)).toEqual(childRuntime);
 }
