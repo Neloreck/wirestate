@@ -39,7 +39,7 @@ jobs:
 
       - run: pnpm typecheck
 
-      - run: pnpm test -- --maxWorkers=100%
+      - run: pnpm test --maxWorkers=100%
 
       - run: pnpm build:dts
 
