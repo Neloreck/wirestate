@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus } from "@wirestate/core";
 

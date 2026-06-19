@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { render } from "@testing-library/react";
 import { type Newable, Container, Injectable } from "@wirestate/core";
 

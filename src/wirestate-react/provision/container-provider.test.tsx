@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { render } from "@testing-library/react";
 import { type ContainerConfig, BindingType, Container, EventBus } from "@wirestate/core";
 import { StrictMode } from "react";

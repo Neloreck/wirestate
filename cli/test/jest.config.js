@@ -31,7 +31,7 @@ const shared = {
   rootDir: path.resolve(__dirname, "../.."),
   roots: ["<rootDir>/cli", "<rootDir>/src"],
   transformIgnorePatterns: ["node_modules/.pnpm/(?!@preact|@lit-labs|@adobe|lit|lit-html|@lit)"],
-  testEnvironment: "jsdom",
+  testEnvironment: "node",
   moduleNameMapper: {
     "^#/(.*)$": "<rootDir>/cli/$1",
     "^@/fixtures/(.*)$": "<rootDir>/src/fixtures/$1",
@@ -52,6 +52,8 @@ module.exports = {
   rootDir: path.resolve(__dirname, "../.."),
   // Default to half the cores locally; CI overrides this with `--maxWorkers=100%`.
   maxWorkers: "50%",
+  // Emit GitHub Actions annotations when running in CI:
+  reporters: ["default", ...(process.env.GITHUB_ACTIONS ? [["github-actions", { silent: false }]] : [])],
   // Coverage is opt-in (`pnpm test:coverage` / CI's `--coverage`), never collected by the default run.
   // The v8 provider is required: @swc/jest does no Babel pass, so the default Istanbul instrumenter
   // would report nothing for SWC-transformed files.

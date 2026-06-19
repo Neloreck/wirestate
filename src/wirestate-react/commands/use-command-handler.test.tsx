@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { render, cleanup } from "@testing-library/react";
 import { type CommandHandler, Container, CommandBus } from "@wirestate/core";
 import { useLayoutEffect } from "react";

@@ -76,6 +76,7 @@ export default [
           tags: ["param", "returns"],
         },
       ],
+      "jsdoc/check-tag-names": ["warn", { definedTags: ["jest-environment"] }],
       "jsdoc/require-returns-check": "off",
       "jsdoc/require-jsdoc": "off",
       "jsdoc/require-param-type": "off",

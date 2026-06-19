@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { render, cleanup } from "@testing-library/react";
 import { type ServiceToken, CommandsPlugin, Container, EventsPlugin, QueriesPlugin } from "@wirestate/core";
 

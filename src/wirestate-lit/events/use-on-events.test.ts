@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { ReactiveElement } from "@lit/reactive-element";
 import { EventBus } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
