@@ -62,6 +62,9 @@ export default [
       "react/prop-types": "off",
       "react/jsx-curly-brace-presence": ["error", { props: "always", children: "ignore" }],
       "import/no-unresolved": "off",
+      "import/namespace": "off",
+      "import/named": "off",
+      "import/default": "off",
       "jsdoc/tag-lines": [
         "error",
         "any",
