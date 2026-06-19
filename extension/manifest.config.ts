@@ -15,7 +15,7 @@ export default defineManifest({
   permissions: ["storage"],
   devtools_page: "src/devtools/devtools.html",
   background: {
-    service_worker: "src/bridge/background.ts",
+    service_worker: "src/background/background.ts",
     type: "module",
   },
   content_scripts: [

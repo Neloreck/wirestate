@@ -3,6 +3,9 @@ import { type DevtoolsServiceRef } from "@wirestate/core/devtools";
 import { type InspectNode } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
+// One-level lazy-read caps: a short string preview (the panel drills in by path for more) but a
+// generous key count, since only this single level is materialized per request. Cf. the eager
+// whole-payload caps in backend.dehydrate.ts.
 const MAX_KEYS: number = 100;
 const MAX_STRING: number = 200;
 

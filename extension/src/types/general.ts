@@ -1,8 +1,14 @@
-/** A value that may be absent. */
+/**
+ * A value that may be absent.
+ */
 export type Optional<T> = T | undefined;
 
-/** A value that may be null. */
+/**
+ * A value that may be null.
+ */
 export type Nullable<T> = T | null;
 
-/** A tri-state value: present, empty, or absent. */
+/**
+ * A tri-state value: present, empty, or absent.
+ */
 export type Maybe<T> = T | null | undefined;

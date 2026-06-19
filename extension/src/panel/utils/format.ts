@@ -58,6 +58,38 @@ export function summarize(event: DevtoolsEvent): string {
   }
 }
 
+/** A dehydrated-ref marker decoded into the cases a value renderer must format. */
+type DecodedRef =
+  | { readonly kind: "undefined" }
+  | { readonly kind: "instance"; readonly className: string; readonly value: Record<string, unknown> }
+  | { readonly kind: "text"; readonly text: string };
+
+/**
+ * Decodes a backend {@link DehydratedRef} marker into the case a renderer formats, or `undefined`
+ * when the value is a plain object the renderer should walk itself. The single place that interprets
+ * every `__wsType`, so {@link preview} (single-line) and {@link stringify} (multi-line) can't drift.
+ *
+ * @param value - A non-null object that may carry a `__wsType` marker.
+ * @returns The decoded ref, or `undefined` for a plain object.
+ */
+function decodeRef(value: object): Optional<DecodedRef> {
+  const ref: Partial<DehydratedRef> = value as Partial<DehydratedRef>;
+
+  if (typeof ref.__wsType !== "string") {
+    return undefined;
+  }
+
+  if (ref.__wsType === "undefined") {
+    return { kind: "undefined" };
+  }
+
+  if (ref.__wsType === "instance") {
+    return { kind: "instance", className: ref.className ?? "Object", value: ref.value ?? {} };
+  }
+
+  return { kind: "text", text: ref.preview ?? ref.__wsType };
+}
+
 /**
  * Compact, depth-limited string for a (possibly dehydrated) value.
  *
@@ -92,18 +124,17 @@ export function preview(value: unknown, depth = 0): string {
   }
 
   if (typeof value === "object") {
-    const ref: Partial<DehydratedRef> = value as Partial<DehydratedRef>;
+    const decoded: Optional<DecodedRef> = decodeRef(value);
 
-    if (typeof ref.__wsType === "string") {
-      if (ref.__wsType === "undefined") {
-        return "undefined";
+    if (decoded) {
+      switch (decoded.kind) {
+        case "undefined":
+          return "undefined";
+        case "instance":
+          return `${decoded.className} ${preview(decoded.value, depth + 1)}`;
+        case "text":
+          return decoded.text;
       }
-
-      if (ref.__wsType === "instance") {
-        return `${ref.className ?? "Object"} ${preview(ref.value ?? {}, depth + 1)}`;
-      }
-
-      return ref.preview ?? ref.__wsType;
     }
 
     if (depth > 1) {
@@ -118,6 +149,63 @@ export function preview(value: unknown, depth = 0): string {
       .join(", ");
 
     return `{${head}${keys.length > 5 ? ", …" : ""}}`;
+  }
+
+  return String(value);
+}
+
+/**
+ * Pretty-prints a (possibly dehydrated) value as an indented multi-line block, for the Timeline's
+ * expanded message payload.
+ *
+ * @param value - The value to render.
+ * @param depth - Current indentation depth.
+ * @returns A multi-line, indented string representation of the value.
+ */
+export function stringify(value: unknown, depth = 0): string {
+  const pad: string = "  ".repeat(depth);
+
+  if (value === null) {
+    return "null";
+  }
+
+  if (typeof value === "string") {
+    return JSON.stringify(value);
+  }
+
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return "[]";
+    }
+
+    return `[\n${value.map((item) => `${pad}  ${stringify(item, depth + 1)}`).join(",\n")}\n${pad}]`;
+  }
+
+  if (typeof value === "object") {
+    const decoded: Optional<DecodedRef> = decodeRef(value);
+
+    if (decoded) {
+      switch (decoded.kind) {
+        case "undefined":
+          return "undefined";
+        case "instance":
+          return `${decoded.className} ${stringify(decoded.value, depth)}`;
+        case "text":
+          return decoded.text;
+      }
+    }
+
+    const entries: Array<[string, unknown]> = Object.entries(value as Record<string, unknown>);
+
+    if (entries.length === 0) {
+      return "{}";
+    }
+
+    return `{\n${entries.map(([key, item]) => `${pad}  ${key}: ${stringify(item, depth + 1)}`).join(",\n")}\n${pad}}`;
   }
 
   return String(value);

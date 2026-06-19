@@ -28,3 +28,12 @@ export function LinkButton({ onClick, children }: PropsWithChildren<{ onClick: (
     </button>
   );
 }
+
+/** The "filter the Timeline to this container" cross-link shown at the foot of a Detail view. */
+export function FilterToContainerLink({ onClick }: { onClick: () => void }) {
+  return (
+    <div>
+      <LinkButton onClick={onClick}>⤵ Filter Timeline to this container</LinkButton>
+    </div>
+  );
+}

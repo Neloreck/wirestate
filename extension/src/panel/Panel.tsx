@@ -9,7 +9,7 @@ import { Timeline } from "@/panel/components/timeline/Timeline";
 import { useBridge } from "@/panel/hooks/use-bridge";
 import { useLayout } from "@/panel/hooks/use-layout";
 import { usePanelState } from "@/panel/hooks/use-panel-state";
-import { type RootModel, buildRoots, filterLog } from "@/panel/utils/selectors";
+import { type RootModel, buildMessageResults, buildRoots, filterLog } from "@/panel/utils/selectors";
 
 /** The inspector panel: master–detail (Navigator + Detail) over a collapsible, cross-linked Timeline. */
 export function Panel() {
@@ -28,17 +28,10 @@ export function Panel() {
     [roots]
   );
   const filtered: ReadonlyArray<DevtoolsEvent> = useMemo(() => filterLog(log, state.filter), [log, state.filter]);
-  const messageResults: ReadonlyMap<number, DevtoolsMessageResultEvent> = useMemo(() => {
-    const map: Map<number, DevtoolsMessageResultEvent> = new Map();
-
-    for (const event of log) {
-      if (event.kind === "messageResult") {
-        map.set(event.messageId, event);
-      }
-    }
-
-    return map;
-  }, [log]);
+  const messageResults: ReadonlyMap<number, DevtoolsMessageResultEvent> = useMemo(
+    () => buildMessageResults(log),
+    [log]
+  );
   const containerCount: number = roots.reduce((total, root) => total + root.containers.length, 0);
 
   return (

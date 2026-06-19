@@ -8,7 +8,7 @@ import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { childContainers, lifecycleHistory } from "@/panel/utils/selectors";
 
 import { History } from "./History";
-import { Field, LinkButton, Section } from "./parts";
+import { Field, FilterToContainerLink, LinkButton, Section } from "./parts";
 
 interface ContainerDetailProps {
   readonly container: DevtoolsContainerSnapshot;
@@ -119,11 +119,7 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
         />
       </Section>
 
-      <div>
-        <LinkButton onClick={() => actions.setContainerFilter(container.containerId)}>
-          ⤵ Filter Timeline to this container
-        </LinkButton>
-      </div>
+      <FilterToContainerLink onClick={() => actions.setContainerFilter(container.containerId)} />
     </div>
   );
 }

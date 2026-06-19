@@ -12,6 +12,9 @@ import { type Optional } from "@/types/general";
  * is deferred (ADR 0011 vNext), to be designed from felt need.
  */
 
+// Eager whole-payload caps: strings stay long (the payload is the data you want to read) while
+// depth and breadth are bounded, since the entire graph is serialized in one pass. The on-demand
+// inspect path (backend.inspect.ts) previews one level lazily and so caps strings far shorter.
 const MAX_DEPTH = 6;
 const MAX_KEYS = 50;
 const MAX_ARRAY = 100;
@@ -70,7 +73,7 @@ function walk(value: unknown, depth: number, seen: WeakSet<object>): unknown {
     case "symbol":
       return { __wsType: "symbol", preview: value.toString() } satisfies DehydratedRef;
     case "function": {
-      const fn: (...args: Array<unknown>) => unknown = value as never;
+      const fn: { name?: string } = value as { name?: string };
 
       return { __wsType: "function", preview: fn.name ? `ƒ ${fn.name}()` : "ƒ ()" } satisfies DehydratedRef;
     }
@@ -92,7 +95,7 @@ function walk(value: unknown, depth: number, seen: WeakSet<object>): unknown {
 
   try {
     if (typeof Node !== "undefined" && object instanceof Node) {
-      const named: { nodeName?: string } = object as never;
+      const named: { nodeName?: string } = object as { nodeName?: string };
 
       return { __wsType: "node", preview: (named.nodeName ?? "Node").toLowerCase() } satisfies DehydratedRef;
     }

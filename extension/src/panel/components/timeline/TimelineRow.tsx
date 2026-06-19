@@ -6,8 +6,9 @@ import {
 import { useState } from "react";
 
 import { EventSummary } from "@/panel/components/EventSummary";
+import { EventTimeCells } from "@/panel/components/EventTimeCells";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { formatClock, formatDelta, timestampOf } from "@/panel/utils/format";
+import { stringify } from "@/panel/utils/format";
 import { type Optional } from "@/types/general";
 
 const TAG_COLOR: Record<DevtoolsEvent["kind"], string> = {
@@ -30,8 +31,6 @@ interface TimelineRowProps {
 export function TimelineRow({ event, count, actions, result, baseline }: TimelineRowProps) {
   const [open, setOpen] = useState(false);
   const expandable: boolean = event.kind === "message";
-  const timestamp: Optional<number> = timestampOf(event);
-  const delta: Optional<number> = timestamp !== undefined && baseline !== undefined ? timestamp - baseline : undefined;
 
   return (
     <div className={"border-b border-divider-subtle"}>
@@ -39,12 +38,7 @@ export function TimelineRow({ event, count, actions, result, baseline }: Timelin
         className={`flex items-center gap-2 px-2.5 py-0.5 ${expandable ? "cursor-pointer" : ""}`}
         onClick={expandable ? () => setOpen((value) => !value) : undefined}
       >
-        <span className={"w-[88px] shrink-0 text-fg-subtle tabular-nums"}>
-          {timestamp === undefined ? "" : formatClock(timestamp)}
-        </span>
-        <span className={"w-[56px] shrink-0 text-fg-muted tabular-nums"}>
-          {delta === undefined ? "" : formatDelta(delta)}
-        </span>
+        <EventTimeCells event={event} baseline={baseline} />
         <span className={`min-w-[84px] shrink-0 ${TAG_COLOR[event.kind]}`}>{event.kind}</span>
         <span className={"flex-1 truncate"}>
           <EventSummary
@@ -81,67 +75,16 @@ function messageDetail(event: DevtoolsMessageEvent, result?: DevtoolsMessageResu
     `type: ${message.type}`,
     `channel: ${message.channel}`,
     `timestamp: ${new Date(message.timestamp).toISOString()}`,
-    `payload: ${stringify(message.payload, 0)}`,
+    `payload: ${stringify(message.payload)}`,
   ];
 
   if (message.source !== undefined) {
-    lines.push(`source: ${stringify(message.source, 0)}`);
+    lines.push(`source: ${stringify(message.source)}`);
   }
 
   if (result) {
-    lines.push(`result (${result.outcome}): ${stringify(result.value, 0)}`);
+    lines.push(`result (${result.outcome}): ${stringify(result.value)}`);
   }
 
   return lines.join("\n");
-}
-
-/** Pretty-prints a (possibly dehydrated) value as an indented block. */
-function stringify(value: unknown, depth: number): string {
-  const pad: string = "  ".repeat(depth);
-
-  if (value === null) {
-    return "null";
-  }
-
-  if (typeof value === "string") {
-    return JSON.stringify(value);
-  }
-
-  if (typeof value === "number" || typeof value === "boolean") {
-    return String(value);
-  }
-
-  if (Array.isArray(value)) {
-    if (value.length === 0) {
-      return "[]";
-    }
-
-    return `[\n${value.map((item) => `${pad}  ${stringify(item, depth + 1)}`).join(",\n")}\n${pad}]`;
-  }
-
-  if (typeof value === "object") {
-    const ref = value as { __wsType?: string; preview?: string; className?: string; value?: Record<string, unknown> };
-
-    if (typeof ref.__wsType === "string") {
-      if (ref.__wsType === "undefined") {
-        return "undefined";
-      }
-
-      if (ref.__wsType === "instance") {
-        return `${ref.className ?? "Object"} ${stringify(ref.value ?? {}, depth)}`;
-      }
-
-      return ref.preview ?? ref.__wsType;
-    }
-
-    const entries: Array<[string, unknown]> = Object.entries(value as Record<string, unknown>);
-
-    if (entries.length === 0) {
-      return "{}";
-    }
-
-    return `{\n${entries.map(([key, item]) => `${pad}  ${key}: ${stringify(item, depth + 1)}`).join(",\n")}\n${pad}}`;
-  }
-
-  return String(value);
 }

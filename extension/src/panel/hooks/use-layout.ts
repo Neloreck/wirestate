@@ -29,6 +29,8 @@ export interface LayoutActions {
  * DEFAULTS and snaps once when storage resolves. Save is a separate effect gated on `hydrated`, so
  * the initial default render never clobbers a saved layout before the load lands. Actions are pure
  * functional updaters — no I/O in the reducer path — keeping the effect the single writer.
+ *
+ * @returns Todo;.
  */
 export function useLayout(): { layout: PanelLayout; actions: LayoutActions } {
   const [layout, setLayout] = useState<PanelLayout>(DEFAULTS);

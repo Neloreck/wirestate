@@ -1,6 +1,5 @@
-import { type DevtoolsEvent } from "@wirestate/core/devtools";
+import { DEVTOOLS_PROTOCOL_VERSION, type DevtoolsEvent } from "@wirestate/core/devtools";
 
-import { FALLBACK_PROTOCOL_VERSION } from "@/backend/backend.config";
 import { post } from "@/backend/backend.messaging";
 import { BACKEND_BUFFER, BACKEND_HOOK } from "@/backend/backend.state";
 import { getRootsSnapshot, inspectAt, record } from "@/backend/backend.utils";
@@ -28,7 +27,7 @@ window.addEventListener("message", (messageEvent: MessageEvent): void => {
   if (request.type === "attach") {
     post({
       type: "init",
-      protocolVersion: BACKEND_HOOK.protocolVersion ?? FALLBACK_PROTOCOL_VERSION,
+      protocolVersion: BACKEND_HOOK.protocolVersion ?? DEVTOOLS_PROTOCOL_VERSION,
       roots: getRootsSnapshot(),
       events: [...BACKEND_BUFFER],
     });

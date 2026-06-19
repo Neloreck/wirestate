@@ -13,8 +13,6 @@ chrome.devtools.panels.setThemeChangeHandler((theme) =>
 
 const container: Maybe<HTMLElement> = document.getElementById("root");
 
-console.warn(container);
-
 if (container) {
   // No StrictMode here on purpose: we don't want the panel's own double-invoked effects churning the bridge connection.
   createRoot(container).render(<Panel />);

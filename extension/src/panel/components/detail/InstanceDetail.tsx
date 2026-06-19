@@ -8,11 +8,11 @@ import {
 
 import { type InspectFn } from "@/bridge/bridge.messages";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { lifecycleHistory } from "@/panel/utils/selectors";
+import { lifecycleHistory, rootIdOfContainer } from "@/panel/utils/selectors";
 import { type Optional } from "@/types/general";
 
 import { History } from "./History";
-import { Field, LinkButton, Section } from "./parts";
+import { Field, FilterToContainerLink, Section } from "./parts";
 import { StateTree } from "./StateTree";
 
 interface InstanceDetailProps {
@@ -31,9 +31,7 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
     className: instance.className,
   });
   const status = instance.status;
-  const rootId: Optional<number> = roots.find((root) =>
-    root.containers.some((entry) => entry.containerId === container.containerId)
-  )?.rootId;
+  const rootId: Optional<number> = rootIdOfContainer(roots, container.containerId);
 
   // Older cores predate `methods`; treat absence as empty. Map each handler method to its channel(s)
   // so the methods list can badge the ones wired to the message stream.
@@ -72,7 +70,7 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
 
       <Section title={`declared handlers (${instance.handlers.length})`}>
         {instance.handlers.length === 0 ? (
-          <span className={"text-fg-muted"}>none</span>
+          <span className={"text-fg-muted"}>—</span>
         ) : (
           instance.handlers.map((handler, index) => (
             <div key={index}>
@@ -85,7 +83,7 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
 
       <Section title={`methods (${methods.length})`}>
         {methods.length === 0 ? (
-          <span className={"text-fg-muted"}>none</span>
+          <span className={"text-fg-muted"}>—</span>
         ) : (
           methods.map((method) => {
             const channels: Optional<Set<string>> = handlerChannels.get(method.name);
@@ -119,11 +117,7 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
         />
       </Section>
 
-      <div>
-        <LinkButton onClick={() => actions.setContainerFilter(container.containerId)}>
-          ⤵ Filter Timeline to this container
-        </LinkButton>
-      </div>
+      <FilterToContainerLink onClick={() => actions.setContainerFilter(container.containerId)} />
     </div>
   );
 }

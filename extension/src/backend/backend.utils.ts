@@ -1,11 +1,11 @@
-import type { DevtoolsEvent, DevtoolsRoot, DevtoolsRootSnapshot } from "@wirestate/core/devtools";
+import { type DevtoolsEvent, type DevtoolsRoot, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
 
 import { BACKEND_BUFFER_SIZE } from "@/backend/backend.config";
 import { dehydrate } from "@/backend/backend.dehydrate";
 import { describeNode, serviceNode } from "@/backend/backend.inspect";
 import { BACKEND_BUFFER, BACKEND_HOOK } from "@/backend/backend.state";
-import type { InspectNode } from "@/bridge/bridge.messages";
-import type { Maybe } from "@/types/general";
+import { type InspectNode } from "@/bridge/bridge.messages";
+import { type Maybe } from "@/types/general";
 
 export function getRootsSnapshot(): ReadonlyArray<DevtoolsRootSnapshot> {
   return BACKEND_HOOK.getRoots().map((root) => root.snapshot());

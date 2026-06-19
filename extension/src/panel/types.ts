@@ -24,8 +24,9 @@ export interface TimelineFilter {
 /**
  * True when two selections point at the same entity (used to detect a survived selection).
  *
- * @param a
- * @param b
+ * @param a - First selection.
+ * @param b - Second selection.
+ * @returns Todo;.
  */
 export function isSameSelection(a: Selection, b: Selection): boolean {
   if (a.kind !== b.kind || a.containerId !== b.containerId) {
@@ -34,12 +35,12 @@ export function isSameSelection(a: Selection, b: Selection): boolean {
 
   switch (a.kind) {
     case "instance":
-      return a.className === (b as { className: string }).className;
+      return b.kind === "instance" && a.className === b.className;
     case "binding":
-      return a.token === (b as { token: string }).token;
+      return b.kind === "binding" && a.token === b.token;
     case "plugin":
-      return a.name === (b as { name: string }).name;
-    default:
+      return b.kind === "plugin" && a.name === b.name;
+    case "container":
       return true;
   }
 }

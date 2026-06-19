@@ -4,6 +4,7 @@ import {
   type DevtoolsEvent,
   type DevtoolsInstance,
   type DevtoolsMessageChannel,
+  type DevtoolsMessageResultEvent,
   type DevtoolsPluginInfo,
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
@@ -36,7 +37,8 @@ export type ResolvedEntity =
 /**
  * Nests each root's flat container list into a forest by `parentContainerId`.
  *
- * @param roots
+ * @param roots - The flat root snapshots from the devtools hook.
+ * @returns One model per root, each with a derived label and its top-level container nodes.
  */
 export function buildRoots(roots: ReadonlyArray<DevtoolsRootSnapshot>): ReadonlyArray<RootModel> {
   return roots.map((root) => {
@@ -68,7 +70,8 @@ export function buildRoots(roots: ReadonlyArray<DevtoolsRootSnapshot>): Readonly
 /**
  * Derives a human hint for a root, which v1 identifies only by a numeric id.
  *
- * @param root
+ * @param root - The root snapshot to label.
+ * @returns A short label combining the root id, container count, and first class names.
  */
 function rootLabel(root: DevtoolsRootSnapshot): string {
   const count: number = root.containers.length;
@@ -83,8 +86,9 @@ function rootLabel(root: DevtoolsRootSnapshot): string {
 /**
  * Finds a container by id across all roots.
  *
- * @param roots
- * @param containerId
+ * @param roots - The root snapshots to search.
+ * @param containerId - The container id to find.
+ * @returns The matching container snapshot, or `undefined` when none has that id.
  */
 export function findContainer(
   roots: ReadonlyArray<DevtoolsRootSnapshot>,
@@ -102,10 +106,22 @@ export function findContainer(
 }
 
 /**
+ * The id of the root whose observed set contains the given container, or `undefined`.
+ *
+ * @param roots - The root snapshots to search.
+ * @param containerId - The container id to locate.
+ * @returns The owning root's id, or `undefined` when no root observes the container.
+ */
+export function rootIdOfContainer(roots: ReadonlyArray<DevtoolsRootSnapshot>, containerId: number): Optional<number> {
+  return roots.find((root) => root.containers.some((container) => container.containerId === containerId))?.rootId;
+}
+
+/**
  * Resolves a selection to a live entity, or `undefined` when it is no longer in the snapshot.
  *
- * @param roots
- * @param selection
+ * @param roots - The current root snapshots.
+ * @param selection - The Navigator selection to resolve.
+ * @returns The resolved entity, or `undefined` when the selection is no longer live.
  */
 export function resolveSelection(
   roots: ReadonlyArray<DevtoolsRootSnapshot>,
@@ -147,8 +163,9 @@ export function resolveSelection(
 /**
  * Containers whose parent is the given container (derived child links).
  *
- * @param roots
- * @param containerId
+ * @param roots - The root snapshots to search.
+ * @param containerId - The parent container id.
+ * @returns The direct child containers, in observed order.
  */
 export function childContainers(
   roots: ReadonlyArray<DevtoolsRootSnapshot>,
@@ -183,8 +200,9 @@ export function mayRealizeInstance(binding: DevtoolsBinding): boolean {
 /**
  * The instance that realizes a binding, if one is active in the same container.
  *
- * @param container
- * @param binding
+ * @param container - The container whose active instances to search.
+ * @param binding - The binding to resolve to an instance.
+ * @returns The realizing instance, or `undefined` when none is active.
  */
 export function realizingInstance(
   container: DevtoolsContainerSnapshot,
@@ -200,7 +218,8 @@ export function realizingInstance(
 /**
  * The channel a delta flowed through, or `undefined` for lifecycle deltas.
  *
- * @param event
+ * @param event - The devtools delta to read.
+ * @returns The message/registration channel, or `undefined` for a lifecycle delta.
  */
 export function channelOf(event: DevtoolsEvent): Optional<DevtoolsMessageChannel> {
   if (event.kind === "message") {
@@ -220,11 +239,12 @@ export function channelOf(event: DevtoolsEvent): Optional<DevtoolsMessageChannel
  * predates the instance handle — target and deltas come from the same core, so either both carry
  * ids or neither does).
  *
- * @param log
- * @param containerId
- * @param instance
- * @param instance.instanceId
- * @param instance.className
+ * @param log - The delta buffer to filter.
+ * @param containerId - The container whose lifecycle deltas to keep.
+ * @param instance - Optional instance to narrow to.
+ * @param instance.instanceId - The instance's stable id, preferred when present.
+ * @param instance.className - The instance's class name, used when no id is available.
+ * @returns The matching lifecycle deltas, in arrival order.
  */
 export function lifecycleHistory(
   log: ReadonlyArray<DevtoolsEvent>,
@@ -255,8 +275,9 @@ export function lifecycleHistory(
 /**
  * Applies the Timeline filter to the delta log.
  *
- * @param log
- * @param filter
+ * @param log - The full delta log.
+ * @param filter - The active Timeline filter.
+ * @returns The deltas that pass every filter dimension.
  */
 export function filterLog(log: ReadonlyArray<DevtoolsEvent>, filter: TimelineFilter): ReadonlyArray<DevtoolsEvent> {
   const needle: string = filter.text.trim().toLowerCase();
@@ -287,4 +308,25 @@ export function filterLog(log: ReadonlyArray<DevtoolsEvent>, filter: TimelineFil
 
     return needle === "" || summarize(event).toLowerCase().includes(needle);
   });
+}
+
+/**
+ * Indexes the log's message-result deltas by the id of the message they correlate to, so a message
+ * row can render its result inline. Last result wins when an id repeats.
+ *
+ * @param log - The delta log to index.
+ * @returns A map from message id to its result delta.
+ */
+export function buildMessageResults(
+  log: ReadonlyArray<DevtoolsEvent>
+): ReadonlyMap<number, DevtoolsMessageResultEvent> {
+  const results: Map<number, DevtoolsMessageResultEvent> = new Map();
+
+  for (const event of log) {
+    if (event.kind === "messageResult") {
+      results.set(event.messageId, event);
+    }
+  }
+
+  return results;
 }

@@ -7,6 +7,7 @@ import {
   mockInstance,
   mockLifecycleEvent,
   mockMessageEvent,
+  mockMessageResultEvent,
   mockPluginInfo,
   mockRegistrationEvent,
   mockRootSnapshot,
@@ -14,6 +15,7 @@ import {
 
 import { type TimelineFilter, isSameSelection } from "@/panel/types";
 import {
+  buildMessageResults,
   buildRoots,
   channelOf,
   childContainers,
@@ -22,6 +24,7 @@ import {
   mayRealizeInstance,
   realizingInstance,
   resolveSelection,
+  rootIdOfContainer,
 } from "@/panel/utils/selectors";
 
 const filterWith = (partial: Partial<TimelineFilter> = {}): TimelineFilter => ({
@@ -203,5 +206,46 @@ describe("sameSelection", () => {
     expect(isSameSelection({ kind: "container", containerId: 1 }, { kind: "plugin", containerId: 1, name: "A" })).toBe(
       false
     );
+  });
+});
+
+describe("rootIdOfContainer", () => {
+  const roots = [
+    mockRootSnapshot(1, [mockContainerSnapshot(1, null), mockContainerSnapshot(2, 1)]),
+    mockRootSnapshot(7, [mockContainerSnapshot(3, null)]),
+  ];
+
+  it("returns the rootId owning the container", () => {
+    expect(rootIdOfContainer(roots, 2)).toBe(1);
+    expect(rootIdOfContainer(roots, 3)).toBe(7);
+  });
+
+  it("returns undefined for an unknown container", () => {
+    expect(rootIdOfContainer(roots, 999)).toBeUndefined();
+  });
+});
+
+describe("buildMessageResults", () => {
+  it("indexes messageResult deltas by messageId and ignores other kinds", () => {
+    const results = buildMessageResults([
+      mockMessageEvent({ message: { id: 1, channel: "command", type: "X" } }),
+      mockMessageResultEvent({ messageId: 1, outcome: "resolved", value: 42 }),
+      mockLifecycleEvent({ containerId: 1, phase: "activate" }),
+      mockMessageResultEvent({ messageId: 2, outcome: "rejected" }),
+    ]);
+
+    expect(results.size).toBe(2);
+    expect(results.get(1)?.value).toBe(42);
+    expect(results.get(2)?.outcome).toBe("rejected");
+    expect(results.get(99)).toBeUndefined();
+  });
+
+  it("keeps the last result when a messageId repeats", () => {
+    const results = buildMessageResults([
+      mockMessageResultEvent({ messageId: 1, outcome: "resolved" }),
+      mockMessageResultEvent({ messageId: 1, outcome: "rejected" }),
+    ]);
+
+    expect(results.get(1)?.outcome).toBe("rejected");
   });
 });

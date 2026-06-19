@@ -1,4 +1,4 @@
-import { BRIDGE_SOURCE, CONTENT_PORT, type PageMessage } from "@/bridge/bridge.messages";
+import { BRIDGE_SOURCE, CONTENT_PORT, type PageMessage, type PanelToBackend } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
 /**
@@ -13,8 +13,8 @@ function connect(): void {
   port = chrome.runtime.connect({ name: CONTENT_PORT });
 
   // Background worker (panel) -> backend (MAIN world).
-  port.onMessage.addListener((payload: PageMessage["payload"]): void => {
-    const message: PageMessage = { source: BRIDGE_SOURCE, dir: "to-page", payload } as PageMessage;
+  port.onMessage.addListener((payload: PanelToBackend): void => {
+    const message: PageMessage = { source: BRIDGE_SOURCE, dir: "to-page", payload };
 
     window.postMessage(message, "*");
   });

@@ -1,5 +1,5 @@
 import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
-import { useEffect, useRef } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 
 import { type InspectFn } from "@/bridge/bridge.messages";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
@@ -32,27 +32,23 @@ export function Detail({ roots, log, selection, actions, inspect }: DetailProps)
     }
   });
 
-  return <section className={"flex-1 overflow-auto p-3"}>{body()}</section>;
+  let content: ReactNode;
 
-  function body() {
-    if (!selection) {
-      return <p className={"text-fg-muted"}>Select a container, instance, binding, or plugin in the Navigator.</p>;
-    }
-
-    if (resolved) {
-      return (
-        <>
-          <Breadcrumb resolved={resolved} actions={actions} />
-          <View resolved={resolved} roots={roots} log={log} actions={actions} inspect={inspect} />
-        </>
-      );
-    }
-
+  if (!selection) {
+    content = <p className={"text-fg-muted"}>Select a container, instance, binding, or plugin in the Navigator.</p>;
+  } else if (resolved) {
+    content = (
+      <>
+        <Breadcrumb resolved={resolved} actions={actions} />
+        <View resolved={resolved} roots={roots} log={log} actions={actions} inspect={inspect} />
+      </>
+    );
+  } else {
     // Selection is no longer live → tombstone. Freeze the last-known view (dimmed) if it matches.
     const dead: Optional<ResolvedEntity> =
       cache.current && isSameSelection(cache.current.selection, selection) ? cache.current.resolved : undefined;
 
-    return (
+    content = (
       <div className={"space-y-3"}>
         <div
           className={
@@ -72,6 +68,8 @@ export function Detail({ roots, log, selection, actions, inspect }: DetailProps)
       </div>
     );
   }
+
+  return <section className={"flex-1 overflow-auto p-3"}>{content}</section>;
 }
 
 function Breadcrumb({ resolved, actions }: { resolved: ResolvedEntity; actions: PanelActions }) {
