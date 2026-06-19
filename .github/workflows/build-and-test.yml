@@ -35,7 +35,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - run: pnpm lint
+      - name: Restore ESLint cache
+        uses: actions/cache@v4
+        with:
+          path: .eslintcache
+          key: eslint-${{ hashFiles('eslint.config.mjs', 'pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            eslint-${{ hashFiles('eslint.config.mjs', 'pnpm-lock.yaml') }}-
+
+      - run: pnpm lint --cache
 
       - run: pnpm typecheck
 
