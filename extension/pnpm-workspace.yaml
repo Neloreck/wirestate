@@ -1,6 +1,0 @@
-# Standalone workspace root for the extension prototype, so it stays independent of the
-# library's pnpm workspace (and carries its own build-script allowlist). See ADR 0011 / README.
-packages:
-  - .
-allowBuilds:
-  esbuild: true
