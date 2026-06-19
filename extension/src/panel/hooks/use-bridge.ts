@@ -7,7 +7,7 @@ import {
   type InspectFn,
   type InspectNode,
   type PanelToBackend,
-} from "@/bridge/messages";
+} from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
 const MAX_LOG = 500;

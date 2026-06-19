@@ -1,6 +1,6 @@
 import { type DevtoolsServiceRef } from "@wirestate/core/devtools";
 
-import { type InspectNode } from "@/bridge/messages";
+import { type InspectNode } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
 const MAX_KEYS: number = 100;

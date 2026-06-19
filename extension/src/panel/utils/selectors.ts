@@ -8,8 +8,8 @@ import {
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
 
-import { summarize } from "@/panel/format";
 import { type Selection, type TimelineFilter } from "@/panel/types";
+import { summarize } from "@/panel/utils/format";
 import { type Optional } from "@/types/general";
 
 /** One container plus its nested child containers, for the Navigator tree. */

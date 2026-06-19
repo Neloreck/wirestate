@@ -1,4 +1,4 @@
-import { type BackendToPanel, CONTENT_PORT, PANEL_PORT_PREFIX } from "@/bridge/messages";
+import { type BackendToPanel, CONTENT_PORT, PANEL_PORT_PREFIX } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
 /**

@@ -27,7 +27,7 @@ export interface TimelineFilter {
  * @param a
  * @param b
  */
-export function sameSelection(a: Selection, b: Selection): boolean {
+export function isSameSelection(a: Selection, b: Selection): boolean {
   if (a.kind !== b.kind || a.containerId !== b.containerId) {
     return false;
   }

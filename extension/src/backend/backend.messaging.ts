@@ -1,4 +1,4 @@
-import { type BackendToPanel, BRIDGE_SOURCE } from "@/bridge/messages";
+import { type BackendToPanel, BRIDGE_SOURCE } from "@/bridge/bridge.messages";
 
 /**
  * Posts a message to the panel, wrapped in the bridge envelope the ISOLATED-world relay expects.

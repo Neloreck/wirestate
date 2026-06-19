@@ -6,10 +6,10 @@ import { Navigator } from "@/panel/components/Navigator";
 import { ResizeHandle } from "@/panel/components/ResizeHandle";
 import { StatusBar } from "@/panel/components/StatusBar";
 import { Timeline } from "@/panel/components/timeline/Timeline";
-import { type RootModel, buildRoots, filterLog } from "@/panel/selectors";
-import { useBridge } from "@/panel/use-bridge";
-import { useLayout } from "@/panel/use-layout";
-import { usePanelState } from "@/panel/use-panel-state";
+import { useBridge } from "@/panel/hooks/use-bridge";
+import { useLayout } from "@/panel/hooks/use-layout";
+import { usePanelState } from "@/panel/hooks/use-panel-state";
+import { type RootModel, buildRoots, filterLog } from "@/panel/utils/selectors";
 
 /** The inspector panel: master–detail (Navigator + Detail) over a collapsible, cross-linked Timeline. */
 export function Panel() {

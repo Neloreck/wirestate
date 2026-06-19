@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { mockLifecycleEvent } from "@/fixtures/devtools";
 
-import { formatDelta, summarize } from "@/panel/format";
+import { formatDelta, summarize } from "@/panel/utils/format";
 
 describe("formatDelta", () => {
   it("formats sub-second gaps in milliseconds", () => {

@@ -1,7 +1,7 @@
 import { type DevtoolsEvent } from "@wirestate/core/devtools";
 
 import { EventSummary } from "@/panel/components/EventSummary";
-import { formatClock, formatDelta, timestampOf } from "@/panel/format";
+import { formatClock, formatDelta, timestampOf } from "@/panel/utils/format";
 import { type Optional } from "@/types/general";
 
 interface HistoryProps {

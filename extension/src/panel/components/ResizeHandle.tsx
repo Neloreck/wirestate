@@ -3,27 +3,17 @@ import { type PointerEvent as ReactPointerEvent, type RefObject, useRef, useStat
 import { type Nullable } from "@/types/general";
 
 interface ResizeHandleProps {
-  /** Resize axis: "x" drags left/right (a vertical divider); "y" drags up/down (a horizontal divider). */
   readonly orientation: "x" | "y";
-  /** Which side of the handle carries the `cssVar` flex-basis — the pane whose fraction we control. */
   readonly controls: "start" | "end";
-  /** The flex container to measure and write the CSS variable on (drag is relative to its box). */
   readonly containerRef: RefObject<Nullable<HTMLDivElement>>;
-  /** Custom property the controlled pane reads as its flex-basis, e.g. "--nav-w". */
   readonly cssVar: string;
-  /** Minimum pixel size of the start (top/left) pane — floors the drag so neither pane starves. */
   readonly minStartPx: number;
-  /** Minimum pixel size of the end (bottom/right) pane. */
   readonly minEndPx: number;
-  /** Called once on release with the committed fraction (0–1) of the controlled pane. */
   readonly onCommit: (fraction: number) => void;
 }
 
 /**
- * A draggable divider between two flex panes. During the drag it writes the live fraction straight to
- * the container's CSS variable through a ref — no React state per move, so the inspector's render path
- * (which re-runs on every devtools event) is untouched. State is the source of truth at rest: on
- * release it commits the final fraction via `onCommit`, and the next render re-applies the same value.
+ * A draggable divider between two flex panes.
  */
 export function ResizeHandle({
   orientation,

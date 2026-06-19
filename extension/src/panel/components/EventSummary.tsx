@@ -1,6 +1,6 @@
 import { type DevtoolsEvent } from "@wirestate/core/devtools";
 
-import { summarize } from "@/panel/format";
+import { summarize } from "@/panel/utils/format";
 
 interface EventSummaryProps {
   readonly event: DevtoolsEvent;

@@ -4,8 +4,8 @@ import {
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
 
-import { childContainers, lifecycleHistory } from "@/panel/selectors";
-import { type PanelActions } from "@/panel/use-panel-state";
+import { type PanelActions } from "@/panel/hooks/use-panel-state";
+import { childContainers, lifecycleHistory } from "@/panel/utils/selectors";
 
 import { History } from "./History";
 import { Field, LinkButton, Section } from "./parts";

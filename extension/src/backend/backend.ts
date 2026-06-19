@@ -4,7 +4,7 @@ import { FALLBACK_PROTOCOL_VERSION } from "@/backend/backend.config";
 import { post } from "@/backend/backend.messaging";
 import { BACKEND_BUFFER, BACKEND_HOOK } from "@/backend/backend.state";
 import { getRootsSnapshot, inspectAt, record } from "@/backend/backend.utils";
-import { BRIDGE_SOURCE, type PageMessage, type PanelToBackend } from "@/bridge/messages";
+import { BRIDGE_SOURCE, type PageMessage, type PanelToBackend } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
 /**

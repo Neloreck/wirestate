@@ -1,10 +1,10 @@
 import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
 import { useEffect, useRef } from "react";
 
-import { type InspectFn } from "@/bridge/messages";
-import { type ResolvedEntity, resolveSelection } from "@/panel/selectors";
-import { type Selection, sameSelection } from "@/panel/types";
-import { type PanelActions } from "@/panel/use-panel-state";
+import { type InspectFn } from "@/bridge/bridge.messages";
+import { type PanelActions } from "@/panel/hooks/use-panel-state";
+import { type Selection, isSameSelection } from "@/panel/types";
+import { type ResolvedEntity, resolveSelection } from "@/panel/utils/selectors";
 import { type Optional } from "@/types/general";
 
 import { BindingDetail } from "./BindingDetail";
@@ -50,7 +50,7 @@ export function Detail({ roots, log, selection, actions, inspect }: DetailProps)
 
     // Selection is no longer live → tombstone. Freeze the last-known view (dimmed) if it matches.
     const dead: Optional<ResolvedEntity> =
-      cache.current && sameSelection(cache.current.selection, selection) ? cache.current.resolved : undefined;
+      cache.current && isSameSelection(cache.current.selection, selection) ? cache.current.resolved : undefined;
 
     return (
       <div className={"space-y-3"}>

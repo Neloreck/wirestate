@@ -1,4 +1,4 @@
-import { BRIDGE_SOURCE, CONTENT_PORT, type PageMessage } from "@/bridge/messages";
+import { BRIDGE_SOURCE, CONTENT_PORT, type PageMessage } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
 /**

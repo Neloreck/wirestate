@@ -12,6 +12,7 @@ import {
   mockRootSnapshot,
 } from "@/fixtures/devtools";
 
+import { type TimelineFilter, isSameSelection } from "@/panel/types";
 import {
   buildRoots,
   channelOf,
@@ -21,8 +22,7 @@ import {
   mayRealizeInstance,
   realizingInstance,
   resolveSelection,
-} from "@/panel/selectors";
-import { type TimelineFilter, sameSelection } from "@/panel/types";
+} from "@/panel/utils/selectors";
 
 const filterWith = (partial: Partial<TimelineFilter> = {}): TimelineFilter => ({
   rootId: undefined,
@@ -186,21 +186,21 @@ describe("filterLog", () => {
 
 describe("sameSelection", () => {
   it("compares kind, container, and the entity key", () => {
-    expect(sameSelection({ kind: "container", containerId: 1 }, { kind: "container", containerId: 1 })).toBe(true);
-    expect(sameSelection({ kind: "container", containerId: 1 }, { kind: "container", containerId: 2 })).toBe(false);
+    expect(isSameSelection({ kind: "container", containerId: 1 }, { kind: "container", containerId: 1 })).toBe(true);
+    expect(isSameSelection({ kind: "container", containerId: 1 }, { kind: "container", containerId: 2 })).toBe(false);
     expect(
-      sameSelection(
+      isSameSelection(
         { kind: "instance", containerId: 1, className: "A" },
         { kind: "instance", containerId: 1, className: "A" }
       )
     ).toBe(true);
     expect(
-      sameSelection(
+      isSameSelection(
         { kind: "instance", containerId: 1, className: "A" },
         { kind: "instance", containerId: 1, className: "B" }
       )
     ).toBe(false);
-    expect(sameSelection({ kind: "container", containerId: 1 }, { kind: "plugin", containerId: 1, name: "A" })).toBe(
+    expect(isSameSelection({ kind: "container", containerId: 1 }, { kind: "plugin", containerId: 1, name: "A" })).toBe(
       false
     );
   });

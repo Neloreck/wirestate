@@ -6,9 +6,9 @@ import {
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
 
-import { type InspectFn } from "@/bridge/messages";
-import { lifecycleHistory } from "@/panel/selectors";
-import { type PanelActions } from "@/panel/use-panel-state";
+import { type InspectFn } from "@/bridge/bridge.messages";
+import { type PanelActions } from "@/panel/hooks/use-panel-state";
+import { lifecycleHistory } from "@/panel/utils/selectors";
 import { type Optional } from "@/types/general";
 
 import { History } from "./History";

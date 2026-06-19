@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { post } from "@/backend/backend.messaging";
-import { type BackendToPanel, BRIDGE_SOURCE } from "@/bridge/messages";
+import { type BackendToPanel, BRIDGE_SOURCE } from "@/bridge/bridge.messages";
 
 describe("post", () => {
   afterEach(() => {
