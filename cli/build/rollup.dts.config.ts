@@ -1,15 +1,15 @@
-import * as path from "path";
+import * as path from "node:path";
 
 import { default as clear } from "rollup-plugin-clear";
-import { default as dts } from "rollup-plugin-dts";
+import { dts } from "rollup-plugin-dts";
 
 import { default as tsconfig } from "../../tsconfig.json";
 import { DIST_ROOT } from "../config/build.constants";
-import { PACKAGES } from "../config/packages";
+import { PACKAGES, type BuildPackage } from "../config/packages";
 
-const isExternal = (pkg) => (id) => pkg.external.some((ext) => id === ext || id.startsWith(ext + "/"));
+const isExternal = (pkg: BuildPackage) => (id: string) => pkg.external.some((ext) => id === ext || id.startsWith(ext + "/"));
 
-const createPackageDtsConfig = (pkg) => ({
+const createPackageDtsConfig = (pkg: BuildPackage) => ({
   external: isExternal(pkg),
   input: pkg.entries,
   output: {
@@ -19,9 +19,8 @@ const createPackageDtsConfig = (pkg) => ({
     sourcemap: false,
   },
   plugins: [
-    dts.default({
+    dts({
       compilerOptions: {
-        baseUrl: tsconfig.compilerOptions.baseUrl,
         paths: tsconfig.compilerOptions.paths,
         rootDir: tsconfig.compilerOptions.rootDir,
         sourceMap: false,

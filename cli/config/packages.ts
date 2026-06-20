@@ -4,7 +4,13 @@ import { SRC_PATH, EXTERNAL_DEPENDENCIES } from "./build.constants";
 
 export const STABLE_PACKAGE_VERSION_PATTERN = /^\d+\.\d+\.\d+$/;
 
-export const PACKAGES = [
+export interface BuildPackage {
+  name: string;
+  entries: Array<string>;
+  external: Array<string>;
+}
+
+export const PACKAGES: Array<BuildPackage> = [
   {
     name: "wirestate-core",
     entries: [path.resolve(SRC_PATH, "wirestate-core/index.ts"), path.resolve(SRC_PATH, "wirestate-core/devtools.ts")],

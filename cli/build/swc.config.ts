@@ -27,7 +27,7 @@ export function swcBuildPlugin() {
 export function swcStripCommentsPlugin() {
   return {
     name: "swc-strip-comments",
-    renderChunk(code, chunk) {
+    renderChunk(code: string, chunk: { fileName: string }) {
       const result = transformSync(code, {
         filename: chunk.fileName,
         jsc: {
