@@ -1,6 +1,6 @@
-import path from "node:path";
+import * as path from "node:path";
 
-import swcTransform from "./jest.swc-transform.mjs";
+import { swcTransform } from "./jest.swc-transform.mjs";
 
 /**
  * Shared project options for both decorator transform modes.

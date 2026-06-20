@@ -1,4 +1,4 @@
-export default function swcTransform(decoratorOptions) {
+export function swcTransform(decoratorOptions) {
   return [
     "@swc/jest",
     {

@@ -6,11 +6,8 @@ import { DIST_ROOT } from "../config/build.constants";
 import { type BuildPackage, PACKAGES } from "../config/packages";
 
 import { clean } from "./clean.plugin";
+import { isExternal } from "./external.check";
 import { formatDts } from "./format-dts.plugin";
-
-function isExternal(pkg: BuildPackage) {
-  return (id: string) => pkg.external.some((ext) => id === ext || id.startsWith(ext + "/"));
-}
 
 function createPackageDtsConfig(pkg: BuildPackage) {
   const dir = path.resolve(DIST_ROOT, pkg.name, "dts");

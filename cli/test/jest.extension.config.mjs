@@ -1,6 +1,6 @@
-import path from "node:path";
+import * as path from "node:path";
 
-import swcTransform from "./jest.swc-transform.mjs";
+import { swcTransform } from "./jest.swc-transform.mjs";
 
 export default {
   rootDir: path.resolve(import.meta.dirname, "../.."),

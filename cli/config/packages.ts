@@ -1,6 +1,6 @@
 import * as path from "node:path";
 
-import { SRC_PATH, EXTERNAL_DEPENDENCIES } from "./build.constants";
+import { EXTERNAL_DEPENDENCIES, SRC_PATH } from "./build.constants";
 
 export const STABLE_PACKAGE_VERSION_PATTERN = /^\d+\.\d+\.\d+$/;
 
