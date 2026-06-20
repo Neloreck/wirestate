@@ -62,10 +62,3 @@ target/
 /docs/api/
 /docs/.vitepress/dist/
 /docs/.vitepress/cache/
-
-# Agents / ai
-.agents
-.claude
-.junie
-AGENTS.md
-skills-lock.json
