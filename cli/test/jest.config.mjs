@@ -33,7 +33,7 @@ export default {
   reporters: [
     "default",
     ...(process.env.GITHUB_ACTIONS
-      ? [["github-actions", { silent: false }], path.resolve(import.meta.dirname, "github-summary-reporter.js")]
+      ? [["github-actions", { silent: false }], path.resolve(import.meta.dirname, "github-summary-reporter.mjs")]
       : []),
   ],
   coverageProvider: "v8",

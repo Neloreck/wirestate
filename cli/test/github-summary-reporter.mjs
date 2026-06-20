@@ -1,8 +1,8 @@
-const fs = require("node:fs");
+import * as fs from "node:fs";
 
 // Writes a test-results summary to the GitHub Actions job summary ($GITHUB_STEP_SUMMARY), matching the
 // format the Vitest run produces for the extension. A no-op outside CI, where the env var is unset.
-module.exports = class GithubSummaryReporter {
+export default class GithubSummaryReporter {
   onRunComplete(_testContexts, results) {
     const summaryFile = process.env.GITHUB_STEP_SUMMARY;
 
@@ -38,4 +38,4 @@ module.exports = class GithubSummaryReporter {
 
     fs.appendFileSync(summaryFile, `${lines.join("\n")}\n`);
   }
-};
+}
