@@ -59,9 +59,6 @@ jobs:
 
       - run: pnpm test:e2e
 
-      - name: Install zip
-        uses: montudor/action-zip@v1
-
       - name: Archive build artifacts
         working-directory: target/
         run: zip -qq -r package.zip dist/ pkg/
@@ -100,9 +97,6 @@ jobs:
       - run: pnpm test:extension
 
       - run: pnpm build:extension
-
-      - name: Install zip
-        uses: montudor/action-zip@v1
 
       - name: Archive extension build
         working-directory: extension/dist
