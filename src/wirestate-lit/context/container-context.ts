@@ -1,4 +1,4 @@
-import { createContext } from "@lit/context";
+import { type Context, createContext } from "@lit/context";
 import { type Container } from "@wirestate/core";
 
 /**
@@ -13,4 +13,4 @@ export const CONTAINER_KEY: unique symbol = Symbol("ContainerContext");
  *
  * @group Context
  */
-export const ContainerContext = createContext<Container>(CONTAINER_KEY);
+export const ContainerContext: Context<unknown, Container> = createContext<Container>(CONTAINER_KEY);
