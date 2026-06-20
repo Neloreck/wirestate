@@ -1,5 +1,7 @@
 const fs = require("node:fs");
 
+// Writes a test-results summary to the GitHub Actions job summary ($GITHUB_STEP_SUMMARY), matching the
+// format the Vitest run produces for the extension. A no-op outside CI, where the env var is unset.
 module.exports = class GithubSummaryReporter {
   onRunComplete(_testContexts, results) {
     const summaryFile = process.env.GITHUB_STEP_SUMMARY;
@@ -8,19 +10,21 @@ module.exports = class GithubSummaryReporter {
       return;
     }
 
-    const passed = results.numFailedTests === 0 && results.numFailedTestSuites === 0;
-    const durationSeconds = ((Date.now() - results.startTime) / 1000).toFixed(1);
+    const summaryLine = (label, passed, failed, total) =>
+      failed > 0
+        ? `- **${label}**: ❌ **${failed} failed** · ${passed} passes · ${total} total`
+        : `- **${label}**: ✅ **${passed} passes** · ${total} total`;
 
     const lines = [
-      `## ${passed ? "✅" : "❌"} Jest — ${results.numPassedTests}/${results.numTotalTests} tests passed`,
+      "## Jest Test Report",
       "",
-      "| Suites | Tests | Passed | Failed | Skipped | Duration |",
-      "| -----: | ----: | -----: | -----: | ------: | -------: |",
-      `| ${results.numTotalTestSuites} | ${results.numTotalTests} | ${results.numPassedTests} | ` +
-        `${results.numFailedTests} | ${results.numPendingTests} | ${durationSeconds}s |`,
+      "### Summary",
+      "",
+      summaryLine("Test Files", results.numPassedTestSuites, results.numFailedTestSuites, results.numTotalTestSuites),
+      summaryLine("Test Results", results.numPassedTests, results.numFailedTests, results.numTotalTests),
     ];
 
-    if (!passed) {
+    if (results.numFailedTests > 0 || results.numFailedTestSuites > 0) {
       lines.push("", "### Failed tests", "");
 
       for (const suite of results.testResults) {
