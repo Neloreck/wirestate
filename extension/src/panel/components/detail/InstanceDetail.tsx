@@ -8,7 +8,7 @@ import {
 
 import { type InspectFn } from "@/bridge/bridge.messages";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { lifecycleHistory, rootIdOfContainer } from "@/panel/utils/selectors";
+import { lifecycleHistory, rootIdOfContainer } from "@/panel/lib/selectors";
 import { type Optional } from "@/types/general";
 
 import { History } from "./History";

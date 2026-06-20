@@ -1,6 +1,6 @@
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { type Selection } from "@/panel/types";
-import { type ContainerNodeModel, type RootModel } from "@/panel/utils/selectors";
+import { type ContainerNodeModel, type RootModel } from "@/panel/lib/selectors";
+import { type Selection } from "@/panel/lib/types";
 import { type Optional } from "@/types/general";
 
 interface NavigatorProps {

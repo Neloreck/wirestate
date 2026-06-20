@@ -3,7 +3,7 @@ import { defineManifest } from "@crxjs/vite-plugin";
 export default defineManifest({
   manifest_version: 3,
   name: "Wirestate DevTools",
-  version: "0.0.0",
+  version: "1.0.0",
   description: "Inspect Wirestate containers, bindings, instances, declared handlers, and the live message stream.",
   icons: {
     "16": "icons/icon-16.png",
@@ -11,7 +11,7 @@ export default defineManifest({
     "48": "icons/icon-48.png",
     "128": "icons/icon-128.png",
   },
-  minimum_chrome_version: "111",
+  minimum_chrome_version: "100",
   permissions: ["storage"],
   devtools_page: "src/devtools/devtools.html",
   background: {

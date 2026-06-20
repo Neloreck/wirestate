@@ -3,8 +3,8 @@ import { type ReactNode, useEffect, useRef } from "react";
 
 import { type InspectFn } from "@/bridge/bridge.messages";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { type Selection, isSameSelection } from "@/panel/types";
-import { type ResolvedEntity, resolveSelection } from "@/panel/utils/selectors";
+import { type ResolvedEntity, resolveSelection } from "@/panel/lib/selectors";
+import { type Selection, isSameSelection } from "@/panel/lib/types";
 import { type Optional } from "@/types/general";
 
 import { BindingDetail } from "./BindingDetail";

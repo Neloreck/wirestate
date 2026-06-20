@@ -8,7 +8,7 @@ import { useState } from "react";
 import { EventSummary } from "@/panel/components/EventSummary";
 import { EventTimeCells } from "@/panel/components/EventTimeCells";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { stringify } from "@/panel/utils/format";
+import { stringify } from "@/panel/lib/format";
 import { type Optional } from "@/types/general";
 
 const TAG_COLOR: Record<DevtoolsEvent["kind"], string> = {

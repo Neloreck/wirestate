@@ -2,26 +2,20 @@ import { type Optional } from "@/types/general";
 
 /**
  * Lossy, bounded, cycle-safe serializer for raw in-page message payloads.
- *
- * @remarks
- * The devtools hook ships message `payload`/`source` as **raw** in-page values (functions, class
- * instances, `Map`/`Set`, DOM nodes, cyclic graphs). Those do not survive structured clone across
- * the bridge, so the backend dehydrates them into a JSON-friendly **preview** before posting.
- * Non-clonable leaves become typed placeholders ({@link DehydratedRef}); depth, breadth, and string
- * length are capped. This is deliberately a preview, not full fidelity — on-demand deep hydration
- * is deferred (ADR 0011 vNext), to be designed from felt need.
  */
 
 // Eager whole-payload caps: strings stay long (the payload is the data you want to read) while
 // depth and breadth are bounded, since the entire graph is serialized in one pass. The on-demand
 // inspect path (backend.inspect.ts) previews one level lazily and so caps strings far shorter.
-const MAX_DEPTH = 6;
-const MAX_KEYS = 50;
-const MAX_ARRAY = 100;
-const MAX_STRING = 10_000;
-const MAX_ENTRIES = 50;
+const MAX_DEPTH = 8;
+const MAX_KEYS = 64;
+const MAX_ARRAY = 128;
+const MAX_STRING = 10_240;
+const MAX_ENTRIES = 64;
 
-/** Marker the panel renders in place of a value that could not (or should not) be cloned whole. */
+/**
+ * Marker the panel renders in place of a value that could not (or should not) be cloned whole.
+ */
 export interface DehydratedRef {
   readonly __wsType:
     | "function"
@@ -35,13 +29,25 @@ export interface DehydratedRef {
     | "set"
     | "node"
     | "truncated";
-  /** Short human-readable description for the panel. */
+
+  /**
+   * Short human-readable description for the panel.
+   */
   readonly preview?: string;
-  /** Class name for `"instance"`. */
+
+  /**
+   * Class name for `"instance"`.
+   */
   readonly className?: string;
-  /** Surviving (already-dehydrated) own properties for `"instance"`. */
+
+  /**
+   * Surviving (already-dehydrated) own properties for `"instance"`.
+   */
   readonly value?: Record<string, unknown>;
-  /** Already-dehydrated entries for `"map"` / `"set"`. */
+
+  /**
+   * Already-dehydrated entries for `"map"` / `"set"`.
+   */
   readonly entries?: ReadonlyArray<unknown>;
 }
 

@@ -45,10 +45,10 @@ describe("dehydrate", () => {
   });
 
   it("truncates large arrays with a marker", () => {
-    const out = dehydrate(Array.from({ length: 150 }, (_, index) => index)) as Array<unknown>;
+    const out = dehydrate(Array.from({ length: 200 }, (_, index) => index)) as Array<unknown>;
 
-    expect(out).toHaveLength(101);
-    expect(asRef(out[100]).__wsType).toBe("truncated");
+    expect(out).toHaveLength(129);
+    expect(asRef(out[128]).__wsType).toBe("truncated");
   });
 
   it("caps recursion depth", () => {

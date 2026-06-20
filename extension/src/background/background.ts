@@ -2,9 +2,10 @@ import { type BackendToPanel, CONTENT_PORT, PANEL_PORT_PREFIX } from "@/bridge/b
 import { type Optional } from "@/types/general";
 
 /**
- * Background half of the bridge. Pairs a page's ISOLATED relay with the DevTools panel inspecting
- * that same tab, keyed by tab id, and forwards messages each way. Each side reconnects independently
- * after the worker sleeps, so the pair re-forms on wake.
+ * Background half of the bridge.
+ * Pairs a page's isolated relay with the DevTools panel inspecting that same tab, keyed by tab id,
+ * and forwards messages each way. Each side reconnects independently after the worker sleeps,
+ * so the pair re-forms on wake.
  */
 
 interface Pair {

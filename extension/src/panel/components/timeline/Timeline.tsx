@@ -2,9 +2,9 @@ import { type DevtoolsEvent, type DevtoolsMessageResultEvent } from "@wirestate/
 import { useEffect, useRef } from "react";
 
 import { type PanelActions, type PanelUi } from "@/panel/hooks/use-panel-state";
-import { type TimelineFilter } from "@/panel/types";
-import { summarize, timestampOf } from "@/panel/utils/format";
-import { type RootModel } from "@/panel/utils/selectors";
+import { summarizeDevtoolsEvent, timestampOf } from "@/panel/lib/format";
+import { type RootModel } from "@/panel/lib/selectors";
+import { type TimelineFilter } from "@/panel/lib/types";
 import { type Optional } from "@/types/general";
 
 import { TimelineFilters } from "./TimelineFilters";
@@ -85,7 +85,7 @@ function collapse(events: ReadonlyArray<DevtoolsEvent>): ReadonlyArray<Collapsed
   for (const event of events) {
     const last: CollapsedRow | undefined = rows[rows.length - 1];
 
-    if (last && summarize(last.event) === summarize(event)) {
+    if (last && summarizeDevtoolsEvent(last.event) === summarizeDevtoolsEvent(event)) {
       last.count += 1;
     } else {
       rows.push({ event, count: 1 });

@@ -1,7 +1,7 @@
 import { type DevtoolsBinding, type DevtoolsContainerSnapshot, type DevtoolsInstance } from "@wirestate/core/devtools";
 
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { mayRealizeInstance, realizingInstance } from "@/panel/utils/selectors";
+import { mayRealizeInstance, realizingInstance } from "@/panel/lib/selectors";
 import { type Optional } from "@/types/general";
 
 import { Field, LinkButton, Section } from "./parts";

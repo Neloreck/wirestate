@@ -1,8 +1,8 @@
 import { type DevtoolsMessageChannel } from "@wirestate/core/devtools";
 
 import { type PanelActions, type PanelUi } from "@/panel/hooks/use-panel-state";
-import { type EventKind, type TimelineFilter } from "@/panel/types";
-import { type RootModel } from "@/panel/utils/selectors";
+import { type RootModel } from "@/panel/lib/selectors";
+import { type EventKind, type TimelineFilter } from "@/panel/lib/types";
 
 const KINDS: ReadonlyArray<EventKind> = ["lifecycle", "message", "registration"];
 const CHANNELS: ReadonlyArray<DevtoolsMessageChannel> = ["event", "command", "query"];

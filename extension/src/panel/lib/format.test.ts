@@ -1,6 +1,6 @@
 import { mockLifecycleEvent } from "@/fixtures/devtools";
 
-import { formatDelta, preview, stringify, summarize } from "@/panel/utils/format";
+import { formatDelta, preview, stringify, summarizeDevtoolsEvent } from "@/panel/lib/format";
 
 describe("formatDelta", () => {
   it("formats sub-second gaps in milliseconds", () => {
@@ -18,11 +18,13 @@ describe("formatDelta", () => {
 
 describe("summarize", () => {
   it("renders an instance-level lifecycle delta as phase · className", () => {
-    expect(summarize(mockLifecycleEvent({ phase: "activate", className: "Worker" }))).toBe("activate · Worker");
+    expect(summarizeDevtoolsEvent(mockLifecycleEvent({ phase: "activate", className: "Worker" }))).toBe(
+      "activate · Worker"
+    );
   });
 
   it("renders a container-level lifecycle delta as just the phase", () => {
-    expect(summarize(mockLifecycleEvent({ phase: "containerProvision" }))).toBe("containerProvision");
+    expect(summarizeDevtoolsEvent(mockLifecycleEvent({ phase: "containerProvision" }))).toBe("containerProvision");
   });
 });
 

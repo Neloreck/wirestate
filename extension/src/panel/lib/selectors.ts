@@ -9,8 +9,8 @@ import {
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
 
-import { type Selection, type TimelineFilter } from "@/panel/types";
-import { summarize } from "@/panel/utils/format";
+import { summarizeDevtoolsEvent } from "@/panel/lib/format";
+import { type Selection, type TimelineFilter } from "@/panel/lib/types";
 import { type Optional } from "@/types/general";
 
 /** One container plus its nested child containers, for the Navigator tree. */
@@ -306,7 +306,7 @@ export function filterLog(log: ReadonlyArray<DevtoolsEvent>, filter: TimelineFil
       return false;
     }
 
-    return needle === "" || summarize(event).toLowerCase().includes(needle);
+    return needle === "" || summarizeDevtoolsEvent(event).toLowerCase().includes(needle);
   });
 }
 

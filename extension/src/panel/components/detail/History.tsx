@@ -2,7 +2,7 @@ import { type DevtoolsEvent } from "@wirestate/core/devtools";
 
 import { EventSummary } from "@/panel/components/EventSummary";
 import { EventTimeCells } from "@/panel/components/EventTimeCells";
-import { timestampOf } from "@/panel/utils/format";
+import { timestampOf } from "@/panel/lib/format";
 import { type Optional } from "@/types/general";
 
 interface HistoryProps {

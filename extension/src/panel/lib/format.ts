@@ -23,7 +23,7 @@ export function timestampOf(event: DevtoolsEvent): Optional<number> {
  * @param timestamp - Epoch milliseconds to format.
  * @returns The clock time as `HH:MM:SS.mmm`.
  */
-export function formatClock(timestamp: number): string {
+export function formatTimestamp(timestamp: number): string {
   const date: Date = new Date(timestamp);
 
   return `${date.toLocaleTimeString(undefined, { hour12: false })}.${String(date.getMilliseconds()).padStart(3, "0")}`;
@@ -45,7 +45,7 @@ export function formatDelta(ms: number): string {
  * @param event - The devtools delta to summarize.
  * @returns A single-line, human-readable summary of the delta.
  */
-export function summarize(event: DevtoolsEvent): string {
+export function summarizeDevtoolsEvent(event: DevtoolsEvent): string {
   switch (event.kind) {
     case "lifecycle":
       return `${event.phase}${event.instance ? ` · ${event.instance.className}` : ""}`;

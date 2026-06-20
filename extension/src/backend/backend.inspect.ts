@@ -4,8 +4,8 @@ import { type InspectNode } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
 // One-level lazy-read caps.
-const MAX_KEYS: number = 100;
-const MAX_STRING: number = 200;
+const MAX_KEYS: number = 128;
+const MAX_STRING: number = 256;
 
 /**
  * Builds the descriptor for a field whose value is another container-managed instance, so the panel
@@ -25,7 +25,7 @@ export function serviceNode(ref: DevtoolsServiceRef): InspectNode {
 }
 
 /**
- * Describes **one level** of a raw in-page value for the panel: primitives and non-clonable leaves
+ * Describes one level of a raw in-page value for the panel: primitives and non-clonable leaves
  * inline, objects with their child keys, arrays with their length — so the panel lazily requests
  * deeper levels by path rather than serializing a whole (possibly cyclic) graph at once.
  *

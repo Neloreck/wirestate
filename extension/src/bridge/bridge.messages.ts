@@ -6,10 +6,14 @@ import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/d
  */
 export const BRIDGE_SOURCE = "wirestate-devtools" as const;
 
-/** Port name the ISOLATED relay opens to the background worker. */
+/**
+ * Port name the ISOLATED relay opens to the background worker.
+ */
 export const CONTENT_PORT = "wirestate-content" as const;
 
-/** Port-name prefix the panel opens to the background worker (suffixed with the inspected tab id). */
+/**
+ * Port-name prefix the panel opens to the background worker (suffixed with the inspected tab id).
+ */
 export const PANEL_PORT_PREFIX = "wirestate-panel:" as const;
 
 /**
@@ -32,7 +36,9 @@ export type InspectNode =
     }
   | { readonly t: "unsupported" };
 
-/** Lazily reads one level of an instance's state at a path. Resolves over the bridge. */
+/**
+ * Lazily reads one level of an instance's state at a path. Resolves over the bridge.
+ */
 export type InspectFn = (
   rootId: number,
   instanceId: number,
@@ -59,7 +65,9 @@ export type BackendToPanel =
   | { readonly type: "inspectResult"; readonly requestId: number; readonly node: InspectNode }
   | { readonly type: "page-connected" };
 
-/** A message the panel sends toward the backend. */
+/**
+ * A message the panel sends toward the backend.
+ */
 export type PanelToBackend =
   | { readonly type: "attach" }
   | { readonly type: "refresh" }
@@ -71,7 +79,9 @@ export type PanelToBackend =
       readonly path: ReadonlyArray<string | number>;
     };
 
-/** Envelope carried over `window.postMessage` between the two content-script worlds. */
+/**
+ * Envelope carried over `window.postMessage` between the two content-script worlds.
+ */
 export type PageMessage =
   | { readonly source: typeof BRIDGE_SOURCE; readonly dir: "to-content"; readonly payload: BackendToPanel }
   | { readonly source: typeof BRIDGE_SOURCE; readonly dir: "to-page"; readonly payload: PanelToBackend };

@@ -12,7 +12,6 @@ import {
   mockRootSnapshot,
 } from "@/fixtures/devtools";
 
-import { type TimelineFilter, isSameSelection } from "@/panel/types";
 import {
   buildMessageResults,
   buildRoots,
@@ -24,7 +23,8 @@ import {
   realizingInstance,
   resolveSelection,
   rootIdOfContainer,
-} from "@/panel/utils/selectors";
+} from "@/panel/lib/selectors";
+import { type TimelineFilter, isSameSelection } from "@/panel/lib/types";
 
 const filterWith = (partial: Partial<TimelineFilter> = {}): TimelineFilter => ({
   rootId: undefined,

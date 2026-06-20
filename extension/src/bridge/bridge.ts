@@ -1,10 +1,11 @@
-import { BRIDGE_SOURCE, CONTENT_PORT, type PageMessage, type PanelToBackend } from "@/bridge/bridge.messages";
+import { forwardToPage, readContentMessage } from "@/bridge/bridge.connection";
+import { CONTENT_PORT, type BackendToPanel } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
 /**
- * ISOLATED-world relay. Bridges the MAIN-world backend (`window.postMessage`) to the background
- * worker (a long-lived port). Reconnects on disconnect so the pair re-forms after the MV3 service
- * worker sleeps and wakes.
+ * Isolated-world relay.
+ * Bridges the MAIN-world backend (`window.postMessage`) to the background worker (a long-lived port).
+ * Reconnects on disconnect so the pair re-forms after the MV3 service worker sleeps and wakes.
  */
 
 let port: Optional<chrome.runtime.Port>;
@@ -13,11 +14,7 @@ function connect(): void {
   port = chrome.runtime.connect({ name: CONTENT_PORT });
 
   // Background worker (panel) -> backend (MAIN world).
-  port.onMessage.addListener((payload: PanelToBackend): void => {
-    const message: PageMessage = { source: BRIDGE_SOURCE, dir: "to-page", payload };
-
-    window.postMessage(message, "*");
-  });
+  port.onMessage.addListener(forwardToPage);
 
   port.onDisconnect.addListener((): void => {
     port = undefined;
@@ -28,13 +25,11 @@ function connect(): void {
 
 // Backend (MAIN world) -> background worker (panel).
 window.addEventListener("message", (messageEvent: MessageEvent): void => {
-  const data: Optional<PageMessage> = messageEvent.data as Optional<PageMessage>;
+  const payload: Optional<BackendToPanel> = readContentMessage(messageEvent);
 
-  if (!data || data.source !== BRIDGE_SOURCE || data.dir !== "to-content") {
-    return;
+  if (payload !== undefined) {
+    port?.postMessage(payload);
   }
-
-  port?.postMessage(data.payload);
 });
 
 connect();

@@ -1,6 +1,6 @@
 import { type DevtoolsEvent } from "@wirestate/core/devtools";
 
-import { summarize } from "@/panel/utils/format";
+import { summarizeDevtoolsEvent } from "@/panel/lib/format";
 
 interface EventSummaryProps {
   readonly event: DevtoolsEvent;
@@ -10,7 +10,7 @@ interface EventSummaryProps {
 
 /**
  * A delta's one-line summary. For a lifecycle delta the class name is a link to the instance that
- * caused the event; other deltas render as plain {@link summarize} text.
+ * caused the event; other deltas render as plain {@link summarizeDevtoolsEvent} text.
  */
 export function EventSummary({ event, onSelectInstance }: EventSummaryProps) {
   if (event.kind === "lifecycle" && event.instance) {
@@ -34,5 +34,5 @@ export function EventSummary({ event, onSelectInstance }: EventSummaryProps) {
     );
   }
 
-  return <>{summarize(event)}</>;
+  return <>{summarizeDevtoolsEvent(event)}</>;
 }

@@ -5,7 +5,7 @@ import {
 } from "@wirestate/core/devtools";
 
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { childContainers, lifecycleHistory } from "@/panel/utils/selectors";
+import { childContainers, lifecycleHistory } from "@/panel/lib/selectors";
 
 import { History } from "./History";
 import { Field, FilterToContainerLink, LinkButton, Section } from "./parts";

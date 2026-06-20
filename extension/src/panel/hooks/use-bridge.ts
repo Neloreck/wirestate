@@ -10,7 +10,7 @@ import {
 } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
-const MAX_LOG = 500;
+const MAX_LOG = 512;
 
 /** State the panel renders, sourced entirely from the v1 hook via the bridge. */
 export interface BridgeState {
