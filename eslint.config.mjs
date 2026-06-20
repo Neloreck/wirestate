@@ -193,4 +193,11 @@ export default [
       "jsdoc/require-returns": "off",
     },
   },
+  {
+    // `public`/`private` accessibility modifiers are TypeScript-only syntax, invalid in plain JS files:
+    files: ["**/*.js", "**/*.cjs", "**/*.mjs"],
+    rules: {
+      "@typescript-eslint/explicit-member-accessibility": "off",
+    },
+  },
 ];

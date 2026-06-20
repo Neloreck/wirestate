@@ -1,4 +1,4 @@
-const path = require("path");
+const path = require("node:path");
 
 function swcTransform(decoratorOptions) {
   return [
@@ -51,7 +51,12 @@ const shared = {
 module.exports = {
   rootDir: path.resolve(__dirname, "../.."),
   maxWorkers: "50%",
-  reporters: ["default", ...(process.env.GITHUB_ACTIONS ? [["github-actions", { silent: false }]] : [])],
+  reporters: [
+    "default",
+    ...(process.env.GITHUB_ACTIONS
+      ? [["github-actions", { silent: false }], path.resolve(__dirname, "github-summary-reporter.js")]
+      : []),
+  ],
   coverageProvider: "v8",
   coveragePathIgnorePatterns: [
     "/node_modules/",
