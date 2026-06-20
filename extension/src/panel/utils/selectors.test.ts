@@ -1,5 +1,4 @@
 import { type DevtoolsBinding, type DevtoolsEvent } from "@wirestate/core/devtools";
-import { describe, expect, it } from "vitest";
 
 import {
   mockBinding,

@@ -1,34 +1,13 @@
-const path = require("node:path");
+import path from "node:path";
 
-function swcTransform(decoratorOptions) {
-  return [
-    "@swc/jest",
-    {
-      jsc: {
-        parser: {
-          syntax: "typescript",
-          tsx: true,
-          decorators: true,
-        },
-        transform: {
-          react: { runtime: "automatic" },
-          useDefineForClassFields: false,
-          ...decoratorOptions,
-        },
-        target: "es2022",
-        keepClassNames: true,
-      },
-      module: { type: "commonjs" },
-    },
-  ];
-}
+import swcTransform from "./jest.swc-transform.mjs";
 
 /**
  * Shared project options for both decorator transform modes.
  */
 const shared = {
-  setupFilesAfterEnv: [path.resolve(__dirname, "setup_tests.js")],
-  rootDir: path.resolve(__dirname, "../.."),
+  setupFilesAfterEnv: [path.resolve(import.meta.dirname, "setup_tests.js")],
+  rootDir: path.resolve(import.meta.dirname, "../.."),
   roots: ["<rootDir>/cli", "<rootDir>/src"],
   transformIgnorePatterns: ["node_modules/.pnpm/(?!@preact|@lit-labs|@adobe|lit|lit-html|@lit)"],
   testEnvironment: "node",
@@ -48,13 +27,13 @@ const shared = {
   },
 };
 
-module.exports = {
-  rootDir: path.resolve(__dirname, "../.."),
+export default {
+  rootDir: path.resolve(import.meta.dirname, "../.."),
   maxWorkers: "50%",
   reporters: [
     "default",
     ...(process.env.GITHUB_ACTIONS
-      ? [["github-actions", { silent: false }], path.resolve(__dirname, "github-summary-reporter.js")]
+      ? [["github-actions", { silent: false }], path.resolve(import.meta.dirname, "github-summary-reporter.js")]
       : []),
   ],
   coverageProvider: "v8",
@@ -90,7 +69,7 @@ module.exports = {
       transform: {
         "\\.tc39only\\.test\\.[tj]sx?$": [
           "babel-jest",
-          { configFile: path.resolve(__dirname, "babel.tc39.config.js") },
+          { configFile: path.resolve(import.meta.dirname, "babel.tc39.config.mjs") },
         ],
         "^.+\\.[tj]sx?$": swcTransform({ legacyDecorator: false, decoratorVersion: "2023-11" }),
       },

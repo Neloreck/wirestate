@@ -1,5 +1,4 @@
 import { type DevtoolsEvent, type DevtoolsServiceRef } from "@wirestate/core/devtools";
-import { afterEach, describe, expect, it } from "vitest";
 
 import {
   mockLifecycleEvent,

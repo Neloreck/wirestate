@@ -1,5 +1,3 @@
-import { describe, expect, it } from "vitest";
-
 import { mockLifecycleEvent } from "@/fixtures/devtools";
 
 import { formatDelta, preview, stringify, summarize } from "@/panel/utils/format";

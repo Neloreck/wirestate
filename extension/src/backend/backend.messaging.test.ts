@@ -1,17 +1,18 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-
 import { post } from "@/backend/backend.messaging";
 import { type BackendToPanel, BRIDGE_SOURCE } from "@/bridge/bridge.messages";
 
 describe("post", () => {
+  const globalScope = globalThis as { window?: unknown };
+  const originalWindow: unknown = globalScope.window;
+
   afterEach(() => {
-    vi.unstubAllGlobals();
+    globalScope.window = originalWindow;
   });
 
   it("wraps the payload in a to-content bridge envelope and posts it to the page", () => {
-    const postMessage = vi.fn();
+    const postMessage = jest.fn();
 
-    vi.stubGlobal("window", { postMessage });
+    globalScope.window = { postMessage };
 
     const payload: BackendToPanel = { type: "snapshot", roots: [] };
 

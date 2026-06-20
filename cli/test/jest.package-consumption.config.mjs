@@ -1,15 +1,15 @@
-const path = require("path");
+import path from "node:path";
 
-module.exports = {
+export default {
   collectCoverage: false,
   rootDir: "../..",
-  setupFilesAfterEnv: [path.resolve(__dirname, "setup_tests.js")],
+  setupFilesAfterEnv: [path.resolve(import.meta.dirname, "setup_tests.js")],
   testEnvironment: "node",
   testMatch: ["<rootDir>/cli/test/package-consumption.e2e.ts"],
   testTimeout: 120000,
   modulePathIgnorePatterns: ["<rootDir>/target"],
   transform: {
-    "^.+\\.[t|j]sx?$": ["babel-jest", { configFile: path.resolve(__dirname, "babel.e2e.config.js") }],
+    "^.+\\.[t|j]sx?$": ["babel-jest", { configFile: path.resolve(import.meta.dirname, "babel.e2e.config.mjs") }],
   },
   transformIgnorePatterns: ["/node_modules/"],
 };

@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
-    "types": ["chrome", "node"],
+    "types": ["chrome", "node", "jest"],
     "paths": {
       "@/*": ["./src/*"],
       "@wirestate/core/devtools": ["../src/wirestate-core/devtools.ts"]

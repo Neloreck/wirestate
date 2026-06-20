@@ -20,12 +20,11 @@ export default defineConfig({
       "@wirestate/core/devtools": PROTOCOL_SRC,
     },
   },
-  esbuild: { target: CHROME_TARGET },
-  optimizeDeps: { esbuildOptions: { target: CHROME_TARGET } },
+  oxc: { target: CHROME_TARGET },
   plugins: [react(), tailwindcss(), crx({ manifest })],
   build: {
     target: CHROME_TARGET,
-    rollupOptions: {
+    rolldownOptions: {
       input: {
         panel: "src/panel/panel.html",
       },
