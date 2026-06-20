@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { render } from "@testing-library/react";
 import { Container, Injectable, OnDeactivation, OnDeprovision, OnProvision } from "@wirestate/core";
 import { type ReactNode, Component } from "react";

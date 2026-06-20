@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { Container, Injectable, OnDeactivation, OnDeprovision, OnProvision } from "@wirestate/core";
 import { ReactiveElement } from "lit";
 import { customElement } from "lit/decorators.js";

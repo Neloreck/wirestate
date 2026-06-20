@@ -48,8 +48,7 @@
     "store",
     "typescript"
   ],
-  "peerDependencies": {
-    "tslib": ">=2.5.0"
-  },
-  "optionalDependencies": {}
+  "dependencies": {
+    "@swc/helpers": "^0.5.23"
+  }
 }

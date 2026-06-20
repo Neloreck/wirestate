@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { ContextConsumer } from "@lit/context";
 import { ReactiveElement } from "@lit/reactive-element";
 import {

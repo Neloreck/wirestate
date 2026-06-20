@@ -13,7 +13,7 @@ export const PACKAGES = [
   {
     name: "wirestate-react",
     entries: [path.resolve(SRC_PATH, "wirestate-react/index.ts")],
-    external: [...EXTERNAL_DEPENDENCIES, "@wirestate/core"],
+    external: EXTERNAL_DEPENDENCIES,
   },
   {
     name: "wirestate-mobx",
@@ -38,7 +38,7 @@ export const PACKAGES = [
   {
     name: "wirestate-lit",
     entries: [path.resolve(SRC_PATH, "wirestate-lit/index.ts")],
-    external: [...EXTERNAL_DEPENDENCIES, "@wirestate/core"],
+    external: EXTERNAL_DEPENDENCIES,
   },
   {
     name: "wirestate-lit-mobx",
@@ -57,14 +57,6 @@ export const PACKAGES = [
       path.resolve(SRC_PATH, "wirestate/mobx.ts"),
       path.resolve(SRC_PATH, "wirestate/signals.ts"),
     ],
-    external: [
-      ...EXTERNAL_DEPENDENCIES,
-      "@wirestate/core",
-      "@wirestate/react",
-      "@wirestate/mobx",
-      "@wirestate/react-mobx",
-      "@wirestate/signals",
-      "@wirestate/react-signals",
-    ],
+    external: EXTERNAL_DEPENDENCIES,
   },
 ];

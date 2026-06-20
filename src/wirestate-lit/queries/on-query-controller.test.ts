@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { ReactiveElement } from "@lit/reactive-element";
 import { QueryBus, Container } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";

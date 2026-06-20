@@ -1,18 +1,26 @@
 import * as path from "node:path";
 
 export const EXTERNAL_DEPENDENCIES = [
-  "react",
-  "mobx",
-  "mobx-react-lite",
+  "@adobe/lit-mobx",
+  "@lit-labs/preact-signals",
+  "@lit/context",
+  "@lit/reactive-element",
   "@preact/signals-core",
   "@preact/signals-react",
   "@preact/signals-react/runtime",
-  "tslib",
+  "@swc/helpers",
+  "@wirestate/core",
+  "@wirestate/lit-mobx",
+  "@wirestate/lit-signals",
+  "@wirestate/mobx",
+  "@wirestate/react",
+  "@wirestate/react-mobx",
+  "@wirestate/react-signals",
+  "@wirestate/signals",
   "lit",
-  "@lit/reactive-element",
-  "@lit/context",
-  "@lit-labs/preact-signals",
-  "@adobe/lit-mobx",
+  "mobx",
+  "mobx-react-lite",
+  "react",
 ];
 
 export const PROJECT_ROOT = path.resolve(__dirname, "../..");
@@ -21,7 +29,5 @@ export const PKG_ROOT = path.resolve(TARGET_ROOT, "./pkg");
 
 export const DIST_ROOT = path.resolve(TARGET_ROOT, "./dist");
 export const STATS_ROOT = path.resolve(DIST_ROOT, "./stats");
-
-export const TS_BUILD_CONFIG = path.resolve(__dirname, "./tsconfig.build.json");
 
 export const SRC_PATH = path.resolve(PROJECT_ROOT, "./src");

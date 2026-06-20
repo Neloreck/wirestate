@@ -1,134 +1,116 @@
-import * as path from "node:path";
+import * as fs from "node:fs";
 
 import * as ts from "typescript";
-
-import { PROJECT_ROOT } from "../config/build.constants";
-
-/**
- * Test infrastructure for asserting the public export surface of a package entry point.
- *
- * @packageDocumentation
- */
-
-const TSCONFIG_PATH: string = path.resolve(PROJECT_ROOT, "tsconfig.json");
-
-let cachedCompilerOptions: ts.CompilerOptions | undefined;
-
-// Loads the project's compiler options once so `paths` (the `@wirestate/*` aliases the aggregator
-// barrels re-export through) and `moduleResolution: bundler` are honoured when we resolve a source
-// entry's import graph.
-function compilerOptions(): ts.CompilerOptions {
-  if (cachedCompilerOptions) {
-    return cachedCompilerOptions;
-  }
-
-  const parsed = ts.getParsedCommandLineOfConfigFile(
-    TSCONFIG_PATH,
-    {},
-    {
-      ...ts.sys,
-      onUnRecoverableConfigFileDiagnostic: (diagnostic) => {
-        throw new Error(ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"));
-      },
-    }
-  );
-
-  if (!parsed) {
-    throw new Error(`Could not parse ${TSCONFIG_PATH}`);
-  }
-
-  cachedCompilerOptions = parsed.options;
-
-  return cachedCompilerOptions;
-}
 
 function sorted(names: Iterable<string>): Array<string> {
   return Array.from(new Set(names)).sort();
 }
 
-// Every export the type system sees for `entryPath` — values *and* type-only names. A scoped
-// `Program` lazily pulls just this entry's reachable import graph; we never run a diagnostics pass,
-// so this stays cheap.
-function fullExportsOf(entryPath: string): Array<string> {
-  const program = ts.createProgram([entryPath], compilerOptions());
-  const checker = program.getTypeChecker();
-  const source = program.getSourceFile(entryPath);
-
-  if (!source) {
-    throw new Error(`Could not load source file for ${entryPath}`);
-  }
-
-  const moduleSymbol = checker.getSymbolAtLocation(source);
-
-  if (!moduleSymbol) {
-    throw new Error(`No module symbol for ${entryPath} — is it a module (does it export anything)?`);
-  }
-
-  return sorted(checker.getExportsOfModule(moduleSymbol).map((symbol) => symbol.name));
-}
-
-// The names actually present on the emitted module at runtime — i.e. the value exports.
-function runtimeExportsOf(entryPath: string): Array<string> {
-  return sorted(Object.keys(require(entryPath) as Record<string, unknown>));
-}
-
 export interface EntryExportSets {
   /**
-   * Names present on the module at runtime (value exports).
-   */
-  readonly runtime: Array<string>;
-  /**
-   * Every export the type system reports (values + type-only).
-   */
-  readonly full: Array<string>;
-  /**
-   * Exports that erase at runtime under `verbatimModuleSyntax` (`full \ runtime`).
-   */
-  readonly typeOnly: Array<string>;
-}
-
-// Computes the runtime, full, and derived type-only export sets for an entry. Exposed so a one-off
-// harvesting pass can print the lists that seed the expectations in the test files.
-export function describeEntryExports(entryPath: string): EntryExportSets {
-  const runtime = runtimeExportsOf(entryPath);
-  const full = fullExportsOf(entryPath);
-  const typeOnly = full.filter((name) => !runtime.includes(name));
-
-  return { runtime, full, typeOnly };
-}
-
-export interface ExpectedExports {
-  /**
-   * Value exports — present at runtime via `Object.keys`.
+   * Value exports — `function`/`class`/`const`/`enum` declarations and value re-export specifiers.
    */
   readonly values: Array<string>;
 
   /**
-   * Type-only exports — erased at runtime, read from the compiler.
+   * Type-only exports — `interface`/`type` declarations and any `type`-marked re-export specifier,
+   * all erased at runtime under `verbatimModuleSyntax`.
    */
   readonly types: Array<string>;
 }
 
-// Asserts a leaf entry point exports exactly `expected.values` at runtime and exactly
-// `expected.types` as type-only names. Set-equality on both halves means any unlisted export —
-// value or type — fails the test, so accidental leaks of internal names are caught.
-export function assertExportedApi(entryPath: string, expected: ExpectedExports): void {
-  const { runtime, full, typeOnly } = describeEntryExports(entryPath);
-
-  // Sanity: every runtime value must be something the compiler also reports as an export.
-  expect(runtime.filter((name) => !full.includes(name))).toEqual([]);
-
-  expect(runtime).toEqual(sorted(expected.values));
-  expect(typeOnly).toEqual(sorted(expected.types));
+function rejectUnsupportedExport(entryPath: string, form: string): never {
+  throw new Error(
+    `${entryPath}: \`${form}\` is not supported by the AST export classifier — a leaf barrel must ` +
+      `enumerate its exports explicitly. A barrel that needs star re-exports is an aggregator and ` +
+      `must use assertAggregatedApi instead.`
+  );
 }
 
-// Asserts an aggregator barrel (e.g. `wirestate` re-exporting `@wirestate/core` + `@wirestate/react`)
-// forwards its children faithfully: its full and runtime surfaces equal the union of the children's.
-// No curated list to drift — when a child gains an export, the barrel follows automatically.
-export function assertAggregatedApi(entryPath: string, childPaths: Array<string>): void {
-  const childFull = sorted(childPaths.flatMap(fullExportsOf));
-  const childRuntime = sorted(childPaths.flatMap(runtimeExportsOf));
+export function describeEntryExports(entryPath: string): EntryExportSets {
+  const text = fs.readFileSync(entryPath, "utf8");
+  const scriptKind = entryPath.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+  const source = ts.createSourceFile(entryPath, text, ts.ScriptTarget.Latest, false, scriptKind);
 
-  expect(fullExportsOf(entryPath)).toEqual(childFull);
-  expect(runtimeExportsOf(entryPath)).toEqual(childRuntime);
+  const values: Array<string> = [];
+  const types: Array<string> = [];
+
+  for (const statement of source.statements) {
+    // `export { ... }`, `export { ... } from "..."`, `export type { ... }`
+    if (ts.isExportDeclaration(statement)) {
+      // `export *` (no clause) and `export * as ns` (NamespaceExport) carry no enumerable names here.
+      if (!statement.exportClause || !ts.isNamedExports(statement.exportClause)) {
+        rejectUnsupportedExport(entryPath, statement.exportClause ? "export * as ns" : "export *");
+      }
+
+      for (const specifier of statement.exportClause.elements) {
+        const isTypeOnly = statement.isTypeOnly || specifier.isTypeOnly;
+
+        (isTypeOnly ? types : values).push(specifier.name.text);
+      }
+
+      continue;
+    }
+
+    // `export = x` and `export default <expression>`
+    if (ts.isExportAssignment(statement)) {
+      rejectUnsupportedExport(entryPath, statement.isExportEquals ? "export =" : "export default");
+    }
+
+    const modifiers = ts.canHaveModifiers(statement) ? ts.getModifiers(statement) : undefined;
+
+    if (!modifiers?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)) {
+      // Imports (including side-effect imports) and any non-exported statement.
+      continue;
+    }
+
+    if (modifiers.some((modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword)) {
+      rejectUnsupportedExport(entryPath, "export default");
+    }
+
+    if (ts.isInterfaceDeclaration(statement) || ts.isTypeAliasDeclaration(statement)) {
+      types.push(statement.name.text);
+    } else if (
+      ts.isFunctionDeclaration(statement) ||
+      ts.isClassDeclaration(statement) ||
+      ts.isEnumDeclaration(statement)
+    ) {
+      if (!statement.name) {
+        rejectUnsupportedExport(entryPath, "anonymous export");
+      }
+
+      values.push(statement.name.text);
+    } else if (ts.isVariableStatement(statement)) {
+      for (const declaration of statement.declarationList.declarations) {
+        if (!ts.isIdentifier(declaration.name)) {
+          rejectUnsupportedExport(entryPath, "destructuring export");
+        }
+
+        values.push(declaration.name.text);
+      }
+    } else {
+      rejectUnsupportedExport(entryPath, ts.SyntaxKind[statement.kind]);
+    }
+  }
+
+  return { values: sorted(values), types: sorted(types) };
+}
+
+export interface ExpectedExports {
+  /**
+   * Value exports — `function`/`class`/`const`/`enum` and value re-export specifiers.
+   */
+  readonly values: Array<string>;
+
+  /**
+   * Type-only exports — `type`-marked specifiers and `interface`/`type` declarations.
+   */
+  readonly types: Array<string>;
+}
+
+export function assertExportedApi(entryPath: string, expected: ExpectedExports): void {
+  const { values, types } = describeEntryExports(entryPath);
+
+  expect(values).toEqual(sorted(expected.values));
+  expect(types).toEqual(sorted(expected.types));
 }
