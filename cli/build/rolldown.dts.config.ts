@@ -28,6 +28,7 @@ function createPackageDtsConfig(pkg: BuildPackage) {
       clean(dir),
       dts({
         emitDtsOnly: true,
+        oxc: true,
       }),
       formatDts(),
     ],
