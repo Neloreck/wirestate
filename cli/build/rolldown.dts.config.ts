@@ -3,13 +3,13 @@ import * as path from "node:path";
 import { dts } from "rolldown-plugin-dts";
 
 import { DIST_ROOT } from "../config/build.constants";
-import { type BuildPackage, PACKAGES } from "../config/packages";
+import { PACKAGES } from "../config/packages";
 
 import { clean } from "./clean.plugin";
 import { isExternal } from "./external.check";
 import { formatDts } from "./format-dts.plugin";
 
-function createPackageDtsConfig(pkg: BuildPackage) {
+export default PACKAGES.map((pkg) => {
   const dir = path.resolve(DIST_ROOT, pkg.name, "dts");
 
   return {
@@ -30,6 +30,4 @@ function createPackageDtsConfig(pkg: BuildPackage) {
       formatDts(),
     ],
   };
-}
-
-export default PACKAGES.map((pkg) => createPackageDtsConfig(pkg));
+});

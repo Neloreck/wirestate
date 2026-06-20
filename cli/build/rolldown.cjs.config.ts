@@ -1,13 +1,13 @@
 import * as path from "node:path";
 
 import { DIST_ROOT } from "../config/build.constants";
-import { type BuildPackage, PACKAGES } from "../config/packages";
+import { PACKAGES } from "../config/packages";
 
 import { clean } from "./clean.plugin";
 import { isExternal } from "./external.check";
 import { swcBuildPlugin, swcStripCommentsPlugin } from "./swc.config";
 
-function createPackageCjsConfig(pkg: BuildPackage) {
+export default PACKAGES.map((pkg) => {
   const dir = path.resolve(DIST_ROOT, pkg.name, "cjs");
 
   return {
@@ -21,6 +21,4 @@ function createPackageCjsConfig(pkg: BuildPackage) {
     },
     plugins: [clean(dir), swcBuildPlugin(), swcStripCommentsPlugin()],
   };
-}
-
-export default PACKAGES.map((pkg) => createPackageCjsConfig(pkg));
+});
