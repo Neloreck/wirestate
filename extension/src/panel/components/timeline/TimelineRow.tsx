@@ -40,7 +40,7 @@ export function TimelineRow({ event, count, actions, result, baseline }: Timelin
         onClick={expandable ? () => setOpen((value) => !value) : undefined}
       >
         <EventTimeCells event={event} baseline={baseline} />
-        <span className={"min-w-[84px] shrink-0"}>
+        <span className={"min-w-21 shrink-0"}>
           <Tag tone={KIND_TONE[event.kind]}>{event.kind}</Tag>
         </span>
         <span className={"flex-1 truncate"}>

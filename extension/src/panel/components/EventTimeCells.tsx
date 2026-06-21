@@ -21,11 +21,11 @@ export function EventTimeCells({ event, baseline }: EventTimeCellsProps) {
 
   return (
     <>
-      <span className={"w-[88px] shrink-0 text-fg-subtle tabular-nums"}>
+      <span className={"w-22 shrink-0 text-fg-subtle tabular-nums"}>
         {timestamp === undefined ? "" : formatTimestamp(timestamp)}
       </span>
 
-      <span className={"w-[56px] shrink-0 text-fg-muted tabular-nums"}>
+      <span className={"w-14 shrink-0 text-fg-muted tabular-nums"}>
         {delta === undefined ? "" : formatDelta(delta)}
       </span>
     </>

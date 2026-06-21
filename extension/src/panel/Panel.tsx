@@ -53,7 +53,7 @@ export function Panel() {
         className={"flex min-h-0 flex-1"}
         style={{ "--nav-w": `${(layout.navFraction * 100).toFixed(3)}%` } as CSSProperties}
       >
-        <div className={"min-w-[220px] overflow-hidden"} style={{ flex: "0 0 var(--nav-w)" }}>
+        <div className={"min-w-55 overflow-hidden"} style={{ flex: "0 0 var(--nav-w)" }}>
           <Navigator roots={builtRoots} selection={state.selection} collapsed={state.ui.collapsed} actions={actions} />
         </div>
 
