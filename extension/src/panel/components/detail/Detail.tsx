@@ -8,9 +8,8 @@ import { type ResolvedEntity, resolveSelection } from "@/panel/lib/selectors";
 import { type Selection, isSameSelection } from "@/panel/lib/types";
 import { type Optional } from "@/types/general";
 
-import { BindingDetail } from "./BindingDetail";
-import { ContainerDetail } from "./ContainerDetail";
-import { PluginDetail } from "./PluginDetail";
+import { Breadcrumb } from "./Breadcrumb";
+import { View } from "./View";
 
 interface DetailProps {
   readonly roots: ReadonlyArray<DevtoolsRootSnapshot>;
@@ -84,68 +83,4 @@ export function Detail({ roots, log, selection, actions, inspect, inspectBinding
   }
 
   return <section className={"flex-1 overflow-auto p-3"}>{content}</section>;
-}
-
-function Breadcrumb({ resolved, actions }: { resolved: ResolvedEntity; actions: PanelActions }) {
-  const containerId: number = resolved.container.containerId;
-
-  return (
-    <div className={"mb-2 flex flex-wrap items-center gap-1 text-fg-muted"}>
-      <LinkButton onClick={() => actions.select({ kind: "container", containerId })}>
-        container #{containerId}
-      </LinkButton>
-      {resolved.kind === "container" ? null : (
-        <>
-          <span>▸</span>
-          <span className={"text-fg"}>{entityLabel(resolved)}</span>
-        </>
-      )}
-    </div>
-  );
-}
-
-function entityLabel(resolved: ResolvedEntity): string {
-  switch (resolved.kind) {
-    case "binding":
-      return resolved.binding.token.name;
-    case "plugin":
-      return resolved.plugin.name;
-    default:
-      return "";
-  }
-}
-
-function View({
-  resolved,
-  roots,
-  log,
-  actions,
-  inspect,
-  inspectBinding,
-}: {
-  resolved: ResolvedEntity;
-  roots: ReadonlyArray<DevtoolsRootSnapshot>;
-  log: ReadonlyArray<DevtoolsEvent>;
-  actions: PanelActions;
-  inspect: InspectFn;
-  inspectBinding: InspectBindingFn;
-}) {
-  switch (resolved.kind) {
-    case "container":
-      return <ContainerDetail container={resolved.container} roots={roots} log={log} actions={actions} />;
-    case "binding":
-      return (
-        <BindingDetail
-          container={resolved.container}
-          binding={resolved.binding}
-          actions={actions}
-          roots={roots}
-          log={log}
-          inspect={inspect}
-          inspectBinding={inspectBinding}
-        />
-      );
-    case "plugin":
-      return <PluginDetail plugin={resolved.plugin} />;
-  }
 }

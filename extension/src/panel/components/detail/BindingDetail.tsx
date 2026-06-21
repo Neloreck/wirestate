@@ -20,9 +20,10 @@ import {
 } from "@/panel/lib/selectors";
 import { type Optional } from "@/types/general";
 
+import { FilterToContainerLink } from "./FilterToContainerLink";
 import { InstanceSections } from "./InstanceSections";
-import { FilterToContainerLink, StatusTag } from "./parts";
 import { StateTree, type ValueReader } from "./StateTree";
+import { StatusTag } from "./StatusTag";
 
 interface BindingDetailProps {
   readonly container: DevtoolsContainerSnapshot;

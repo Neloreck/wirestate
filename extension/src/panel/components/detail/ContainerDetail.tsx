@@ -8,8 +8,9 @@ import { Field, LinkButton, Section, Tag } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { type BindingStatus, bindingStatus, childContainers, lifecycleHistory } from "@/panel/lib/selectors";
 
+import { FilterToContainerLink } from "./FilterToContainerLink";
 import { History } from "./History";
-import { FilterToContainerLink, StatusTag } from "./parts";
+import { StatusTag } from "./StatusTag";
 
 interface ContainerDetailProps {
   readonly container: DevtoolsContainerSnapshot;

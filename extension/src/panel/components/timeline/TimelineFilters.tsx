@@ -4,6 +4,8 @@ import { type PanelActions, type PanelUi } from "@/panel/hooks/use-panel-state";
 import { type RootModel } from "@/panel/lib/selectors";
 import { type EventKind, type TimelineFilter } from "@/panel/lib/types";
 
+import { Toggle } from "./Toggle";
+
 const KINDS: ReadonlyArray<EventKind> = ["lifecycle", "message", "registration"];
 const CHANNELS: ReadonlyArray<DevtoolsMessageChannel> = ["event", "command", "query"];
 
@@ -79,19 +81,5 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
         clear
       </button>
     </div>
-  );
-}
-
-function Toggle({ on, label, onClick }: { on: boolean; label: string; onClick: () => void }) {
-  return (
-    <button
-      type={"button"}
-      onClick={onClick}
-      className={`rounded border px-2 py-0.5 ${
-        on ? "border-emerald-400 text-emerald-600 dark:text-emerald-400" : "border-divider text-fg-muted"
-      }`}
-    >
-      {label}
-    </button>
   );
 }
