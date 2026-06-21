@@ -54,6 +54,7 @@ export default [
       "@typescript-eslint/explicit-member-accessibility": ["error"],
       "@typescript-eslint/array-type": ["error", { default: "generic" }],
       "@typescript-eslint/no-require-imports": "off",
+      "func-style": ["error", "declaration"],
       "@typescript-eslint/consistent-type-imports": [
         "error",
         { prefer: "type-imports", fixStyle: "inline-type-imports" },
@@ -191,6 +192,13 @@ export default [
     rules: {
       "jsdoc/require-param": "off",
       "jsdoc/require-returns": "off",
+    },
+  },
+  {
+    // Tests favor inline arrow helpers and throwaway components.
+    files: ["**/*.test.ts", "**/*.test.tsx"],
+    rules: {
+      "func-style": "off",
     },
   },
   {

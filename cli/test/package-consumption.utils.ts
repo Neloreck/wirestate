@@ -95,9 +95,9 @@ export function packageExportCheckScript(mode: PackageExportCheckMode): string {
 }
 
 export function packageIdentityCheckScript(mode: PackageExportCheckMode): string {
-  const load = (name: string): string => {
+  function load(name: string): string {
     return mode === "require" ? `require("${name}")` : `await import("${name}")`;
-  };
+  }
 
   return [
     `const core = ${load("@wirestate/core")};`,

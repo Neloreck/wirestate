@@ -10,10 +10,11 @@ export default class GithubSummaryReporter {
       return;
     }
 
-    const summaryLine = (label, passed, failed, total) =>
-      failed > 0
+    function summaryLine(label, passed, failed, total) {
+      return failed > 0
         ? `- **${label}**: ❌ **${failed} failed** · ${passed} passes · ${total} total`
         : `- **${label}**: ✅ **${passed} passes** · ${total} total`;
+    }
 
     const lines = [
       "## Jest Test Report",
