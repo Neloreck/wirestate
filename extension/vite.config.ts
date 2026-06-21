@@ -20,7 +20,7 @@ export default defineConfig({
       "@wirestate/core/devtools": PROTOCOL_SRC,
     },
   },
-  oxc: { target: CHROME_TARGET },
+  oxc: { target: CHROME_TARGET, decorator: { legacy: true } },
   plugins: [react(), tailwindcss(), crx({ manifest })],
   build: {
     target: CHROME_TARGET,
