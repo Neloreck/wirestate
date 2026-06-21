@@ -64,9 +64,7 @@ export function TimelineRow({ event, count, actions, result, baseline }: Timelin
       </div>
 
       {open && event.kind === "message" ? (
-        <pre className={"overflow-auto bg-elevated px-2.5 py-1 text-xs text-fg"}>
-          {messageDetail(event, result)}
-        </pre>
+        <pre className={"overflow-auto bg-elevated px-2.5 py-1 text-xs text-fg"}>{messageDetail(event, result)}</pre>
       ) : null}
     </div>
   );
