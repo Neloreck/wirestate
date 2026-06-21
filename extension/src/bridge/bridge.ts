@@ -1,5 +1,5 @@
 import { forwardToPage, readContentMessage } from "@/bridge/bridge.connection";
-import { CONTENT_PORT, type BackendToPanel } from "@/bridge/bridge.messages";
+import { CONTENT_PORT, type BackendToPanelPayload } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
 /**
@@ -25,7 +25,7 @@ function connect(): void {
 
 // Backend (MAIN world) -> background worker (panel).
 window.addEventListener("message", (messageEvent: MessageEvent): void => {
-  const payload: Optional<BackendToPanel> = readContentMessage(messageEvent);
+  const payload: Optional<BackendToPanelPayload> = readContentMessage(messageEvent);
 
   if (payload !== undefined) {
     port?.postMessage(payload);

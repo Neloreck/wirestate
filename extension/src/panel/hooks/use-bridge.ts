@@ -3,11 +3,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   PANEL_PORT_PREFIX,
-  type BackendToPanel,
+  type BackendToPanelPayload,
   type InspectBindingFn,
   type InspectFn,
   type InspectNode,
-  type PanelToBackend,
+  type PanelToBackendPayload,
 } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
@@ -51,7 +51,7 @@ export function useBridge(): BridgeState {
       portRef.current = port;
       setConnected(true);
 
-      port.onMessage.addListener((message: BackendToPanel): void => {
+      port.onMessage.addListener((message: BackendToPanelPayload): void => {
         switch (message.type) {
           case "init":
             setProtocolVersion(message.protocolVersion);
@@ -65,7 +65,7 @@ export function useBridge(): BridgeState {
             setLog((previous) => [...previous, message.event].slice(-MAX_LOG));
             // Structure-affecting deltas → pull a fresh tree; message deltas don't change it.
             if (message.event.kind !== "message") {
-              port.postMessage({ type: "refresh" } satisfies PanelToBackend);
+              port.postMessage({ type: "refresh" } satisfies PanelToBackendPayload);
             }
 
             break;
@@ -76,7 +76,7 @@ export function useBridge(): BridgeState {
           case "page-connected":
             // A fresh page backend just paired (reload/first load/worker wake). Re-pull its snapshot
             // + buffered deltas; the onNavigated reset has already cleared the previous page's tree.
-            port.postMessage({ type: "attach" } satisfies PanelToBackend);
+            port.postMessage({ type: "attach" } satisfies PanelToBackendPayload);
             break;
         }
       });
@@ -95,7 +95,7 @@ export function useBridge(): BridgeState {
         }
       });
 
-      port.postMessage({ type: "attach" } satisfies PanelToBackend);
+      port.postMessage({ type: "attach" } satisfies PanelToBackendPayload);
     }
 
     connect();
@@ -140,7 +140,7 @@ export function useBridge(): BridgeState {
 
       return new Promise((resolve) => {
         pendingRef.current.set(requestId, resolve);
-        port.postMessage({ type: "inspect", requestId, rootId, instanceId, path } satisfies PanelToBackend);
+        port.postMessage({ type: "inspect", requestId, rootId, instanceId, path } satisfies PanelToBackendPayload);
       });
     },
     []
@@ -158,7 +158,13 @@ export function useBridge(): BridgeState {
 
       return new Promise((resolve) => {
         pendingRef.current.set(requestId, resolve);
-        port.postMessage({ type: "inspectBinding", requestId, rootId, bindingId, path } satisfies PanelToBackend);
+        port.postMessage({
+          type: "inspectBinding",
+          requestId,
+          rootId,
+          bindingId,
+          path,
+        } satisfies PanelToBackendPayload);
       });
     },
     []

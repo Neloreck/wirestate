@@ -1,5 +1,5 @@
 import { post } from "@/backend/backend.messaging";
-import { type BackendToPanel, BRIDGE_SOURCE } from "@/bridge/bridge.messages";
+import { type BackendToPanelPayload, BRIDGE_SOURCE } from "@/bridge/bridge.messages";
 
 describe("post", () => {
   const globalScope = globalThis as { window?: unknown };
@@ -14,7 +14,7 @@ describe("post", () => {
 
     globalScope.window = { postMessage };
 
-    const payload: BackendToPanel = { type: "snapshot", roots: [] };
+    const payload: BackendToPanelPayload = { type: "snapshot", roots: [] };
 
     post(payload);
 

@@ -243,16 +243,10 @@ describe("sameSelection", () => {
     expect(isSameSelection({ kind: "container", containerId: 1 }, { kind: "container", containerId: 1 })).toBe(true);
     expect(isSameSelection({ kind: "container", containerId: 1 }, { kind: "container", containerId: 2 })).toBe(false);
     expect(
-      isSameSelection(
-        { kind: "binding", containerId: 1, token: "A" },
-        { kind: "binding", containerId: 1, token: "A" }
-      )
+      isSameSelection({ kind: "binding", containerId: 1, token: "A" }, { kind: "binding", containerId: 1, token: "A" })
     ).toBe(true);
     expect(
-      isSameSelection(
-        { kind: "binding", containerId: 1, token: "A" },
-        { kind: "binding", containerId: 1, token: "B" }
-      )
+      isSameSelection({ kind: "binding", containerId: 1, token: "A" }, { kind: "binding", containerId: 1, token: "B" })
     ).toBe(false);
     expect(isSameSelection({ kind: "container", containerId: 1 }, { kind: "plugin", containerId: 1, name: "A" })).toBe(
       false

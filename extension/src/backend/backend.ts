@@ -1,49 +1,17 @@
-import { DEVTOOLS_PROTOCOL_VERSION, type DevtoolsEvent } from "@wirestate/core/devtools";
+import { type DevtoolsHook, installDevtoolsHook } from "@wirestate/core/devtools";
 
+import { InspectorBackend } from "@/backend/backend.inspector";
 import { post } from "@/backend/backend.messaging";
-import { BACKEND_BUFFER, BACKEND_HOOK } from "@/backend/backend.state";
-import { getRootsSnapshot, inspectAt, inspectBindingAt, record } from "@/backend/backend.utils";
-import { BRIDGE_SOURCE, type PageMessage, type PanelToBackend } from "@/bridge/bridge.messages";
-import { type Optional } from "@/types/general";
 
 /**
- * Forwards every delta the hook emits to the panel, recording it in the replay buffer first.
+ * MAIN-world content-script entry and composition root. Installs (or reuses) the page's DevTools hook,
+ * constructs the inspector backend, and wires its two external event sources to the backend's handlers:
+ * the hook's lifecycle/message delta stream, and the page `message` events carrying panel requests.
+ * Runs at `document_start`, so the backend observes from the first lifecycle delta.
  */
-BACKEND_HOOK.subscribe((event: DevtoolsEvent): void => post({ type: "event", event: record(event) }));
+const hook: DevtoolsHook = installDevtoolsHook();
+const backend: InspectorBackend = new InspectorBackend(hook, post);
 
-/**
- * Answers panel requests arriving over the bridge: `attach` (init payload), `refresh` (re-snapshot),
- * `inspect` (one-level instance read), and `inspectBinding` (one-level `Value` binding read).
- */
-window.addEventListener("message", (messageEvent: MessageEvent): void => {
-  const data: Optional<PageMessage> = messageEvent.data as Optional<PageMessage>;
+hook.subscribe((event) => backend.onDelta(event));
 
-  if (!data || data.source !== BRIDGE_SOURCE || data.dir !== "to-page") {
-    return;
-  }
-
-  const request: PanelToBackend = data.payload;
-
-  if (request.type === "attach") {
-    post({
-      type: "init",
-      protocolVersion: BACKEND_HOOK.protocolVersion ?? DEVTOOLS_PROTOCOL_VERSION,
-      roots: getRootsSnapshot(),
-      events: [...BACKEND_BUFFER],
-    });
-  } else if (request.type === "refresh") {
-    post({ type: "snapshot", roots: getRootsSnapshot() });
-  } else if (request.type === "inspect") {
-    post({
-      type: "inspectResult",
-      requestId: request.requestId,
-      node: inspectAt(request.rootId, request.instanceId, request.path),
-    });
-  } else if (request.type === "inspectBinding") {
-    post({
-      type: "inspectResult",
-      requestId: request.requestId,
-      node: inspectBindingAt(request.rootId, request.bindingId, request.path),
-    });
-  }
-});
+window.addEventListener("message", (event) => backend.onMessage(event));

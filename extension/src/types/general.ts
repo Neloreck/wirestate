@@ -13,4 +13,7 @@ export type Nullable<T> = T | null;
  */
 export type Maybe<T> = T | null | undefined;
 
+/**
+ * Any callable function.
+ */
 export type AnyCallable<T = void> = (...args: Array<unknown>) => T;

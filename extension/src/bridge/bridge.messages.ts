@@ -63,7 +63,7 @@ export type InspectBindingFn = (
  * `message` delta's `payload`/`source` have been **dehydrated** by the backend (see
  * {@link "../backend/dehydrate"}) so they survive structured clone across the bridge.
  */
-export type BackendToPanel =
+export type BackendToPanelPayload =
   | {
       readonly type: "init";
       readonly protocolVersion: number;
@@ -78,7 +78,7 @@ export type BackendToPanel =
 /**
  * A message the panel sends toward the backend.
  */
-export type PanelToBackend =
+export type PanelToBackendPayload =
   | { readonly type: "attach" }
   | { readonly type: "refresh" }
   | {
@@ -100,5 +100,5 @@ export type PanelToBackend =
  * Envelope carried over `window.postMessage` between the two content-script worlds.
  */
 export type PageMessage =
-  | { readonly source: typeof BRIDGE_SOURCE; readonly dir: "to-content"; readonly payload: BackendToPanel }
-  | { readonly source: typeof BRIDGE_SOURCE; readonly dir: "to-page"; readonly payload: PanelToBackend };
+  | { readonly source: typeof BRIDGE_SOURCE; readonly dir: "to-content"; readonly payload: BackendToPanelPayload }
+  | { readonly source: typeof BRIDGE_SOURCE; readonly dir: "to-page"; readonly payload: PanelToBackendPayload };

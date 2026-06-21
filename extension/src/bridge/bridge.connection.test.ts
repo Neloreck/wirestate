@@ -1,5 +1,10 @@
 import { forwardToPage, readContentMessage } from "@/bridge/bridge.connection";
-import { type BackendToPanel, BRIDGE_SOURCE, type PageMessage, type PanelToBackend } from "@/bridge/bridge.messages";
+import {
+  type BackendToPanelPayload,
+  BRIDGE_SOURCE,
+  type PageMessage,
+  type PanelToBackendPayload,
+} from "@/bridge/bridge.messages";
 
 describe("forwardToPage", () => {
   const globalScope = globalThis as { window?: unknown };
@@ -14,7 +19,7 @@ describe("forwardToPage", () => {
 
     globalScope.window = { postMessage };
 
-    const payload: PanelToBackend = { type: "refresh" };
+    const payload: PanelToBackendPayload = { type: "refresh" };
 
     forwardToPage(payload);
 
@@ -28,7 +33,7 @@ describe("readContentMessage", () => {
   }
 
   it("returns the payload of a valid to-content message", () => {
-    const payload: BackendToPanel = { type: "snapshot", roots: [] };
+    const payload: BackendToPanelPayload = { type: "snapshot", roots: [] };
     const message: PageMessage = { source: BRIDGE_SOURCE, dir: "to-content", payload };
 
     expect(readContentMessage(eventWith(message))).toBe(payload);

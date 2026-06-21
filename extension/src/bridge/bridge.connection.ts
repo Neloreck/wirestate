@@ -1,4 +1,9 @@
-import { BRIDGE_SOURCE, type BackendToPanel, type PageMessage, type PanelToBackend } from "@/bridge/bridge.messages";
+import {
+  BRIDGE_SOURCE,
+  type BackendToPanelPayload,
+  type PageMessage,
+  type PanelToBackendPayload,
+} from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
 /**
@@ -6,7 +11,7 @@ import { type Optional } from "@/types/general";
  *
  * @param payload - Message from the background worker (panel) bound for the page.
  */
-export function forwardToPage(payload: PanelToBackend): void {
+export function forwardToPage(payload: PanelToBackendPayload): void {
   const message: PageMessage = { source: BRIDGE_SOURCE, dir: "to-page", payload };
 
   window.postMessage(message, "*");
@@ -18,7 +23,7 @@ export function forwardToPage(payload: PanelToBackend): void {
  * @param messageEvent - A `window` `message` event from the MAIN-world backend.
  * @returns The payload to forward to the port, or `undefined` when the message is not ours.
  */
-export function readContentMessage(messageEvent: MessageEvent): Optional<BackendToPanel> {
+export function readContentMessage(messageEvent: MessageEvent): Optional<BackendToPanelPayload> {
   const data: Optional<PageMessage> = messageEvent.data as Optional<PageMessage>;
 
   if (!data || data.source !== BRIDGE_SOURCE || data.dir !== "to-content") {
