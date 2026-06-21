@@ -122,7 +122,7 @@ export class CounterService {
       count: this.count,
       isEven: this.isEven,
       lastIncrementAt: this.lastIncrementAt,
-      fetchedAt: new Date(),
+      fetchedAt: Date.now(),
     };
   }
 }
