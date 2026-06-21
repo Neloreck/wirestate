@@ -20,7 +20,7 @@ import {
 import { type Optional } from "@/types/general";
 
 import { InstanceSections } from "./InstanceSections";
-import { Field, FilterToContainerLink, Section, StatusTag } from "./parts";
+import { Field, FilterToContainerLink, Section, StatusTag, Tag } from "./parts";
 import { StateTree, type ValueReader } from "./StateTree";
 
 interface BindingDetailProps {
@@ -74,10 +74,16 @@ export function BindingDetail({
     <div className={"space-y-3"}>
       <Section title={"binding"}>
         <Field label={"token"}>
-          {binding.token.name} <span className={"text-fg-muted"}>({binding.token.kind})</span>
+          {binding.token.name} <Tag tone={"neutral"}>{binding.token.kind}</Tag>
         </Field>
-        <Field label={"type"}>{binding.type}</Field>
-        <Field label={"scope"}>{binding.scope}</Field>
+        <Field label={"type"}>
+          <Tag tone={binding.type === "Value" ? "info" : binding.type === "Instance" ? "accent" : "warn"}>
+            {binding.type}
+          </Tag>
+        </Field>
+        <Field label={"scope"}>
+          <Tag tone={binding.scope === "Transient" ? "warn" : "neutral"}>{binding.scope}</Tag>
+        </Field>
         <Field label={"impl"}>{binding.implementation ?? "—"}</Field>
         {status === "none" ? null : (
           <Field label={"status"}>

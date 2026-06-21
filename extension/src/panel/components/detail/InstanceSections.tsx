@@ -13,7 +13,7 @@ import { lifecycleHistory, rootIdOfContainer, tokenOfInstanceId } from "@/panel/
 import { type Optional } from "@/types/general";
 
 import { History } from "./History";
-import { Field, Section } from "./parts";
+import { Field, Section, Tag } from "./parts";
 import { StateTree, type ValueReader } from "./StateTree";
 
 interface InstanceSectionsProps {
@@ -70,12 +70,13 @@ export function InstanceSections({ container, instance, log, roots, inspect, act
         <Field label={"class"}>{instance.className}</Field>
       </Section>
 
-      <Section title={"status"}>
+      <Section title={"provision"}>
         {status ? (
           <>
-            <Field label={"active"}>{status.isInactive ? "inactive" : "active"}</Field>
-            <Field label={"provision"}>
-              {status.isDeprovisioned === null ? "not provisioned" : status.isDeprovisioned ? "deprovisioned" : "owned"}
+            <Field label={"state"}>
+              <Tag tone={status.isDeprovisioned === null ? "neutral" : status.isDeprovisioned ? "warn" : "ok"}>
+                {status.isDeprovisioned === null ? "not provisioned" : status.isDeprovisioned ? "deprovisioned" : "owned"}
+              </Tag>
             </Field>
             <Field label={"provisionId"}>{status.provisionId ?? "—"}</Field>
           </>
@@ -90,8 +91,10 @@ export function InstanceSections({ container, instance, log, roots, inspect, act
         ) : (
           instance.handlers.map((handler, index) => (
             <div key={index}>
-              <span className={"text-fuchsia-600 dark:text-fuchsia-400"}>{handler.channel}</span> {handler.type} →{" "}
-              {handler.method}()
+              <Tag tone={"accent"} variant={"outline"}>
+                {handler.channel}
+              </Tag>{" "}
+              {handler.type} → {handler.method}()
             </div>
           ))
         )}
@@ -105,12 +108,18 @@ export function InstanceSections({ container, instance, log, roots, inspect, act
             const channels: Optional<Set<string>> = handlerChannels.get(method.name);
 
             return (
-              <div key={method.name}>
-                {method.name}
-                <span className={"text-fg-muted"}>({method.arity})</span>
-                {channels ? (
-                  <span className={"text-fuchsia-600 dark:text-fuchsia-400"}> {Array.from(channels).join(", ")}</span>
-                ) : null}
+              <div key={method.name} className={"flex flex-wrap items-center gap-1"}>
+                <span>
+                  {method.name}
+                  <span className={"text-fg-muted"}>({method.arity})</span>
+                </span>
+                {channels
+                  ? Array.from(channels).map((channel) => (
+                      <Tag key={channel} tone={"accent"} variant={"outline"}>
+                        {channel}
+                      </Tag>
+                    ))
+                  : null}
               </div>
             );
           })

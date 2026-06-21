@@ -8,7 +8,7 @@ import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { type BindingStatus, bindingStatus, childContainers, lifecycleHistory } from "@/panel/lib/selectors";
 
 import { History } from "./History";
-import { Field, FilterToContainerLink, LinkButton, Section, StatusTag } from "./parts";
+import { Field, FilterToContainerLink, LinkButton, Section, StatusTag, Tag } from "./parts";
 
 interface ContainerDetailProps {
   readonly container: DevtoolsContainerSnapshot;
@@ -84,11 +84,15 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
                     actions.select({ kind: "binding", containerId: container.containerId, token: binding.token.name })
                   }
                 >
-                  {binding.token.name}{" "}
-                  <span className={"text-fg-muted"}>
-                    ({binding.type}/{binding.scope})
-                  </span>
+                  {binding.token.name}
                 </LinkButton>
+
+                <Tag tone={binding.type === "Value" ? "info" : binding.type === "Instance" ? "accent" : "warn"}>
+                  {binding.type}
+                </Tag>
+
+                {binding.scope === "Transient" ? <Tag tone={"warn"}>Transient</Tag> : null}
+
                 {status === "none" ? null : <StatusTag status={status} />}
               </div>
             );

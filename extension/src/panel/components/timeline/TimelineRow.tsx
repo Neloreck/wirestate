@@ -5,17 +5,18 @@ import {
 } from "@wirestate/core/devtools";
 import { useState } from "react";
 
+import { Tag, type TagTone } from "@/panel/components/detail/parts";
 import { EventSummary } from "@/panel/components/EventSummary";
 import { EventTimeCells } from "@/panel/components/EventTimeCells";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { stringify } from "@/panel/lib/format";
 import { type Optional } from "@/types/general";
 
-const TAG_COLOR: Record<DevtoolsEvent["kind"], string> = {
-  lifecycle: "text-sky-600 dark:text-sky-400",
-  message: "text-fuchsia-600 dark:text-fuchsia-400",
-  registration: "text-amber-600 dark:text-amber-400",
-  messageResult: "text-fg-muted",
+const KIND_TONE: Record<DevtoolsEvent["kind"], TagTone> = {
+  lifecycle: "info",
+  message: "accent",
+  registration: "warn",
+  messageResult: "muted",
 };
 
 interface TimelineRowProps {
@@ -39,7 +40,9 @@ export function TimelineRow({ event, count, actions, result, baseline }: Timelin
         onClick={expandable ? () => setOpen((value) => !value) : undefined}
       >
         <EventTimeCells event={event} baseline={baseline} />
-        <span className={`min-w-[84px] shrink-0 ${TAG_COLOR[event.kind]}`}>{event.kind}</span>
+        <span className={"min-w-[84px] shrink-0"}>
+          <Tag tone={KIND_TONE[event.kind]}>{event.kind}</Tag>
+        </span>
         <span className={"flex-1 truncate"}>
           <EventSummary
             event={event}
