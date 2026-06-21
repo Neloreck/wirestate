@@ -8,12 +8,12 @@ import {
 import { useMemo } from "react";
 
 import { type InspectFn } from "@/bridge/bridge.messages";
+import { Field, Section, Tag } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { lifecycleHistory, rootIdOfContainer, tokenOfInstanceId } from "@/panel/lib/selectors";
 import { type Optional } from "@/types/general";
 
 import { History } from "./History";
-import { Field, Section, Tag } from "./parts";
 import { StateTree, type ValueReader } from "./StateTree";
 
 interface InstanceSectionsProps {
@@ -75,7 +75,11 @@ export function InstanceSections({ container, instance, log, roots, inspect, act
           <>
             <Field label={"state"}>
               <Tag tone={status.isDeprovisioned === null ? "neutral" : status.isDeprovisioned ? "warn" : "ok"}>
-                {status.isDeprovisioned === null ? "not provisioned" : status.isDeprovisioned ? "deprovisioned" : "owned"}
+                {status.isDeprovisioned === null
+                  ? "not provisioned"
+                  : status.isDeprovisioned
+                    ? "deprovisioned"
+                    : "owned"}
               </Tag>
             </Field>
             <Field label={"provisionId"}>{status.provisionId ?? "—"}</Field>

@@ -1,6 +1,6 @@
 import { type DevtoolsPluginInfo } from "@wirestate/core/devtools";
 
-import { Field, Section } from "./parts";
+import { Field, Section } from "@/panel/components/ui";
 
 /** Detail view for a selected plugin. */
 export function PluginDetail({ plugin }: { plugin: DevtoolsPluginInfo }) {

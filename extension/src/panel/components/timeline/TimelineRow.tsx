@@ -5,9 +5,9 @@ import {
 } from "@wirestate/core/devtools";
 import { useState } from "react";
 
-import { Tag, type TagTone } from "@/panel/components/detail/parts";
 import { EventSummary } from "@/panel/components/EventSummary";
 import { EventTimeCells } from "@/panel/components/EventTimeCells";
+import { Tag, type TagTone } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { stringify } from "@/panel/lib/format";
 import { type Optional } from "@/types/general";

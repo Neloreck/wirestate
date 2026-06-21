@@ -2,6 +2,7 @@ import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/d
 import { type ReactNode, useEffect, useRef } from "react";
 
 import { type InspectBindingFn, type InspectFn } from "@/bridge/bridge.messages";
+import { LinkButton } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { type ResolvedEntity, resolveSelection } from "@/panel/lib/selectors";
 import { type Selection, isSameSelection } from "@/panel/lib/types";
@@ -9,7 +10,6 @@ import { type Optional } from "@/types/general";
 
 import { BindingDetail } from "./BindingDetail";
 import { ContainerDetail } from "./ContainerDetail";
-import { LinkButton } from "./parts";
 import { PluginDetail } from "./PluginDetail";
 
 interface DetailProps {
@@ -40,7 +40,14 @@ export function Detail({ roots, log, selection, actions, inspect, inspectBinding
     content = (
       <>
         <Breadcrumb resolved={resolved} actions={actions} />
-        <View resolved={resolved} roots={roots} log={log} actions={actions} inspect={inspect} inspectBinding={inspectBinding} />
+        <View
+          resolved={resolved}
+          roots={roots}
+          log={log}
+          actions={actions}
+          inspect={inspect}
+          inspectBinding={inspectBinding}
+        />
       </>
     );
   } else {
@@ -62,7 +69,14 @@ export function Detail({ roots, log, selection, actions, inspect, inspectBinding
         </div>
         {dead ? (
           <div className={"pointer-events-none opacity-60"}>
-            <View resolved={dead} roots={roots} log={log} actions={actions} inspect={inspect} inspectBinding={inspectBinding} />
+            <View
+              resolved={dead}
+              roots={roots}
+              log={log}
+              actions={actions}
+              inspect={inspect}
+              inspectBinding={inspectBinding}
+            />
           </div>
         ) : null}
       </div>

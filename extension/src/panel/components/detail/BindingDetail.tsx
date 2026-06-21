@@ -8,6 +8,7 @@ import {
 import { useMemo } from "react";
 
 import { type InspectBindingFn, type InspectFn } from "@/bridge/bridge.messages";
+import { Field, Section, Tag } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import {
   type BindingStatus,
@@ -20,7 +21,7 @@ import {
 import { type Optional } from "@/types/general";
 
 import { InstanceSections } from "./InstanceSections";
-import { Field, FilterToContainerLink, Section, StatusTag, Tag } from "./parts";
+import { FilterToContainerLink, StatusTag } from "./parts";
 import { StateTree, type ValueReader } from "./StateTree";
 
 interface BindingDetailProps {

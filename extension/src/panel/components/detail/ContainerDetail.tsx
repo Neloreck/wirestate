@@ -4,11 +4,12 @@ import {
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
 
+import { Field, LinkButton, Section, Tag } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { type BindingStatus, bindingStatus, childContainers, lifecycleHistory } from "@/panel/lib/selectors";
 
 import { History } from "./History";
-import { Field, FilterToContainerLink, LinkButton, Section, StatusTag, Tag } from "./parts";
+import { FilterToContainerLink, StatusTag } from "./parts";
 
 interface ContainerDetailProps {
   readonly container: DevtoolsContainerSnapshot;
@@ -52,24 +53,6 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
         </Field>
       </Section>
 
-      <Section title={`plugins (${container.plugins.length})`}>
-        {container.plugins.length === 0 ? (
-          <span className={"text-fg-muted"}>—</span>
-        ) : (
-          container.plugins.map((plugin) => (
-            <div key={plugin.name}>
-              <LinkButton
-                onClick={() =>
-                  actions.select({ kind: "plugin", containerId: container.containerId, name: plugin.name })
-                }
-              >
-                {plugin.name}
-              </LinkButton>
-            </div>
-          ))
-        )}
-      </Section>
-
       <Section title={`bindings (${container.bindings.length})`}>
         {container.bindings.length === 0 ? (
           <span className={"text-fg-muted"}>—</span>
@@ -102,6 +85,24 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
               </div>
             );
           })
+        )}
+      </Section>
+
+      <Section title={`plugins (${container.plugins.length})`}>
+        {container.plugins.length === 0 ? (
+          <span className={"text-fg-muted"}>—</span>
+        ) : (
+          container.plugins.map((plugin) => (
+            <div key={plugin.name}>
+              <LinkButton
+                onClick={() =>
+                  actions.select({ kind: "plugin", containerId: container.containerId, name: plugin.name })
+                }
+              >
+                {plugin.name}
+              </LinkButton>
+            </div>
+          ))
         )}
       </Section>
 
