@@ -1,7 +1,8 @@
 import { type PropsWithChildren } from "react";
 
-/** Visual tone of a {@link Tag}. */
 export type TagTone = "neutral" | "info" | "accent" | "ok" | "warn" | "muted";
+
+export type TagVariant = "solid" | "outline";
 
 const TAG_TONE: Record<TagTone, string> = {
   neutral: "bg-zinc-500/15 text-fg-muted",
@@ -21,18 +22,15 @@ const TAG_OUTLINE: Record<TagTone, string> = {
   muted: "border-zinc-500/40 text-fg-muted",
 };
 
-/**
- * Visual style of a {@link Tag}: a filled `solid` pill (uppercase, small — for binding metadata), or
- * an `outline` chip that inherits the surrounding font size, for inline use such as handler channels.
- */
-export type TagVariant = "solid" | "outline";
+interface TagProps extends PropsWithChildren {
+  readonly tone?: TagTone;
+  readonly variant?: TagVariant;
+}
 
-/** A small chip used for binding metadata, lifecycle status, and handler channels. */
-export function Tag({
-  tone = "neutral",
-  variant = "solid",
-  children,
-}: PropsWithChildren<{ tone?: TagTone; variant?: TagVariant }>) {
+/**
+ * A small chip used for binding metadata, lifecycle status, and handler channels.
+ */
+export function Tag({ tone = "neutral", variant = "solid", children }: TagProps) {
   if (variant === "outline") {
     return <span className={`rounded border px-1 ${TAG_OUTLINE[tone]}`}>{children}</span>;
   }

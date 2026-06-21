@@ -1,7 +1,13 @@
 import { type PropsWithChildren } from "react";
 
-/** A titled block within a detail view. */
-export function Section({ title, children }: PropsWithChildren<{ title: string }>) {
+interface SectionProps extends PropsWithChildren {
+  readonly title: string;
+}
+
+/**
+ * A titled block within a detail view.
+ */
+export function Section({ title, children }: SectionProps) {
   return (
     <section className={"space-y-1"}>
       <h4 className={"text-2xs tracking-wide text-fg-muted uppercase"}>{title}</h4>

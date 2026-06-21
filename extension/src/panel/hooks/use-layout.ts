@@ -30,7 +30,7 @@ export interface LayoutActions {
  * the initial default render never clobbers a saved layout before the load lands. Actions are pure
  * functional updaters — no I/O in the reducer path — keeping the effect the single writer.
  *
- * @returns Todo;.
+ * @returns The current layout and a stable actions API for resizing the panes and toggling the dock.
  */
 export function useLayout(): { layout: PanelLayout; actions: LayoutActions } {
   const [layout, setLayout] = useState<PanelLayout>(DEFAULTS);

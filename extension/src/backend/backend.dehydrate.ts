@@ -67,11 +67,11 @@ function walk(value: unknown, depth: number, seen: WeakSet<object>): unknown {
   }
 
   switch (typeof value) {
-    case "string":
-      return value.length > MAX_STRING ? `${value.slice(0, MAX_STRING)}…` : value;
     case "number":
     case "boolean":
       return value;
+    case "string":
+      return value.length > MAX_STRING ? `${value.slice(0, MAX_STRING)}...` : value;
     case "undefined":
       return { __wsType: "undefined" } satisfies DehydratedRef;
     case "bigint":

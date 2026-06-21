@@ -30,7 +30,7 @@ export interface TimelineFilter {
  *
  * @param a - First selection.
  * @param b - Second selection.
- * @returns Todo;.
+ * @returns Whether the two selections point at the same entity.
  */
 export function isSameSelection(a: Selection, b: Selection): boolean {
   if (a.kind !== b.kind || a.containerId !== b.containerId) {

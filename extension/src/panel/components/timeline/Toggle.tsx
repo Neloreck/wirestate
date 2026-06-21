@@ -1,5 +1,11 @@
+interface ToggleProps {
+  readonly on: boolean;
+  readonly label: string;
+  readonly onClick: () => void;
+}
+
 /** A small on/off pill button used in the Timeline's control bar. */
-export function Toggle({ on, label, onClick }: { on: boolean; label: string; onClick: () => void }) {
+export function Toggle({ on, label, onClick }: ToggleProps) {
   return (
     <button
       type={"button"}

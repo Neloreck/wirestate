@@ -104,7 +104,7 @@ export interface PanelActions {
 /**
  * Owns the panel's UI state (selection, Timeline filter, view prefs).
  *
- * @returns Todo;.
+ * @returns The current panel state and a stable actions API for dispatching selection, filter, and view updates.
  */
 export function usePanelState(): { state: PanelState; actions: PanelActions } {
   const [state, dispatch] = useReducer(reducer, initialState);
