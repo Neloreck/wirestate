@@ -55,6 +55,7 @@ typings/
 .env
 
 target/
+dist/
 
 /.idea/
 
