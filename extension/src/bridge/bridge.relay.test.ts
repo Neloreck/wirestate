@@ -35,7 +35,7 @@ describe("BridgeRelay", () => {
     expect(port.onDisconnect.addListener).toHaveBeenCalledTimes(1);
   });
 
-  it("forwards a valid backend→panel envelope to the worker port", () => {
+  it("forwards a valid backend->panel envelope to the worker port", () => {
     const port = fakePort();
     const relay = new BridgeRelay(() => port as unknown as chrome.runtime.Port);
     const payload: BackendToPanelPayload = { type: "snapshot", roots: [] };
@@ -47,7 +47,7 @@ describe("BridgeRelay", () => {
     expect(port.postMessage).toHaveBeenCalledWith(payload);
   });
 
-  it("ignores anything that is not a backend→panel bridge envelope", () => {
+  it("ignores anything that is not a backend->panel bridge envelope", () => {
     const port = fakePort();
     const relay = new BridgeRelay(() => port as unknown as chrome.runtime.Port);
 

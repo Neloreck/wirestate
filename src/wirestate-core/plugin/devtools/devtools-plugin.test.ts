@@ -205,7 +205,7 @@ describe("DevToolsPlugin", () => {
 
     expect(root.inspect(id, ["count"])).toBe(5);
     expect(root.inspect(id, ["nested", "deep", "value"])).toBe("x");
-    // Unknown instance / missing path → undefined, never throws.
+    // Unknown instance / missing path -> undefined, never throws.
     expect(root.inspect(999_999, ["count"])).toBeUndefined();
     expect(root.inspect(id, ["nope", "deeper"])).toBeUndefined();
 
@@ -232,7 +232,7 @@ describe("DevToolsPlugin", () => {
     expect(root.inspectBinding(id, [])).toBe(config);
     expect(root.inspectBinding(id, ["url"])).toBe("https://api.example.com");
     expect(root.inspectBinding(id, ["nested", "retries"])).toBe(3);
-    // Unknown id / missing path → undefined, never throws.
+    // Unknown id / missing path -> undefined, never throws.
     expect(root.inspectBinding(999_999, [])).toBeUndefined();
     expect(root.inspectBinding(id, ["nope", "deeper"])).toBeUndefined();
 

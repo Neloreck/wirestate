@@ -43,13 +43,13 @@ export function StateNode({ read, path, label, depth, defaultOpen = false, onNav
   const navigable: boolean = service !== undefined && onNavigate !== undefined;
   const clickable: boolean = expandable || navigable;
 
-  const handleClick = (): void => {
+  function handleClick(): void {
     if (expandable) {
       setOpen((value) => !value);
     } else if (service && onNavigate) {
       onNavigate(service.containerId, service.instanceId, service.className);
     }
-  };
+  }
 
   return (
     <div style={{ paddingLeft: `${depth * 12}px` }}>

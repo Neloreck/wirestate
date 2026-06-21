@@ -64,13 +64,13 @@ export function BindingDetail({
   );
 
   // A field in the value tree may point at a tracked service; resolve it to the realizing binding.
-  const selectByInstanceId = (containerId: number, instanceId: number): void => {
+  function selectByInstanceId(containerId: number, instanceId: number): void {
     const token: Optional<string> = tokenOfInstanceId(roots, containerId, instanceId);
 
     if (token !== undefined) {
       actions.select({ kind: "binding", containerId, token });
     }
-  };
+  }
 
   return (
     <div className={"space-y-3"}>

@@ -50,7 +50,7 @@ export function Detail({ roots, log, selection, actions, inspect, inspectBinding
       </>
     );
   } else {
-    // Selection is no longer live → tombstone. Freeze the last-known view (dimmed) if it matches.
+    // Selection is no longer live -> tombstone. Freeze the last-known view (dimmed) if it matches.
     const dead: Optional<ResolvedEntity> =
       cache.current && isSameSelection(cache.current.selection, selection) ? cache.current.resolved : undefined;
 

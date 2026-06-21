@@ -1,6 +1,18 @@
 import { createDescribeNode, createServiceNode } from "@/backend/backend.node";
 
-describe("describeNode", () => {
+describe("createServiceNode", () => {
+  it("describes a field that references another tracked instance, carrying jump coordinates", () => {
+    expect(createServiceNode({ className: "Logger", containerId: 2, instanceId: 7 })).toEqual({
+      t: "service",
+      preview: "Logger",
+      className: "Logger",
+      containerId: 2,
+      instanceId: 7,
+    });
+  });
+});
+
+describe("createDescribeNode", () => {
   it("describes primitives inline", () => {
     expect(createDescribeNode(5)).toEqual({ t: "primitive", value: 5 });
     expect(createDescribeNode("hi")).toEqual({ t: "primitive", value: "hi" });
@@ -39,17 +51,5 @@ describe("describeNode", () => {
     expect(createDescribeNode(undefined)).toEqual({ t: "leaf", preview: "undefined" });
     expect(createDescribeNode(new Map([["k", 1]])).t).toBe("leaf");
     expect(createDescribeNode(new Set([1])).t).toBe("leaf");
-  });
-});
-
-describe("serviceNode", () => {
-  it("describes a field that references another tracked instance, carrying jump coordinates", () => {
-    expect(createServiceNode({ className: "Logger", containerId: 2, instanceId: 7 })).toEqual({
-      t: "service",
-      preview: "Logger",
-      className: "Logger",
-      containerId: 2,
-      instanceId: 7,
-    });
   });
 });

@@ -51,11 +51,13 @@ export function buildRoots(roots: ReadonlyArray<DevtoolsRootSnapshot>): Readonly
       byParent.set(container.parentContainerId, siblings);
     }
 
-    const build = (container: DevtoolsContainerSnapshot): ContainerNodeModel => ({
-      rootId: root.rootId,
-      container,
-      children: (byParent.get(container.containerId) ?? []).map(build),
-    });
+    function build(container: DevtoolsContainerSnapshot): ContainerNodeModel {
+      return {
+        rootId: root.rootId,
+        container,
+        children: (byParent.get(container.containerId) ?? []).map(build),
+      };
+    }
 
     // Top-level = no parent, or a parent that isn't in this root's observed set.
     const tops: ReadonlyArray<DevtoolsContainerSnapshot> = root.containers.filter(

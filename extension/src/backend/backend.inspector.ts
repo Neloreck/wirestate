@@ -7,7 +7,7 @@ import {
 } from "@wirestate/core/devtools";
 
 import { createDescribeNode, createServiceNode } from "@/backend/backend.node";
-import { sanitizeDevtoolsEvent, stampTime } from "@/backend/backend.utils";
+import { sanitizeDevtoolsEvent, stampTimeInDevtoolsEvent } from "@/backend/backend.utils";
 import {
   BRIDGE_SOURCE,
   type BackendToPanelPayload,
@@ -56,7 +56,7 @@ export class InspectorBackend {
   }
 
   /**
-   * Handles one page `message`: ignores anything that is not a panel→backend bridge envelope, then
+   * Handles one page `message`: ignores anything that is not a panel->backend bridge envelope, then
    * dispatches the request it carries. The `window` listener is added externally (in the entry), so
    * this is purely the callback — the class never touches the DOM.
    *
@@ -69,7 +69,7 @@ export class InspectorBackend {
       return;
     }
 
-    this.handleRequest(data.payload);
+    this.onMessageRequest(data.payload);
   }
 
   /**
@@ -78,7 +78,7 @@ export class InspectorBackend {
    *
    * @param request - The decoded panel-to-backend request.
    */
-  public handleRequest(request: PanelToBackendPayload): void {
+  public onMessageRequest(request: PanelToBackendPayload): void {
     switch (request.type) {
       case "attach":
         this.post({
@@ -155,7 +155,7 @@ export class InspectorBackend {
    * @returns The clone-safe, timestamped delta that was buffered.
    */
   private record(event: DevtoolsEvent): DevtoolsEvent {
-    const safe: DevtoolsEvent = stampTime(sanitizeDevtoolsEvent(event));
+    const safe: DevtoolsEvent = stampTimeInDevtoolsEvent(sanitizeDevtoolsEvent(event));
 
     this.buffer.push(safe);
 

@@ -4,10 +4,9 @@ import { InspectorBackend } from "@/backend/backend.inspector";
 import { post } from "@/backend/backend.messaging";
 
 /**
- * MAIN-world content-script entry and composition root. Installs (or reuses) the page's DevTools hook,
- * constructs the inspector backend, and wires its two external event sources to the backend's handlers:
- * the hook's lifecycle/message delta stream, and the page `message` events carrying panel requests.
- * Runs at `document_start`, so the backend observes from the first lifecycle delta.
+ * MAIN-world content-script entry and composition root.
+ * Installs (or reuses) the page's DevTools hook, constructs the inspector backend,
+ * and wires its two external event sources to the backend's handlers.
  */
 const hook: DevtoolsHook = installDevtoolsHook();
 const backend: InspectorBackend = new InspectorBackend(hook, post);

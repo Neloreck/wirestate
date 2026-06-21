@@ -46,13 +46,13 @@ export function InstanceSections({ container, instance, log, roots, inspect, act
 
   // Resolve an instance-anchored reference (lifecycle row, or a service field in the state tree) to
   // the binding that realizes it, then select that binding.
-  const selectByInstanceId = (containerId: number, instanceId: number): void => {
+  function selectByInstanceId(containerId: number, instanceId: number): void {
     const token: Optional<string> = tokenOfInstanceId(roots, containerId, instanceId);
 
     if (token !== undefined) {
       actions.select({ kind: "binding", containerId, token });
     }
-  };
+  }
 
   const methods: ReadonlyArray<DevtoolsMethod> = instance.methods ?? [];
   const handlerChannels: Map<string, Set<string>> = new Map();
@@ -98,7 +98,7 @@ export function InstanceSections({ container, instance, log, roots, inspect, act
               <Tag tone={"accent"} variant={"outline"}>
                 {handler.channel}
               </Tag>{" "}
-              {handler.type} → {handler.method}()
+              {handler.type} - {handler.method}()
             </div>
           ))
         )}

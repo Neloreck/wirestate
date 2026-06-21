@@ -8,13 +8,13 @@ import {
 } from "@/fixtures/devtools";
 
 import { dehydrate } from "@/backend/backend.dehydrate";
-import { sanitizeDevtoolsEvent, stampTime } from "@/backend/backend.utils";
+import { sanitizeDevtoolsEvent, stampTimeInDevtoolsEvent } from "@/backend/backend.utils";
 
 function getTimestampOf(event: DevtoolsEvent): unknown {
   return (event as { timestamp?: number }).timestamp;
 }
 
-describe("sanitize", () => {
+describe("sanitizeDevtoolsEvent", () => {
   it("dehydrates a message delta's payload and source", () => {
     const payload = { hello: "world" };
     const source = { from: "svc" };
@@ -43,22 +43,22 @@ describe("sanitize", () => {
   });
 });
 
-describe("stampTime", () => {
+describe("stampTimeInDevtoolsEvent", () => {
   it("leaves message deltas alone (they carry message.timestamp)", () => {
     const event = mockMessageEvent();
 
-    expect(stampTime(event)).toBe(event);
+    expect(stampTimeInDevtoolsEvent(event)).toBe(event);
   });
 
   it("passes a delta that already has a timestamp through unchanged", () => {
     const event = mockLifecycleEvent({ timestamp: 5 });
 
-    expect(stampTime(event)).toBe(event);
+    expect(stampTimeInDevtoolsEvent(event)).toBe(event);
   });
 
   it("stamps a delta that is missing a timestamp", () => {
     const event = mockLifecycleEventWithoutTimestamp();
-    const stamped = stampTime(event);
+    const stamped = stampTimeInDevtoolsEvent(event);
 
     expect(stamped).not.toBe(event);
     expect(typeof getTimestampOf(stamped)).toBe("number");

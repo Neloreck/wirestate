@@ -63,7 +63,7 @@ export function useBridge(): BridgeState {
             break;
           case "event":
             setLog((previous) => [...previous, message.event].slice(-MAX_LOG));
-            // Structure-affecting deltas → pull a fresh tree; message deltas don't change it.
+            // Structure-affecting deltas -> pull a fresh tree; message deltas don't change it.
             if (message.event.kind !== "message") {
               port.postMessage({ type: "refresh" } satisfies PanelToBackendPayload);
             }

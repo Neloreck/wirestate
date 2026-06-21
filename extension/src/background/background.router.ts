@@ -13,7 +13,7 @@ interface Pair {
  * the worker sleeps, so the pair re-forms on wake.
  *
  * @remarks
- * Owns the tab→pair registry. The `chrome.runtime.onConnect` subscription is external and wired in the
+ * Owns the tab->pair registry. The `chrome.runtime.onConnect` subscription is external and wired in the
  * service-worker entry; this class only routes the ports handed to {@link onConnect}, so it can be
  * driven directly in tests.
  */
@@ -35,7 +35,7 @@ export class BackgroundRouter {
   }
 
   /**
-   * Pairs a page relay to its tab and wires backend→panel forwarding.
+   * Pairs a page relay to its tab and wires backend->panel forwarding.
    *
    * @param port - The content (relay) port; ignored when it carries no sender tab id.
    */
@@ -53,7 +53,7 @@ export class BackgroundRouter {
     // A fresh page relay just paired.
     pair.panel?.postMessage({ type: "page-connected" } satisfies BackendToPanelPayload);
 
-    // Backend → panel.
+    // Backend -> panel.
     port.onMessage.addListener((message: unknown): void => {
       pair.panel?.postMessage(message);
     });
@@ -68,7 +68,7 @@ export class BackgroundRouter {
   }
 
   /**
-   * Pairs a panel to its tab (parsed from the port name) and wires panel→backend forwarding.
+   * Pairs a panel to its tab (parsed from the port name) and wires panel->backend forwarding.
    *
    * @param port - The panel port, named `PANEL_PORT_PREFIX:<tabId>`; ignored when the id isn't an integer.
    */
@@ -83,7 +83,7 @@ export class BackgroundRouter {
 
     pair.panel = port;
 
-    // Panel → backend.
+    // Panel -> backend.
     port.onMessage.addListener((message: unknown): void => {
       pair.content?.postMessage(message);
     });

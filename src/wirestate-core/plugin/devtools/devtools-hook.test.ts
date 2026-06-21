@@ -172,8 +172,8 @@ describe("DevtoolsHook id allocators", () => {
 
     const idA: number = hook.idForBinding(a);
 
-    expect(hook.idForBinding(a)).toBe(idA); // same descriptor → same id
-    expect(hook.idForBinding(b)).not.toBe(idA); // distinct descriptor → distinct id
+    expect(hook.idForBinding(a)).toBe(idA); // same descriptor -> same id
+    expect(hook.idForBinding(b)).not.toBe(idA); // distinct descriptor -> distinct id
   });
 
   it("mints binding ids on a counter independent of containers and instances", () => {

@@ -29,7 +29,7 @@ export class BridgeRelay {
 
     this.port = port;
 
-    // Background worker (panel) → backend (MAIN world).
+    // Background worker (panel) -> backend (MAIN world).
     port.onMessage.addListener(forwardToPage);
 
     port.onDisconnect.addListener((): void => {
@@ -40,7 +40,7 @@ export class BridgeRelay {
   }
 
   /**
-   * Handles one page `message`: forwards a valid backend→panel envelope to the worker port, ignoring
+   * Handles one page `message`: forwards a valid backend->panel envelope to the worker port, ignoring
    * anything that isn't one.
    *
    * @param messageEvent - A `message` event observed on the page (from the MAIN-world backend).

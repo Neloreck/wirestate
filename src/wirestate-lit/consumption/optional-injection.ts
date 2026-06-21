@@ -115,7 +115,7 @@ export function optionalInjection<T, F = undefined>(
     const resolvedFallback: Optional<OptionalInjectionFallback<F>> =
       options.fallback !== undefined ? options.fallback : fallback;
 
-    const resolve = (container: Container): T | F => {
+    function resolve(container: Container): T | F {
       if (container.has(token)) {
         return container.get(token);
       }

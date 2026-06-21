@@ -12,7 +12,7 @@ interface NavigatorProps {
   readonly actions: PanelActions;
 }
 
-/** Master region: roots → nested container hierarchy. Selecting a container drives the Detail pane. */
+/** Master region: roots -> nested container hierarchy. Selecting a container drives the Detail pane. */
 export function Navigator({ roots, selection, collapsed, actions }: NavigatorProps) {
   if (roots.length === 0) {
     return (

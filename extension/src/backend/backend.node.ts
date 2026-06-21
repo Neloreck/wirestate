@@ -27,7 +27,7 @@ export function createServiceNode(ref: DevtoolsServiceRef): InspectNode {
 /**
  * Describes one level of a raw in-page value for the panel: primitives and non-clonable leaves
  * inline, objects with their child keys, arrays with their length — so the panel lazily requests
- * deeper levels by path rather than serializing a whole (possibly cyclic) graph at once.
+ * deeper levels by path rather than serializing a whole graph at once.
  *
  * @param value - Raw value at the inspected path.
  * @returns A clone-safe, one-level descriptor.
@@ -40,15 +40,20 @@ export function createDescribeNode(value: unknown): InspectNode {
   switch (typeof value) {
     case "string":
       return { t: "primitive", value: value.length > MAX_STRING ? `${value.slice(0, MAX_STRING)}…` : value };
+
     case "number":
     case "boolean":
       return { t: "primitive", value };
+
     case "undefined":
       return { t: "leaf", preview: "undefined" };
+
     case "bigint":
       return { t: "leaf", preview: `${value.toString()}n` };
+
     case "symbol":
       return { t: "leaf", preview: value.toString() };
+
     case "function": {
       const fn: { name?: string } = value as { name?: string };
 
@@ -62,17 +67,11 @@ export function createDescribeNode(value: unknown): InspectNode {
 
   if (Array.isArray(object)) {
     return { t: "array", preview: `Array(${object.length})`, length: Math.min(object.length, MAX_KEYS) };
-  }
-
-  if (object instanceof Map) {
+  } else if (object instanceof Map) {
     return { t: "leaf", preview: `Map(${object.size})` };
-  }
-
-  if (object instanceof Set) {
+  } else if (object instanceof Set) {
     return { t: "leaf", preview: `Set(${object.size})` };
-  }
-
-  if (typeof Node !== "undefined" && object instanceof Node) {
+  } else if (typeof Node !== "undefined" && object instanceof Node) {
     return { t: "leaf", preview: ((object as { nodeName?: string }).nodeName ?? "Node").toLowerCase() };
   }
 

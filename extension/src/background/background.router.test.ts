@@ -31,7 +31,7 @@ function fakePort(name: string, tabId?: number): FakePort {
 const asPort = (port: FakePort): chrome.runtime.Port => port as unknown as chrome.runtime.Port;
 
 describe("BackgroundRouter", () => {
-  it("relays content→panel and panel→backend once paired", () => {
+  it("relays content->panel and panel->backend once paired", () => {
     const router = new BackgroundRouter();
     const content = fakePort(CONTENT_PORT, 1);
     const panel = fakePort(`${PANEL_PORT_PREFIX}1`);
