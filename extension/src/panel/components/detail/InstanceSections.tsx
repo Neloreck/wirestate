@@ -98,7 +98,7 @@ export function InstanceSections({ container, instance, log, roots, inspect, act
               <Tag tone={"accent"} variant={"outline"}>
                 {handler.channel}
               </Tag>{" "}
-              {handler.type} - {handler.method}()
+              {handler.type} → {handler.method}()
             </div>
           ))
         )}
