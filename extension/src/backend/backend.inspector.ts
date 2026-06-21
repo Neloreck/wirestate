@@ -108,7 +108,11 @@ export class InspectorBackend {
     }
   }
 
-  /** Snapshots every registered root for the panel's tree. */
+  /**
+   * Snapshots every registered root for the panel's tree.
+   *
+   * @returns A snapshot for each currently registered root.
+   */
   public snapshotRoots(): ReadonlyArray<DevtoolsRootSnapshot> {
     return this.hook.getRoots().map((root) => root.snapshot());
   }

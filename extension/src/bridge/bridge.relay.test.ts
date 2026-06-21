@@ -19,7 +19,8 @@ function fakePort(): FakePort {
 /**
  * Wraps arbitrary `data` as a page `message` event.
  *
- * @param data
+ * @param data - Payload to expose as the event's `data` property.
+ * @returns A `MessageEvent` whose `data` is the given value.
  */
 const messageEvent = (data: unknown): MessageEvent => ({ data }) as unknown as MessageEvent;
 

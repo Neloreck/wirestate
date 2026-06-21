@@ -4,7 +4,9 @@ import { summarizeDevtoolsEvent } from "@/panel/lib/format";
 
 interface EventSummaryProps {
   readonly event: DevtoolsEvent;
-  /** Navigates to the binding that realizes the instance a lifecycle delta is about (by container + token). */
+  /**
+   * Navigates to the binding that realizes the instance a lifecycle delta is about.
+   */
   readonly onSelectBinding: (containerId: number, token: string) => void;
 }
 

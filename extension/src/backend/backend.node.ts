@@ -80,7 +80,7 @@ export function createDescribeNode(value: unknown): InspectNode {
 
   return {
     t: "object",
-    preview: className && className !== "Object" ? className : "{…}",
+    preview: className && className !== "Object" ? className : "{...}",
     keys: Object.keys(object).slice(0, MAX_KEYS),
   };
 }

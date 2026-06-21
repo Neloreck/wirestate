@@ -21,7 +21,8 @@ interface Harness {
 /**
  * Builds a backend over a fresh hook with a capturing transport — no globals or DOM needed.
  *
- * @param bufferSize
+ * @param bufferSize - Optional cap on the delta replay buffer passed to the backend.
+ * @returns The hook, the captured posts, and the backend under test.
  */
 function setup(bufferSize?: number): Harness {
   const hook: DevtoolsHook = installDevtoolsHook();
@@ -34,8 +35,9 @@ function setup(bufferSize?: number): Harness {
 /**
  * Registers a root, defaulting the required capability methods so a test supplies only what it uses.
  *
- * @param hook
- * @param partial
+ * @param hook - Hook the root is registered on.
+ * @param partial - Capability overrides; only `snapshot` is required.
+ * @returns The id assigned to the registered root.
  */
 function registerRoot(
   hook: DevtoolsHook,
@@ -52,7 +54,8 @@ function registerRoot(
 /**
  * Wraps arbitrary `data` as a page `message` event for the message handler.
  *
- * @param data
+ * @param data - Payload to expose as the event's `data` property.
+ * @returns A `MessageEvent` whose `data` is the given value.
  */
 const messageEvent = (data: unknown): MessageEvent => ({ data }) as unknown as MessageEvent;
 
