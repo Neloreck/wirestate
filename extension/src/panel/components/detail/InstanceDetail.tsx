@@ -101,13 +101,6 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
         )}
       </Section>
 
-      <Section title={"lifecycle history"}>
-        <History
-          events={history}
-          onSelectInstance={(containerId, className) => actions.select({ kind: "instance", containerId, className })}
-        />
-      </Section>
-
       <Section title={"state"}>
         <StateTree
           rootId={rootId}
@@ -117,6 +110,12 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
         />
       </Section>
 
+      <Section title={"lifecycle history"}>
+        <History
+          events={history}
+          onSelectInstance={(containerId, className) => actions.select({ kind: "instance", containerId, className })}
+        />
+      </Section>
       <FilterToContainerLink onClick={() => actions.setContainerFilter(container.containerId)} />
     </div>
   );

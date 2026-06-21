@@ -37,6 +37,7 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
             </LinkButton>
           )}
         </Field>
+
         <Field label={"children"}>
           {children.length === 0
             ? "—"
@@ -49,6 +50,24 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
                 </LinkButton>
               ))}
         </Field>
+      </Section>
+
+      <Section title={`plugins (${container.plugins.length})`}>
+        {container.plugins.length === 0 ? (
+          <span className={"text-fg-muted"}>—</span>
+        ) : (
+          container.plugins.map((plugin) => (
+            <div key={plugin.name}>
+              <LinkButton
+                onClick={() =>
+                  actions.select({ kind: "plugin", containerId: container.containerId, name: plugin.name })
+                }
+              >
+                {plugin.name}
+              </LinkButton>
+            </div>
+          ))
+        )}
       </Section>
 
       <Section title={`bindings (${container.bindings.length})`}>
@@ -71,7 +90,6 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
           ))
         )}
       </Section>
-
       <Section title={`instances (${container.instances.length})`}>
         {container.instances.length === 0 ? (
           <span className={"text-fg-muted"}>—</span>
@@ -93,32 +111,12 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
           ))
         )}
       </Section>
-
-      <Section title={`plugins (${container.plugins.length})`}>
-        {container.plugins.length === 0 ? (
-          <span className={"text-fg-muted"}>—</span>
-        ) : (
-          container.plugins.map((plugin) => (
-            <div key={plugin.name}>
-              <LinkButton
-                onClick={() =>
-                  actions.select({ kind: "plugin", containerId: container.containerId, name: plugin.name })
-                }
-              >
-                {plugin.name}
-              </LinkButton>
-            </div>
-          ))
-        )}
-      </Section>
-
       <Section title={"lifecycle history"}>
         <History
           events={history}
           onSelectInstance={(containerId, className) => actions.select({ kind: "instance", containerId, className })}
         />
       </Section>
-
       <FilterToContainerLink onClick={() => actions.setContainerFilter(container.containerId)} />
     </div>
   );
