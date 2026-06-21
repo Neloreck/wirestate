@@ -90,6 +90,7 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
           ))
         )}
       </Section>
+
       <Section title={`instances (${container.instances.length})`}>
         {container.instances.length === 0 ? (
           <span className={"text-fg-muted"}>—</span>
@@ -111,12 +112,14 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
           ))
         )}
       </Section>
+
       <Section title={"lifecycle history"}>
         <History
           events={history}
           onSelectInstance={(containerId, className) => actions.select({ kind: "instance", containerId, className })}
         />
       </Section>
+
       <FilterToContainerLink onClick={() => actions.setContainerFilter(container.containerId)} />
     </div>
   );

@@ -31,6 +31,11 @@ export const DEVTOOLS_HOOK_KEY = "__WIRESTATE_DEVTOOLS_HOOK__" as const;
 export const DEVTOOLS_PROTOCOL_VERSION = 1 as const;
 
 /**
+ * Upper bound on the recent-event backlog retained for replay to late subscribers.
+ */
+const MAX_REPLAY_EVENTS = 1024;
+
+/**
  * In-page host implementing the devtools hook: owns the registered roots, the subscriber listeners,
  * and the stable id allocators. One instance is created by {@link installDevtoolsHook} and shared by
  * every Wirestate copy on the page (so ids stay consistent across library versions).
@@ -42,6 +47,7 @@ class DevtoolsHookHost implements DevtoolsHook {
 
   private readonly roots: Map<DevtoolsRootId, DevtoolsRootRegister> = new Map();
   private readonly listeners: Set<DevtoolsListener> = new Set();
+  private readonly recent: Array<DevtoolsEvent> = [];
   private readonly containerIds: WeakMap<object, DevtoolsContainerId> = new WeakMap();
   private readonly instanceIds: WeakMap<object, DevtoolsInstanceId> = new WeakMap();
 
@@ -84,12 +90,22 @@ class DevtoolsHookHost implements DevtoolsHook {
   }
 
   public emit(event: DevtoolsEvent): void {
+    this.recent.push(event);
+
+    if (this.recent.length > MAX_REPLAY_EVENTS) {
+      this.recent.shift();
+    }
+
     for (const listener of this.listeners) {
       listener(event);
     }
   }
 
   public subscribe(listener: DevtoolsListener): () => void {
+    for (const event of [...this.recent]) {
+      listener(event);
+    }
+
     this.listeners.add(listener);
 
     return () => {
