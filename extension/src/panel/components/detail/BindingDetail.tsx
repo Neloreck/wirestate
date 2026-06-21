@@ -85,11 +85,12 @@ export function BindingDetail({
           <Tag tone={binding.scope === "Transient" ? "warn" : "neutral"}>{binding.scope}</Tag>
         </Field>
         <Field label={"impl"}>{binding.implementation ?? "—"}</Field>
-        {status === "none" ? null : (
+        {/* Active is the norm and goes untagged; only flag the exceptions. */}
+        {status === "inactive" || status === "unrealized" ? (
           <Field label={"status"}>
             <StatusTag status={status} />
           </Field>
-        )}
+        ) : null}
       </Section>
 
       {isValue ? (

@@ -78,7 +78,12 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
             const status: BindingStatus = bindingStatus(container, binding);
 
             return (
-              <div key={binding.token.name} className={"flex items-center gap-1"}>
+              // Active is the common case (no tag); only the exceptions are flagged, and an inactive
+              // binding's row dims so the live ones stand out.
+              <div
+                key={binding.token.name}
+                className={`flex items-center gap-1 ${status === "inactive" ? "opacity-60" : ""}`}
+              >
                 <LinkButton
                   onClick={() =>
                     actions.select({ kind: "binding", containerId: container.containerId, token: binding.token.name })
@@ -93,7 +98,7 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
 
                 {binding.scope === "Transient" ? <Tag tone={"warn"}>Transient</Tag> : null}
 
-                {status === "none" ? null : <StatusTag status={status} />}
+                {status === "inactive" || status === "unrealized" ? <StatusTag status={status} /> : null}
               </div>
             );
           })
