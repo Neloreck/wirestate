@@ -83,7 +83,7 @@ export function record(event: DevtoolsEvent): DevtoolsEvent {
 export function inspectAt(rootId: number, instanceId: number, path: ReadonlyArray<string | number>): InspectNode {
   const root: Maybe<DevtoolsRoot> = BACKEND_HOOK.getRoots().find((candidate) => candidate.rootId === rootId);
 
-  if (!root || typeof root.inspect !== "function") {
+  if (!root) {
     return { t: "unsupported" };
   }
 
@@ -91,7 +91,39 @@ export function inspectAt(rootId: number, instanceId: number, path: ReadonlyArra
 
   // When a nested field holds another tracked instance, mark it as a service so the panel can jump
   // to it. `path.length === 0` is the inspected instance itself — never flag that as a reference.
-  if (path.length > 0 && value !== null && typeof value === "object" && typeof root.serviceRefOf === "function") {
+  if (path.length > 0 && value !== null && typeof value === "object") {
+    const ref = root.serviceRefOf(value);
+
+    if (ref) {
+      return serviceNode(ref);
+    }
+  }
+
+  return describeNode(value);
+}
+
+/**
+ * Reads the live value at `path` within a `Value` binding and returns a clone-safe, one-level node —
+ * or a service marker when a nested field is itself another tracked instance. The binding-side
+ * counterpart of {@link inspectAt}.
+ *
+ * @param rootId - Root whose `inspectBinding` resolves the value.
+ * @param bindingId - `Value` binding to read from.
+ * @param path - Object keys / array indices from the binding's value to the target.
+ * @returns The describing node, or `{ t: "unsupported" }` when the root is no longer registered.
+ */
+export function inspectBindingAt(rootId: number, bindingId: number, path: ReadonlyArray<string | number>): InspectNode {
+  const root: Maybe<DevtoolsRoot> = BACKEND_HOOK.getRoots().find((candidate) => candidate.rootId === rootId);
+
+  if (!root) {
+    return { t: "unsupported" };
+  }
+
+  const value: unknown = root.inspectBinding(bindingId, path);
+
+  // A nested field holding a tracked service becomes a jump, exactly as for instance state. The root
+  // (`path.length === 0`) is the binding's own value, rendered inline rather than as a reference.
+  if (path.length > 0 && value !== null && typeof value === "object") {
     const ref = root.serviceRefOf(value);
 
     if (ref) {

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   PANEL_PORT_PREFIX,
   type BackendToPanel,
+  type InspectBindingFn,
   type InspectFn,
   type InspectNode,
   type PanelToBackend,
@@ -20,6 +21,7 @@ export interface BridgeState {
   readonly log: ReadonlyArray<DevtoolsEvent>;
   clear(): void;
   readonly inspect: InspectFn;
+  readonly inspectBinding: InspectBindingFn;
 }
 
 /**
@@ -144,6 +146,24 @@ export function useBridge(): BridgeState {
     []
   );
 
+  const inspectBinding: InspectBindingFn = useCallback(
+    (rootId: number, bindingId: number, path: ReadonlyArray<string | number>): Promise<InspectNode> => {
+      const port: Optional<chrome.runtime.Port> = portRef.current;
+
+      if (!port) {
+        return Promise.resolve({ t: "unsupported" });
+      }
+
+      const requestId: number = (requestIdRef.current += 1);
+
+      return new Promise((resolve) => {
+        pendingRef.current.set(requestId, resolve);
+        port.postMessage({ type: "inspectBinding", requestId, rootId, bindingId, path } satisfies PanelToBackend);
+      });
+    },
+    []
+  );
+
   return {
     connected,
     protocolVersion,
@@ -151,5 +171,6 @@ export function useBridge(): BridgeState {
     log,
     clear: () => setLog([]),
     inspect,
+    inspectBinding,
   };
 }

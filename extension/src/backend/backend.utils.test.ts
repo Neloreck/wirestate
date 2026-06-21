@@ -1,4 +1,8 @@
-import { type DevtoolsEvent, type DevtoolsServiceRef } from "@wirestate/core/devtools";
+import {
+  type DevtoolsEvent,
+  type DevtoolsRootRegister,
+  type DevtoolsServiceRef,
+} from "@wirestate/core/devtools";
 
 import {
   mockLifecycleEvent,
@@ -12,10 +16,26 @@ import { BACKEND_BUFFER_SIZE } from "@/backend/backend.config";
 import { dehydrate } from "@/backend/backend.dehydrate";
 import { serviceNode } from "@/backend/backend.inspect";
 import { BACKEND_BUFFER, BACKEND_HOOK } from "@/backend/backend.state";
-import { getRootsSnapshot, inspectAt, record, sanitize, stampTime } from "@/backend/backend.utils";
+import { getRootsSnapshot, inspectAt, inspectBindingAt, record, sanitize, stampTime } from "@/backend/backend.utils";
 
 function getTimestampOf(event: DevtoolsEvent): unknown {
   return (event as { timestamp?: number }).timestamp;
+}
+
+/**
+ * Registers a root, defaulting the required capability methods so a test supplies only the parts it
+ * exercises. Mirrors how a real `DevToolsPlugin` always provides all three.
+ *
+ * @param partial - Register fields to override; `snapshot` is required, the rest default to stubs.
+ * @returns The allocated root id.
+ */
+function registerRoot(partial: Partial<DevtoolsRootRegister> & Pick<DevtoolsRootRegister, "snapshot">): number {
+  return BACKEND_HOOK.registerRoot({
+    inspect: () => undefined,
+    inspectBinding: () => undefined,
+    serviceRefOf: () => undefined,
+    ...partial,
+  });
 }
 
 afterEach(() => {
@@ -99,21 +119,18 @@ describe("record", () => {
 
 describe("inspectAt", () => {
   it("describes the value the root's inspect resolves", () => {
-    const rootId = BACKEND_HOOK.registerRoot({ snapshot: mockRootSnapshot, inspect: () => 42 });
+    const rootId = registerRoot({ snapshot: mockRootSnapshot, inspect: () => 42 });
 
     expect(inspectAt(rootId, 1, ["count"])).toEqual({ t: "primitive", value: 42 });
   });
 
-  it("reports unsupported when the root has no inspect, or the root is unknown", () => {
-    const rootId = BACKEND_HOOK.registerRoot({ snapshot: mockRootSnapshot });
-
-    expect(inspectAt(rootId, 1, ["x"])).toEqual({ t: "unsupported" });
+  it("reports unsupported when the root is unknown", () => {
     expect(inspectAt(9999, 1, ["x"])).toEqual({ t: "unsupported" });
   });
 
   it("marks a nested field that resolves to another tracked instance as a service", () => {
     const ref: DevtoolsServiceRef = { className: "Dep", containerId: 2, instanceId: 9 };
-    const rootId = BACKEND_HOOK.registerRoot({
+    const rootId = registerRoot({
       snapshot: mockRootSnapshot,
       inspect: () => ({ dep: "ref" }),
       serviceRefOf: () => ref,
@@ -123,7 +140,7 @@ describe("inspectAt", () => {
   });
 
   it("never flags the instance itself (path length 0) as a service", () => {
-    const rootId = BACKEND_HOOK.registerRoot({
+    const rootId = registerRoot({
       snapshot: mockRootSnapshot,
       inspect: () => ({ dep: "ref" }),
       serviceRefOf: () => ({ className: "Dep", containerId: 2, instanceId: 9 }),
@@ -133,11 +150,44 @@ describe("inspectAt", () => {
   });
 });
 
+describe("inspectBindingAt", () => {
+  it("describes the value the root's inspectBinding resolves", () => {
+    const rootId = registerRoot({ snapshot: mockRootSnapshot, inspectBinding: () => "https://api" });
+
+    expect(inspectBindingAt(rootId, 1, [])).toEqual({ t: "primitive", value: "https://api" });
+  });
+
+  it("reports unsupported when the root is unknown", () => {
+    expect(inspectBindingAt(9999, 1, [])).toEqual({ t: "unsupported" });
+  });
+
+  it("marks a nested field that resolves to a tracked instance as a service", () => {
+    const ref: DevtoolsServiceRef = { className: "Dep", containerId: 2, instanceId: 9 };
+    const rootId = registerRoot({
+      snapshot: mockRootSnapshot,
+      inspectBinding: () => ({ dep: "ref" }),
+      serviceRefOf: () => ref,
+    });
+
+    expect(inspectBindingAt(rootId, 1, ["dep"])).toEqual(serviceNode(ref));
+  });
+
+  it("never flags the binding's own value (path length 0) as a service", () => {
+    const rootId = registerRoot({
+      snapshot: mockRootSnapshot,
+      inspectBinding: () => ({ dep: "ref" }),
+      serviceRefOf: () => ({ className: "Dep", containerId: 2, instanceId: 9 }),
+    });
+
+    expect(inspectBindingAt(rootId, 1, [])).toMatchObject({ t: "object" });
+  });
+});
+
 describe("getRootsSnapshot", () => {
   it("returns each registered root's snapshot", () => {
     const snapshot = mockRootSnapshot(777);
 
-    BACKEND_HOOK.registerRoot({ snapshot: () => snapshot });
+    registerRoot({ snapshot: () => snapshot });
 
     expect(getRootsSnapshot()).toEqual([snapshot]);
   });

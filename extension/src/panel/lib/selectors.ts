@@ -30,7 +30,6 @@ export interface RootModel {
 /** The entity a {@link Selection} resolves to against the current snapshot. */
 export type ResolvedEntity =
   | { readonly kind: "container"; readonly container: DevtoolsContainerSnapshot }
-  | { readonly kind: "instance"; readonly container: DevtoolsContainerSnapshot; readonly instance: DevtoolsInstance }
   | { readonly kind: "binding"; readonly container: DevtoolsContainerSnapshot; readonly binding: DevtoolsBinding }
   | { readonly kind: "plugin"; readonly container: DevtoolsContainerSnapshot; readonly plugin: DevtoolsPluginInfo };
 
@@ -136,13 +135,6 @@ export function resolveSelection(
   switch (selection.kind) {
     case "container":
       return { kind: "container", container };
-    case "instance": {
-      const instance: Optional<DevtoolsInstance> = container.instances.find(
-        (candidate) => candidate.className === selection.className
-      );
-
-      return instance ? { kind: "instance", container, instance } : undefined;
-    }
     case "binding": {
       const binding: Optional<DevtoolsBinding> = container.bindings.find(
         (candidate) => candidate.token.name === selection.token
@@ -213,6 +205,51 @@ export function realizingInstance(
       instance.token.name === binding.token.name ||
       (binding.implementation !== undefined && instance.className === binding.implementation)
   );
+}
+
+/**
+ * The lifecycle tag shown next to a binding in the token-centric view. Only a singleton `Instance`
+ * binding has a single tracked realization, so only it carries `active`/`inactive`/`unrealized`;
+ * `Value`/`Factory`/`Transient` bindings have no single instance to track and report `none`.
+ *
+ * @param container - Container the binding belongs to.
+ * @param binding - The binding to classify.
+ * @returns The lifecycle tag for the binding row.
+ */
+export type BindingStatus = "active" | "inactive" | "unrealized" | "none";
+
+export function bindingStatus(container: DevtoolsContainerSnapshot, binding: DevtoolsBinding): BindingStatus {
+  if (!mayRealizeInstance(binding)) {
+    return "none";
+  }
+
+  const instance: Optional<DevtoolsInstance> = realizingInstance(container, binding);
+
+  if (!instance) {
+    return "unrealized";
+  }
+
+  return instance.status?.isInactive ? "inactive" : "active";
+}
+
+/**
+ * The token name of the instance with the given id in a container — used to navigate from an
+ * instance-anchored reference (a lifecycle delta, or a service field in the state tree) to the
+ * binding that realizes it, since selection is now binding/token-centric.
+ *
+ * @param roots - The current root snapshots.
+ * @param containerId - Container the instance lives in.
+ * @param instanceId - The instance's stable id.
+ * @returns The realizing binding's token name, or `undefined` when the instance is no longer live.
+ */
+export function tokenOfInstanceId(
+  roots: ReadonlyArray<DevtoolsRootSnapshot>,
+  containerId: number,
+  instanceId: number
+): Optional<string> {
+  const container: Optional<DevtoolsContainerSnapshot> = findContainer(roots, containerId);
+
+  return container?.instances.find((instance) => instance.instanceId === instanceId)?.token.name;
 }
 
 /**

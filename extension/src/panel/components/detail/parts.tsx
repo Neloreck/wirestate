@@ -29,6 +29,18 @@ export function LinkButton({ onClick, children }: PropsWithChildren<{ onClick: (
   );
 }
 
+/** A small lifecycle chip for a singleton instance binding (`active` / `inactive` / `unrealized`). */
+export function StatusTag({ status }: { status: "active" | "inactive" | "unrealized" }) {
+  const tone: string =
+    status === "active"
+      ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+      : status === "inactive"
+        ? "bg-zinc-500/20 text-fg-muted"
+        : "bg-amber-500/15 text-amber-600 dark:text-amber-400";
+
+  return <span className={`rounded px-1 text-[10px] uppercase tracking-wide ${tone}`}>{status}</span>;
+}
+
 /** The "filter the Timeline to this container" cross-link shown at the foot of a Detail view. */
 export function FilterToContainerLink({ onClick }: { onClick: () => void }) {
   return (

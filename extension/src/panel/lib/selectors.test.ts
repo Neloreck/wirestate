@@ -13,6 +13,7 @@ import {
 } from "@/fixtures/devtools";
 
 import {
+  bindingStatus,
   buildMessageResults,
   buildRoots,
   channelOf,
@@ -23,6 +24,7 @@ import {
   realizingInstance,
   resolveSelection,
   rootIdOfContainer,
+  tokenOfInstanceId,
 } from "@/panel/lib/selectors";
 import { type TimelineFilter, isSameSelection } from "@/panel/lib/types";
 
@@ -80,14 +82,13 @@ describe("resolveSelection", () => {
 
   it("resolves a live entity", () => {
     expect(resolveSelection(roots, { kind: "container", containerId: 1 })?.kind).toBe("container");
-    expect(resolveSelection(roots, { kind: "instance", containerId: 1, className: "Foo" })?.kind).toBe("instance");
     expect(resolveSelection(roots, { kind: "binding", containerId: 1, token: "Bar" })?.kind).toBe("binding");
     expect(resolveSelection(roots, { kind: "plugin", containerId: 1, name: "Baz" })?.kind).toBe("plugin");
   });
 
   it("returns undefined when the entity is gone (tombstone trigger)", () => {
     expect(resolveSelection(roots, { kind: "container", containerId: 999 })).toBeUndefined();
-    expect(resolveSelection(roots, { kind: "instance", containerId: 1, className: "Gone" })).toBeUndefined();
+    expect(resolveSelection(roots, { kind: "binding", containerId: 1, token: "Gone" })).toBeUndefined();
   });
 });
 
@@ -115,6 +116,7 @@ describe("derived links", () => {
 
   it("mayRealizeInstance is true only for singleton instance bindings", () => {
     const make = (type: DevtoolsBinding["type"], scope: DevtoolsBinding["scope"]): DevtoolsBinding => ({
+      bindingId: 1,
       token: { name: "Svc", kind: "class" },
       type,
       scope,
@@ -125,6 +127,56 @@ describe("derived links", () => {
     expect(mayRealizeInstance(make("Instance", "Transient"))).toBe(false);
     expect(mayRealizeInstance(make("Factory", "Singleton"))).toBe(false);
     expect(mayRealizeInstance(make("Value", "Singleton"))).toBe(false);
+  });
+});
+
+describe("bindingStatus", () => {
+  const value: DevtoolsBinding = {
+    bindingId: 1,
+    token: { name: "cfg", kind: "string" },
+    type: "Value",
+    scope: "Singleton",
+    implementation: undefined,
+  };
+  const singleton = mockBinding("Svc"); // mockBinding builds an Instance/Singleton binding
+
+  it("is 'none' for a non-instance binding (Value/Factory/Transient)", () => {
+    expect(bindingStatus(mockContainerSnapshot(1), value)).toBe("none");
+  });
+
+  it("is 'unrealized' for a singleton instance binding with no live instance", () => {
+    expect(bindingStatus(mockContainerSnapshot(1, null, { instances: [] }), singleton)).toBe("unrealized");
+  });
+
+  it("is 'active' when the realizing instance is live", () => {
+    const container = mockContainerSnapshot(1, null, { instances: [mockInstance("Svc")] });
+
+    expect(bindingStatus(container, singleton)).toBe("active");
+  });
+
+  it("is 'inactive' when the realizing instance is inactive", () => {
+    const inactive = {
+      ...mockInstance("Svc"),
+      status: { isDeactivated: true, isDeprovisioned: true, isInactive: true, provisionId: null },
+    };
+    const container = mockContainerSnapshot(1, null, { instances: [inactive] });
+
+    expect(bindingStatus(container, singleton)).toBe("inactive");
+  });
+});
+
+describe("tokenOfInstanceId", () => {
+  const roots = [
+    mockRootSnapshot(1, [mockContainerSnapshot(1, null, { instances: [mockInstance("SvcImpl", "Svc", 7)] })]),
+  ];
+
+  it("maps an instance id to its realizing binding's token", () => {
+    expect(tokenOfInstanceId(roots, 1, 7)).toBe("Svc");
+  });
+
+  it("is undefined for an unknown instance or container", () => {
+    expect(tokenOfInstanceId(roots, 1, 999)).toBeUndefined();
+    expect(tokenOfInstanceId(roots, 999, 7)).toBeUndefined();
   });
 });
 
@@ -192,14 +244,14 @@ describe("sameSelection", () => {
     expect(isSameSelection({ kind: "container", containerId: 1 }, { kind: "container", containerId: 2 })).toBe(false);
     expect(
       isSameSelection(
-        { kind: "instance", containerId: 1, className: "A" },
-        { kind: "instance", containerId: 1, className: "A" }
+        { kind: "binding", containerId: 1, token: "A" },
+        { kind: "binding", containerId: 1, token: "A" }
       )
     ).toBe(true);
     expect(
       isSameSelection(
-        { kind: "instance", containerId: 1, className: "A" },
-        { kind: "instance", containerId: 1, className: "B" }
+        { kind: "binding", containerId: 1, token: "A" },
+        { kind: "binding", containerId: 1, token: "B" }
       )
     ).toBe(false);
     expect(isSameSelection({ kind: "container", containerId: 1 }, { kind: "plugin", containerId: 1, name: "A" })).toBe(

@@ -1,7 +1,7 @@
 import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
 import { type ReactNode, useEffect, useRef } from "react";
 
-import { type InspectFn } from "@/bridge/bridge.messages";
+import { type InspectBindingFn, type InspectFn } from "@/bridge/bridge.messages";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { type ResolvedEntity, resolveSelection } from "@/panel/lib/selectors";
 import { type Selection, isSameSelection } from "@/panel/lib/types";
@@ -9,7 +9,6 @@ import { type Optional } from "@/types/general";
 
 import { BindingDetail } from "./BindingDetail";
 import { ContainerDetail } from "./ContainerDetail";
-import { InstanceDetail } from "./InstanceDetail";
 import { LinkButton } from "./parts";
 import { PluginDetail } from "./PluginDetail";
 
@@ -19,10 +18,11 @@ interface DetailProps {
   readonly selection: Optional<Selection>;
   readonly actions: PanelActions;
   readonly inspect: InspectFn;
+  readonly inspectBinding: InspectBindingFn;
 }
 
 /** Detail pane: routes the current selection to its view, with breadcrumb + dead-entity tombstone. */
-export function Detail({ roots, log, selection, actions, inspect }: DetailProps) {
+export function Detail({ roots, log, selection, actions, inspect, inspectBinding }: DetailProps) {
   const cache = useRef<Optional<{ selection: Selection; resolved: ResolvedEntity }>>(undefined);
   const resolved: Optional<ResolvedEntity> = selection ? resolveSelection(roots, selection) : undefined;
 
@@ -40,7 +40,7 @@ export function Detail({ roots, log, selection, actions, inspect }: DetailProps)
     content = (
       <>
         <Breadcrumb resolved={resolved} actions={actions} />
-        <View resolved={resolved} roots={roots} log={log} actions={actions} inspect={inspect} />
+        <View resolved={resolved} roots={roots} log={log} actions={actions} inspect={inspect} inspectBinding={inspectBinding} />
       </>
     );
   } else {
@@ -62,7 +62,7 @@ export function Detail({ roots, log, selection, actions, inspect }: DetailProps)
         </div>
         {dead ? (
           <div className={"pointer-events-none opacity-60"}>
-            <View resolved={dead} roots={roots} log={log} actions={actions} inspect={inspect} />
+            <View resolved={dead} roots={roots} log={log} actions={actions} inspect={inspect} inspectBinding={inspectBinding} />
           </div>
         ) : null}
       </div>
@@ -92,8 +92,6 @@ function Breadcrumb({ resolved, actions }: { resolved: ResolvedEntity; actions: 
 
 function entityLabel(resolved: ResolvedEntity): string {
   switch (resolved.kind) {
-    case "instance":
-      return resolved.instance.className;
     case "binding":
       return resolved.binding.token.name;
     case "plugin":
@@ -109,29 +107,30 @@ function View({
   log,
   actions,
   inspect,
+  inspectBinding,
 }: {
   resolved: ResolvedEntity;
   roots: ReadonlyArray<DevtoolsRootSnapshot>;
   log: ReadonlyArray<DevtoolsEvent>;
   actions: PanelActions;
   inspect: InspectFn;
+  inspectBinding: InspectBindingFn;
 }) {
   switch (resolved.kind) {
     case "container":
       return <ContainerDetail container={resolved.container} roots={roots} log={log} actions={actions} />;
-    case "instance":
+    case "binding":
       return (
-        <InstanceDetail
+        <BindingDetail
           container={resolved.container}
-          instance={resolved.instance}
-          log={log}
+          binding={resolved.binding}
           actions={actions}
           roots={roots}
+          log={log}
           inspect={inspect}
+          inspectBinding={inspectBinding}
         />
       );
-    case "binding":
-      return <BindingDetail container={resolved.container} binding={resolved.binding} actions={actions} />;
     case "plugin":
       return <PluginDetail plugin={resolved.plugin} />;
   }

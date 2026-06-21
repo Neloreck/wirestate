@@ -46,6 +46,16 @@ export type InspectFn = (
 ) => Promise<InspectNode>;
 
 /**
+ * Lazily reads one level of a `Value` binding's value at a path. Resolves over the bridge. The
+ * binding-side counterpart of {@link InspectFn}, keyed by `bindingId` instead of `instanceId`.
+ */
+export type InspectBindingFn = (
+  rootId: number,
+  bindingId: number,
+  path: ReadonlyArray<string | number>
+) => Promise<InspectNode>;
+
+/**
  * A message the panel receives on its background port.
  *
  * @remarks
@@ -76,6 +86,13 @@ export type PanelToBackend =
       readonly requestId: number;
       readonly rootId: number;
       readonly instanceId: number;
+      readonly path: ReadonlyArray<string | number>;
+    }
+  | {
+      readonly type: "inspectBinding";
+      readonly requestId: number;
+      readonly rootId: number;
+      readonly bindingId: number;
       readonly path: ReadonlyArray<string | number>;
     };
 

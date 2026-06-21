@@ -43,7 +43,7 @@ export function TimelineRow({ event, count, actions, result, baseline }: Timelin
         <span className={"flex-1 truncate"}>
           <EventSummary
             event={event}
-            onSelectInstance={(containerId, className) => actions.select({ kind: "instance", containerId, className })}
+            onSelectBinding={(containerId, token) => actions.select({ kind: "binding", containerId, token })}
           />
         </span>
         {count > 1 ? <span className={"rounded bg-selected px-1 text-[10px]"}>×{count}</span> : null}

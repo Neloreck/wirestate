@@ -34,10 +34,11 @@ export function mockInstance(
  *
  * @param name - Token name associated with the binding.
  * @param implementation - Optional implementation display name.
+ * @param bindingId - Stable binding identifier.
  * @returns A devtools binding descriptor.
  */
-export function mockBinding(name: string = "Service", implementation?: string): DevtoolsBinding {
-  return { token: { name, kind: "class" }, type: "Instance", scope: "Singleton", implementation };
+export function mockBinding(name: string = "Service", implementation?: string, bindingId: number = 1): DevtoolsBinding {
+  return { bindingId, token: { name, kind: "class" }, type: "Instance", scope: "Singleton", implementation };
 }
 
 /**

@@ -2,7 +2,7 @@ import { DEVTOOLS_PROTOCOL_VERSION, type DevtoolsEvent } from "@wirestate/core/d
 
 import { post } from "@/backend/backend.messaging";
 import { BACKEND_BUFFER, BACKEND_HOOK } from "@/backend/backend.state";
-import { getRootsSnapshot, inspectAt, record } from "@/backend/backend.utils";
+import { getRootsSnapshot, inspectAt, inspectBindingAt, record } from "@/backend/backend.utils";
 import { BRIDGE_SOURCE, type PageMessage, type PanelToBackend } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
 
@@ -13,7 +13,7 @@ BACKEND_HOOK.subscribe((event: DevtoolsEvent): void => post({ type: "event", eve
 
 /**
  * Answers panel requests arriving over the bridge: `attach` (init payload), `refresh` (re-snapshot),
- * and `inspect` (one-level read).
+ * `inspect` (one-level instance read), and `inspectBinding` (one-level `Value` binding read).
  */
 window.addEventListener("message", (messageEvent: MessageEvent): void => {
   const data: Optional<PageMessage> = messageEvent.data as Optional<PageMessage>;
@@ -38,6 +38,12 @@ window.addEventListener("message", (messageEvent: MessageEvent): void => {
       type: "inspectResult",
       requestId: request.requestId,
       node: inspectAt(request.rootId, request.instanceId, request.path),
+    });
+  } else if (request.type === "inspectBinding") {
+    post({
+      type: "inspectResult",
+      requestId: request.requestId,
+      node: inspectBindingAt(request.rootId, request.bindingId, request.path),
     });
   }
 });

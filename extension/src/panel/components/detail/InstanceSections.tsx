@@ -5,27 +5,32 @@ import {
   type DevtoolsMethod,
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
+import { useMemo } from "react";
 
 import { type InspectFn } from "@/bridge/bridge.messages";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { lifecycleHistory, rootIdOfContainer } from "@/panel/lib/selectors";
+import { lifecycleHistory, rootIdOfContainer, tokenOfInstanceId } from "@/panel/lib/selectors";
 import { type Optional } from "@/types/general";
 
 import { History } from "./History";
-import { Field, FilterToContainerLink, Section } from "./parts";
-import { StateTree } from "./StateTree";
+import { Field, Section } from "./parts";
+import { StateTree, type ValueReader } from "./StateTree";
 
-interface InstanceDetailProps {
+interface InstanceSectionsProps {
   readonly container: DevtoolsContainerSnapshot;
   readonly instance: DevtoolsInstance;
   readonly log: ReadonlyArray<DevtoolsEvent>;
-  readonly actions: PanelActions;
   readonly roots: ReadonlyArray<DevtoolsRootSnapshot>;
   readonly inspect: InspectFn;
+  readonly actions: PanelActions;
 }
 
-/** Detail view for a selected instance: status, declared handlers, history, and on-demand state. */
-export function InstanceDetail({ container, instance, log, actions, roots, inspect }: InstanceDetailProps) {
+/**
+ * The live-instance facet of a realized singleton `Instance` binding: status, declared handlers,
+ * methods, on-demand state, and lifecycle history. Rendered inline by {@link BindingDetail} — selection
+ * is binding/token-centric, so every cross-link resolves to the binding that realizes the instance.
+ */
+export function InstanceSections({ container, instance, log, roots, inspect, actions }: InstanceSectionsProps) {
   const history: ReadonlyArray<DevtoolsEvent> = lifecycleHistory(log, container.containerId, {
     instanceId: instance.instanceId,
     className: instance.className,
@@ -33,8 +38,22 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
   const status = instance.status;
   const rootId: Optional<number> = rootIdOfContainer(roots, container.containerId);
 
-  // Older cores predate `methods`; treat absence as empty. Map each handler method to its channel(s)
-  // so the methods list can badge the ones wired to the message stream.
+  // Memoized per (root, instance) so each state-tree node doesn't refetch on every parent re-render.
+  const readState: Optional<ValueReader> = useMemo(
+    () => (rootId === undefined ? undefined : (path) => inspect(rootId, instance.instanceId, path)),
+    [inspect, rootId, instance.instanceId]
+  );
+
+  // Resolve an instance-anchored reference (lifecycle row, or a service field in the state tree) to
+  // the binding that realizes it, then select that binding.
+  const selectByInstanceId = (containerId: number, instanceId: number): void => {
+    const token: Optional<string> = tokenOfInstanceId(roots, containerId, instanceId);
+
+    if (token !== undefined) {
+      actions.select({ kind: "binding", containerId, token });
+    }
+  };
+
   const methods: ReadonlyArray<DevtoolsMethod> = instance.methods ?? [];
   const handlerChannels: Map<string, Set<string>> = new Map();
 
@@ -46,12 +65,9 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
   }
 
   return (
-    <div className={"space-y-3"}>
+    <>
       <Section title={"instance"}>
         <Field label={"class"}>{instance.className}</Field>
-        <Field label={"token"}>
-          {instance.token.name} <span className={"text-fg-muted"}>({instance.token.kind})</span>
-        </Field>
       </Section>
 
       <Section title={"status"}>
@@ -103,20 +119,18 @@ export function InstanceDetail({ container, instance, log, actions, roots, inspe
 
       <Section title={"state"}>
         <StateTree
-          rootId={rootId}
-          instanceId={instance.instanceId}
-          inspect={inspect}
-          onNavigate={(containerId, className) => actions.select({ kind: "instance", containerId, className })}
+          read={readState}
+          rootLabel={"state"}
+          onNavigate={(containerId, instanceId) => selectByInstanceId(containerId, instanceId)}
         />
       </Section>
 
       <Section title={"lifecycle history"}>
         <History
           events={history}
-          onSelectInstance={(containerId, className) => actions.select({ kind: "instance", containerId, className })}
+          onSelectBinding={(containerId, token) => actions.select({ kind: "binding", containerId, token })}
         />
       </Section>
-      <FilterToContainerLink onClick={() => actions.setContainerFilter(container.containerId)} />
-    </div>
+    </>
   );
 }

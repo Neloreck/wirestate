@@ -5,10 +5,14 @@ import { type Optional } from "@/types/general";
 /** The kinds of timeline delta the panel can filter by. */
 export type EventKind = Exclude<DevtoolsEvent["kind"], "messageResult">;
 
-/** The single entity selected in the Navigator, identified within its container. */
+/**
+ * The single entity selected in the Navigator, identified within its container. Bindings are the unit
+ * of selection for everything a container resolves: a `Value` binding shows its value, and an
+ * `Instance` binding shows its realized instance's live detail (status, handlers, state) inline — so
+ * there is no separate "instance" selection.
+ */
 export type Selection =
   | { readonly kind: "container"; readonly containerId: number }
-  | { readonly kind: "instance"; readonly containerId: number; readonly className: string }
   | { readonly kind: "binding"; readonly containerId: number; readonly token: string }
   | { readonly kind: "plugin"; readonly containerId: number; readonly name: string };
 
@@ -34,8 +38,6 @@ export function isSameSelection(a: Selection, b: Selection): boolean {
   }
 
   switch (a.kind) {
-    case "instance":
-      return b.kind === "instance" && a.className === b.className;
     case "binding":
       return b.kind === "binding" && a.token === b.token;
     case "plugin":

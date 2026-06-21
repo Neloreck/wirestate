@@ -15,7 +15,7 @@ import { type RootModel, buildMessageResults, buildRoots, filterLog } from "@/pa
  * The inspector panel: master–detail (Navigator + Detail) over a collapsible, cross-linked Timeline.
  */
 export function Panel() {
-  const { connected, protocolVersion, roots, log, clear, inspect } = useBridge();
+  const { connected, protocolVersion, roots, log, clear, inspect, inspectBinding } = useBridge();
   const { state, actions } = usePanelState();
   const { layout, actions: layoutActions } = useLayout();
 
@@ -67,7 +67,14 @@ export function Panel() {
           onCommit={layoutActions.setNavFraction}
         />
 
-        <Detail roots={roots} log={log} selection={state.selection} actions={actions} inspect={inspect} />
+        <Detail
+          roots={roots}
+          log={log}
+          selection={state.selection}
+          actions={actions}
+          inspect={inspect}
+          inspectBinding={inspectBinding}
+        />
       </div>
 
       {layout.timelineOpen ? (
