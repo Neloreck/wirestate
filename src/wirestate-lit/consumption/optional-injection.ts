@@ -127,7 +127,7 @@ export function optionalInjection<T, F = undefined>(
       }
 
       return undefined as F;
-    };
+    }
 
     // Standard decorators branch.
     if (typeof nameOrContext === "object") {
