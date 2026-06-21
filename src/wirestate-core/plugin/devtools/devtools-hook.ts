@@ -31,9 +31,14 @@ export const DEVTOOLS_HOOK_KEY = "__WIRESTATE_DEVTOOLS_HOOK__" as const;
 export const DEVTOOLS_PROTOCOL_VERSION = 1 as const;
 
 /**
- * Upper bound on the recent-event backlog retained for replay to late subscribers.
+ * Maximum number of recent events replayed to a late subscriber.
  */
 const MAX_REPLAY_EVENTS = 1024;
+
+/**
+ * Headroom the backlog may overgrow before the oldest events are evicted in a single splice.
+ */
+const REPLAY_EVICT_MARGIN = 76;
 
 /**
  * In-page host implementing the devtools hook: owns the registered roots, the subscriber listeners,
@@ -92,8 +97,8 @@ class DevtoolsHookHost implements DevtoolsHook {
   public emit(event: DevtoolsEvent): void {
     this.recent.push(event);
 
-    if (this.recent.length > MAX_REPLAY_EVENTS) {
-      this.recent.shift();
+    if (this.recent.length >= MAX_REPLAY_EVENTS + REPLAY_EVICT_MARGIN) {
+      this.recent.splice(0, this.recent.length - MAX_REPLAY_EVENTS);
     }
 
     for (const listener of this.listeners) {
@@ -102,7 +107,7 @@ class DevtoolsHookHost implements DevtoolsHook {
   }
 
   public subscribe(listener: DevtoolsListener): () => void {
-    for (const event of [...this.recent]) {
+    for (const event of this.recent.slice(-MAX_REPLAY_EVENTS)) {
       listener(event);
     }
 

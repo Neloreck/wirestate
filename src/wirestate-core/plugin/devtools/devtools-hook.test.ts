@@ -70,4 +70,92 @@ describe("DevtoolsHook replay buffer", () => {
     expect(events[0].containerId).toBe(1100 - 1024);
     expect(events[events.length - 1].containerId).toBe(1099);
   });
+
+  it("caps replay at the limit even before the backlog evicts", () => {
+    const hook = installDevtoolsHook();
+
+    // 1099 events: one under the eviction trigger, so the backlog has not been spliced yet.
+    for (let index = 0; index < 1099; index++) {
+      hook.emit(mockLifecycleEvent(index));
+    }
+
+    const events: Array<DevtoolsEvent> = [];
+
+    hook.subscribe((event) => {
+      events.push(event);
+    });
+
+    expect(events).toHaveLength(1024);
+    expect(events[0].containerId).toBe(1099 - 1024);
+    expect(events[events.length - 1].containerId).toBe(1098);
+  });
+
+  it("surfaces the freshest window after repeated evictions past the buffer limit", () => {
+    const hook = installDevtoolsHook();
+    const total = 2000;
+
+    for (let index = 0; index < total; index++) {
+      hook.emit(mockLifecycleEvent(index));
+    }
+
+    const events: Array<DevtoolsEvent> = [];
+
+    hook.subscribe((event) => {
+      events.push(event);
+    });
+
+    // Only the freshest 1024 survive — contiguous, in order, no gaps or duplicates across evictions.
+    expect(events.map((event) => event.containerId)).toEqual(
+      Array.from({ length: 1024 }, (_unused, index) => total - 1024 + index)
+    );
+  });
+
+  it("replays without consuming the backlog, so later subscribers still get it", () => {
+    const hook = installDevtoolsHook();
+
+    hook.emit(mockLifecycleEvent(1));
+    hook.emit(mockLifecycleEvent(2));
+    hook.emit(mockLifecycleEvent(3));
+
+    const first: Array<DevtoolsEvent> = [];
+    const second: Array<DevtoolsEvent> = [];
+
+    hook.subscribe((event) => first.push(event));
+    hook.subscribe((event) => second.push(event));
+
+    // The second subscriber still sees the full backlog — replay's slice() did not drain it.
+    expect(first.map((event) => event.containerId)).toEqual([1, 2, 3]);
+    expect(second.map((event) => event.containerId)).toEqual([1, 2, 3]);
+
+    hook.emit(mockLifecycleEvent(4));
+
+    const third: Array<DevtoolsEvent> = [];
+
+    hook.subscribe((event) => third.push(event));
+
+    expect(first.map((event) => event.containerId)).toEqual([1, 2, 3, 4]);
+    expect(second.map((event) => event.containerId)).toEqual([1, 2, 3, 4]);
+    expect(third.map((event) => event.containerId)).toEqual([1, 2, 3, 4]);
+  });
+
+  it("keeps the cache intact after an eviction, so a re-subscribe replays the same window", () => {
+    const hook = installDevtoolsHook();
+
+    for (let index = 0; index < 1100; index++) {
+      hook.emit(mockLifecycleEvent(index));
+    }
+
+    const first: Array<DevtoolsEvent> = [];
+    const second: Array<DevtoolsEvent> = [];
+
+    hook.subscribe((event) => first.push(event));
+    hook.subscribe((event) => second.push(event));
+
+    // Eviction trimmed the backlog to 1024 and the first replay sliced a copy; the backlog itself is
+    // untouched, so the second subscriber replays the identical post-eviction window.
+    const window = Array.from({ length: 1024 }, (_unused, index) => 1100 - 1024 + index);
+
+    expect(first.map((event) => event.containerId)).toEqual(window);
+    expect(second.map((event) => event.containerId)).toEqual(window);
+  });
 });
