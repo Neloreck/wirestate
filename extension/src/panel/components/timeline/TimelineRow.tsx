@@ -49,7 +49,7 @@ export function TimelineRow({ event, count, actions, result, baseline }: Timelin
             onSelectBinding={(containerId, token) => actions.select({ kind: "binding", containerId, token })}
           />
         </span>
-        {count > 1 ? <span className={"rounded bg-selected px-1 text-[10px]"}>×{count}</span> : null}
+        {count > 1 ? <span className={"rounded bg-selected px-1 text-2xs"}>×{count}</span> : null}
         <button
           type={"button"}
           title={"Select this container"}
@@ -64,7 +64,7 @@ export function TimelineRow({ event, count, actions, result, baseline }: Timelin
       </div>
 
       {open && event.kind === "message" ? (
-        <pre className={"overflow-auto bg-elevated px-2.5 py-1 text-[11px] text-fg"}>
+        <pre className={"overflow-auto bg-elevated px-2.5 py-1 text-xs text-fg"}>
           {messageDetail(event, result)}
         </pre>
       ) : null}

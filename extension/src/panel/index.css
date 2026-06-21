@@ -14,6 +14,10 @@
   --color-fg-subtle: var(--fg-subtle);
 }
 
+@theme {
+  --text-2xs: 0.625rem; /* 10px */
+}
+
 :root {
   color-scheme: light;
   --surface: #ffffff; /* --sys-color-cdt-base-container */

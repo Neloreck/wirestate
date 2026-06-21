@@ -37,5 +37,5 @@ export function Tag({
     return <span className={`rounded border px-1 ${TAG_OUTLINE[tone]}`}>{children}</span>;
   }
 
-  return <span className={`rounded px-1 text-[10px] uppercase tracking-wide ${TAG_TONE[tone]}`}>{children}</span>;
+  return <span className={`rounded px-1 text-2xs uppercase tracking-wide ${TAG_TONE[tone]}`}>{children}</span>;
 }
