@@ -16,6 +16,7 @@ export {
 
 export {
   type DevtoolsBinding,
+  type DevtoolsBindingId,
   type DevtoolsContainerId,
   type DevtoolsContainerSnapshot,
   type DevtoolsEvent,

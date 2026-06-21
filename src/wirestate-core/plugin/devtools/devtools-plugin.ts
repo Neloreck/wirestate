@@ -1,3 +1,4 @@
+import { isValueDescriptor } from "../../binding/binding-guards";
 import { type Container } from "../../container/container";
 import { type ContainerKernel } from "../../container/container-kernel";
 import { type Optional } from "../../types/general";
@@ -6,6 +7,7 @@ import { getOwnPlugins } from "../plugin-registry";
 
 import { DEVTOOLS_PROTOCOL_VERSION, installDevtoolsHook } from "./devtools-hook";
 import {
+  type DevtoolsBindingId,
   type DevtoolsContainerId,
   type DevtoolsContainerSnapshot,
   type DevtoolsHook,
@@ -101,6 +103,7 @@ export class DevToolsPlugin implements WirestatePlugin {
       this.rootId = this.hook.registerRoot({
         snapshot: () => this.snapshot(),
         inspect: (instanceId, path) => this.inspect(instanceId, path),
+        inspectBinding: (bindingId, path) => this.inspectBinding(bindingId, path),
         serviceRefOf: (value) => this.serviceRefOf(value),
       });
     }
@@ -244,7 +247,7 @@ export class DevToolsPlugin implements WirestatePlugin {
     return {
       containerId: hook.idForContainer(container),
       parentContainerId: parentId !== undefined && this.observed.has(parentId) ? parentId : null,
-      bindings: container.getOwnBindings().map(normalizeBinding),
+      bindings: container.getOwnBindings().map((binding) => normalizeBinding(binding, hook.idForBinding(binding))),
       instances: container
         .getActiveInstances()
         .map((instance: object): DevtoolsInstance => normalizeInstance(instance, hook.idForInstance(instance))),
@@ -275,6 +278,38 @@ export class DevToolsPlugin implements WirestatePlugin {
       for (const instance of container.getActiveInstances()) {
         if (this.hook.idForInstance(instance) === instanceId) {
           return readPath(instance, path);
+        }
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Reads the raw value at `path` within the `Value` binding identified by `bindingId`, scanning the
+   * observed containers' own bindings. Reads the stored value directly — never resolves or constructs
+   * — so it is side-effect-free and works even before the binding is first resolved. Only `Value`
+   * bindings are addressable here; an `Instance`/`Factory` binding's id never matches.
+   *
+   * @param bindingId - Binding to read from.
+   * @param path - Object keys / array indices from the binding's value to the target.
+   * @returns The raw value at the path, or `undefined` when no live `Value` binding has that id.
+   */
+  private inspectBinding(bindingId: DevtoolsBindingId, path: DevtoolsInspectPath): unknown {
+    if (!this.hook) {
+      return undefined;
+    }
+
+    for (const reference of this.observed.values()) {
+      const container: Optional<ContainerKernel> = reference.deref();
+
+      if (!container) {
+        continue;
+      }
+
+      for (const binding of container.getOwnBindings()) {
+        if (isValueDescriptor(binding) && this.hook.idForBinding(binding) === bindingId) {
+          return readPath(binding.value, path);
         }
       }
     }

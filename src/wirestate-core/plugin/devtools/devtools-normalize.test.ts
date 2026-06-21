@@ -22,8 +22,9 @@ describe("normalizeToken", () => {
 describe("normalizeBinding", () => {
   class Repository {}
 
-  it("normalizes a value binding — always singleton, no implementation", () => {
-    expect(normalizeBinding({ token: "CONFIG", value: 42 })).toEqual({
+  it("normalizes a value binding — always singleton, no implementation — and stamps the binding id", () => {
+    expect(normalizeBinding({ token: "CONFIG", value: 42 }, 5)).toEqual({
+      bindingId: 5,
       token: { name: "CONFIG", kind: "string" },
       type: "Value",
       scope: "Singleton",
@@ -32,7 +33,8 @@ describe("normalizeBinding", () => {
   });
 
   it("normalizes an instance binding, carrying the implementation class name", () => {
-    expect(normalizeBinding({ token: Repository, type: "Instance", value: Repository })).toEqual({
+    expect(normalizeBinding({ token: Repository, type: "Instance", value: Repository }, 6)).toEqual({
+      bindingId: 6,
       token: { name: "Repository", kind: "class" },
       type: "Instance",
       scope: "Singleton",
@@ -41,13 +43,14 @@ describe("normalizeBinding", () => {
   });
 
   it("reports a transient instance binding's scope", () => {
-    const binding = normalizeBinding({ token: Repository, type: "Instance", value: Repository, scope: "Transient" });
+    const binding = normalizeBinding({ token: Repository, type: "Instance", value: Repository, scope: "Transient" }, 7);
 
     expect(binding.scope).toBe("Transient");
   });
 
   it("normalizes a factory binding — no implementation", () => {
-    expect(normalizeBinding({ token: "MAKE", type: "Factory", factory: () => 1 })).toEqual({
+    expect(normalizeBinding({ token: "MAKE", type: "Factory", factory: () => 1 }, 8)).toEqual({
+      bindingId: 8,
       token: { name: "MAKE", kind: "string" },
       type: "Factory",
       scope: "Singleton",

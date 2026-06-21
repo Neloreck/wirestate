@@ -25,6 +25,14 @@ export type DevtoolsContainerId = number;
 export type DevtoolsInstanceId = number;
 
 /**
+ * Identifier for one binding registered on a container. Stable for the binding's lifetime (keyed on
+ * the binding descriptor's object identity) and unique within (and across) containers.
+ *
+ * @group DevTools
+ */
+export type DevtoolsBindingId = number;
+
+/**
  * Normalized, display-ready description of a binding token.
  *
  * @group DevTools
@@ -47,6 +55,11 @@ export interface DevtoolsToken {
  * @group DevTools
  */
 export interface DevtoolsBinding {
+  /**
+   * Stable id for this binding — the target of on-demand inspection for `Value` bindings.
+   */
+  readonly bindingId: DevtoolsBindingId;
+
   /**
    * Token the binding is registered under.
    */
@@ -518,7 +531,8 @@ export type DevtoolsEvent =
   | DevtoolsRegistrationEvent;
 
 /**
- * A path from a service instance to a nested value: object keys and array indices.
+ * A path from an inspection root (a service instance or a `Value` binding) to a nested value:
+ * object keys and array indices.
  *
  * @group DevTools
  */
@@ -562,23 +576,31 @@ export interface DevtoolsRootRegister {
   /**
    * Reads the **raw** live value at `path` within the instance identified by `instanceId`, or
    * `undefined` when the instance is not in this root. Read-only; the consumer serializes the
-   * result. Absent on a root whose plugin predates on-demand inspection.
+   * result.
    *
    * @param instanceId - Instance to read from.
    * @param path - Object keys / array indices from the instance to the value.
    * @returns The raw value at the path.
    */
-  inspect?(instanceId: DevtoolsInstanceId, path: DevtoolsInspectPath): unknown;
+  inspect(instanceId: DevtoolsInstanceId, path: DevtoolsInspectPath): unknown;
+
+  /**
+   * Reads the **raw** live value at `path` within the `Value` binding identified by `bindingId`, or.
+   *
+   * @param bindingId - Binding to read from.
+   * @param path - Object keys / array indices from the binding's value to the target.
+   * @returns The raw value at the path.
+   */
+  inspectBinding(bindingId: DevtoolsBindingId, path: DevtoolsInspectPath): unknown;
 
   /**
    * If `value` is a service instance this root tracks, returns a reference to it (so the inspector
    * can mark a field that points at another service and offer a jump); otherwise `undefined`.
-   * Absent on a root whose plugin predates this capability.
    *
    * @param value - The raw value at an inspected field.
    * @returns A service reference, or `undefined` when the value isn't a tracked instance.
    */
-  serviceRefOf?(value: object): Optional<DevtoolsServiceRef>;
+  serviceRefOf(value: object): Optional<DevtoolsServiceRef>;
 }
 
 /**
@@ -650,6 +672,15 @@ export interface DevtoolsHook {
    * @returns The instance's stable id.
    */
   idForInstance(instance: object): DevtoolsInstanceId;
+
+  /**
+   * Allocates (or returns) the stable id for a binding.
+   *
+   * @param descriptor - Binding descriptor to identify; keyed by object identity, so copies from any
+   *   library version share one allocator (and a primitive-valued binding still gets a stable id).
+   * @returns The binding's stable id.
+   */
+  idForBinding(descriptor: object): DevtoolsBindingId;
 
   /**
    * Emits a lifecycle delta to all subscribed backends.

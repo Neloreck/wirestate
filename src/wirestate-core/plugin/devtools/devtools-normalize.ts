@@ -11,6 +11,7 @@ import { getQueryHandlerMetadata } from "../queries/on-query";
 
 import {
   type DevtoolsBinding,
+  type DevtoolsBindingId,
   type DevtoolsHandler,
   type DevtoolsInstance,
   type DevtoolsInstanceId,
@@ -52,10 +53,12 @@ function tokenKind(token: ServiceToken): DevtoolsToken["kind"] {
  * Normalizes a binding descriptor into a display-ready record.
  *
  * @param binding - Binding descriptor to normalize.
+ * @param bindingId - Stable id the hook allocated for this binding descriptor.
  * @returns The normalized binding.
  */
-export function normalizeBinding(binding: BindingDescriptor<unknown>): DevtoolsBinding {
+export function normalizeBinding(binding: BindingDescriptor<unknown>, bindingId: DevtoolsBindingId): DevtoolsBinding {
   return {
+    bindingId,
     token: normalizeToken(getBindingToken(binding)),
     type: binding.type ?? "Value",
     scope: getBindingScope(binding),

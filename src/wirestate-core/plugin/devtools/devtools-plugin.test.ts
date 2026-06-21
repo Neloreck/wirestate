@@ -203,11 +203,70 @@ describe("DevToolsPlugin", () => {
     const counter = root.snapshot().containers[0].instances.find((entry) => entry.className === "Counter");
     const id: number = counter?.instanceId as number;
 
-    expect(root.inspect?.(id, ["count"])).toBe(5);
-    expect(root.inspect?.(id, ["nested", "deep", "value"])).toBe("x");
+    expect(root.inspect(id, ["count"])).toBe(5);
+    expect(root.inspect(id, ["nested", "deep", "value"])).toBe("x");
     // Unknown instance / missing path → undefined, never throws.
-    expect(root.inspect?.(999_999, ["count"])).toBeUndefined();
-    expect(root.inspect?.(id, ["nope", "deeper"])).toBeUndefined();
+    expect(root.inspect(999_999, ["count"])).toBeUndefined();
+    expect(root.inspect(id, ["nope", "deeper"])).toBeUndefined();
+
+    container.deprovision();
+  });
+
+  it("reads a live Value binding on demand via inspectBinding, by stable binding id", () => {
+    const TOKEN: symbol = Symbol("CONFIG");
+    const config = { url: "https://api.example.com", nested: { retries: 3 } };
+
+    const container: Container = new Container({
+      bindings: [{ token: TOKEN, value: config }],
+      plugins: [new DevToolsPlugin()],
+    });
+
+    container.provision();
+
+    const root = (getDevtoolsHook() as DevtoolsHook).getRoots()[0];
+    const binding = root.snapshot().containers[0].bindings.find((entry) => entry.token.name === "CONFIG");
+    const id: number = binding?.bindingId as number;
+
+    expect(id).toEqual(expect.any(Number));
+    // The whole value at the root path, then nested reads.
+    expect(root.inspectBinding(id, [])).toBe(config);
+    expect(root.inspectBinding(id, ["url"])).toBe("https://api.example.com");
+    expect(root.inspectBinding(id, ["nested", "retries"])).toBe(3);
+    // Unknown id / missing path → undefined, never throws.
+    expect(root.inspectBinding(999_999, [])).toBeUndefined();
+    expect(root.inspectBinding(id, ["nope", "deeper"])).toBeUndefined();
+
+    // The id is stable across snapshots.
+    const again = root.snapshot().containers[0].bindings.find((entry) => entry.token.name === "CONFIG");
+
+    expect(again?.bindingId).toBe(id);
+
+    container.deprovision();
+  });
+
+  it("does not expose Instance or Factory bindings to inspectBinding", () => {
+    @Injectable()
+    class Svc {
+      public secret: number = 1;
+    }
+
+    const container: Container = new Container({
+      bindings: [Svc, { token: "MAKE", type: "Factory", factory: () => ({ made: true }) }],
+      activate: [Svc],
+      plugins: [new DevToolsPlugin()],
+    });
+
+    container.provision();
+
+    const root = (getDevtoolsHook() as DevtoolsHook).getRoots()[0];
+    const bindings = root.snapshot().containers[0].bindings;
+    const instanceId: number = bindings.find((binding) => binding.token.name === "Svc")?.bindingId as number;
+    const factoryId: number = bindings.find((binding) => binding.token.name === "MAKE")?.bindingId as number;
+
+    // A non-Value binding id never matches: Instance values are read via `inspect`, and a Factory is
+    // never invoked (reading it would be a side effect).
+    expect(root.inspectBinding(instanceId, [])).toBeUndefined();
+    expect(root.inspectBinding(factoryId, [])).toBeUndefined();
 
     container.deprovision();
   });
@@ -266,10 +325,10 @@ describe("DevToolsPlugin", () => {
     const root = (getDevtoolsHook() as DevtoolsHook).getRoots()[0];
     const logger: Logger = container.get(Logger);
 
-    expect(root.serviceRefOf?.(logger)?.className).toBe("Logger");
-    expect(root.serviceRefOf?.(logger)?.instanceId).toEqual(expect.any(Number));
+    expect(root.serviceRefOf(logger)?.className).toBe("Logger");
+    expect(root.serviceRefOf(logger)?.instanceId).toEqual(expect.any(Number));
     // A plain object (or any value the container doesn't manage) is not a service.
-    expect(root.serviceRefOf?.({ not: "a service" })).toBeUndefined();
+    expect(root.serviceRefOf({ not: "a service" })).toBeUndefined();
 
     container.deprovision();
   });

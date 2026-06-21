@@ -159,3 +159,31 @@ describe("DevtoolsHook replay buffer", () => {
     expect(second.map((event) => event.containerId)).toEqual(window);
   });
 });
+
+describe("DevtoolsHook id allocators", () => {
+  afterEach(() => {
+    delete (globalThis as Record<string, unknown>)[DEVTOOLS_HOOK_KEY];
+  });
+
+  it("allocates a stable binding id per descriptor identity", () => {
+    const hook = installDevtoolsHook();
+    const a = {};
+    const b = {};
+
+    const idA: number = hook.idForBinding(a);
+
+    expect(hook.idForBinding(a)).toBe(idA); // same descriptor → same id
+    expect(hook.idForBinding(b)).not.toBe(idA); // distinct descriptor → distinct id
+  });
+
+  it("mints binding ids on a counter independent of containers and instances", () => {
+    const hook = installDevtoolsHook();
+
+    // The first id from each allocator is 1 — the id spaces overlap, so a binding and an instance can
+    // share a numeric id. That is exactly why `inspect` and `inspectBinding` are separate methods
+    // rather than one overloaded handle space.
+    expect(hook.idForBinding({})).toBe(1);
+    expect(hook.idForContainer({})).toBe(1);
+    expect(hook.idForInstance({})).toBe(1);
+  });
+});

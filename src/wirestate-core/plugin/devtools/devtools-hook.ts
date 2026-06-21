@@ -1,6 +1,7 @@
 import { type Optional } from "../../types/general";
 
 import {
+  type DevtoolsBindingId,
   type DevtoolsContainerId,
   type DevtoolsEvent,
   type DevtoolsHook,
@@ -55,10 +56,12 @@ class DevtoolsHookHost implements DevtoolsHook {
   private readonly recent: Array<DevtoolsEvent> = [];
   private readonly containerIds: WeakMap<object, DevtoolsContainerId> = new WeakMap();
   private readonly instanceIds: WeakMap<object, DevtoolsInstanceId> = new WeakMap();
+  private readonly bindingIds: WeakMap<object, DevtoolsBindingId> = new WeakMap();
 
   private nextRootId: DevtoolsRootId = 1;
   private nextContainerId: DevtoolsContainerId = 1;
   private nextInstanceId: DevtoolsInstanceId = 1;
+  private nextBindingId: DevtoolsBindingId = 1;
 
   public registerRoot(register: DevtoolsRootRegister): DevtoolsRootId {
     const rootId: DevtoolsRootId = this.nextRootId++;
@@ -94,6 +97,17 @@ class DevtoolsHookHost implements DevtoolsHook {
     return id;
   }
 
+  public idForBinding(descriptor: object): DevtoolsBindingId {
+    let id: Optional<DevtoolsBindingId> = this.bindingIds.get(descriptor);
+
+    if (id === undefined) {
+      id = this.nextBindingId++;
+      this.bindingIds.set(descriptor, id);
+    }
+
+    return id;
+  }
+
   public emit(event: DevtoolsEvent): void {
     this.recent.push(event);
 
@@ -123,6 +137,7 @@ class DevtoolsHookHost implements DevtoolsHook {
       rootId,
       snapshot: register.snapshot,
       inspect: register.inspect,
+      inspectBinding: register.inspectBinding,
       serviceRefOf: register.serviceRefOf,
     }));
   }
