@@ -45,6 +45,8 @@ jobs:
 
       - run: pnpm lint --cache
 
+      - run: pnpm format:check
+
       - run: pnpm typecheck && pnpm typecheck:cli
 
       - run: pnpm test --maxWorkers=100%
