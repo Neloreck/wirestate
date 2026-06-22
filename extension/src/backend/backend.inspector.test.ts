@@ -127,7 +127,7 @@ describe("InspectorBackend.onMessageRequest", () => {
 
     backend.onMessageRequest({ type: "inspect", requestId: 5, rootId, instanceId: 1, path: ["count"] });
 
-    expect(posts).toEqual([{ type: "inspectResult", requestId: 5, node: { t: "primitive", value: 42 } }]);
+    expect(posts).toEqual([{ type: "inspectResult", requestId: 5, node: { kind: "primitive", value: 42 } }]);
   });
 
   it("answers inspectBinding with the described node, correlated by requestId", () => {
@@ -137,7 +137,7 @@ describe("InspectorBackend.onMessageRequest", () => {
 
     backend.onMessageRequest({ type: "inspectBinding", requestId: 6, rootId, bindingId: 1, path: [] });
 
-    expect(posts).toEqual([{ type: "inspectResult", requestId: 6, node: { t: "primitive", value: "https://api" } }]);
+    expect(posts).toEqual([{ type: "inspectResult", requestId: 6, node: { kind: "primitive", value: "https://api" } }]);
   });
 });
 
@@ -145,8 +145,8 @@ describe("InspectorBackend inspection", () => {
   it("returns unsupported for an unknown root", () => {
     const { backend } = setup();
 
-    expect(backend.inspectAt(9999, 1, [])).toEqual({ t: "unsupported" });
-    expect(backend.inspectBindingAt(9999, 1, [])).toEqual({ t: "unsupported" });
+    expect(backend.inspectAt(9999, 1, [])).toEqual({ kind: "unsupported" });
+    expect(backend.inspectBindingAt(9999, 1, [])).toEqual({ kind: "unsupported" });
   });
 
   it("marks a nested field that resolves to a tracked instance as a service", () => {
@@ -171,6 +171,6 @@ describe("InspectorBackend inspection", () => {
       serviceRefOf: () => ({ className: "SampleRefClass", containerId: 2, instanceId: 9 }),
     });
 
-    expect(backend.inspectAt(rootId, 1, [])).toMatchObject({ t: "object" });
+    expect(backend.inspectAt(rootId, 1, [])).toMatchObject({ kind: "object" });
   });
 });

@@ -86,7 +86,7 @@ export function useBridge(): BridgeState {
         setConnected(false);
         // Fail any in-flight inspect requests rather than leaving the panel spinning.
         for (const resolve of pendingRef.current.values()) {
-          resolve({ t: "unsupported" });
+          resolve({ kind: "unsupported" });
         }
 
         pendingRef.current.clear();
@@ -133,7 +133,7 @@ export function useBridge(): BridgeState {
       const port: Optional<chrome.runtime.Port> = portRef.current;
 
       if (!port) {
-        return Promise.resolve({ t: "unsupported" });
+        return Promise.resolve({ kind: "unsupported" });
       }
 
       const requestId: number = (requestIdRef.current += 1);
@@ -151,7 +151,7 @@ export function useBridge(): BridgeState {
       const port: Optional<chrome.runtime.Port> = portRef.current;
 
       if (!port) {
-        return Promise.resolve({ t: "unsupported" });
+        return Promise.resolve({ kind: "unsupported" });
       }
 
       const requestId: number = (requestIdRef.current += 1);

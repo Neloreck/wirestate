@@ -6,7 +6,7 @@ import { type Optional } from "@/types/general";
 import { type NavigateToService, type ValueReader } from "./StateTree";
 
 /** A field whose value is itself a container-managed instance. */
-type ServiceNode = Extract<InspectNode, { t: "service" }>;
+type ServiceNode = Extract<InspectNode, { kind: "service" }>;
 
 interface StateNodeProps {
   readonly read: ValueReader;
@@ -43,8 +43,8 @@ export function StateNode({ read, path, label, depth, defaultOpen = false, onNav
     };
   }, [read, pathKey]);
 
-  const expandable: boolean = node?.t === "object" || node?.t === "array";
-  const service: Optional<ServiceNode> = node?.t === "service" ? node : undefined;
+  const expandable: boolean = node?.kind === "object" || node?.kind === "array";
+  const service: Optional<ServiceNode> = node?.kind === "service" ? node : undefined;
   const navigable: boolean = service !== undefined && onNavigate !== undefined;
   const clickable: boolean = expandable || navigable;
 
@@ -93,11 +93,11 @@ export function StateNode({ read, path, label, depth, defaultOpen = false, onNav
 }
 
 function childKeys(node: InspectNode): ReadonlyArray<string | number> {
-  if (node.t === "object") {
+  if (node.kind === "object") {
     return node.keys;
   }
 
-  if (node.t === "array") {
+  if (node.kind === "array") {
     return Array.from({ length: node.length }, (_unused, index) => index);
   }
 
@@ -105,7 +105,7 @@ function childKeys(node: InspectNode): ReadonlyArray<string | number> {
 }
 
 function summarize(node: InspectNode): string {
-  switch (node.t) {
+  switch (node.kind) {
     case "primitive":
       return typeof node.value === "string" ? JSON.stringify(node.value) : String(node.value);
     case "leaf":

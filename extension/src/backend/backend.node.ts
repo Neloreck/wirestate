@@ -16,7 +16,7 @@ const MAX_STRING: number = 256;
  */
 export function createServiceNode(ref: DevtoolsServiceRef): InspectNode {
   return {
-    t: "service",
+    kind: "service",
     preview: ref.className,
     className: ref.className,
     containerId: ref.containerId,
@@ -34,30 +34,30 @@ export function createServiceNode(ref: DevtoolsServiceRef): InspectNode {
  */
 export function createDescribeNode(value: unknown): InspectNode {
   if (value === null) {
-    return { t: "primitive", value: null };
+    return { kind: "primitive", value: null };
   }
 
   switch (typeof value) {
     case "string":
-      return { t: "primitive", value: value.length > MAX_STRING ? `${value.slice(0, MAX_STRING)}…` : value };
+      return { kind: "primitive", value: value.length > MAX_STRING ? `${value.slice(0, MAX_STRING)}…` : value };
 
     case "number":
     case "boolean":
-      return { t: "primitive", value };
+      return { kind: "primitive", value };
 
     case "undefined":
-      return { t: "leaf", preview: "undefined" };
+      return { kind: "leaf", preview: "undefined" };
 
     case "bigint":
-      return { t: "leaf", preview: `${value.toString()}n` };
+      return { kind: "leaf", preview: `${value.toString()}n` };
 
     case "symbol":
-      return { t: "leaf", preview: value.toString() };
+      return { kind: "leaf", preview: value.toString() };
 
     case "function": {
       const fn: { name?: string } = value as { name?: string };
 
-      return { t: "leaf", preview: fn.name ? `ƒ ${fn.name}()` : "ƒ ()" };
+      return { kind: "leaf", preview: fn.name ? `ƒ ${fn.name}()` : "ƒ ()" };
     }
     default:
       break;
@@ -66,19 +66,19 @@ export function createDescribeNode(value: unknown): InspectNode {
   const object: object = value as object;
 
   if (Array.isArray(object)) {
-    return { t: "array", preview: `Array(${object.length})`, length: Math.min(object.length, MAX_KEYS) };
+    return { kind: "array", preview: `Array(${object.length})`, length: Math.min(object.length, MAX_KEYS) };
   } else if (object instanceof Map) {
-    return { t: "leaf", preview: `Map(${object.size})` };
+    return { kind: "leaf", preview: `Map(${object.size})` };
   } else if (object instanceof Set) {
-    return { t: "leaf", preview: `Set(${object.size})` };
+    return { kind: "leaf", preview: `Set(${object.size})` };
   } else if (typeof Node !== "undefined" && object instanceof Node) {
-    return { t: "leaf", preview: ((object as { nodeName?: string }).nodeName ?? "Node").toLowerCase() };
+    return { kind: "leaf", preview: ((object as { nodeName?: string }).nodeName ?? "Node").toLowerCase() };
   }
 
   const className: Optional<string> = object.constructor?.name;
 
   return {
-    t: "object",
+    kind: "object",
     preview: className && className !== "Object" ? className : "{...}",
     keys: Object.keys(object).slice(0, MAX_KEYS),
   };

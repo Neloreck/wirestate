@@ -137,12 +137,12 @@ export class InspectorBackend {
    * @param rootId - Root whose `inspect` resolves the value.
    * @param instanceId - Instance to read from.
    * @param path - Object keys / array indices from the instance to the value.
-   * @returns The describing node, or `{ t: "unsupported" }` when the root is no longer registered.
+   * @returns The describing node, or `{ kind: "unsupported" }` when the root is no longer registered.
    */
   public inspectAt(rootId: number, instanceId: number, path: ReadonlyArray<string | number>): InspectNode {
     const root: Maybe<DevtoolsRoot> = this.findRoot(rootId);
 
-    return root ? this.resolveNode(root, root.inspect(instanceId, path), path) : { t: "unsupported" };
+    return root ? this.resolveNode(root, root.inspect(instanceId, path), path) : { kind: "unsupported" };
   }
 
   /**
@@ -152,12 +152,12 @@ export class InspectorBackend {
    * @param rootId - Root whose `inspectBinding` resolves the value.
    * @param bindingId - `Value` binding to read from.
    * @param path - Object keys / array indices from the binding's value to the target.
-   * @returns The describing node, or `{ t: "unsupported" }` when the root is no longer registered.
+   * @returns The describing node, or `{ kind: "unsupported" }` when the root is no longer registered.
    */
   public inspectBindingAt(rootId: number, bindingId: number, path: ReadonlyArray<string | number>): InspectNode {
     const root: Maybe<DevtoolsRoot> = this.findRoot(rootId);
 
-    return root ? this.resolveNode(root, root.inspectBinding(bindingId, path), path) : { t: "unsupported" };
+    return root ? this.resolveNode(root, root.inspectBinding(bindingId, path), path) : { kind: "unsupported" };
   }
 
   /**

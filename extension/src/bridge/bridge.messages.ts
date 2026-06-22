@@ -23,18 +23,18 @@ export const PANEL_PORT_PREFIX = "wirestate-panel:" as const;
  * `unsupported` means the inspected page's wirestate build predates on-demand inspection.
  */
 export type InspectNode =
-  | { readonly t: "primitive"; readonly value: string | number | boolean | null }
-  | { readonly t: "leaf"; readonly preview: string }
-  | { readonly t: "object"; readonly preview: string; readonly keys: ReadonlyArray<string> }
-  | { readonly t: "array"; readonly preview: string; readonly length: number }
+  | { readonly kind: "primitive"; readonly value: string | number | boolean | null }
+  | { readonly kind: "leaf"; readonly preview: string }
+  | { readonly kind: "object"; readonly preview: string; readonly keys: ReadonlyArray<string> }
+  | { readonly kind: "array"; readonly preview: string; readonly length: number }
   | {
-      readonly t: "service";
+      readonly kind: "service";
       readonly preview: string;
       readonly className: string;
       readonly containerId: number;
       readonly instanceId: number;
     }
-  | { readonly t: "unsupported" };
+  | { readonly kind: "unsupported" };
 
 /**
  * Lazily reads one level of an instance's state at a path. Resolves over the bridge.
