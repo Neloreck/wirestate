@@ -1,3 +1,4 @@
+import { BindingScope, BindingType } from "@wirestate/core";
 import {
   type DevtoolsBinding,
   type DevtoolsContainerSnapshot,
@@ -51,7 +52,7 @@ export function BindingDetail({
   inspectBinding,
 }: BindingDetailProps) {
   const status: BindingStatus = getBindingStatus(container, binding);
-  const isValue: boolean = binding.type === "Value";
+  const isValue: boolean = binding.type === BindingType.Value;
   const realizes: boolean = mayRealizeInstance(binding);
   const instance: Optional<DevtoolsInstance> = realizes ? realizingInstance(container, binding) : undefined;
   const rootId: Optional<number> = rootIdOfContainer(roots, container.containerId);
@@ -88,13 +89,13 @@ export function BindingDetail({
         </Field>
 
         <Field label={"type"}>
-          <Tag tone={binding.type === "Value" ? "info" : binding.type === "Instance" ? "accent" : "warn"}>
+          <Tag tone={binding.type === BindingType.Value ? "info" : binding.type === BindingType.Instance ? "accent" : "warn"}>
             {binding.type}
           </Tag>
         </Field>
 
         <Field label={"scope"}>
-          <Tag tone={binding.scope === "Transient" ? "warn" : "neutral"}>{binding.scope}</Tag>
+          <Tag tone={binding.scope === BindingScope.Transient ? "warn" : "neutral"}>{binding.scope}</Tag>
         </Field>
 
         <Field label={"impl"}>{binding.implementation ?? "-"}</Field>

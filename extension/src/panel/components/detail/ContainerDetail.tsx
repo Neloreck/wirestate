@@ -1,3 +1,4 @@
+import { BindingScope, BindingType } from "@wirestate/core";
 import {
   type DevtoolsContainerSnapshot,
   type DevtoolsEvent,
@@ -78,11 +79,11 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
                   {binding.token.name}
                 </LinkButton>
 
-                <Tag tone={binding.type === "Value" ? "info" : binding.type === "Instance" ? "accent" : "warn"}>
+                <Tag tone={binding.type === BindingType.Value ? "info" : binding.type === BindingType.Instance ? "accent" : "warn"}>
                   {binding.type}
                 </Tag>
 
-                {binding.scope === "Transient" ? <Tag tone={"warn"}>Transient</Tag> : null}
+                {binding.scope === BindingScope.Transient ? <Tag tone={"warn"}>Transient</Tag> : null}
 
                 {status === BindingStatus.Inactive || status === BindingStatus.Unrealized ? (
                   <StatusTag status={status} />

@@ -1,3 +1,4 @@
+import { BindingScope, BindingType } from "@wirestate/core";
 import {
   type DevtoolsBinding,
   type DevtoolsContainerSnapshot,
@@ -188,7 +189,7 @@ export function childContainers(
  * @returns `true` when a singleton instance binding, else `false`.
  */
 export function mayRealizeInstance(binding: DevtoolsBinding): boolean {
-  return binding.type === "Instance" && binding.scope === "Singleton";
+  return binding.type === BindingType.Instance && binding.scope === BindingScope.Singleton;
 }
 
 /**
