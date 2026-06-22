@@ -9,6 +9,7 @@ import { default as manifest } from "./manifest.config";
 
 const SRC_DIR: string = fileURLToPath(new URL("./src", import.meta.url));
 const PROTOCOL_SRC: string = fileURLToPath(new URL("../src/wirestate-core/devtools.ts", import.meta.url));
+const CORE_SRC: string = fileURLToPath(new URL("../src/wirestate-core/index.ts", import.meta.url));
 
 const CHROME_TARGET: string = "chrome99";
 
@@ -18,6 +19,7 @@ export default defineConfig({
     alias: {
       "@": SRC_DIR,
       "@wirestate/core/devtools": PROTOCOL_SRC,
+      "@wirestate/core": CORE_SRC,
     },
   },
   oxc: { target: CHROME_TARGET, decorator: { legacy: true } },
