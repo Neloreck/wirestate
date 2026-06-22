@@ -10,7 +10,7 @@ import {
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
 
-import { summarizeDevtoolsEvent } from "@/panel/lib/format";
+import { getDevtoolsEventSummary } from "@/panel/lib/format";
 import { type Selection, type TimelineFilter } from "@/panel/lib/types";
 import { type Optional } from "@/types/general";
 
@@ -351,7 +351,7 @@ export function filterLogBy(log: ReadonlyArray<DevtoolsEvent>, filter: TimelineF
       return false;
     }
 
-    return needle === "" || summarizeDevtoolsEvent(event).toLowerCase().includes(needle);
+    return needle === "" || getDevtoolsEventSummary(event).toLowerCase().includes(needle);
   });
 }
 

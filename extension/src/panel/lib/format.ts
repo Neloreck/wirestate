@@ -44,7 +44,7 @@ export function formatDelta(ms: number): string {
  * @param event - The devtools delta to summarize.
  * @returns A single-line, human-readable summary of the delta.
  */
-export function summarizeDevtoolsEvent(event: DevtoolsEvent): string {
+export function getDevtoolsEventSummary(event: DevtoolsEvent): string {
   switch (event.kind) {
     case "lifecycle":
       return `${event.phase}${event.instance ? ` · ${event.instance.className}` : ""}`;

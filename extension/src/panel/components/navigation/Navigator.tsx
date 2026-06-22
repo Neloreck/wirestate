@@ -1,19 +1,28 @@
+import { useInjection } from "@wirestate/react";
+import { observer } from "@wirestate/react-mobx";
+import { useMemo } from "react";
+
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { type RootModel } from "@/panel/lib/selectors";
+import { type RootModel, buildRoots } from "@/panel/lib/selectors";
 import { type Selection } from "@/panel/lib/types";
+import { BridgeService } from "@/panel/services/bridge.service";
 import { type Optional } from "@/types/general";
 
 import { ContainerNode } from "./ContainerNode";
 
 interface NavigatorProps {
-  readonly roots: ReadonlyArray<RootModel>;
   readonly selection: Optional<Selection>;
   readonly collapsed: ReadonlySet<number>;
   readonly actions: PanelActions;
 }
 
-/** Master region: roots -> nested container hierarchy. Selecting a container drives the Detail pane. */
-export function Navigator({ roots, selection, collapsed, actions }: NavigatorProps) {
+/**
+ * Master region: roots -> nested container hierarchy. Selecting a container drives the Detail pane.
+ */
+export const Navigator = observer(function Navigator({ selection, collapsed, actions }: NavigatorProps) {
+  const bridge: BridgeService = useInjection(BridgeService);
+  const roots: ReadonlyArray<RootModel> = useMemo(() => buildRoots(bridge.roots), [bridge.roots]);
+
   if (roots.length === 0) {
     return (
       <nav className={"h-full w-full overflow-auto p-2"}>
@@ -43,4 +52,4 @@ export function Navigator({ roots, selection, collapsed, actions }: NavigatorPro
       ))}
     </nav>
   );
-}
+});

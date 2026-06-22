@@ -1,39 +1,22 @@
-import { type DevtoolsEvent, type DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
-import { type CSSProperties, useMemo, useRef } from "react";
+import { type CSSProperties, useRef } from "react";
 
 import { Detail } from "@/panel/components/detail";
 import { Navigator } from "@/panel/components/navigation";
 import { ResizeHandle } from "@/panel/components/resize";
 import { StatusBar } from "@/panel/components/status";
-import { Timeline } from "@/panel/components/timeline";
-import { useBridge } from "@/panel/hooks/use-bridge";
+import { Timeline, TimelineCount } from "@/panel/components/timeline";
 import { useLayout } from "@/panel/hooks/use-layout";
 import { usePanelState } from "@/panel/hooks/use-panel-state";
-import { type RootModel, buildMessageResults, buildRoots, filterLogBy } from "@/panel/lib/selectors";
 
 /**
  * The inspector panel: master–detail (Navigator + Detail) over a collapsible, cross-linked Timeline.
  */
 export function Panel() {
-  const { connected, protocolVersion, roots, log, clear, inspect, inspectBinding } = useBridge();
   const { state, actions } = usePanelState();
   const { layout, actions: layoutActions } = useLayout();
 
   const columnRef = useRef<HTMLDivElement>(null);
   const rowRef = useRef<HTMLDivElement>(null);
-
-  const containerCount: number = roots.reduce((total, root) => total + root.containers.length, 0);
-  const containerIds: ReadonlyArray<number> = useMemo(
-    () => roots.flatMap((root) => root.containers.map((container) => container.containerId)),
-    [roots]
-  );
-
-  const builtRoots: ReadonlyArray<RootModel> = useMemo(() => buildRoots(roots), [roots]);
-  const filteredLogs: ReadonlyArray<DevtoolsEvent> = useMemo(() => filterLogBy(log, state.filter), [log, state.filter]);
-  const messageResults: ReadonlyMap<number, DevtoolsMessageResultEvent> = useMemo(
-    () => buildMessageResults(log),
-    [log]
-  );
 
   return (
     <div
@@ -41,12 +24,7 @@ export function Panel() {
       className={"flex h-screen flex-col bg-surface font-mono text-xs text-fg"}
       style={{ "--timeline-h": `${(layout.timelineFraction * 100).toFixed(3)}%` } as CSSProperties}
     >
-      <StatusBar
-        isConnected={connected}
-        protocolVersion={protocolVersion}
-        rootsCount={roots.length}
-        containersCount={containerCount}
-      />
+      <StatusBar />
 
       <div
         ref={rowRef}
@@ -54,7 +32,7 @@ export function Panel() {
         style={{ "--nav-w": `${(layout.navFraction * 100).toFixed(3)}%` } as CSSProperties}
       >
         <div className={"min-w-55 overflow-hidden"} style={{ flex: "0 0 var(--nav-w)" }}>
-          <Navigator roots={builtRoots} selection={state.selection} collapsed={state.ui.collapsed} actions={actions} />
+          <Navigator selection={state.selection} collapsed={state.ui.collapsed} actions={actions} />
         </div>
 
         <ResizeHandle
@@ -67,14 +45,7 @@ export function Panel() {
           onCommit={layoutActions.setNavFraction}
         />
 
-        <Detail
-          roots={roots}
-          log={log}
-          selection={state.selection}
-          actions={actions}
-          inspect={inspect}
-          inspectBinding={inspectBinding}
-        />
+        <Detail selection={state.selection} actions={actions} />
       </div>
 
       {layout.timelineOpen ? (
@@ -98,21 +69,12 @@ export function Panel() {
           onClick={layoutActions.toggleTimeline}
           className={"flex items-center gap-1 bg-elevated px-2.5 py-0.5 text-left text-fg-muted"}
         >
-          {layout.timelineOpen ? "▾" : "▸"} Timeline <span className={"text-fg-subtle"}>({filteredLogs.length})</span>
+          {layout.timelineOpen ? "▾" : "▸"} Timeline <TimelineCount filter={state.filter} />
         </button>
 
         {layout.timelineOpen ? (
           <div className={"min-h-0 flex-1"}>
-            <Timeline
-              events={filteredLogs}
-              roots={builtRoots}
-              containerIds={containerIds}
-              filter={state.filter}
-              ui={state.ui}
-              actions={actions}
-              onClear={clear}
-              results={messageResults}
-            />
+            <Timeline filter={state.filter} ui={state.ui} actions={actions} />
           </div>
         ) : null}
       </div>

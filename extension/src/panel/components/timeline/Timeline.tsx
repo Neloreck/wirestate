@@ -1,25 +1,26 @@
 import { type DevtoolsEvent, type DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
-import { useEffect, useRef } from "react";
+import { useInjection } from "@wirestate/react";
+import { observer } from "@wirestate/react-mobx";
+import { useEffect, useMemo, useRef } from "react";
 
 import { type PanelActions, type PanelUi } from "@/panel/hooks/use-panel-state";
-import { summarizeDevtoolsEvent, timestampOfDevtoolsEvent } from "@/panel/lib/format";
-import { type RootModel } from "@/panel/lib/selectors";
+import { getDevtoolsEventSummary, timestampOfDevtoolsEvent } from "@/panel/lib/format";
+import { type RootModel, buildMessageResults, buildRoots, filterLogBy } from "@/panel/lib/selectors";
 import { type TimelineFilter } from "@/panel/lib/types";
+import { BridgeService } from "@/panel/services/bridge.service";
 import { type Optional } from "@/types/general";
 
 import { TimelineFilters } from "./TimelineFilters";
 import { TimelineRow } from "./TimelineRow";
 
 interface TimelineProps {
-  /** Already filtered deltas (Panel applies the filter). */
-  readonly events: ReadonlyArray<DevtoolsEvent>;
-  readonly roots: ReadonlyArray<RootModel>;
-  readonly containerIds: ReadonlyArray<number>;
   readonly filter: TimelineFilter;
   readonly ui: PanelUi;
   readonly actions: PanelActions;
-  readonly onClear: () => void;
-  readonly results: ReadonlyMap<number, DevtoolsMessageResultEvent>;
+}
+
+interface TimelineCountProps {
+  readonly filter: TimelineFilter;
 }
 
 interface CollapsedRow {
@@ -27,8 +28,31 @@ interface CollapsedRow {
   count: number;
 }
 
+/**
+ * The filtered-delta count shown on the (possibly collapsed) Timeline toggle. Isolated so the count
+ * tracks the log without re-rendering the panel shell.
+ */
+export const TimelineCount = observer(function TimelineCount({ filter }: TimelineCountProps) {
+  const bridge: BridgeService = useInjection(BridgeService);
+  const count: number = useMemo(() => filterLogBy(bridge.log, filter).length, [bridge.log, filter]);
+
+  return <span className={"text-fg-subtle"}>({count})</span>;
+});
+
 /** Timeline dock body: filter bar + the (frozen-on-pause, dedup-collapsed, autoscrolled) delta list. */
-export function Timeline({ events, roots, containerIds, filter, ui, actions, onClear, results }: TimelineProps) {
+export const Timeline = observer(function Timeline({ filter, ui, actions }: TimelineProps) {
+  const bridge: BridgeService = useInjection(BridgeService);
+  const roots: ReadonlyArray<RootModel> = useMemo(() => buildRoots(bridge.roots), [bridge.roots]);
+  const containerIds: ReadonlyArray<number> = useMemo(
+    () => bridge.roots.flatMap((root) => root.containers.map((container) => container.containerId)),
+    [bridge.roots]
+  );
+  const events: ReadonlyArray<DevtoolsEvent> = useMemo(() => filterLogBy(bridge.log, filter), [bridge.log, filter]);
+  const results: ReadonlyMap<number, DevtoolsMessageResultEvent> = useMemo(
+    () => buildMessageResults(bridge.log),
+    [bridge.log]
+  );
+
   const frozen = useRef<ReadonlyArray<DevtoolsEvent>>(events);
 
   if (!ui.paused) {
@@ -56,7 +80,7 @@ export function Timeline({ events, roots, containerIds, filter, ui, actions, onC
         filter={filter}
         ui={ui}
         actions={actions}
-        onClear={onClear}
+        onClear={() => bridge.clear()}
       />
       <div ref={scrollRef} className={"flex-1 overflow-auto"}>
         {rows.length === 0 ? (
@@ -76,7 +100,7 @@ export function Timeline({ events, roots, containerIds, filter, ui, actions, onC
       </div>
     </div>
   );
-}
+});
 
 /** Collapses consecutive identical deltas into one row with a count. */
 function collapse(events: ReadonlyArray<DevtoolsEvent>): ReadonlyArray<CollapsedRow> {
@@ -85,7 +109,7 @@ function collapse(events: ReadonlyArray<DevtoolsEvent>): ReadonlyArray<Collapsed
   for (const event of events) {
     const last: CollapsedRow | undefined = rows[rows.length - 1];
 
-    if (last && summarizeDevtoolsEvent(last.event) === summarizeDevtoolsEvent(event)) {
+    if (last && getDevtoolsEventSummary(last.event) === getDevtoolsEventSummary(event)) {
       last.count += 1;
     } else {
       rows.push({ event, count: 1 });

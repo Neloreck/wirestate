@@ -1,29 +1,29 @@
-import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
+import { useInjection } from "@wirestate/react";
+import { observer } from "@wirestate/react-mobx";
 import { type ReactNode, useEffect, useRef } from "react";
 
-import { type InspectBindingFn, type InspectFn } from "@/bridge/bridge.messages";
 import { LinkButton } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { type ResolvedEntity, resolveSelection } from "@/panel/lib/selectors";
 import { type Selection, isSameSelection } from "@/panel/lib/types";
+import { BridgeService } from "@/panel/services/bridge.service";
 import { type Optional } from "@/types/general";
 
 import { Breadcrumb } from "./Breadcrumb";
 import { View } from "./View";
 
 interface DetailProps {
-  readonly roots: ReadonlyArray<DevtoolsRootSnapshot>;
-  readonly log: ReadonlyArray<DevtoolsEvent>;
   readonly selection: Optional<Selection>;
   readonly actions: PanelActions;
-  readonly inspect: InspectFn;
-  readonly inspectBinding: InspectBindingFn;
 }
 
-/** Detail pane: routes the current selection to its view, with breadcrumb + dead-entity tombstone. */
-export function Detail({ roots, log, selection, actions, inspect, inspectBinding }: DetailProps) {
+/**
+ * Detail pane: routes the current selection to its view, with breadcrumb + dead-entity tombstone.
+ */
+export const Detail = observer(function Detail({ selection, actions }: DetailProps) {
+  const bridge: BridgeService = useInjection(BridgeService);
   const cache = useRef<Optional<{ selection: Selection; resolved: ResolvedEntity }>>(undefined);
-  const resolved: Optional<ResolvedEntity> = selection ? resolveSelection(roots, selection) : undefined;
+  const resolved: Optional<ResolvedEntity> = selection ? resolveSelection(bridge.roots, selection) : undefined;
 
   useEffect(() => {
     if (selection && resolved) {
@@ -41,11 +41,11 @@ export function Detail({ roots, log, selection, actions, inspect, inspectBinding
         <Breadcrumb resolved={resolved} actions={actions} />
         <View
           resolved={resolved}
-          roots={roots}
-          log={log}
+          roots={bridge.roots}
+          log={bridge.log}
           actions={actions}
-          inspect={inspect}
-          inspectBinding={inspectBinding}
+          inspect={bridge.inspect}
+          inspectBinding={bridge.inspectBinding}
         />
       </>
     );
@@ -70,11 +70,11 @@ export function Detail({ roots, log, selection, actions, inspect, inspectBinding
           <div className={"pointer-events-none opacity-60"}>
             <View
               resolved={dead}
-              roots={roots}
-              log={log}
+              roots={bridge.roots}
+              log={bridge.log}
               actions={actions}
-              inspect={inspect}
-              inspectBinding={inspectBinding}
+              inspect={bridge.inspect}
+              inspectBinding={bridge.inspectBinding}
             />
           </div>
         ) : null}
@@ -83,4 +83,4 @@ export function Detail({ roots, log, selection, actions, inspect, inspectBinding
   }
 
   return <section className={"flex-1 overflow-auto p-3"}>{content}</section>;
-}
+});

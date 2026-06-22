@@ -4,7 +4,7 @@ import { type PanelActions, type PanelUi } from "@/panel/hooks/use-panel-state";
 import { type RootModel } from "@/panel/lib/selectors";
 import { type EventKind, type TimelineFilter } from "@/panel/lib/types";
 
-import { Toggle } from "./Toggle";
+import { TimelineToggle } from "./TimelineToggle";
 
 const KINDS: ReadonlyArray<EventKind> = ["lifecycle", "message", "registration"];
 const CHANNELS: ReadonlyArray<DevtoolsMessageChannel> = ["event", "command", "query"];
@@ -18,7 +18,9 @@ interface TimelineFiltersProps {
   readonly onClear: () => void;
 }
 
-/** The Timeline's filter + control bar. */
+/**
+ * The Timeline's filter + control bar.
+ */
 export function TimelineFilters({ roots, containerIds, filter, ui, actions, onClear }: TimelineFiltersProps) {
   return (
     <div className={"flex flex-wrap items-center gap-2 border-b border-divider bg-elevated px-2.5 py-1"}>
@@ -28,6 +30,7 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
         onChange={(event) => actions.setRootFilter(event.target.value === "" ? undefined : Number(event.target.value))}
       >
         <option value={""}>all roots</option>
+
         {roots.map((root) => (
           <option key={root.rootId} value={root.rootId}>
             {root.label}
@@ -43,6 +46,7 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
         }
       >
         <option value={""}>all containers</option>
+
         {containerIds.map((id) => (
           <option key={id} value={id}>
             container #{id}
@@ -75,8 +79,10 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
 
       <span className={"flex-1"} />
 
-      <Toggle on={ui.paused} label={ui.paused ? "paused" : "live"} onClick={actions.togglePaused} />
-      <Toggle on={ui.autoscroll} label={"autoscroll"} onClick={actions.toggleAutoscroll} />
+      <TimelineToggle active={ui.paused} label={ui.paused ? "paused" : "live"} onClick={actions.togglePaused} />
+
+      <TimelineToggle active={ui.autoscroll} label={"autoscroll"} onClick={actions.toggleAutoscroll} />
+
       <button type={"button"} onClick={onClear} className={"rounded border border-divider px-2 py-0.5 hover:bg-hover"}>
         clear
       </button>

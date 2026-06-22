@@ -1,15 +1,11 @@
-import {
-  type DevtoolsMessageEvent,
-  type DevtoolsMessageResultEvent,
-  type DevtoolsEvent,
-} from "@wirestate/core/devtools";
-import { useState } from "react";
+import { type DevtoolsMessageResultEvent, type DevtoolsEvent } from "@wirestate/core/devtools";
+import { useCallback, useState, type MouseEvent } from "react";
 
 import { EventSummary } from "@/panel/components/EventSummary";
 import { EventTimeCells } from "@/panel/components/EventTimeCells";
+import { TimelineMessageDetail } from "@/panel/components/timeline/TimelineMessageDetail";
 import { Tag, type TagTone } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { stringify } from "@/panel/lib/format";
 import { type Optional } from "@/types/general";
 
 const KIND_TONE: Record<DevtoolsEvent["kind"], TagTone> = {
@@ -24,68 +20,71 @@ interface TimelineRowProps {
   readonly count: number;
   readonly actions: PanelActions;
   readonly result?: DevtoolsMessageResultEvent;
-  /** Timestamp of the first row shown, for the relative offset; `undefined` disables the Δ column. */
+  /**
+   * Timestamp of the first row shown, for the relative offset; `undefined` disables the delta column.
+   */
   readonly baseline?: Optional<number>;
 }
 
-/** One Timeline delta. Message rows expand inline to show the dehydrated payload (and any result). */
+/**
+ * One Timeline delta.
+ * Message rows expand inline to show the dehydrated payload (and any result).
+ */
 export function TimelineRow({ event, count, actions, result, baseline }: TimelineRowProps) {
   const [open, setOpen] = useState(false);
-  const expandable: boolean = event.kind === "message";
+
+  const isExpandable: boolean = event.kind === "message";
+
+  const onToggle = useCallback(() => {
+    setOpen((it) => !it);
+  }, []);
+
+  const onSelectBinding = useCallback(
+    (containerId: number, token: string) => actions.select({ kind: "binding", containerId, token }),
+    [actions]
+  );
+
+  const onNavigateToContainer = useCallback(
+    (domEvent: MouseEvent) => {
+      domEvent.stopPropagation();
+      actions.select({ kind: "container", containerId: event.containerId });
+    },
+    [actions, event.containerId]
+  );
 
   return (
     <div className={"border-b border-divider-subtle"}>
       <div
-        className={`flex items-center gap-2 px-2.5 py-0.5 ${expandable ? "cursor-pointer" : ""}`}
-        onClick={expandable ? () => setOpen((value) => !value) : undefined}
+        className={`flex items-center gap-2 px-2.5 py-0.5 ${isExpandable ? "cursor-pointer" : ""}`}
+        onClick={isExpandable ? onToggle : undefined}
       >
         <EventTimeCells event={event} baseline={baseline} />
+
         <span className={"min-w-21 shrink-0"}>
           <Tag tone={KIND_TONE[event.kind]}>{event.kind}</Tag>
         </span>
+
         <span className={"flex-1 truncate"}>
-          <EventSummary
-            event={event}
-            onSelectBinding={(containerId, token) => actions.select({ kind: "binding", containerId, token })}
-          />
+          <EventSummary event={event} onSelectBinding={onSelectBinding} />
         </span>
+
         {count > 1 ? <span className={"rounded bg-selected px-1 text-2xs"}>×{count}</span> : null}
+
         <button
           type={"button"}
           title={"Select this container"}
           className={"shrink-0 text-fg-subtle hover:text-fg"}
-          onClick={(domEvent) => {
-            domEvent.stopPropagation();
-            actions.select({ kind: "container", containerId: event.containerId });
-          }}
+          onClick={onNavigateToContainer}
         >
           bus: #{event.containerId}
         </button>
       </div>
 
       {open && event.kind === "message" ? (
-        <pre className={"overflow-auto bg-elevated px-2.5 py-1 text-xs text-fg"}>{messageDetail(event, result)}</pre>
+        <pre className={"overflow-auto bg-elevated px-2.5 py-1 text-xs text-fg"}>
+          <TimelineMessageDetail message={event.message} result={result} />
+        </pre>
       ) : null}
     </div>
   );
-}
-
-function messageDetail(event: DevtoolsMessageEvent, result?: DevtoolsMessageResultEvent): string {
-  const message = event.message;
-  const lines: Array<string> = [
-    `type: ${message.type}`,
-    `channel: ${message.channel}`,
-    `timestamp: ${new Date(message.timestamp).toISOString()}`,
-    `payload: ${stringify(message.payload)}`,
-  ];
-
-  if (message.source !== undefined) {
-    lines.push(`source: ${stringify(message.source)}`);
-  }
-
-  if (result) {
-    lines.push(`result (${result.outcome}): ${stringify(result.value)}`);
-  }
-
-  return lines.join("\n");
 }

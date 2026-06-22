@@ -6,7 +6,9 @@ interface PluginDetailProps {
   readonly plugin: DevtoolsPluginInfo;
 }
 
-/** Detail view for a selected plugin. */
+/**
+ * Detail view for a selected plugin.
+ */
 export function PluginDetail({ plugin }: PluginDetailProps) {
   return (
     <div className={"space-y-3"}>

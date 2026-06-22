@@ -16,6 +16,9 @@
     "paths": {
       "@/*": ["./src/*"],
       "@wirestate/core/devtools": ["../src/wirestate-core/devtools.ts"],
+      "@wirestate/react-mobx": ["../src/wirestate-react-mobx/index.ts"],
+      "@wirestate/react": ["../src/wirestate-react/index.ts"],
+      "@wirestate/mobx": ["../src/wirestate-mobx/index.ts"],
       "@wirestate/core": ["../src/wirestate-core/index.ts"]
     }
   },

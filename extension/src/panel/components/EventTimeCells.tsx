@@ -1,13 +1,12 @@
 import { type DevtoolsEvent } from "@wirestate/core/devtools";
 
 import { formatTimestamp, formatDelta, timestampOfDevtoolsEvent } from "@/panel/lib/format";
-import { type Optional } from "@/types/general";
+import { type Maybe, type Optional } from "@/types/general";
 
 interface EventTimeCellsProps {
   readonly event: DevtoolsEvent;
-
   /**
-   * Timestamp of the first row shown, for the relative offset; `undefined` disables the Δ column.
+   * Timestamp of the first row shown, for the relative offset; `undefined` disables the delta column.
    */
   readonly baseline: Optional<number>;
 }
@@ -16,17 +15,18 @@ interface EventTimeCellsProps {
  * The clock-time + relative-offset (Δ) columns shared by the Timeline rows and the lifecycle History.
  */
 export function EventTimeCells({ event, baseline }: EventTimeCellsProps) {
-  const timestamp: Optional<number> = timestampOfDevtoolsEvent(event);
-  const delta: Optional<number> = timestamp !== undefined && baseline !== undefined ? timestamp - baseline : undefined;
+  const timestamp: Maybe<number> = timestampOfDevtoolsEvent(event);
+  const delta: Maybe<number> =
+    typeof timestamp === "number" && typeof baseline === "number" ? timestamp - baseline : null;
 
   return (
     <>
       <span className={"w-22 shrink-0 text-fg-subtle tabular-nums"}>
-        {timestamp === undefined ? "" : formatTimestamp(timestamp)}
+        {typeof timestamp === "number" ? formatTimestamp(timestamp) : ""}
       </span>
 
       <span className={"w-14 shrink-0 text-fg-muted tabular-nums"}>
-        {delta === undefined ? "" : formatDelta(delta)}
+        {typeof delta === "number" ? formatDelta(delta) : ""}
       </span>
     </>
   );
