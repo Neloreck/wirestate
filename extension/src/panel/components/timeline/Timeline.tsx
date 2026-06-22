@@ -19,27 +19,9 @@ interface TimelineProps {
   readonly actions: PanelActions;
 }
 
-interface TimelineCountProps {
-  readonly filter: TimelineFilter;
-}
-
-interface CollapsedRow {
-  event: DevtoolsEvent;
-  count: number;
-}
-
 /**
- * The filtered-delta count shown on the (possibly collapsed) Timeline toggle. Isolated so the count
- * tracks the log without re-rendering the panel shell.
+ * Timeline dock body: filter bar + the (frozen-on-pause, dedup-collapsed, autoscrolled) delta list.
  */
-export const TimelineCount = observer(function TimelineCount({ filter }: TimelineCountProps) {
-  const bridge: BridgeService = useInjection(BridgeService);
-  const count: number = useMemo(() => filterLogBy(bridge.log, filter).length, [bridge.log, filter]);
-
-  return <span className={"text-fg-subtle"}>({count})</span>;
-});
-
-/** Timeline dock body: filter bar + the (frozen-on-pause, dedup-collapsed, autoscrolled) delta list. */
 export const Timeline = observer(function Timeline({ filter, ui, actions }: TimelineProps) {
   const bridge: BridgeService = useInjection(BridgeService);
   const roots: ReadonlyArray<RootModel> = useMemo(() => buildRoots(bridge.roots), [bridge.roots]);
@@ -60,7 +42,7 @@ export const Timeline = observer(function Timeline({ filter, ui, actions }: Time
   }
 
   const shown: ReadonlyArray<DevtoolsEvent> = ui.paused ? frozen.current : events;
-  const rows: ReadonlyArray<CollapsedRow> = collapse(shown);
+  const rows: ReadonlyArray<CollapsedRow> = timelineCollapse(shown);
   // Relative offsets are measured from the first row currently shown (resets with the filter/pause).
   const baseline: Optional<number> = rows.length > 0 ? timestampOfDevtoolsEvent(rows[0].event) : undefined;
 
@@ -102,8 +84,15 @@ export const Timeline = observer(function Timeline({ filter, ui, actions }: Time
   );
 });
 
-/** Collapses consecutive identical deltas into one row with a count. */
-function collapse(events: ReadonlyArray<DevtoolsEvent>): ReadonlyArray<CollapsedRow> {
+interface CollapsedRow {
+  event: DevtoolsEvent;
+  count: number;
+}
+
+/**
+ * Collapses consecutive identical deltas into one row with a count.
+ */
+function timelineCollapse(events: ReadonlyArray<DevtoolsEvent>): ReadonlyArray<CollapsedRow> {
   const rows: Array<CollapsedRow> = [];
 
   for (const event of events) {

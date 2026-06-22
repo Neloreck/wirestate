@@ -1,4 +1,5 @@
 import { type DevtoolsMessageChannel } from "@wirestate/core/devtools";
+import { type ChangeEvent, useCallback } from "react";
 
 import { type PanelActions, type PanelUi } from "@/panel/hooks/use-panel-state";
 import { type RootModel } from "@/panel/lib/selectors";
@@ -22,12 +23,31 @@ interface TimelineFiltersProps {
  * The Timeline's filter + control bar.
  */
 export function TimelineFilters({ roots, containerIds, filter, ui, actions, onClear }: TimelineFiltersProps) {
+  const onSetRootFilter = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      actions.setRootFilter(event.target.value === "" ? undefined : Number(event.target.value));
+    },
+    [actions]
+  );
+
+  const onSetContainerFilter = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      actions.setContainerFilter(event.target.value === "" ? undefined : Number(event.target.value));
+    },
+    [actions]
+  );
+
+  const onChangeFilter = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => actions.setText(event.target.value),
+    [actions]
+  );
+
   return (
     <div className={"flex flex-wrap items-center gap-2 border-b border-divider bg-elevated px-2.5 py-1"}>
       <select
         className={"rounded border border-divider bg-surface px-1 py-0.5"}
         value={filter.rootId ?? ""}
-        onChange={(event) => actions.setRootFilter(event.target.value === "" ? undefined : Number(event.target.value))}
+        onChange={onSetRootFilter}
       >
         <option value={""}>all roots</option>
 
@@ -41,9 +61,7 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
       <select
         className={"rounded border border-divider bg-surface px-1 py-0.5"}
         value={filter.containerId ?? ""}
-        onChange={(event) =>
-          actions.setContainerFilter(event.target.value === "" ? undefined : Number(event.target.value))
-        }
+        onChange={onSetContainerFilter}
       >
         <option value={""}>all containers</option>
 
@@ -74,7 +92,7 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
         className={"rounded border border-divider bg-surface px-1.5 py-0.5"}
         placeholder={"filter…"}
         value={filter.text}
-        onChange={(event) => actions.setText(event.target.value)}
+        onChange={onChangeFilter}
       />
 
       <span className={"flex-1"} />
@@ -83,7 +101,7 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
 
       <TimelineToggle active={ui.autoscroll} label={"autoscroll"} onClick={actions.toggleAutoscroll} />
 
-      <button type={"button"} onClick={onClear} className={"rounded border border-divider px-2 py-0.5 hover:bg-hover"}>
+      <button className={"rounded border border-divider px-2 py-0.5 hover:bg-hover"} type={"button"} onClick={onClear}>
         clear
       </button>
     </div>

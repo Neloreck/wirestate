@@ -33,9 +33,12 @@ export function ResizeHandle({
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>): void {
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
+
     active.current = true;
     last.current = null;
+
     setDragging(true);
+
     document.body.style.userSelect = "none";
     document.body.style.cursor = orientation === "x" ? "col-resize" : "row-resize";
   }
@@ -76,7 +79,9 @@ export function ResizeHandle({
     }
 
     active.current = false;
+
     setDragging(false);
+
     document.body.style.userSelect = "";
     document.body.style.cursor = "";
 
@@ -85,13 +90,13 @@ export function ResizeHandle({
     }
   }
 
+  const lineColor: string = dragging ? "bg-fg-subtle" : "bg-divider group-hover:bg-fg-subtle";
   const strip: string =
     orientation === "x" ? "w-[5px] cursor-col-resize self-stretch" : "h-[5px] cursor-row-resize w-full";
   const line: string =
     orientation === "x"
       ? "absolute inset-y-0 left-1/2 w-px -translate-x-1/2"
       : "absolute inset-x-0 top-1/2 h-px -translate-y-1/2";
-  const lineColor: string = dragging ? "bg-fg-subtle" : "bg-divider group-hover:bg-fg-subtle";
 
   return (
     <div

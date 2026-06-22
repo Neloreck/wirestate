@@ -22,6 +22,9 @@ export default {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/extension/src/$1",
     "^@wirestate/core/devtools$": "<rootDir>/src/wirestate-core/devtools",
+    "^@wirestate/react-mobx$": "<rootDir>/src/wirestate-react-mobx/index",
+    "^@wirestate/react$": "<rootDir>/src/wirestate-react/index",
+    "^@wirestate/mobx$": "<rootDir>/src/wirestate-mobx/index",
     "^@wirestate/core$": "<rootDir>/src/wirestate-core/index",
   },
 };
