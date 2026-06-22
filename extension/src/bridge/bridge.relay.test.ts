@@ -8,7 +8,7 @@ interface FakePort {
   readonly postMessage: jest.Mock;
 }
 
-function fakePort(): FakePort {
+function mockFakePort(): FakePort {
   return {
     onMessage: { addListener: jest.fn() },
     onDisconnect: { addListener: jest.fn() },
@@ -22,38 +22,40 @@ function fakePort(): FakePort {
  * @param data - Payload to expose as the event's `data` property.
  * @returns A `MessageEvent` whose `data` is the given value.
  */
-const messageEvent = (data: unknown): MessageEvent => ({ data }) as unknown as MessageEvent;
+function mockMessageEvent(data: unknown): MessageEvent {
+  return { data } as unknown as MessageEvent;
+}
 
 describe("BridgeRelay", () => {
   it("opens a port and wires its message + disconnect listeners on connect", () => {
-    const port = fakePort();
-    const relay = new BridgeRelay(() => port as unknown as chrome.runtime.Port);
+    const port = mockFakePort();
+    const relay = new BridgeRelay();
 
-    relay.connect();
+    relay.connect(() => port as unknown as chrome.runtime.Port);
 
     expect(port.onMessage.addListener).toHaveBeenCalledWith(postToPage);
     expect(port.onDisconnect.addListener).toHaveBeenCalledTimes(1);
   });
 
   it("forwards a valid backend->panel envelope to the worker port", () => {
-    const port = fakePort();
-    const relay = new BridgeRelay(() => port as unknown as chrome.runtime.Port);
+    const port = mockFakePort();
+    const relay = new BridgeRelay();
     const payload: BackendToPanelPayload = { type: "snapshot", roots: [] };
     const message: PageMessage = { source: BRIDGE_SOURCE, dir: "to-content", payload };
 
-    relay.connect();
-    relay.onPageMessage(messageEvent(message));
+    relay.connect(() => port as unknown as chrome.runtime.Port);
+    relay.onPageMessage(mockMessageEvent(message));
 
     expect(port.postMessage).toHaveBeenCalledWith(payload);
   });
 
   it("ignores anything that is not a backend->panel bridge envelope", () => {
-    const port = fakePort();
-    const relay = new BridgeRelay(() => port as unknown as chrome.runtime.Port);
+    const port = mockFakePort();
+    const relay = new BridgeRelay();
 
-    relay.connect();
-    relay.onPageMessage(messageEvent(undefined));
-    relay.onPageMessage(messageEvent({ source: BRIDGE_SOURCE, dir: "to-page", payload: { type: "refresh" } }));
+    relay.connect(() => port as unknown as chrome.runtime.Port);
+    relay.onPageMessage(mockMessageEvent(undefined));
+    relay.onPageMessage(mockMessageEvent({ source: BRIDGE_SOURCE, dir: "to-page", payload: { type: "refresh" } }));
 
     expect(port.postMessage).not.toHaveBeenCalled();
   });
@@ -62,14 +64,14 @@ describe("BridgeRelay", () => {
     jest.useFakeTimers();
 
     try {
-      const ports = [fakePort(), fakePort()];
+      const ports = [mockFakePort(), mockFakePort()];
       const openPort = jest
         .fn()
         .mockReturnValueOnce(ports[0] as unknown as chrome.runtime.Port)
         .mockReturnValueOnce(ports[1] as unknown as chrome.runtime.Port);
-      const relay = new BridgeRelay(openPort);
+      const relay = new BridgeRelay();
 
-      relay.connect();
+      relay.connect(openPort);
       expect(openPort).toHaveBeenCalledTimes(1);
 
       const onDisconnect = ports[0].onDisconnect.addListener.mock.calls[0][0] as () => void;
