@@ -79,7 +79,15 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
                   {binding.token.name}
                 </LinkButton>
 
-                <Tag tone={binding.type === BindingType.Value ? "info" : binding.type === BindingType.Instance ? "accent" : "warn"}>
+                <Tag
+                  tone={
+                    binding.type === BindingType.Value
+                      ? "info"
+                      : binding.type === BindingType.Instance
+                        ? "accent"
+                        : "warn"
+                  }
+                >
                   {binding.type}
                 </Tag>
 

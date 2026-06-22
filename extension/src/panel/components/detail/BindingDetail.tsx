@@ -89,7 +89,11 @@ export function BindingDetail({
         </Field>
 
         <Field label={"type"}>
-          <Tag tone={binding.type === BindingType.Value ? "info" : binding.type === BindingType.Instance ? "accent" : "warn"}>
+          <Tag
+            tone={
+              binding.type === BindingType.Value ? "info" : binding.type === BindingType.Instance ? "accent" : "warn"
+            }
+          >
             {binding.type}
           </Tag>
         </Field>
