@@ -5,6 +5,6 @@ import { type BackendToPanelPayload, BRIDGE_SOURCE } from "@/bridge/bridge.messa
  *
  * @param payload - The message to deliver to the panel.
  */
-export function post(payload: BackendToPanelPayload): void {
+export function postToContent(payload: BackendToPanelPayload): void {
   window.postMessage({ source: BRIDGE_SOURCE, dir: "to-content", payload }, "*");
 }

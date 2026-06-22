@@ -2,16 +2,20 @@ import { type BackendToPanelPayload, CONTENT_PORT, PANEL_PORT_PREFIX } from "@/b
 import { Logger } from "@/lib/logging/Logger";
 import { type Optional } from "@/types/general";
 
-/** A page's isolated relay and the DevTools panel inspecting that same tab, paired by tab id. */
+/**
+ * A page's isolated relay and the DevTools panel inspecting that same tab, paired by tab id.
+ */
 interface Pair {
   content?: chrome.runtime.Port;
   panel?: chrome.runtime.Port;
 }
 
 /**
- * Background half of the bridge. Pairs a page's isolated relay with the DevTools panel inspecting that
- * same tab (keyed by tab id) and forwards messages each way. Each side reconnects independently after
- * the worker sleeps, so the pair re-forms on wake.
+ * Background half of the bridge.
+ * Pairs a page's isolated relay with the DevTools panel inspecting that same tab (keyed by tab id) and forwards
+ * messages each way.
+ *
+ * Each side reconnects independently after the worker sleeps, so the pair re-forms on wake.
  *
  * @remarks
  * Owns the tab->pair registry. The `chrome.runtime.onConnect` subscription is external and wired in the
@@ -56,6 +60,7 @@ export class BackgroundRouter {
     const pair: Pair = this.pairFor(tabId);
 
     pair.content = port;
+
     this.logger.info("Page relay paired:", { tabId });
 
     // A fresh page relay just paired.

@@ -13,6 +13,8 @@ import {
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
 
+import type { Nullable } from "@/types/general";
+
 /**
  * Builds a minimal service instance snapshot for devtools tests.
  *
@@ -61,7 +63,7 @@ export function mockPluginInfo(name: string = "Plugin"): DevtoolsPluginInfo {
  */
 export function mockContainerSnapshot(
   containerId: number = 1,
-  parentContainerId: number | null = null,
+  parentContainerId: Nullable<number> = null,
   extra: Partial<DevtoolsContainerSnapshot> = {}
 ): DevtoolsContainerSnapshot {
   return { containerId, parentContainerId, bindings: [], instances: [], plugins: [], ...extra };

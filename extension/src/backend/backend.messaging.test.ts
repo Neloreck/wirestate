@@ -1,7 +1,7 @@
-import { post } from "@/backend/backend.messaging";
+import { postToContent } from "@/backend/backend.messaging";
 import { type BackendToPanelPayload, BRIDGE_SOURCE } from "@/bridge/bridge.messages";
 
-describe("post", () => {
+describe("postToContent", () => {
   const globalScope = globalThis as { window?: unknown };
   const originalWindow: unknown = globalScope.window;
 
@@ -16,7 +16,7 @@ describe("post", () => {
 
     const payload: BackendToPanelPayload = { type: "snapshot", roots: [] };
 
-    post(payload);
+    postToContent(payload);
 
     expect(postMessage).toHaveBeenCalledWith({ source: BRIDGE_SOURCE, dir: "to-content", payload }, "*");
   });

@@ -11,10 +11,8 @@ import { type Optional } from "@/types/general";
  *
  * @param payload - Message from the background worker (panel) bound for the page.
  */
-export function forwardToPage(payload: PanelToBackendPayload): void {
-  const message: PageMessage = { source: BRIDGE_SOURCE, dir: "to-page", payload };
-
-  window.postMessage(message, "*");
+export function postToPage(payload: PanelToBackendPayload): void {
+  window.postMessage({ source: BRIDGE_SOURCE, dir: "to-page", payload }, "*");
 }
 
 /**
@@ -23,7 +21,7 @@ export function forwardToPage(payload: PanelToBackendPayload): void {
  * @param messageEvent - A `window` `message` event from the MAIN-world backend.
  * @returns The payload to forward to the port, or `undefined` when the message is not ours.
  */
-export function readContentMessage(messageEvent: MessageEvent): Optional<BackendToPanelPayload> {
+export function readMessageEvent(messageEvent: MessageEvent): Optional<BackendToPanelPayload> {
   const data: Optional<PageMessage> = messageEvent.data as Optional<PageMessage>;
 
   if (!data || data.source !== BRIDGE_SOURCE || data.dir !== "to-content") {

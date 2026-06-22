@@ -1,7 +1,7 @@
 import { type DevtoolsHook, installDevtoolsHook } from "@wirestate/core/devtools";
 
 import { InspectorBackend } from "@/backend/backend.inspector";
-import { post } from "@/backend/backend.messaging";
+import { postToContent } from "@/backend/backend.messaging";
 
 /**
  * MAIN-world content-script entry and composition root.
@@ -9,7 +9,7 @@ import { post } from "@/backend/backend.messaging";
  * and wires its two external event sources to the backend's handlers.
  */
 const hook: DevtoolsHook = installDevtoolsHook();
-const backend: InspectorBackend = new InspectorBackend(hook, post);
+const backend: InspectorBackend = new InspectorBackend(hook, postToContent);
 
 hook.subscribe((event) => backend.onDelta(event));
 

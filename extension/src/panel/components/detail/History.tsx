@@ -2,7 +2,7 @@ import { type DevtoolsEvent } from "@wirestate/core/devtools";
 
 import { EventSummary } from "@/panel/components/EventSummary";
 import { EventTimeCells } from "@/panel/components/EventTimeCells";
-import { timestampOf } from "@/panel/lib/format";
+import { timestampOfDevtoolsEvent } from "@/panel/lib/format";
 import { type Optional } from "@/types/general";
 
 interface HistoryProps {
@@ -18,7 +18,7 @@ export function History({ events, onSelectBinding }: HistoryProps) {
   }
 
   // Relative offsets are measured from the first event currently shown.
-  const baseline: Optional<number> = timestampOf(events[0]);
+  const baseline: Optional<number> = timestampOfDevtoolsEvent(events[0]);
 
   return (
     <ol className={"space-y-0.5"}>

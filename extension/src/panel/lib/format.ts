@@ -8,7 +8,7 @@ import { type Optional } from "@/types/general";
  * @param event - The devtools delta to read the timestamp from.
  * @returns The epoch-ms timestamp, or `undefined` when the delta carries none.
  */
-export function timestampOf(event: DevtoolsEvent): Optional<number> {
+export function timestampOfDevtoolsEvent(event: DevtoolsEvent): Optional<number> {
   if (event.kind === "message") {
     return event.message.timestamp;
   }

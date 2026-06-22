@@ -1,5 +1,5 @@
-import { forwardToPage } from "@/bridge/bridge.connection";
 import { BRIDGE_SOURCE, type BackendToPanelPayload, type PageMessage } from "@/bridge/bridge.messages";
+import { postToPage } from "@/bridge/bridge.messaging";
 import { BridgeRelay } from "@/bridge/bridge.relay";
 
 interface FakePort {
@@ -31,7 +31,7 @@ describe("BridgeRelay", () => {
 
     relay.connect();
 
-    expect(port.onMessage.addListener).toHaveBeenCalledWith(forwardToPage);
+    expect(port.onMessage.addListener).toHaveBeenCalledWith(postToPage);
     expect(port.onDisconnect.addListener).toHaveBeenCalledTimes(1);
   });
 

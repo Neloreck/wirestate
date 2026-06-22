@@ -1,10 +1,10 @@
-import { forwardToPage, readContentMessage } from "@/bridge/bridge.connection";
 import {
   type BackendToPanelPayload,
   BRIDGE_SOURCE,
   type PageMessage,
   type PanelToBackendPayload,
 } from "@/bridge/bridge.messages";
+import { postToPage, readMessageEvent } from "@/bridge/bridge.messaging";
 
 describe("forwardToPage", () => {
   const globalScope = globalThis as { window?: unknown };
@@ -21,7 +21,7 @@ describe("forwardToPage", () => {
 
     const payload: PanelToBackendPayload = { type: "refresh" };
 
-    forwardToPage(payload);
+    postToPage(payload);
 
     expect(postMessage).toHaveBeenCalledWith({ source: BRIDGE_SOURCE, dir: "to-page", payload }, "*");
   });
@@ -36,23 +36,23 @@ describe("readContentMessage", () => {
     const payload: BackendToPanelPayload = { type: "snapshot", roots: [] };
     const message: PageMessage = { source: BRIDGE_SOURCE, dir: "to-content", payload };
 
-    expect(readContentMessage(eventWith(message))).toBe(payload);
+    expect(readMessageEvent(eventWith(message))).toBe(payload);
   });
 
   it("ignores messages stamped with another source", () => {
     const foreign = { source: "other", dir: "to-content", payload: { type: "refresh" } };
 
-    expect(readContentMessage(eventWith(foreign))).toBeUndefined();
+    expect(readMessageEvent(eventWith(foreign))).toBeUndefined();
   });
 
   it("ignores to-page messages (the opposite direction)", () => {
     const message: PageMessage = { source: BRIDGE_SOURCE, dir: "to-page", payload: { type: "refresh" } };
 
-    expect(readContentMessage(eventWith(message))).toBeUndefined();
+    expect(readMessageEvent(eventWith(message))).toBeUndefined();
   });
 
   it("ignores empty or non-bridge data", () => {
-    expect(readContentMessage(eventWith(undefined))).toBeUndefined();
-    expect(readContentMessage(eventWith(null))).toBeUndefined();
+    expect(readMessageEvent(eventWith(undefined))).toBeUndefined();
+    expect(readMessageEvent(eventWith(null))).toBeUndefined();
   });
 });

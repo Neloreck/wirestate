@@ -7,13 +7,17 @@ interface FakePort {
   readonly postMessage: jest.Mock;
   readonly onMessage: { readonly addListener: jest.Mock };
   readonly onDisconnect: { readonly addListener: jest.Mock };
-  /** Invokes every registered `onMessage` listener (simulates an inbound port message). */
+  /**
+   * Invokes every registered `onMessage` listener (simulates an inbound port message).
+   */
   emit(message: unknown): void;
-  /** Invokes every registered `onDisconnect` listener (simulates the port dropping). */
+  /**
+   * Invokes every registered `onDisconnect` listener (simulates the port dropping).
+   */
   disconnect(): void;
 }
 
-function fakePort(name: string, tabId?: number): FakePort {
+function mockFakePort(name: string, tabId?: number): FakePort {
   const onMessage = { addListener: jest.fn() };
   const onDisconnect = { addListener: jest.fn() };
 
@@ -33,8 +37,8 @@ const asPort = (port: FakePort): chrome.runtime.Port => port as unknown as chrom
 describe("BackgroundRouter", () => {
   it("relays content->panel and panel->backend once paired", () => {
     const router = new BackgroundRouter();
-    const content = fakePort(CONTENT_PORT, 1);
-    const panel = fakePort(`${PANEL_PORT_PREFIX}1`);
+    const content = mockFakePort(CONTENT_PORT, 1);
+    const panel = mockFakePort(`${PANEL_PORT_PREFIX}1`);
 
     router.onConnect(asPort(panel));
     router.onConnect(asPort(content));
@@ -48,8 +52,8 @@ describe("BackgroundRouter", () => {
 
   it("notifies an already-connected panel when its page relay connects", () => {
     const router = new BackgroundRouter();
-    const panel = fakePort(`${PANEL_PORT_PREFIX}1`);
-    const content = fakePort(CONTENT_PORT, 1);
+    const panel = mockFakePort(`${PANEL_PORT_PREFIX}1`);
+    const content = mockFakePort(CONTENT_PORT, 1);
 
     router.onConnect(asPort(panel));
     router.onConnect(asPort(content));
@@ -59,8 +63,8 @@ describe("BackgroundRouter", () => {
 
   it("stops relaying to a side after it disconnects", () => {
     const router = new BackgroundRouter();
-    const content = fakePort(CONTENT_PORT, 1);
-    const panel = fakePort(`${PANEL_PORT_PREFIX}1`);
+    const content = mockFakePort(CONTENT_PORT, 1);
+    const panel = mockFakePort(`${PANEL_PORT_PREFIX}1`);
 
     router.onConnect(asPort(content));
     router.onConnect(asPort(panel));
@@ -73,8 +77,8 @@ describe("BackgroundRouter", () => {
 
   it("ignores a content port with no sender tab id", () => {
     const router = new BackgroundRouter();
-    const panel = fakePort(`${PANEL_PORT_PREFIX}1`);
-    const content = fakePort(CONTENT_PORT);
+    const panel = mockFakePort(`${PANEL_PORT_PREFIX}1`);
+    const content = mockFakePort(CONTENT_PORT);
 
     router.onConnect(asPort(panel));
     router.onConnect(asPort(content));
@@ -84,7 +88,7 @@ describe("BackgroundRouter", () => {
 
   it("ignores ports with an unrecognized name", () => {
     const router = new BackgroundRouter();
-    const other = fakePort("something-else", 1);
+    const other = mockFakePort("something-else", 1);
 
     expect(() => router.onConnect(asPort(other))).not.toThrow();
     expect(other.onMessage.addListener).not.toHaveBeenCalled();

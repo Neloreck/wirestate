@@ -1,6 +1,6 @@
 import { type DevtoolsEvent } from "@wirestate/core/devtools";
 
-import { formatTimestamp, formatDelta, timestampOf } from "@/panel/lib/format";
+import { formatTimestamp, formatDelta, timestampOfDevtoolsEvent } from "@/panel/lib/format";
 import { type Optional } from "@/types/general";
 
 interface EventTimeCellsProps {
@@ -16,7 +16,7 @@ interface EventTimeCellsProps {
  * The clock-time + relative-offset (Δ) columns shared by the Timeline rows and the lifecycle History.
  */
 export function EventTimeCells({ event, baseline }: EventTimeCellsProps) {
-  const timestamp: Optional<number> = timestampOf(event);
+  const timestamp: Optional<number> = timestampOfDevtoolsEvent(event);
   const delta: Optional<number> = timestamp !== undefined && baseline !== undefined ? timestamp - baseline : undefined;
 
   return (
