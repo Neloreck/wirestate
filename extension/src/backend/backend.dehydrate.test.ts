@@ -1,6 +1,8 @@
 import { type DehydratedRef, dehydrate } from "@/backend/backend.dehydrate";
 
-const asRef = (value: unknown): DehydratedRef => value as DehydratedRef;
+function asRef(value: unknown): DehydratedRef {
+  return value as DehydratedRef;
+}
 
 describe("dehydrate", () => {
   it("passes through JSON-safe primitives", () => {
@@ -35,8 +37,11 @@ describe("dehydrate", () => {
     const out = asRef(dehydrate(new Foo()));
 
     expect(out.__wsType).toBe("instance");
-    expect(out.className).toBe("Foo");
-    expect(out.value).toEqual({ x: 1 });
+
+    if (out.__wsType === "instance") {
+      expect(out.className).toBe("Foo");
+      expect(out.value).toEqual({ x: 1 });
+    }
   });
 
   it("marks Map and Set", () => {

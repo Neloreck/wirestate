@@ -11,45 +11,21 @@ const MAX_DEPTH = 8;
 const MAX_KEYS = 64;
 const MAX_ARRAY = 128;
 const MAX_STRING = 10_240;
-const MAX_ENTRIES = 64;
 
 /**
  * Marker the panel renders in place of a value that could not (or should not) be cloned whole.
+ *
+ * @remarks
+ * Discriminated on `__wsType`. Bare markers carry nothing; preview markers carry a short
+ * human-readable string; `"instance"` carries its class name and surviving own properties.
  */
-export interface DehydratedRef {
-  readonly __wsType:
-    | "function"
-    | "symbol"
-    | "bigint"
-    | "undefined"
-    | "circular"
-    | "maxDepth"
-    | "instance"
-    | "map"
-    | "set"
-    | "node"
-    | "truncated";
-
-  /**
-   * Short human-readable description for the panel.
-   */
-  readonly preview?: string;
-
-  /**
-   * Class name for `"instance"`.
-   */
-  readonly className?: string;
-
-  /**
-   * Surviving (already-dehydrated) own properties for `"instance"`.
-   */
-  readonly value?: Record<string, unknown>;
-
-  /**
-   * Already-dehydrated entries for `"map"` / `"set"`.
-   */
-  readonly entries?: ReadonlyArray<unknown>;
-}
+export type DehydratedRef =
+  | { readonly __wsType: "undefined" | "circular" }
+  | {
+      readonly __wsType: "bigint" | "symbol" | "function" | "maxDepth" | "node" | "map" | "set" | "truncated";
+      readonly preview: string;
+    }
+  | { readonly __wsType: "instance"; readonly className: string; readonly value: Record<string, unknown> };
 
 /**
  * Produces a structured-clone-safe preview of an arbitrary in-page value.
@@ -107,22 +83,11 @@ function walk(value: unknown, depth: number, seen: WeakSet<object>): unknown {
     }
 
     if (object instanceof Map) {
-      return {
-        __wsType: "map",
-        preview: `Map(${object.size})`,
-        entries: capped([...object.entries()], MAX_ENTRIES).map(([key, mapValue]) => [
-          walk(key, depth + 1, seen),
-          walk(mapValue, depth + 1, seen),
-        ]),
-      } satisfies DehydratedRef;
+      return { __wsType: "map", preview: `Map(${object.size})` } satisfies DehydratedRef;
     }
 
     if (object instanceof Set) {
-      return {
-        __wsType: "set",
-        preview: `Set(${object.size})`,
-        entries: capped([...object.values()], MAX_ENTRIES).map((entry) => walk(entry, depth + 1, seen)),
-      } satisfies DehydratedRef;
+      return { __wsType: "set", preview: `Set(${object.size})` } satisfies DehydratedRef;
     }
 
     if (Array.isArray(object)) {
@@ -152,10 +117,6 @@ function walk(value: unknown, depth: number, seen: WeakSet<object>): unknown {
   } finally {
     seen.delete(object);
   }
-}
-
-function capped<T>(items: ReadonlyArray<T>, limit: number): ReadonlyArray<T> {
-  return items.length > limit ? items.slice(0, limit) : items;
 }
 
 function describe(object: object): string {

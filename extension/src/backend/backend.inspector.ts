@@ -24,13 +24,14 @@ import { type Maybe, type Optional } from "@/types/general";
  *
  * @remarks
  * Owns its mutable state (the replay buffer) and the `hook` + `post` transport it is constructed with,
- * so it can be driven directly in tests with no globals or DOM. The pure delta transforms it composes
- * live in `backend.utils` (sanitize/stampTime) and `backend.inspect` (describeNode/serviceNode).
+ * so it can be driven directly in tests with no globals or DOM.
  */
 export class InspectorBackend {
   public static readonly BACKEND_BUFFER_SIZE: number = 512;
 
-  /** Recent deltas retained for replay to a late / reconnecting panel (oldest evicted past the cap). */
+  /**
+   * Recent deltas retained for replay to a late / reconnecting panel (oldest evicted past the cap).
+   */
   private readonly buffer: Array<DevtoolsEvent> = [];
 
   /**
@@ -88,9 +89,11 @@ export class InspectorBackend {
           events: [...this.buffer],
         });
         break;
+
       case "refresh":
         this.post({ type: "snapshot", roots: this.snapshotRoots() });
         break;
+
       case "inspect":
         this.post({
           type: "inspectResult",
@@ -98,6 +101,7 @@ export class InspectorBackend {
           node: this.inspectAt(request.rootId, request.instanceId, request.path),
         });
         break;
+
       case "inspectBinding":
         this.post({
           type: "inspectResult",

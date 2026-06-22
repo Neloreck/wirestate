@@ -1,6 +1,5 @@
 import { type DevtoolsEvent } from "@wirestate/core/devtools";
 
-import { type DehydratedRef } from "@/backend/backend.dehydrate";
 import { type Optional } from "@/types/general";
 
 /**
@@ -65,7 +64,7 @@ type DecodedRef =
   | { readonly kind: "text"; readonly text: string };
 
 /**
- * Decodes a backend {@link DehydratedRef} marker into the case a renderer formats, or `undefined`
+ * Decodes a backend `DehydratedRef` marker into the case a renderer formats, or `undefined`
  * when the value is a plain object the renderer should walk itself. The single place that interprets
  * every `__wsType`, so {@link preview} (single-line) and {@link stringify} (multi-line) can't drift.
  *
@@ -73,21 +72,26 @@ type DecodedRef =
  * @returns The decoded ref, or `undefined` for a plain object.
  */
 function decodeRef(value: object): Optional<DecodedRef> {
-  const ref: Partial<DehydratedRef> = value as Partial<DehydratedRef>;
+  const marker: Record<string, unknown> = value as Record<string, unknown>;
+  const type: unknown = marker.__wsType;
 
-  if (typeof ref.__wsType !== "string") {
+  if (typeof type !== "string") {
     return undefined;
   }
 
-  if (ref.__wsType === "undefined") {
+  if (type === "undefined") {
     return { kind: "undefined" };
   }
 
-  if (ref.__wsType === "instance") {
-    return { kind: "instance", className: ref.className ?? "Object", value: ref.value ?? {} };
+  if (type === "instance") {
+    return {
+      kind: "instance",
+      className: typeof marker.className === "string" ? marker.className : "Object",
+      value: (marker.value as Record<string, unknown>) ?? {},
+    };
   }
 
-  return { kind: "text", text: ref.preview ?? ref.__wsType };
+  return { kind: "text", text: typeof marker.preview === "string" ? marker.preview : type };
 }
 
 /**
