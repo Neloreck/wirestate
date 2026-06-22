@@ -1,3 +1,4 @@
+import { type BindingScopeValue, type BindingTypeValue } from "../../binding/binding";
 import { type Nullable, type Optional } from "../../types/general";
 
 /**
@@ -68,12 +69,12 @@ export interface DevtoolsBinding {
   /**
    * Construction strategy.
    */
-  readonly type: "Value" | "Instance" | "Factory";
+  readonly type: BindingTypeValue;
 
   /**
    * Lifetime scope.
    */
-  readonly scope: "Singleton" | "Transient";
+  readonly scope: BindingScopeValue;
 
   /**
    * Implementation class name for instance bindings; absent otherwise.
