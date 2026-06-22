@@ -9,7 +9,7 @@ import { Timeline } from "@/panel/components/timeline";
 import { useBridge } from "@/panel/hooks/use-bridge";
 import { useLayout } from "@/panel/hooks/use-layout";
 import { usePanelState } from "@/panel/hooks/use-panel-state";
-import { type RootModel, buildMessageResults, buildRoots, filterLog } from "@/panel/lib/selectors";
+import { type RootModel, buildMessageResults, buildRoots, filterLogBy } from "@/panel/lib/selectors";
 
 /**
  * The inspector panel: master–detail (Navigator + Detail) over a collapsible, cross-linked Timeline.
@@ -29,7 +29,7 @@ export function Panel() {
   );
 
   const builtRoots: ReadonlyArray<RootModel> = useMemo(() => buildRoots(roots), [roots]);
-  const filteredLogs: ReadonlyArray<DevtoolsEvent> = useMemo(() => filterLog(log, state.filter), [log, state.filter]);
+  const filteredLogs: ReadonlyArray<DevtoolsEvent> = useMemo(() => filterLogBy(log, state.filter), [log, state.filter]);
   const messageResults: ReadonlyMap<number, DevtoolsMessageResultEvent> = useMemo(
     () => buildMessageResults(log),
     [log]

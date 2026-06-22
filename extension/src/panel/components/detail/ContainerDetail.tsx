@@ -6,7 +6,7 @@ import {
 
 import { Field, LinkButton, Section, Tag } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { type BindingStatus, bindingStatus, childContainers, lifecycleHistory } from "@/panel/lib/selectors";
+import { BindingStatus, getBindingStatus, childContainers, getLifecycleHistory } from "@/panel/lib/selectors";
 
 import { FilterToContainerLink } from "./FilterToContainerLink";
 import { History } from "./History";
@@ -19,10 +19,12 @@ interface ContainerDetailProps {
   readonly actions: PanelActions;
 }
 
-/** Detail view for a selected container: links, contents (drill-in), history, cross-link. */
+/**
+ * Detail view for a selected container: links, contents (drill-in), history, cross-link.
+ */
 export function ContainerDetail({ container, roots, log, actions }: ContainerDetailProps) {
   const children: ReadonlyArray<DevtoolsContainerSnapshot> = childContainers(roots, container.containerId);
-  const history: ReadonlyArray<DevtoolsEvent> = lifecycleHistory(log, container.containerId);
+  const history: ReadonlyArray<DevtoolsEvent> = getLifecycleHistory(log, container.containerId);
 
   return (
     <div className={"space-y-3"}>
@@ -59,14 +61,14 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
           <span className={"text-fg-muted"}>—</span>
         ) : (
           container.bindings.map((binding) => {
-            const status: BindingStatus = bindingStatus(container, binding);
+            const status: BindingStatus = getBindingStatus(container, binding);
 
             return (
               // Active is the common case (no tag); only the exceptions are flagged, and an inactive
               // binding's row dims so the live ones stand out.
               <div
                 key={binding.token.name}
-                className={`flex items-center gap-1 ${status === "inactive" ? "opacity-60" : ""}`}
+                className={`flex items-center gap-1 ${status === BindingStatus.Inactive ? "opacity-60" : ""}`}
               >
                 <LinkButton
                   onClick={() =>
@@ -82,7 +84,9 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
 
                 {binding.scope === "Transient" ? <Tag tone={"warn"}>Transient</Tag> : null}
 
-                {status === "inactive" || status === "unrealized" ? <StatusTag status={status} /> : null}
+                {status === BindingStatus.Inactive || status === BindingStatus.Unrealized ? (
+                  <StatusTag status={status} />
+                ) : null}
               </div>
             );
           })

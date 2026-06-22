@@ -10,7 +10,7 @@ import { useMemo } from "react";
 import { type InspectFn } from "@/bridge/bridge.messages";
 import { Field, Section, Tag } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { lifecycleHistory, rootIdOfContainer, tokenOfInstanceId } from "@/panel/lib/selectors";
+import { getLifecycleHistory, rootIdOfContainer, getTokenOfInstanceId } from "@/panel/lib/selectors";
 import { type Optional } from "@/types/general";
 
 import { History } from "./History";
@@ -31,7 +31,7 @@ interface InstanceSectionsProps {
  * is binding/token-centric, so every cross-link resolves to the binding that realizes the instance.
  */
 export function InstanceSections({ container, instance, log, roots, inspect, actions }: InstanceSectionsProps) {
-  const history: ReadonlyArray<DevtoolsEvent> = lifecycleHistory(log, container.containerId, {
+  const history: ReadonlyArray<DevtoolsEvent> = getLifecycleHistory(log, container.containerId, {
     instanceId: instance.instanceId,
     className: instance.className,
   });
@@ -47,7 +47,7 @@ export function InstanceSections({ container, instance, log, roots, inspect, act
   // Resolve an instance-anchored reference (lifecycle row, or a service field in the state tree) to
   // the binding that realizes it, then select that binding.
   function selectByInstanceId(containerId: number, instanceId: number): void {
-    const token: Optional<string> = tokenOfInstanceId(roots, containerId, instanceId);
+    const token: Optional<string> = getTokenOfInstanceId(roots, containerId, instanceId);
 
     if (token !== undefined) {
       actions.select({ kind: "binding", containerId, token });

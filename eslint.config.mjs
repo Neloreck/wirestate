@@ -31,7 +31,7 @@ export default [
   {
     plugins: {
       eslintConfigPrettier,
-      reactHooks: reactHooksPlugin,
+      "react-hooks": reactHooksPlugin,
       reactRefresh: reactRefreshPlugin,
     },
     languageOptions: {
@@ -54,7 +54,6 @@ export default [
       "@typescript-eslint/explicit-member-accessibility": ["error"],
       "@typescript-eslint/array-type": ["error", { default: "generic" }],
       "@typescript-eslint/no-require-imports": "off",
-      "func-style": ["error", "declaration"],
       "@typescript-eslint/consistent-type-imports": [
         "error",
         { prefer: "type-imports", fixStyle: "inline-type-imports" },
@@ -148,6 +147,22 @@ export default [
     },
   },
   {
+    files: [
+      "extension/src/panel/**/*.ts",
+      "extension/src/panel/**/*.tsx",
+      "src/wirestate-react/**/*.ts",
+      "src/wirestate-react/**/*.tsx",
+      "src/wirestate-react-mobx/**/*.ts",
+      "src/wirestate-react-mobx/**/*.tsx",
+      "src/wirestate-react-signals/**/*.ts",
+      "src/wirestate-react-signals/**/*.tsx",
+    ],
+    rules: {
+      "react-hooks/exhaustive-deps": "warn",
+      "react-hooks/rules-of-hooks": "error",
+    },
+  },
+  {
     files: ["src/wirestate-core/**/*.ts"],
     rules: {
       "import/no-cycle": ["error", { ignoreExternal: true }],
@@ -192,13 +207,6 @@ export default [
     rules: {
       "jsdoc/require-param": "off",
       "jsdoc/require-returns": "off",
-    },
-  },
-  {
-    // Tests favor inline arrow helpers and throwaway components.
-    files: ["**/*.test.ts", "**/*.test.tsx"],
-    rules: {
-      "func-style": "off",
     },
   },
   {

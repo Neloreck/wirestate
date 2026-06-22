@@ -13,29 +13,31 @@ import {
 } from "@/fixtures/devtools";
 
 import {
-  bindingStatus,
+  getBindingStatus,
   buildMessageResults,
   buildRoots,
-  channelOf,
+  getChannelOfEvent,
   childContainers,
-  filterLog,
-  lifecycleHistory,
+  filterLogBy,
+  getLifecycleHistory,
   mayRealizeInstance,
   realizingInstance,
   resolveSelection,
   rootIdOfContainer,
-  tokenOfInstanceId,
+  getTokenOfInstanceId,
 } from "@/panel/lib/selectors";
 import { type TimelineFilter, isSameSelection } from "@/panel/lib/types";
 
-const filterWith = (partial: Partial<TimelineFilter> = {}): TimelineFilter => ({
-  rootId: undefined,
-  containerId: undefined,
-  kinds: { lifecycle: true, message: true, registration: true },
-  channels: { event: true, command: true, query: true },
-  text: "",
-  ...partial,
-});
+function filterWith(partial: Partial<TimelineFilter> = {}): TimelineFilter {
+  return {
+    rootId: undefined,
+    containerId: undefined,
+    kinds: { lifecycle: true, message: true, registration: true },
+    channels: { event: true, command: true, query: true },
+    text: "",
+    ...partial,
+  };
+}
 
 describe("buildRoots", () => {
   it("nests containers by parentContainerId and treats orphans as top-level", () => {
@@ -141,17 +143,17 @@ describe("bindingStatus", () => {
   const singleton = mockBinding("Svc"); // mockBinding builds an Instance/Singleton binding
 
   it("is 'none' for a non-instance binding (Value/Factory/Transient)", () => {
-    expect(bindingStatus(mockContainerSnapshot(1), value)).toBe("none");
+    expect(getBindingStatus(mockContainerSnapshot(1), value)).toBe("none");
   });
 
   it("is 'unrealized' for a singleton instance binding with no live instance", () => {
-    expect(bindingStatus(mockContainerSnapshot(1, null, { instances: [] }), singleton)).toBe("unrealized");
+    expect(getBindingStatus(mockContainerSnapshot(1, null, { instances: [] }), singleton)).toBe("unrealized");
   });
 
   it("is 'active' when the realizing instance is live", () => {
     const container = mockContainerSnapshot(1, null, { instances: [mockInstance("Svc")] });
 
-    expect(bindingStatus(container, singleton)).toBe("active");
+    expect(getBindingStatus(container, singleton)).toBe("active");
   });
 
   it("is 'inactive' when the realizing instance is inactive", () => {
@@ -161,7 +163,7 @@ describe("bindingStatus", () => {
     };
     const container = mockContainerSnapshot(1, null, { instances: [inactive] });
 
-    expect(bindingStatus(container, singleton)).toBe("inactive");
+    expect(getBindingStatus(container, singleton)).toBe("inactive");
   });
 });
 
@@ -171,22 +173,24 @@ describe("tokenOfInstanceId", () => {
   ];
 
   it("maps an instance id to its realizing binding's token", () => {
-    expect(tokenOfInstanceId(roots, 1, 7)).toBe("Svc");
+    expect(getTokenOfInstanceId(roots, 1, 7)).toBe("Svc");
   });
 
   it("is undefined for an unknown instance or container", () => {
-    expect(tokenOfInstanceId(roots, 1, 999)).toBeUndefined();
-    expect(tokenOfInstanceId(roots, 999, 7)).toBeUndefined();
+    expect(getTokenOfInstanceId(roots, 1, 999)).toBeUndefined();
+    expect(getTokenOfInstanceId(roots, 999, 7)).toBeUndefined();
   });
 });
 
 describe("channelOf", () => {
   it("reads the channel for message/registration and undefined for lifecycle", () => {
-    expect(channelOf(mockMessageEvent({ containerId: 1, message: { channel: "command", type: "X" } }))).toBe("command");
-    expect(channelOf(mockRegistrationEvent({ containerId: 1, registration: { channel: "event", type: "Y" } }))).toBe(
-      "event"
+    expect(getChannelOfEvent(mockMessageEvent({ containerId: 1, message: { channel: "command", type: "X" } }))).toBe(
+      "command"
     );
-    expect(channelOf(mockLifecycleEvent({ containerId: 1, phase: "activate" }))).toBeUndefined();
+    expect(
+      getChannelOfEvent(mockRegistrationEvent({ containerId: 1, registration: { channel: "event", type: "Y" } }))
+    ).toBe("event");
+    expect(getChannelOfEvent(mockLifecycleEvent({ containerId: 1, phase: "activate" }))).toBeUndefined();
   });
 });
 
@@ -199,9 +203,9 @@ describe("lifecycleHistory", () => {
   ];
 
   it("filters by container, and optionally by instance (className fallback)", () => {
-    expect(lifecycleHistory(log, 1)).toHaveLength(2);
-    expect(lifecycleHistory(log, 1, { className: "Foo" })).toHaveLength(2);
-    expect(lifecycleHistory(log, 1, { className: "Other" })).toHaveLength(0);
+    expect(getLifecycleHistory(log, 1)).toHaveLength(2);
+    expect(getLifecycleHistory(log, 1, { className: "Foo" })).toHaveLength(2);
+    expect(getLifecycleHistory(log, 1, { className: "Other" })).toHaveLength(0);
   });
 
   it("narrows by instanceId when the target carries one", () => {
@@ -210,9 +214,9 @@ describe("lifecycleHistory", () => {
       mockLifecycleEvent({ phase: "provision", instance: mockInstance("Foo", "Foo", 2) }),
     ];
 
-    expect(lifecycleHistory(discriminated, 1, { instanceId: 1, className: "Foo" })).toHaveLength(1);
-    expect(lifecycleHistory(discriminated, 1, { instanceId: 2, className: "Foo" })).toHaveLength(1);
-    expect(lifecycleHistory(discriminated, 1, { className: "Foo" })).toHaveLength(2);
+    expect(getLifecycleHistory(discriminated, 1, { instanceId: 1, className: "Foo" })).toHaveLength(1);
+    expect(getLifecycleHistory(discriminated, 1, { instanceId: 2, className: "Foo" })).toHaveLength(1);
+    expect(getLifecycleHistory(discriminated, 1, { className: "Foo" })).toHaveLength(2);
   });
 });
 
@@ -224,17 +228,17 @@ describe("filterLog", () => {
   ];
 
   it("passes everything by default", () => {
-    expect(filterLog(log, filterWith())).toHaveLength(3);
+    expect(filterLogBy(log, filterWith())).toHaveLength(3);
   });
 
   it("filters by kind, root, container, channel, and text", () => {
     expect(
-      filterLog(log, filterWith({ kinds: { lifecycle: false, message: true, registration: false } }))
+      filterLogBy(log, filterWith({ kinds: { lifecycle: false, message: true, registration: false } }))
     ).toHaveLength(1);
-    expect(filterLog(log, filterWith({ rootId: 1 }))).toHaveLength(2);
-    expect(filterLog(log, filterWith({ containerId: 1 }))).toHaveLength(2);
-    expect(filterLog(log, filterWith({ channels: { event: true, command: false, query: true } }))).toHaveLength(2);
-    expect(filterLog(log, filterWith({ text: "X" }))).toHaveLength(1);
+    expect(filterLogBy(log, filterWith({ rootId: 1 }))).toHaveLength(2);
+    expect(filterLogBy(log, filterWith({ containerId: 1 }))).toHaveLength(2);
+    expect(filterLogBy(log, filterWith({ channels: { event: true, command: false, query: true } }))).toHaveLength(2);
+    expect(filterLogBy(log, filterWith({ text: "X" }))).toHaveLength(1);
   });
 });
 

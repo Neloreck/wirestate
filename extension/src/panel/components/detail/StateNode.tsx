@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { type InspectNode } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";
@@ -21,13 +21,18 @@ interface StateNodeProps {
 export function StateNode({ read, path, label, depth, defaultOpen = false, onNavigate }: StateNodeProps) {
   // `path` is a fresh array each render; key the fetch effect on its stable string form.
   const pathKey: string = path.join(" ");
+  const pathRef = useRef(path);
+
+  pathRef.current = path;
+
   const [node, setNode] = useState<Optional<InspectNode>>(undefined);
   const [open, setOpen] = useState(defaultOpen);
 
   useEffect(() => {
     let cancelled = false;
+    const currentPath = pathRef.current;
 
-    void read(path).then((result) => {
+    void read(currentPath).then((result) => {
       if (!cancelled) {
         setNode(result);
       }

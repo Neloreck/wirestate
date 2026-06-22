@@ -218,20 +218,25 @@ export function realizingInstance(
  * @param binding - The binding to classify.
  * @returns The lifecycle tag for the binding row.
  */
-export type BindingStatus = "active" | "inactive" | "unrealized" | "none";
+export enum BindingStatus {
+  Active = "active",
+  Inactive = "inactive",
+  Unrealized = "unrealized",
+  None = "none",
+}
 
-export function bindingStatus(container: DevtoolsContainerSnapshot, binding: DevtoolsBinding): BindingStatus {
+export function getBindingStatus(container: DevtoolsContainerSnapshot, binding: DevtoolsBinding): BindingStatus {
   if (!mayRealizeInstance(binding)) {
-    return "none";
+    return BindingStatus.None;
   }
 
   const instance: Optional<DevtoolsInstance> = realizingInstance(container, binding);
 
   if (!instance) {
-    return "unrealized";
+    return BindingStatus.Unrealized;
   }
 
-  return instance.status?.isInactive ? "inactive" : "active";
+  return instance.status?.isInactive ? BindingStatus.Inactive : BindingStatus.Active;
 }
 
 /**
@@ -244,7 +249,7 @@ export function bindingStatus(container: DevtoolsContainerSnapshot, binding: Dev
  * @param instanceId - The instance's stable id.
  * @returns The realizing binding's token name, or `undefined` when the instance is no longer live.
  */
-export function tokenOfInstanceId(
+export function getTokenOfInstanceId(
   roots: ReadonlyArray<DevtoolsRootSnapshot>,
   containerId: number,
   instanceId: number
@@ -260,7 +265,7 @@ export function tokenOfInstanceId(
  * @param event - The devtools delta to read.
  * @returns The message/registration channel, or `undefined` for a lifecycle delta.
  */
-export function channelOf(event: DevtoolsEvent): Optional<DevtoolsMessageChannel> {
+export function getChannelOfEvent(event: DevtoolsEvent): Optional<DevtoolsMessageChannel> {
   if (event.kind === "message") {
     return event.message.channel;
   }
@@ -285,7 +290,7 @@ export function channelOf(event: DevtoolsEvent): Optional<DevtoolsMessageChannel
  * @param instance.className - The instance's class name, used when no id is available.
  * @returns The matching lifecycle deltas, in arrival order.
  */
-export function lifecycleHistory(
+export function getLifecycleHistory(
   log: ReadonlyArray<DevtoolsEvent>,
   containerId: number,
   instance?: { readonly instanceId?: number; readonly className?: string }
@@ -318,7 +323,7 @@ export function lifecycleHistory(
  * @param filter - The active Timeline filter.
  * @returns The deltas that pass every filter dimension.
  */
-export function filterLog(log: ReadonlyArray<DevtoolsEvent>, filter: TimelineFilter): ReadonlyArray<DevtoolsEvent> {
+export function filterLogBy(log: ReadonlyArray<DevtoolsEvent>, filter: TimelineFilter): ReadonlyArray<DevtoolsEvent> {
   const needle: string = filter.text.trim().toLowerCase();
 
   return log.filter((event) => {
@@ -339,7 +344,7 @@ export function filterLog(log: ReadonlyArray<DevtoolsEvent>, filter: TimelineFil
       return false;
     }
 
-    const channel: Optional<DevtoolsMessageChannel> = channelOf(event);
+    const channel: Optional<DevtoolsMessageChannel> = getChannelOfEvent(event);
 
     if (channel !== undefined && !filter.channels[channel]) {
       return false;

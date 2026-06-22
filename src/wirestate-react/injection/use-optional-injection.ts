@@ -61,5 +61,6 @@ export function useOptionalInjection<T, F = undefined>(
     } else {
       return undefined as F;
     }
+    // eslint-disable-next-line
   }, [container, token]);
 }
