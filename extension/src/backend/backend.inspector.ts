@@ -15,6 +15,7 @@ import {
   type PageMessage,
   type PanelToBackendPayload,
 } from "@/bridge/bridge.messages";
+import { Logger } from "@/lib/logging/Logger";
 import { type Maybe, type Optional } from "@/types/general";
 
 /**
@@ -34,6 +35,8 @@ export class InspectorBackend {
    */
   private readonly buffer: Array<DevtoolsEvent> = [];
 
+  private readonly logger: Logger = new Logger("backend");
+
   /**
    * @param hook - The page's DevTools hook — the source of roots and the lifecycle/message stream.
    * @param post - Transport that delivers one message to the panel.
@@ -43,7 +46,9 @@ export class InspectorBackend {
     private readonly hook: DevtoolsHook,
     private readonly post: (payload: BackendToPanelPayload) => void,
     private readonly bufferSize: number = InspectorBackend.BACKEND_BUFFER_SIZE
-  ) {}
+  ) {
+    this.logger.info("Inspector backend ready");
+  }
 
   /**
    * Handles one delta from the hook: records it in the replay buffer and forwards it to the panel.
@@ -53,6 +58,7 @@ export class InspectorBackend {
    * @param event - The delta the hook emitted.
    */
   public onDelta(event: DevtoolsEvent): void {
+    this.logger.debug("Received delta:", event.kind);
     this.post({ type: "event", event: this.record(event) });
   }
 
@@ -80,8 +86,11 @@ export class InspectorBackend {
    * @param request - The decoded panel-to-backend request.
    */
   public onMessageRequest(request: PanelToBackendPayload): void {
+    this.logger.debug("Received message request:", request.type);
+
     switch (request.type) {
       case "attach":
+        this.logger.info("Panel attached");
         this.post({
           type: "init",
           protocolVersion: this.hook.protocolVersion ?? DEVTOOLS_PROTOCOL_VERSION,

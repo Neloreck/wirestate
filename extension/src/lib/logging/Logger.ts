@@ -1,31 +1,45 @@
-import { type ILogger } from "@/panel/lib/logging/ILogger";
-import { PREFIX_TIMESTAMP_TAG } from "@/panel/lib/logging/prefix";
+import { type ILogger } from "@/lib/logging/ILogger";
+import { PREFIX_TIMESTAMP_TAG } from "@/lib/logging/prefix";
 import { type AnyCallable } from "@/types/general";
 
 /**
  * A lightweight wrapper around `console` methods that adds a styled prefix.
- * Logging is automatically disabled in the production environment.
+ *
+ * @remarks
+ * Enabled only in development: the global switch reads `process.env.NODE_ENV`, which Vite statically
+ * replaces in the extension build (and which is `"test"` under Jest), so logging stays silent in
+ * production builds and in tests. A disabled logger binds no-op methods and never touches the console.
  */
 export class Logger implements ILogger {
-  public static IS_GLOBAL_LOGGING_ENABLED: boolean = true;
+  public static IS_GLOBAL_LOGGING_ENABLED: boolean = process.env.NODE_ENV === "development";
 
   public static readonly PREFIX_STYLE: string = "color: #bada53; font-weight: 700;";
 
   protected static global: Logger = new Logger("application");
 
-  /** Logs a general message. */
+  /**
+   * Logs a general message.
+   */
   public static readonly log: AnyCallable = this.global.log;
 
-  /** Logs an informational message. */
+  /**
+   * Logs an informational message.
+   */
   public static readonly info: AnyCallable = this.global.info;
 
-  /** Logs a warning message. */
+  /**
+   * Logs a warning message.
+   */
   public static readonly warn: AnyCallable = this.global.warn;
 
-  /** Logs an error message. */
+  /**
+   * Logs an error message.
+   */
   public static readonly error: AnyCallable = this.global.error;
 
-  /** Logs a debug message. */
+  /**
+   * Logs a debug message.
+   */
   public static readonly debug: AnyCallable = this.global.debug;
 
   public static getLogTagsForPrefix(prefix: string): Array<unknown> {
@@ -64,18 +78,28 @@ export class Logger implements ILogger {
     }
   }
 
-  /** Logs a general message. */
+  /**
+   * Logs a general message.
+   */
   public readonly log: AnyCallable;
 
-  /** Logs an informational message. */
+  /**
+   * Logs an informational message.
+   */
   public readonly info: AnyCallable;
 
-  /** Logs a warning message. */
+  /**
+   * Logs a warning message.
+   */
   public readonly warn: AnyCallable;
 
-  /** Logs an error message. */
+  /**
+   * Logs an error message.
+   */
   public readonly error: AnyCallable;
 
-  /** Logs a debug message. */
+  /**
+   * Logs a debug message.
+   */
   public readonly debug: AnyCallable;
 }

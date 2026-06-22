@@ -1,4 +1,5 @@
 import { type BackendToPanelPayload, CONTENT_PORT, PANEL_PORT_PREFIX } from "@/bridge/bridge.messages";
+import { Logger } from "@/lib/logging/Logger";
 import { type Optional } from "@/types/general";
 
 /** A page's isolated relay and the DevTools panel inspecting that same tab, paired by tab id. */
@@ -20,6 +21,8 @@ interface Pair {
 export class BackgroundRouter {
   private readonly pairs: Map<number, Pair> = new Map();
 
+  private readonly logger: Logger = new Logger("background");
+
   /**
    * Routes a newly-connected port — a page relay (`CONTENT_PORT`) or a panel (`PANEL_PORT_PREFIX:<tabId>`).
    * Unknown port names are ignored.
@@ -27,6 +30,8 @@ export class BackgroundRouter {
    * @param port - The newly-connected runtime port.
    */
   public onConnect(port: chrome.runtime.Port): void {
+    this.logger.debug("Port connected:", port.name);
+
     if (port.name === CONTENT_PORT) {
       this.connectContent(port);
     } else if (port.name.startsWith(PANEL_PORT_PREFIX)) {
@@ -43,18 +48,22 @@ export class BackgroundRouter {
     const tabId: Optional<number> = port.sender?.tab?.id;
 
     if (tabId === undefined) {
+      this.logger.debug("Content port without sender tab id; ignoring");
+
       return;
     }
 
     const pair: Pair = this.pairFor(tabId);
 
     pair.content = port;
+    this.logger.info("Page relay paired:", { tabId });
 
     // A fresh page relay just paired.
     pair.panel?.postMessage({ type: "page-connected" } satisfies BackendToPanelPayload);
 
     // Backend -> panel.
     port.onMessage.addListener((message: unknown): void => {
+      this.logger.debug("Received message backend->panel:", message);
       pair.panel?.postMessage(message);
     });
 
@@ -63,6 +72,7 @@ export class BackgroundRouter {
         pair.content = undefined;
       }
 
+      this.logger.info("Page relay disconnected:", { tabId });
       this.dropIfEmpty(tabId, pair);
     });
   }
@@ -76,15 +86,19 @@ export class BackgroundRouter {
     const tabId: number = Number(port.name.slice(PANEL_PORT_PREFIX.length));
 
     if (!Number.isInteger(tabId)) {
+      this.logger.debug("Panel port with invalid tab id:", port.name);
+
       return;
     }
 
     const pair: Pair = this.pairFor(tabId);
 
     pair.panel = port;
+    this.logger.info("Panel paired", { tabId });
 
     // Panel -> backend.
     port.onMessage.addListener((message: unknown): void => {
+      this.logger.debug("Received message panel->backend:", message);
       pair.content?.postMessage(message);
     });
 
@@ -93,6 +107,7 @@ export class BackgroundRouter {
         pair.panel = undefined;
       }
 
+      this.logger.info("Panel disconnected:", { tabId });
       this.dropIfEmpty(tabId, pair);
     });
   }

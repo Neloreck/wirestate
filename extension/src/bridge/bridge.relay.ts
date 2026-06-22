@@ -1,5 +1,6 @@
 import { forwardToPage, readContentMessage } from "@/bridge/bridge.connection";
 import { type BackendToPanelPayload } from "@/bridge/bridge.messages";
+import { Logger } from "@/lib/logging/Logger";
 import { type Optional } from "@/types/general";
 
 /**
@@ -18,6 +19,8 @@ export class BridgeRelay {
 
   private port: Optional<chrome.runtime.Port>;
 
+  private readonly logger: Logger = new Logger("bridge");
+
   /**
    * @param openPort - Opens a fresh worker port (e.g. `() => chrome.runtime.connect({ name })`).
    */
@@ -28,12 +31,14 @@ export class BridgeRelay {
     const port: chrome.runtime.Port = this.openPort();
 
     this.port = port;
+    this.logger.info("Worker port opened");
 
     // Background worker (panel) -> backend (MAIN world).
     port.onMessage.addListener(forwardToPage);
 
     port.onDisconnect.addListener((): void => {
       this.port = undefined;
+      this.logger.info("Worker port dropped; reconnecting in", BridgeRelay.RECONNECT_DELAY_MS, "ms");
       // The worker slept (or the panel closed); re-establish so a later panel re-pairs.
       setTimeout(() => this.connect(), BridgeRelay.RECONNECT_DELAY_MS);
     });
@@ -49,6 +54,7 @@ export class BridgeRelay {
     const payload: Optional<BackendToPanelPayload> = readContentMessage(messageEvent);
 
     if (payload !== undefined) {
+      this.logger.debug("Page message backend->panel:", payload.type);
       this.port?.postMessage(payload);
     }
   }
