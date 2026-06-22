@@ -52,6 +52,14 @@ export function DevToolsPanel() {
     [log],
   );
 
+  // Reads a `Value` binding's live value directly from the in-realm hook (no bridge, unlike the
+  // extension). Returns `undefined` when the root is gone — `preview` renders that safely.
+  const readBindingValue = (rootId: number, bindingId: number): unknown =>
+    getDevtoolsHook()
+      ?.getRoots()
+      .find((entry) => entry.rootId === rootId)
+      ?.inspectBinding(bindingId, []);
+
   if (roots.length === 0) {
     return <div className={"devtools__empty"}>No devtools hook found — is the DevToolsPlugin installed?</div>;
   }
@@ -84,7 +92,15 @@ export function DevToolsPanel() {
                   <span className={"devtools__label"}>bindings</span>
                   <span>
                     {container.bindings
-                      .map((binding) => `${binding.token.name} · ${binding.type} · ${binding.scope}`)
+                      .map((binding) => {
+                        const base = `${binding.token.name} · ${binding.type} · ${binding.scope}`;
+
+                        // A Value binding shows its live raw value inline — the in-realm twin of the
+                        // extension panel's on-demand value tree.
+                        return binding.type === "Value"
+                          ? `${base} = ${preview(readBindingValue(root.rootId, binding.bindingId))}`
+                          : base;
+                      })
                       .join(", ") || "—"}
                   </span>
                 </div>
