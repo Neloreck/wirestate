@@ -15,6 +15,9 @@ import { DEVTOOLS_HOOK_KEY, getDevtoolsHook } from "./devtools-hook";
 import { type DevtoolsHook } from "./devtools-hook.types";
 import { DevToolsPlugin } from "./devtools-plugin";
 
+@Injectable()
+class Service {}
+
 describe("DevToolsPlugin", () => {
   afterEach(() => {
     delete (globalThis as Record<string, unknown>)[DEVTOOLS_HOOK_KEY];
@@ -23,19 +26,17 @@ describe("DevToolsPlugin", () => {
   it("adds nothing to globalThis until a plugin is installed", () => {
     expect(getDevtoolsHook()).toBeUndefined();
 
-    @Injectable()
-    class Svc {}
-
-    new Container({ bindings: [Svc], activate: [Svc] });
+    new Container({ bindings: [Service], activate: [Service] });
 
     expect(getDevtoolsHook()).toBeUndefined();
   });
 
   it("installs the hook lazily and registers the root with a snapshot", () => {
-    @Injectable()
-    class Svc {}
-
-    const container: Container = new Container({ bindings: [Svc], activate: [Svc], plugins: [new DevToolsPlugin()] });
+    const container: Container = new Container({
+      bindings: [Service],
+      activate: [Service],
+      plugins: [new DevToolsPlugin()],
+    });
 
     // The tree tracks provisioned (live) containers, so provision before snapshotting.
     container.provision();
@@ -65,16 +66,13 @@ describe("DevToolsPlugin", () => {
   });
 
   it("registers one root and tracks only the live container when a plugin instance is installed twice", () => {
-    @Injectable()
-    class Svc {}
-
     // A managed provider reuses one config (and its plugin instance) for a StrictMode
     // throwaway plus the committed container; only the committed one provisions.
     const plugin: DevToolsPlugin = new DevToolsPlugin();
 
-    new Container({ bindings: [Svc], plugins: [plugin] }); // throwaway — never provisioned
+    new Container({ bindings: [Service], plugins: [plugin] }); // throwaway — never provisioned
 
-    const committed: Container = new Container({ bindings: [Svc], plugins: [plugin] });
+    const committed: Container = new Container({ bindings: [Service], plugins: [plugin] });
 
     committed.provision();
 
@@ -89,12 +87,15 @@ describe("DevToolsPlugin", () => {
 
   it("streams lifecycle deltas to a subscribed backend", () => {
     @Injectable()
-    class Svc {
+    class LifecycleService {
       @OnProvision()
       public onProvision(): void {}
     }
 
-    const container: Container = new Container({ bindings: [Svc], plugins: [new DevToolsPlugin()] });
+    const container: Container = new Container({
+      bindings: [LifecycleService],
+      plugins: [new DevToolsPlugin()],
+    });
     const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
     const phases: Array<string> = [];
 
@@ -104,7 +105,7 @@ describe("DevToolsPlugin", () => {
       }
     });
 
-    container.get(Svc);
+    container.get(LifecycleService);
     container.provision();
     container.deprovision();
 
@@ -117,12 +118,12 @@ describe("DevToolsPlugin", () => {
 
   it("stamps a stable instanceId on snapshots that matches its lifecycle deltas", () => {
     @Injectable()
-    class Svc {
+    class LifecycleService {
       @OnProvision()
       public onProvision(): void {}
     }
 
-    const container: Container = new Container({ bindings: [Svc], plugins: [new DevToolsPlugin()] });
+    const container: Container = new Container({ bindings: [LifecycleService], plugins: [new DevToolsPlugin()] });
     const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
     const provisionIds: Array<number> = [];
 
@@ -132,7 +133,7 @@ describe("DevToolsPlugin", () => {
       }
     });
 
-    container.get(Svc);
+    container.get(LifecycleService);
     container.provision();
 
     const instance = hook
@@ -157,13 +158,13 @@ describe("DevToolsPlugin", () => {
 
   it("stamps timestamps on lifecycle/registration deltas and carries a configured root label", () => {
     @Injectable()
-    class Feature {
+    class CommandService {
       @OnCommand("SAVE")
       public save(): void {}
     }
 
     const container: Container = new Container({
-      bindings: [Feature],
+      bindings: [CommandService],
       plugins: [new CommandsPlugin(), new DevToolsPlugin({ label: "main" })],
     });
     const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
@@ -186,14 +187,14 @@ describe("DevToolsPlugin", () => {
 
   it("reads a live instance value on demand via inspect, safely", () => {
     @Injectable()
-    class Counter {
+    class CounterService {
       public count: number = 5;
       public nested: { deep: { value: string } } = { deep: { value: "x" } };
     }
 
     const container: Container = new Container({
-      bindings: [Counter],
-      activate: [Counter],
+      bindings: [CounterService],
+      activate: [CounterService],
       plugins: [new DevToolsPlugin()],
     });
 
@@ -246,13 +247,13 @@ describe("DevToolsPlugin", () => {
 
   it("does not expose Instance or Factory bindings to inspectBinding", () => {
     @Injectable()
-    class Svc {
+    class ValueService {
       public secret: number = 1;
     }
 
     const container: Container = new Container({
-      bindings: [Svc, { token: "MAKE", type: "Factory", factory: () => ({ made: true }) }],
-      activate: [Svc],
+      bindings: [ValueService, { token: "MAKE", type: "Factory", factory: () => ({ made: true }) }],
+      activate: [ValueService],
       plugins: [new DevToolsPlugin()],
     });
 
@@ -312,18 +313,18 @@ describe("DevToolsPlugin", () => {
 
   it("identifies a tracked service instance by identity via serviceRefOf", () => {
     @Injectable()
-    class Logger {}
+    class LoggingService {}
 
     const container: Container = new Container({
-      bindings: [Logger],
-      activate: [Logger],
+      bindings: [LoggingService],
+      activate: [LoggingService],
       plugins: [new DevToolsPlugin()],
     });
 
     container.provision();
 
     const root = (getDevtoolsHook() as DevtoolsHook).getRoots()[0];
-    const logger: Logger = container.get(Logger);
+    const logger: LoggingService = container.get(LoggingService);
 
     expect(root.serviceRefOf(logger)?.className).toBe("Logger");
     expect(root.serviceRefOf(logger)?.instanceId).toEqual(expect.any(Number));
@@ -335,18 +336,18 @@ describe("DevToolsPlugin", () => {
 
   it("reconstructs the subtree from inherited observation, linking child to parent", () => {
     @Injectable()
-    class ParentSvc {}
+    class ParentService {}
 
     @Injectable()
-    class ChildSvc {}
+    class ChildService {}
 
     const parent: Container = new Container({
-      bindings: [ParentSvc],
-      activate: [ParentSvc],
+      bindings: [ParentService],
+      activate: [ParentService],
       plugins: [new DevToolsPlugin()],
     });
 
-    const child: Container = new Container({ parent, bindings: [ChildSvc], activate: [ChildSvc] });
+    const child: Container = new Container({ parent, bindings: [ChildService], activate: [ChildService] });
 
     parent.provision();
     child.provision();
@@ -375,14 +376,11 @@ describe("DevToolsPlugin", () => {
   });
 
   it("normalizes binding type and scope in the snapshot", () => {
-    @Injectable()
-    class Svc {}
-
     const TOKEN: symbol = Symbol("CONFIG");
 
     const container: Container = new Container({
-      bindings: [Svc, { token: TOKEN, value: 42 }],
-      activate: [Svc],
+      bindings: [Service, { token: TOKEN, value: 42 }],
+      activate: [Service],
       plugins: [new DevToolsPlugin()],
     });
 
@@ -511,13 +509,13 @@ describe("DevToolsPlugin", () => {
 
   it("streams handler registration and unregistration deltas (decorated and imperative)", () => {
     @Injectable()
-    class Feature {
+    class ServiceWithCommand {
       @OnCommand("SAVE")
       public save(): void {}
     }
 
     const container: Container = new Container({
-      bindings: [Feature],
+      bindings: [ServiceWithCommand],
       plugins: [new CommandsPlugin(), new DevToolsPlugin()],
     });
 
@@ -549,15 +547,15 @@ describe("DevToolsPlugin", () => {
 
   it("streams deactivation on unbindAll and drops the instance from the snapshot", () => {
     @Injectable()
-    class Svc {
+    class LifecycleService {
       @OnProvision()
       public onProvision(): void {}
     }
 
-    const container: Container = new Container({ bindings: [Svc], plugins: [new DevToolsPlugin()] });
+    const container: Container = new Container({ bindings: [LifecycleService], plugins: [new DevToolsPlugin()] });
     const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
 
-    container.get(Svc);
+    container.get(LifecycleService);
     container.provision();
 
     // The instance is present before teardown.
