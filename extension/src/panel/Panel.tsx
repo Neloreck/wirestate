@@ -46,7 +46,7 @@ export function Panel() {
         </div>
 
         <ResizeHandle
-          orientation={"x"}
+          orientation={"vertical"}
           controls={"start"}
           containerRef={rowRef}
           cssVar={NAV_WIDTH_VAR}
@@ -60,7 +60,7 @@ export function Panel() {
 
       {layout.timelineOpen ? (
         <ResizeHandle
-          orientation={"y"}
+          orientation={"horizontal"}
           controls={"end"}
           containerRef={columnRef}
           cssVar={TIMELINE_HEIGHT_VAR}

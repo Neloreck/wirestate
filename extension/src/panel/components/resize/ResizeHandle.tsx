@@ -1,9 +1,10 @@
 import { type PointerEvent as ReactPointerEvent, type RefObject, useRef, useState } from "react";
 
+import { cn } from "@/lib/class-name";
 import { type Nullable } from "@/types/general";
 
 interface ResizeHandleProps {
-  readonly orientation: "x" | "y";
+  readonly orientation: "vertical" | "horizontal";
   readonly controls: "start" | "end";
   readonly containerRef: RefObject<Nullable<HTMLDivElement>>;
   readonly cssVar: string;
@@ -40,7 +41,7 @@ export function ResizeHandle({
     setDragging(true);
 
     document.body.style.userSelect = "none";
-    document.body.style.cursor = orientation === "x" ? "col-resize" : "row-resize";
+    document.body.style.cursor = orientation === "vertical" ? "col-resize" : "row-resize";
   }
 
   function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>): void {
@@ -55,13 +56,13 @@ export function ResizeHandle({
     }
 
     const rect: DOMRect = container.getBoundingClientRect();
-    const size: number = orientation === "x" ? rect.width : rect.height;
+    const size: number = orientation === "vertical" ? rect.width : rect.height;
 
     if (size <= 0) {
       return;
     }
 
-    const offset: number = orientation === "x" ? event.clientX - rect.left : event.clientY - rect.top;
+    const offset: number = orientation === "vertical" ? event.clientX - rect.left : event.clientY - rect.top;
     const startFraction: number = offset / size;
     const controlled: number = controls === "start" ? startFraction : 1 - startFraction;
 
@@ -70,6 +71,7 @@ export function ResizeHandle({
     const clamped: number = Math.min(Math.max(controlled, minControlled), Math.max(minControlled, maxControlled));
 
     container.style.setProperty(cssVar, `${(clamped * 100).toFixed(3)}%`);
+
     last.current = clamped;
   }
 
@@ -90,25 +92,28 @@ export function ResizeHandle({
     }
   }
 
-  const lineColor: string = dragging ? "bg-fg-subtle" : "bg-divider group-hover:bg-fg-subtle";
-  const strip: string =
-    orientation === "x" ? "w-[5px] cursor-col-resize self-stretch" : "h-[5px] cursor-row-resize w-full";
-  const line: string =
-    orientation === "x"
-      ? "absolute inset-y-0 left-1/2 w-px -translate-x-1/2"
-      : "absolute inset-x-0 top-1/2 h-px -translate-y-1/2";
-
   return (
     <div
-      className={`group relative flex-none ${strip}`}
+      className={cn(
+        `group relative flex-none`,
+        orientation === "vertical" ? "w-[5px] cursor-col-resize self-stretch" : "h-[5px] w-full cursor-row-resize"
+      )}
       role={"separator"}
-      aria-orientation={orientation === "x" ? "vertical" : "horizontal"}
+      aria-orientation={orientation}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
     >
-      <span className={`${line} ${lineColor}`} />
+      <span
+        className={cn(
+          "absolute",
+          dragging ? "bg-fg-subtle" : "bg-divider group-hover:bg-fg-subtle",
+          orientation === "vertical"
+            ? "inset-y-0 left-1/2 w-px -translate-x-1/2"
+            : "inset-x-0 top-1/2 h-px -translate-y-1/2"
+        )}
+      />
     </div>
   );
 }
