@@ -9,7 +9,7 @@ import {
 import { mockLifecycleEvent, mockRootSnapshot } from "@/fixtures/devtools";
 
 import { InspectorBackend } from "@/backend/backend.inspector";
-import { createServiceNode } from "@/backend/backend.node";
+import { createServiceInspectNode } from "@/backend/backend.node";
 import { BRIDGE_SOURCE, type BackendToPanelPayload } from "@/bridge/bridge.messages";
 import type { Optional } from "@/types/general";
 
@@ -159,7 +159,7 @@ describe("InspectorBackend inspection", () => {
       serviceRefOf: () => ref,
     });
 
-    expect(backend.inspectAt(rootId, 1, ["sampleRef"])).toEqual(createServiceNode(ref));
+    expect(backend.inspectAt(rootId, 1, ["sampleRef"])).toEqual(createServiceInspectNode(ref));
   });
 
   it("never flags the root value (path length 0) as a service", () => {

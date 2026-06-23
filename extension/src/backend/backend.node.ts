@@ -14,7 +14,7 @@ const MAX_STRING: number = 256;
  * @param ref - The service reference the in-page hook resolved for the field's value.
  * @returns A clone-safe `service` node.
  */
-export function createServiceNode(ref: DevtoolsServiceRef): InspectNode {
+export function createServiceInspectNode(ref: DevtoolsServiceRef): InspectNode {
   return {
     kind: "service",
     preview: ref.className,
@@ -32,7 +32,7 @@ export function createServiceNode(ref: DevtoolsServiceRef): InspectNode {
  * @param value - Raw value at the inspected path.
  * @returns A clone-safe, one-level descriptor.
  */
-export function createDescribeNode(value: unknown): InspectNode {
+export function createInspectNode(value: unknown): InspectNode {
   if (value === null) {
     return { kind: "primitive", value: null };
   }

@@ -32,7 +32,9 @@ function mockFakePort(name: string, tabId?: number): FakePort {
   };
 }
 
-const asPort = (port: FakePort): chrome.runtime.Port => port as unknown as chrome.runtime.Port;
+function mockAsPort(port: FakePort): chrome.runtime.Port {
+  return port as unknown as chrome.runtime.Port;
+}
 
 describe("BackgroundRouter", () => {
   it("relays content->panel and panel->backend once paired", () => {
@@ -40,8 +42,8 @@ describe("BackgroundRouter", () => {
     const content = mockFakePort(CONTENT_PORT, 1);
     const panel = mockFakePort(`${PANEL_PORT_PREFIX}1`);
 
-    router.onConnect(asPort(panel));
-    router.onConnect(asPort(content));
+    router.onConnect(mockAsPort(panel));
+    router.onConnect(mockAsPort(content));
 
     content.emit({ type: "event" });
     expect(panel.postMessage).toHaveBeenCalledWith({ type: "event" });
@@ -55,8 +57,8 @@ describe("BackgroundRouter", () => {
     const panel = mockFakePort(`${PANEL_PORT_PREFIX}1`);
     const content = mockFakePort(CONTENT_PORT, 1);
 
-    router.onConnect(asPort(panel));
-    router.onConnect(asPort(content));
+    router.onConnect(mockAsPort(panel));
+    router.onConnect(mockAsPort(content));
 
     expect(panel.postMessage).toHaveBeenCalledWith({ type: "page-connected" });
   });
@@ -66,8 +68,8 @@ describe("BackgroundRouter", () => {
     const content = mockFakePort(CONTENT_PORT, 1);
     const panel = mockFakePort(`${PANEL_PORT_PREFIX}1`);
 
-    router.onConnect(asPort(content));
-    router.onConnect(asPort(panel));
+    router.onConnect(mockAsPort(content));
+    router.onConnect(mockAsPort(panel));
 
     panel.disconnect();
     content.emit({ type: "event" });
@@ -80,8 +82,8 @@ describe("BackgroundRouter", () => {
     const panel = mockFakePort(`${PANEL_PORT_PREFIX}1`);
     const content = mockFakePort(CONTENT_PORT);
 
-    router.onConnect(asPort(panel));
-    router.onConnect(asPort(content));
+    router.onConnect(mockAsPort(panel));
+    router.onConnect(mockAsPort(content));
 
     expect(panel.postMessage).not.toHaveBeenCalled();
   });
@@ -90,7 +92,7 @@ describe("BackgroundRouter", () => {
     const router = new BackgroundRouter();
     const other = mockFakePort("something-else", 1);
 
-    expect(() => router.onConnect(asPort(other))).not.toThrow();
+    expect(() => router.onConnect(mockAsPort(other))).not.toThrow();
     expect(other.onMessage.addListener).not.toHaveBeenCalled();
   });
 });

@@ -40,25 +40,6 @@ export interface DevToolsPluginConfig {
  * Read-only observer plugin that exposes a container subtree to an inspector
  * backend (a Chrome extension or a standalone dev panel).
  *
- * @remarks
- * Installing this plugin is the **only** thing that puts the devtools hook on
- * `globalThis`; an application that never registers it has zero footprint and the
- * plugin tree-shakes away. Register it on a root container and, by plugin chain
- * inheritance, it observes the whole subtree — reconstructing the container tree from
- * the lifecycle stream rather than from reverse child-pointers.
- *
- * It owns nothing it observes: every live container is held **weakly** (`WeakRef`), so
- * devtools never extends a container's lifetime. The tree tracks **currently-provisioned**
- * containers — added when a container provisions, removed when it deprovisions — so a
- * container the app has torn down, or a **discarded render** (e.g. a React StrictMode
- * throwaway that constructs but never commits), never appears. Exactly **one root** is
- * registered per plugin instance, even when a managed provider constructs more than one
- * container from the same config. Development-time only.
- *
- * It observes both lifecycle (activation and provision) and messaging traffic — events
- * via a catch-all subscription, commands and queries by wrapping their dispatch methods —
- * and streams both as normalized deltas to the hook.
- *
  * @group DevTools
  *
  * @example

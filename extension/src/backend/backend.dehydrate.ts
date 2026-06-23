@@ -46,19 +46,25 @@ function walk(value: unknown, depth: number, seen: WeakSet<object>): unknown {
     case "number":
     case "boolean":
       return value;
+
     case "string":
       return value.length > MAX_STRING ? `${value.slice(0, MAX_STRING)}...` : value;
+
     case "undefined":
       return { __wsType: "undefined" } satisfies DehydratedRef;
+
     case "bigint":
       return { __wsType: "bigint", preview: `${value.toString()}n` } satisfies DehydratedRef;
+
     case "symbol":
       return { __wsType: "symbol", preview: value.toString() } satisfies DehydratedRef;
+
     case "function": {
       const fn: { name?: string } = value as { name?: string };
 
       return { __wsType: "function", preview: fn.name ? `ƒ ${fn.name}()` : "ƒ ()" } satisfies DehydratedRef;
     }
+
     default:
       break;
   }

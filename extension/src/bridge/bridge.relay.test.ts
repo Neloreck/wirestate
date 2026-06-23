@@ -16,12 +16,6 @@ function mockFakePort(): FakePort {
   };
 }
 
-/**
- * Wraps arbitrary `data` as a page `message` event.
- *
- * @param data - Payload to expose as the event's `data` property.
- * @returns A `MessageEvent` whose `data` is the given value.
- */
 function mockMessageEvent(data: unknown): MessageEvent {
   return { data } as unknown as MessageEvent;
 }

@@ -1,8 +1,8 @@
-import { createDescribeNode, createServiceNode } from "@/backend/backend.node";
+import { createInspectNode, createServiceInspectNode } from "@/backend/backend.node";
 
-describe("createServiceNode", () => {
+describe("createServiceInspectNode", () => {
   it("describes a field that references another tracked instance, carrying jump coordinates", () => {
-    expect(createServiceNode({ className: "Logger", containerId: 2, instanceId: 7 })).toEqual({
+    expect(createServiceInspectNode({ className: "Logger", containerId: 2, instanceId: 7 })).toEqual({
       kind: "service",
       preview: "Logger",
       className: "Logger",
@@ -12,16 +12,16 @@ describe("createServiceNode", () => {
   });
 });
 
-describe("createDescribeNode", () => {
+describe("createInspectNode", () => {
   it("describes primitives inline", () => {
-    expect(createDescribeNode(5)).toEqual({ kind: "primitive", value: 5 });
-    expect(createDescribeNode("hi")).toEqual({ kind: "primitive", value: "hi" });
-    expect(createDescribeNode(true)).toEqual({ kind: "primitive", value: true });
-    expect(createDescribeNode(null)).toEqual({ kind: "primitive", value: null });
+    expect(createInspectNode(5)).toEqual({ kind: "primitive", value: 5 });
+    expect(createInspectNode("hi")).toEqual({ kind: "primitive", value: "hi" });
+    expect(createInspectNode(true)).toEqual({ kind: "primitive", value: true });
+    expect(createInspectNode(null)).toEqual({ kind: "primitive", value: null });
   });
 
   it("describes an object as its child keys (one level — no recursion)", () => {
-    const node = createDescribeNode({ a: 1, b: { deep: true } });
+    const node = createInspectNode({ a: 1, b: { deep: true } });
 
     expect(node.kind).toBe("object");
     if (node.kind === "object") {
@@ -33,7 +33,7 @@ describe("createDescribeNode", () => {
     class User {
       public name: string = "x";
     }
-    const node = createDescribeNode(new User());
+    const node = createInspectNode(new User());
 
     expect(node.kind).toBe("object");
     if (node.kind === "object") {
@@ -43,13 +43,13 @@ describe("createDescribeNode", () => {
   });
 
   it("describes arrays by length", () => {
-    expect(createDescribeNode([1, 2, 3])).toMatchObject({ kind: "array", length: 3 });
+    expect(createInspectNode([1, 2, 3])).toMatchObject({ kind: "array", length: 3 });
   });
 
   it("marks non-expandable leaves", () => {
-    expect(createDescribeNode(() => 1).kind).toBe("leaf");
-    expect(createDescribeNode(undefined)).toEqual({ kind: "leaf", preview: "undefined" });
-    expect(createDescribeNode(new Map([["k", 1]])).kind).toBe("leaf");
-    expect(createDescribeNode(new Set([1])).kind).toBe("leaf");
+    expect(createInspectNode(() => 1).kind).toBe("leaf");
+    expect(createInspectNode(undefined)).toEqual({ kind: "leaf", preview: "undefined" });
+    expect(createInspectNode(new Map([["k", 1]])).kind).toBe("leaf");
+    expect(createInspectNode(new Set([1])).kind).toBe("leaf");
   });
 });

@@ -59,9 +59,9 @@ export type InspectBindingFn = (
  * A message the panel receives on its background port.
  *
  * @remarks
- * `roots` are already normalized to clone-safe primitives by the protocol. In `event`, a
- * `message` delta's `payload`/`source` have been **dehydrated** by the backend (see
- * {@link "../backend/dehydrate"}) so they survive structured clone across the bridge.
+ * `roots` are already normalized to clone-safe primitives by the protocol.
+ * In `event`, a `message` delta's `payload`/`source` have been dehydrated by the backend
+ * so they survive structured clone across the bridge.
  */
 export type BackendToPanelPayload =
   | {

@@ -4,11 +4,6 @@ import { type AnyCallable } from "@/types/general";
 
 /**
  * A lightweight wrapper around `console` methods that adds a styled prefix.
- *
- * @remarks
- * Enabled only in development: the global switch reads `process.env.NODE_ENV`, which Vite statically
- * replaces in the extension build (and which is `"test"` under Jest), so logging stays silent in
- * production builds and in tests. A disabled logger binds no-op methods and never touches the console.
  */
 export class Logger implements ILogger {
   public static IS_GLOBAL_LOGGING_ENABLED: boolean = process.env.NODE_ENV === "development";

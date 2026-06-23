@@ -6,7 +6,7 @@ import {
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
 
-import { createDescribeNode, createServiceNode } from "@/backend/backend.node";
+import { createInspectNode, createServiceInspectNode } from "@/backend/backend.node";
 import { sanitizeDevtoolsEvent, stampTimeInDevtoolsEvent } from "@/backend/backend.utils";
 import {
   BRIDGE_SOURCE,
@@ -204,10 +204,10 @@ export class InspectorBackend {
       const ref = root.serviceRefOf(value);
 
       if (ref) {
-        return createServiceNode(ref);
+        return createServiceInspectNode(ref);
       }
     }
 
-    return createDescribeNode(value);
+    return createInspectNode(value);
   }
 }

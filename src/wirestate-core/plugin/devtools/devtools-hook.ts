@@ -16,7 +16,7 @@ import {
  * Global key the in-page inspector backend reads to find the devtools hook.
  *
  * @remarks
- * The property is added to `globalThis` **only** when a {@link DevToolsPlugin} is
+ * The property is added to `globalThis` only when a {@link DevToolsPlugin} is
  * installed (see {@link installDevtoolsHook}). An application that never registers
  * the plugin never touches `globalThis`.
  *
@@ -147,7 +147,7 @@ class DevtoolsHookHost implements DevtoolsHook {
  * Returns the existing devtools hook on `globalThis`, or installs a fresh one.
  *
  * @remarks
- * The **only** place that writes to `globalThis`. Called from a plugin's `install`,
+ * The only place that writes to `globalThis`. Called from a plugin's `install`,
  * never by core, so the global appears exactly when (and only when) a
  * {@link DevToolsPlugin} is registered. First-installer wins; later plugins reuse it.
  *

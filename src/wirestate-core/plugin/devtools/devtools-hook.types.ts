@@ -113,10 +113,6 @@ export interface DevtoolsInstanceStatus {
  * A message handler/subscriber a service declares via `@OnEvent` / `@OnCommand` /
  * `@OnQuery`.
  *
- * @remarks
- * Reflects **declared** (decorated) handlers only; handlers registered imperatively
- * (`bus.register` / `bus.subscribe`) are not included.
- *
  * @group DevTools
  */
 export interface DevtoolsHandler {
@@ -334,7 +330,7 @@ export type DevtoolsMessageChannel = "event" | "command" | "query";
  * One observed message: an event emitted, or a command/query dispatched.
  *
  * @remarks
- * `payload` and `source` are the **raw** in-page values — the in-page backend
+ * `payload` and `source` are the raw in-page values — the in-page backend
  * serializes them when bridging to the panel.
  *
  * @group DevTools
@@ -376,7 +372,7 @@ export interface DevtoolsMessage {
  * One observed message delta, attributed to the bus-owning container.
  *
  * @remarks
- * Attribution is **bus-scoped**: a message on an inherited bus is attributed to the
+ * Attribution is bus-scoped: a message on an inherited bus is attributed to the
  * container that first tapped that bus (typically the root), not the emitting service.
  *
  * @group DevTools
@@ -426,7 +422,7 @@ export interface DevtoolsMessageResult {
 }
 
 /**
- * A command/query **result** delta, correlated to its dispatch by `messageId` (bus-scoped, like
+ * A command/query result delta, correlated to its dispatch by `messageId` (bus-scoped, like
  * {@link DevtoolsMessageEvent}). Events do not produce results.
  *
  * @group DevTools
@@ -575,7 +571,7 @@ export interface DevtoolsRootRegister {
   snapshot(): DevtoolsRootSnapshot;
 
   /**
-   * Reads the **raw** live value at `path` within the instance identified by `instanceId`, or
+   * Reads the raw live value at `path` within the instance identified by `instanceId`, or
    * `undefined` when the instance is not in this root. Read-only; the consumer serializes the
    * result.
    *
@@ -586,7 +582,7 @@ export interface DevtoolsRootRegister {
   inspect(instanceId: DevtoolsInstanceId, path: DevtoolsInspectPath): unknown;
 
   /**
-   * Reads the **raw** live value at `path` within the `Value` binding identified by `bindingId`, or.
+   * Reads the raw live value at `path` within the `Value` binding identified by `bindingId`, or.
    *
    * @param bindingId - Binding to read from.
    * @param path - Object keys / array indices from the binding's value to the target.

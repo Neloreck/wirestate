@@ -7,11 +7,6 @@ import { type Nullable } from "@/types/general";
  * Isolated-world relay. Bridges the MAIN-world backend (`window.postMessage`) to the background worker
  * (a long-lived `chrome.runtime` port), forwarding each way and re-opening the port after the MV3
  * service worker sleeps and wakes.
- *
- * @remarks
- * Owns the worker port and its reconnect lifecycle (so it re-wires the port's listeners on every
- * reconnect). The `window` message source is external and wired in the content-script entry; this
- * class only manages the port it opens via the injected factory, so it can be driven in tests.
  */
 export class BridgeRelay {
   /**
