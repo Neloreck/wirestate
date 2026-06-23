@@ -6,6 +6,7 @@ import {
 } from "@wirestate/core/devtools";
 import { useCallback } from "react";
 
+import { cn } from "@/lib/class-name";
 import { Field, LinkButton, Section, Tag } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { BindingStatus, getBindingStatus, childContainers, getLifecycleHistory } from "@/panel/lib/selectors";
@@ -77,7 +78,7 @@ export function DetailContainer({ container, roots, log, actions }: DetailContai
             return (
               <div
                 key={binding.token.name}
-                className={`flex items-center gap-1 ${status === BindingStatus.Inactive ? "opacity-60" : ""}`}
+                className={cn("flex items-center gap-1", status === BindingStatus.Inactive ? "opacity-60" : null)}
               >
                 <LinkButton
                   onClick={() =>

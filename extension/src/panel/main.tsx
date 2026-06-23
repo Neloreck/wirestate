@@ -3,7 +3,7 @@ import "@/panel/index.css";
 import { ContainerProvider } from "@wirestate/react";
 import { createRoot } from "react-dom/client";
 
-import { setPanelTheme, syncPanelTheme } from "@/panel/lib/theme";
+import { setPanelTheme, syncPanelTheme } from "@/lib/theme";
 import { Panel } from "@/panel/Panel";
 import { BridgeService } from "@/panel/services/bridge.service";
 import { PanelTransport } from "@/panel/services/panel.transport";

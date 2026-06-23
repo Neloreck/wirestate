@@ -1,5 +1,6 @@
 import { type CSSProperties, useMemo, useRef } from "react";
 
+import { cn } from "@/lib/class-name";
 import { Detail } from "@/panel/components/detail";
 import { Navigation } from "@/panel/components/navigation";
 import { ResizeHandle } from "@/panel/components/resize";
@@ -70,7 +71,7 @@ export function Panel() {
       ) : null}
 
       <div
-        className={`flex min-h-0 flex-col ${layout.timelineOpen ? "" : "border-t border-divider"}`}
+        className={cn("flex min-h-0 flex-col", layout.timelineOpen ? null : "border-t border-divider")}
         style={layout.timelineOpen ? styles.timeline : undefined}
       >
         <button

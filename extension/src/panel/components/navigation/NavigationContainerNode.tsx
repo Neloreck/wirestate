@@ -1,5 +1,6 @@
 import { useCallback, type MouseEvent, useMemo } from "react";
 
+import { cn } from "@/lib/class-name";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { type ContainerNodeModel } from "@/panel/lib/selectors";
 import { type Selection } from "@/panel/lib/types";
@@ -39,9 +40,10 @@ export function NavigationContainerNode({ node, depth, selection, collapsed, act
   return (
     <div>
       <div
-        className={`flex cursor-pointer items-center gap-1 rounded px-1 py-0.5 hover:bg-hover ${
-          isSelected ? "bg-selected" : ""
-        }`}
+        className={cn(
+          "flex cursor-pointer items-center gap-1 rounded px-1 py-0.5 hover:bg-hover",
+          isSelected ? "bg-selected" : null
+        )}
         style={style}
         onClick={onSelectContainer}
       >

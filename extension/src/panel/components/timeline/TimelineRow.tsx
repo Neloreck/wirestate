@@ -1,6 +1,7 @@
 import { type DevtoolsMessageResultEvent, type DevtoolsEvent } from "@wirestate/core/devtools";
 import { useCallback, useState, type MouseEvent } from "react";
 
+import { cn } from "@/lib/class-name";
 import { EventSummary } from "@/panel/components/EventSummary";
 import { EventTimeCells } from "@/panel/components/EventTimeCells";
 import { TimelineMessageDetail } from "@/panel/components/timeline/TimelineMessageDetail";
@@ -55,7 +56,7 @@ export function TimelineRow({ event, count, actions, result, baseline }: Timelin
   return (
     <div className={"border-b border-divider-subtle"}>
       <div
-        className={`flex items-center gap-2 px-2.5 py-0.5 ${isExpandable ? "cursor-pointer" : ""}`}
+        className={cn("flex items-center gap-2 px-2.5 py-0.5", isExpandable ? "cursor-pointer" : null)}
         onClick={isExpandable ? onToggle : undefined}
       >
         <EventTimeCells event={event} baseline={baseline} />
