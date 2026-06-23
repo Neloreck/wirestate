@@ -13,10 +13,10 @@ import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { getLifecycleHistory, rootIdOfContainer, getTokenOfInstanceId } from "@/panel/lib/selectors";
 import { type Optional } from "@/types/general";
 
-import { History } from "./History";
-import { StateTree, type ValueReader } from "./StateTree";
+import { DetailHistory } from "./DetailHistory";
+import { DetailStateTree, type ValueReader } from "./DetailStateTree";
 
-interface InstanceSectionsProps {
+interface DetailInstanceSectionsProps {
   readonly container: DevtoolsContainerSnapshot;
   readonly instance: DevtoolsInstance;
   readonly log: ReadonlyArray<DevtoolsEvent>;
@@ -30,7 +30,14 @@ interface InstanceSectionsProps {
  * methods, on-demand state, and lifecycle history. Rendered inline by {@link BindingDetail} — selection
  * is binding/token-centric, so every cross-link resolves to the binding that realizes the instance.
  */
-export function InstanceSections({ container, instance, log, roots, inspect, actions }: InstanceSectionsProps) {
+export function DetailInstanceSections({
+  container,
+  instance,
+  log,
+  roots,
+  inspect,
+  actions,
+}: DetailInstanceSectionsProps) {
   const history: ReadonlyArray<DevtoolsEvent> = getLifecycleHistory(log, container.containerId, {
     instanceId: instance.instanceId,
     className: instance.className,
@@ -131,7 +138,7 @@ export function InstanceSections({ container, instance, log, roots, inspect, act
       </Section>
 
       <Section title={"state"}>
-        <StateTree
+        <DetailStateTree
           read={readState}
           rootLabel={"state"}
           onNavigate={(containerId, instanceId) => selectByInstanceId(containerId, instanceId)}
@@ -139,7 +146,7 @@ export function InstanceSections({ container, instance, log, roots, inspect, act
       </Section>
 
       <Section title={"lifecycle history"}>
-        <History
+        <DetailHistory
           events={history}
           onSelectBinding={(containerId, token) => actions.select({ kind: "binding", containerId, token })}
         />

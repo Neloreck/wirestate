@@ -21,12 +21,12 @@ import {
 } from "@/panel/lib/selectors";
 import { type Optional } from "@/types/general";
 
-import { FilterToContainerLink } from "./FilterToContainerLink";
-import { InstanceSections } from "./InstanceSections";
-import { StateTree, type ValueReader } from "./StateTree";
-import { StatusTag } from "./StatusTag";
+import { DetailFilterToContainerButton } from "./DetailFilterToContainerButton";
+import { DetailInstanceSections } from "./DetailInstanceSections";
+import { DetailStateTree, type ValueReader } from "./DetailStateTree";
+import { DetailStatusTag } from "./DetailStatusTag";
 
-interface BindingDetailProps {
+interface DetailBindingProps {
   readonly container: DevtoolsContainerSnapshot;
   readonly binding: DevtoolsBinding;
   readonly actions: PanelActions;
@@ -42,7 +42,7 @@ interface BindingDetailProps {
  * tree, and a realized singleton `Instance` binding inlines its live instance (status, handlers,
  * methods, state, history) so there is no separate instance view to navigate to.
  */
-export function BindingDetail({
+export function DetailBinding({
   container,
   binding,
   actions,
@@ -50,7 +50,7 @@ export function BindingDetail({
   log,
   inspect,
   inspectBinding,
-}: BindingDetailProps) {
+}: DetailBindingProps) {
   const status: BindingStatus = getBindingStatus(container, binding);
   const isValue: boolean = binding.type === BindingType.Value;
   const realizes: boolean = mayRealizeInstance(binding);
@@ -106,20 +106,20 @@ export function BindingDetail({
 
         {status === BindingStatus.Inactive || status === BindingStatus.Unrealized ? (
           <Field label={"status"}>
-            <StatusTag status={status} />
+            <DetailStatusTag status={status} />
           </Field>
         ) : null}
       </Section>
 
       {isValue ? (
         <Section title={"value"}>
-          <StateTree read={readValue} rootLabel={"value"} onNavigate={onNavigateByInstanceId} />
+          <DetailStateTree read={readValue} rootLabel={"value"} onNavigate={onNavigateByInstanceId} />
         </Section>
       ) : null}
 
       {realizes ? (
         instance ? (
-          <InstanceSections
+          <DetailInstanceSections
             container={container}
             instance={instance}
             log={log}
@@ -134,7 +134,7 @@ export function BindingDetail({
         )
       ) : null}
 
-      <FilterToContainerLink onClick={onFilterByContainer} />
+      <DetailFilterToContainerButton onClick={onFilterByContainer} />
     </div>
   );
 }

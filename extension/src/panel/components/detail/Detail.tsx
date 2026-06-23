@@ -9,8 +9,8 @@ import { type Selection, isSameSelection } from "@/panel/lib/types";
 import { BridgeService } from "@/panel/services/bridge.service";
 import { type Optional } from "@/types/general";
 
-import { Breadcrumb } from "./Breadcrumb";
-import { View } from "./View";
+import { DetailBreadcrumb } from "./DetailBreadcrumb";
+import { DetailResolvedView } from "./DetailResolvedView";
 
 interface DetailProps {
   readonly selection: Optional<Selection>;
@@ -21,9 +21,10 @@ interface DetailProps {
  * Detail pane: routes the current selection to its view, with breadcrumb + dead-entity tombstone.
  */
 export const Detail = observer(function Detail({ selection, actions }: DetailProps) {
-  const bridge: BridgeService = useInjection(BridgeService);
+  const bridgeService: BridgeService = useInjection(BridgeService);
+
   const cache = useRef<Optional<{ selection: Selection; resolved: ResolvedEntity }>>(undefined);
-  const resolved: Optional<ResolvedEntity> = selection ? resolveSelection(bridge.roots, selection) : undefined;
+  const resolved: Optional<ResolvedEntity> = selection ? resolveSelection(bridgeService.roots, selection) : undefined;
 
   useEffect(() => {
     if (selection && resolved) {
@@ -38,20 +39,20 @@ export const Detail = observer(function Detail({ selection, actions }: DetailPro
   } else if (resolved) {
     content = (
       <>
-        <Breadcrumb resolved={resolved} actions={actions} />
-        <View
+        <DetailBreadcrumb resolved={resolved} actions={actions} />
+        <DetailResolvedView
           resolved={resolved}
-          roots={bridge.roots}
-          log={bridge.log}
+          roots={bridgeService.roots}
+          log={bridgeService.log}
           actions={actions}
-          inspect={bridge.inspect}
-          inspectBinding={bridge.inspectBinding}
+          inspect={bridgeService.inspect}
+          inspectBinding={bridgeService.inspectBinding}
         />
       </>
     );
   } else {
     // Selection is no longer live -> tombstone. Freeze the last-known view (dimmed) if it matches.
-    const dead: Optional<ResolvedEntity> =
+    const isDead: Optional<ResolvedEntity> =
       cache.current && isSameSelection(cache.current.selection, selection) ? cache.current.resolved : undefined;
 
     content = (
@@ -66,15 +67,16 @@ export const Detail = observer(function Detail({ selection, actions }: DetailPro
             <LinkButton onClick={actions.clearSelection}>Clear selection</LinkButton>
           </div>
         </div>
-        {dead ? (
+
+        {isDead ? (
           <div className={"pointer-events-none opacity-60"}>
-            <View
-              resolved={dead}
-              roots={bridge.roots}
-              log={bridge.log}
+            <DetailResolvedView
+              resolved={isDead}
+              roots={bridgeService.roots}
+              log={bridgeService.log}
               actions={actions}
-              inspect={bridge.inspect}
-              inspectBinding={bridge.inspectBinding}
+              inspect={bridgeService.inspect}
+              inspectBinding={bridgeService.inspectBinding}
             />
           </div>
         ) : null}

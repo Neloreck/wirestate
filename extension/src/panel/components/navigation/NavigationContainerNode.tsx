@@ -5,7 +5,7 @@ import { type ContainerNodeModel } from "@/panel/lib/selectors";
 import { type Selection } from "@/panel/lib/types";
 import { type Optional } from "@/types/general";
 
-interface ContainerNodeProps {
+interface NavigationContainerNodeProps {
   readonly node: ContainerNodeModel;
   readonly depth: number;
   readonly selection: Optional<Selection>;
@@ -16,7 +16,7 @@ interface ContainerNodeProps {
 /**
  * One container row in the Navigator, recursively rendering its child containers.
  */
-export function ContainerNode({ node, depth, selection, collapsed, actions }: ContainerNodeProps) {
+export function NavigationContainerNode({ node, depth, selection, collapsed, actions }: NavigationContainerNodeProps) {
   const containerId: number = node.container.containerId;
   const isSelected: boolean = selection?.kind === "container" && selection.containerId === containerId;
   const isCollapsed: boolean = collapsed.has(containerId);
@@ -61,7 +61,7 @@ export function ContainerNode({ node, depth, selection, collapsed, actions }: Co
 
       {hasChildren && !isCollapsed
         ? node.children.map((child) => (
-            <ContainerNode
+            <NavigationContainerNode
               key={child.container.containerId}
               node={child}
               depth={depth + 1}

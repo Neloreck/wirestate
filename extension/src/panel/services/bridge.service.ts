@@ -1,4 +1,4 @@
-import { Injectable, OnActivated, OnDeactivation, inject } from "@wirestate/core";
+import { Injectable, inject, OnProvision, OnDeprovision } from "@wirestate/core";
 import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
 import { BoundAction, Observable, RefObservable, makeObservable } from "@wirestate/mobx";
 
@@ -15,10 +15,7 @@ import { type Optional } from "@/types/general";
 
 /**
  * Connects the panel to the inspected tab's backend over the bridge and exposes the live, MobX-observable
- * state the panel renders. The DI replacement for the former `useBridge` hook: pulls structure + buffered
- * history on attach, streams deltas, reconnects when the MV3 worker sleeps, and resets on a full page
- * navigation. Chrome access is delegated to the injected {@link PanelTransport}; connect/teardown are
- * driven by the provider lifecycle (`@OnActivated`/`@OnDeactivation`).
+ * state the panel renders.
  */
 @Injectable()
 export class BridgeService {
@@ -47,14 +44,14 @@ export class BridgeService {
     makeObservable(this);
   }
 
-  @OnActivated()
-  public onActivated(): void {
+  @OnProvision()
+  public onProvision(): void {
     this.connect();
     this.transport.onNavigated(() => this.reset());
   }
 
-  @OnDeactivation()
-  public onDeactivation(): void {
+  @OnDeprovision()
+  public onDeprovision(): void {
     this.disposed = true;
 
     if (this.reconnectTimer !== undefined) {

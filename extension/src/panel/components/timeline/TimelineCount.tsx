@@ -15,8 +15,9 @@ interface TimelineCountProps {
  * tracks the log without re-rendering the panel shell.
  */
 export const TimelineCount = observer(function TimelineCount({ filter }: TimelineCountProps) {
-  const bridge: BridgeService = useInjection(BridgeService);
-  const count: number = useMemo(() => filterLogBy(bridge.log, filter).length, [bridge.log, filter]);
+  const bridgeService: BridgeService = useInjection(BridgeService);
+
+  const count: number = useMemo(() => filterLogBy(bridgeService.log, filter).length, [bridgeService.log, filter]);
 
   return <span className={"text-fg-subtle"}>({count})</span>;
 });

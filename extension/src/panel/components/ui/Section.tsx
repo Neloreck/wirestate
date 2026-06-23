@@ -1,7 +1,7 @@
 import { type PropsWithChildren } from "react";
 
 interface SectionProps extends PropsWithChildren {
-  readonly title: string;
+  readonly title?: string;
 }
 
 /**
@@ -10,7 +10,7 @@ interface SectionProps extends PropsWithChildren {
 export function Section({ title, children }: SectionProps) {
   return (
     <section className={"space-y-1"}>
-      <h4 className={"text-2xs tracking-wide text-fg-muted uppercase"}>{title}</h4>
+      {title ? <h4 className={"text-2xs tracking-wide text-fg-muted uppercase"}>{title}</h4> : null}
       <div className={"space-y-0.5"}>{children}</div>
     </section>
   );

@@ -23,16 +23,20 @@ interface TimelineProps {
  * Timeline dock body: filter bar + the (frozen-on-pause, dedup-collapsed, autoscrolled) delta list.
  */
 export const Timeline = observer(function Timeline({ filter, ui, actions }: TimelineProps) {
-  const bridge: BridgeService = useInjection(BridgeService);
-  const roots: ReadonlyArray<RootModel> = useMemo(() => buildRoots(bridge.roots), [bridge.roots]);
+  const bridgeService: BridgeService = useInjection(BridgeService);
+
+  const roots: ReadonlyArray<RootModel> = useMemo(() => buildRoots(bridgeService.roots), [bridgeService.roots]);
   const containerIds: ReadonlyArray<number> = useMemo(
-    () => bridge.roots.flatMap((root) => root.containers.map((container) => container.containerId)),
-    [bridge.roots]
+    () => bridgeService.roots.flatMap((root) => root.containers.map((container) => container.containerId)),
+    [bridgeService.roots]
   );
-  const events: ReadonlyArray<DevtoolsEvent> = useMemo(() => filterLogBy(bridge.log, filter), [bridge.log, filter]);
+  const events: ReadonlyArray<DevtoolsEvent> = useMemo(
+    () => filterLogBy(bridgeService.log, filter),
+    [bridgeService.log, filter]
+  );
   const results: ReadonlyMap<number, DevtoolsMessageResultEvent> = useMemo(
-    () => buildMessageResults(bridge.log),
-    [bridge.log]
+    () => buildMessageResults(bridgeService.log),
+    [bridgeService.log]
   );
 
   const frozen = useRef<ReadonlyArray<DevtoolsEvent>>(events);
@@ -62,7 +66,7 @@ export const Timeline = observer(function Timeline({ filter, ui, actions }: Time
         filter={filter}
         ui={ui}
         actions={actions}
-        onClear={() => bridge.clear()}
+        onClear={() => bridgeService.clear()}
       />
       <div ref={scrollRef} className={"flex-1 overflow-auto"}>
         {rows.length === 0 ? (

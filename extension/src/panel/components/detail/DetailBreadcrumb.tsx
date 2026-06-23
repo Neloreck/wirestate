@@ -4,7 +4,7 @@ import { LinkButton } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { type ResolvedEntity } from "@/panel/lib/selectors";
 
-interface BreadcrumbProps {
+interface DetailBreadcrumbProps {
   readonly resolved: ResolvedEntity;
   readonly actions: PanelActions;
 }
@@ -12,7 +12,7 @@ interface BreadcrumbProps {
 /**
  * Trail above a detail view: the container link, plus the resolved entity when it is not the container itself.
  */
-export function Breadcrumb({ resolved, actions }: BreadcrumbProps) {
+export function DetailBreadcrumb({ resolved, actions }: DetailBreadcrumbProps) {
   const containerId: number = resolved.container.containerId;
 
   const onContainerRefClick = useCallback(() => {

@@ -2,14 +2,14 @@ import { type DevtoolsPluginInfo } from "@wirestate/core/devtools";
 
 import { Field, Section } from "@/panel/components/ui";
 
-interface PluginDetailProps {
+interface DetailPluginProps {
   readonly plugin: DevtoolsPluginInfo;
 }
 
 /**
  * Detail view for a selected plugin.
  */
-export function PluginDetail({ plugin }: PluginDetailProps) {
+export function DetailPlugin({ plugin }: DetailPluginProps) {
   return (
     <div className={"space-y-3"}>
       <Section title={"plugin"}>

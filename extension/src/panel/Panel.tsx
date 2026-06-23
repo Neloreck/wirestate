@@ -1,7 +1,7 @@
 import { type CSSProperties, useRef } from "react";
 
 import { Detail } from "@/panel/components/detail";
-import { Navigator } from "@/panel/components/navigation";
+import { Navigation } from "@/panel/components/navigation";
 import { ResizeHandle } from "@/panel/components/resize";
 import { StatusBar } from "@/panel/components/status";
 import { Timeline, TimelineCount } from "@/panel/components/timeline";
@@ -32,7 +32,7 @@ export function Panel() {
         style={{ "--nav-w": `${(layout.navFraction * 100).toFixed(3)}%` } as CSSProperties}
       >
         <div className={"min-w-55 overflow-hidden"} style={{ flex: "0 0 var(--nav-w)" }}>
-          <Navigator selection={state.selection} collapsed={state.ui.collapsed} actions={actions} />
+          <Navigation selection={state.selection} collapsed={state.ui.collapsed} actions={actions} />
         </div>
 
         <ResizeHandle

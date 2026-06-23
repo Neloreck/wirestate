@@ -4,11 +4,11 @@ import { type InspectBindingFn, type InspectFn } from "@/bridge/bridge.messages"
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { type ResolvedEntity } from "@/panel/lib/selectors";
 
-import { BindingDetail } from "./BindingDetail";
-import { ContainerDetail } from "./ContainerDetail";
-import { PluginDetail } from "./PluginDetail";
+import { DetailBinding } from "./DetailBinding";
+import { DetailContainer } from "./DetailContainer";
+import { DetailPlugin } from "./DetailPlugin";
 
-interface ViewProps {
+interface DetailResolvedViewProps {
   readonly resolved: ResolvedEntity;
   readonly roots: ReadonlyArray<DevtoolsRootSnapshot>;
   readonly log: ReadonlyArray<DevtoolsEvent>;
@@ -17,14 +17,24 @@ interface ViewProps {
   readonly inspectBinding: InspectBindingFn;
 }
 
-/** Routes a resolved entity to its concrete detail view (container / binding / plugin). */
-export function View({ resolved, roots, log, actions, inspect, inspectBinding }: ViewProps) {
+/**
+ * Routes a resolved entity to its concrete detail view (container / binding / plugin).
+ */
+export function DetailResolvedView({
+  resolved,
+  roots,
+  log,
+  actions,
+  inspect,
+  inspectBinding,
+}: DetailResolvedViewProps) {
   switch (resolved.kind) {
     case "container":
-      return <ContainerDetail container={resolved.container} roots={roots} log={log} actions={actions} />;
+      return <DetailContainer container={resolved.container} roots={roots} log={log} actions={actions} />;
+
     case "binding":
       return (
-        <BindingDetail
+        <DetailBinding
           container={resolved.container}
           binding={resolved.binding}
           actions={actions}
@@ -34,7 +44,8 @@ export function View({ resolved, roots, log, actions, inspect, inspectBinding }:
           inspectBinding={inspectBinding}
         />
       );
+
     case "plugin":
-      return <PluginDetail plugin={resolved.plugin} />;
+      return <DetailPlugin plugin={resolved.plugin} />;
   }
 }

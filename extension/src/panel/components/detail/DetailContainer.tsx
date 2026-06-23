@@ -4,16 +4,17 @@ import {
   type DevtoolsEvent,
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
+import { useCallback } from "react";
 
 import { Field, LinkButton, Section, Tag } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { BindingStatus, getBindingStatus, childContainers, getLifecycleHistory } from "@/panel/lib/selectors";
 
-import { FilterToContainerLink } from "./FilterToContainerLink";
-import { History } from "./History";
-import { StatusTag } from "./StatusTag";
+import { DetailFilterToContainerButton } from "./DetailFilterToContainerButton";
+import { DetailHistory } from "./DetailHistory";
+import { DetailStatusTag } from "./DetailStatusTag";
 
-interface ContainerDetailProps {
+interface DetailContainerProps {
   readonly container: DevtoolsContainerSnapshot;
   readonly roots: ReadonlyArray<DevtoolsRootSnapshot>;
   readonly log: ReadonlyArray<DevtoolsEvent>;
@@ -23,23 +24,32 @@ interface ContainerDetailProps {
 /**
  * Detail view for a selected container: links, contents (drill-in), history, cross-link.
  */
-export function ContainerDetail({ container, roots, log, actions }: ContainerDetailProps) {
+export function DetailContainer({ container, roots, log, actions }: DetailContainerProps) {
   const children: ReadonlyArray<DevtoolsContainerSnapshot> = childContainers(roots, container.containerId);
   const history: ReadonlyArray<DevtoolsEvent> = getLifecycleHistory(log, container.containerId);
 
+  const onSelectParentContainer = useCallback(() => {
+    actions.select({ kind: "container", containerId: container.parentContainerId as number });
+  }, [actions, container.parentContainerId]);
+
+  const onSelectBinding = useCallback(
+    (containerId: number, token: string) => actions.select({ kind: "binding", containerId, token }),
+    [actions]
+  );
+
+  const onSetContainerFilter = useCallback(() => {
+    actions.setContainerFilter(container.containerId);
+  }, [actions, container.containerId]);
+
   return (
     <div className={"space-y-3"}>
-      <Section title={"container"}>
+      <Section>
         <Field label={"id"}>#{container.containerId}</Field>
         <Field label={"parent"}>
           {container.parentContainerId === null ? (
             "— (root)"
           ) : (
-            <LinkButton
-              onClick={() => actions.select({ kind: "container", containerId: container.parentContainerId as number })}
-            >
-              #{container.parentContainerId}
-            </LinkButton>
+            <LinkButton onClick={onSelectParentContainer}>#{container.parentContainerId}</LinkButton>
           )}
         </Field>
 
@@ -65,8 +75,6 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
             const status: BindingStatus = getBindingStatus(container, binding);
 
             return (
-              // Active is the common case (no tag); only the exceptions are flagged, and an inactive
-              // binding's row dims so the live ones stand out.
               <div
                 key={binding.token.name}
                 className={`flex items-center gap-1 ${status === BindingStatus.Inactive ? "opacity-60" : ""}`}
@@ -94,7 +102,7 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
                 {binding.scope === BindingScope.Transient ? <Tag tone={"warn"}>Transient</Tag> : null}
 
                 {status === BindingStatus.Inactive || status === BindingStatus.Unrealized ? (
-                  <StatusTag status={status} />
+                  <DetailStatusTag status={status} />
                 ) : null}
               </div>
             );
@@ -121,13 +129,10 @@ export function ContainerDetail({ container, roots, log, actions }: ContainerDet
       </Section>
 
       <Section title={"lifecycle history"}>
-        <History
-          events={history}
-          onSelectBinding={(containerId, token) => actions.select({ kind: "binding", containerId, token })}
-        />
+        <DetailHistory events={history} onSelectBinding={onSelectBinding} />
       </Section>
 
-      <FilterToContainerLink onClick={() => actions.setContainerFilter(container.containerId)} />
+      <DetailFilterToContainerButton onClick={onSetContainerFilter} />
     </div>
   );
 }
