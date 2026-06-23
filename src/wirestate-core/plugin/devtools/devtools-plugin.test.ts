@@ -53,8 +53,8 @@ describe("DevToolsPlugin", () => {
     const snapshot = roots[0].snapshot();
 
     expect(snapshot.containers).toHaveLength(1);
-    expect(snapshot.containers[0].bindings.map((binding) => binding.token.name)).toContain("Svc");
-    expect(snapshot.containers[0].instances.map((instance) => instance.className)).toContain("Svc");
+    expect(snapshot.containers[0].bindings.map((binding) => binding.token.name)).toContain("Service");
+    expect(snapshot.containers[0].instances.map((instance) => instance.className)).toContain("Service");
     expect(container).toBeInstanceOf(Container);
   });
 
@@ -109,10 +109,10 @@ describe("DevToolsPlugin", () => {
     container.provision();
     container.deprovision();
 
-    expect(phases).toContain("activate:Svc");
+    expect(phases).toContain("activate:LifecycleService");
     expect(phases).toContain("containerProvision");
-    expect(phases).toContain("provision:Svc");
-    expect(phases).toContain("deprovision:Svc");
+    expect(phases).toContain("provision:LifecycleService");
+    expect(phases).toContain("deprovision:LifecycleService");
     expect(phases).toContain("containerDeprovision");
   });
 
@@ -139,7 +139,7 @@ describe("DevToolsPlugin", () => {
     const instance = hook
       .getRoots()[0]
       .snapshot()
-      .containers[0].instances.find((entry) => entry.className === "Svc");
+      .containers[0].instances.find((entry) => entry.className === "LifecycleService");
 
     expect(instance?.instanceId).toEqual(expect.any(Number));
     // The provision delta carries the same id as the snapshot — exact correlation, not by class name.
@@ -149,7 +149,7 @@ describe("DevToolsPlugin", () => {
     const again = hook
       .getRoots()[0]
       .snapshot()
-      .containers[0].instances.find((entry) => entry.className === "Svc");
+      .containers[0].instances.find((entry) => entry.className === "LifecycleService");
 
     expect(again?.instanceId).toBe(instance?.instanceId);
 
@@ -201,7 +201,7 @@ describe("DevToolsPlugin", () => {
     container.provision();
 
     const root = (getDevtoolsHook() as DevtoolsHook).getRoots()[0];
-    const counter = root.snapshot().containers[0].instances.find((entry) => entry.className === "Counter");
+    const counter = root.snapshot().containers[0].instances.find((entry) => entry.className === "CounterService");
     const id: number = counter?.instanceId as number;
 
     expect(root.inspect(id, ["count"])).toBe(5);
@@ -261,7 +261,7 @@ describe("DevToolsPlugin", () => {
 
     const root = (getDevtoolsHook() as DevtoolsHook).getRoots()[0];
     const bindings = root.snapshot().containers[0].bindings;
-    const instanceId: number = bindings.find((binding) => binding.token.name === "Svc")?.bindingId as number;
+    const instanceId: number = bindings.find((binding) => binding.token.name === "ValueService")?.bindingId as number;
     const factoryId: number = bindings.find((binding) => binding.token.name === "MAKE")?.bindingId as number;
 
     // A non-Value binding id never matches: Instance values are read via `inspect`, and a Factory is
@@ -326,7 +326,7 @@ describe("DevToolsPlugin", () => {
     const root = (getDevtoolsHook() as DevtoolsHook).getRoots()[0];
     const logger: LoggingService = container.get(LoggingService);
 
-    expect(root.serviceRefOf(logger)?.className).toBe("Logger");
+    expect(root.serviceRefOf(logger)?.className).toBe("LoggingService");
     expect(root.serviceRefOf(logger)?.instanceId).toEqual(expect.any(Number));
     // A plain object (or any value the container doesn't manage) is not a service.
     expect(root.serviceRefOf({ not: "a service" })).toBeUndefined();
@@ -360,14 +360,14 @@ describe("DevToolsPlugin", () => {
       container.instances.map((instance) => instance.className)
     );
 
-    expect(classNames).toContain("ParentSvc");
-    expect(classNames).toContain("ChildSvc");
+    expect(classNames).toContain("ParentService");
+    expect(classNames).toContain("ChildService");
 
     const parentSnapshot = snapshot.containers.find((container) =>
-      container.instances.some((instance) => instance.className === "ParentSvc")
+      container.instances.some((instance) => instance.className === "ParentService")
     );
     const childSnapshot = snapshot.containers.find((container) =>
-      container.instances.some((instance) => instance.className === "ChildSvc")
+      container.instances.some((instance) => instance.className === "ChildService")
     );
 
     expect(childSnapshot?.parentContainerId).toBe(parentSnapshot?.containerId);
@@ -389,10 +389,10 @@ describe("DevToolsPlugin", () => {
     const snapshot = (getDevtoolsHook() as DevtoolsHook).getRoots()[0].snapshot();
     const bindings = snapshot.containers[0].bindings;
 
-    const instanceBinding = bindings.find((binding) => binding.token.name === "Svc");
+    const instanceBinding = bindings.find((binding) => binding.token.name === "Service");
     const valueBinding = bindings.find((binding) => binding.token.name === "CONFIG");
 
-    expect(instanceBinding).toMatchObject({ type: "Instance", scope: "Singleton", implementation: "Svc" });
+    expect(instanceBinding).toMatchObject({ type: "Instance", scope: "Singleton", implementation: "Service" });
     expect(valueBinding).toMatchObject({ type: "Value", scope: "Singleton", token: { kind: "symbol" } });
     expect(container).toBeInstanceOf(Container);
   });
@@ -564,7 +564,7 @@ describe("DevToolsPlugin", () => {
         .getRoots()[0]
         .snapshot()
         .containers[0].instances.map((instance) => instance.className)
-    ).toContain("Svc");
+    ).toContain("LifecycleService");
 
     const phases: Array<string> = [];
 
@@ -577,8 +577,8 @@ describe("DevToolsPlugin", () => {
     // unbindAll deprovisions then deactivates (ADR 0003 ordering).
     container.unbindAll();
 
-    expect(phases).toContain("deprovision:Svc");
-    expect(phases).toContain("deactivate:Svc");
+    expect(phases).toContain("deprovision:LifecycleService");
+    expect(phases).toContain("deactivate:LifecycleService");
 
     // Cleanup is reflected: the deprovisioned container drops out of a fresh snapshot.
     const remaining: Array<string> = hook
@@ -586,7 +586,7 @@ describe("DevToolsPlugin", () => {
       .snapshot()
       .containers.flatMap((node) => node.instances.map((instance) => instance.className));
 
-    expect(remaining).not.toContain("Svc");
+    expect(remaining).not.toContain("LifecycleService");
   });
 
   it("taps a bus exactly once across provision cycles (no double observation)", () => {

@@ -28,7 +28,7 @@ describe("forwardToPage", () => {
 });
 
 describe("readContentMessage", () => {
-  function eventWith(data: unknown): MessageEvent {
+  function mockEventWith(data: unknown): MessageEvent {
     return { data } as MessageEvent;
   }
 
@@ -36,23 +36,23 @@ describe("readContentMessage", () => {
     const payload: BackendToPanelPayload = { type: "snapshot", roots: [] };
     const message: PageMessage = { source: BRIDGE_SOURCE, dir: "to-content", payload };
 
-    expect(readMessageEvent(eventWith(message))).toBe(payload);
+    expect(readMessageEvent(mockEventWith(message))).toBe(payload);
   });
 
   it("ignores messages stamped with another source", () => {
     const foreign = { source: "other", dir: "to-content", payload: { type: "refresh" } };
 
-    expect(readMessageEvent(eventWith(foreign))).toBeUndefined();
+    expect(readMessageEvent(mockEventWith(foreign))).toBeNull();
   });
 
   it("ignores to-page messages (the opposite direction)", () => {
     const message: PageMessage = { source: BRIDGE_SOURCE, dir: "to-page", payload: { type: "refresh" } };
 
-    expect(readMessageEvent(eventWith(message))).toBeUndefined();
+    expect(readMessageEvent(mockEventWith(message))).toBeNull();
   });
 
   it("ignores empty or non-bridge data", () => {
-    expect(readMessageEvent(eventWith(undefined))).toBeUndefined();
-    expect(readMessageEvent(eventWith(null))).toBeUndefined();
+    expect(readMessageEvent(mockEventWith(undefined))).toBeNull();
+    expect(readMessageEvent(mockEventWith(null))).toBeNull();
   });
 });
