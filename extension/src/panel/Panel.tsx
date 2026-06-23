@@ -1,4 +1,4 @@
-import { type CSSProperties, useRef } from "react";
+import { type CSSProperties, useMemo, useRef } from "react";
 
 import { Detail } from "@/panel/components/detail";
 import { Navigation } from "@/panel/components/navigation";
@@ -7,6 +7,9 @@ import { StatusBar } from "@/panel/components/status";
 import { Timeline, TimelineCount } from "@/panel/components/timeline";
 import { useLayout } from "@/panel/hooks/use-layout";
 import { usePanelState } from "@/panel/hooks/use-panel-state";
+
+export const NAV_WIDTH_VAR: string = "--nav-w";
+export const TIMELINE_HEIGHT_VAR: string = "--timeline-h";
 
 /**
  * The inspector panel: master–detail (Navigator + Detail) over a collapsible, cross-linked Timeline.
@@ -18,20 +21,26 @@ export function Panel() {
   const columnRef = useRef<HTMLDivElement>(null);
   const rowRef = useRef<HTMLDivElement>(null);
 
+  const styles = useMemo(
+    () => ({
+      column: { [TIMELINE_HEIGHT_VAR]: `${(layout.timelineFraction * 100).toFixed(3)}%` } as CSSProperties,
+      row: { [NAV_WIDTH_VAR]: `${(layout.navFraction * 100).toFixed(3)}%` } as CSSProperties,
+      navigation: { flex: `0 0 var(${NAV_WIDTH_VAR})` } as CSSProperties,
+      timeline: { flex: `0 0 var(${TIMELINE_HEIGHT_VAR})` } as CSSProperties,
+    }),
+    [layout.navFraction, layout.timelineFraction]
+  );
+
   return (
     <div
       ref={columnRef}
       className={"flex h-screen flex-col bg-surface font-mono text-xs text-fg"}
-      style={{ "--timeline-h": `${(layout.timelineFraction * 100).toFixed(3)}%` } as CSSProperties}
+      style={styles.column}
     >
       <StatusBar />
 
-      <div
-        ref={rowRef}
-        className={"flex min-h-0 flex-1"}
-        style={{ "--nav-w": `${(layout.navFraction * 100).toFixed(3)}%` } as CSSProperties}
-      >
-        <div className={"min-w-55 overflow-hidden"} style={{ flex: "0 0 var(--nav-w)" }}>
+      <div ref={rowRef} className={"flex min-h-0 flex-1"} style={styles.row}>
+        <div className={"min-w-55 overflow-hidden"} style={styles.navigation}>
           <Navigation selection={state.selection} collapsed={state.ui.collapsed} actions={actions} />
         </div>
 
@@ -39,7 +48,7 @@ export function Panel() {
           orientation={"x"}
           controls={"start"}
           containerRef={rowRef}
-          cssVar={"--nav-w"}
+          cssVar={NAV_WIDTH_VAR}
           minStartPx={220}
           minEndPx={240}
           onCommit={layoutActions.setNavFraction}
@@ -53,7 +62,7 @@ export function Panel() {
           orientation={"y"}
           controls={"end"}
           containerRef={columnRef}
-          cssVar={"--timeline-h"}
+          cssVar={TIMELINE_HEIGHT_VAR}
           minStartPx={150}
           minEndPx={80}
           onCommit={layoutActions.setTimelineFraction}
@@ -62,7 +71,7 @@ export function Panel() {
 
       <div
         className={`flex min-h-0 flex-col ${layout.timelineOpen ? "" : "border-t border-divider"}`}
-        style={layout.timelineOpen ? { flex: "0 0 var(--timeline-h)" } : undefined}
+        style={layout.timelineOpen ? styles.timeline : undefined}
       >
         <button
           type={"button"}

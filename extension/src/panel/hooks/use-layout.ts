@@ -11,8 +11,6 @@ export interface PanelLayout {
   readonly timelineOpen: boolean;
 }
 
-const DEFAULTS: PanelLayout = { navFraction: 0.42, timelineFraction: 0.4, timelineOpen: true };
-
 const STORAGE_KEY = "wirestate.devtools.layout";
 
 /** Stable API over the layout state. Sizes commit on drag release; toggle flips the dock. */
@@ -33,14 +31,19 @@ export interface LayoutActions {
  * @returns The current layout and a stable actions API for resizing the panes and toggling the dock.
  */
 export function useLayout(): { layout: PanelLayout; actions: LayoutActions } {
-  const [layout, setLayout] = useState<PanelLayout>(DEFAULTS);
+  const [layout, setLayout] = useState<PanelLayout>(() => ({
+    navFraction: 0.42,
+    timelineFraction: 0.4,
+    timelineOpen: true,
+  }));
+
   const hydrated = useRef<boolean>(false);
 
   useEffect(() => {
     const storage: Nullable<chrome.storage.StorageArea> = chrome.storage?.local;
 
+    // No `storage` permission / API unavailable — run session-only rather than crash the panel.
     if (!storage) {
-      // No `storage` permission / API unavailable — run session-only rather than crash the panel.
       hydrated.current = true;
 
       return;
@@ -62,7 +65,7 @@ export function useLayout(): { layout: PanelLayout; actions: LayoutActions } {
         }
       })
       .catch(() => {
-        // Storage unavailable (e.g. permissions) — fall back to in-memory defaults.
+        /* Storage unavailable (e.g. permissions) — fall back to in-memory defaults. */
       })
       .finally(() => {
         if (!ignore) {

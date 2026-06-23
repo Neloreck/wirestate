@@ -100,9 +100,9 @@ export function ResizeHandle({
 
   return (
     <div
+      className={`group relative flex-none ${strip}`}
       role={"separator"}
       aria-orientation={orientation === "x" ? "vertical" : "horizontal"}
-      className={`group relative flex-none ${strip}`}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={endDrag}
