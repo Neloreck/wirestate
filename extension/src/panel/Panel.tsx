@@ -55,7 +55,9 @@ export function Panel() {
           onCommit={layoutActions.setNavFraction}
         />
 
-        <Detail selection={state.selection} actions={actions} />
+        <section className={"flex-1 overflow-auto p-3"}>
+          <Detail selection={state.selection} actions={actions} />
+        </section>
       </div>
 
       {layout.timelineOpen ? (

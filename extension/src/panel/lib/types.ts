@@ -2,7 +2,9 @@ import { type DevtoolsEvent, type DevtoolsMessageChannel } from "@wirestate/core
 
 import { type Optional } from "@/types/general";
 
-/** The kinds of timeline delta the panel can filter by. */
+/**
+ * The kinds of timeline delta the panel can filter by.
+ */
 export type EventKind = Exclude<DevtoolsEvent["kind"], "messageResult">;
 
 /**
@@ -16,7 +18,9 @@ export type Selection =
   | { readonly kind: "binding"; readonly containerId: number; readonly token: string }
   | { readonly kind: "plugin"; readonly containerId: number; readonly name: string };
 
-/** The Timeline's independent filter state (single-select per dimension; `undefined` = all). */
+/**
+ * The Timeline's independent filter state (single-select per dimension; `undefined` = all).
+ */
 export interface TimelineFilter {
   readonly rootId: Optional<number>;
   readonly containerId: Optional<number>;
@@ -28,20 +32,20 @@ export interface TimelineFilter {
 /**
  * True when two selections point at the same entity (used to detect a survived selection).
  *
- * @param a - First selection.
- * @param b - Second selection.
+ * @param first - First selection.
+ * @param second - Second selection.
  * @returns Whether the two selections point at the same entity.
  */
-export function isSameSelection(a: Selection, b: Selection): boolean {
-  if (a.kind !== b.kind || a.containerId !== b.containerId) {
+export function isSameSelection(first: Selection, second: Selection): boolean {
+  if (first.kind !== second.kind || first.containerId !== second.containerId) {
     return false;
   }
 
-  switch (a.kind) {
+  switch (first.kind) {
     case "binding":
-      return b.kind === "binding" && a.token === b.token;
+      return second.kind === "binding" && first.token === second.token;
     case "plugin":
-      return b.kind === "plugin" && a.name === b.name;
+      return second.kind === "plugin" && first.name === second.name;
     case "container":
       return true;
   }

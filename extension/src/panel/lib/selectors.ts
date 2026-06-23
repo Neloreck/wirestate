@@ -14,21 +14,27 @@ import { getDevtoolsEventSummary } from "@/panel/lib/format";
 import { type Selection, type TimelineFilter } from "@/panel/lib/types";
 import { type Optional } from "@/types/general";
 
-/** One container plus its nested child containers, for the Navigator tree. */
+/**
+ * One container plus its nested child containers, for the Navigator tree.
+ */
 export interface ContainerNodeModel {
   readonly rootId: number;
   readonly container: DevtoolsContainerSnapshot;
   readonly children: ReadonlyArray<ContainerNodeModel>;
 }
 
-/** A root with a derived display label and its top-level container nodes. */
+/**
+ * A root with a derived display label and its top-level container nodes.
+ */
 export interface RootModel {
   readonly rootId: number;
   readonly label: string;
   readonly nodes: ReadonlyArray<ContainerNodeModel>;
 }
 
-/** The entity a {@link Selection} resolves to against the current snapshot. */
+/**
+ * The entity a {@link Selection} resolves to against the current snapshot.
+ */
 export type ResolvedEntity =
   | { readonly kind: "container"; readonly container: DevtoolsContainerSnapshot }
   | { readonly kind: "binding"; readonly container: DevtoolsContainerSnapshot; readonly binding: DevtoolsBinding }

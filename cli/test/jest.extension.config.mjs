@@ -16,7 +16,7 @@ export default {
   roots: ["<rootDir>/extension/src"],
   testEnvironment: "node",
   transform: {
-    "^.+\\.[tj]sx?$": swcTransform({ legacyDecorator: false, decoratorVersion: "2023-11" }),
+    "^.+\\.[tj]sx?$": swcTransform({ legacyDecorator: true }),
   },
   transformIgnorePatterns: ["node_modules/.pnpm/(?!@preact|@lit-labs|@adobe|lit|lit-html|@lit)"],
   moduleNameMapper: {

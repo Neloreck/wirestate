@@ -23,7 +23,7 @@ import { type Optional } from "@/types/general";
 
 import { DetailFilterToContainerButton } from "./DetailFilterToContainerButton";
 import { DetailInstanceSections } from "./DetailInstanceSections";
-import { DetailStateTree, type ValueReader } from "./DetailStateTree";
+import { DetailStateTree } from "./DetailStateTree";
 import { DetailStatusTag } from "./DetailStatusTag";
 
 interface DetailBindingProps {
@@ -53,14 +53,17 @@ export function DetailBinding({
 }: DetailBindingProps) {
   const status: BindingStatus = getBindingStatus(container, binding);
   const isValue: boolean = binding.type === BindingType.Value;
-  const realizes: boolean = mayRealizeInstance(binding);
-  const instance: Optional<DevtoolsInstance> = realizes ? realizingInstance(container, binding) : undefined;
+  const canRealizeInstance: boolean = mayRealizeInstance(binding);
+  const instance: Optional<DevtoolsInstance> = canRealizeInstance ? realizingInstance(container, binding) : undefined;
   const rootId: Optional<number> = rootIdOfContainer(roots, container.containerId);
 
   // Only a `Value` binding carries an inspectable raw value;
   // memoized per (root, binding) so each value-tree node doesn't refetch on every parent re-render.
-  const readValue: Optional<ValueReader> = useMemo(
-    () => (!isValue || rootId === undefined ? undefined : (path) => inspectBinding(rootId, binding.bindingId, path)),
+  const readValue = useMemo(
+    () =>
+      !isValue || rootId === undefined
+        ? undefined
+        : (path: ReadonlyArray<string | number>) => inspectBinding(rootId, binding.bindingId, path),
     [isValue, inspectBinding, rootId, binding.bindingId]
   );
 
@@ -117,7 +120,7 @@ export function DetailBinding({
         </Section>
       ) : null}
 
-      {realizes ? (
+      {canRealizeInstance ? (
         instance ? (
           <DetailInstanceSections
             container={container}

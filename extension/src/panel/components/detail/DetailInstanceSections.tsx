@@ -5,7 +5,7 @@ import {
   type DevtoolsMethod,
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import { type InspectFn } from "@/bridge/bridge.messages";
 import { Field, Section, Tag } from "@/panel/components/ui";
@@ -14,7 +14,7 @@ import { getLifecycleHistory, rootIdOfContainer, getTokenOfInstanceId } from "@/
 import { type Optional } from "@/types/general";
 
 import { DetailHistory } from "./DetailHistory";
-import { DetailStateTree, type ValueReader } from "./DetailStateTree";
+import { DetailStateTree } from "./DetailStateTree";
 
 interface DetailInstanceSectionsProps {
   readonly container: DevtoolsContainerSnapshot;
@@ -27,8 +27,7 @@ interface DetailInstanceSectionsProps {
 
 /**
  * The live-instance facet of a realized singleton `Instance` binding: status, declared handlers,
- * methods, on-demand state, and lifecycle history. Rendered inline by {@link BindingDetail} — selection
- * is binding/token-centric, so every cross-link resolves to the binding that realizes the instance.
+ * methods, on-demand state, and lifecycle history.
  */
 export function DetailInstanceSections({
   container,
@@ -38,38 +37,52 @@ export function DetailInstanceSections({
   inspect,
   actions,
 }: DetailInstanceSectionsProps) {
-  const history: ReadonlyArray<DevtoolsEvent> = getLifecycleHistory(log, container.containerId, {
-    instanceId: instance.instanceId,
-    className: instance.className,
-  });
   const status = instance.status;
-  const rootId: Optional<number> = rootIdOfContainer(roots, container.containerId);
 
-  // Memoized per (root, instance) so each state-tree node doesn't refetch on every parent re-render.
-  const readState: Optional<ValueReader> = useMemo(
-    () => (rootId === undefined ? undefined : (path) => inspect(rootId, instance.instanceId, path)),
-    [inspect, rootId, instance.instanceId]
+  const { history, readState } = useMemo(() => {
+    const rootId: Optional<number> = rootIdOfContainer(roots, container.containerId);
+
+    return {
+      history: getLifecycleHistory(log, container.containerId, {
+        instanceId: instance.instanceId,
+        className: instance.className,
+      }),
+      readState:
+        rootId === undefined
+          ? undefined
+          : (path: ReadonlyArray<string | number>) => inspect(rootId, instance.instanceId, path),
+    };
+  }, [container.containerId, instance.className, instance.instanceId, inspect, log, roots]);
+
+  const [methods, handlerChannels] = useMemo(() => {
+    const methods: ReadonlyArray<DevtoolsMethod> = instance.methods ?? [];
+    const handlerChannels: Map<string, Set<string>> = new Map();
+
+    for (const handler of instance.handlers) {
+      const channels: Set<string> = handlerChannels.get(handler.method) ?? new Set();
+
+      channels.add(handler.channel);
+      handlerChannels.set(handler.method, channels);
+    }
+
+    return [methods, handlerChannels];
+  }, [instance.handlers, instance.methods]);
+
+  const selectByInstanceId = useCallback(
+    (containerId: number, instanceId: number): void => {
+      const token: Optional<string> = getTokenOfInstanceId(roots, containerId, instanceId);
+
+      if (token !== undefined) {
+        actions.select({ kind: "binding", containerId, token });
+      }
+    },
+    [roots, actions]
   );
 
-  // Resolve an instance-anchored reference (lifecycle row, or a service field in the state tree) to
-  // the binding that realizes it, then select that binding.
-  function selectByInstanceId(containerId: number, instanceId: number): void {
-    const token: Optional<string> = getTokenOfInstanceId(roots, containerId, instanceId);
-
-    if (token !== undefined) {
-      actions.select({ kind: "binding", containerId, token });
-    }
-  }
-
-  const methods: ReadonlyArray<DevtoolsMethod> = instance.methods ?? [];
-  const handlerChannels: Map<string, Set<string>> = new Map();
-
-  for (const handler of instance.handlers) {
-    const channels: Set<string> = handlerChannels.get(handler.method) ?? new Set();
-
-    channels.add(handler.channel);
-    handlerChannels.set(handler.method, channels);
-  }
+  const onSelectBinding = useCallback(
+    (containerId: number, token: string) => actions.select({ kind: "binding", containerId, token }),
+    [actions]
+  );
 
   return (
     <>
@@ -138,18 +151,11 @@ export function DetailInstanceSections({
       </Section>
 
       <Section title={"state"}>
-        <DetailStateTree
-          read={readState}
-          rootLabel={"state"}
-          onNavigate={(containerId, instanceId) => selectByInstanceId(containerId, instanceId)}
-        />
+        <DetailStateTree read={readState} rootLabel={"state"} onNavigate={selectByInstanceId} />
       </Section>
 
       <Section title={"lifecycle history"}>
-        <DetailHistory
-          events={history}
-          onSelectBinding={(containerId, token) => actions.select({ kind: "binding", containerId, token })}
-        />
+        <DetailHistory events={history} onSelectBinding={onSelectBinding} />
       </Section>
     </>
   );

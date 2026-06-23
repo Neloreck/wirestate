@@ -1,6 +1,6 @@
 import { useInjection } from "@wirestate/react";
 import { observer } from "@wirestate/react-mobx";
-import { type ReactNode, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { LinkButton } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
@@ -18,7 +18,7 @@ interface DetailProps {
 }
 
 /**
- * Detail pane: routes the current selection to its view, with breadcrumb + dead-entity tombstone.
+ * Detail panel: routes the current selection to its view, with breadcrumb + dead-entity tombstone.
  */
 export const Detail = observer(function Detail({ selection, actions }: DetailProps) {
   const bridgeService: BridgeService = useInjection(BridgeService);
@@ -32,14 +32,13 @@ export const Detail = observer(function Detail({ selection, actions }: DetailPro
     }
   });
 
-  let content: ReactNode;
-
   if (!selection) {
-    content = <p className={"text-fg-muted"}>Select a container, instance, binding, or plugin in the Navigator.</p>;
+    return <p className={"text-fg-muted"}>Select a container, instance, binding, or plugin in the Navigator.</p>;
   } else if (resolved) {
-    content = (
+    return (
       <>
         <DetailBreadcrumb resolved={resolved} actions={actions} />
+
         <DetailResolvedView
           resolved={resolved}
           roots={bridgeService.roots}
@@ -52,10 +51,10 @@ export const Detail = observer(function Detail({ selection, actions }: DetailPro
     );
   } else {
     // Selection is no longer live -> tombstone. Freeze the last-known view (dimmed) if it matches.
-    const isDead: Optional<ResolvedEntity> =
+    const deadEntry: Optional<ResolvedEntity> =
       cache.current && isSameSelection(cache.current.selection, selection) ? cache.current.resolved : undefined;
 
-    content = (
+    return (
       <div className={"space-y-3"}>
         <div
           className={
@@ -68,10 +67,10 @@ export const Detail = observer(function Detail({ selection, actions }: DetailPro
           </div>
         </div>
 
-        {isDead ? (
+        {deadEntry ? (
           <div className={"pointer-events-none opacity-60"}>
             <DetailResolvedView
-              resolved={isDead}
+              resolved={deadEntry}
               roots={bridgeService.roots}
               log={bridgeService.log}
               actions={actions}
@@ -83,6 +82,4 @@ export const Detail = observer(function Detail({ selection, actions }: DetailPro
       </div>
     );
   }
-
-  return <section className={"flex-1 overflow-auto p-3"}>{content}</section>;
 });
