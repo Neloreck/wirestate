@@ -4,15 +4,9 @@ import { observer } from "@wirestate/react-mobx";
 import { useEffect, useMemo, useRef } from "react";
 
 import { type PanelActions, type PanelUi, type TimelineFilter } from "@/panel/hooks/use-panel-state";
+import { type RootModel, buildRoots } from "@/panel/lib/container-tree";
+import { type CollapsedRow, buildMessageResults, collapseTimeline, filterLogBy } from "@/panel/lib/deltas";
 import { timestampOfDevtoolsEvent } from "@/panel/lib/format";
-import {
-  type CollapsedRow,
-  type RootModel,
-  buildMessageResults,
-  buildRoots,
-  collapseTimeline,
-  filterLogBy,
-} from "@/panel/lib/selectors";
 import { BridgeService } from "@/panel/services/bridge.service";
 import { type Optional } from "@/types/general";
 

@@ -11,14 +11,9 @@ import { useCallback, useMemo } from "react";
 import { type InspectBindingFn, type InspectFn } from "@/bridge/bridge.messages";
 import { Field, Section, Tag } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import {
-  BindingStatus,
-  getBindingStatus,
-  mayRealizeInstance,
-  realizingInstance,
-  rootIdOfContainer,
-  getTokenOfInstanceId,
-} from "@/panel/lib/selectors";
+import { BindingStatus, getBindingStatus, mayRealizeInstance, realizingInstance } from "@/panel/lib/binding";
+import { rootIdOfContainer } from "@/panel/lib/container-tree";
+import { getTokenOfInstanceId } from "@/panel/lib/selection";
 import { type Optional } from "@/types/general";
 
 import { DetailFilterToContainerButton } from "./DetailFilterToContainerButton";

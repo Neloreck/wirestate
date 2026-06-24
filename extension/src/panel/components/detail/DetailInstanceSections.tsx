@@ -10,7 +10,9 @@ import { useCallback, useMemo } from "react";
 import { type InspectFn } from "@/bridge/bridge.messages";
 import { Field, Section, Tag } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { getLifecycleHistory, rootIdOfContainer, getTokenOfInstanceId } from "@/panel/lib/selectors";
+import { rootIdOfContainer } from "@/panel/lib/container-tree";
+import { getLifecycleHistory } from "@/panel/lib/deltas";
+import { getTokenOfInstanceId } from "@/panel/lib/selection";
 import { type Optional } from "@/types/general";
 
 import { DetailHistory } from "./DetailHistory";

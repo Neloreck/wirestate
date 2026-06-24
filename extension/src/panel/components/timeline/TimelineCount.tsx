@@ -3,7 +3,7 @@ import { observer } from "@wirestate/react-mobx";
 import { useMemo } from "react";
 
 import { type TimelineFilter } from "@/panel/hooks/use-panel-state";
-import { filterLogBy } from "@/panel/lib/selectors";
+import { filterLogBy } from "@/panel/lib/deltas";
 import { BridgeService } from "@/panel/services/bridge.service";
 
 interface TimelineCountProps {

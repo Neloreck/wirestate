@@ -9,7 +9,9 @@ import { useCallback } from "react";
 import { cn } from "@/lib/class-name";
 import { Field, LinkButton, Section, Tag } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { BindingStatus, getBindingStatus, childContainers, getLifecycleHistory } from "@/panel/lib/selectors";
+import { BindingStatus, getBindingStatus } from "@/panel/lib/binding";
+import { childContainers } from "@/panel/lib/container-tree";
+import { getLifecycleHistory } from "@/panel/lib/deltas";
 
 import { DetailFilterToContainerButton } from "./DetailFilterToContainerButton";
 import { DetailHistory } from "./DetailHistory";

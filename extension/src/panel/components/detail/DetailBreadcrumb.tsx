@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import { LinkButton } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { type ResolvedEntity } from "@/panel/lib/selectors";
+import { type ResolvedEntity } from "@/panel/lib/selection";
 
 interface DetailBreadcrumbProps {
   readonly resolved: ResolvedEntity;

@@ -2,7 +2,7 @@ import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/d
 
 import { type InspectBindingFn, type InspectFn } from "@/bridge/bridge.messages";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
-import { type ResolvedEntity } from "@/panel/lib/selectors";
+import { type ResolvedEntity } from "@/panel/lib/selection";
 
 import { DetailBinding } from "./DetailBinding";
 import { DetailContainer } from "./DetailContainer";

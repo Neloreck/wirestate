@@ -3,8 +3,8 @@ import { observer } from "@wirestate/react-mobx";
 import { useMemo } from "react";
 
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
+import { type RootModel, buildRoots } from "@/panel/lib/container-tree";
 import { type Selection } from "@/panel/lib/selection";
-import { type RootModel, buildRoots } from "@/panel/lib/selectors";
 import { BridgeService } from "@/panel/services/bridge.service";
 import { type Optional } from "@/types/general";
 

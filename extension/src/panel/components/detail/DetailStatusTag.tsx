@@ -1,5 +1,5 @@
 import { Tag } from "@/panel/components/ui";
-import { BindingStatus } from "@/panel/lib/selectors";
+import { BindingStatus } from "@/panel/lib/binding";
 
 interface DetailStatusTagProps {
   readonly status: BindingStatus;
