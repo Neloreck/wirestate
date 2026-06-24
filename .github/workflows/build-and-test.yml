@@ -43,7 +43,7 @@ jobs:
           restore-keys: |
             eslint-${{ hashFiles('eslint.config.mjs', 'pnpm-lock.yaml') }}-
 
-      - run: pnpm lint --cache
+      - run: pnpm lint --cache --cache-strategy content
 
       - run: pnpm format:check
 
