@@ -151,8 +151,8 @@ export class Container extends ContainerKernel {
    * Adds the lifecycle-aware guard the pure kernel cannot carry (ADR 0004): a
    * `Transient` instance binding must declare no wirestate lifecycle or messaging
    * handlers, since the container never owns the fresh-per-resolution instance for
-   * them to fire against. Every other binding passes straight through to
-   * {@link ContainerKernel.bind}.
+   * them to fire against. Every other binding passes straight through to the
+   * kernel's `bind`.
    *
    * @param binding - Service class or binding descriptor to register.
    * @returns The same container for chaining.
