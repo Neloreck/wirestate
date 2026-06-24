@@ -6,6 +6,7 @@ import {
   CommandsPlugin,
   QueriesPlugin,
 } from "@wirestate/core";
+import { DevToolsPlugin } from "@wirestate/core/devtools";
 import { ContainerProvider } from "@wirestate/react";
 import { type PropsWithChildren, useMemo } from "react";
 
@@ -33,7 +34,12 @@ export function Provider({ children }: PropsWithChildren) {
           scope: BindingScope.Singleton,
         },
       ],
-      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
+      plugins: [
+        new EventsPlugin(),
+        new CommandsPlugin(),
+        new QueriesPlugin(),
+        ...(import.meta.env.DEV ? [new DevToolsPlugin({ label: "Wirestate — React + Signals" })] : []),
+      ],
     }),
     [],
   );

@@ -5,6 +5,7 @@ import "@/components/events-log";
 import "@/components/queries-data";
 
 import { BindingType, BindingScope, EventsPlugin, CommandsPlugin, QueriesPlugin } from "@wirestate/core";
+import { DevToolsPlugin } from "@wirestate/core/devtools";
 import { ContainerProvider, provideContainer } from "@wirestate/lit";
 import { LitElement, html, CSSResult, TemplateResult, css } from "lit";
 import { customElement } from "lit/decorators.js";
@@ -101,7 +102,12 @@ export class Application extends LitElement {
           scope: BindingScope.Singleton,
         },
       ],
-      plugins: [new EventsPlugin(), new CommandsPlugin(), new QueriesPlugin()],
+      plugins: [
+        new EventsPlugin(),
+        new CommandsPlugin(),
+        new QueriesPlugin(),
+        ...(import.meta.env.DEV ? [new DevToolsPlugin({ label: "Wirestate — Lit + MobX" })] : []),
+      ],
     },
   })
   public readonly containerProvider!: ContainerProvider;
