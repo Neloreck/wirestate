@@ -1,4 +1,10 @@
-import { mockBinding, mockContainerSnapshot, mockInstance, mockPluginInfo, mockRootSnapshot } from "@/fixtures/devtools";
+import {
+  mockBinding,
+  mockContainerSnapshot,
+  mockInstance,
+  mockPluginInfo,
+  mockRootSnapshot,
+} from "@/fixtures/devtools";
 
 import { getTokenOfInstanceId, isSameSelection, resolveSelection } from "@/panel/lib/selection";
 
