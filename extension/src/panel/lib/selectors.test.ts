@@ -45,9 +45,9 @@ describe("buildRoots", () => {
     expect(built).toHaveLength(1);
     expect(built[0].nodes.map((node) => node.container.containerId).sort()).toEqual([1, 4]);
 
-    const c1 = built[0].nodes.find((node) => node.container.containerId === 1);
+    const containerNode = built[0].nodes.find((node) => node.container.containerId === 1);
 
-    expect(c1?.children.map((child) => child.container.containerId).sort()).toEqual([2, 3]);
+    expect(containerNode?.children.map((child) => child.container.containerId).sort()).toEqual([2, 3]);
   });
 
   it("derives a label with id and container count", () => {
@@ -100,38 +100,44 @@ describe("derived links", () => {
   });
 
   it("realizingInstance matches by token name or implementation class", () => {
-    const c = mockContainerSnapshot(1, null, { instances: [mockInstance("SvcImpl", "Svc")] });
+    const containerSnapshot = mockContainerSnapshot(1, null, {
+      instances: [mockInstance("ServiceImplementation", "Service")],
+    });
 
-    expect(realizingInstance(c, mockBinding("Svc"))?.className).toBe("SvcImpl");
-    expect(realizingInstance(c, mockBinding("Other", "SvcImpl"))?.className).toBe("SvcImpl");
-    expect(realizingInstance(c, mockBinding("None", "Nope"))).toBeUndefined();
+    expect(realizingInstance(containerSnapshot, mockBinding("Service"))?.className).toBe("ServiceImplementation");
+    expect(realizingInstance(containerSnapshot, mockBinding("Other", "ServiceImplementation"))?.className).toBe(
+      "ServiceImplementation"
+    );
+    expect(realizingInstance(containerSnapshot, mockBinding("None", "Nope"))).toBeUndefined();
   });
 
   it("mayRealizeInstance is true only for singleton instance bindings", () => {
-    const make = (type: DevtoolsBinding["type"], scope: DevtoolsBinding["scope"]): DevtoolsBinding => ({
+    const mockBinding = (type: DevtoolsBinding["type"], scope: DevtoolsBinding["scope"]): DevtoolsBinding => ({
       bindingId: 1,
-      token: { name: "Svc", kind: "class" },
+      token: { name: "Service", kind: "class" },
       type,
       scope,
       implementation: undefined,
     });
 
-    expect(mayRealizeInstance(make("Instance", "Singleton"))).toBe(true);
-    expect(mayRealizeInstance(make("Instance", "Transient"))).toBe(false);
-    expect(mayRealizeInstance(make("Factory", "Singleton"))).toBe(false);
-    expect(mayRealizeInstance(make("Value", "Singleton"))).toBe(false);
+    expect(mayRealizeInstance(mockBinding("Instance", "Singleton"))).toBe(true);
+    expect(mayRealizeInstance(mockBinding("Instance", "Transient"))).toBe(false);
+    expect(mayRealizeInstance(mockBinding("Factory", "Singleton"))).toBe(false);
+    expect(mayRealizeInstance(mockBinding("Value", "Singleton"))).toBe(false);
   });
 });
 
 describe("bindingStatus", () => {
   const value: DevtoolsBinding = {
     bindingId: 1,
-    token: { name: "cfg", kind: "string" },
+    token: { name: "config", kind: "string" },
     type: "Value",
     scope: "Singleton",
     implementation: undefined,
   };
-  const singleton = mockBinding("Svc"); // mockBinding builds an Instance/Singleton binding
+
+  // mockBinding builds an Instance/Singleton binding
+  const singleton = mockBinding("Service");
 
   it("is 'none' for a non-instance binding (Value/Factory/Transient)", () => {
     expect(getBindingStatus(mockContainerSnapshot(1), value)).toBe("none");
@@ -142,14 +148,14 @@ describe("bindingStatus", () => {
   });
 
   it("is 'active' when the realizing instance is live", () => {
-    const container = mockContainerSnapshot(1, null, { instances: [mockInstance("Svc")] });
+    const container = mockContainerSnapshot(1, null, { instances: [mockInstance("Service")] });
 
     expect(getBindingStatus(container, singleton)).toBe("active");
   });
 
   it("is 'inactive' when the realizing instance is inactive", () => {
     const inactive = {
-      ...mockInstance("Svc"),
+      ...mockInstance("Service"),
       status: { isDeactivated: true, isDeprovisioned: true, isInactive: true, provisionId: null },
     };
     const container = mockContainerSnapshot(1, null, { instances: [inactive] });
@@ -160,11 +166,11 @@ describe("bindingStatus", () => {
 
 describe("tokenOfInstanceId", () => {
   const roots = [
-    mockRootSnapshot(1, [mockContainerSnapshot(1, null, { instances: [mockInstance("SvcImpl", "Svc", 7)] })]),
+    mockRootSnapshot(1, [mockContainerSnapshot(1, null, { instances: [mockInstance("SvcImpl", "Service", 7)] })]),
   ];
 
   it("maps an instance id to its realizing binding's token", () => {
-    expect(getTokenOfInstanceId(roots, 1, 7)).toBe("Svc");
+    expect(getTokenOfInstanceId(roots, 1, 7)).toBe("Service");
   });
 
   it("is undefined for an unknown instance or container", () => {
