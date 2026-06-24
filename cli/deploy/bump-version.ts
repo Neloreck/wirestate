@@ -1,4 +1,7 @@
+import * as fs from "node:fs";
 import * as process from "node:process";
+
+import { CHANGELOG_PATH } from "../config/build.constants";
 
 import {
   type PackageRecord,
@@ -9,6 +12,28 @@ import {
   resolveNextVersion,
   writeVersion,
 } from "./bump-version.utils";
+import { finalizeChangelog, isStableVersion } from "./changelog.utils";
+
+function getToday(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function finalizeChangelogForRelease(version: string, dryRun: boolean): void {
+  if (!isStableVersion(version)) {
+    console.log(`Leaving CHANGELOG.md [Unreleased] in place (prerelease ${version}).`);
+
+    return;
+  }
+
+  const source = fs.readFileSync(CHANGELOG_PATH, "utf8");
+  const updated = finalizeChangelog(source, version, getToday());
+
+  if (!dryRun) {
+    fs.writeFileSync(CHANGELOG_PATH, updated);
+  }
+
+  console.log(`Finalized CHANGELOG.md [Unreleased] -> [${version}]${dryRun ? " (dry run)" : ""}`);
+}
 
 if (require.main === module) {
   try {
@@ -42,6 +67,8 @@ if (require.main === module) {
 
       console.log(`- ${pkg.displayName}`);
     }
+
+    finalizeChangelogForRelease(nextVersion, dryRun);
   } catch (error) {
     console.error(error instanceof Error ? error.message : error);
     process.exit(1);

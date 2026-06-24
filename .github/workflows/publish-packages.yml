@@ -12,7 +12,7 @@ on:
         default: true
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 concurrency:
@@ -62,3 +62,31 @@ jobs:
 
       - name: Publish packages
         run: pnpm ${{ env.PUBLISH_SCRIPT }}
+
+      - name: Resolve published version
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> "${GITHUB_OUTPUT}"
+
+      - name: Tag the published commit
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git rev-parse "v${VERSION}" >/dev/null 2>&1; then
+            echo "Tag v${VERSION} already exists; skipping."
+            exit 0
+          fi
+
+          git tag -a "v${VERSION}" -m "v${VERSION}"
+          git push origin "v${VERSION}"
+
+      - name: Create GitHub release from changelog
+        if: ${{ !inputs.experimental }}
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pnpm tsx cli/deploy/print-release-notes.ts "${VERSION}" > release-notes.md
+          gh release create "v${VERSION}" --title "v${VERSION}" --notes-file release-notes.md

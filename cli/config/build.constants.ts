@@ -1,6 +1,8 @@
 import * as path from "node:path";
 
-export const EXTERNAL_DEPENDENCIES = [
+export const REPOSITORY_URL: string = "https://github.com/Neloreck/wirestate";
+
+export const EXTERNAL_DEPENDENCIES: Array<string> = [
   "@adobe/lit-mobx",
   "@lit-labs/preact-signals",
   "@lit/context",
@@ -23,11 +25,11 @@ export const EXTERNAL_DEPENDENCIES = [
   "react",
 ];
 
-export const PROJECT_ROOT = path.resolve(__dirname, "../..");
-export const TARGET_ROOT = path.resolve(PROJECT_ROOT, "./target");
-export const PKG_ROOT = path.resolve(TARGET_ROOT, "./pkg");
+export const PROJECT_ROOT: string = path.resolve(__dirname, "../..");
+export const TARGET_ROOT: string = path.resolve(PROJECT_ROOT, "./target");
+export const PKG_ROOT: string = path.resolve(TARGET_ROOT, "./pkg");
 
-export const DIST_ROOT = path.resolve(TARGET_ROOT, "./dist");
-export const STATS_ROOT = path.resolve(DIST_ROOT, "./stats");
+export const DIST_ROOT: string = path.resolve(TARGET_ROOT, "./dist");
+export const CHANGELOG_PATH: string = path.resolve(PROJECT_ROOT, "CHANGELOG.md");
 
-export const SRC_PATH = path.resolve(PROJECT_ROOT, "./src");
+export const SRC_PATH: string = path.resolve(PROJECT_ROOT, "./src");
