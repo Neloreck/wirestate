@@ -32,14 +32,17 @@ export const Timeline = observer(function Timeline({ filter, ui, actions }: Time
   const bridgeService: BridgeService = useInjection(BridgeService);
 
   const roots: ReadonlyArray<RootModel> = useMemo(() => buildRoots(bridgeService.roots), [bridgeService.roots]);
+
   const containerIds: ReadonlyArray<number> = useMemo(
     () => bridgeService.roots.flatMap((root) => root.containers.map((container) => container.containerId)),
     [bridgeService.roots]
   );
+
   const events: ReadonlyArray<DevtoolsEvent> = useMemo(
     () => filterLogBy(bridgeService.log, filter),
     [bridgeService.log, filter]
   );
+
   const results: ReadonlyMap<number, DevtoolsMessageResultEvent> = useMemo(
     () => buildMessageResults(bridgeService.log),
     [bridgeService.log]

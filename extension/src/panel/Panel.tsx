@@ -60,7 +60,7 @@ export function Panel() {
         </section>
       </div>
 
-      {layout.timelineOpen ? (
+      {layout.isTimelineOpen ? (
         <ResizeHandle
           orientation={"horizontal"}
           controls={"end"}
@@ -73,18 +73,18 @@ export function Panel() {
       ) : null}
 
       <div
-        className={cn("flex min-h-0 flex-col", layout.timelineOpen ? null : "border-t border-divider")}
-        style={layout.timelineOpen ? styles.timeline : undefined}
+        className={cn("flex min-h-0 flex-col", layout.isTimelineOpen ? null : "border-t border-divider")}
+        style={layout.isTimelineOpen ? styles.timeline : undefined}
       >
         <button
           type={"button"}
           onClick={layoutActions.toggleTimeline}
           className={"flex items-center gap-1 bg-elevated px-2.5 py-0.5 text-left text-fg-muted"}
         >
-          {layout.timelineOpen ? "▾" : "▸"} Timeline <TimelineCount filter={state.filter} />
+          {layout.isTimelineOpen ? "▾" : "▸"} Timeline <TimelineCount filter={state.filter} />
         </button>
 
-        {layout.timelineOpen ? (
+        {layout.isTimelineOpen ? (
           <div className={"min-h-0 flex-1"}>
             <Timeline filter={state.filter} ui={state.ui} actions={actions} />
           </div>

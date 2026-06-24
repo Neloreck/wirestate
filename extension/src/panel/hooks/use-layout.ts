@@ -2,19 +2,22 @@ import { useEffect, useRef, useState } from "react";
 
 import { type Nullable } from "@/types/general";
 
-/** Spatial layout of the panel: pane sizes (as fractions of their container) + Timeline open state. */
+const DEVTOOLS_LAYOUT_STORAGE_KEY: string = "wirestate.devtools.layout";
+
+/**
+ * Spatial layout of the panel: panel sizes (as fractions of their container) + timeline state.
+ */
 export interface PanelLayout {
-  /** Navigator width as a fraction (0–1) of the master/detail row. */
   readonly navFraction: number;
-  /** Timeline dock height as a fraction (0–1) of the panel column. */
   readonly timelineFraction: number;
-  readonly timelineOpen: boolean;
+  readonly isTimelineOpen: boolean;
 }
 
-const STORAGE_KEY = "wirestate.devtools.layout";
-
-/** Stable API over the layout state. Sizes commit on drag release; toggle flips the dock. */
-export interface LayoutActions {
+/**
+ * Stable API over the layout state. Sizes commit on drag release.
+ * Toggle flips the dock.
+ */
+export interface PanelLayoutActions {
   setNavFraction(fraction: number): void;
   setTimelineFraction(fraction: number): void;
   toggleTimeline(): void;
@@ -23,42 +26,37 @@ export interface LayoutActions {
 /**
  * Owns the panel's spatial layout and persists it to `chrome.storage.local`.
  *
- * Load is a guarded mount effect (a late resolve after unmount is ignored); first paint uses
- * DEFAULTS and snaps once when storage resolves. Save is a separate effect gated on `hydrated`, so
- * the initial default render never clobbers a saved layout before the load lands. Actions are pure
- * functional updaters — no I/O in the reducer path — keeping the effect the single writer.
- *
  * @returns The current layout and a stable actions API for resizing the panes and toggling the dock.
  */
-export function useLayout(): { layout: PanelLayout; actions: LayoutActions } {
+export function useLayout(): { layout: PanelLayout; actions: PanelLayoutActions } {
   const [layout, setLayout] = useState<PanelLayout>(() => ({
-    navFraction: 0.42,
+    navFraction: 0.4,
     timelineFraction: 0.4,
-    timelineOpen: true,
+    isTimelineOpen: true,
   }));
 
-  const hydrated = useRef<boolean>(false);
+  const isHydratedRef = useRef<boolean>(false);
 
   useEffect(() => {
     const storage: Nullable<chrome.storage.StorageArea> = chrome.storage?.local;
 
     // No `storage` permission / API unavailable — run session-only rather than crash the panel.
     if (!storage) {
-      hydrated.current = true;
+      isHydratedRef.current = true;
 
       return;
     }
 
-    let ignore = false;
+    let cancelled: boolean = false;
 
     storage
-      .get(STORAGE_KEY)
+      .get(DEVTOOLS_LAYOUT_STORAGE_KEY)
       .then((stored) => {
-        if (ignore) {
+        if (cancelled) {
           return;
         }
 
-        const saved = stored[STORAGE_KEY] as Partial<PanelLayout> | undefined;
+        const saved = stored[DEVTOOLS_LAYOUT_STORAGE_KEY] as Partial<PanelLayout> | undefined;
 
         if (saved) {
           setLayout((current) => ({ ...current, ...saved }));
@@ -68,32 +66,32 @@ export function useLayout(): { layout: PanelLayout; actions: LayoutActions } {
         /* Storage unavailable (e.g. permissions) — fall back to in-memory defaults. */
       })
       .finally(() => {
-        if (!ignore) {
-          hydrated.current = true;
+        if (!cancelled) {
+          isHydratedRef.current = true;
         }
       });
 
     return () => {
-      ignore = true;
+      cancelled = true;
     };
   }, []);
 
   useEffect(() => {
     const storage: Nullable<chrome.storage.StorageArea> = chrome.storage?.local;
 
-    if (!hydrated.current || !storage) {
+    if (!isHydratedRef.current || !storage) {
       return;
     }
 
-    storage.set({ [STORAGE_KEY]: layout }).catch(() => {
-      // Best-effort persistence; a failed write just means this session won't be remembered.
+    storage.set({ [DEVTOOLS_LAYOUT_STORAGE_KEY]: layout }).catch(() => {
+      /* Storage unavailable (e.g. permissions) — safe to fail. */
     });
   }, [layout]);
 
-  const actions: LayoutActions = useRef<LayoutActions>({
+  const actions: PanelLayoutActions = useRef<PanelLayoutActions>({
     setNavFraction: (navFraction) => setLayout((current) => ({ ...current, navFraction })),
     setTimelineFraction: (timelineFraction) => setLayout((current) => ({ ...current, timelineFraction })),
-    toggleTimeline: () => setLayout((current) => ({ ...current, timelineOpen: !current.timelineOpen })),
+    toggleTimeline: () => setLayout((current) => ({ ...current, isTimelineOpen: !current.isTimelineOpen })),
   }).current;
 
   return { layout, actions };
