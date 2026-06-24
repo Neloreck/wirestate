@@ -11,25 +11,24 @@ packages:
   - 'src/wirestate-react-mobx'
   - 'src/wirestate-react-signals'
   - 'src/wirestate-signals'
+
 autoInstallPeers: false
+
 allowBuilds:
   '@swc/core': true
   core-js: true
   esbuild: true
   unrs-resolver: true
+
 overrides:
   '@types/react': 19.2.15
   '@types/react-dom': 19.2.3
   react: 19.2.6
   react-dom: 19.2.6
+
+minimumReleaseAge: 1440 # minutes (1 day)
 minimumReleaseAgeExclude:
-  - pnpm@11.1.3
-  - '@wirestate/core'
-  - '@wirestate/lit'
-  - '@wirestate/lit-mobx'
-  - '@wirestate/lit-signals'
-  - '@wirestate/mobx'
-  - '@wirestate/react'
-  - '@wirestate/react-mobx'
-  - '@wirestate/react-signals'
-  - '@wirestate/signals'
+  - '@wirestate/*'
+  - rolldown
+  - '@rolldown/*'
+  - '@napi-rs/wasm-runtime'

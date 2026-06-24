@@ -1,4 +1,8 @@
 export default {
+  assumptions: {
+    setPublicClassFields: true,
+    privateFieldsAsProperties: true,
+  },
   presets: [
     [
       "@babel/preset-env",
@@ -7,7 +11,6 @@ export default {
           node: "current",
         },
         modules: false,
-        loose: true,
       },
     ],
     "@babel/preset-typescript",
@@ -15,10 +18,10 @@ export default {
   ],
   plugins: [
     "@babel/plugin-transform-modules-commonjs",
-    ["@babel/plugin-proposal-decorators", { legacy: true }],
-    ["@babel/plugin-transform-class-properties", { loose: true }],
-    ["@babel/plugin-transform-private-methods", { loose: true }],
-    ["@babel/plugin-transform-private-property-in-object", { loose: true }],
+    ["@babel/plugin-proposal-decorators", { version: "legacy" }],
+    "@babel/plugin-transform-class-properties",
+    "@babel/plugin-transform-private-methods",
+    "@babel/plugin-transform-private-property-in-object",
     [
       "module-resolver",
       {
