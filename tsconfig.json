@@ -31,12 +31,6 @@
     "types": ["node", "jest"],
     "verbatimModuleSyntax": true
   },
-  "ts-node": {
-    "comment": "cli/* deploy scripts run through ts-node as CommonJS;",
-    "compilerOptions": {
-      "verbatimModuleSyntax": false
-    }
-  },
   "exclude": ["node_modules"],
   "include": ["src/"]
 }

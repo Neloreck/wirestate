@@ -1,6 +1,7 @@
 import { type Optional } from "../../types/general";
 
 import {
+  type DevtoolsBindingId,
   type DevtoolsContainerId,
   type DevtoolsEvent,
   type DevtoolsHook,
@@ -15,7 +16,7 @@ import {
  * Global key the in-page inspector backend reads to find the devtools hook.
  *
  * @remarks
- * The property is added to `globalThis` **only** when a {@link DevToolsPlugin} is
+ * The property is added to `globalThis` only when a {@link DevToolsPlugin} is
  * installed (see {@link installDevtoolsHook}). An application that never registers
  * the plugin never touches `globalThis`.
  *
@@ -31,6 +32,16 @@ export const DEVTOOLS_HOOK_KEY = "__WIRESTATE_DEVTOOLS_HOOK__" as const;
 export const DEVTOOLS_PROTOCOL_VERSION = 1 as const;
 
 /**
+ * Maximum number of recent events replayed to a late subscriber.
+ */
+const MAX_REPLAY_EVENTS = 1024;
+
+/**
+ * Headroom the backlog may overgrow before the oldest events are evicted in a single splice.
+ */
+const REPLAY_EVICT_MARGIN = 76;
+
+/**
  * In-page host implementing the devtools hook: owns the registered roots, the subscriber listeners,
  * and the stable id allocators. One instance is created by {@link installDevtoolsHook} and shared by
  * every Wirestate copy on the page (so ids stay consistent across library versions).
@@ -42,12 +53,15 @@ class DevtoolsHookHost implements DevtoolsHook {
 
   private readonly roots: Map<DevtoolsRootId, DevtoolsRootRegister> = new Map();
   private readonly listeners: Set<DevtoolsListener> = new Set();
+  private readonly recent: Array<DevtoolsEvent> = [];
   private readonly containerIds: WeakMap<object, DevtoolsContainerId> = new WeakMap();
   private readonly instanceIds: WeakMap<object, DevtoolsInstanceId> = new WeakMap();
+  private readonly bindingIds: WeakMap<object, DevtoolsBindingId> = new WeakMap();
 
   private nextRootId: DevtoolsRootId = 1;
   private nextContainerId: DevtoolsContainerId = 1;
   private nextInstanceId: DevtoolsInstanceId = 1;
+  private nextBindingId: DevtoolsBindingId = 1;
 
   public registerRoot(register: DevtoolsRootRegister): DevtoolsRootId {
     const rootId: DevtoolsRootId = this.nextRootId++;
@@ -83,13 +97,34 @@ class DevtoolsHookHost implements DevtoolsHook {
     return id;
   }
 
+  public idForBinding(descriptor: object): DevtoolsBindingId {
+    let id: Optional<DevtoolsBindingId> = this.bindingIds.get(descriptor);
+
+    if (id === undefined) {
+      id = this.nextBindingId++;
+      this.bindingIds.set(descriptor, id);
+    }
+
+    return id;
+  }
+
   public emit(event: DevtoolsEvent): void {
+    this.recent.push(event);
+
+    if (this.recent.length >= MAX_REPLAY_EVENTS + REPLAY_EVICT_MARGIN) {
+      this.recent.splice(0, this.recent.length - MAX_REPLAY_EVENTS);
+    }
+
     for (const listener of this.listeners) {
       listener(event);
     }
   }
 
   public subscribe(listener: DevtoolsListener): () => void {
+    for (const event of this.recent.slice(-MAX_REPLAY_EVENTS)) {
+      listener(event);
+    }
+
     this.listeners.add(listener);
 
     return () => {
@@ -102,6 +137,7 @@ class DevtoolsHookHost implements DevtoolsHook {
       rootId,
       snapshot: register.snapshot,
       inspect: register.inspect,
+      inspectBinding: register.inspectBinding,
       serviceRefOf: register.serviceRefOf,
     }));
   }
@@ -111,7 +147,7 @@ class DevtoolsHookHost implements DevtoolsHook {
  * Returns the existing devtools hook on `globalThis`, or installs a fresh one.
  *
  * @remarks
- * The **only** place that writes to `globalThis`. Called from a plugin's `install`,
+ * The only place that writes to `globalThis`. Called from a plugin's `install`,
  * never by core, so the global appears exactly when (and only when) a
  * {@link DevToolsPlugin} is registered. First-installer wins; later plugins reuse it.
  *

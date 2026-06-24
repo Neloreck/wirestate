@@ -1,0 +1,78 @@
+import { useCallback, type MouseEvent, useMemo } from "react";
+
+import { cn } from "@/lib/class-name";
+import { type PanelActions } from "@/panel/hooks/use-panel-state";
+import { type ContainerNodeModel } from "@/panel/lib/container-tree";
+import { type Selection } from "@/panel/lib/selection";
+import { type Optional } from "@/types/general";
+
+interface NavigationContainerNodeProps {
+  readonly node: ContainerNodeModel;
+  readonly depth: number;
+  readonly selection: Optional<Selection>;
+  readonly collapsed: ReadonlySet<number>;
+  readonly actions: PanelActions;
+}
+
+/**
+ * One container row in the Navigator, recursively rendering its child containers.
+ */
+export function NavigationContainerNode({ node, depth, selection, collapsed, actions }: NavigationContainerNodeProps) {
+  const containerId: number = node.container.containerId;
+  const isSelected: boolean = selection?.kind === "container" && selection.containerId === containerId;
+  const isCollapsed: boolean = collapsed.has(containerId);
+  const hasChildren: boolean = node.children.length > 0;
+
+  const style = useMemo(() => ({ paddingLeft: `${depth * 12 + 4}px` }), [depth]);
+
+  const onSelectContainer = useCallback(() => {
+    actions.select({ kind: "container", containerId });
+  }, [actions, containerId]);
+
+  const onCollapseContainer = useCallback(
+    (event: MouseEvent) => {
+      event.stopPropagation();
+      actions.toggleCollapsed(containerId);
+    },
+    [actions, containerId]
+  );
+
+  return (
+    <div>
+      <div
+        className={cn(
+          "flex cursor-pointer items-center gap-1 rounded px-1 py-0.5 hover:bg-hover",
+          isSelected ? "bg-selected" : null
+        )}
+        style={style}
+        onClick={onSelectContainer}
+      >
+        {hasChildren ? (
+          <button className={"w-3 text-fg-muted"} type={"button"} onClick={onCollapseContainer}>
+            {isCollapsed ? "▸" : "▾"}
+          </button>
+        ) : (
+          <span className={"w-3"} />
+        )}
+
+        <span>container #{containerId}</span>
+        <span className={"text-fg-subtle"}>
+          · {node.container.instances.length} inst · {node.container.bindings.length} bind
+        </span>
+      </div>
+
+      {hasChildren && !isCollapsed
+        ? node.children.map((child) => (
+            <NavigationContainerNode
+              key={child.container.containerId}
+              node={child}
+              depth={depth + 1}
+              selection={selection}
+              collapsed={collapsed}
+              actions={actions}
+            />
+          ))
+        : null}
+    </div>
+  );
+}

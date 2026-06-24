@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
+  --color-hover: var(--hover);
+  --color-selected: var(--selected);
+  --color-divider: var(--divider);
+  --color-divider-subtle: var(--divider-subtle);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+}
+
+@theme {
+  --text-2xs: 0.625rem; /* 10px */
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-md: 1rem; /* 16px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-xl: 1.25rem; /* 20px */
+}
+
+:root {
+  color-scheme: light;
+  --surface: #ffffff; /* --sys-color-cdt-base-container */
+  --elevated: #f3f3f3; /* toolbar surface (≈ --ref-palette-neutral94) */
+  --hover: color-mix(in srgb, #1f1f1f 6%, transparent); /* --sys-color-state-hover-on-subtle */
+  --selected: #e8eaed; /* selected row (neutral container) */
+  --divider: #e0e0e0; /* --sys-color-divider (neutral) */
+  --divider-subtle: color-mix(in srgb, #000000 6%, transparent);
+  --fg: #1f1f1f; /* --sys-color-on-surface = --ref-palette-neutral10 */
+  --fg-muted: #474747; /* --sys-color-on-surface-subtle = --ref-palette-neutral30 */
+  --fg-subtle: #757575; /* --sys-color-token-subtle = --ref-palette-neutral50 */
+}
+
+.dark {
+  color-scheme: dark;
+  --surface: #282828; /* --sys-color-cdt-base-container = --ref-palette-neutral15 */
+  --elevated: #2d2f31; /* --sys-color-surface2 (color-mix #d1e1ff 8% + neutral10) */
+  --hover: color-mix(in srgb, #fdfcfb 10%, transparent); /* --sys-color-state-hover-on-subtle (dark) */
+  --selected: #3c3c3c; /* --sys-color-neutral-container = --ref-palette-neutral25 */
+  --divider: #5e5e5e; /* --sys-color-divider = --ref-palette-neutral40 */
+  --divider-subtle: color-mix(in srgb, #ffffff 8%, transparent);
+  --fg: #e3e3e3; /* --sys-color-on-surface = --ref-palette-neutral90 */
+  --fg-muted: #c7c7c7; /* --sys-color-on-surface-subtle = --ref-palette-neutral80 */
+  --fg-subtle: #8f8f8f; /* --sys-color-token-subtle = --ref-palette-neutral60 */
+}

@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "types": ["chrome", "node", "jest"],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@wirestate/core/devtools": ["../src/wirestate-core/devtools.ts"],
+      "@wirestate/react-mobx": ["../src/wirestate-react-mobx/index.ts"],
+      "@wirestate/react": ["../src/wirestate-react/index.ts"],
+      "@wirestate/mobx": ["../src/wirestate-mobx/index.ts"],
+      "@wirestate/core": ["../src/wirestate-core/index.ts"]
+    }
+  },
+  "include": ["src", "vite.config.ts", "manifest.config.ts"]
+}

@@ -1,3 +1,4 @@
+import { type BindingScopeValue, type BindingTypeValue } from "../../binding/binding";
 import { type Nullable, type Optional } from "../../types/general";
 
 /**
@@ -25,6 +26,14 @@ export type DevtoolsContainerId = number;
 export type DevtoolsInstanceId = number;
 
 /**
+ * Identifier for one binding registered on a container. Stable for the binding's lifetime (keyed on
+ * the binding descriptor's object identity) and unique within (and across) containers.
+ *
+ * @group DevTools
+ */
+export type DevtoolsBindingId = number;
+
+/**
  * Normalized, display-ready description of a binding token.
  *
  * @group DevTools
@@ -48,6 +57,11 @@ export interface DevtoolsToken {
  */
 export interface DevtoolsBinding {
   /**
+   * Stable id for this binding — the target of on-demand inspection for `Value` bindings.
+   */
+  readonly bindingId: DevtoolsBindingId;
+
+  /**
    * Token the binding is registered under.
    */
   readonly token: DevtoolsToken;
@@ -55,12 +69,12 @@ export interface DevtoolsBinding {
   /**
    * Construction strategy.
    */
-  readonly type: "Value" | "Instance" | "Factory";
+  readonly type: BindingTypeValue;
 
   /**
    * Lifetime scope.
    */
-  readonly scope: "Singleton" | "Transient";
+  readonly scope: BindingScopeValue;
 
   /**
    * Implementation class name for instance bindings; absent otherwise.
@@ -98,10 +112,6 @@ export interface DevtoolsInstanceStatus {
 /**
  * A message handler/subscriber a service declares via `@OnEvent` / `@OnCommand` /
  * `@OnQuery`.
- *
- * @remarks
- * Reflects **declared** (decorated) handlers only; handlers registered imperatively
- * (`bus.register` / `bus.subscribe`) are not included.
  *
  * @group DevTools
  */
@@ -320,7 +330,7 @@ export type DevtoolsMessageChannel = "event" | "command" | "query";
  * One observed message: an event emitted, or a command/query dispatched.
  *
  * @remarks
- * `payload` and `source` are the **raw** in-page values — the in-page backend
+ * `payload` and `source` are the raw in-page values — the in-page backend
  * serializes them when bridging to the panel.
  *
  * @group DevTools
@@ -362,7 +372,7 @@ export interface DevtoolsMessage {
  * One observed message delta, attributed to the bus-owning container.
  *
  * @remarks
- * Attribution is **bus-scoped**: a message on an inherited bus is attributed to the
+ * Attribution is bus-scoped: a message on an inherited bus is attributed to the
  * container that first tapped that bus (typically the root), not the emitting service.
  *
  * @group DevTools
@@ -412,7 +422,7 @@ export interface DevtoolsMessageResult {
 }
 
 /**
- * A command/query **result** delta, correlated to its dispatch by `messageId` (bus-scoped, like
+ * A command/query result delta, correlated to its dispatch by `messageId` (bus-scoped, like
  * {@link DevtoolsMessageEvent}). Events do not produce results.
  *
  * @group DevTools
@@ -518,7 +528,8 @@ export type DevtoolsEvent =
   | DevtoolsRegistrationEvent;
 
 /**
- * A path from a service instance to a nested value: object keys and array indices.
+ * A path from an inspection root (a service instance or a `Value` binding) to a nested value:
+ * object keys and array indices.
  *
  * @group DevTools
  */
@@ -560,25 +571,33 @@ export interface DevtoolsRootRegister {
   snapshot(): DevtoolsRootSnapshot;
 
   /**
-   * Reads the **raw** live value at `path` within the instance identified by `instanceId`, or
+   * Reads the raw live value at `path` within the instance identified by `instanceId`, or
    * `undefined` when the instance is not in this root. Read-only; the consumer serializes the
-   * result. Absent on a root whose plugin predates on-demand inspection.
+   * result.
    *
    * @param instanceId - Instance to read from.
    * @param path - Object keys / array indices from the instance to the value.
    * @returns The raw value at the path.
    */
-  inspect?(instanceId: DevtoolsInstanceId, path: DevtoolsInspectPath): unknown;
+  inspect(instanceId: DevtoolsInstanceId, path: DevtoolsInspectPath): unknown;
+
+  /**
+   * Reads the raw live value at `path` within the `Value` binding identified by `bindingId`, or.
+   *
+   * @param bindingId - Binding to read from.
+   * @param path - Object keys / array indices from the binding's value to the target.
+   * @returns The raw value at the path.
+   */
+  inspectBinding(bindingId: DevtoolsBindingId, path: DevtoolsInspectPath): unknown;
 
   /**
    * If `value` is a service instance this root tracks, returns a reference to it (so the inspector
    * can mark a field that points at another service and offer a jump); otherwise `undefined`.
-   * Absent on a root whose plugin predates this capability.
    *
    * @param value - The raw value at an inspected field.
    * @returns A service reference, or `undefined` when the value isn't a tracked instance.
    */
-  serviceRefOf?(value: object): Optional<DevtoolsServiceRef>;
+  serviceRefOf(value: object): Optional<DevtoolsServiceRef>;
 }
 
 /**
@@ -650,6 +669,15 @@ export interface DevtoolsHook {
    * @returns The instance's stable id.
    */
   idForInstance(instance: object): DevtoolsInstanceId;
+
+  /**
+   * Allocates (or returns) the stable id for a binding.
+   *
+   * @param descriptor - Binding descriptor to identify; keyed by object identity, so copies from any
+   *   library version share one allocator (and a primitive-valued binding still gets a stable id).
+   * @returns The binding's stable id.
+   */
+  idForBinding(descriptor: object): DevtoolsBindingId;
 
   /**
    * Emits a lifecycle delta to all subscribed backends.

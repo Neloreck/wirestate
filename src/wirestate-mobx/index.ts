@@ -143,7 +143,7 @@ export function Action(): IActionFactory {
  *
  * @returns Action decorator.
  */
-export function BoundAction() {
+export function BoundAction(): typeof action.bound {
   return action.bound;
 }
 
@@ -179,7 +179,7 @@ export function Observable(): IObservableFactory {
  *
  * @returns `observable.shallow` decorator.
  */
-export function ShallowObservable() {
+export function ShallowObservable(): typeof observable.shallow {
   return observable.shallow;
 }
 
@@ -191,7 +191,7 @@ export function ShallowObservable() {
  *
  * @returns `observable.ref` decorator.
  */
-export function RefObservable() {
+export function RefObservable(): typeof observable.ref {
   return observable.ref;
 }
 
@@ -203,6 +203,6 @@ export function RefObservable() {
  *
  * @returns `observable.deep` decorator.
  */
-export function DeepObservable() {
+export function DeepObservable(): typeof observable.deep {
   return observable.deep;
 }

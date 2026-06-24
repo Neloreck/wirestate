@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-test:
+  build-lib:
     runs-on: ubuntu-latest
 
     steps:
@@ -45,7 +45,9 @@ jobs:
 
       - run: pnpm lint --cache
 
-      - run: pnpm typecheck
+      - run: pnpm format:check
+
+      - run: pnpm typecheck && pnpm typecheck:cli
 
       - run: pnpm test --maxWorkers=100%
 
@@ -59,9 +61,6 @@ jobs:
 
       - run: pnpm test:e2e
 
-      - name: Install zip
-        uses: montudor/action-zip@v1
-
       - name: Archive build artifacts
         working-directory: target/
         run: zip -qq -r package.zip dist/ pkg/
@@ -74,17 +73,62 @@ jobs:
           path: target/package.zip
           retention-days: 1
 
+  build-extension:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - run: pnpm typecheck:extension
+
+      - run: pnpm test:extension
+
+      - run: pnpm build:extension
+
+      - name: Archive extension build
+        working-directory: extension/dist
+        run: zip -qq -r "$GITHUB_WORKSPACE/extension.zip" .
+
+      - name: Upload extension package
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: error
+          name: extension
+          path: extension.zip
+          retention-days: 1
+
   upload-nightly:
     if: ${{ github.ref_name == 'main' && github.event_name != 'pull_request' }}
-    needs: [ build-and-test ]
+    needs: [ build-lib, build-extension ]
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v6
 
-      - uses: actions/download-artifact@v8
+      - name: Download library package
+        uses: actions/download-artifact@v8
         with:
           name: package
+
+      - name: Download extension package
+        uses: actions/download-artifact@v8
+        with:
+          name: extension
 
       - name: Update nightly tag
         uses: EndBug/latest-tag@latest
@@ -96,4 +140,4 @@ jobs:
         if: ${{ steps.update-nightly-tag.outcome == 'success' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload --clobber nightly package.zip
+        run: gh release upload --clobber nightly package.zip extension.zip

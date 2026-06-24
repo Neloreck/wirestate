@@ -1,7 +1,10 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "verbatimModuleSyntax": false
-  }
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "**/node_modules"]
 }

@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/react-mobx",
-  "version": "1.0.0-experimental.10",
+  "version": "1.0.0-experimental.11",
   "description": "MobX React reactivity binding (mobx-react-lite) for Wirestate React services",
   "sideEffects": false,
   "author": "Syrotenko Igor",

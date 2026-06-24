@@ -1,3 +1,4 @@
+import { isValueDescriptor } from "../../binding/binding-guards";
 import { type Container } from "../../container/container";
 import { type ContainerKernel } from "../../container/container-kernel";
 import { type Optional } from "../../types/general";
@@ -6,6 +7,7 @@ import { getOwnPlugins } from "../plugin-registry";
 
 import { DEVTOOLS_PROTOCOL_VERSION, installDevtoolsHook } from "./devtools-hook";
 import {
+  type DevtoolsBindingId,
   type DevtoolsContainerId,
   type DevtoolsContainerSnapshot,
   type DevtoolsHook,
@@ -37,25 +39,6 @@ export interface DevToolsPluginConfig {
 /**
  * Read-only observer plugin that exposes a container subtree to an inspector
  * backend (a Chrome extension or a standalone dev panel).
- *
- * @remarks
- * Installing this plugin is the **only** thing that puts the devtools hook on
- * `globalThis`; an application that never registers it has zero footprint and the
- * plugin tree-shakes away. Register it on a root container and, by plugin chain
- * inheritance, it observes the whole subtree — reconstructing the container tree from
- * the lifecycle stream rather than from reverse child-pointers.
- *
- * It owns nothing it observes: every live container is held **weakly** (`WeakRef`), so
- * devtools never extends a container's lifetime. The tree tracks **currently-provisioned**
- * containers — added when a container provisions, removed when it deprovisions — so a
- * container the app has torn down, or a **discarded render** (e.g. a React StrictMode
- * throwaway that constructs but never commits), never appears. Exactly **one root** is
- * registered per plugin instance, even when a managed provider constructs more than one
- * container from the same config. Development-time only.
- *
- * It observes both lifecycle (activation and provision) and messaging traffic — events
- * via a catch-all subscription, commands and queries by wrapping their dispatch methods —
- * and streams both as normalized deltas to the hook.
  *
  * @group DevTools
  *
@@ -101,6 +84,7 @@ export class DevToolsPlugin implements WirestatePlugin {
       this.rootId = this.hook.registerRoot({
         snapshot: () => this.snapshot(),
         inspect: (instanceId, path) => this.inspect(instanceId, path),
+        inspectBinding: (bindingId, path) => this.inspectBinding(bindingId, path),
         serviceRefOf: (value) => this.serviceRefOf(value),
       });
     }
@@ -244,7 +228,7 @@ export class DevToolsPlugin implements WirestatePlugin {
     return {
       containerId: hook.idForContainer(container),
       parentContainerId: parentId !== undefined && this.observed.has(parentId) ? parentId : null,
-      bindings: container.getOwnBindings().map(normalizeBinding),
+      bindings: container.getOwnBindings().map((binding) => normalizeBinding(binding, hook.idForBinding(binding))),
       instances: container
         .getActiveInstances()
         .map((instance: object): DevtoolsInstance => normalizeInstance(instance, hook.idForInstance(instance))),
@@ -275,6 +259,38 @@ export class DevToolsPlugin implements WirestatePlugin {
       for (const instance of container.getActiveInstances()) {
         if (this.hook.idForInstance(instance) === instanceId) {
           return readPath(instance, path);
+        }
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Reads the raw value at `path` within the `Value` binding identified by `bindingId`, scanning the
+   * observed containers' own bindings. Reads the stored value directly — never resolves or constructs
+   * — so it is side-effect-free and works even before the binding is first resolved. Only `Value`
+   * bindings are addressable here; an `Instance`/`Factory` binding's id never matches.
+   *
+   * @param bindingId - Binding to read from.
+   * @param path - Object keys / array indices from the binding's value to the target.
+   * @returns The raw value at the path, or `undefined` when no live `Value` binding has that id.
+   */
+  private inspectBinding(bindingId: DevtoolsBindingId, path: DevtoolsInspectPath): unknown {
+    if (!this.hook) {
+      return undefined;
+    }
+
+    for (const reference of this.observed.values()) {
+      const container: Optional<ContainerKernel> = reference.deref();
+
+      if (!container) {
+        continue;
+      }
+
+      for (const binding of container.getOwnBindings()) {
+        if (isValueDescriptor(binding) && this.hook.idForBinding(binding) === bindingId) {
+          return readPath(binding.value, path);
         }
       }
     }

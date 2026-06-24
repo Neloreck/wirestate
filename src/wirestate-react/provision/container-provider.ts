@@ -1,5 +1,5 @@
 import { type ContainerConfig, Container, WirestateError } from "@wirestate/core";
-import { type ReactNode, createElement, useEffect, useRef, useState } from "react";
+import { type ReactElement, type ReactNode, createElement, useEffect, useRef, useState } from "react";
 
 import { ContainerContext } from "../context/container-context";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
@@ -100,7 +100,7 @@ interface ContainerProvisionError {
  * }
  * ```
  */
-export function ContainerProvider(props: ContainerProviderProps) {
+export function ContainerProvider(props: ContainerProviderProps): ReactElement {
   const configValue: unknown = props.config;
   const hasConfig: boolean = configValue !== undefined;
 

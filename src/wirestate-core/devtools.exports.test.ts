@@ -13,6 +13,7 @@ describe("Library exported API from wirestate-core/devtools", () => {
       types: [
         "DevToolsPluginConfig",
         "DevtoolsBinding",
+        "DevtoolsBindingId",
         "DevtoolsContainerId",
         "DevtoolsContainerSnapshot",
         "DevtoolsEvent",

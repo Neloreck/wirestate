@@ -15,6 +15,13 @@ export const BindingType = {
 } as const;
 
 /**
+ * Binding strategy name.
+ *
+ * @group Bind
+ */
+export type BindingTypeValue = keyof typeof BindingType;
+
+/**
  * Lifetime scope names accepted by binding descriptors:
  *
  * - `Singleton` (default): the value is constructed once and reused for every resolution.
