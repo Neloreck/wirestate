@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/lit-signals",
-  "version": "1.0.0-experimental.11",
+  "version": "1.0.0-experimental.12",
   "description": "Preact Signals Lit reactivity binding (@lit-labs/preact-signals) for Wirestate Lit services",
   "sideEffects": false,
   "author": "Syrotenko Igor",
