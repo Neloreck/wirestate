@@ -1,3 +1,4 @@
+import { Container } from "@wirestate/core";
 import { type DevtoolsEvent } from "@wirestate/core/devtools";
 
 import { asChromePort, mockChromePort, type MockChromePort } from "@/fixtures/chrome";
@@ -5,7 +6,7 @@ import { mockLifecycleEvent, mockMessageEvent, mockRootSnapshot } from "@/fixtur
 
 import { type InspectNode } from "@/bridge/bridge.messages";
 import { BridgeService } from "@/panel/services/bridge.service";
-import { type PanelTransport } from "@/panel/services/panel.transport";
+import { PanelTransport } from "@/panel/services/panel.transport";
 
 const TAB_ID: number = 7;
 const PORT_NAME: string = `wirestate-panel:${TAB_ID}`;
@@ -16,23 +17,32 @@ function setup() {
   const ports: Array<MockChromePort> = [];
   const navigated: Array<() => void> = [];
 
-  const transport = {
-    tabId: TAB_ID,
-    openPort: jest.fn(() => {
-      const port = mockChromePort();
+  const container = new Container({
+    bindings: [
+      {
+        token: PanelTransport,
+        value: {
+          tabId: TAB_ID,
+          openPort: jest.fn(() => {
+            const port = mockChromePort();
 
-      ports.push(port);
+            ports.push(port);
 
-      return asChromePort(port);
-    }),
-    onNavigated: jest.fn((callback: () => void) => {
-      navigated.push(callback);
-    }),
-  };
+            return asChromePort(port);
+          }),
+          onNavigated: jest.fn((callback: () => void) => {
+            navigated.push(callback);
+          }),
+        },
+      },
+      BridgeService,
+    ],
+  });
 
   return {
-    service: new BridgeService(transport as unknown as PanelTransport),
-    transport,
+    container,
+    service: container.get(BridgeService),
+    transport: container.get(PanelTransport),
     ports,
     getActivePort: () => ports[ports.length - 1],
     navigate: () => navigated.forEach((callback) => callback()),
@@ -46,12 +56,12 @@ function mockEvents(count: number): Array<DevtoolsEvent> {
 describe("BridgeService", () => {
   describe("connection lifecycle", () => {
     it("opens a tab-scoped port, marks connected, attaches, and watches navigation on provision", () => {
-      const { service, transport, getActivePort } = setup();
+      const { container, service, transport, getActivePort } = setup();
 
-      service.onProvision();
+      container.provision();
 
       expect(transport.openPort).toHaveBeenCalledWith(PORT_NAME);
-      expect(service.connected).toBe(true);
+      expect(service.isConnected).toBe(true);
       expect(getActivePort().postMessage).toHaveBeenCalledWith({ type: "attach" });
       expect(transport.onNavigated).toHaveBeenCalledTimes(1);
     });
@@ -60,9 +70,9 @@ describe("BridgeService", () => {
       jest.useFakeTimers();
 
       try {
-        const { service, transport, getActivePort } = setup();
+        const { container, transport, getActivePort } = setup();
 
-        service.onProvision();
+        container.provision();
 
         expect(transport.openPort).toHaveBeenCalledTimes(1);
 
@@ -79,12 +89,12 @@ describe("BridgeService", () => {
       jest.useFakeTimers();
 
       try {
-        const { service, transport, getActivePort } = setup();
+        const { container, transport, getActivePort } = setup();
 
-        service.onProvision();
-        service.onDeprovision();
+        container.provision();
+        container.deprovision();
 
-        // A late drop after teardown must not schedule another connect.
+        // A late drop after teardown must not schedule another connection.
         getActivePort().disconnect();
         jest.advanceTimersByTime(RECONNECT_DELAY_MS * 4);
 
@@ -97,11 +107,12 @@ describe("BridgeService", () => {
 
   describe("inbound messages", () => {
     it("init applies protocol version, roots, and backlog", () => {
-      const { service, getActivePort } = setup();
+      const { container, service, getActivePort } = setup();
       const roots = [mockRootSnapshot()];
       const events = mockEvents(3);
 
-      service.onProvision();
+      container.provision();
+
       getActivePort().emit({ type: "init", protocolVersion: 2, roots, events });
 
       expect(service.protocolVersion).toBe(2);
@@ -110,10 +121,11 @@ describe("BridgeService", () => {
     });
 
     it("trims the initial backlog to the most recent MAX_LOG entries", () => {
-      const { service, ports, getActivePort } = setup();
+      const { container, service, getActivePort } = setup();
       const events = mockEvents(MAX_LOG + 88);
 
-      service.onProvision();
+      container.provision();
+
       getActivePort().emit({ type: "init", protocolVersion: 1, roots: [], events });
 
       expect(service.log).toHaveLength(MAX_LOG);
@@ -122,9 +134,10 @@ describe("BridgeService", () => {
     });
 
     it("snapshot replaces roots without touching the log", () => {
-      const { service, getActivePort } = setup();
+      const { container, service, getActivePort } = setup();
 
-      service.onProvision();
+      container.provision();
+
       getActivePort().emit({ type: "init", protocolVersion: 1, roots: [], events: mockEvents(2) });
 
       const roots = [mockRootSnapshot(9)];
@@ -136,9 +149,10 @@ describe("BridgeService", () => {
     });
 
     it("a structural event appends to the log and pulls a fresh tree", () => {
-      const { service, getActivePort } = setup();
+      const { container, service, getActivePort } = setup();
 
-      service.onProvision();
+      container.provision();
+
       getActivePort().postMessage.mockClear();
 
       const event = mockLifecycleEvent();
@@ -150,9 +164,10 @@ describe("BridgeService", () => {
     });
 
     it("a message event appends without pulling a fresh tree", () => {
-      const { service, getActivePort } = setup();
+      const { container, service, getActivePort } = setup();
 
-      service.onProvision();
+      container.provision();
+
       getActivePort().postMessage.mockClear();
 
       const event = mockMessageEvent();
@@ -164,10 +179,11 @@ describe("BridgeService", () => {
     });
 
     it("drops the oldest entry once the streamed log exceeds MAX_LOG", () => {
-      const { service, getActivePort } = setup();
+      const { container, service, getActivePort } = setup();
       const backlog = mockEvents(MAX_LOG);
 
-      service.onProvision();
+      container.provision();
+
       getActivePort().emit({ type: "init", protocolVersion: 1, roots: [], events: backlog });
 
       const next = mockLifecycleEvent({ timestamp: 9999 });
@@ -180,9 +196,10 @@ describe("BridgeService", () => {
     });
 
     it("page-connected re-attaches to the freshly paired backend", () => {
-      const { service, getActivePort } = setup();
+      const { container, getActivePort } = setup();
 
-      service.onProvision();
+      container.provision();
+
       getActivePort().postMessage.mockClear();
       getActivePort().emit({ type: "page-connected" });
 
@@ -192,9 +209,9 @@ describe("BridgeService", () => {
 
   describe("inspect requests", () => {
     it("posts an inspect request and resolves it when the result arrives", async () => {
-      const { service, getActivePort } = setup();
+      const { container, service, getActivePort } = setup();
 
-      service.onProvision();
+      container.provision();
 
       const pending = service.inspect(1, 2, ["count"]);
 
@@ -214,9 +231,10 @@ describe("BridgeService", () => {
     });
 
     it("posts an inspectBinding request keyed by binding id", () => {
-      const { service, getActivePort } = setup();
+      const { container, service, getActivePort } = setup();
 
-      service.onProvision();
+      container.provision();
+
       void service.inspectBinding(1, 5, ["value"]);
 
       expect(getActivePort().postMessage).toHaveBeenCalledWith({
@@ -239,9 +257,9 @@ describe("BridgeService", () => {
       jest.useFakeTimers();
 
       try {
-        const { service, getActivePort } = setup();
+        const { container, service, getActivePort } = setup();
 
-        service.onProvision();
+        container.provision();
 
         const pending = service.inspect(1, 2, ["a"]);
 
@@ -256,9 +274,10 @@ describe("BridgeService", () => {
 
   describe("navigation and clear", () => {
     it("resets roots and log when the inspected page navigates", () => {
-      const { service, getActivePort, navigate } = setup();
+      const { container, service, getActivePort, navigate } = setup();
 
-      service.onProvision();
+      container.provision();
+
       getActivePort().emit({ type: "init", protocolVersion: 1, roots: [mockRootSnapshot()], events: mockEvents(2) });
       expect(service.roots).toHaveLength(1);
 
@@ -269,9 +288,10 @@ describe("BridgeService", () => {
     });
 
     it("clear empties the streamed log", () => {
-      const { service, getActivePort } = setup();
+      const { container, service, getActivePort } = setup();
 
-      service.onProvision();
+      container.provision();
+
       getActivePort().emit({ type: "event", event: mockMessageEvent() });
       expect(service.log).toHaveLength(1);
 

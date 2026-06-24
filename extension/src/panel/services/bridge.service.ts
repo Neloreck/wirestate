@@ -1,4 +1,4 @@
-import { Injectable, inject, OnProvision, OnDeprovision } from "@wirestate/core";
+import { Injectable, inject, OnProvision, OnDeprovision, WireStatus } from "@wirestate/core";
 import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
 import { BoundAction, Observable, RefObservable, makeObservable } from "@wirestate/mobx";
 
@@ -11,7 +11,7 @@ import {
   type PanelToBackendPayload,
 } from "@/bridge/bridge.messages";
 import { PanelTransport } from "@/panel/services/panel.transport";
-import { type Optional } from "@/types/general";
+import { type Nullable, type Optional } from "@/types/general";
 
 /**
  * Connects the panel to the inspected tab's backend over the bridge and exposes the live, MobX-observable
@@ -23,7 +23,7 @@ export class BridgeService {
   private static readonly RECONNECT_DELAY_MS: number = 250;
 
   @Observable()
-  public connected: boolean = false;
+  public isConnected: boolean = false;
 
   @Observable()
   public protocolVersion: Optional<number> = undefined;
@@ -34,13 +34,15 @@ export class BridgeService {
   @RefObservable()
   public log: ReadonlyArray<DevtoolsEvent> = [];
 
-  private port: Optional<chrome.runtime.Port>;
-  private readonly pending: Map<number, (node: InspectNode) => void> = new Map();
+  private port: Nullable<chrome.runtime.Port> = null;
+  private reconnectTimer: Nullable<ReturnType<typeof setTimeout>> = null;
   private requestId: number = 0;
-  private reconnectTimer: Optional<ReturnType<typeof setTimeout>>;
-  private disposed: boolean = false;
+  private pending: Map<number, (node: InspectNode) => void> = new Map();
 
-  public constructor(private readonly transport: PanelTransport = inject(PanelTransport)) {
+  public constructor(
+    private readonly status: WireStatus = WireStatus.for(this, { initialize: true }),
+    private readonly transport: PanelTransport = inject(PanelTransport)
+  ) {
     makeObservable(this);
   }
 
@@ -52,14 +54,16 @@ export class BridgeService {
 
   @OnDeprovision()
   public onDeprovision(): void {
-    this.disposed = true;
-
-    if (this.reconnectTimer !== undefined) {
-      clearTimeout(this.reconnectTimer);
-    }
-
     this.port?.disconnect();
-    this.port = undefined;
+    this.port = null;
+
+    // The disconnect above can synchronously schedule a reconnect, so cancel the timer
+    // afterwards (not before) to leave teardown with nothing pending. `connect()` also
+    // bails on a stale timer as a backstop.
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
   }
 
   /**
@@ -93,6 +97,10 @@ export class BridgeService {
   }
 
   private connect(): void {
+    if (this.status.isInactive) {
+      return;
+    }
+
     const port: chrome.runtime.Port = this.transport.openPort(`${PANEL_PORT_PREFIX}${this.transport.tabId}`);
 
     this.port = port;
@@ -101,24 +109,26 @@ export class BridgeService {
     port.onMessage.addListener((message: BackendToPanelPayload): void => this.onMessage(port, message));
 
     port.onDisconnect.addListener((): void => {
-      this.port = undefined;
-      // Fail any in-flight inspect requests rather than leaving the panel spinning.
+      this.port = null;
+
       for (const resolve of this.pending.values()) {
         resolve({ kind: "unsupported" });
       }
 
       this.pending.clear();
 
-      if (!this.disposed) {
-        this.reconnectTimer = setTimeout(() => this.connect(), BridgeService.RECONNECT_DELAY_MS);
+      if (this.status.isInactive) {
+        return;
       }
+
+      this.reconnectTimer = setTimeout(() => this.connect(), BridgeService.RECONNECT_DELAY_MS);
     });
 
     port.postMessage({ type: "attach" } satisfies PanelToBackendPayload);
   }
 
   private request(build: (requestId: number) => PanelToBackendPayload): Promise<InspectNode> {
-    const port: Optional<chrome.runtime.Port> = this.port;
+    const port: Nullable<chrome.runtime.Port> = this.port;
 
     if (!port) {
       return Promise.resolve({ kind: "unsupported" });
@@ -134,7 +144,7 @@ export class BridgeService {
 
   @BoundAction()
   private setConnected(connected: boolean): void {
-    this.connected = connected;
+    this.isConnected = connected;
   }
 
   @BoundAction()
@@ -176,6 +186,7 @@ export class BridgeService {
 
       case "event":
         this.appendEvent(message.event);
+
         // Structure-affecting deltas -> pull a fresh tree; message deltas don't change it.
         if (message.event.kind !== "message") {
           port.postMessage({ type: "refresh" } satisfies PanelToBackendPayload);
