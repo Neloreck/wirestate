@@ -12,6 +12,8 @@ import {
   mockRootSnapshot,
 } from "@/fixtures/devtools";
 
+import { type TimelineFilter } from "@/panel/hooks/use-panel-state";
+import { isSameSelection } from "@/panel/lib/selection";
 import {
   getBindingStatus,
   buildMessageResults,
@@ -26,7 +28,6 @@ import {
   rootIdOfContainer,
   getTokenOfInstanceId,
 } from "@/panel/lib/selectors";
-import { type TimelineFilter, isSameSelection } from "@/panel/lib/types";
 
 function filterWith(partial: Partial<TimelineFilter> = {}): TimelineFilter {
   return {

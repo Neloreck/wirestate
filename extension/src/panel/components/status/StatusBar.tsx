@@ -16,9 +16,7 @@ export const StatusBar = observer(function StatusBar() {
   return (
     <header className={"flex items-center gap-2.5 border-b border-divider bg-elevated px-2 py-1"}>
       <span className={`h-2 w-2 rounded-full ${bridgeService.isConnected ? "bg-emerald-500" : "bg-red-500"}`} />
-      <strong className={"font-semibold"}>Wirestate</strong>·
       <span className={"text-fg-muted"}>{bridgeService.isConnected ? "connected" : "reconnecting…"}</span>·
-      <span className={"text-fg-muted"}>protocol v{bridgeService.protocolVersion ?? "?"}</span>·
       <span className={"text-fg-muted"}>
         {rootsCount} root{rootsCount === 1 ? "" : "s"} · {containersCount} container{containersCount === 1 ? "" : "s"}
       </span>

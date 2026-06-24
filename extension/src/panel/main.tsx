@@ -13,10 +13,12 @@ const container: Maybe<HTMLElement> = document.getElementById("root");
 
 if (container) {
   syncPanelTheme();
+
   createRoot(container).render(
     <ContainerProvider config={{ bindings: [PanelTransport, BridgeService] }}>
       <Panel />
     </ContainerProvider>
   );
+
   chrome.devtools.panels.setThemeChangeHandler(setPanelTheme);
 }

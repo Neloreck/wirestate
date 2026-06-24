@@ -3,10 +3,9 @@ import { useInjection } from "@wirestate/react";
 import { observer } from "@wirestate/react-mobx";
 import { useEffect, useMemo, useRef } from "react";
 
-import { type PanelActions, type PanelUi } from "@/panel/hooks/use-panel-state";
+import { type PanelActions, type PanelUi, type TimelineFilter } from "@/panel/hooks/use-panel-state";
 import { getDevtoolsEventSummary, timestampOfDevtoolsEvent } from "@/panel/lib/format";
 import { type RootModel, buildMessageResults, buildRoots, filterLogBy } from "@/panel/lib/selectors";
-import { type TimelineFilter } from "@/panel/lib/types";
 import { BridgeService } from "@/panel/services/bridge.service";
 import { type Optional } from "@/types/general";
 

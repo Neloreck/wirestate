@@ -1,8 +1,24 @@
-import { type DevtoolsMessageChannel } from "@wirestate/core/devtools";
+import { type DevtoolsEvent, type DevtoolsMessageChannel } from "@wirestate/core/devtools";
 import { useMemo, useReducer } from "react";
 
-import { type EventKind, type Selection, type TimelineFilter } from "@/panel/lib/types";
+import { type Selection } from "@/panel/lib/selection";
 import { type Optional } from "@/types/general";
+
+/**
+ * The kinds of timeline delta the panel can filter by.
+ */
+export type EventKind = Exclude<DevtoolsEvent["kind"], "messageResult">;
+
+/**
+ * The Timeline's independent filter state (single-select per dimension; `undefined` = all).
+ */
+export interface TimelineFilter {
+  readonly rootId: Optional<number>;
+  readonly containerId: Optional<number>;
+  readonly kinds: Record<EventKind, boolean>;
+  readonly channels: Record<DevtoolsMessageChannel, boolean>;
+  readonly text: string;
+}
 
 /** Panel-local view preferences (not data — data lives in the bridge). */
 export interface PanelUi {

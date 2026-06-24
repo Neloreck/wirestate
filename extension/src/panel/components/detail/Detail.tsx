@@ -4,8 +4,8 @@ import { useEffect, useRef } from "react";
 
 import { LinkButton } from "@/panel/components/ui";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
+import { type Selection, isSameSelection } from "@/panel/lib/selection";
 import { type ResolvedEntity, resolveSelection } from "@/panel/lib/selectors";
-import { type Selection, isSameSelection } from "@/panel/lib/types";
 import { BridgeService } from "@/panel/services/bridge.service";
 import { type Optional } from "@/types/general";
 

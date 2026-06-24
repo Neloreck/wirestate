@@ -10,8 +10,9 @@ import {
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
 
+import { type TimelineFilter } from "@/panel/hooks/use-panel-state";
 import { getDevtoolsEventSummary } from "@/panel/lib/format";
-import { type Selection, type TimelineFilter } from "@/panel/lib/types";
+import { type Selection } from "@/panel/lib/selection";
 import { type Optional } from "@/types/general";
 
 /**

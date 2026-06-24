@@ -2,8 +2,8 @@ import { useCallback, type MouseEvent, useMemo } from "react";
 
 import { cn } from "@/lib/class-name";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";
+import { type Selection } from "@/panel/lib/selection";
 import { type ContainerNodeModel } from "@/panel/lib/selectors";
-import { type Selection } from "@/panel/lib/types";
 import { type Optional } from "@/types/general";
 
 interface NavigationContainerNodeProps {

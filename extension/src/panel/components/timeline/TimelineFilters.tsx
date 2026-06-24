@@ -1,9 +1,8 @@
 import { type DevtoolsMessageChannel } from "@wirestate/core/devtools";
 import { type ChangeEvent, useCallback } from "react";
 
-import { type PanelActions, type PanelUi } from "@/panel/hooks/use-panel-state";
+import { type EventKind, type PanelActions, type PanelUi, type TimelineFilter } from "@/panel/hooks/use-panel-state";
 import { type RootModel } from "@/panel/lib/selectors";
-import { type EventKind, type TimelineFilter } from "@/panel/lib/types";
 
 import { TimelineToggle } from "./TimelineToggle";
 
