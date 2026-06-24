@@ -33,6 +33,7 @@ export default defineConfig({
         ],
       },
       { text: "API", link: "/api/" },
+      { text: "Changelog", link: "/changelog" },
     ],
     sidebar: [
       {
@@ -120,6 +121,10 @@ export default defineConfig({
             ],
           },
         ],
+      },
+      {
+        text: "Releases",
+        items: [{ text: "Changelog", link: "/changelog" }],
       },
     ],
     socialLinks: [{ icon: "github", link: "https://github.com/Neloreck/wirestate" }],
