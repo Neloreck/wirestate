@@ -382,3 +382,35 @@ export function buildMessageResults(
 
   return results;
 }
+
+/**
+ * One Timeline row: a delta plus how many consecutive identical deltas it stands for.
+ */
+export interface CollapsedRow {
+  readonly event: DevtoolsEvent;
+  readonly count: number;
+}
+
+/**
+ * Collapses runs of consecutive identical deltas into one row carrying a repeat count, so a burst
+ * of the same event reads as a single counted row instead of N rows. Identity is the rendered
+ * event summary.
+ *
+ * @param events - The (already filtered) deltas to collapse, in arrival order.
+ * @returns One row per run of identical deltas, in arrival order; the first delta of each run is kept.
+ */
+export function collapseTimeline(events: ReadonlyArray<DevtoolsEvent>): ReadonlyArray<CollapsedRow> {
+  const rows: Array<{ event: DevtoolsEvent; count: number }> = [];
+
+  for (const event of events) {
+    const last = rows[rows.length - 1];
+
+    if (last && getDevtoolsEventSummary(last.event) === getDevtoolsEventSummary(event)) {
+      last.count += 1;
+    } else {
+      rows.push({ event, count: 1 });
+    }
+  }
+
+  return rows;
+}

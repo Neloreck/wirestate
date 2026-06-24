@@ -18,6 +18,7 @@ import {
   getBindingStatus,
   buildMessageResults,
   buildRoots,
+  collapseTimeline,
   getChannelOfEvent,
   childContainers,
   filterLogBy,
@@ -297,5 +298,40 @@ describe("buildMessageResults", () => {
     ]);
 
     expect(results.get(1)?.outcome).toBe("rejected");
+  });
+});
+
+describe("collapseTimeline", () => {
+  it("collapses a run of identical deltas into one row carrying the repeat count", () => {
+    const rows = collapseTimeline([
+      mockLifecycleEvent({ phase: "activate", className: "Worker" }),
+      mockLifecycleEvent({ phase: "activate", className: "Worker" }),
+      mockLifecycleEvent({ phase: "activate", className: "Worker" }),
+    ]);
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0].count).toBe(3);
+  });
+
+  it("keeps non-adjacent identical deltas as separate runs", () => {
+    const rows = collapseTimeline([
+      mockLifecycleEvent({ phase: "activate", className: "A" }),
+      mockLifecycleEvent({ phase: "activate", className: "A" }),
+      mockLifecycleEvent({ phase: "activate", className: "B" }),
+      mockLifecycleEvent({ phase: "activate", className: "A" }),
+    ]);
+
+    expect(rows.map((row) => row.count)).toEqual([2, 1, 1]);
+  });
+
+  it("keeps the first delta of each run as the row's event", () => {
+    const first = mockLifecycleEvent({ phase: "activate", className: "A" });
+    const rows = collapseTimeline([first, mockLifecycleEvent({ phase: "activate", className: "A" })]);
+
+    expect(rows[0].event).toBe(first);
+  });
+
+  it("returns an empty list for no deltas", () => {
+    expect(collapseTimeline([])).toEqual([]);
   });
 });
