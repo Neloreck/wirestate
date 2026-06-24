@@ -87,6 +87,18 @@ export default [
       "jsdoc/require-property-type": "off",
       "jsdoc/require-throws-type": "off",
       "jsdoc/no-undefined-types": "off",
+      // TypeScript is the source of truth for types, so JSDoc `{type}` annotations are not used here.
+      "jsdoc/check-types": "off",
+      "jsdoc/valid-types": "off",
+      "jsdoc/reject-any-type": "off",
+      "jsdoc/reject-function-type": "off",
+      "jsdoc/ts-no-empty-object-type": "off",
+      // No `@access` tags and no generators in the codebase, so these never match. Disabled.
+      "jsdoc/check-access": "off",
+      "jsdoc/require-yields": "off",
+      "jsdoc/require-yields-check": "off",
+      "jsdoc/require-yields-type": "off",
+      "jsdoc/require-next-type": "off",
       "padding-line-between-statements": [
         "error",
         {
