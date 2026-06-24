@@ -30,17 +30,6 @@ import {
   getTokenOfInstanceId,
 } from "@/panel/lib/selectors";
 
-function filterWith(partial: Partial<TimelineFilter> = {}): TimelineFilter {
-  return {
-    rootId: undefined,
-    containerId: undefined,
-    kinds: { lifecycle: true, message: true, registration: true },
-    channels: { event: true, command: true, query: true },
-    text: "",
-    ...partial,
-  };
-}
-
 describe("buildRoots", () => {
   it("nests containers by parentContainerId and treats orphans as top-level", () => {
     const roots = [
@@ -223,6 +212,17 @@ describe("lifecycleHistory", () => {
 });
 
 describe("filterLog", () => {
+  function mockTimelineFilter(partial: Partial<TimelineFilter> = {}): TimelineFilter {
+    return {
+      rootId: undefined,
+      containerId: undefined,
+      kinds: { lifecycle: true, message: true, registration: true },
+      channels: { event: true, command: true, query: true },
+      text: "",
+      ...partial,
+    };
+  }
+
   const log = [
     mockLifecycleEvent({ containerId: 1, phase: "activate" }),
     mockMessageEvent({ containerId: 1, message: { channel: "command", type: "X" } }),
@@ -230,17 +230,19 @@ describe("filterLog", () => {
   ];
 
   it("passes everything by default", () => {
-    expect(filterLogBy(log, filterWith())).toHaveLength(3);
+    expect(filterLogBy(log, mockTimelineFilter())).toHaveLength(3);
   });
 
   it("filters by kind, root, container, channel, and text", () => {
     expect(
-      filterLogBy(log, filterWith({ kinds: { lifecycle: false, message: true, registration: false } }))
+      filterLogBy(log, mockTimelineFilter({ kinds: { lifecycle: false, message: true, registration: false } }))
     ).toHaveLength(1);
-    expect(filterLogBy(log, filterWith({ rootId: 1 }))).toHaveLength(2);
-    expect(filterLogBy(log, filterWith({ containerId: 1 }))).toHaveLength(2);
-    expect(filterLogBy(log, filterWith({ channels: { event: true, command: false, query: true } }))).toHaveLength(2);
-    expect(filterLogBy(log, filterWith({ text: "X" }))).toHaveLength(1);
+    expect(filterLogBy(log, mockTimelineFilter({ rootId: 1 }))).toHaveLength(2);
+    expect(filterLogBy(log, mockTimelineFilter({ containerId: 1 }))).toHaveLength(2);
+    expect(
+      filterLogBy(log, mockTimelineFilter({ channels: { event: true, command: false, query: true } }))
+    ).toHaveLength(2);
+    expect(filterLogBy(log, mockTimelineFilter({ text: "X" }))).toHaveLength(1);
   });
 });
 
