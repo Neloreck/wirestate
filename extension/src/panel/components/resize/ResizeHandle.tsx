@@ -1,4 +1,4 @@
-import { type PointerEvent as ReactPointerEvent, type RefObject, useRef, useState } from "react";
+import { type PointerEvent as ReactPointerEvent, type RefObject, useCallback, useRef, useState } from "react";
 
 import { cn } from "@/lib/class-name";
 import { type Nullable } from "@/types/general";
@@ -31,79 +31,88 @@ export function ResizeHandle({
   const active = useRef<boolean>(false);
   const last = useRef<Nullable<number>>(null);
 
-  function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>): void {
-    event.preventDefault();
-    event.currentTarget.setPointerCapture(event.pointerId);
+  const onPointerDown = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>): void => {
+      event.preventDefault();
+      event.currentTarget.setPointerCapture(event.pointerId);
 
-    active.current = true;
-    last.current = null;
+      active.current = true;
+      last.current = null;
 
-    setDragging(true);
+      setDragging(true);
 
-    document.body.style.userSelect = "none";
-    document.body.style.cursor = orientation === "vertical" ? "col-resize" : "row-resize";
-  }
+      document.body.style.userSelect = "none";
+      document.body.style.cursor = orientation === "vertical" ? "col-resize" : "row-resize";
+    },
+    [orientation]
+  );
 
-  function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>): void {
-    if (!active.current) {
-      return;
-    }
+  const onPointerMove = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>): void => {
+      if (!active.current) {
+        return;
+      }
 
-    const container: Nullable<HTMLDivElement> = containerRef.current;
+      const container: Nullable<HTMLDivElement> = containerRef.current;
 
-    if (!container) {
-      return;
-    }
+      if (!container) {
+        return;
+      }
 
-    const rect: DOMRect = container.getBoundingClientRect();
-    const size: number = orientation === "vertical" ? rect.width : rect.height;
+      const rect: DOMRect = container.getBoundingClientRect();
+      const size: number = orientation === "vertical" ? rect.width : rect.height;
 
-    if (size <= 0) {
-      return;
-    }
+      if (size <= 0) {
+        return;
+      }
 
-    const offset: number = orientation === "vertical" ? event.clientX - rect.left : event.clientY - rect.top;
-    const startFraction: number = offset / size;
-    const controlled: number = controls === "start" ? startFraction : 1 - startFraction;
+      const offset: number = orientation === "vertical" ? event.clientX - rect.left : event.clientY - rect.top;
+      const startFraction: number = offset / size;
+      const controlled: number = controls === "start" ? startFraction : 1 - startFraction;
 
-    const minControlled: number = (controls === "start" ? minStartPx : minEndPx) / size;
-    const maxControlled: number = 1 - (controls === "start" ? minEndPx : minStartPx) / size;
-    const clamped: number = Math.min(Math.max(controlled, minControlled), Math.max(minControlled, maxControlled));
+      const minControlled: number = (controls === "start" ? minStartPx : minEndPx) / size;
+      const maxControlled: number = 1 - (controls === "start" ? minEndPx : minStartPx) / size;
+      const clamped: number = Math.min(Math.max(controlled, minControlled), Math.max(minControlled, maxControlled));
 
-    container.style.setProperty(cssVar, `${(clamped * 100).toFixed(3)}%`);
+      container.style.setProperty(cssVar, `${(clamped * 100).toFixed(3)}%`);
 
-    last.current = clamped;
-  }
+      last.current = clamped;
+    },
+    [containerRef, orientation, controls, minStartPx, minEndPx, cssVar]
+  );
 
-  function endDrag(event: ReactPointerEvent<HTMLDivElement>): void {
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
+  const onEndDrag = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>): void => {
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
 
-    active.current = false;
+      active.current = false;
 
-    setDragging(false);
+      setDragging(false);
 
-    document.body.style.userSelect = "";
-    document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
 
-    if (last.current !== null) {
-      onCommit(last.current);
-    }
-  }
+      if (last.current !== null) {
+        onCommit(last.current);
+      }
+    },
+    [onCommit]
+  );
 
   return (
     <div
       className={cn(
         `group relative flex-none`,
-        orientation === "vertical" ? "w-[5px] cursor-col-resize self-stretch" : "h-[5px] w-full cursor-row-resize"
+        orientation === "vertical" ? "w-1.25 cursor-col-resize self-stretch" : "h-1.25 w-full cursor-row-resize"
       )}
       role={"separator"}
       aria-orientation={orientation}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={endDrag}
-      onPointerCancel={endDrag}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onEndDrag}
+      onPointerCancel={onEndDrag}
     >
       <span
         className={cn(

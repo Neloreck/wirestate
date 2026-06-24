@@ -21,9 +21,6 @@ interface TimelineRowProps {
   readonly count: number;
   readonly actions: PanelActions;
   readonly result?: DevtoolsMessageResultEvent;
-  /**
-   * Timestamp of the first row shown, for the relative offset; `undefined` disables the delta column.
-   */
   readonly baseline?: Optional<number>;
 }
 

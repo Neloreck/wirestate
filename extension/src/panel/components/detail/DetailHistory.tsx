@@ -7,9 +7,6 @@ import { type Optional } from "@/types/general";
 
 interface DetailHistoryProps {
   readonly events: ReadonlyArray<DevtoolsEvent>;
-  /**
-   * Navigates to the binding that realizes the instance a lifecycle row is about (by container + token).
-   */
   readonly onSelectBinding: (containerId: number, token: string) => void;
 }
 

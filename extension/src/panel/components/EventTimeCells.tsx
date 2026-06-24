@@ -5,14 +5,11 @@ import { type Maybe, type Optional } from "@/types/general";
 
 interface EventTimeCellsProps {
   readonly event: DevtoolsEvent;
-  /**
-   * Timestamp of the first row shown, for the relative offset; `undefined` disables the delta column.
-   */
   readonly baseline: Optional<number>;
 }
 
 /**
- * The clock-time + relative-offset (Δ) columns shared by the Timeline rows and the lifecycle History.
+ * The clock-time + relative-offset columns shared by the Timeline rows and the lifecycle History.
  */
 export function EventTimeCells({ event, baseline }: EventTimeCellsProps) {
   const timestamp: Maybe<number> = timestampOfDevtoolsEvent(event);
