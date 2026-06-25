@@ -24,12 +24,13 @@
     "url": "https://github.com/Neloreck/wirestate/issues"
   },
   "keywords": [
+    "wirestate",
+    "state-management",
     "class-based",
     "context",
     "declarative",
     "management",
     "manager",
-    "mobx",
     "react",
     "ioc",
     "di",

@@ -24,6 +24,8 @@
     "url": "https://github.com/Neloreck/wirestate/issues"
   },
   "keywords": [
+    "wirestate",
+    "state-management",
     "class-based",
     "declarative",
     "management",
