@@ -1,12 +1,15 @@
+import { Activity, Antenna, Box, Braces, Code, History, Power } from "lucide-react";
+import { useCallback, useMemo } from "react";
+
 import {
   type DevtoolsContainerSnapshot,
   type DevtoolsEvent,
   type DevtoolsInstance,
+  type DevtoolsLifecycleHook,
+  type DevtoolsLifecycleHookMethod,
   type DevtoolsMethod,
   type DevtoolsRootSnapshot,
-} from "@wirestate/core/devtools";
-import { Antenna, Box, Braces, Code, History, Power } from "lucide-react";
-import { useCallback, useMemo } from "react";
+} from "#/devtools";
 
 import { type InspectFn } from "@/bridge/bridge.messages";
 import { Field, Section, Tag } from "@/panel/components/ui";
@@ -14,6 +17,7 @@ import { type PanelActions } from "@/panel/hooks/use-panel-state";
 import { rootIdOfContainer } from "@/panel/lib/container-tree";
 import { getLifecycleHistory } from "@/panel/lib/deltas";
 import { getTokenOfInstanceId } from "@/panel/lib/selection";
+import { getLifecycleHookPresentation } from "@/panel/lib/styling/lifecycle-hook";
 import { type Optional } from "@/types/general";
 
 import { DetailHistory } from "./DetailHistory";
@@ -57,7 +61,7 @@ export function DetailInstanceSections({
     };
   }, [container.containerId, instance.className, instance.instanceId, inspect, log, roots]);
 
-  const [methods, handlerChannels] = useMemo(() => {
+  const { methods, handlerChannels, lifecycle, lifecycleHooks } = useMemo(() => {
     const methods: ReadonlyArray<DevtoolsMethod> = instance.methods ?? [];
     const handlerChannels: Map<string, Set<string>> = new Map();
 
@@ -68,8 +72,18 @@ export function DetailInstanceSections({
       handlerChannels.set(handler.method, channels);
     }
 
-    return [methods, handlerChannels];
-  }, [instance.handlers, instance.methods]);
+    const lifecycle: ReadonlyArray<DevtoolsLifecycleHookMethod> = instance.lifecycle ?? [];
+    const lifecycleHooks: Map<string, Set<DevtoolsLifecycleHook>> = new Map();
+
+    for (const entry of lifecycle) {
+      const hooks: Set<DevtoolsLifecycleHook> = lifecycleHooks.get(entry.method) ?? new Set();
+
+      hooks.add(entry.hook);
+      lifecycleHooks.set(entry.method, hooks);
+    }
+
+    return { methods, handlerChannels, lifecycle, lifecycleHooks };
+  }, [instance.handlers, instance.methods, instance.lifecycle]);
 
   const selectByInstanceId = useCallback(
     (containerId: number, instanceId: number): void => {
@@ -112,6 +126,25 @@ export function DetailInstanceSections({
         )}
       </Section>
 
+      <Section title={"lifecycle hooks"} count={lifecycle.length} icon={<Activity />}>
+        {lifecycle.length === 0 ? (
+          <span className={"text-fg-muted"}>—</span>
+        ) : (
+          lifecycle.map((entry) => {
+            const { className, glyph } = getLifecycleHookPresentation(entry.hook);
+
+            return (
+              <div key={entry.hook}>
+                <span className={className}>
+                  {glyph} {entry.hook}
+                </span>{" "}
+                → <span className={"text-val-function"}>{entry.method}</span>()
+              </div>
+            );
+          })
+        )}
+      </Section>
+
       <Section title={"declared handlers"} count={instance.handlers.length} icon={<Antenna />}>
         {instance.handlers.length === 0 ? (
           <span className={"text-fg-muted"}>—</span>
@@ -133,6 +166,7 @@ export function DetailInstanceSections({
         ) : (
           methods.map((method) => {
             const channels: Optional<Set<string>> = handlerChannels.get(method.name);
+            const hooks: Optional<Set<DevtoolsLifecycleHook>> = lifecycleHooks.get(method.name);
 
             return (
               <div key={method.name} className={"flex flex-wrap items-center gap-1"}>
@@ -146,6 +180,18 @@ export function DetailInstanceSections({
                         {channel}
                       </Tag>
                     ))
+                  : null}
+
+                {hooks
+                  ? Array.from(hooks).map((hook) => {
+                      const { className, glyph } = getLifecycleHookPresentation(hook);
+
+                      return (
+                        <span key={hook} className={className}>
+                          {glyph} {hook}
+                        </span>
+                      );
+                    })
                   : null}
               </div>
             );

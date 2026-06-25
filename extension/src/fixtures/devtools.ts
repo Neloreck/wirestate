@@ -4,6 +4,7 @@ import {
   type DevtoolsEvent,
   type DevtoolsInstance,
   type DevtoolsLifecycleEvent,
+  type DevtoolsLifecycleHookMethod,
   type DevtoolsMessage,
   type DevtoolsMessageEvent,
   type DevtoolsMessageResultEvent,
@@ -11,7 +12,7 @@ import {
   type DevtoolsRegistration,
   type DevtoolsRegistrationEvent,
   type DevtoolsRootSnapshot,
-} from "@wirestate/core/devtools";
+} from "#/devtools";
 
 import type { Nullable } from "@/types/general";
 
@@ -21,14 +22,24 @@ import type { Nullable } from "@/types/general";
  * @param className - Display class name for the instance.
  * @param token - Token name associated with the instance.
  * @param instanceId - Stable instance identifier.
+ * @param lifecycle - Declared lifecycle hooks to attach (none by default).
  * @returns A devtools instance with no status or registered handlers.
  */
 export function mockInstance(
   className: string = "Service",
   token: string = className,
-  instanceId: number = 1
+  instanceId: number = 1,
+  lifecycle: ReadonlyArray<DevtoolsLifecycleHookMethod> = []
 ): DevtoolsInstance {
-  return { instanceId, token: { name: token, kind: "class" }, className, status: undefined, handlers: [], methods: [] };
+  return {
+    instanceId,
+    token: { name: token, kind: "class" },
+    className,
+    status: undefined,
+    handlers: [],
+    methods: [],
+    lifecycle,
+  };
 }
 
 /**

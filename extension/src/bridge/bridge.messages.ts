@@ -1,4 +1,4 @@
-import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
+import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "#/devtools";
 
 /**
  * Tag stamped on every `window.postMessage` between the MAIN-world backend and the
