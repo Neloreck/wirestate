@@ -36,7 +36,7 @@ export const Navigation = observer(function Navigation({ selection, collapsed, a
   }
 
   return (
-    <nav className={"h-full w-full overflow-auto p-1"}>
+    <nav className={"h-full w-full overflow-auto p-2"}>
       {roots.map((root) => (
         <div key={root.rootId} className={"mb-1"}>
           <div className={"px-1 py-0.5 font-semibold text-[#ff4733]"}>{root.label}</div>

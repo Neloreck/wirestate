@@ -6,7 +6,7 @@ import {
   installDevtoolsHook,
 } from "@wirestate/core/devtools";
 
-import { mockLifecycleEvent, mockRootSnapshot } from "@/fixtures/devtools";
+import { mockContainerSnapshot, mockLifecycleEvent, mockRootSnapshot } from "@/fixtures/devtools";
 
 import { InspectorBackend } from "@/backend/backend.inspector";
 import { createServiceInspectNode } from "@/backend/backend.node";
@@ -101,7 +101,7 @@ describe("InspectorBackend.onMessageRequest", () => {
   it("answers attach with the protocol version, root snapshots, and buffered events", () => {
     const { hook, posts, backend } = setup();
 
-    const snapshot = mockRootSnapshot(1);
+    const snapshot = mockRootSnapshot(1, [mockContainerSnapshot(1)]);
 
     registerRoot(hook, { snapshot: () => snapshot });
     backend.onMessageRequest({ type: "attach" });
@@ -112,12 +112,27 @@ describe("InspectorBackend.onMessageRequest", () => {
   it("answers refresh with a fresh snapshot", () => {
     const { hook, posts, backend } = setup();
 
-    const snapshot = mockRootSnapshot(7);
+    const snapshot = mockRootSnapshot(7, [mockContainerSnapshot(1)]);
 
     registerRoot(hook, { snapshot: () => snapshot });
     backend.onMessageRequest({ type: "refresh" });
 
     expect(posts).toEqual([{ type: "snapshot", roots: [snapshot] }]);
+  });
+
+  it("omits roots that currently have no containers", () => {
+    const { hook, posts, backend } = setup();
+
+    const populated = mockRootSnapshot(1, [mockContainerSnapshot(1)]);
+    const empty = mockRootSnapshot(2, []);
+
+    // A root registered on `install` before its first container provisions (or an HMR-orphaned one mid-teardown).
+    registerRoot(hook, { snapshot: () => populated });
+    registerRoot(hook, { snapshot: () => empty });
+
+    backend.onMessageRequest({ type: "refresh" });
+
+    expect(posts).toEqual([{ type: "snapshot", roots: [populated] }]);
   });
 
   it("answers inspect with the described node, correlated by requestId", () => {

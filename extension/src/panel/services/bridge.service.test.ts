@@ -300,4 +300,26 @@ describe("BridgeService", () => {
       expect(service.log).toEqual([]);
     });
   });
+
+  describe("refresh", () => {
+    it("re-pulls the tree and swaps the inspect closures so expanded reads re-run", () => {
+      const { container, service, getActivePort } = setup();
+
+      container.provision();
+
+      const previousInspect = service.inspect;
+      const previousInspectBinding = service.inspectBinding;
+
+      getActivePort().postMessage.mockClear();
+
+      service.refresh();
+
+      // Re-pulls the container tree.
+      expect(getActivePort().postMessage).toHaveBeenCalledWith({ type: "refresh" });
+      // Gives the inspect closures fresh identities — the signal the Detail value-tree keys
+      // its per-node fetch on, so every expanded node re-issues its read against the live page.
+      expect(service.inspect).not.toBe(previousInspect);
+      expect(service.inspectBinding).not.toBe(previousInspectBinding);
+    });
+  });
 });

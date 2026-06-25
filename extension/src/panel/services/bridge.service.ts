@@ -74,8 +74,8 @@ export class BridgeService {
    * @param path - Object keys / array indices from the instance to the target value.
    * @returns The one-level node at `path`, or an `unsupported` marker when the bridge is down.
    */
-  public readonly inspect: InspectFn = (rootId, instanceId, path) =>
-    this.request((requestId) => ({ type: "inspect", requestId, rootId, instanceId, path }));
+  @RefObservable()
+  public inspect: InspectFn = this.createInspect();
 
   /**
    * Lazily reads one level of a `Value` binding's value at a path. Resolves over the bridge.
@@ -85,8 +85,8 @@ export class BridgeService {
    * @param path - Object keys / array indices from the binding's value to the target.
    * @returns The one-level node at `path`, or an `unsupported` marker when the bridge is down.
    */
-  public readonly inspectBinding: InspectBindingFn = (rootId, bindingId, path) =>
-    this.request((requestId) => ({ type: "inspectBinding", requestId, rootId, bindingId, path }));
+  @RefObservable()
+  public inspectBinding: InspectBindingFn = this.createInspectBinding();
 
   /**
    * Clears the streamed delta log (the Timeline's clear action).
@@ -94,6 +94,17 @@ export class BridgeService {
   @BoundAction()
   public clear(): void {
     this.log = [];
+  }
+
+  /**
+   * Pulls the latest state from the inspected app on demand.
+   * The panel has no direct reactivity to the app's field values, so this is the manual "fetch latest".
+   */
+  @BoundAction()
+  public refresh(): void {
+    this.port?.postMessage({ type: "refresh" } satisfies PanelToBackendPayload);
+    this.inspect = this.createInspect();
+    this.inspectBinding = this.createInspectBinding();
   }
 
   private connect(): void {
@@ -172,6 +183,22 @@ export class BridgeService {
   private reset(): void {
     this.roots = [];
     this.log = [];
+  }
+
+  /**
+   * @returns A closure that resolves one level of instance state over the bridge.
+   */
+  private createInspect(): InspectFn {
+    return (rootId, instanceId, path) =>
+      this.request((requestId) => ({ type: "inspect", requestId, rootId, instanceId, path }));
+  }
+
+  /**
+   * @returns A closure that resolves one level of a `Value` binding's value over the bridge.
+   */
+  private createInspectBinding(): InspectBindingFn {
+    return (rootId, bindingId, path) =>
+      this.request((requestId) => ({ type: "inspectBinding", requestId, rootId, bindingId, path }));
   }
 
   private onMessage(port: chrome.runtime.Port, message: BackendToPanelPayload): void {

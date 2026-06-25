@@ -122,12 +122,15 @@ export class InspectorBackend {
   }
 
   /**
-   * Snapshots every registered root for the panel's tree.
+   * Snapshots every registered root for the panel's tree, dropping any that currently has no containers.
    *
-   * @returns A snapshot for each currently registered root.
+   * @returns A snapshot for each registered root that currently has at least one container.
    */
   public snapshotRoots(): ReadonlyArray<DevtoolsRootSnapshot> {
-    return this.hook.getRoots().map((root) => root.snapshot());
+    return this.hook
+      .getRoots()
+      .map((root) => root.snapshot())
+      .filter((snapshot) => snapshot.containers.length > 0);
   }
 
   /**

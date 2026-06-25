@@ -1,11 +1,11 @@
 import { useInjection } from "@wirestate/react";
 import { observer } from "@wirestate/react-mobx";
+import { RefreshCw } from "lucide-react";
 
 import { BridgeService } from "@/panel/services/bridge.service";
 
 /**
- * Thin top bar: connection status, protocol version, and a root/container summary. Reads the bridge
- * state directly (observer), so a streamed delta re-renders only this bar — not the whole panel.
+ * Thin top bar: connection status, protocol version, a root/container summary, and a manual refresh.
  */
 export const StatusBar = observer(function StatusBar() {
   const bridgeService: BridgeService = useInjection(BridgeService);
@@ -20,6 +20,18 @@ export const StatusBar = observer(function StatusBar() {
       <span className={"text-fg-muted"}>
         {rootsCount} root{rootsCount === 1 ? "" : "s"} · {containersCount} container{containersCount === 1 ? "" : "s"}
       </span>
+      <span className={"flex-1"} />
+      <button
+        className={
+          "inline-flex cursor-pointer items-center gap-1 rounded border border-divider px-1 py-1 hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
+        }
+        disabled={!bridgeService.isConnected}
+        title={"Re-fetch the latest state from the page"}
+        type={"button"}
+        onClick={bridgeService.refresh}
+      >
+        <RefreshCw className={"size-3"} />
+      </button>
     </header>
   );
 });

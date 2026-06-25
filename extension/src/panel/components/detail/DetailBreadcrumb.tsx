@@ -1,3 +1,4 @@
+import { X } from "lucide-react";
 import { useCallback } from "react";
 
 import { LinkButton } from "@/panel/components/ui";
@@ -31,6 +32,16 @@ export function DetailBreadcrumb({ resolved, actions }: DetailBreadcrumbProps) {
           <span className={"text-fg"}>{getEntityLabel(resolved)}</span>
         </>
       )}
+
+      <button
+        type={"button"}
+        className={"ml-auto rounded p-0.5 hover:bg-hover hover:text-fg"}
+        onClick={actions.clearSelection}
+        title={"Close (clear selection)"}
+        aria-label={"Close"}
+      >
+        <X className={"size-4"} />
+      </button>
     </div>
   );
 }
