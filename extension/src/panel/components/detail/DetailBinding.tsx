@@ -6,7 +6,7 @@ import {
   type DevtoolsInstance,
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
-import { Box, Braces, Link } from "lucide-react";
+import { Box, Braces } from "lucide-react";
 import { useCallback, useMemo } from "react";
 
 import { type InspectBindingFn, type InspectFn } from "@/bridge/bridge.messages";
