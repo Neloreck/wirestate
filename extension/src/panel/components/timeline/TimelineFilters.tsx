@@ -4,6 +4,7 @@ import { type ChangeEvent, useCallback } from "react";
 import { type EventKind, type PanelActions, type PanelUi, type TimelineFilter } from "@/panel/hooks/use-panel-state";
 import { type RootModel } from "@/panel/lib/container-tree";
 
+import { TimelineFilterGroup } from "./TimelineFilterGroup";
 import { TimelineToggle } from "./TimelineToggle";
 
 const KINDS: ReadonlyArray<EventKind> = ["lifecycle", "message", "registration"];
@@ -42,67 +43,92 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
   );
 
   return (
-    <div className={"flex flex-wrap items-center gap-2 border-b border-divider bg-elevated px-2.5 py-1"}>
-      <select
-        className={"rounded border border-divider bg-surface px-1 py-0.5"}
-        value={filter.rootId ?? ""}
-        onChange={onSetRootFilter}
-      >
-        <option value={""}>all roots</option>
-
-        {roots.map((root) => (
-          <option key={root.rootId} value={root.rootId}>
-            {root.label}
-          </option>
-        ))}
-      </select>
-
-      <select
-        className={"rounded border border-divider bg-surface px-1 py-0.5"}
-        value={filter.containerId ?? ""}
-        onChange={onSetContainerFilter}
-      >
-        <option value={""}>all containers</option>
-
-        {containerIds.map((id) => (
-          <option key={id} value={id}>
-            container #{id}
-          </option>
-        ))}
-      </select>
-
-      {KINDS.map((kind) => (
-        <label key={kind} className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}>
-          <input type={"checkbox"} checked={filter.kinds[kind]} onChange={() => actions.toggleKind(kind)} />
-          {kind}
-        </label>
-      ))}
-
-      <span className={"text-fg-subtle"}>|</span>
-
-      {CHANNELS.map((channel) => (
-        <label key={channel} className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}>
-          <input type={"checkbox"} checked={filter.channels[channel]} onChange={() => actions.toggleChannel(channel)} />
-          {channel}
-        </label>
-      ))}
-
+    <div className={"flex flex-wrap items-center gap-x-4 gap-y-1.5 border-b border-divider bg-elevated px-2.5 py-1"}>
       <input
-        className={"rounded border border-divider bg-surface px-1.5 py-0.5"}
+        className={"w-56 rounded border border-divider bg-surface px-1.5 py-0.5"}
         placeholder={"filter…"}
         value={filter.text}
         onChange={onChangeFilter}
       />
 
-      <span className={"flex-1"} />
+      <TimelineFilterGroup>
+        <select
+          className={"rounded border border-divider bg-surface px-1 py-0.5"}
+          value={filter.rootId ?? ""}
+          onChange={onSetRootFilter}
+        >
+          <option value={""}>all roots</option>
 
-      <TimelineToggle active={ui.paused} label={ui.paused ? "paused" : "live"} onClick={actions.togglePaused} />
+          {roots.map((root) => (
+            <option key={root.rootId} value={root.rootId}>
+              {root.label}
+            </option>
+          ))}
+        </select>
 
-      <TimelineToggle active={ui.autoscroll} label={"autoscroll"} onClick={actions.toggleAutoscroll} />
+        <select
+          className={"rounded border border-divider bg-surface px-1 py-0.5"}
+          value={filter.containerId ?? ""}
+          onChange={onSetContainerFilter}
+        >
+          <option value={""}>all containers</option>
 
-      <button className={"rounded border border-divider px-2 py-0.5 hover:bg-hover"} type={"button"} onClick={onClear}>
-        clear
-      </button>
+          {containerIds.map((id) => (
+            <option key={id} value={id}>
+              container #{id}
+            </option>
+          ))}
+        </select>
+      </TimelineFilterGroup>
+
+      <div className={"flex flex-nowrap items-center gap-2"}>
+        <TimelineFilterGroup label={"kind"}>
+          {KINDS.map((kind) => (
+            <label key={kind} className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}>
+              <input type={"checkbox"} checked={filter.kinds[kind]} onChange={() => actions.toggleKind(kind)} />
+              {kind}
+            </label>
+          ))}
+        </TimelineFilterGroup>
+
+        <span className={"h-4 w-px shrink-0 bg-divider"} />
+
+        <TimelineFilterGroup label={"channel"}>
+          {CHANNELS.map((channel) => (
+            <label key={channel} className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}>
+              <input
+                type={"checkbox"}
+                checked={filter.channels[channel]}
+                onChange={() => actions.toggleChannel(channel)}
+              />
+              {channel}
+            </label>
+          ))}
+        </TimelineFilterGroup>
+      </div>
+
+      <div className={"ml-auto flex flex-nowrap items-center gap-2"}>
+        <TimelineToggle
+          active={!ui.paused}
+          label={ui.paused ? "paused" : "live"}
+          dot={true}
+          onClick={actions.togglePaused}
+        />
+
+        <TimelineToggle active={ui.autoscroll} label={"autoscroll"} onClick={actions.toggleAutoscroll} />
+
+        <span className={"h-4 w-px shrink-0 bg-divider"} />
+
+        <button
+          className={
+            "rounded border border-divider px-2 py-0.5 text-fg-muted hover:border-red-400 hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400"
+          }
+          type={"button"}
+          onClick={onClear}
+        >
+          clear
+        </button>
+      </div>
     </div>
   );
 }

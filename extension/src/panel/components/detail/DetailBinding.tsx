@@ -17,7 +17,6 @@ import { rootIdOfContainer } from "@/panel/lib/container-tree";
 import { getTokenOfInstanceId } from "@/panel/lib/selection";
 import { type Optional } from "@/types/general";
 
-import { DetailFilterToContainerButton } from "./DetailFilterToContainerButton";
 import { DetailInstanceSections } from "./DetailInstanceSections";
 import { DetailStateTree } from "./DetailStateTree";
 import { DetailStatusTag } from "./DetailStatusTag";
@@ -132,8 +131,6 @@ export function DetailBinding({
           </Section>
         )
       ) : null}
-
-      <DetailFilterToContainerButton onClick={onFilterByContainer} />
     </div>
   );
 }

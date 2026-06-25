@@ -14,7 +14,6 @@ import { BindingStatus, getBindingStatus } from "@/panel/lib/binding";
 import { childContainers } from "@/panel/lib/container-tree";
 import { getLifecycleHistory } from "@/panel/lib/deltas";
 
-import { DetailFilterToContainerButton } from "./DetailFilterToContainerButton";
 import { DetailHistory } from "./DetailHistory";
 import { DetailStatusTag } from "./DetailStatusTag";
 
@@ -134,8 +133,6 @@ export function DetailContainer({ container, roots, log, actions }: DetailContai
       <Section title={"lifecycle history"} icon={<History />}>
         <DetailHistory events={history} onSelectBinding={onSelectBinding} />
       </Section>
-
-      <DetailFilterToContainerButton onClick={onSetContainerFilter} />
     </div>
   );
 }

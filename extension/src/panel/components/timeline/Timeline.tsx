@@ -71,6 +71,7 @@ export const Timeline = observer(function Timeline({ filter, ui, actions }: Time
         actions={actions}
         onClear={bridgeService.clear}
       />
+
       <div ref={scrollRef} className={"flex-1 overflow-auto"}>
         {rows.length === 0 ? (
           <p className={"p-2 text-fg-muted"}>No deltas match the current filter — interact with the page.</p>

@@ -77,9 +77,9 @@ export function Panel() {
         style={layout.isTimelineOpen ? styles.timeline : undefined}
       >
         <button
+          className={"flex cursor-pointer items-center gap-1 bg-elevated px-2.5 py-0.5 text-left text-fg-muted"}
           type={"button"}
           onClick={layoutActions.toggleTimeline}
-          className={"flex items-center gap-1 bg-elevated px-2.5 py-0.5 text-left text-fg-muted"}
         >
           {layout.isTimelineOpen ? "▾" : "▸"} Timeline <TimelineCount filter={state.filter} />
         </button>
