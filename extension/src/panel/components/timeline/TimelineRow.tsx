@@ -69,12 +69,12 @@ export function TimelineRow({ event, count, actions, result, baseline }: Timelin
         {count > 1 ? <span className={"rounded bg-selected px-1 text-2xs"}>×{count}</span> : null}
 
         <button
+          className={"shrink-0 cursor-pointer text-fg-subtle hover:text-fg"}
           type={"button"}
           title={"Select this container"}
-          className={"shrink-0 text-fg-subtle hover:text-fg"}
           onClick={onNavigateToContainer}
         >
-          bus: #{event.containerId}
+          #{event.containerId}
         </button>
       </div>
 
