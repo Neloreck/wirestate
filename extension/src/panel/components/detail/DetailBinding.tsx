@@ -74,11 +74,6 @@ export function DetailBinding({
     [actions, roots]
   );
 
-  const onFilterByContainer = useCallback(
-    () => actions.setContainerFilter(container.containerId),
-    [actions, container.containerId]
-  );
-
   return (
     <div className={"space-y-3"}>
       <Section>

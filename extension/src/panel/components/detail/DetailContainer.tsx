@@ -40,10 +40,6 @@ export function DetailContainer({ container, roots, log, actions }: DetailContai
     [actions]
   );
 
-  const onSetContainerFilter = useCallback(() => {
-    actions.setContainerFilter(container.containerId);
-  }, [actions, container.containerId]);
-
   return (
     <div className={"space-y-3"}>
       <Section>
