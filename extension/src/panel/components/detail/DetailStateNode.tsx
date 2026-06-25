@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { type InspectNode } from "@/bridge/bridge.messages";
+import { getInspectNodeColorClass } from "@/panel/lib/styling/value-type";
 import { type Optional } from "@/types/general";
 
 function getNodeChildKeys(node: InspectNode): ReadonlyArray<string | number> {
@@ -100,7 +101,7 @@ export function DetailStateNode({ read, path, label, depth, defaultOpen = false,
             ↪ {serviceNode.className} <span className={"text-fg-subtle"}>(service)</span>
           </span>
         ) : (
-          <span>{summary}</span>
+          <span className={node ? getInspectNodeColorClass(node) : undefined}>{summary}</span>
         )}
       </span>
 

@@ -21,7 +21,9 @@ export function DetailBreadcrumb({ resolved, actions }: DetailBreadcrumbProps) {
 
   return (
     <div className={"mb-2 flex flex-wrap items-center gap-1 text-fg-muted"}>
-      <LinkButton onClick={onContainerRefClick}>container #{containerId}</LinkButton>
+      <LinkButton className={"font-bold uppercase"} onClick={onContainerRefClick}>
+        container #{containerId}
+      </LinkButton>
 
       {resolved.kind === "container" ? null : (
         <>

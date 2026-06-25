@@ -5,6 +5,7 @@ import {
   type DevtoolsMethod,
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
+import { Antenna, Box, Braces, Code, History, Power } from "lucide-react";
 import { useCallback, useMemo } from "react";
 
 import { type InspectFn } from "@/bridge/bridge.messages";
@@ -88,11 +89,11 @@ export function DetailInstanceSections({
 
   return (
     <>
-      <Section title={"instance"}>
+      <Section title={"instance"} icon={<Box />}>
         <Field label={"class"}>{instance.className}</Field>
       </Section>
 
-      <Section title={"provision"}>
+      <Section title={"provision"} icon={<Power />}>
         {status ? (
           <>
             <Field label={"state"}>
@@ -111,7 +112,7 @@ export function DetailInstanceSections({
         )}
       </Section>
 
-      <Section title={`declared handlers (${instance.handlers.length})`}>
+      <Section title={"declared handlers"} count={instance.handlers.length} icon={<Antenna />}>
         {instance.handlers.length === 0 ? (
           <span className={"text-fg-muted"}>—</span>
         ) : (
@@ -120,13 +121,13 @@ export function DetailInstanceSections({
               <Tag tone={"accent"} variant={"outline"}>
                 {handler.channel}
               </Tag>{" "}
-              {handler.type} → {handler.method}()
+              {handler.type} → <span className={"text-val-function"}>{handler.method}</span>()
             </div>
           ))
         )}
       </Section>
 
-      <Section title={`methods (${methods.length})`}>
+      <Section title={"methods"} count={methods.length} icon={<Code />}>
         {methods.length === 0 ? (
           <span className={"text-fg-muted"}>—</span>
         ) : (
@@ -136,7 +137,7 @@ export function DetailInstanceSections({
             return (
               <div key={method.name} className={"flex flex-wrap items-center gap-1"}>
                 <span>
-                  {method.name}
+                  <span className={"text-val-function"}>{method.name}</span>
                   <span className={"text-fg-muted"}>({method.arity})</span>
                 </span>
                 {channels
@@ -152,11 +153,11 @@ export function DetailInstanceSections({
         )}
       </Section>
 
-      <Section title={"state"}>
+      <Section title={"state"} icon={<Braces />}>
         <DetailStateTree read={readState} rootLabel={"state"} onNavigate={selectByInstanceId} />
       </Section>
 
-      <Section title={"lifecycle history"}>
+      <Section title={"lifecycle history"} icon={<History />}>
         <DetailHistory events={history} onSelectBinding={onSelectBinding} />
       </Section>
     </>

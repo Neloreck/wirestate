@@ -6,6 +6,7 @@ import {
   type DevtoolsInstance,
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
+import { Box, Braces, Link } from "lucide-react";
 import { useCallback, useMemo } from "react";
 
 import { type InspectBindingFn, type InspectFn } from "@/bridge/bridge.messages";
@@ -81,7 +82,7 @@ export function DetailBinding({
 
   return (
     <div className={"space-y-3"}>
-      <Section title={"binding"}>
+      <Section>
         <Field label={"token"}>
           {binding.token.name} <Tag tone={"neutral"}>{binding.token.kind}</Tag>
         </Field>
@@ -110,7 +111,7 @@ export function DetailBinding({
       </Section>
 
       {isValue ? (
-        <Section title={"value"}>
+        <Section title={"value"} icon={<Braces />}>
           <DetailStateTree read={readValue} rootLabel={"value"} onNavigate={onNavigateByInstanceId} />
         </Section>
       ) : null}
@@ -126,7 +127,7 @@ export function DetailBinding({
             actions={actions}
           />
         ) : (
-          <Section title={"instance"}>
+          <Section title={"instance"} icon={<Box />}>
             <span className={"text-fg-muted"}>not yet realized</span>
           </Section>
         )

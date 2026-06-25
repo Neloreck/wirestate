@@ -12,6 +12,21 @@
   --color-fg: var(--fg);
   --color-fg-muted: var(--fg-muted);
   --color-fg-subtle: var(--fg-subtle);
+
+  /* Lifecycle phase hues: cool = setup, warm = teardown. */
+  --color-phase-container-provision: var(--phase-container-provision);
+  --color-phase-provision: var(--phase-provision);
+  --color-phase-activate: var(--phase-activate);
+  --color-phase-deactivate: var(--phase-deactivate);
+  --color-phase-deprovision: var(--phase-deprovision);
+  --color-phase-container-deprovision: var(--phase-container-deprovision);
+
+  /* Inspector value-type hues (IDE-like). */
+  --color-val-string: var(--val-string);
+  --color-val-number: var(--val-number);
+  --color-val-boolean: var(--val-boolean);
+  --color-val-nullish: var(--val-nullish);
+  --color-val-function: var(--val-function);
 }
 
 @theme {
@@ -21,6 +36,9 @@
   --text-md: 1rem; /* 16px */
   --text-lg: 1.125rem; /* 18px */
   --text-xl: 1.25rem; /* 20px */
+
+  /* Inline section-header icon size; yields the `size-icon` utility. */
+  --spacing-icon: 0.75rem; /* 12px */
 }
 
 :root {
@@ -34,6 +52,20 @@
   --fg: #1f1f1f; /* --sys-color-on-surface = --ref-palette-neutral10 */
   --fg-muted: #474747; /* --sys-color-on-surface-subtle = --ref-palette-neutral30 */
   --fg-subtle: #757575; /* --sys-color-token-subtle = --ref-palette-neutral50 */
+
+  /* Tuned for contrast on the light surface (#ffffff). */
+  --phase-container-provision: #0c447c;
+  --phase-provision: #0f6e56;
+  --phase-activate: #3b6d11;
+  --phase-deactivate: #854f0b;
+  --phase-deprovision: #993c1d;
+  --phase-container-deprovision: #a32d2d;
+
+  --val-string: #993c1d;
+  --val-number: #3b6d11;
+  --val-boolean: #0c447c;
+  --val-nullish: #854f0b;
+  --val-function: #534ab7;
 }
 
 .dark {
@@ -47,4 +79,18 @@
   --fg: #e3e3e3; /* --sys-color-on-surface = --ref-palette-neutral90 */
   --fg-muted: #c7c7c7; /* --sys-color-on-surface-subtle = --ref-palette-neutral80 */
   --fg-subtle: #8f8f8f; /* --sys-color-token-subtle = --ref-palette-neutral60 */
+
+  /* Lightened for contrast on the dark surface (#282828). */
+  --phase-container-provision: #85b7eb;
+  --phase-provision: #5dcaa5;
+  --phase-activate: #97c459;
+  --phase-deactivate: #fac775;
+  --phase-deprovision: #f0997b;
+  --phase-container-deprovision: #f09595;
+
+  --val-string: #f0997b;
+  --val-number: #97c459;
+  --val-boolean: #85b7eb;
+  --val-nullish: #ef9f27;
+  --val-function: #afa9ec;
 }

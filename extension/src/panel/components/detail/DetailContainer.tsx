@@ -4,6 +4,7 @@ import {
   type DevtoolsEvent,
   type DevtoolsRootSnapshot,
 } from "@wirestate/core/devtools";
+import { History, Link, Puzzle } from "lucide-react";
 import { useCallback } from "react";
 
 import { cn } from "@/lib/class-name";
@@ -47,7 +48,6 @@ export function DetailContainer({ container, roots, log, actions }: DetailContai
   return (
     <div className={"space-y-3"}>
       <Section>
-        <Field label={"id"}>#{container.containerId}</Field>
         <Field label={"parent"}>
           {container.parentContainerId === null ? (
             "— (root)"
@@ -70,7 +70,7 @@ export function DetailContainer({ container, roots, log, actions }: DetailContai
         </Field>
       </Section>
 
-      <Section title={`bindings (${container.bindings.length})`}>
+      <Section title={"bindings"} count={container.bindings.length} icon={<Link />}>
         {container.bindings.length === 0 ? (
           <span className={"text-fg-muted"}>—</span>
         ) : (
@@ -113,7 +113,7 @@ export function DetailContainer({ container, roots, log, actions }: DetailContai
         )}
       </Section>
 
-      <Section title={`plugins (${container.plugins.length})`}>
+      <Section title={"plugins"} count={container.plugins.length} icon={<Puzzle />}>
         {container.plugins.length === 0 ? (
           <span className={"text-fg-muted"}>—</span>
         ) : (
@@ -131,7 +131,7 @@ export function DetailContainer({ container, roots, log, actions }: DetailContai
         )}
       </Section>
 
-      <Section title={"lifecycle history"}>
+      <Section title={"lifecycle history"} icon={<History />}>
         <DetailHistory events={history} onSelectBinding={onSelectBinding} />
       </Section>
 

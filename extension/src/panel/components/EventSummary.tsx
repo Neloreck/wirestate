@@ -2,6 +2,7 @@ import { type DevtoolsEvent, type DevtoolsInstance } from "@wirestate/core/devto
 import { useCallback, type MouseEvent } from "react";
 
 import { getDevtoolsEventSummary } from "@/panel/lib/format";
+import { getLifecyclePhasePresentation } from "@/panel/lib/styling/phase";
 
 interface EventSummaryProps {
   readonly event: DevtoolsEvent;
@@ -20,22 +21,34 @@ export function EventSummary({ event, onSelectBinding }: EventSummaryProps) {
     [event, onSelectBinding]
   );
 
-  if (event.kind === "lifecycle" && event.instance) {
-    const instance: DevtoolsInstance = event.instance;
+  if (event.kind === "lifecycle") {
+    const { className, glyph } = getLifecyclePhasePresentation(event.phase);
 
-    return (
-      <>
-        {event.phase} ·{" "}
-        <button
-          className={"text-sky-600 hover:underline dark:text-sky-400"}
-          type={"button"}
-          title={`Select ${instance.className}`}
-          onClick={onSelect}
-        >
-          {instance.className}
-        </button>
-      </>
+    const phase = (
+      <span className={className}>
+        {glyph} {event.phase}
+      </span>
     );
+
+    if (event.instance) {
+      const instance: DevtoolsInstance = event.instance;
+
+      return (
+        <>
+          {phase} ·{" "}
+          <button
+            className={"text-sky-600 hover:underline dark:text-sky-400"}
+            type={"button"}
+            title={`Select ${instance.className}`}
+            onClick={onSelect}
+          >
+            {instance.className}
+          </button>
+        </>
+      );
+    }
+
+    return phase;
   }
 
   return getDevtoolsEventSummary(event);
