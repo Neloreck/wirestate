@@ -43,17 +43,21 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
   );
 
   return (
-    <div className={"flex flex-wrap items-center gap-x-4 gap-y-1.5 border-b border-divider bg-elevated px-2.5 py-1"}>
+    <div
+      className={
+        "@container flex flex-wrap items-center gap-x-4 gap-y-1.5 border-b border-divider bg-elevated px-2.5 py-1"
+      }
+    >
       <input
-        className={"w-56 rounded border border-divider bg-surface px-1.5 py-0.5"}
+        className={"min-w-32 basis-56 rounded border border-divider bg-surface px-1.5 py-0.5 @max-5xl:grow"}
         placeholder={"filter…"}
         value={filter.text}
         onChange={onChangeFilter}
       />
 
-      <TimelineFilterGroup>
+      <TimelineFilterGroup grow={true}>
         <select
-          className={"rounded border border-divider bg-surface px-1 py-0.5"}
+          className={"rounded border border-divider bg-surface px-1 py-0.5 @max-5xl:min-w-0 @max-5xl:grow"}
           value={filter.rootId ?? ""}
           onChange={onSetRootFilter}
         >
@@ -67,7 +71,7 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
         </select>
 
         <select
-          className={"rounded border border-divider bg-surface px-1 py-0.5"}
+          className={"rounded border border-divider bg-surface px-1 py-0.5 @max-5xl:min-w-0 @max-5xl:grow"}
           value={filter.containerId ?? ""}
           onChange={onSetContainerFilter}
         >
@@ -81,31 +85,27 @@ export function TimelineFilters({ roots, containerIds, filter, ui, actions, onCl
         </select>
       </TimelineFilterGroup>
 
-      <div className={"flex flex-nowrap items-center gap-2"}>
-        <TimelineFilterGroup label={"kind"}>
-          {KINDS.map((kind) => (
-            <label key={kind} className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}>
-              <input type={"checkbox"} checked={filter.kinds[kind]} onChange={() => actions.toggleKind(kind)} />
-              {kind}
-            </label>
-          ))}
-        </TimelineFilterGroup>
+      <TimelineFilterGroup label={"kind"}>
+        {KINDS.map((kind) => (
+          <label key={kind} className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}>
+            <input type={"checkbox"} checked={filter.kinds[kind]} onChange={() => actions.toggleKind(kind)} />
+            {kind}
+          </label>
+        ))}
+      </TimelineFilterGroup>
 
-        <span className={"h-4 w-px shrink-0 bg-divider"} />
-
-        <TimelineFilterGroup label={"channel"}>
-          {CHANNELS.map((channel) => (
-            <label key={channel} className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}>
-              <input
-                type={"checkbox"}
-                checked={filter.channels[channel]}
-                onChange={() => actions.toggleChannel(channel)}
-              />
-              {channel}
-            </label>
-          ))}
-        </TimelineFilterGroup>
-      </div>
+      <TimelineFilterGroup label={"channel"}>
+        {CHANNELS.map((channel) => (
+          <label key={channel} className={"inline-flex cursor-pointer items-center gap-1 text-fg-muted"}>
+            <input
+              type={"checkbox"}
+              checked={filter.channels[channel]}
+              onChange={() => actions.toggleChannel(channel)}
+            />
+            {channel}
+          </label>
+        ))}
+      </TimelineFilterGroup>
 
       <div className={"ml-auto flex flex-nowrap items-center gap-2"}>
         <TimelineToggle
