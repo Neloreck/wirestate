@@ -17,15 +17,10 @@ import {
   QueriesPlugin,
   QueryBus,
 } from "@wirestate/core";
-import {
-  DEVTOOLS_HOOK_KEY,
-  type DevtoolsEvent,
-  type DevtoolsHook,
-  DevToolsPlugin,
-  getDevtoolsHook,
-} from "@wirestate/core/devtools";
 import { ContainerProvider } from "@wirestate/react";
 import { StrictMode } from "react";
+
+import { DEVTOOLS_HOOK_KEY, type DevtoolsEvent, type DevtoolsHook, DevToolsPlugin, getDevtoolsHook } from "#/devtools";
 
 /**
  * End-to-end validation of the v1 devtools protocol:

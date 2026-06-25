@@ -12,6 +12,7 @@ const shared = {
   transformIgnorePatterns: ["node_modules/.pnpm/(?!@preact|@lit-labs|@adobe|lit|lit-html|@lit)"],
   testEnvironment: "node",
   moduleNameMapper: {
+    "^#/devtools$": "<rootDir>/src/wirestate-core/plugin/devtools/index",
     "^#/(.*)$": "<rootDir>/cli/$1",
     "^@/fixtures/(.*)$": "<rootDir>/src/fixtures/$1",
     "^@wirestate/core/devtools$": "<rootDir>/src/wirestate-core/devtools",

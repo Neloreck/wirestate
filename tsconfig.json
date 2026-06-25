@@ -10,6 +10,7 @@
     "moduleResolution": "bundler",
     "noImplicitAny": true,
     "paths": {
+      "#/devtools": ["./src/wirestate-core/plugin/devtools"],
       "#/*": ["./cli/*"],
       "@/fixtures/*": ["./src/fixtures/*"],
       "@wirestate/core": ["./src/wirestate-core"],

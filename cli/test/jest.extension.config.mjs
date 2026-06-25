@@ -20,6 +20,7 @@ export default {
   },
   transformIgnorePatterns: ["node_modules/.pnpm/(?!@preact|@lit-labs|@adobe|lit|lit-html|@lit)"],
   moduleNameMapper: {
+    "^#/devtools$": "<rootDir>/src/wirestate-core/plugin/devtools/index",
     "^@/(.*)$": "<rootDir>/extension/src/$1",
     "^@wirestate/core/devtools$": "<rootDir>/src/wirestate-core/devtools",
     "^@wirestate/react-mobx$": "<rootDir>/src/wirestate-react-mobx/index",
