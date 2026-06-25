@@ -85,6 +85,66 @@ describe("DevToolsPlugin", () => {
     committed.deprovision();
   });
 
+  it("deregisters its root once the last container deprovisions, leaving no empty shell", () => {
+    const container: Container = new Container({ bindings: [Service], plugins: [new DevToolsPlugin()] });
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+
+    container.provision();
+
+    expect(hook.getRoots()).toHaveLength(1);
+
+    container.deprovision();
+
+    expect(hook.getRoots()).toHaveLength(0);
+  });
+
+  it("keeps the root until its last observed container deprovisions", () => {
+    @Injectable()
+    class ParentService {}
+
+    @Injectable()
+    class ChildService {}
+
+    const parent: Container = new Container({ bindings: [ParentService], plugins: [new DevToolsPlugin()] });
+    const child: Container = new Container({ parent, bindings: [ChildService] });
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+
+    parent.provision();
+    child.provision();
+
+    expect(hook.getRoots()).toHaveLength(1);
+
+    // The child (observed through inheritance) leaves first; the parent keeps the root alive.
+    child.deprovision();
+    expect(hook.getRoots()).toHaveLength(1);
+
+    // The last container leaves -> the root is released.
+    parent.deprovision();
+    expect(hook.getRoots()).toHaveLength(0);
+  });
+
+  it("re-registers under a fresh, higher id when a container provisions after going empty", () => {
+    const container: Container = new Container({ bindings: [Service], plugins: [new DevToolsPlugin()] });
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+
+    container.provision();
+
+    const firstId: number = hook.getRoots()[0].rootId;
+
+    container.deprovision();
+    expect(hook.getRoots()).toHaveLength(0);
+
+    container.provision();
+
+    const roots = hook.getRoots();
+
+    expect(roots).toHaveLength(1);
+    // Ids are never reused: the re-registered root takes the next id up.
+    expect(roots[0].rootId).toBeGreaterThan(firstId);
+
+    container.deprovision();
+  });
+
   it("streams lifecycle deltas to a subscribed backend", () => {
     @Injectable()
     class LifecycleService {
@@ -580,13 +640,9 @@ describe("DevToolsPlugin", () => {
     expect(phases).toContain("deprovision:LifecycleService");
     expect(phases).toContain("deactivate:LifecycleService");
 
-    // Cleanup is reflected: the deprovisioned container drops out of a fresh snapshot.
-    const remaining: Array<string> = hook
-      .getRoots()[0]
-      .snapshot()
-      .containers.flatMap((node) => node.instances.map((instance) => instance.className));
-
-    expect(remaining).not.toContain("LifecycleService");
+    // Cleanup is reflected: deprovisioning the last container releases the root entirely, so the
+    // torn-down instance can no longer surface through a lingering empty root.
+    expect(hook.getRoots()).toHaveLength(0);
   });
 
   it("taps a bus exactly once across provision cycles (no double observation)", () => {

@@ -75,22 +75,11 @@ export class DevToolsPlugin implements WirestatePlugin {
 
   public install(): void {
     this.hook = installDevtoolsHook();
-
-    // Register exactly one root per plugin instance. A managed provider may `install`
-    // the same instance on more than one container from one config — React StrictMode
-    // double-invokes the `useState` initializer, constructing a throwaway alongside the
-    // committed container — and only the committed one ever provisions.
-    if (this.rootId === 0) {
-      this.rootId = this.hook.registerRoot({
-        snapshot: () => this.snapshot(),
-        inspect: (instanceId, path) => this.inspect(instanceId, path),
-        inspectBinding: (bindingId, path) => this.inspectBinding(bindingId, path),
-        serviceRefOf: (value) => this.serviceRefOf(value),
-      });
-    }
+    this.ensureRoot();
   }
 
   public onContainerProvision(container: Container): void {
+    this.ensureRoot();
     this.observe(container);
     this.report(container, "containerProvision");
     this.tapMessages(container);
@@ -99,6 +88,38 @@ export class DevToolsPlugin implements WirestatePlugin {
   public onContainerDeprovision(container: Container): void {
     this.report(container, "containerDeprovision");
     this.unobserve(container);
+    this.releaseRoot();
+  }
+
+  /**
+   * Registers this plugin's root on the hook unless one is already registered.
+   * Exactly one root per plugin instance at a time.
+   */
+  private ensureRoot(): void {
+    if (!this.hook || this.rootId !== 0) {
+      return;
+    }
+
+    this.rootId = this.hook.registerRoot({
+      snapshot: () => this.snapshot(),
+      inspect: (instanceId, path) => this.inspect(instanceId, path),
+      inspectBinding: (bindingId, path) => this.inspectBinding(bindingId, path),
+      serviceRefOf: (value) => this.serviceRefOf(value),
+    });
+  }
+
+  /**
+   * Deregisters this plugin's root once its last observed container has deprovisioned.
+   * This drops the root from snapshots and releases the registration the hook held, so repeated HMR cycles (unload a
+   * root, mount a fresh one) don't accumulate empty roots over a long dev session.
+   */
+  private releaseRoot(): void {
+    if (!this.hook || this.rootId === 0 || this.observed.size > 0) {
+      return;
+    }
+
+    this.hook.deregisterRoot(this.rootId);
+    this.rootId = 0;
   }
 
   public onActivate(instance: object, container: Container): void {

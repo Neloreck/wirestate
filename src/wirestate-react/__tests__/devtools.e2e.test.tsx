@@ -140,13 +140,9 @@ describe("devtools protocol — React-driven consumer e2e", () => {
     expect(phases).toContain("containerDeprovision");
     expect(phases).toContain("deactivate");
 
-    // The dropped container's bindings/instances are gone from a fresh snapshot.
-    const snapshot = hook().getRoots()[0].snapshot();
-    const instances: Array<string> = snapshot.containers.flatMap((node) =>
-      node.instances.map((instance) => instance.className)
-    );
-
-    expect(instances).not.toContain("Feature");
+    // The app dropped its only container, so the plugin releases the root entirely — no empty shell
+    // lingers (and with it, no trace of the torn-down Feature).
+    expect(hook().getRoots()).toHaveLength(0);
   });
 
   it("surfaces independent providers as separate roots", () => {
