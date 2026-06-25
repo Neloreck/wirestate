@@ -1,4 +1,9 @@
-import { publishPackages, readPublishPackages, resolvePublishTag } from "./publish.utils";
+import {
+  publishPackages,
+  readPublishPackages,
+  resolvePublishTag,
+  writeGithubActionPublishSummary,
+} from "./publish.utils";
 
 if (require.main === module) {
   try {
@@ -6,6 +11,8 @@ if (require.main === module) {
     const packages = readPublishPackages();
 
     publishPackages(packages, tag);
+
+    writeGithubActionPublishSummary(packages, tag);
   } catch (error) {
     console.error(error instanceof Error ? error.message : error);
     process.exit(1);

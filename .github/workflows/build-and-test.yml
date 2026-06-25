@@ -43,23 +43,32 @@ jobs:
           restore-keys: |
             eslint-${{ hashFiles('eslint.config.mjs', 'pnpm-lock.yaml') }}-
 
-      - run: pnpm lint --cache --cache-strategy content
+      - name: Lint
+        run: pnpm lint --cache --cache-strategy content
 
-      - run: pnpm format:check
+      - name: Check formatting
+        run: pnpm format:check
 
-      - run: pnpm typecheck && pnpm typecheck:cli
+      - name: Type check
+        run: pnpm typecheck && pnpm typecheck:cli
 
-      - run: pnpm test --maxWorkers=100%
+      - name: Run tests
+        run: pnpm test --maxWorkers=100%
 
-      - run: pnpm build:dts
+      - name: Build type declarations
+        run: pnpm build:dts
 
-      - run: pnpm build:cjs
+      - name: Build CommonJS bundle
+        run: pnpm build:cjs
 
-      - run: pnpm build:esm
+      - name: Build ESM bundle
+        run: pnpm build:esm
 
-      - run: pnpm build:pkg
+      - name: Prepare packages
+        run: pnpm build:pkg
 
-      - run: pnpm test:e2e
+      - name: Run package consumption tests
+        run: pnpm test:e2e
 
       - name: Archive build artifacts
         working-directory: target/
@@ -94,11 +103,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - run: pnpm typecheck:extension
+      - name: Type check extension
+        run: pnpm typecheck:extension
 
-      - run: pnpm test:extension
+      - name: Test extension
+        run: pnpm test:extension
 
-      - run: pnpm build:extension
+      - name: Build extension
+        run: pnpm build:extension
 
       - name: Archive extension build
         working-directory: extension/dist
@@ -118,7 +130,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@v6
 
       - name: Download library package
         uses: actions/download-artifact@v8

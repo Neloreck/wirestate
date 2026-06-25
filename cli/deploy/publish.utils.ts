@@ -117,6 +117,34 @@ export function readPublishPackages(): Array<PublishPackage> {
   });
 }
 
+export function buildPublishSummary(packages: Array<PublishPackage>, tag?: string): string {
+  const distTag = tag ?? "latest";
+
+  return [
+    "## NPM Publish Report",
+    "",
+    "### Summary",
+    "",
+    `- **Packages**: ✅ **${packages.length} published**`,
+    `- **Tag**: \`${distTag}\``,
+    "",
+    "| Package | Version |",
+    "| --- | --- |",
+    ...packages.map((pkg) => `| \`${pkg.displayName}\` | \`${pkg.version}\` |`),
+  ].join("\n");
+}
+
+// Appends an npm-publish summary to the GitHub Actions job summary ($GITHUB_STEP_SUMMARY).
+export function writeGithubActionPublishSummary(packages: Array<PublishPackage>, tag?: string): void {
+  const summaryFile = process.env.GITHUB_STEP_SUMMARY;
+
+  if (!summaryFile) {
+    return;
+  }
+
+  fs.appendFileSync(summaryFile, `${buildPublishSummary(packages, tag)}\n`);
+}
+
 export function publishPackages(packages: Array<PublishPackage>, tag?: string): void {
   if (tag) {
     assertPublishTag(tag);
