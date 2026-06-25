@@ -20,10 +20,26 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  publish:
-    name: Publish packages
+  version:
+    name: Resolve version
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    outputs:
+      version: ${{ steps.read.outputs.version }}
+    steps:
+      - name: Read root package.json version
+        id: read
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="$(gh api "repos/${{ github.repository }}/contents/package.json?ref=${{ github.sha }}" \
+            -H "Accept: application/vnd.github.raw" | jq -r '.version')"
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+
+  publish:
+    name: Publish v${{ needs.version.outputs.version }}
+    needs: version
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: npm-publish
     env:
       PUBLISH_SCRIPT: ${{ inputs.experimental && 'deploy:experimental' || 'deploy' }}
@@ -63,13 +79,9 @@ jobs:
       - name: Publish packages
         run: pnpm ${{ env.PUBLISH_SCRIPT }}
 
-      - name: Resolve published version
-        id: version
-        run: echo "version=$(node -p "require('./package.json').version")" >> "${GITHUB_OUTPUT}"
-
       - name: Tag the published commit
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          VERSION: ${{ needs.version.outputs.version }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -85,7 +97,7 @@ jobs:
       - name: Create GitHub release from changelog
         if: ${{ !inputs.experimental }}
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          VERSION: ${{ needs.version.outputs.version }}
           GH_TOKEN: ${{ github.token }}
         run: |
           pnpm tsx cli/deploy/print-release-notes.ts "${VERSION}" > release-notes.md
