@@ -24,6 +24,8 @@ describe("Library exported API from wirestate-core/devtools", () => {
         "DevtoolsInstanceId",
         "DevtoolsInstanceStatus",
         "DevtoolsLifecycleEvent",
+        "DevtoolsLifecycleHook",
+        "DevtoolsLifecycleHookMethod",
         "DevtoolsLifecyclePhase",
         "DevtoolsListener",
         "DevtoolsMessage",

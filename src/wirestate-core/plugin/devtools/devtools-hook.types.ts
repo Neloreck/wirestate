@@ -155,6 +155,30 @@ export interface DevtoolsMethod {
 }
 
 /**
+ * One of the four single-method lifecycle hooks a service may declare via decorators.
+ *
+ * @group DevTools
+ */
+export type DevtoolsLifecycleHook = "onActivated" | "onDeactivation" | "onProvision" | "onDeprovision";
+
+/**
+ * A lifecycle hook a service statically declares, paired with the method that implements it.
+ *
+ * @group DevTools
+ */
+export interface DevtoolsLifecycleHookMethod {
+  /**
+   * Which lifecycle hook the method is wired to.
+   */
+  readonly hook: DevtoolsLifecycleHook;
+
+  /**
+   * Implementing method name on the service (symbols stringified, like {@link DevtoolsHandler.method}).
+   */
+  readonly method: string;
+}
+
+/**
  * Normalized description of one active service instance.
  *
  * @group DevTools
@@ -190,6 +214,11 @@ export interface DevtoolsInstance {
    * Methods declared on the instance's class and its base classes.
    */
   readonly methods: ReadonlyArray<DevtoolsMethod>;
+
+  /**
+   * Lifecycle hooks this instance statically declares via decorators, in setup-to-teardown order.
+   */
+  readonly lifecycle: ReadonlyArray<DevtoolsLifecycleHookMethod>;
 }
 
 /**

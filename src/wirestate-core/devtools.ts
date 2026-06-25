@@ -27,6 +27,8 @@ export {
   type DevtoolsInstanceId,
   type DevtoolsInstanceStatus,
   type DevtoolsLifecycleEvent,
+  type DevtoolsLifecycleHook,
+  type DevtoolsLifecycleHookMethod,
   type DevtoolsLifecyclePhase,
   type DevtoolsListener,
   type DevtoolsMessage,

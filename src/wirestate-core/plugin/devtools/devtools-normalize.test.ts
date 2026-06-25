@@ -1,5 +1,11 @@
+import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
+
+import { OnActivated } from "../../activation/on-activated";
+import { OnDeactivation } from "../../activation/on-deactivation";
 import { InjectionToken } from "../../binding/binding-tokens";
 import { Injectable } from "../../metadata/metadata-injectable";
+import { OnDeprovision } from "../../provision/on-deprovision";
+import { OnProvision } from "../../provision/on-provision";
 import { OnCommand } from "../commands/on-command";
 import { OnEvent } from "../events/on-event";
 
@@ -88,6 +94,7 @@ describe("normalizeInstance", () => {
       status: undefined,
       handlers: [],
       methods: [{ name: "render", arity: 0 }],
+      lifecycle: [],
     });
   });
 
@@ -171,5 +178,57 @@ describe("normalizeInstance", () => {
     class Empty {}
 
     expect(normalizeInstance(new Empty(), 1).methods).toEqual([]);
+  });
+
+  it("collects declared lifecycle hooks in setup-to-teardown order, alongside the methods that implement them", () => {
+    const { LifecycleService } = createLifecycleService();
+
+    const { lifecycle, methods } = normalizeInstance(new LifecycleService(), 1);
+
+    expect(lifecycle).toEqual([
+      { hook: "onActivated", method: "onActivated" },
+      { hook: "onProvision", method: "onProvision" },
+      { hook: "onDeprovision", method: "onDeprovision" },
+      { hook: "onDeactivation", method: "onDeactivation" },
+    ]);
+
+    expect(methods.map((method) => method.name)).toEqual([
+      "onActivated",
+      "onDeactivation",
+      "onProvision",
+      "onDeprovision",
+    ]);
+  });
+
+  it("skips a hook whose metadata read throws (hierarchy conflict) without dropping the others", () => {
+    @Injectable()
+    class Base {
+      @OnActivated()
+      public onActivated(): void {}
+
+      @OnDeactivation()
+      public onDeactivation(): void {}
+
+      @OnDeprovision()
+      public onDeprovision(): void {}
+
+      @OnProvision()
+      public provisionOnBase(): void {}
+    }
+
+    // Re-declares @OnProvision on a different method name across the hierarchy — its reader throws.
+    @Injectable()
+    class Derived extends Base {
+      @OnProvision()
+      public provisionOnDerived(): void {}
+    }
+
+    expect(() => normalizeInstance(new Derived(), 1)).not.toThrow();
+
+    expect(normalizeInstance(new Derived(), 1).lifecycle).toEqual([
+      { hook: "onActivated", method: "onActivated" },
+      { hook: "onDeprovision", method: "onDeprovision" },
+      { hook: "onDeactivation", method: "onDeactivation" },
+    ]);
   });
 });

@@ -1,8 +1,12 @@
+import { getActivatedHandlerMetadata } from "../../activation/on-activated";
+import { getDeactivationHandlerMetadata } from "../../activation/on-deactivation";
 import { WireStatus } from "../../activation/wire-status";
 import { type BindingDescriptor, type ServiceToken } from "../../binding/binding";
 import { isInstanceDescriptor } from "../../binding/binding-guards";
 import { getBindingScope } from "../../binding/binding-lifecycle";
 import { InjectionToken, getBindingToken, tokenToString } from "../../binding/binding-tokens";
+import { getDeprovisionHandlerMetadata } from "../../provision/on-deprovision";
+import { getProvisionHandlerMetadata } from "../../provision/on-provision";
 import { type Optional } from "../../types/general";
 import { getCommandHandlerMetadata } from "../commands/on-command";
 import { getEventHandlerMetadata } from "../events/events-registry";
@@ -16,10 +20,24 @@ import {
   type DevtoolsInstance,
   type DevtoolsInstanceId,
   type DevtoolsInstanceStatus,
+  type DevtoolsLifecycleHook,
+  type DevtoolsLifecycleHookMethod,
   type DevtoolsMethod,
   type DevtoolsPluginInfo,
   type DevtoolsToken,
 } from "./devtools-hook.types";
+
+/**
+ * The four lifecycle hooks and their metadata readers, in setup-to-teardown display order.
+ */
+const LIFECYCLE_HOOK_READERS: ReadonlyArray<
+  readonly [DevtoolsLifecycleHook, (instance: object) => Optional<string | symbol>]
+> = [
+  ["onActivated", getActivatedHandlerMetadata],
+  ["onProvision", getProvisionHandlerMetadata],
+  ["onDeprovision", getDeprovisionHandlerMetadata],
+  ["onDeactivation", getDeactivationHandlerMetadata],
+];
 
 /**
  * Normalizes a service token into a display-ready record.
@@ -94,7 +112,32 @@ export function normalizeInstance(instance: object, instanceId: DevtoolsInstance
     status: readStatus(instance),
     handlers: normalizeHandlers(instance),
     methods: normalizeMethods(instance),
+    lifecycle: normalizeLifecycle(instance),
   };
+}
+
+/**
+ * Reads the lifecycle hooks a service instance declares via decorators.
+ *
+ * @param instance - Service instance to inspect.
+ * @returns The declared hooks, one record per hook, in setup-to-teardown order.
+ */
+function normalizeLifecycle(instance: object): ReadonlyArray<DevtoolsLifecycleHookMethod> {
+  const lifecycle: Array<DevtoolsLifecycleHookMethod> = [];
+
+  for (const [hook, read] of LIFECYCLE_HOOK_READERS) {
+    try {
+      const method: Optional<string | symbol> = read(instance);
+
+      if (method !== undefined) {
+        lifecycle.push({ hook, method: String(method) });
+      }
+    } catch {
+      // Skip a hook whose metadata read throws.
+    }
+  }
+
+  return lifecycle;
 }
 
 /**
