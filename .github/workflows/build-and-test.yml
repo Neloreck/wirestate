@@ -14,6 +14,7 @@ concurrency:
 
 jobs:
   build-lib:
+    name: Build library
     runs-on: ubuntu-latest
 
     steps:
@@ -83,6 +84,7 @@ jobs:
           retention-days: 1
 
   build-extension:
+    name: Build extension
     runs-on: ubuntu-latest
 
     steps:
@@ -125,6 +127,7 @@ jobs:
           retention-days: 1
 
   upload-nightly:
+    name: Upload nightly release
     if: ${{ github.ref_name == 'main' && github.event_name != 'pull_request' }}
     needs: [ build-lib, build-extension ]
     runs-on: ubuntu-latest
