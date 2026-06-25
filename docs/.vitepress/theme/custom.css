@@ -40,17 +40,20 @@
   --vp-font-family-mono: "IBM Plex Mono", ui-monospace, "SF Mono", "Menlo", "Monaco",
     "Consolas", "Liberation Mono", "Courier New", monospace;
 
-  /* Display font used for headings + hero (applied via selectors below). */
+  /* Display font used for headings + hero. */
   --ws-font-display: "Space Grotesk", var(--vp-font-family-base);
 
-  /* Hero wordmark gradient: coral -> teal. Vibrant coral leads; a gradient has
-     no text-contrast constraint so the bright coral is fine here. */
+  /* Hero wordmark gradient: coral -> teal. */
   --vp-home-hero-name-color: transparent;
   --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #ff4733 30%, #12b8a8);
 
-  /* Soft glow blob behind the hero logo image. Low-saturation coral haze: keeps
-     the warmth but stays muted so the vibrant coral cog still pops against it. */
-  --vp-home-hero-image-background-image: linear-gradient(-45deg, #e9c5bb 30%, #f8e2db 95%);
+  /* Warm coral glow blob behind the hero logo image. */
+  --vp-home-hero-image-background-image: radial-gradient(
+    circle,
+    rgba(255, 140, 95, 0.5),
+    rgba(255, 95, 65, 0.2) 45%,
+    transparent 72%
+  );
   --vp-home-hero-image-filter: blur(48px);
 }
 
@@ -62,7 +65,9 @@
   --vp-c-brand-soft: rgba(255, 142, 110, 0.16);
 
   --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #ff4733 30%, #34e0cf);
-  --vp-home-hero-image-background-image: linear-gradient(-45deg, #957169 30%, #b8968c 95%);
+
+  /* No glow blob in dark mode. */
+  --vp-home-hero-image-background-image: none;
 }
 
 @media (min-width: 960px) {
