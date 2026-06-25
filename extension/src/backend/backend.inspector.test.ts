@@ -4,7 +4,7 @@ import {
   type DevtoolsRootRegister,
   type DevtoolsServiceRef,
   installDevtoolsHook,
-} from "@wirestate/core/devtools";
+} from "#/devtools";
 
 import { mockContainerSnapshot, mockLifecycleEvent, mockRootSnapshot } from "@/fixtures/devtools";
 

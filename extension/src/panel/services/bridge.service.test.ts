@@ -1,5 +1,6 @@
 import { Container } from "@wirestate/core";
-import { type DevtoolsEvent } from "@wirestate/core/devtools";
+
+import { type DevtoolsEvent } from "#/devtools";
 
 import { asChromePort, mockChromePort, type MockChromePort } from "@/fixtures/chrome";
 import { mockLifecycleEvent, mockMessageEvent, mockRootSnapshot } from "@/fixtures/devtools";

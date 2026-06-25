@@ -1,11 +1,8 @@
 import { BindingScope, BindingType } from "@wirestate/core";
-import {
-  type DevtoolsContainerSnapshot,
-  type DevtoolsEvent,
-  type DevtoolsRootSnapshot,
-} from "@wirestate/core/devtools";
 import { History, Link, Puzzle } from "lucide-react";
 import { useCallback } from "react";
+
+import { type DevtoolsContainerSnapshot, type DevtoolsEvent, type DevtoolsRootSnapshot } from "#/devtools";
 
 import { cn } from "@/lib/class-name";
 import { Field, LinkButton, Section, Tag } from "@/panel/components/ui";

@@ -4,7 +4,7 @@ import {
   type DevtoolsHook,
   type DevtoolsRoot,
   type DevtoolsRootSnapshot,
-} from "@wirestate/core/devtools";
+} from "#/devtools";
 
 import { createInspectNode, createServiceInspectNode } from "@/backend/backend.node";
 import { sanitizeDevtoolsEvent, stampTimeInDevtoolsEvent } from "@/backend/backend.utils";

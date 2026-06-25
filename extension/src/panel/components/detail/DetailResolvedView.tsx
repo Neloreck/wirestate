@@ -1,4 +1,4 @@
-import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
+import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "#/devtools";
 
 import { type InspectBindingFn, type InspectFn } from "@/bridge/bridge.messages";
 import { type PanelActions } from "@/panel/hooks/use-panel-state";

@@ -1,4 +1,4 @@
-import { type DevtoolsHook, installDevtoolsHook } from "@wirestate/core/devtools";
+import { type DevtoolsHook, installDevtoolsHook } from "#/devtools";
 
 import { InspectorBackend } from "@/backend/backend.inspector";
 import { postToContent } from "@/backend/backend.messaging";

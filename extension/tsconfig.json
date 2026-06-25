@@ -14,6 +14,7 @@
     "verbatimModuleSyntax": true,
     "types": ["chrome", "node", "jest"],
     "paths": {
+      "#/devtools": ["../src/wirestate-core/plugin/devtools/index.ts"],
       "@/*": ["./src/*"],
       "@wirestate/core/devtools": ["../src/wirestate-core/devtools.ts"],
       "@wirestate/react-mobx": ["../src/wirestate-react-mobx/index.ts"],

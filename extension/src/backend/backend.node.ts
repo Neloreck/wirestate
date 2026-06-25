@@ -1,4 +1,4 @@
-import { type DevtoolsServiceRef } from "@wirestate/core/devtools";
+import { type DevtoolsServiceRef } from "#/devtools";
 
 import { type InspectNode } from "@/bridge/bridge.messages";
 import { type Optional } from "@/types/general";

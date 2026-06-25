@@ -1,4 +1,4 @@
-import { type DevtoolsEvent } from "@wirestate/core/devtools";
+import { type DevtoolsEvent } from "#/devtools";
 
 import {
   mockLifecycleEvent,

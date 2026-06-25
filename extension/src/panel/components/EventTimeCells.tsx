@@ -1,4 +1,4 @@
-import { type DevtoolsEvent } from "@wirestate/core/devtools";
+import { type DevtoolsEvent } from "#/devtools";
 
 import { formatTimestamp, formatDelta, timestampOfDevtoolsEvent } from "@/panel/lib/format";
 import { type Maybe, type Optional } from "@/types/general";

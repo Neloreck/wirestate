@@ -1,4 +1,4 @@
-import { type DevtoolsLifecyclePhase } from "@wirestate/core/devtools";
+import { type DevtoolsLifecyclePhase } from "#/devtools";
 
 export interface LifecyclePhasePresentation {
   /**

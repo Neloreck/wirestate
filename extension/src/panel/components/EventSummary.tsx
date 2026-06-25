@@ -1,5 +1,6 @@
-import { type DevtoolsEvent, type DevtoolsInstance } from "@wirestate/core/devtools";
 import { useCallback, type MouseEvent } from "react";
+
+import { type DevtoolsEvent, type DevtoolsInstance } from "#/devtools";
 
 import { getDevtoolsEventSummary } from "@/panel/lib/format";
 import { getLifecyclePhasePresentation } from "@/panel/lib/styling/phase";

@@ -1,4 +1,4 @@
-import { type DevtoolsBinding } from "@wirestate/core/devtools";
+import { type DevtoolsBinding } from "#/devtools";
 
 import { mockBinding, mockContainerSnapshot, mockInstance } from "@/fixtures/devtools";
 

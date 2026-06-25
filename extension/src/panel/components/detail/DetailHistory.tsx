@@ -1,4 +1,4 @@
-import { type DevtoolsEvent } from "@wirestate/core/devtools";
+import { type DevtoolsEvent } from "#/devtools";
 
 import { EventSummary } from "@/panel/components/EventSummary";
 import { EventTimeCells } from "@/panel/components/EventTimeCells";

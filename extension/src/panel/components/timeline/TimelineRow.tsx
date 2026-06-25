@@ -1,5 +1,6 @@
-import { type DevtoolsMessageResultEvent, type DevtoolsEvent } from "@wirestate/core/devtools";
 import { useCallback, useState, type MouseEvent } from "react";
+
+import { type DevtoolsMessageResultEvent, type DevtoolsEvent } from "#/devtools";
 
 import { cn } from "@/lib/class-name";
 import { EventSummary } from "@/panel/components/EventSummary";

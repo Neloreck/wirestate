@@ -1,7 +1,8 @@
-import { type DevtoolsEvent, type DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
 import { useInjection } from "@wirestate/react";
 import { observer } from "@wirestate/react-mobx";
 import { useEffect, useMemo, useRef } from "react";
+
+import { type DevtoolsEvent, type DevtoolsMessageResultEvent } from "#/devtools";
 
 import { type PanelActions, type PanelUi, type TimelineFilter } from "@/panel/hooks/use-panel-state";
 import { type RootModel, buildRoots } from "@/panel/lib/container-tree";

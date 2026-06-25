@@ -1,4 +1,4 @@
-import { type DevtoolsPluginInfo } from "@wirestate/core/devtools";
+import { type DevtoolsPluginInfo } from "#/devtools";
 
 import { Field, Section } from "@/panel/components/ui";
 

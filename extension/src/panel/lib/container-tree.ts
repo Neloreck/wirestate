@@ -1,4 +1,4 @@
-import { type DevtoolsContainerSnapshot, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
+import { type DevtoolsContainerSnapshot, type DevtoolsRootSnapshot } from "#/devtools";
 
 import { type Optional } from "@/types/general";
 

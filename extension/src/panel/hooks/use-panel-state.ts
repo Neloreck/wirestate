@@ -1,5 +1,6 @@
-import { type DevtoolsEvent, type DevtoolsMessageChannel } from "@wirestate/core/devtools";
 import { useMemo, useReducer } from "react";
+
+import { type DevtoolsEvent, type DevtoolsMessageChannel } from "#/devtools";
 
 import { type Selection } from "@/panel/lib/selection";
 import { type Optional } from "@/types/general";

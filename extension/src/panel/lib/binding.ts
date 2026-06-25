@@ -1,5 +1,6 @@
 import { BindingScope, BindingType } from "@wirestate/core";
-import { type DevtoolsBinding, type DevtoolsContainerSnapshot, type DevtoolsInstance } from "@wirestate/core/devtools";
+
+import { type DevtoolsBinding, type DevtoolsContainerSnapshot, type DevtoolsInstance } from "#/devtools";
 
 import { type Optional } from "@/types/general";
 

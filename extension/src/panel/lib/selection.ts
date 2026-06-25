@@ -3,7 +3,7 @@ import {
   type DevtoolsContainerSnapshot,
   type DevtoolsPluginInfo,
   type DevtoolsRootSnapshot,
-} from "@wirestate/core/devtools";
+} from "#/devtools";
 
 import { findContainer } from "@/panel/lib/container-tree";
 import { type Optional } from "@/types/general";

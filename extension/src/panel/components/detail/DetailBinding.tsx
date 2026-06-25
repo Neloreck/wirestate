@@ -1,13 +1,14 @@
 import { BindingScope, BindingType } from "@wirestate/core";
+import { Box, Braces } from "lucide-react";
+import { useCallback, useMemo } from "react";
+
 import {
   type DevtoolsBinding,
   type DevtoolsContainerSnapshot,
   type DevtoolsEvent,
   type DevtoolsInstance,
   type DevtoolsRootSnapshot,
-} from "@wirestate/core/devtools";
-import { Box, Braces } from "lucide-react";
-import { useCallback, useMemo } from "react";
+} from "#/devtools";
 
 import { type InspectBindingFn, type InspectFn } from "@/bridge/bridge.messages";
 import { Field, Section, Tag } from "@/panel/components/ui";

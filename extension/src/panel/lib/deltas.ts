@@ -1,8 +1,4 @@
-import {
-  type DevtoolsEvent,
-  type DevtoolsMessageChannel,
-  type DevtoolsMessageResultEvent,
-} from "@wirestate/core/devtools";
+import { type DevtoolsEvent, type DevtoolsMessageChannel, type DevtoolsMessageResultEvent } from "#/devtools";
 
 import { type TimelineFilter } from "@/panel/hooks/use-panel-state";
 import { getDevtoolsEventSummary } from "@/panel/lib/format";

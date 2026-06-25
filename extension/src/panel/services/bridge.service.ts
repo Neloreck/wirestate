@@ -1,6 +1,7 @@
 import { Injectable, inject, OnProvision, OnDeprovision, WireStatus } from "@wirestate/core";
-import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "@wirestate/core/devtools";
 import { BoundAction, Observable, RefObservable, makeObservable } from "@wirestate/mobx";
+
+import { type DevtoolsEvent, type DevtoolsRootSnapshot } from "#/devtools";
 
 import {
   PANEL_PORT_PREFIX,

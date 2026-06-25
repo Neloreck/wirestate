@@ -1,4 +1,4 @@
-import type { DevtoolsMessage, DevtoolsMessageResultEvent } from "@wirestate/core/devtools";
+import type { DevtoolsMessage, DevtoolsMessageResultEvent } from "#/devtools";
 
 import { stringify } from "@/panel/lib/format";
 import type { Optional } from "@/types/general";

@@ -1,5 +1,6 @@
-import { type DevtoolsMessageChannel } from "@wirestate/core/devtools";
 import { type ChangeEvent, useCallback } from "react";
+
+import { type DevtoolsMessageChannel } from "#/devtools";
 
 import { type EventKind, type PanelActions, type PanelUi, type TimelineFilter } from "@/panel/hooks/use-panel-state";
 import { type RootModel } from "@/panel/lib/container-tree";
