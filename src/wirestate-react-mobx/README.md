@@ -1,4 +1,4 @@
-# @wirestate/react-mobx [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://neloreck.github.io/wirestate/)]
+# @wirestate/react-mobx [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://Neloreck.github.io/wirestate/)]
 
 [![npm](https://img.shields.io/npm/v/@wirestate/react-mobx.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react-mobx)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
@@ -57,8 +57,8 @@ Observable definitions and decorator aliases (`Observable`, `Action`, `Computed`
 
 ## Learn More
 
-- [React MobX guide](https://neloreck.github.io/wirestate/react-mobx/overview)
-- [API reference](https://neloreck.github.io/wirestate/api/wirestate-react-mobx/)
+- [React MobX guide](https://Neloreck.github.io/wirestate/react-mobx/overview)
+- [API reference](https://Neloreck.github.io/wirestate/api/wirestate-react-mobx/)
 - [MobX React docs](https://mobx.js.org/react-integration.html)
 
 ## License

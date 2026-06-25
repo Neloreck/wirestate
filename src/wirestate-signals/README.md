@@ -1,4 +1,4 @@
-# @wirestate/signals [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://neloreck.github.io/wirestate/)]
+# @wirestate/signals [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://Neloreck.github.io/wirestate/)]
 
 [![npm](https://img.shields.io/npm/v/@wirestate/signals.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/signals)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
@@ -40,7 +40,7 @@ The same `CounterService` can now be consumed from a React component (via `@wire
 
 ## Learn More
 
-- [API reference](https://neloreck.github.io/wirestate/api/wirestate-signals/)
+- [API reference](https://Neloreck.github.io/wirestate/api/wirestate-signals/)
 - [Preact Signals docs](https://preactjs.com/guide/v10/signals/)
 
 ## License

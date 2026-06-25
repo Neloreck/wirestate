@@ -1,4 +1,4 @@
-# @wirestate/mobx [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://neloreck.github.io/wirestate/)]
+# @wirestate/mobx [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://Neloreck.github.io/wirestate/)]
 
 [![npm](https://img.shields.io/npm/v/@wirestate/mobx.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/mobx)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
@@ -47,7 +47,7 @@ The same `CounterService` can now be consumed from a React component (via `@wire
 
 ## Learn More
 
-- [API reference](https://neloreck.github.io/wirestate/api/wirestate-mobx/)
+- [API reference](https://Neloreck.github.io/wirestate/api/wirestate-mobx/)
 - [MobX docs](https://mobx.js.org/README.html)
 
 ## License

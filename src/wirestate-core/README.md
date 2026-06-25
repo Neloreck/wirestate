@@ -1,4 +1,4 @@
-# @wirestate/core [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://neloreck.github.io/wirestate/)]
+# @wirestate/core [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://Neloreck.github.io/wirestate/)]
 
 [![npm](https://img.shields.io/npm/v/@wirestate/core.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/core)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
@@ -51,8 +51,8 @@ React and Lit integration live in [`@wirestate/react`](https://www.npmjs.com/pac
 
 ## Learn More
 
-- [Core guide](https://neloreck.github.io/wirestate/core/overview)
-- [API reference](https://neloreck.github.io/wirestate/api/wirestate-core/)
+- [Core guide](https://Neloreck.github.io/wirestate/core/overview)
+- [API reference](https://Neloreck.github.io/wirestate/api/wirestate-core/)
 
 ## License
 

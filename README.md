@@ -1,6 +1,6 @@
 # Wirestate
 
-[![docs](https://img.shields.io/badge/docs-github_pages-blue)](https://neloreck.github.io/wirestate)
+[![docs](https://img.shields.io/badge/docs-github_pages-blue)](https://Neloreck.github.io/wirestate)
 [![npm](https://img.shields.io/npm/v/@wirestate/core.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/core)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
 
@@ -104,12 +104,12 @@ during render. The same service pattern can use MobX or Preact Signals in React 
 
 ## Documentation
 
-- [Docs home](https://neloreck.github.io/wirestate/)
-- [Installation](https://neloreck.github.io/wirestate/introduction/installation)
-- [Core guide](https://neloreck.github.io/wirestate/core/overview)
-- [React guide](https://neloreck.github.io/wirestate/react/overview)
-- [Lit guide](https://neloreck.github.io/wirestate/lit/overview)
-- [API reference](https://neloreck.github.io/wirestate/api/)
+- [Docs home](https://Neloreck.github.io/wirestate/)
+- [Installation](https://Neloreck.github.io/wirestate/introduction/installation)
+- [Core guide](https://Neloreck.github.io/wirestate/core/overview)
+- [React guide](https://Neloreck.github.io/wirestate/react/overview)
+- [Lit guide](https://Neloreck.github.io/wirestate/lit/overview)
+- [API reference](https://Neloreck.github.io/wirestate/api/)
 
 ## Development
 

@@ -1,4 +1,4 @@
-# @wirestate/lit-signals [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://neloreck.github.io/wirestate/)]
+# @wirestate/lit-signals [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://Neloreck.github.io/wirestate/)]
 
 [![npm](https://img.shields.io/npm/v/@wirestate/lit-signals.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/lit-signals)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
@@ -61,8 +61,8 @@ Signal definitions (`signal`, `computed`, `effect`, and others) live in
 
 ## Learn More
 
-- [Lit Signals guide](https://neloreck.github.io/wirestate/lit-signals/overview)
-- [API reference](https://neloreck.github.io/wirestate/api/wirestate-lit-signals/)
+- [Lit Signals guide](https://Neloreck.github.io/wirestate/lit-signals/overview)
+- [API reference](https://Neloreck.github.io/wirestate/api/wirestate-lit-signals/)
 - [lit-labs/preact-signals docs](https://www.npmjs.com/package/@lit-labs/preact-signals)
 
 ## License

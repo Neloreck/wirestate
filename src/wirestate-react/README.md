@@ -1,4 +1,4 @@
-# @wirestate/react [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://neloreck.github.io/wirestate/)]
+# @wirestate/react [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://Neloreck.github.io/wirestate/)]
 
 [![npm](https://img.shields.io/npm/v/@wirestate/react.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
@@ -54,8 +54,8 @@ when components need to re-render from service changes.
 
 ## Learn More
 
-- [React guide](https://neloreck.github.io/wirestate/react/overview)
-- [API reference](https://neloreck.github.io/wirestate/api/wirestate-react/)
+- [React guide](https://Neloreck.github.io/wirestate/react/overview)
+- [API reference](https://Neloreck.github.io/wirestate/api/wirestate-react/)
 
 ## License
 

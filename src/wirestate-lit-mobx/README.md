@@ -1,4 +1,4 @@
-# @wirestate/lit-mobx [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://neloreck.github.io/wirestate/)]
+# @wirestate/lit-mobx [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://Neloreck.github.io/wirestate/)]
 
 [![npm](https://img.shields.io/npm/v/@wirestate/lit-mobx.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/lit-mobx)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
@@ -67,7 +67,7 @@ Observable definitions and decorator aliases (`Observable`, `Action`, `Computed`
 
 ## Learn More
 
-- [API reference](https://neloreck.github.io/wirestate/api/wirestate-lit-mobx/)
+- [API reference](https://Neloreck.github.io/wirestate/api/wirestate-lit-mobx/)
 - [`@adobe/lit-mobx` package](https://www.npmjs.com/package/@adobe/lit-mobx)
 
 ## License

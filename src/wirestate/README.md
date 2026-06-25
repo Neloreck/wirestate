@@ -1,4 +1,4 @@
-# wirestate [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://neloreck.github.io/wirestate/)]
+# wirestate [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://Neloreck.github.io/wirestate/)]
 
 [![npm](https://img.shields.io/npm/v/wirestate.svg?style=flat-square)](https://www.npmjs.com/package/wirestate)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
@@ -45,8 +45,8 @@ import { signal, useSignals } from "wirestate/signals";
 
 ## Learn More
 
-- [Docs](https://neloreck.github.io/wirestate/)
-- [Scoped package overview](https://neloreck.github.io/wirestate/introduction/installation)
+- [Docs](https://Neloreck.github.io/wirestate/)
+- [Scoped package overview](https://Neloreck.github.io/wirestate/introduction/installation)
 
 ## License
 

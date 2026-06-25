@@ -1,4 +1,4 @@
-# @wirestate/react-signals [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://neloreck.github.io/wirestate/)]
+# @wirestate/react-signals [[monorepo](https://github.com/Neloreck/wirestate)] [[docs](https://Neloreck.github.io/wirestate/)]
 
 [![npm](https://img.shields.io/npm/v/@wirestate/react-signals.svg?style=flat-square)](https://www.npmjs.com/package/@wirestate/react-signals)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/Neloreck/wirestate/blob/main/LICENSE)
@@ -58,8 +58,8 @@ transform, call `useSignals()` in those components.
 
 ## Learn More
 
-- [React Signals guide](https://neloreck.github.io/wirestate/react-signals/overview)
-- [API reference](https://neloreck.github.io/wirestate/api/wirestate-react-signals/)
+- [React Signals guide](https://Neloreck.github.io/wirestate/react-signals/overview)
+- [API reference](https://Neloreck.github.io/wirestate/api/wirestate-react-signals/)
 - [Preact Signals docs](https://preactjs.com/guide/v10/signals)
 
 ## License
