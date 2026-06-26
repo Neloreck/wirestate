@@ -116,7 +116,7 @@ export function Application() {
 ```
 
 `bindings` is shallow-compared, so an inline hydration object recreates the container on every render. Keep the config
-stable with `useMemo`, or hoist it to module scope — the same rule that applies to every managed container (see
+stable with `useMemo`, or hoist it to module scope - the same rule that applies to every managed container (see
 [Managed Root Container](#managed-root-container)).
 
 ## Direct Access

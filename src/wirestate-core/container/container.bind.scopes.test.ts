@@ -162,7 +162,7 @@ describe("Binding scopes", () => {
   it("should not enforce the lifecycle-handler guard on a bare kernel", () => {
     // The guard lives on Container.bind: a bare kernel runs no activation
     // adapter and no provision, so a transient instance binding whose class declares a
-    // handler is allowed here — the handler simply never fires.
+    // handler is allowed here - the handler simply never fires.
     const container = new ContainerKernel();
 
     @Injectable()

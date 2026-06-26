@@ -1,20 +1,25 @@
 import { ContextConsumer } from "@lit/context";
 import { type ReactiveElement } from "@lit/reactive-element";
-import { type ServiceToken } from "@wirestate/core";
+import { type Container, type ServiceToken } from "@wirestate/core";
 
 import { ContainerContext } from "../context/container-context";
 import {
   type AnyObject,
   type FieldMustMatchProvidedType,
   type Interface,
+  type Optional,
   type ProvidedTypeMustMatch,
 } from "../types/general";
+
+import { type InjectionFallback } from "./use-injection";
 
 /**
  * Describes type returned by {@link injection}.
  *
  * @remarks
- * Supports both TC39 and legacy experimental decorators.
+ * Supports both TC39 and legacy experimental decorators. The type parameter is
+ * the resolved value type - `T` for a required injection, `T | undefined` for an
+ * optional one, or `T | F` when a fallback is given.
  *
  * @group Consumption
  */
@@ -43,11 +48,12 @@ export interface InjectionDecorator<T> {
  *
  * @group Consumption
  */
-export interface InjectionOptions<T> {
+export interface InjectionOptions<T, F = undefined> {
   /**
    * The token to inject.
    */
   token: ServiceToken<T>;
+
   /**
    * Resolve only the first context value.
    *
@@ -56,62 +62,102 @@ export interface InjectionOptions<T> {
    * Defaults to `false`.
    */
   once?: boolean;
+
+  /**
+   * Resolve `undefined` instead of throwing when the token is not bound.
+   */
+  optional?: boolean;
+
+  /**
+   * Value used when the token is not bound; providing it makes the lookup optional.
+   */
+  fallback?: InjectionFallback<F>;
 }
 
 /**
  * Injects a container value into a Lit element property.
  *
  * @remarks
- * The property follows the nearest container context unless `once` is `true`.
+ * Follows the nearest container context unless `once` is set. Throws when the
+ * token is not bound; pass `optional` to assign `undefined` on a miss, or a
+ * `fallback` (which implies `optional`) to assign a default.
  *
  * @group Consumption
  *
- * @param optionsOrToken - Service token or options.
+ * @param token - Token to inject, or options carrying the token plus `once`/`optional`/`fallback`.
  * @returns Lit property decorator.
  *
  * @example
  * ```typescript
  * class MyElement extends LitElement {
  *   @injection(MyService)
- *   private myService!: MyService;
+ *   private service!: MyService;
  *
- *   public render() {
- *     return html`<div>${this.myService.getName()}</div>`;
- *   }
- * }
- * ```
+ *   @injection({ token: MyService, optional: true })
+ *   private maybeService?: MyService;
  *
- * @example
- * ```typescript
- * class MyElement extends LitElement {
- *   @injection({ token: MyService, once: true })
- *   private myService!: MyService;
- *
- *   public render() {
- *     return html`<div>${this.myService.getName()}</div>`;
- *   }
+ *   @injection({ token: UserName, fallback: "guest" })
+ *   private name!: string;
  * }
  * ```
  */
-export function injection<T>(optionsOrToken: InjectionOptions<T> | ServiceToken<T>): InjectionDecorator<T> {
-  const options: InjectionOptions<T> =
+export function injection<T>(token: ServiceToken<T>): InjectionDecorator<T>;
+export function injection<T>(options: {
+  token: ServiceToken<T>;
+  once?: boolean;
+  optional?: false;
+  fallback?: undefined;
+}): InjectionDecorator<T>;
+export function injection<T>(options: {
+  token: ServiceToken<T>;
+  once?: boolean;
+  optional: true;
+  fallback?: undefined;
+}): InjectionDecorator<Optional<T>>;
+export function injection<T, F>(options: {
+  token: ServiceToken<T>;
+  once?: boolean;
+  optional?: boolean;
+  fallback: InjectionFallback<F>;
+}): InjectionDecorator<T | F>;
+export function injection<T, F = undefined>(
+  optionsOrToken: InjectionOptions<T, F> | ServiceToken<T>
+): InjectionDecorator<T | F> {
+  const options: InjectionOptions<T, F> =
     typeof optionsOrToken === "object" && optionsOrToken !== null && "token" in optionsOrToken
       ? optionsOrToken
       : { token: optionsOrToken as ServiceToken<T> };
 
-  return ((
-    protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, T>,
-    nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, T>
-  ): void => {
-    const { once, token } = options;
+  const { once, token, optional, fallback } = options;
 
+  function resolve(container: Container): T | F {
+    // Required lookup (neither optional nor fallback): resolve directly so the container throws on a miss.
+    if (!optional && fallback === undefined) {
+      return container.get(token);
+    }
+
+    if (container.has(token)) {
+      return container.get(token);
+    }
+
+    if (fallback !== undefined) {
+      return typeof fallback === "function" ? (fallback as (container: Container) => F)(container) : fallback;
+    }
+
+    return undefined as F;
+  }
+
+  return ((
+    protoOrTarget: ClassAccessorDecoratorTarget<ReactiveElement, T | F>,
+    nameOrContext: PropertyKey | ClassAccessorDecoratorContext<ReactiveElement, T | F>
+  ): void => {
     // Standard decorators branch.
     if (typeof nameOrContext === "object") {
       nameOrContext.addInitializer(function () {
         new ContextConsumer(this, {
           context: ContainerContext,
           callback: (container) => {
-            nameOrContext.access.set(this, container.get(token));
+            nameOrContext.access.set(this, resolve(container));
           },
           subscribe: !once,
         });
@@ -122,11 +168,11 @@ export function injection<T>(optionsOrToken: InjectionOptions<T> | ServiceToken<
         new ContextConsumer(element, {
           context: ContainerContext,
           callback: (container) => {
-            (element as AnyObject)[nameOrContext] = container.get(token);
+            (element as AnyObject)[nameOrContext] = resolve(container);
           },
           subscribe: !once,
         });
       });
     }
-  }) as InjectionDecorator<T>;
+  }) as InjectionDecorator<T | F>;
 }

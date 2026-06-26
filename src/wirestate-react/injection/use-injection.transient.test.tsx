@@ -35,7 +35,7 @@ describe("useInjection transient instance binding", () => {
       </ContainerProvider>
     );
 
-    // Each consumer resolves its own fresh instance — distinct ids prove transient construction.
+    // Each consumer resolves its own fresh instance - distinct ids prove transient construction.
     expect(getByTestId("a").textContent).not.toBe(getByTestId("b").textContent);
   });
 

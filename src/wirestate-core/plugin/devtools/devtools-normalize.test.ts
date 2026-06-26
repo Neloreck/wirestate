@@ -28,7 +28,7 @@ describe("normalizeToken", () => {
 describe("normalizeBinding", () => {
   class Repository {}
 
-  it("normalizes a value binding — always singleton, no implementation — and stamps the binding id", () => {
+  it("normalizes a value binding - always singleton, no implementation - and stamps the binding id", () => {
     expect(normalizeBinding({ token: "CONFIG", value: 42 }, 5)).toEqual({
       bindingId: 5,
       token: { name: "CONFIG", kind: "string" },
@@ -54,7 +54,7 @@ describe("normalizeBinding", () => {
     expect(binding.scope).toBe("Transient");
   });
 
-  it("normalizes a factory binding — no implementation", () => {
+  it("normalizes a factory binding - no implementation", () => {
     expect(normalizeBinding({ token: "MAKE", type: "Factory", factory: () => 1 }, 8)).toEqual({
       bindingId: 8,
       token: { name: "MAKE", kind: "string" },
@@ -145,12 +145,12 @@ describe("normalizeInstance", () => {
         return left + right;
       }
 
-      // Re-declares Base.shadowed — the derived one wins, listed once.
+      // Re-declares Base.shadowed - the derived one wins, listed once.
       public shadowed(): string {
         return "derived";
       }
 
-      // Accessor — never invoked, never listed.
+      // Accessor - never invoked, never listed.
       public get computed(): number {
         return 1;
       }
@@ -216,7 +216,7 @@ describe("normalizeInstance", () => {
       public provisionOnBase(): void {}
     }
 
-    // Re-declares @OnProvision on a different method name across the hierarchy — its reader throws.
+    // Re-declares @OnProvision on a different method name across the hierarchy - its reader throws.
     @Injectable()
     class Derived extends Base {
       @OnProvision()

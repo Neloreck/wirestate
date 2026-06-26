@@ -31,30 +31,32 @@ private cart!: CartService;
 
 ## Optional Injection
 
-Use `optionalInjection` when a missing value is valid.
+Pass `optional` when a missing value is valid - the property is assigned `undefined` instead of throwing.
 
 ```ts
-import { optionalInjection } from "@wirestate/lit";
+import { injection } from "@wirestate/lit";
 
 class DiagnosticsPanel extends LitElement {
-  @optionalInjection(LoggerService)
-  private logger: LoggerService | null = null;
+  @injection({ token: LoggerService, optional: true })
+  private logger?: LoggerService;
 }
 ```
 
-Provide a `fallback` for the unbound case — either a raw value or a `(container) => value` factory.
+Provide a `fallback` - which implies `optional` - for the unbound case, either a raw value or a `(container) => value` factory.
 
 ```ts
 class DiagnosticsPanel extends LitElement {
-  // Raw value: returned as-is when the token is not bound.
-  @optionalInjection(UserName, "guest")
+  // Raw value: used as-is when the token is not bound.
+  @injection({ token: UserName, fallback: "guest" })
   private name: string = "guest";
 
   // Factory: lazy, receives the container, runs only when the token is missing.
-  @optionalInjection(FileLogger, (container) => container.get(ConsoleLogger))
-  private logger: Logger | undefined = undefined;
+  @injection({ token: FileLogger, fallback: (container) => container.get(ConsoleLogger) })
+  private logger?: Logger;
 }
 ```
+
+The same `optional` and `fallback` options work on the `useInjection` controller helper.
 
 ## Controller Helpers
 
@@ -106,7 +108,5 @@ class DebugButton extends LitElement {
 
 ## API Reference
 
-[`injection`](/api/wirestate-lit/functions/injection),
-[`optionalInjection`](/api/wirestate-lit/functions/optionalInjection), [`useInjection`](/api/wirestate-lit/functions/useInjection),
-[`useOptionalInjection`](/api/wirestate-lit/functions/useOptionalInjection),
+[`injection`](/api/wirestate-lit/functions/injection), [`useInjection`](/api/wirestate-lit/functions/useInjection),
 [`useContainer`](/api/wirestate-lit/functions/useContainer).

@@ -64,8 +64,8 @@ export class OrderService {
 
 ## Injection Tokens
 
-Use an `InjectionToken<T>` for any dependency without a class constructor — constants, external objects, or
-interface-typed values — when you want the resolved value to keep its TypeScript type. A bare string or symbol token
+Use an `InjectionToken<T>` for any dependency without a class constructor - constants, external objects, or
+interface-typed values - when you want the resolved value to keep its TypeScript type. A bare string or symbol token
 resolves as `unknown` and forces a cast; `InjectionToken<T>` resolves as `T`.
 
 ```ts
@@ -86,7 +86,7 @@ class ApiClient {
 
 The constructor argument is a human-readable label used only in diagnostics; it does not identify the token. Each
 `InjectionToken` is identified by reference, so two tokens never collide even with the same description, and it is
-nominal at the type level — `InjectionToken<A>` is not assignable to `InjectionToken<B>`. Prefer a class token for
+nominal at the type level - `InjectionToken<A>` is not assignable to `InjectionToken<B>`. Prefer a class token for
 services, an `InjectionToken<T>` for typed values, and a plain string or symbol only for interop or when a type is not
 needed.
 

@@ -162,7 +162,7 @@ describe("container plugins", () => {
 
   it("throws when a handler's kind is handled by a plugin but its bus is not bound", () => {
     // A messaging plugin that declares its kind (so provision validation passes) but
-    // skips binding its bus — so onProvision finds no bus up the chain and must throw.
+    // skips binding its bus - so onProvision finds no bus up the chain and must throw.
     class BuslessEventsPlugin extends EventsPlugin {
       public override install(): void {
         // Intentionally do not bind the EventBus.

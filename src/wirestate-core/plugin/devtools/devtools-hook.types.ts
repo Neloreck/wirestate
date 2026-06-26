@@ -57,7 +57,7 @@ export interface DevtoolsToken {
  */
 export interface DevtoolsBinding {
   /**
-   * Stable id for this binding — the target of on-demand inspection for `Value` bindings.
+   * Stable id for this binding - the target of on-demand inspection for `Value` bindings.
    */
   readonly bindingId: DevtoolsBindingId;
 
@@ -136,7 +136,7 @@ export interface DevtoolsHandler {
  * A method declared on a service instance's class (or an inherited base class).
  *
  * @remarks
- * Enumerated from the instance's prototype chain — accessors, statics, the constructor, and
+ * Enumerated from the instance's prototype chain - accessors, statics, the constructor, and
  * arrow-function instance fields are excluded. The inspector cross-references {@link DevtoolsHandler}
  * to mark which methods are message handlers.
  *
@@ -149,7 +149,7 @@ export interface DevtoolsMethod {
   readonly name: string;
 
   /**
-   * Declared parameter count (`Function.length` — params before the first default/rest).
+   * Declared parameter count (`Function.length` - params before the first default/rest).
    */
   readonly arity: number;
 }
@@ -185,7 +185,7 @@ export interface DevtoolsLifecycleHookMethod {
  */
 export interface DevtoolsInstance {
   /**
-   * Stable id for this instance — the target of on-demand inspection and the key for exact
+   * Stable id for this instance - the target of on-demand inspection and the key for exact
    * event↔instance correlation.
    */
   readonly instanceId: DevtoolsInstanceId;
@@ -359,7 +359,7 @@ export type DevtoolsMessageChannel = "event" | "command" | "query";
  * One observed message: an event emitted, or a command/query dispatched.
  *
  * @remarks
- * `payload` and `source` are the raw in-page values — the in-page backend
+ * `payload` and `source` are the raw in-page values - the in-page backend
  * serializes them when bridging to the panel.
  *
  * @group DevTools
@@ -445,7 +445,7 @@ export interface DevtoolsMessageResult {
   readonly outcome: "resolved" | "rejected";
 
   /**
-   * Raw resolved value or thrown error — serialized by the backend when bridging.
+   * Raw resolved value or thrown error - serialized by the backend when bridging.
    */
   readonly value: unknown;
 }
@@ -566,7 +566,7 @@ export type DevtoolsInspectPath = ReadonlyArray<string | number>;
 
 /**
  * A reference to a tracked service instance, returned when an inspected field turns out to be
- * another instance the container manages — so the inspector can mark it and jump to it.
+ * another instance the container manages - so the inspector can mark it and jump to it.
  *
  * @group DevTools
  */

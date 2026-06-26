@@ -112,7 +112,7 @@ describe("provision lifecycle errors", () => {
       public onPing(): void {}
     }
 
-    // Bound, but no EventsPlugin registered — the declared @OnEvent kind is unhandled.
+    // Bound, but no EventsPlugin registered - the declared @OnEvent kind is unhandled.
     const container: Container = new Container({ bindings: [EventListenerService] });
 
     expect(() => provisionContainer(container, [EventListenerService])).toThrow(

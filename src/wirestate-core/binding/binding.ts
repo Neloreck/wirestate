@@ -98,7 +98,7 @@ export interface InstanceBindingDescriptor<T = unknown> {
    * @remarks
    * Defaults to `Singleton` (constructed once, cached, owned by the container with
    * full instance lifecycle). A `Transient` instance is constructed fresh on every
-   * resolution and never owned or tracked — construct-and-forget — so its class must
+   * resolution and never owned or tracked - construct-and-forget - so its class must
    * declare no wirestate lifecycle or messaging handlers (rejected at bind time
    * otherwise).
    */

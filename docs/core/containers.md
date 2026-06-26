@@ -113,7 +113,7 @@ resolution chain, so bind the data once on the root and every descendant injects
 there is no separate construction step and no merge.
 
 To avoid declaring a token per value, bind one `Map` keyed by service class and read it with `this.constructor`. This
-trades type safety for fewer tokens — reads are `unknown` and need a cast — so prefer typed `InjectionToken`s unless the
+trades type safety for fewer tokens - reads are `unknown` and need a cast - so prefer typed `InjectionToken`s unless the
 indirection earns its place.
 
 ```ts

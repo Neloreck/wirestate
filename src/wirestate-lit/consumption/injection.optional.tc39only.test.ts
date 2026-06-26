@@ -11,9 +11,9 @@ import { GenericService } from "@/fixtures/services/generic-service";
 
 import { type Optional } from "../types/general";
 
-import { optionalInjection } from "./optional-injection";
+import { injection } from "./injection";
 
-describe("optionalInjection on standard accessors", () => {
+describe("injection (optional) on standard accessors", () => {
   let fixture: LitProvisionFixture;
 
   afterEach(() => {
@@ -26,9 +26,9 @@ describe("optionalInjection on standard accessors", () => {
 
     fixture = createLitProvision(container);
 
-    @customElement("test-optional-injection-accessor-missing-element")
+    @customElement("test-injection-optional-accessor-missing-element")
     class TestAccessorMissingElement extends ReactiveElement {
-      @optionalInjection(token)
+      @injection({ token, optional: true })
       public accessor value: Optional<string> = "initial-value";
     }
 
@@ -46,9 +46,9 @@ describe("optionalInjection on standard accessors", () => {
 
     fixture = createLitProvision(container);
 
-    @customElement("test-optional-injection-accessor-bound-element")
+    @customElement("test-injection-optional-accessor-bound-element")
     class TestAccessorBoundElement extends ReactiveElement {
-      @optionalInjection(GenericService)
+      @injection({ token: GenericService, optional: true })
       public accessor service: Optional<GenericService> = undefined;
     }
 
@@ -66,29 +66,29 @@ describe("optionalInjection on standard accessors", () => {
 
     fixture = createLitProvision(container);
 
-    @customElement("test-optional-injection-non-nullable-element")
+    @customElement("test-injection-optional-non-nullable-element")
     class TestNonNullableElement extends ReactiveElement {
-      // @ts-expect-error - the default `undefined` value is not assignable to a non-nullable accessor.
-      @optionalInjection(token)
+      // @ts-expect-error - the optional `undefined` value is not assignable to a non-nullable accessor.
+      @injection({ token, optional: true })
       public accessor value: string = "";
 
-      // @ts-expect-error - the default `undefined` value is not assignable to a non-nullable field.
-      @optionalInjection(token)
+      // @ts-expect-error - the optional `undefined` value is not assignable to a non-nullable field.
+      @injection({ token, optional: true })
       public field: string = "";
     }
 
     expect(TestNonNullableElement).toBeDefined();
   });
 
-  it("should use fallback for accessors when token is not bound", () => {
+  it("should use a fallback for accessors when token is not bound", () => {
     const container: Container = new Container();
     const token: ServiceToken<string> = Symbol("optional-token");
 
     fixture = createLitProvision(container);
 
-    @customElement("test-optional-injection-accessor-fallback-element")
+    @customElement("test-injection-optional-accessor-fallback-element")
     class TestAccessorFallbackElement extends ReactiveElement {
-      @optionalInjection(token, () => "fallback-value")
+      @injection({ token, fallback: () => "fallback-value" })
       public accessor value: Optional<string> = undefined;
     }
 

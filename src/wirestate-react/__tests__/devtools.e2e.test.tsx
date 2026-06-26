@@ -54,7 +54,7 @@ function hook(): DevtoolsHook {
   return getDevtoolsHook() as DevtoolsHook;
 }
 
-describe("devtools protocol — React-driven consumer e2e", () => {
+describe("devtools protocol - React-driven consumer e2e", () => {
   afterEach(() => {
     delete (globalThis as Record<string, unknown>)[DEVTOOLS_HOOK_KEY];
   });
@@ -135,8 +135,6 @@ describe("devtools protocol — React-driven consumer e2e", () => {
     expect(phases).toContain("containerDeprovision");
     expect(phases).toContain("deactivate");
 
-    // The app dropped its only container, so the plugin releases the root entirely — no empty shell
-    // lingers (and with it, no trace of the torn-down Feature).
     expect(hook().getRoots()).toHaveLength(0);
   });
 
@@ -148,11 +146,6 @@ describe("devtools protocol — React-driven consumer e2e", () => {
   });
 
   it("registers one root under StrictMode with a managed provider (no throwaway duplication)", () => {
-    // A managed provider under StrictMode: React double-invokes the useState initializer,
-    // so the same config (and its DevToolsPlugin instance) constructs a throwaway container
-    // alongside the committed one. Only the committed container provisions, so the inspector
-    // must see exactly one root and one live container — not the pre-fix duplicate roots /
-    // phantom throwaway.
     const config: ContainerConfig = createConfig();
 
     render(

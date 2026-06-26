@@ -75,7 +75,7 @@ activation, and disposal fit together.
 ## Lit Package Surface
 
 - `provideContainer` and `useContainerProvider` publish containers.
-- `injection`, `optionalInjection`, `useInjection`, `useOptionalInjection`, and `useContainer` consume values.
+- `injection`, `useInjection`, and `useContainer` consume values.
 - `onEvent`, `useOnEvents`, and `OnEventController` work with the event bus.
 - `onCommand`, `useOnCommand`, and `OnCommandController` work with the command bus.
 - `onQuery`, `useOnQuery`, and `OnQueryController` work with the query bus.

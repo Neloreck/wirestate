@@ -42,7 +42,7 @@ function CartActivity() {
     console.log(event.type);
   });
 
-  // Every event — pass only a handler.
+  // Every event - pass only a handler.
   useOnEvents((event) => {
     console.log(event.type);
   });

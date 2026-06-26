@@ -104,7 +104,7 @@ describe("DevtoolsHook replay buffer", () => {
       events.push(event);
     });
 
-    // Only the freshest 1024 survive — contiguous, in order, no gaps or duplicates across evictions.
+    // Only the freshest 1024 survive - contiguous, in order, no gaps or duplicates across evictions.
     expect(events.map((event) => event.containerId)).toEqual(
       Array.from({ length: 1024 }, (_unused, index) => total - 1024 + index)
     );
@@ -123,7 +123,7 @@ describe("DevtoolsHook replay buffer", () => {
     hook.subscribe((event) => first.push(event));
     hook.subscribe((event) => second.push(event));
 
-    // The second subscriber still sees the full backlog — replay's slice() did not drain it.
+    // The second subscriber still sees the full backlog - replay's slice() did not drain it.
     expect(first.map((event) => event.containerId)).toEqual([1, 2, 3]);
     expect(second.map((event) => event.containerId)).toEqual([1, 2, 3]);
 
@@ -179,7 +179,7 @@ describe("DevtoolsHook id allocators", () => {
   it("mints binding ids on a counter independent of containers and instances", () => {
     const hook = installDevtoolsHook();
 
-    // The first id from each allocator is 1 — the id spaces overlap, so a binding and an instance can
+    // The first id from each allocator is 1 - the id spaces overlap, so a binding and an instance can
     // share a numeric id. That is exactly why `inspect` and `inspectBinding` are separate methods
     // rather than one overloaded handle space.
     expect(hook.idForBinding({})).toBe(1);

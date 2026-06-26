@@ -21,26 +21,26 @@ export function Counter() {
 
 ## Optional Injection
 
-Use `useOptionalInjection` when a missing value is valid.
+Pass `optional` when a missing value is valid - the hook returns `undefined` instead of throwing.
 
 ```tsx
-import { useOptionalInjection } from "@wirestate/react";
+import { useInjection } from "@wirestate/react";
 
 function Diagnostics() {
-  const logger = useOptionalInjection(LoggerService);
+  const logger = useInjection(LoggerService, { optional: true });
 
   return <span>{logger ? "Logging enabled" : "Logging disabled"}</span>;
 }
 ```
 
-Provide a `fallback` for the unbound case — either a raw value or a `(container) => value` factory.
+Provide a `fallback` - which implies `optional` - for the unbound case, either a raw value or a `(container) => value` factory.
 
 ```tsx
-// Raw value: returned as-is when the token is not bound.
-const name = useOptionalInjection(UserName, "guest");
+// Raw value: used as-is when the token is not bound.
+const name = useInjection(UserName, { fallback: "guest" });
 
 // Factory: lazy, receives the container, runs only when the token is missing.
-const logger = useOptionalInjection(FileLogger, (container) => container.get(ConsoleLogger));
+const logger = useInjection(FileLogger, { fallback: (container) => container.get(ConsoleLogger) });
 ```
 
 ## Container
@@ -76,5 +76,4 @@ function DebugButton() {
 ## API Reference
 
 [`useInjection`](/api/wirestate-react/functions/useInjection),
-[`useOptionalInjection`](/api/wirestate-react/functions/useOptionalInjection),
 [`useContainer`](/api/wirestate-react/functions/useContainer).

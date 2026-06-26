@@ -7,7 +7,7 @@ import { type Nullable, type Optional } from "../types/general";
  *
  * @remarks
  * `tokens` and `disposers` share an instance's lifetime within one provision
- * cycle, so they live in one entry (ADR 0010) rather than two parallel maps.
+ * cycle, so they live in one entry rather than two parallel maps.
  *
  * @group Container
  * @internal

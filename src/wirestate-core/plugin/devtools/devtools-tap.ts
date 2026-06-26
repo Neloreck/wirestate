@@ -64,15 +64,6 @@ const QUERY_METHODS: ReadonlyArray<string> = ["query", "queryAsync", "queryOptio
  * Taps the messaging buses a container resolves, so dispatches and handler
  * registrations flow to the sink.
  *
- * @remarks
- * Non-intrusive and idempotent. Each bus is tapped once and never untapped — the tap
- * lives on the bus instance and is collected with it, so devtools never extends a
- * lifetime. `EventBus` dispatch is observed with a catch-all subscription;
- * `CommandBus` / `QueryBus` dispatch is observed by wrapping their public dispatch
- * methods. Handler registration is observed by wrapping `register`/`unregister`
- * (commands/queries) and `subscribe`/`unsubscribe` (events) — which captures decorated
- * handlers (wired at provision, after this tap installs) and imperative ones alike.
- *
  * @param container - Container whose resolved buses to tap.
  * @param sink - Where to report observed messages and registrations.
  */

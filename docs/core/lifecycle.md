@@ -57,7 +57,7 @@ boundary, but they never dispose it. The code that created the external containe
 ## WireStatus
 
 Wirestate tracks lifecycle state for each resolved service instance. Use `WireStatus.for(this)` inside a service when
-async work needs to know whether the instance is still active — typically to drop a late `await` result after the
+async work needs to know whether the instance is still active - typically to drop a late `await` result after the
 service has been deprovisioned or disposed.
 
 [`WireStatus`](/api/wirestate-core/classes/WireStatus) exposes lifecycle state for late async guards:
@@ -93,7 +93,7 @@ export class SearchService {
 ```
 
 Capture the `provisionId` passed to `@OnProvision` before awaiting, then after the await bail when `isInactive` is
-`true` (the service was disposed or deprovisioned) or when `provisionId` no longer matches — a newer provision cycle
+`true` (the service was disposed or deprovisioned) or when `provisionId` no longer matches - a newer provision cycle
 has superseded this one, for example a Strict Mode remount or a DOM move. This stops a stale response from overwriting
 current state.
 

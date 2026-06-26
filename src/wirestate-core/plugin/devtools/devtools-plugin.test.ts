@@ -70,7 +70,7 @@ describe("DevToolsPlugin", () => {
     // throwaway plus the committed container; only the committed one provisions.
     const plugin: DevToolsPlugin = new DevToolsPlugin();
 
-    new Container({ bindings: [Service], plugins: [plugin] }); // throwaway — never provisioned
+    new Container({ bindings: [Service], plugins: [plugin] }); // throwaway - never provisioned
 
     const committed: Container = new Container({ bindings: [Service], plugins: [plugin] });
 
@@ -202,7 +202,7 @@ describe("DevToolsPlugin", () => {
       .containers[0].instances.find((entry) => entry.className === "LifecycleService");
 
     expect(instance?.instanceId).toEqual(expect.any(Number));
-    // The provision delta carries the same id as the snapshot — exact correlation, not by class name.
+    // The provision delta carries the same id as the snapshot - exact correlation, not by class name.
     expect(provisionIds).toContain(instance?.instanceId);
 
     // The id is stable across snapshots.
@@ -507,7 +507,7 @@ describe("DevToolsPlugin", () => {
 
   it("observes messaging regardless of plugin registration order", () => {
     // DevToolsPlugin is registered BEFORE the messaging plugins. The tap happens at
-    // provision (not install), by which point every bus is bound — so order is irrelevant.
+    // provision (not install), by which point every bus is bound - so order is irrelevant.
     const container: Container = new Container({
       plugins: [new DevToolsPlugin(), new EventsPlugin(), new CommandsPlugin()],
     });
@@ -634,7 +634,6 @@ describe("DevToolsPlugin", () => {
       }
     });
 
-    // unbindAll deprovisions then deactivates (ADR 0003 ordering).
     container.unbindAll();
 
     expect(phases).toContain("deprovision:LifecycleService");

@@ -10,11 +10,11 @@ import { GenericService } from "@/fixtures/services/generic-service";
 import { ContainerProvider } from "../provision/container-provider";
 import { type AnyObject, type Nullable } from "../types/general";
 
-import { useOptionalInjection } from "./use-optional-injection";
+import { useInjection } from "./use-injection";
 
-describe("useOptionalInjection", () => {
+describe("useInjection (optional)", () => {
   function TestComponent({ token = GenericService as ServiceToken<unknown> }) {
-    const value: Nullable<unknown> = useOptionalInjection(token);
+    const value: Nullable<unknown> = useInjection(token, { optional: true });
 
     return (
       <div data-testid={"injectable-name"}>
@@ -59,7 +59,7 @@ describe("useOptionalInjection", () => {
     const token: unique symbol = Symbol("optional-token");
 
     function FallbackComponent() {
-      const data: Nullable<string> = useOptionalInjection(token, () => "fallback-value");
+      const data: Nullable<string> = useInjection(token, { fallback: () => "fallback-value" });
 
       return <div data-testid={"result"}>{data}</div>;
     }
@@ -78,7 +78,7 @@ describe("useOptionalInjection", () => {
     const token: ServiceToken<string> = Symbol("optional-token");
 
     function FallbackComponent() {
-      const data: string | number = useOptionalInjection(token, () => 10);
+      const data: string | number = useInjection(token, { fallback: () => 10 });
 
       return <div data-testid={"result"}>{data}</div>;
     }
@@ -100,7 +100,7 @@ describe("useOptionalInjection", () => {
     container.bind({ token: boundToken, value: "bound-value" });
 
     function FallbackComponent() {
-      const data: Nullable<string> = useOptionalInjection(unboundToken, (container) => container.get(boundToken));
+      const data: Nullable<string> = useInjection(unboundToken, { fallback: (container) => container.get(boundToken) });
 
       return <div data-testid={"result"}>{data}</div>;
     }
@@ -114,12 +114,12 @@ describe("useOptionalInjection", () => {
     expect(getByTestId("result").textContent).toBe("bound-value");
   });
 
-  it("should not re-trigger resolving in fallback changes (depend only on container changes)", () => {
+  it("should not re-trigger resolving when fallback changes (depend only on container changes)", () => {
     const container: Container = new Container();
     const token: unique symbol = Symbol("optional-token");
 
     function FallbackComponent({ value }: { value: string }) {
-      const data: Nullable<string> = useOptionalInjection(token, () => value);
+      const data: Nullable<string> = useInjection(token, { fallback: () => value });
 
       return <div data-testid={"result"}>{data}</div>;
     }
@@ -158,7 +158,7 @@ describe("useOptionalInjection", () => {
     });
 
     function FallbackComponent({ value }: { value: string }) {
-      const data: Nullable<string> = useOptionalInjection(token, () => value);
+      const data: Nullable<string> = useInjection(token, { fallback: () => value });
 
       return <div data-testid={"result"}>{data}</div>;
     }
@@ -189,7 +189,7 @@ describe("useOptionalInjection", () => {
     let captured: unknown;
 
     function RawComponent() {
-      captured = useOptionalInjection(token, "guest");
+      captured = useInjection(token, { fallback: "guest" });
 
       return null;
     }
@@ -210,7 +210,7 @@ describe("useOptionalInjection", () => {
       let captured: unknown;
 
       function Probe(): null {
-        captured = useOptionalInjection(Symbol("optional-token") as ServiceToken<unknown>, fallback);
+        captured = useInjection(Symbol("optional-token") as ServiceToken<unknown>, { fallback });
 
         return null;
       }
@@ -229,7 +229,6 @@ describe("useOptionalInjection", () => {
     expect(resolveFallback(0)).toBe(0);
     expect(resolveFallback("")).toBe("");
     expect(resolveFallback(false)).toBe(false);
-    // `null` is a deliberate value (ADR 0009), not a structural miss — it must survive.
     expect(resolveFallback(null)).toBeNull();
   });
 
@@ -242,7 +241,7 @@ describe("useOptionalInjection", () => {
 
     function RawComponent() {
       // A bare function is the factory; wrap it to fall back to a function value.
-      captured = useOptionalInjection<() => string, () => string>(token, () => fallbackFn);
+      captured = useInjection<() => string, () => string>(token, { fallback: () => fallbackFn });
 
       return null;
     }
@@ -256,7 +255,7 @@ describe("useOptionalInjection", () => {
     expect(captured).toBe(fallbackFn);
   });
 
-  it("should ignore the raw fallback when the token is bound", () => {
+  it("should ignore the fallback when the token is bound", () => {
     const container: Container = new Container();
     const token: ServiceToken<string> = Symbol("optional-token");
 
@@ -265,7 +264,7 @@ describe("useOptionalInjection", () => {
     let captured: unknown;
 
     function RawComponent() {
-      captured = useOptionalInjection(token, "raw-fallback");
+      captured = useInjection(token, { fallback: "raw-fallback" });
 
       return null;
     }

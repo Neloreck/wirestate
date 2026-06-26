@@ -6,18 +6,10 @@
 
 export { type InjectionDecorator, type InjectionOptions } from "./consumption/injection";
 export { injection } from "./consumption/injection";
-export { type OptionalInjectionDecorator, type OptionalInjectionOptions } from "./consumption/optional-injection";
-export { optionalInjection } from "./consumption/optional-injection";
 export { type UseContainerValue } from "./consumption/use-container";
 export { useContainer } from "./consumption/use-container";
-export { type UseInjectionOptions, type UseInjectionValue } from "./consumption/use-injection";
+export { type InjectionFallback, type UseInjectionOptions, type UseInjectionValue } from "./consumption/use-injection";
 export { useInjection } from "./consumption/use-injection";
-export {
-  type OptionalInjectionFallback,
-  type UseOptionalInjectionOptions,
-  type UseOptionalInjectionValue,
-} from "./consumption/use-optional-injection";
-export { useOptionalInjection } from "./consumption/use-optional-injection";
 
 export { type OnCommandDecorator } from "./commands/on-command";
 export { onCommand } from "./commands/on-command";

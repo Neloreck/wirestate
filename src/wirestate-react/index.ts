@@ -16,9 +16,7 @@ export { useContainer } from "./context/use-container";
 export { useOnEvents } from "./events/use-on-events";
 export { useEventEmitter } from "./events/use-event-emitter";
 
-export { useInjection } from "./injection/use-injection";
-export { type OptionalInjectionFallback } from "./injection/use-optional-injection";
-export { useOptionalInjection } from "./injection/use-optional-injection";
+export { type InjectionFallback, useInjection } from "./injection/use-injection";
 
 export { type ContainerProviderProps } from "./provision/container-provider";
 export { ContainerProvider } from "./provision/container-provider";
