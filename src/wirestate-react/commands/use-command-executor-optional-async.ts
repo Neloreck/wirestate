@@ -2,14 +2,15 @@ import { type Container, type CommandType, CommandBus } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { type OptionalAsyncCommandExecutor } from "../types/commands";
+import { type CommandExecutorOptionalAsync } from "../types/commands";
 
 /**
  * Returns a stable function to dispatch optional commands with Promise-normalized results.
  *
  * @remarks
- * Similar to {@link useAsyncCommandExecutor}, but resolves to `undefined` instead of
- * rejecting with `WirestateError` if no handler is registered for the command type.
+ * Always returns a Promise that resolves to the command result, or to
+ * `undefined` when no handler is registered. The function is stable while the
+ * active container is unchanged.
  *
  * @group Commands
  *
@@ -17,14 +18,14 @@ import { type OptionalAsyncCommandExecutor } from "../types/commands";
  *
  * @example
  * ```tsx
- * const executeOptionalAsync: OptionalAsyncCommandExecutor = useOptionalAsyncCommandExecutor();
+ * const executeOptionalAsync: CommandExecutorOptionalAsync = useCommandExecutorOptionalAsync();
  *
  * const onClick = useCallback(async () => {
  *   const result: string | undefined = await executeOptionalAsync("OPTIONAL_COMMAND", payload);
  * }, [payload, executeOptionalAsync]);
  * ```
  */
-export function useOptionalAsyncCommandExecutor(): OptionalAsyncCommandExecutor {
+export function useCommandExecutorOptionalAsync(): CommandExecutorOptionalAsync {
   const container: Container = useContainer();
 
   return useMemo(() => {
@@ -32,6 +33,6 @@ export function useOptionalAsyncCommandExecutor(): OptionalAsyncCommandExecutor 
 
     return ((type: CommandType, payload?: unknown) => {
       return bus.executeOptionalAsync(type, payload);
-    }) as OptionalAsyncCommandExecutor;
+    }) as CommandExecutorOptionalAsync;
   }, [container]);
 }

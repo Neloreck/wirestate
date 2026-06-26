@@ -7,11 +7,11 @@ import { Container, QueryBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
 import { type Optional, type Nullable } from "../types/general";
-import { type OptionalAsyncQueryExecutor } from "../types/queries";
+import { type QueryExecutorOptionalAsync } from "../types/queries";
 
-import { useOptionalAsyncQueryExecutor } from "./use-optional-async-query-executor";
+import { useQueryExecutorOptionalAsync } from "./use-query-executor-optional-async";
 
-describe("useOptionalAsyncQueryExecutor", () => {
+describe("useQueryExecutorOptionalAsync", () => {
   it("should return an executor that dispatches sync queries as promises", async () => {
     const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
@@ -21,10 +21,10 @@ describe("useOptionalAsyncQueryExecutor", () => {
 
     jest.spyOn(bus, "queryOptionalAsync");
 
-    let executor: Nullable<OptionalAsyncQueryExecutor> = null as Nullable<OptionalAsyncQueryExecutor>;
+    let executor: Nullable<QueryExecutorOptionalAsync> = null as Nullable<QueryExecutorOptionalAsync>;
 
     function TestComponent() {
-      executor = useOptionalAsyncQueryExecutor();
+      executor = useQueryExecutorOptionalAsync();
 
       return null;
     }
@@ -35,7 +35,7 @@ describe("useOptionalAsyncQueryExecutor", () => {
       </ContainerProvider>
     );
 
-    const result: Optional<string> = await (executor as OptionalAsyncQueryExecutor)("TEST_QUERY", "some-payload");
+    const result: Optional<string> = await (executor as QueryExecutorOptionalAsync)("TEST_QUERY", "some-payload");
 
     expect(result).toBe("some-payload-result");
     expect(handler).toHaveBeenCalledWith("some-payload");
@@ -45,12 +45,12 @@ describe("useOptionalAsyncQueryExecutor", () => {
   it("should resolve undefined on unhandled queries", async () => {
     const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
-    let executor: Nullable<OptionalAsyncQueryExecutor> = null as Nullable<OptionalAsyncQueryExecutor>;
+    let executor: Nullable<QueryExecutorOptionalAsync> = null as Nullable<QueryExecutorOptionalAsync>;
 
     jest.spyOn(bus, "queryOptionalAsync");
 
     function TestComponent() {
-      executor = useOptionalAsyncQueryExecutor();
+      executor = useQueryExecutorOptionalAsync();
 
       return null;
     }
@@ -61,7 +61,7 @@ describe("useOptionalAsyncQueryExecutor", () => {
       </ContainerProvider>
     );
 
-    const result: Optional<string> = await (executor as OptionalAsyncQueryExecutor)("NOT_EXISTING", "payload");
+    const result: Optional<string> = await (executor as QueryExecutorOptionalAsync)("NOT_EXISTING", "payload");
 
     expect(result).toBeUndefined();
     expect(bus.queryOptionalAsync).toHaveBeenCalledWith("NOT_EXISTING", "payload");
@@ -73,10 +73,10 @@ describe("useOptionalAsyncQueryExecutor", () => {
 
     bus.register("ASYNC_QUERY", async (payload: string) => payload + "-async");
 
-    let executor: Nullable<OptionalAsyncQueryExecutor> = null as Nullable<OptionalAsyncQueryExecutor>;
+    let executor: Nullable<QueryExecutorOptionalAsync> = null as Nullable<QueryExecutorOptionalAsync>;
 
     function TestComponent() {
-      executor = useOptionalAsyncQueryExecutor();
+      executor = useQueryExecutorOptionalAsync();
 
       return null;
     }
@@ -87,17 +87,17 @@ describe("useOptionalAsyncQueryExecutor", () => {
       </ContainerProvider>
     );
 
-    const result: Optional<string> = await (executor as OptionalAsyncQueryExecutor)("ASYNC_QUERY", "value");
+    const result: Optional<string> = await (executor as QueryExecutorOptionalAsync)("ASYNC_QUERY", "value");
 
     expect(result).toBe("value-async");
   });
 
   it("should return a stable executor between re-renders", () => {
     const container: Container = new Container({ bindings: [QueryBus] });
-    const executors: Array<OptionalAsyncQueryExecutor> = [];
+    const executors: Array<QueryExecutorOptionalAsync> = [];
 
     function TestComponent() {
-      executors.push(useOptionalAsyncQueryExecutor());
+      executors.push(useQueryExecutorOptionalAsync());
 
       return null;
     }
@@ -125,10 +125,10 @@ describe("useOptionalAsyncQueryExecutor", () => {
 
     bus.register(type, () => "symbol-result");
 
-    let executor: Nullable<OptionalAsyncQueryExecutor> = null as Nullable<OptionalAsyncQueryExecutor>;
+    let executor: Nullable<QueryExecutorOptionalAsync> = null as Nullable<QueryExecutorOptionalAsync>;
 
     function TestComponent() {
-      executor = useOptionalAsyncQueryExecutor();
+      executor = useQueryExecutorOptionalAsync();
 
       return null;
     }
@@ -139,6 +139,6 @@ describe("useOptionalAsyncQueryExecutor", () => {
       </ContainerProvider>
     );
 
-    await expect((executor as OptionalAsyncQueryExecutor)(type)).resolves.toBe("symbol-result");
+    await expect((executor as QueryExecutorOptionalAsync)(type)).resolves.toBe("symbol-result");
   });
 });

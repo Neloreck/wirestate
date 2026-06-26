@@ -8,9 +8,9 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * Registers a query handler for the component's lifetime.
  *
  * @remarks
- * The handler is stored in a `useRef` and synced on every render to avoid stale
- * closures. Only one handler is active per type; newer registrations shadow older ones.
- * The handler is automatically unregistered when the component unmounts.
+ * Only one handler is active per type; the newest registration shadows older
+ * ones. The handler is unregistered when the component unmounts or the active
+ * container changes, and may change between renders without re-registering.
  *
  * @group Queries
  *
@@ -18,17 +18,17 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * @template P - Payload type of the query.
  * @template T - Query type.
  *
- * @param type - Query type (string or symbol).
- * @param handler - Function that responds to the query.
+ * @param type - Query type to handle.
+ * @param handler - Function that resolves the query and returns its result.
  *
  * @example
  * ```tsx
- * useQueryHandler("GET_DATA", (payload) => {
+ * useOnQuery("GET_DATA", (payload) => {
  *   return { id: payload.id, value: "Resolved" };
  * });
  * ```
  */
-export function useQueryHandler<R = unknown, P = unknown, T extends QueryType = QueryType>(
+export function useOnQuery<R = unknown, P = unknown, T extends QueryType = QueryType>(
   type: T,
   handler: QueryHandler<R, P, T>
 ): void {

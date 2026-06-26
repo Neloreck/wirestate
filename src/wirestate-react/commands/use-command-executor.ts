@@ -8,8 +8,10 @@ import { type CommandExecutor } from "../types/commands";
  * Returns a stable function to dispatch commands on the active container.
  *
  * @remarks
- * The returned executor is memoized using `useMemo` and stays stable
- * for the lifetime of the container. It uses {@link CommandBus.execute} internally.
+ * Returns the command result synchronously and throws when no handler is
+ * registered. The function is stable while the active container is unchanged, so
+ * it is safe to use as an effect or callback dependency. Use
+ * {@link useCommandExecutorAsync} when the result should always be a Promise.
  *
  * @group Commands
  *

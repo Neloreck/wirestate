@@ -80,11 +80,11 @@ fit together.
 
 - `ContainerProvider` publishes containers through React context.
 - `useInjection`, `useOptionalInjection`, and `useContainer` read from the active container.
-- `useEvent`, `useEvents`, `useAllEvents`, and `useEventEmitter` work with the event bus.
-- `useCommandExecutor`, `useAsyncCommandExecutor`, `useOptionalCommandExecutor`,
-  `useOptionalAsyncCommandExecutor`, and `useCommandHandler` work with the command bus.
-- `useQueryExecutor`, `useAsyncQueryExecutor`, `useOptionalQueryExecutor`, `useOptionalAsyncQueryExecutor`, and
-  `useQueryHandler` work with the query bus.
+- `useOnEvents` and `useEventEmitter` work with the event bus.
+- `useCommandExecutor`, `useCommandExecutorAsync`, `useCommandExecutorOptional`,
+  `useCommandExecutorOptionalAsync`, and `useOnCommand` work with the command bus.
+- `useQueryExecutor`, `useQueryExecutorAsync`, `useQueryExecutorOptional`, `useQueryExecutorOptionalAsync`, and
+  `useOnQuery` work with the query bus.
 
 ## API Reference
 

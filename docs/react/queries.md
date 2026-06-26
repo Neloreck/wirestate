@@ -38,15 +38,15 @@ function CheckoutSummaryBadge() {
 Choose the hook by return shape:
 
 - `useQueryExecutor` returns the handler result as-is.
-- `useAsyncQueryExecutor` always returns a Promise.
-- `useOptionalQueryExecutor` returns `null` when no handler exists.
-- `useOptionalAsyncQueryExecutor` combines optional lookup and Promise wrapping.
+- `useQueryExecutorAsync` always returns a Promise.
+- `useQueryExecutorOptional` returns `undefined` when no handler exists.
+- `useQueryExecutorOptionalAsync` combines optional lookup and Promise wrapping.
 
 Use an async variant when the handler may return a Promise. Callers can then always `await` the result without checking
 whether the handler is sync or async.
 
 ```tsx
-import { useOptionalQueryExecutor } from "@wirestate/react";
+import { useQueryExecutorOptional } from "@wirestate/react";
 import { useCallback, useState } from "react";
 
 interface ShippingQuote {
@@ -55,7 +55,7 @@ interface ShippingQuote {
 }
 
 function ShippingQuoteButton() {
-  const query = useOptionalQueryExecutor();
+  const query = useQueryExecutorOptional();
   const [quote, setQuote] = useState<ShippingQuote | null>(null);
 
   const refreshQuote = useCallback(() => {
@@ -69,10 +69,10 @@ function ShippingQuoteButton() {
 ## Handle a Query
 
 ```tsx
-import { useQueryHandler } from "@wirestate/react";
+import { useOnQuery } from "@wirestate/react";
 
 function CheckoutQueries(props: { cart: Array<{ price: number }> }) {
-  useQueryHandler("CHECKOUT_SUMMARY", () => ({
+  useOnQuery("CHECKOUT_SUMMARY", () => ({
     itemCount: props.cart.length,
     total: props.cart.reduce((sum, item) => sum + item.price, 0),
   }));
@@ -87,7 +87,7 @@ type, the newest one handles the query.
 ## API Reference
 
 [`useQueryExecutor`](/api/wirestate-react/functions/useQueryExecutor),
-[`useAsyncQueryExecutor`](/api/wirestate-react/functions/useAsyncQueryExecutor),
-[`useOptionalQueryExecutor`](/api/wirestate-react/functions/useOptionalQueryExecutor),
-[`useOptionalAsyncQueryExecutor`](/api/wirestate-react/functions/useOptionalAsyncQueryExecutor),
-[`useQueryHandler`](/api/wirestate-react/functions/useQueryHandler).
+[`useQueryExecutorAsync`](/api/wirestate-react/functions/useQueryExecutorAsync),
+[`useQueryExecutorOptional`](/api/wirestate-react/functions/useQueryExecutorOptional),
+[`useQueryExecutorOptionalAsync`](/api/wirestate-react/functions/useQueryExecutorOptionalAsync),
+[`useOnQuery`](/api/wirestate-react/functions/useOnQuery).

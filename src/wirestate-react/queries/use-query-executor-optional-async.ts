@@ -2,15 +2,15 @@ import { type Container, type QueryType, QueryBus } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { type OptionalAsyncQueryExecutor } from "../types/queries";
+import { type QueryExecutorOptionalAsync } from "../types/queries";
 
 /**
  * Returns a stable function to dispatch optional queries with Promise-normalized results.
  *
  * @remarks
- * The returned executor is memoized using `useMemo` and stays stable
- * for the lifetime of the container. It returns `undefined` instead of throwing
- * if no handler is registered and uses {@link QueryBus.queryOptionalAsync} internally.
+ * Always returns a Promise that resolves to the query result, or to `undefined`
+ * when no handler is registered. The function is stable while the active
+ * container is unchanged.
  *
  * @group Queries
  *
@@ -18,7 +18,7 @@ import { type OptionalAsyncQueryExecutor } from "../types/queries";
  *
  * @example
  * ```tsx
- * const queryOptionalAsync: OptionalAsyncQueryExecutor = useOptionalAsyncQueryExecutor();
+ * const queryOptionalAsync: QueryExecutorOptionalAsync = useQueryExecutorOptionalAsync();
  * const [settings, setSettings] = useState<UserSettings | undefined>(undefined);
  *
  * const refreshSettings = useCallback(async () => {
@@ -26,7 +26,7 @@ import { type OptionalAsyncQueryExecutor } from "../types/queries";
  * }, [queryOptionalAsync]);
  * ```
  */
-export function useOptionalAsyncQueryExecutor(): OptionalAsyncQueryExecutor {
+export function useQueryExecutorOptionalAsync(): QueryExecutorOptionalAsync {
   const container: Container = useContainer();
 
   return useMemo(() => {
@@ -34,6 +34,6 @@ export function useOptionalAsyncQueryExecutor(): OptionalAsyncQueryExecutor {
 
     return ((type: QueryType, payload?: unknown) => {
       return bus.queryOptionalAsync(type, payload);
-    }) as OptionalAsyncQueryExecutor;
+    }) as QueryExecutorOptionalAsync;
   }, [container]);
 }

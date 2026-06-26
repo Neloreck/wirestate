@@ -2,14 +2,15 @@ import { type Container, type QueryType, QueryBus } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { type AsyncQueryExecutor } from "../types/queries";
+import { type QueryExecutorAsync } from "../types/queries";
 
 /**
  * Returns a stable function to dispatch queries with Promise-normalized results.
  *
  * @remarks
- * The returned executor is memoized using `useMemo` and stays stable
- * for the lifetime of the container. It uses {@link QueryBus.queryAsync} internally.
+ * Always returns a Promise, whether the handler is synchronous or asynchronous,
+ * so callers can `await` the result without checking. The function is stable
+ * while the active container is unchanged.
  *
  * @group Queries
  *
@@ -17,7 +18,7 @@ import { type AsyncQueryExecutor } from "../types/queries";
  *
  * @example
  * ```tsx
- * const queryAsync: AsyncQueryExecutor = useAsyncQueryExecutor();
+ * const queryAsync: QueryExecutorAsync = useQueryExecutorAsync();
  * const [profile, setProfile] = useState<UserProfile | null>(null);
  *
  * const refreshProfile = useCallback(async () => {
@@ -25,7 +26,7 @@ import { type AsyncQueryExecutor } from "../types/queries";
  * }, [queryAsync]);
  * ```
  */
-export function useAsyncQueryExecutor(): AsyncQueryExecutor {
+export function useQueryExecutorAsync(): QueryExecutorAsync {
   const container: Container = useContainer();
 
   return useMemo(() => {
@@ -33,6 +34,6 @@ export function useAsyncQueryExecutor(): AsyncQueryExecutor {
 
     return ((type: QueryType, payload?: unknown) => {
       return bus.queryAsync(type, payload);
-    }) as AsyncQueryExecutor;
+    }) as QueryExecutorAsync;
   }, [container]);
 }

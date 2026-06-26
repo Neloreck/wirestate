@@ -5,17 +5,15 @@
  */
 
 export { useCommandExecutor } from "./commands/use-command-executor";
-export { useAsyncCommandExecutor } from "./commands/use-async-command-executor";
-export { useOptionalCommandExecutor } from "./commands/use-optional-command-executor";
-export { useOptionalAsyncCommandExecutor } from "./commands/use-optional-async-command-executor";
-export { useCommandHandler } from "./commands/use-command-handler";
+export { useCommandExecutorAsync } from "./commands/use-command-executor-async";
+export { useCommandExecutorOptional } from "./commands/use-command-executor-optional";
+export { useCommandExecutorOptionalAsync } from "./commands/use-command-executor-optional-async";
+export { useOnCommand } from "./commands/use-on-command";
 
 export { ContainerContext } from "./context/container-context";
 export { useContainer } from "./context/use-container";
 
-export { useAllEvents } from "./events/use-all-events";
-export { useEvent } from "./events/use-event";
-export { useEvents } from "./events/use-events";
+export { useOnEvents } from "./events/use-on-events";
 export { useEventEmitter } from "./events/use-event-emitter";
 
 export { useInjection } from "./injection/use-injection";
@@ -26,21 +24,21 @@ export { type ContainerProviderProps } from "./provision/container-provider";
 export { ContainerProvider } from "./provision/container-provider";
 
 export { useQueryExecutor } from "./queries/use-query-executor";
-export { useAsyncQueryExecutor } from "./queries/use-async-query-executor";
-export { useOptionalQueryExecutor } from "./queries/use-optional-query-executor";
-export { useOptionalAsyncQueryExecutor } from "./queries/use-optional-async-query-executor";
-export { useQueryHandler } from "./queries/use-query-handler";
+export { useQueryExecutorAsync } from "./queries/use-query-executor-async";
+export { useQueryExecutorOptional } from "./queries/use-query-executor-optional";
+export { useQueryExecutorOptionalAsync } from "./queries/use-query-executor-optional-async";
+export { useOnQuery } from "./queries/use-on-query";
 
 export {
-  type AsyncCommandExecutor,
   type CommandExecutor,
-  type OptionalAsyncCommandExecutor,
-  type OptionalCommandExecutor,
+  type CommandExecutorAsync,
+  type CommandExecutorOptional,
+  type CommandExecutorOptionalAsync,
 } from "./types/commands";
 export { type EventEmitter } from "./types/events";
 export {
   type QueryExecutor,
-  type AsyncQueryExecutor,
-  type OptionalQueryExecutor,
-  type OptionalAsyncQueryExecutor,
+  type QueryExecutorAsync,
+  type QueryExecutorOptional,
+  type QueryExecutorOptionalAsync,
 } from "./types/queries";

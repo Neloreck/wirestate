@@ -32,19 +32,19 @@ function AddItemButton({ item }: { item: CartItem }) {
 }
 ```
 
-`useCommandExecutor` throws through the core command bus when no handler exists.
+`useCommandExecutor` throws when no handler exists.
 
 ## Execute an Async Command
 
-Use `useAsyncCommandExecutor` when the handler may return a Promise, or when
+Use `useCommandExecutorAsync` when the handler may return a Promise, or when
 the component should always work in an async way.
 
 ```tsx
-import { useAsyncCommandExecutor } from "@wirestate/react";
+import { useCommandExecutorAsync } from "@wirestate/react";
 import { useCallback, useState } from "react";
 
 function LogoutButton() {
-  const executeCommandAsync = useAsyncCommandExecutor();
+  const executeCommandAsync = useCommandExecutorAsync();
   const [pending, setPending] = useState(false);
 
   const logout = useCallback(async () => {
@@ -70,11 +70,11 @@ function LogoutButton() {
 Use optional executors when a command handler may be absent in some containers.
 
 ```tsx
-import { useOptionalAsyncCommandExecutor, useOptionalCommandExecutor } from "@wirestate/react";
+import { useCommandExecutorOptionalAsync, useCommandExecutorOptional } from "@wirestate/react";
 
 function DevtoolsButtons() {
-  const executeOptionalCommand = useOptionalCommandExecutor();
-  const executeOptionalCommandAsync = useOptionalAsyncCommandExecutor();
+  const executeOptionalCommand = useCommandExecutorOptional();
+  const executeOptionalCommandAsync = useCommandExecutorOptionalAsync();
 
   return (
     <>
@@ -88,13 +88,13 @@ function DevtoolsButtons() {
 ## Handle a Command
 
 ```tsx
-import { useCommandHandler } from "@wirestate/react";
+import { useOnCommand } from "@wirestate/react";
 import { useState } from "react";
 
 function SearchPanel() {
   const [open, setOpen] = useState(false);
 
-  useCommandHandler("OPEN_SEARCH", () => setOpen(true));
+  useOnCommand("OPEN_SEARCH", () => setOpen(true));
 
   return open ? <div>Search</div> : null;
 }
@@ -106,7 +106,7 @@ command type, the newest one handles the command.
 ## API Reference
 
 [`useCommandExecutor`](/api/wirestate-react/functions/useCommandExecutor),
-[`useAsyncCommandExecutor`](/api/wirestate-react/functions/useAsyncCommandExecutor),
-[`useOptionalCommandExecutor`](/api/wirestate-react/functions/useOptionalCommandExecutor),
-[`useOptionalAsyncCommandExecutor`](/api/wirestate-react/functions/useOptionalAsyncCommandExecutor),
-[`useCommandHandler`](/api/wirestate-react/functions/useCommandHandler).
+[`useCommandExecutorAsync`](/api/wirestate-react/functions/useCommandExecutorAsync),
+[`useCommandExecutorOptional`](/api/wirestate-react/functions/useCommandExecutorOptional),
+[`useCommandExecutorOptionalAsync`](/api/wirestate-react/functions/useCommandExecutorOptionalAsync),
+[`useOnCommand`](/api/wirestate-react/functions/useOnCommand).

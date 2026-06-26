@@ -6,12 +6,12 @@ import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { type OptionalAsyncCommandExecutor } from "../types/commands";
+import { type CommandExecutorOptionalAsync } from "../types/commands";
 import { type Optional } from "../types/general";
 
-import { useOptionalAsyncCommandExecutor } from "./use-optional-async-command-executor";
+import { useCommandExecutorOptionalAsync } from "./use-command-executor-optional-async";
 
-describe("useOptionalAsyncCommandExecutor", () => {
+describe("useCommandExecutorOptionalAsync", () => {
   afterEach(() => {
     cleanup();
   });
@@ -19,10 +19,10 @@ describe("useOptionalAsyncCommandExecutor", () => {
   it("should resolve undefined if no handler exists", async () => {
     const container: Container = new Container({ bindings: [CommandBus] });
 
-    let executor: OptionalAsyncCommandExecutor = null as unknown as OptionalAsyncCommandExecutor;
+    let executor: CommandExecutorOptionalAsync = null as unknown as CommandExecutorOptionalAsync;
 
     function TestComponent() {
-      executor = useOptionalAsyncCommandExecutor();
+      executor = useCommandExecutorOptionalAsync();
 
       return null;
     }
@@ -44,10 +44,10 @@ describe("useOptionalAsyncCommandExecutor", () => {
     bus.register("EXISTING_COMMAND", () => "ok");
     jest.spyOn(bus, "executeOptionalAsync");
 
-    let executor: OptionalAsyncCommandExecutor = null as unknown as OptionalAsyncCommandExecutor;
+    let executor: CommandExecutorOptionalAsync = null as unknown as CommandExecutorOptionalAsync;
 
     function TestComponent() {
-      executor = useOptionalAsyncCommandExecutor();
+      executor = useCommandExecutorOptionalAsync();
 
       return null;
     }
@@ -69,10 +69,10 @@ describe("useOptionalAsyncCommandExecutor", () => {
 
     container.get(CommandBus).register("ASYNC_COMMAND", async () => "async-ok");
 
-    let executor: OptionalAsyncCommandExecutor = null as unknown as OptionalAsyncCommandExecutor;
+    let executor: CommandExecutorOptionalAsync = null as unknown as CommandExecutorOptionalAsync;
 
     function TestComponent() {
-      executor = useOptionalAsyncCommandExecutor();
+      executor = useCommandExecutorOptionalAsync();
 
       return null;
     }

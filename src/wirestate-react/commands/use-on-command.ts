@@ -8,10 +8,9 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * Registers a command handler for the component's lifetime.
  *
  * @remarks
- * The handler is stored in a `useRef` and synced on every render to avoid stale
- * closures without requiring manual memoization of the handler function.
- * Only one handler is active per type; newer registrations shadow older ones.
- * The handler is automatically unregistered when the component unmounts.
+ * Only one handler is active per type; the newest registration shadows older
+ * ones. The handler is unregistered when the component unmounts or the active
+ * container changes, and may change between renders without re-registering.
  *
  * @group Commands
  *
@@ -19,17 +18,17 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * @template P - Payload type of the command.
  * @template T - Command type.
  *
- * @param type - Command type (string or symbol).
- * @param handler - Command handler function.
+ * @param type - Command type to handle.
+ * @param handler - Function that handles the command and returns its result.
  *
  * @example
  * ```tsx
- * useCommandHandler("SAVE_COMMAND", (payload) => {
+ * useOnCommand("SAVE_COMMAND", (payload) => {
  *   return api.save(payload);
  * });
  * ```
  */
-export function useCommandHandler<R = unknown, P = unknown, T extends CommandType = CommandType>(
+export function useOnCommand<R = unknown, P = unknown, T extends CommandType = CommandType>(
   type: T,
   handler: CommandHandler<R, P, T>
 ): void {

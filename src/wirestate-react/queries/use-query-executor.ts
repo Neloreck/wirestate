@@ -8,9 +8,10 @@ import { type QueryExecutor } from "../types/queries";
  * Returns a stable function to dispatch synchronous queries on the active container.
  *
  * @remarks
- * The returned executor is memoized using `useMemo` and stays stable
- * for the lifetime of the container. It uses {@link QueryBus.query} internally.
- * Use {@link useAsyncQueryExecutor} when consumers should consistently receive a Promise.
+ * Returns the query result synchronously and throws when no handler is
+ * registered. The function is stable while the active container is unchanged, so
+ * it is safe to use as an effect or callback dependency. Use
+ * {@link useQueryExecutorAsync} when the result should always be a Promise.
  *
  * @group Queries
  *

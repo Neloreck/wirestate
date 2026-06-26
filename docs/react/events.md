@@ -20,28 +20,30 @@ function CartButton() {
 }
 ```
 
-## Listen To One Event
+## Subscribe To Events
+
+`useOnEvents` mirrors `EventBus.subscribe`.
+Pass a single type, an array of types, or only a handler to receive every event.
+The subscription is cleaned up when the component unmounts, the active container changes, or the listened type
+membership changes.
 
 ```tsx
 import { WireEvent } from "@wirestate/core";
-import { useEvent } from "@wirestate/react";
+import { useOnEvents } from "@wirestate/react";
 
-function CartLogger() {
-  useEvent("CART_ITEM_ADDED", (event: WireEvent<CartItem>) => {
+function CartActivity() {
+  // One type.
+  useOnEvents("CART_ITEM_ADDED", (event: WireEvent<CartItem>) => {
     console.log(event.payload);
   });
 
-  return null;
-}
-```
+  // Several types.
+  useOnEvents(["CART_ITEM_ADDED", "CART_VIEWED"], (event) => {
+    console.log(event.type);
+  });
 
-## Listen To Several Events
-
-```tsx
-import { useEvents } from "@wirestate/react";
-
-function CartActivity() {
-  useEvents(["CART_ITEM_ADDED", "CART_VIEWED"], (event) => {
+  // Every event — pass only a handler.
+  useOnEvents((event) => {
     console.log(event.type);
   });
 
@@ -49,23 +51,10 @@ function CartActivity() {
 }
 ```
 
-## Listen To All Events
-
-```tsx
-import { useAllEvents } from "@wirestate/react";
-
-function EventLog() {
-  useAllEvents((event) => {
-    console.log(event.type);
-  });
-
-  return null;
-}
-```
-
-Subscriptions unregister when the component unmounts or the active container changes.
+Passing only a handler subscribes to every event, which is useful for logging or debugging. Provide a type or list of
+types to scope the subscription.
 
 ## API Reference
 
-[`useEventEmitter`](/api/wirestate-react/functions/useEventEmitter), [`useEvent`](/api/wirestate-react/functions/useEvent),
-[`useEvents`](/api/wirestate-react/functions/useEvents), [`useAllEvents`](/api/wirestate-react/functions/useAllEvents).
+[`useEventEmitter`](/api/wirestate-react/functions/useEventEmitter),
+[`useOnEvents`](/api/wirestate-react/functions/useOnEvents).

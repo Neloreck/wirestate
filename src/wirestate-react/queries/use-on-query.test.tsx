@@ -9,16 +9,16 @@ import { useLayoutEffect } from "react";
 import { ContainerProvider } from "../provision/container-provider";
 import { type AnyObject } from "../types/general";
 
-import { useQueryHandler } from "./use-query-handler";
+import { useOnQuery } from "./use-on-query";
 
-describe("useQueryHandler", () => {
+describe("useOnQuery", () => {
   it("should register and unregister a query handler", () => {
     const container: Container = new Container({ bindings: [QueryBus] });
     const bus: QueryBus = container.get(QueryBus);
     const handler = jest.fn((payload: string) => payload + "-result");
 
     function TestComponent() {
-      useQueryHandler("TEST_QUERY", handler);
+      useOnQuery("TEST_QUERY", handler);
 
       return null;
     }
@@ -51,7 +51,7 @@ describe("useQueryHandler", () => {
     const handler2 = jest.fn(() => "result2");
 
     function TestComponent({ handler }: { handler: () => string }) {
-      useQueryHandler("TEST_QUERY", handler);
+      useOnQuery("TEST_QUERY", handler);
 
       return null;
     }
@@ -79,7 +79,7 @@ describe("useQueryHandler", () => {
     const handler = jest.fn().mockReturnValue("value");
 
     function TestComponent({ type }: AnyObject) {
-      useQueryHandler(type, handler);
+      useOnQuery(type, handler);
 
       return null;
     }
@@ -110,7 +110,7 @@ describe("useQueryHandler", () => {
     const handler2 = jest.fn().mockReturnValue("value2");
 
     function TestComponent({ type, handler }: AnyObject) {
-      useQueryHandler(type, handler);
+      useOnQuery(type, handler);
 
       return null;
     }
@@ -148,7 +148,7 @@ describe("useQueryHandler", () => {
     const handler2 = jest.fn(() => "result2");
 
     function TestComponent({ fire, handler }: { fire: boolean; handler: () => string }) {
-      useQueryHandler("IMMEDIATE_QUERY", handler);
+      useOnQuery("IMMEDIATE_QUERY", handler);
 
       useLayoutEffect(() => {
         if (fire) {
@@ -184,7 +184,7 @@ describe("useQueryHandler", () => {
     const handler = jest.fn(async (payload: string) => payload + "-async");
 
     function TestComponent() {
-      useQueryHandler("ASYNC_QUERY", handler);
+      useOnQuery("ASYNC_QUERY", handler);
 
       return null;
     }

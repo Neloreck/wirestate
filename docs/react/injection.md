@@ -59,8 +59,8 @@ function DebugFlag() {
 
 ## Messaging
 
-Injection hooks resolve services and values. For messaging, use the dedicated hooks: `useEventEmitter` and `useEvent` for
-events, `useCommandExecutor` and `useCommandHandler` for commands, and `useQueryExecutor` and `useQueryHandler` for
+Injection hooks resolve services and values. For messaging, use the dedicated hooks: `useEventEmitter` and `useOnEvents` for
+events, `useCommandExecutor` and `useOnCommand` for commands, and `useQueryExecutor` and `useOnQuery` for
 queries.
 
 ```tsx

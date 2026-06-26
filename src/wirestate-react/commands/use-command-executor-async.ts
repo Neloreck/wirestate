@@ -2,14 +2,15 @@ import { type Container, type CommandType, CommandBus } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { type AsyncCommandExecutor } from "../types/commands";
+import { type CommandExecutorAsync } from "../types/commands";
 
 /**
  * Returns a stable function to dispatch commands with Promise-normalized results.
  *
  * @remarks
- * The returned executor is memoized using `useMemo` and stays stable
- * for the lifetime of the container. It uses {@link CommandBus.executeAsync} internally.
+ * Always returns a Promise, whether the handler is synchronous or asynchronous,
+ * so callers can `await` the result without checking. The function is stable
+ * while the active container is unchanged.
  *
  * @group Commands
  *
@@ -17,14 +18,14 @@ import { type AsyncCommandExecutor } from "../types/commands";
  *
  * @example
  * ```tsx
- * const executeAsync: AsyncCommandExecutor = useAsyncCommandExecutor();
+ * const executeAsync: CommandExecutorAsync = useCommandExecutorAsync();
  *
  * const onClick = useCallback(async () => {
  *   await executeAsync("SAVE_USER_COMMAND", { id: 1 });
  * }, [executeAsync]);
  * ```
  */
-export function useAsyncCommandExecutor(): AsyncCommandExecutor {
+export function useCommandExecutorAsync(): CommandExecutorAsync {
   const container: Container = useContainer();
 
   return useMemo(() => {
@@ -32,6 +33,6 @@ export function useAsyncCommandExecutor(): AsyncCommandExecutor {
 
     return ((type: CommandType, payload?: unknown) => {
       return bus.executeAsync(type, payload);
-    }) as AsyncCommandExecutor;
+    }) as CommandExecutorAsync;
   }, [container]);
 }

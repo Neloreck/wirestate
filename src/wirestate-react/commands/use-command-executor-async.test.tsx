@@ -6,11 +6,11 @@ import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { type AsyncCommandExecutor } from "../types/commands";
+import { type CommandExecutorAsync } from "../types/commands";
 
-import { useAsyncCommandExecutor } from "./use-async-command-executor";
+import { useCommandExecutorAsync } from "./use-command-executor-async";
 
-describe("useAsyncCommandExecutor", () => {
+describe("useCommandExecutorAsync", () => {
   afterEach(() => {
     cleanup();
   });
@@ -23,10 +23,10 @@ describe("useAsyncCommandExecutor", () => {
     bus.register("TEST_COMMAND", handler);
     jest.spyOn(bus, "executeAsync");
 
-    let executor: AsyncCommandExecutor = null as unknown as AsyncCommandExecutor;
+    let executor: CommandExecutorAsync = null as unknown as CommandExecutorAsync;
 
     function TestComponent() {
-      executor = useAsyncCommandExecutor();
+      executor = useCommandExecutorAsync();
 
       return null;
     }
@@ -47,10 +47,10 @@ describe("useAsyncCommandExecutor", () => {
 
     container.get(CommandBus).register("ASYNC_COMMAND", async (payload: string) => payload + "-result");
 
-    let executor: AsyncCommandExecutor = null as unknown as AsyncCommandExecutor;
+    let executor: CommandExecutorAsync = null as unknown as CommandExecutorAsync;
 
     function TestComponent() {
-      executor = useAsyncCommandExecutor();
+      executor = useCommandExecutorAsync();
 
       return null;
     }
@@ -66,10 +66,10 @@ describe("useAsyncCommandExecutor", () => {
 
   it("should reject on unhandled commands", async () => {
     const container: Container = new Container({ bindings: [CommandBus] });
-    let executor: AsyncCommandExecutor = null as unknown as AsyncCommandExecutor;
+    let executor: CommandExecutorAsync = null as unknown as CommandExecutorAsync;
 
     function TestComponent() {
-      executor = useAsyncCommandExecutor();
+      executor = useCommandExecutorAsync();
 
       return null;
     }

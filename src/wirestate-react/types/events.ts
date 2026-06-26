@@ -3,9 +3,6 @@ import { type EventEmitOptions, type EventType } from "@wirestate/core";
 /**
  * Represents the function returned by {@link useEventEmitter}.
  *
- * @remarks
- * Typically returned by {@link useEventEmitter}. Supports optional payload and options.
- *
  * @group Events
  *
  * @template P - The type of the event payload.

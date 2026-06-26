@@ -8,9 +8,9 @@ import { useLayoutEffect } from "react";
 
 import { ContainerProvider } from "../provision/container-provider";
 
-import { useCommandHandler } from "./use-command-handler";
+import { useOnCommand } from "./use-on-command";
 
-describe("useCommandHandler", () => {
+describe("useOnCommand", () => {
   afterEach(() => {
     cleanup();
   });
@@ -21,7 +21,7 @@ describe("useCommandHandler", () => {
     const handler = jest.fn(() => Promise.resolve("async-payload"));
 
     function TestComponent() {
-      useCommandHandler("HOOK_COMMAND", handler);
+      useOnCommand("HOOK_COMMAND", handler);
 
       return null;
     }
@@ -54,7 +54,7 @@ describe("useCommandHandler", () => {
     const handler2 = jest.fn().mockReturnValue("second");
 
     function TestComponent({ handler }: Record<string, unknown>) {
-      useCommandHandler("UPDATE_COMMAND", handler as CommandHandler);
+      useOnCommand("UPDATE_COMMAND", handler as CommandHandler);
 
       return null;
     }
@@ -86,7 +86,7 @@ describe("useCommandHandler", () => {
     const handler2 = jest.fn().mockReturnValue("second");
 
     function TestComponent({ fire, handler }: { fire: boolean; handler: CommandHandler }) {
-      useCommandHandler("IMMEDIATE_COMMAND", handler);
+      useOnCommand("IMMEDIATE_COMMAND", handler);
 
       useLayoutEffect(() => {
         if (fire) {

@@ -44,8 +44,7 @@ export function Application() {
 
 - `ContainerProvider` and `useContainer`.
 - `useInjection` and `useOptionalInjection`.
-- Event hooks: `useEventEmitter`, `useEvent`, `useEvents`, and `useAllEvents`.
-- Command hooks and query hooks for executors and component-owned handlers.
+- Event, command and query hooks for executors and component-owned handlers.
 
 This package wires services into React. It does not make service fields reactive by itself; pair it with
 [`@wirestate/react-mobx`](https://www.npmjs.com/package/@wirestate/react-mobx),
