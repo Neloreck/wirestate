@@ -10,7 +10,7 @@ import { type Nullable } from "../types/general";
  * This context is internal to Wirestate. Consumers should use provided hooks
  * like {@link useContainer} or {@link useInjection} to access the container and resolved services.
  *
- * @group Context
+ * @group Container
  */
 export const ContainerContext: Context<Nullable<Container>> = createContext<Nullable<Container>>(null);
 

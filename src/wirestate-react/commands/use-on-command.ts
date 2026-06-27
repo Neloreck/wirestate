@@ -1,7 +1,7 @@
 import { type Container, type CommandHandler, type CommandType, CommandBus } from "@wirestate/core";
 import { useRef } from "react";
 
-import { useContainer } from "../context/use-container";
+import { useContainer } from "../container/use-container";
 import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect";
 
 /**

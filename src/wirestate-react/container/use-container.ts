@@ -13,7 +13,7 @@ import { ContainerContext } from "./container-context";
  * Use this hook when you need direct access to the {@link Container} for manual
  * resolution or checking bindings. For typical usage, prefer {@link useInjection}.
  *
- * @group Context
+ * @group Container
  *
  * @returns The active container.
  *

@@ -1,7 +1,7 @@
 import { type Container, type EventHandler, type EventType, EventBus } from "@wirestate/core";
 import { type RefObject, useRef } from "react";
 
-import { useContainer } from "../context/use-container";
+import { useContainer } from "../container/use-container";
 import type { Nullable } from "../types/general";
 import { shallowEqualArrays } from "../utils/shallow-equal";
 import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect";

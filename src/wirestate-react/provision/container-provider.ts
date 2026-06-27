@@ -1,7 +1,7 @@
 import { type ContainerConfig, Container, WirestateError } from "@wirestate/core";
 import { type ReactElement, type ReactNode, createElement, useEffect, useRef, useState } from "react";
 
-import { ContainerContext } from "../context/container-context";
+import { ContainerContext } from "../container/container-context";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { type Maybe, type Nullable } from "../types/general";
 import { shallowEqualActivation, shallowEqualArrays } from "../utils/shallow-equal";

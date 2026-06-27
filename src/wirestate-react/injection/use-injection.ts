@@ -1,7 +1,7 @@
 import { type Container, type ServiceToken } from "@wirestate/core";
 import { useMemo } from "react";
 
-import { useContainer } from "../context/use-container";
+import { useContainer } from "../container/use-container";
 import { type Optional } from "../types/general";
 
 /**

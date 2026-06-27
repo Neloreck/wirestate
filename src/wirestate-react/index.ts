@@ -6,8 +6,8 @@
 
 export { useOnCommand } from "./commands/use-on-command";
 
-export { ContainerContext } from "./context/container-context";
-export { useContainer } from "./context/use-container";
+export { ContainerContext } from "./container/container-context";
+export { useContainer } from "./container/use-container";
 
 export { useOnEvents } from "./events/use-on-events";
 

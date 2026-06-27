@@ -8,7 +8,7 @@ import { StrictMode } from "react";
 
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { useContainer } from "../context/use-container";
+import { useContainer } from "../container/use-container";
 import { useInjection } from "../injection/use-injection";
 import { type AnyObject } from "../types/general";
 
