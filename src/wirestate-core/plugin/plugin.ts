@@ -5,23 +5,18 @@ import type { Container } from "../container/container";
  * A container lifecycle plugin.
  *
  * @remarks
- * Plugins are registered on a {@link Container} via `config.plugins` and observe
- * or extend the container lifecycle. Every hook is optional: a plugin implements
- * only the phases it cares about. A plugin is a class instance (`new MyPlugin()`),
- * which gives it a home for per-instance state.
+ * Register plugins on a {@link Container} via `config.plugins`. A plugin is a
+ * class instance, so it can hold per-instance state, and every hook is optional.
  *
- * Plugins are the framework layer that brackets the user layer
- * (`@OnActivated` / `@OnProvision`): on setup phases plugin hooks run before
- * the matching user hook. On teardown phases they run *after* it.
+ * Plugins bracket the user layer (`@OnActivated` / `@OnProvision`): setup hooks
+ * run before the matching user hook, teardown hooks run after it. Setup hooks
+ * (`install`, `onActivate`, `onContainerProvision`, `onProvision`) are atomic, so
+ * a throw unwinds the activation/provision cycle. Teardown hooks (`onDeactivate`,
+ * `onDeprovision`, `onContainerDeprovision`) and disposers are failsafe, so a
+ * throw is swallowed and teardown continues.
  *
- * Setup hooks (`install`, `onActivate`, `onContainerProvision`, `onProvision`) are
- * atomic: a throw unwinds the activation/provision cycle. Teardown hooks
- * (`onDeactivate`, `onDeprovision`, `onContainerDeprovision`) and disposers are
- * failsafe: a throw is swallowed and never aborts teardown.
- *
- * A plugin's effective reach is its container plus every descendant container
- * (plugins resolve up the parent chain), so a plugin registered on the root
- * observes the whole subtree.
+ * A plugin reaches its container and every descendant (plugins resolve up the
+ * parent chain), so one registered on the root observes the whole subtree.
  *
  * @group Plugin
  *

@@ -73,9 +73,9 @@ export class EventBus {
    * an event is being emitted. If a handler throws, Wirestate reports it through
    * the container error handler and continues with the next subscriber.
    *
-   * @template P - Type of the event payload.
-   * @template T - Type of the event.
-   * @template S - Type of the event source.
+   * @template P - Payload type.
+   * @template T - Event type.
+   * @template S - Source type.
    *
    * @param type - Event token.
    * @param payload - Event payload.

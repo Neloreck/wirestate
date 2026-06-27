@@ -49,9 +49,9 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    * If a handler returns a Promise, this method returns that Promise. Use
    * {@link queryAsync} when the caller should always receive a Promise.
    *
-   * @template R - Type of the expected query result.
-   * @template P - Type of the query payload.
-   * @template T - Type of the query.
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Query type.
    *
    * @param type - Query type.
    * @param payload - Optional payload for the handler.
@@ -75,9 +75,9 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    * Synchronous handler results are wrapped. Promises returned by handlers are
    * passed through.
    *
-   * @template R - Type of the expected query result.
-   * @template P - Type of the query payload.
-   * @template T - Type of the query.
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Query type.
    *
    * @param type - Query type.
    * @param payload - Optional payload for the handler.
@@ -96,9 +96,9 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    * Returns the handler result as-is. Use {@link queryOptionalAsync} when the
    * caller should always receive a Promise.
    *
-   * @template R - Type of the expected query result.
-   * @template P - Type of the query payload.
-   * @template T - Type of the query.
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Query type.
    *
    * @param type - Query type.
    * @param payload - Optional payload for the handler.
@@ -111,9 +111,9 @@ export class QueryBus extends HandlerStackBus<QueryType> {
   /**
    * Dispatches an optional query and Promise-wraps the result.
    *
-   * @template R - Type of the expected query result.
-   * @template P - Type of the query payload.
-   * @template T - Type of the query.
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Query type.
    *
    * @param type - Query type.
    * @param payload - Optional payload for the handler.
@@ -132,9 +132,9 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    * @remarks
    * Registering another handler for the same type shadows the previous one. Unregistering the newest restores it.
    *
-   * @template R - Type of the query result.
-   * @template P - Type of the query payload.
-   * @template T - Type of the query.
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Query type.
    *
    * @param type - Query token.
    * @param handler - Query handler.
@@ -158,9 +158,9 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    * @remarks
    * If the handler was not registered for the given type, this operation does nothing.
    *
-   * @template R - Type of the query result.
-   * @template P - Type of the query payload.
-   * @template T - Type of the query.
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Query type.
    *
    * @param type - Query type.
    * @param handler - The handler function instance to remove.

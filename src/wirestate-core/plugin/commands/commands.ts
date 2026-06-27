@@ -1,10 +1,10 @@
 import { type MaybePromise } from "../../types/general";
 
 /**
- * Represents the type used to dispatch and handle commands.
+ * Identifies a command and routes it to its handler.
  *
  * @remarks
- * Use strings for public commands and symbols for private/scoped commands to avoid name collisions.
+ * Prefer strings for public commands and symbols for private ones to avoid collisions.
  *
  * @group Commands
  *
@@ -13,29 +13,22 @@ import { type MaybePromise } from "../../types/general";
  * const PUBLIC_COMMAND: CommandType = "USER/LOGIN";
  *
  * const PRIVATE_COMMAND: CommandType = Symbol("INTERNAL/SYNC");
- *
- * enum CounterCommand {
- *   INCREMENT = "COUNTER/INCREMENT",
- *   DECREMENT = "COUNTER/DECREMENT",
- * }
  * ```
  */
 export type CommandType = string | symbol | number;
 
 /**
- * Represents the function that handles a command.
+ * Handles a dispatched command and returns its result.
  *
  * @group Commands
  *
- * @template R - Type of the result returned by the handler (can be wrapped in a Promise).
- * @template P - Type of the command payload.
- * @template T - Type of the command.
+ * @template R - Result type, optionally a Promise.
+ * @template P - Payload type.
+ * @template T - Command type.
  *
  * @example
  * ```typescript
- * const loginHandler: CommandHandler<Session, Credentials> = (payload) => {
- *   return auth.login(payload);
- * };
+ * const loginHandler: CommandHandler<Session, Credentials> = (payload) => auth.login(payload);
  * ```
  */
 export type CommandHandler<R = unknown, P = unknown, T extends CommandType = CommandType> = ((
@@ -45,9 +38,7 @@ export type CommandHandler<R = unknown, P = unknown, T extends CommandType = Com
 };
 
 /**
- * Represents the function returned by command registration.
- *
- * Call it to unregister that exact handler.
+ * Removes the command handler it was returned for.
  *
  * @group Commands
  *

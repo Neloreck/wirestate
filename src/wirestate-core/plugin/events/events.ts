@@ -1,14 +1,14 @@
 import { type Nullable } from "../../types/general";
 
 /**
- * Represents the type used to emit and filter events.
+ * Identifies an event for emitting and subscribing.
  *
  * @group Events
  */
 export type EventType = string | symbol | number;
 
 /**
- * Represents event payload delivered to handlers.
+ * Event delivered to handlers: its type, optional payload, and optional source.
  *
  * @group Events
  */
@@ -19,40 +19,38 @@ export interface WireEvent<P = unknown, T extends EventType = EventType, S = unk
 }
 
 /**
- * Options used when emitting an event.
+ * Options for emitting an event.
  *
  * @group Events
  *
- * @template S - Type of the event source.
+ * @template S - Source type.
  */
 export interface EventEmitOptions<S = unknown> {
   /**
-   * Optional source attached to the emitted event.
+   * Source attached to the emitted event.
    */
   readonly source?: S;
 }
 
 /**
- * Represents the function that handles an event.
+ * Receives an emitted event from the bus.
  *
  * @group Events
  */
 export type EventHandler<E extends WireEvent = WireEvent> = (event: E) => void;
 
 /**
- * Represents the function that removes an event subscription.
+ * Removes the event subscription it was returned for.
  *
  * @group Events
  */
 export type EventUnsubscribe = () => void;
 
 /**
- * Represents a single bus subscription for one decorated method.
+ * One bus subscription for a decorated method.
  *
  * @remarks
- * Produced by `buildEventDispatcher`, one per `@OnEvent` method. `types` is
- * `null` for catch-all handlers and the method's event types otherwise, so the
- * bus indexes the {@link handler} directly under the matching buckets.
+ * Produced per `@OnEvent` method. `types` is `null` for catch-all handlers, otherwise the method's event types.
  *
  * @group Events
  * @internal
@@ -63,11 +61,10 @@ export interface EventDispatch {
 }
 
 /**
- * Represents metadata for `@OnEvent` decorated methods.
+ * Metadata for `@OnEvent` decorated methods.
  *
  * @remarks
- * Type lists are normalized to a deduplicated array at registration, or `null`
- * for catch-all handlers.
+ * Type lists are normalized to a deduplicated array, or `null` for catch-all handlers.
  *
  * @group Events
  * @internal

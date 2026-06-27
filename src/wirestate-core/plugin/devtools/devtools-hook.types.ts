@@ -2,62 +2,58 @@ import { type BindingScopeValue, type BindingTypeValue } from "../../binding/bin
 import { type Nullable, type Optional } from "../../types/general";
 
 /**
- * Identifier for one registered root (one installed {@link DevToolsPlugin}).
+ * Identifier for a registered root (one installed {@link DevToolsPlugin}).
  *
  * @group DevTools
  */
 export type DevtoolsRootId = number;
 
 /**
- * Identifier for one container within a root's subtree. Stable for a container's
- * lifetime and shared across roots that observe the same container.
+ * Identifier for a container, stable for its lifetime and shared across roots that observe it.
  *
  * @group DevTools
  */
 export type DevtoolsContainerId = number;
 
 /**
- * Identifier for one service instance. Stable for the instance's lifetime and unique within (and
- * across) containers. The target of on-demand inspection and the key for exact event↔instance
- * correlation.
+ * Identifier for a service instance, stable for its lifetime and unique across containers.
  *
  * @group DevTools
  */
 export type DevtoolsInstanceId = number;
 
 /**
- * Identifier for one binding registered on a container. Stable for the binding's lifetime (keyed on
- * the binding descriptor's object identity) and unique within (and across) containers.
+ * Identifier for a binding, stable for its lifetime (keyed on the descriptor's identity).
  *
  * @group DevTools
  */
 export type DevtoolsBindingId = number;
 
 /**
- * Normalized, display-ready description of a binding token.
+ * Display-ready description of a binding token.
  *
  * @group DevTools
  */
 export interface DevtoolsToken {
   /**
-   * Human-readable token label (class name, symbol description, or token string).
+   * Token label (class name, symbol description, or token string).
    */
   readonly name: string;
 
   /**
-   * Underlying token category, for icon/grouping in the panel.
+   * Token category, for icon or grouping in the panel.
    */
   readonly kind: "class" | "string" | "symbol" | "injectionToken";
 }
 
 /**
- * Normalized description of one binding registered on a container.
+ * Description of one binding registered on a container.
  *
  * @group DevTools
  */
 export interface DevtoolsBinding {
   /**
-   * Stable id for this binding - the target of on-demand inspection for `Value` bindings.
+   * Stable id for this binding.
    */
   readonly bindingId: DevtoolsBindingId;
 
@@ -77,13 +73,13 @@ export interface DevtoolsBinding {
   readonly scope: BindingScopeValue;
 
   /**
-   * Implementation class name for instance bindings. Absent otherwise.
+   * Implementation class name for instance bindings, otherwise `undefined`.
    */
   readonly implementation: Optional<string>;
 }
 
 /**
- * Normalized snapshot of a service instance's lifecycle status.
+ * Snapshot of a service instance's lifecycle status.
  *
  * @group DevTools
  */
@@ -94,24 +90,23 @@ export interface DevtoolsInstanceStatus {
   readonly isDeactivated: boolean;
 
   /**
-   * Provider-ownership state: `null` not yet provisioned, `false` owned, `true` deprovisioned.
+   * Provider ownership: `null` not yet provisioned, `false` owned, `true` deprovisioned.
    */
   readonly isDeprovisioned: Nullable<boolean>;
 
   /**
-   * Whether the instance's lifecycle has ended (derived).
+   * Whether the instance's lifecycle has ended.
    */
   readonly isInactive: boolean;
 
   /**
-   * Current provider provision-cycle id, or `null` outside a cycle.
+   * Current provision-cycle id, or `null` outside a cycle.
    */
   readonly provisionId: Nullable<number>;
 }
 
 /**
- * A message handler/subscriber a service declares via `@OnEvent` / `@OnCommand` /
- * `@OnQuery`.
+ * A message handler a service declares via `@OnEvent` / `@OnCommand` / `@OnQuery`.
  *
  * @group DevTools
  */
@@ -122,7 +117,7 @@ export interface DevtoolsHandler {
   readonly channel: DevtoolsMessageChannel;
 
   /**
-   * Stringified message type the handler covers. `"*"` for a catch-all event handler.
+   * Message type the handler covers, or `"*"` for a catch-all event handler.
    */
   readonly type: string;
 
@@ -133,12 +128,10 @@ export interface DevtoolsHandler {
 }
 
 /**
- * A method declared on a service instance's class (or an inherited base class).
+ * A method declared on a service instance's class or a base class.
  *
  * @remarks
- * Enumerated from the instance's prototype chain - accessors, statics, the constructor, and
- * arrow-function instance fields are excluded. The inspector cross-references {@link DevtoolsHandler}
- * to mark which methods are message handlers.
+ * Accessors, statics, the constructor, and arrow-function fields are excluded.
  *
  * @group DevTools
  */
@@ -149,20 +142,20 @@ export interface DevtoolsMethod {
   readonly name: string;
 
   /**
-   * Declared parameter count (`Function.length` - params before the first default/rest).
+   * Declared parameter count.
    */
   readonly arity: number;
 }
 
 /**
- * One of the four single-method lifecycle hooks a service may declare via decorators.
+ * One of the four single-method lifecycle hooks a service may declare.
  *
  * @group DevTools
  */
 export type DevtoolsLifecycleHook = "onActivated" | "onDeactivation" | "onProvision" | "onDeprovision";
 
 /**
- * A lifecycle hook a service statically declares, paired with the method that implements it.
+ * A lifecycle hook a service declares, paired with its implementing method.
  *
  * @group DevTools
  */
@@ -173,20 +166,19 @@ export interface DevtoolsLifecycleHookMethod {
   readonly hook: DevtoolsLifecycleHook;
 
   /**
-   * Implementing method name on the service (symbols stringified, like {@link DevtoolsHandler.method}).
+   * Implementing method name (symbols stringified).
    */
   readonly method: string;
 }
 
 /**
- * Normalized description of one active service instance.
+ * Description of one active service instance.
  *
  * @group DevTools
  */
 export interface DevtoolsInstance {
   /**
-   * Stable id for this instance - the target of on-demand inspection and the key for exact
-   * event↔instance correlation.
+   * Stable id for this instance.
    */
   readonly instanceId: DevtoolsInstanceId;
 
@@ -206,40 +198,40 @@ export interface DevtoolsInstance {
   readonly status: Optional<DevtoolsInstanceStatus>;
 
   /**
-   * Message handlers/subscribers this instance declares (decorated handlers only).
+   * Decorated message handlers this instance declares.
    */
   readonly handlers: ReadonlyArray<DevtoolsHandler>;
 
   /**
-   * Methods declared on the instance's class and its base classes.
+   * Methods declared on the instance's class and base classes.
    */
   readonly methods: ReadonlyArray<DevtoolsMethod>;
 
   /**
-   * Lifecycle hooks this instance statically declares via decorators, in setup-to-teardown order.
+   * Lifecycle hooks this instance declares, in setup-to-teardown order.
    */
   readonly lifecycle: ReadonlyArray<DevtoolsLifecycleHookMethod>;
 }
 
 /**
- * Normalized description of one plugin registered on a container.
+ * Description of one plugin registered on a container.
  *
  * @group DevTools
  */
 export interface DevtoolsPluginInfo {
   /**
-   * Plugin class name (for example `"EventsPlugin"` or `"DevToolsPlugin"`).
+   * Plugin class name.
    */
   readonly name: string;
 
   /**
-   * Messaging-handler kind descriptions the plugin owns. Empty for pure observers.
+   * Messaging-handler kinds the plugin owns, empty for pure observers.
    */
   readonly handles: ReadonlyArray<string>;
 }
 
 /**
- * Normalized snapshot of one container.
+ * Snapshot of one container.
  *
  * @group DevTools
  */
@@ -255,23 +247,23 @@ export interface DevtoolsContainerSnapshot {
   readonly parentContainerId: Nullable<DevtoolsContainerId>;
 
   /**
-   * Bindings registered directly on this container, in registration order.
+   * Bindings registered on this container, in registration order.
    */
   readonly bindings: ReadonlyArray<DevtoolsBinding>;
 
   /**
-   * Active service instances this container constructed, in creation order.
+   * Active instances this container constructed, in creation order.
    */
   readonly instances: ReadonlyArray<DevtoolsInstance>;
 
   /**
-   * Plugins registered directly on this container (own, not inherited).
+   * Plugins registered directly on this container.
    */
   readonly plugins: ReadonlyArray<DevtoolsPluginInfo>;
 }
 
 /**
- * Full snapshot of one root: every container observed under it.
+ * Snapshot of one root and every container observed under it.
  *
  * @group DevTools
  */
@@ -287,13 +279,12 @@ export interface DevtoolsRootSnapshot {
   readonly protocolVersion: number;
 
   /**
-   * Every container observed under this root, root container first.
+   * Every container under this root, root container first.
    */
   readonly containers: ReadonlyArray<DevtoolsContainerSnapshot>;
 
   /**
-   * Optional human label for the root, set via `new DevToolsPlugin({ label })`. `undefined` when
-   * the app did not name it (a consumer may derive a hint instead).
+   * Human label set via `new DevToolsPlugin({ label })`, or `undefined`.
    */
   readonly label: Optional<string>;
 }
@@ -312,7 +303,7 @@ export type DevtoolsLifecyclePhase =
   | "deprovision";
 
 /**
- * A container/instance lifecycle delta.
+ * A container or instance lifecycle delta.
  *
  * @group DevTools
  */
@@ -349,7 +340,7 @@ export interface DevtoolsLifecycleEvent {
 }
 
 /**
- * Messaging channel a {@link DevtoolsMessage} flowed through.
+ * Channel a {@link DevtoolsMessage} flowed through.
  *
  * @group DevTools
  */
@@ -359,15 +350,13 @@ export type DevtoolsMessageChannel = "event" | "command" | "query";
  * One observed message: an event emitted, or a command/query dispatched.
  *
  * @remarks
- * `payload` and `source` are the raw in-page values - the in-page backend
- * serializes them when bridging to the panel.
+ * `payload` and `source` are raw in-page values, serialized by the backend when bridging.
  *
  * @group DevTools
  */
 export interface DevtoolsMessage {
   /**
-   * Correlation id, unique per dispatch. A {@link DevtoolsMessageResultEvent} references it via
-   * `messageId`. Events carry an id too, but never produce a result.
+   * Correlation id, unique per dispatch. A {@link DevtoolsMessageResultEvent} references it via `messageId`.
    */
   readonly id: number;
 
@@ -377,7 +366,7 @@ export interface DevtoolsMessage {
   readonly channel: DevtoolsMessageChannel;
 
   /**
-   * Stringified message type (event type, command type, or query type).
+   * Message type (event, command, or query type).
    */
   readonly type: string;
 
@@ -387,7 +376,7 @@ export interface DevtoolsMessage {
   readonly payload: unknown;
 
   /**
-   * Raw event source (events only). `undefined` for commands and queries.
+   * Raw event source, or `undefined` for commands and queries.
    */
   readonly source: Optional<unknown>;
 
@@ -401,8 +390,7 @@ export interface DevtoolsMessage {
  * One observed message delta, attributed to the bus-owning container.
  *
  * @remarks
- * Attribution is bus-scoped: a message on an inherited bus is attributed to the
- * container that first tapped that bus (typically the root), not the emitting service.
+ * A message on an inherited bus is attributed to the container that first tapped it, not the emitter.
  *
  * @group DevTools
  */
@@ -429,7 +417,7 @@ export interface DevtoolsMessageEvent {
 }
 
 /**
- * The settled outcome of a command/query dispatch, reported by the bus tap.
+ * The settled outcome of a command/query dispatch.
  *
  * @group DevTools
  */
@@ -440,19 +428,18 @@ export interface DevtoolsMessageResult {
   readonly messageId: number;
 
   /**
-   * Whether the dispatch resolved or rejected/threw.
+   * Whether the dispatch resolved or rejected.
    */
   readonly outcome: "resolved" | "rejected";
 
   /**
-   * Raw resolved value or thrown error - serialized by the backend when bridging.
+   * Raw resolved value or thrown error.
    */
   readonly value: unknown;
 }
 
 /**
- * A command/query result delta, correlated to its dispatch by `messageId` (bus-scoped, like
- * {@link DevtoolsMessageEvent}). Events do not produce results.
+ * A command/query result delta, correlated to its dispatch by `messageId`. Events produce none.
  *
  * @group DevTools
  */
@@ -479,18 +466,14 @@ export interface DevtoolsMessageResultEvent extends DevtoolsMessageResult {
 }
 
 /**
- * Whether a handler/subscriber was registered or unregistered.
+ * Whether a handler was registered or unregistered.
  *
  * @group DevTools
  */
 export type DevtoolsRegistrationPhase = "registered" | "unregistered";
 
 /**
- * One observed handler/subscriber registration change.
- *
- * @remarks
- * Captures both decorated handlers (wired at provision) and imperative `bus.register` /
- * `bus.subscribe` registrations. `type` is `"*"` for a catch-all event subscriber.
+ * One observed handler registration change (decorated or imperative).
  *
  * @group DevTools
  */
@@ -501,7 +484,7 @@ export interface DevtoolsRegistration {
   readonly channel: DevtoolsMessageChannel;
 
   /**
-   * Stringified message type the handler covers. `"*"` for a catch-all event subscriber.
+   * Message type the handler covers, or `"*"` for a catch-all event subscriber.
    */
   readonly type: string;
 
@@ -512,8 +495,7 @@ export interface DevtoolsRegistration {
 }
 
 /**
- * One registration delta, attributed to the bus-owning container (bus-scoped, like
- * {@link DevtoolsMessageEvent}).
+ * One registration delta, attributed to the bus-owning container.
  *
  * @group DevTools
  */
@@ -545,8 +527,7 @@ export interface DevtoolsRegistrationEvent {
 }
 
 /**
- * One delta emitted to listening backends: a lifecycle change, an observed message, or a
- * handler registration change.
+ * One delta emitted to backends: a lifecycle change, a message, a result, or a registration change.
  *
  * @group DevTools
  */
@@ -557,16 +538,14 @@ export type DevtoolsEvent =
   | DevtoolsRegistrationEvent;
 
 /**
- * A path from an inspection root (a service instance or a `Value` binding) to a nested value:
- * object keys and array indices.
+ * A path from an inspection root to a nested value: object keys and array indices.
  *
  * @group DevTools
  */
 export type DevtoolsInspectPath = ReadonlyArray<string | number>;
 
 /**
- * A reference to a tracked service instance, returned when an inspected field turns out to be
- * another instance the container manages - so the inspector can mark it and jump to it.
+ * A reference to a tracked instance, returned when an inspected field is another managed instance.
  *
  * @group DevTools
  */
@@ -588,43 +567,41 @@ export interface DevtoolsServiceRef {
 }
 
 /**
- * What a plugin hands the hook to register a root: a way to snapshot the root's
- * tree on demand, and (optionally) to read a live value on demand.
+ * What a plugin hands the hook to register a root: snapshot the tree and read live values on demand.
  *
  * @group DevTools
  */
 export interface DevtoolsRootRegister {
   /**
-   * Produces the current snapshot of the root's whole observed subtree.
+   * Produces the current snapshot of the root's observed subtree.
+   *
+   * @returns The root snapshot.
    */
   snapshot(): DevtoolsRootSnapshot;
 
   /**
-   * Reads the raw live value at `path` within the instance identified by `instanceId`, or
-   * `undefined` when the instance is not in this root. Read-only. The consumer serializes the
-   * result.
+   * Reads the raw live value at `path` within an instance, or `undefined` when it is not in this root.
    *
    * @param instanceId - Instance to read from.
-   * @param path - Object keys / array indices from the instance to the value.
+   * @param path - Object keys or array indices to the value.
    * @returns The raw value at the path.
    */
   inspect(instanceId: DevtoolsInstanceId, path: DevtoolsInspectPath): unknown;
 
   /**
-   * Reads the raw live value at `path` within the `Value` binding identified by `bindingId`, or.
+   * Reads the raw live value at `path` within a `Value` binding.
    *
    * @param bindingId - Binding to read from.
-   * @param path - Object keys / array indices from the binding's value to the target.
+   * @param path - Object keys or array indices to the value.
    * @returns The raw value at the path.
    */
   inspectBinding(bindingId: DevtoolsBindingId, path: DevtoolsInspectPath): unknown;
 
   /**
-   * If `value` is a service instance this root tracks, returns a reference to it (so the inspector
-   * can mark a field that points at another service and offer a jump). Otherwise `undefined`.
+   * Returns a reference if `value` is a service instance this root tracks, otherwise `undefined`.
    *
    * @param value - The raw value at an inspected field.
-   * @returns A service reference, or `undefined` when the value isn't a tracked instance.
+   * @returns A service reference, or `undefined`.
    */
   serviceRefOf(value: object): Optional<DevtoolsServiceRef>;
 }
@@ -642,21 +619,19 @@ export interface DevtoolsRoot extends DevtoolsRootRegister {
 }
 
 /**
- * Backend listener invoked for each lifecycle delta.
+ * Backend listener invoked for each delta.
  *
  * @group DevTools
  */
 export type DevtoolsListener = (event: DevtoolsEvent) => void;
 
 /**
- * The in-page meeting point between installed {@link DevToolsPlugin}s and an
- * inspector backend.
+ * The in-page meeting point between installed {@link DevToolsPlugin}s and an inspector backend.
  *
  * @remarks
- * Created lazily on `globalThis` by the first plugin to install and shared by every
- * later plugin (including ones from other library copies on the page). The plugin
- * registers a root and emits lifecycle deltas. The backend snapshots current roots
- * on attach and subscribes for deltas thereafter.
+ * Created lazily on `globalThis` by the first plugin and shared by every later one, including copies
+ * from other library versions on the page. Plugins register roots and emit deltas. A backend
+ * snapshots current roots on attach, then subscribes for deltas.
  *
  * @group DevTools
  */
@@ -682,34 +657,31 @@ export interface DevtoolsHook {
   deregisterRoot(rootId: DevtoolsRootId): void;
 
   /**
-   * Allocates (or returns) the stable id for a container.
+   * Allocates or returns the stable id for a container.
    *
-   * @param container - Container to identify. Keyed by object identity, so copies
-   *   from any library version share one allocator.
+   * @param container - Container to identify, keyed by object identity.
    * @returns The container's stable id.
    */
   idForContainer(container: object): DevtoolsContainerId;
 
   /**
-   * Allocates (or returns) the stable id for a service instance.
+   * Allocates or returns the stable id for a service instance.
    *
-   * @param instance - Instance to identify. Keyed by object identity, so copies from any library
-   *   version share one allocator.
+   * @param instance - Instance to identify, keyed by object identity.
    * @returns The instance's stable id.
    */
   idForInstance(instance: object): DevtoolsInstanceId;
 
   /**
-   * Allocates (or returns) the stable id for a binding.
+   * Allocates or returns the stable id for a binding.
    *
-   * @param descriptor - Binding descriptor to identify. Keyed by object identity, so copies from any
-   *   library version share one allocator (and a primitive-valued binding still gets a stable id).
+   * @param descriptor - Binding descriptor to identify, keyed by object identity.
    * @returns The binding's stable id.
    */
   idForBinding(descriptor: object): DevtoolsBindingId;
 
   /**
-   * Emits a lifecycle delta to all subscribed backends.
+   * Emits a delta to all subscribed backends.
    *
    * @param event - The delta to broadcast.
    */
@@ -724,8 +696,7 @@ export interface DevtoolsHook {
   subscribe(listener: DevtoolsListener): () => void;
 
   /**
-   * Returns the currently registered roots, so a late-attaching backend can
-   * snapshot existing state before subscribing for deltas.
+   * Returns the currently registered roots, so a late backend can snapshot before subscribing.
    *
    * @returns The registered roots.
    */

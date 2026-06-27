@@ -4,8 +4,7 @@ import { type MaybePromise } from "../../types/general";
  * Identifies a query and routes it to its handler.
  *
  * @remarks
- * Queries use a request-response pattern. Using symbols is recommended for
- * private or internal queries to avoid naming collisions.
+ * Prefer symbols for private queries to avoid name collisions.
  *
  * @group Queries
  *
@@ -19,15 +18,11 @@ export type QueryType = string | symbol | number;
 /**
  * Answers a dispatched query and returns its result.
  *
- * @remarks
- * Query handlers can be synchronous or asynchronous. They receive a payload
- * and must return a result (or a Promise resolving to it).
- *
  * @group Queries
  *
- * @template R - Type of the returned result.
- * @template P - Type of the query payload.
- * @template T - Type of the query.
+ * @template R - Result type, optionally a Promise.
+ * @template P - Payload type.
+ * @template T - Query type.
  *
  * @example
  * ```typescript
@@ -47,30 +42,20 @@ export type QueryHandler<R = unknown, P = unknown, T extends QueryType = QueryTy
  *
  * @example
  * ```typescript
- * const unregister: QueryUnregister = queryBus.register("QUERY_TYPE", handler);
+ * const unregister: QueryUnregister = queryBus.register("GET_USER", handler);
  *
- * unregister(); // Handler is no longer active
+ * unregister();
  * ```
  */
 export type QueryUnregister = () => void;
 
 /**
- * Describes metadata for methods decorated with {@link OnQuery}.
- *
- * @remarks
- * This interface is used internally to track which methods should be registered
- * on the {@link QueryBus} during instance activation.
+ * Metadata for `@OnQuery` decorated methods.
  *
  * @group Queries
  * @internal
  */
 export interface QueryHandlerMetadata {
-  /**
-   * The name of the method on the class prototype.
-   */
   readonly methodName: string | symbol;
-  /**
-   * The query type this method handles.
-   */
   readonly type: QueryType;
 }

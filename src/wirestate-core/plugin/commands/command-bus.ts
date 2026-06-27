@@ -49,9 +49,9 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    * If a handler returns a Promise, this method returns that Promise. Use
    * {@link executeAsync} when the caller should always receive a Promise.
    *
-   * @template R - Type of the command result.
-   * @template P - Type of the command payload.
-   * @template T - Type of the command.
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Command type.
    *
    * @param type - Command token.
    * @param payload - Command payload.
@@ -75,9 +75,9 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    * Synchronous handler results are wrapped. Promises returned by handlers are
    * passed through.
    *
-   * @template R - Type of the command result.
-   * @template P - Type of the command payload.
-   * @template T - Type of the command.
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Command type.
    *
    * @param type - Command token.
    * @param payload - Command payload.
@@ -92,9 +92,9 @@ export class CommandBus extends HandlerStackBus<CommandType> {
   /**
    * Dispatches a command if a handler exists.
    *
-   * @template R - Type of the command result.
-   * @template P - Type of the command payload.
-   * @template T - Type of the command.
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Command type.
    *
    * @param type - Command type.
    * @param payload - Optional payload for the handler.
@@ -110,9 +110,9 @@ export class CommandBus extends HandlerStackBus<CommandType> {
   /**
    * Dispatches an optional command and Promise-wraps the result.
    *
-   * @template R - Type of the command result.
-   * @template P - Type of the command payload.
-   * @template T - Type of the command.
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Command type.
    *
    * @param type - Command type.
    * @param payload - Optional payload for the handler.
@@ -131,9 +131,9 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    * @remarks
    * Registering another handler for the same type shadows the previous one. Unregistering the newest restores it.
    *
-   * @template R - Type of the command execution result.
-   * @template P - Type of the command payload.
-   * @template T - Type of the command.
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Command type.
    *
    * @param type - Command type.
    * @param handler - Function to execute when the command is dispatched.
@@ -159,9 +159,9 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    * @remarks
    * If the handler was not registered for the given type, this operation does nothing.
    *
-   * @template R - Type of the command execution result.
-   * @template P - Type of the command payload.
-   * @template T - Type of the command.
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Command type.
    *
    * @param type - Command type.
    * @param handler - The handler function instance to remove.
