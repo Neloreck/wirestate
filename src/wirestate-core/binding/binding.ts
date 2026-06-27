@@ -106,29 +106,45 @@ export interface InstanceBindingDescriptor<T = unknown> {
 }
 
 /**
- * Describes a factory binding whose value is lazily produced by a factory function.
+ * Describes a token-bound value produced by a factory function.
+ *
+ * @remarks
+ * Use a factory binding when a dependency should be created on first resolution,
+ * should read other container bindings while it is created, or should create a fresh
+ * value for each resolution with `Transient` scope. Singleton factories are cached
+ * after the first resolution. Factory results are not service instances, so service
+ * lifecycle decorators and messaging handlers are not wired for the returned value.
  *
  * @group Bind
+ *
+ * @template T - Value returned by the factory.
  */
 export interface FactoryBindingDescriptor<T = unknown> {
   /**
-   * Binding strategy.
+   * Binding strategy. Optional when the descriptor has a `factory` field.
    */
   readonly type?: "Factory";
 
   /**
-   * Token used to resolve the binding.
+   * Token used to resolve the factory result.
    */
   readonly token: ServiceToken<T>;
 
   /**
-   * Factory used to produce the value at resolution time.
-   * Runs inside the injection context, so `inject()` works in its body.
+   * Creates the value for this token.
+   *
+   * @remarks
+   * Receives the current container and runs inside the injection context, so
+   * both `current.get(...)` and `inject(...)` can read other bindings.
    */
   readonly factory: (container: ContainerKernel) => NoInfer<T>;
 
   /**
-   * Lifetime scope for created values.
+   * Lifetime scope for factory results.
+   *
+   * @remarks
+   * Defaults to `Singleton`, which calls the factory once and reuses the result.
+   * `Transient` calls the factory on every resolution and does not cache the result.
    */
   readonly scope?: BindingScopeValue;
 }
@@ -142,19 +158,6 @@ export interface FactoryBindingDescriptor<T = unknown> {
  * @group Bind
  *
  * @template T - Resolved value type.
- *
- * @example
- * ```typescript
- * import { BindingType, BindingDescriptor } from "@wirestate/core";
- *
- * const API_URL = Symbol("API_URL");
- *
- * const descriptor: BindingDescriptor<string> = {
- *   token: API_URL,
- *   type: BindingType.Value,
- *   value: "https://api.example.com",
- * };
- * ```
  */
 export type BindingDescriptor<T = unknown> =
   | ValueBindingDescriptor<T>

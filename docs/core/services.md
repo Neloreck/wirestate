@@ -46,9 +46,9 @@ container.bind(UserService);
 ## Constructor Injection
 
 Use `inject(token)` in constructor parameter defaults or field initializers. A token can be a class, string, symbol,
-or [`InjectionToken`](#injection-tokens). Pass `{ optional: true }` to resolve `undefined` instead of throwing when the token is not
-bound. Because `inject()` is a plain function call, dependency declarations do not need parameter decorators or
-`emitDecoratorMetadata`.
+or [`InjectionToken`](#injection-tokens). Pass `{ optional: true }` to resolve `undefined` instead of throwing when the
+token is not bound. Because `inject()` is a plain function call, dependency declarations do not need parameter
+decorators or `emitDecoratorMetadata`.
 
 ```ts
 import { Injectable, inject } from "@wirestate/core";
@@ -64,31 +64,42 @@ export class OrderService {
 
 ## Injection Tokens
 
-Use an `InjectionToken<T>` for any dependency without a class constructor - constants, external objects, or
-interface-typed values - when you want the resolved value to keep its TypeScript type. A bare string or symbol token
-resolves as `unknown` and forces a cast; `InjectionToken<T>` resolves as `T`.
+An `InjectionToken<T>` is a typed, reference-stable key for the container. Use it when the token should carry the
+resolved value type: configuration values, browser APIs, external clients, interface-typed dependencies, or service
+contracts that should be resolved through an explicit key.
+
+Plain string and symbol tokens work too, but they resolve as `unknown` and usually require a cast. An
+`InjectionToken<T>` resolves as `T`, so the type follows the binding and every `inject()` or `container.get()` call that
+uses the token.
 
 ```ts
 import { Container, InjectionToken, Injectable, inject } from "@wirestate/core";
 
-const API_URL = new InjectionToken<string>("API_URL");
+interface RuntimeConfig {
+  readonly apiUrl: string;
+}
+
+const RUNTIME_CONFIG = new InjectionToken<RuntimeConfig>("RUNTIME_CONFIG");
 
 const container = new Container({
-  bindings: [{ token: API_URL, value: "https://api.example.com" }],
+  bindings: [{ token: RUNTIME_CONFIG, value: { apiUrl: "https://api.example.com" } }],
 });
 
 @Injectable()
 class ApiClient {
-  // Typed as string, no cast:
-  public constructor(private readonly url = inject(API_URL)) {}
+  public constructor(private readonly config = inject(RUNTIME_CONFIG)) {}
+
+  public loadUsers(): Promise<Response> {
+    return fetch(`${this.config.apiUrl}/users`);
+  }
 }
 ```
 
-The constructor argument is a human-readable label used only in diagnostics; it does not identify the token. Each
+The constructor argument is a human-readable label used only in diagnostics. It does not identify the token. Each
 `InjectionToken` is identified by reference, so two tokens never collide even with the same description, and it is
-nominal at the type level - `InjectionToken<A>` is not assignable to `InjectionToken<B>`. Prefer a class token for
-services, an `InjectionToken<T>` for typed values, and a plain string or symbol only for interop or when a type is not
-needed.
+nominal at the type level. `InjectionToken<A>` is not assignable to `InjectionToken<B>`. Use plain strings or symbols
+for interop or untyped extension points. Use `InjectionToken<T>` when the dependency is part of your typed application
+contract.
 
 ## Messaging
 
@@ -214,19 +225,19 @@ export class NotificationService {
 ## Constants and Factories
 
 Use descriptors when a binding needs an explicit token or binding strategy. This includes constants, factories, and
-service classes registered behind a token that is different from the class itself. Reach for a typed
-[`InjectionToken`](#injection-tokens) so the resolved value keeps its type.
+service classes registered behind an explicit token. Reach for a typed [`InjectionToken`](#injection-tokens) when the
+resolved value should keep its type.
 
 ```ts
 import { BindingScope, BindingType, Container, InjectionToken } from "@wirestate/core";
 
 const API_URL = new InjectionToken<string>("API_URL");
-const DATE_NOW = new InjectionToken<Date>("DATE_NOW");
+const CURRENT_TIME = new InjectionToken<Date>("CURRENT_TIME");
 const container = new Container();
 
 container.bind({ token: API_URL, value: "https://api.example.com" });
 container.bind({
-  token: DATE_NOW,
+  token: CURRENT_TIME,
   type: BindingType.Factory,
   scope: BindingScope.Transient,
   factory: () => new Date(),
@@ -235,6 +246,41 @@ container.bind({
 
 A plain string or symbol works as a token too, but resolves as `unknown`; use one only for interop or when you do not
 need the value typed.
+
+A factory binding creates the value lazily when its token is resolved. It receives the current container, and it also
+runs inside the injection context, so it can read other bindings with either the container argument or `inject()`.
+Factory bindings are singletons by default: the factory runs once and the result is cached. Use
+`scope: BindingScope.Transient` when every resolution should call the factory again.
+
+```ts
+import { BindingType, Container, InjectionToken } from "@wirestate/core";
+
+interface RuntimeConfig {
+  readonly apiUrl: string;
+}
+
+class ApiClient {
+  public constructor(private readonly config: RuntimeConfig) {}
+}
+
+const RUNTIME_CONFIG = new InjectionToken<RuntimeConfig>("RUNTIME_CONFIG");
+const API_CLIENT = new InjectionToken<ApiClient>("API_CLIENT");
+
+const container = new Container({
+  bindings: [
+    { token: RUNTIME_CONFIG, value: { apiUrl: "https://api.example.com" } },
+    {
+      token: API_CLIENT,
+      type: BindingType.Factory,
+      factory: (current) => new ApiClient(current.get(RUNTIME_CONFIG)),
+    },
+  ],
+});
+```
+
+Factory results are ordinary resolved values, not container-owned service instances. If the returned object needs
+Wirestate lifecycle decorators, messaging decorators, or deactivation cleanup, bind an `@Injectable()` class with an
+instance descriptor instead.
 
 ## Remove Services
 

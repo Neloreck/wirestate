@@ -3,11 +3,13 @@
 import { type BindingDescriptor, type ServiceToken } from "./binding";
 
 /**
- * Reference token for dependencies that do not have a class constructor token.
+ * Typed reference token for dependencies stored in a container.
  *
  * @remarks
- * Use an `InjectionToken<T>` for constants, external objects, interfaces, and
- * other values that need a stable runtime token with a TypeScript value type.
+ * Use an `InjectionToken<T>` when a dependency needs a named, collision-free runtime key
+ * that carries the resolved TypeScript type. It works well for configuration, external
+ * objects, interfaces, and service contracts that should be resolved through an explicit key.
+ * The token is identified by object reference, not by its description.
  *
  * @group Bind
  *
@@ -15,24 +17,26 @@ import { type BindingDescriptor, type ServiceToken } from "./binding";
  * ```typescript
  * import { Container, InjectionToken, Injectable, inject } from "@wirestate/core";
  *
- * const API_URL = new InjectionToken<string>("API_URL");
+ * interface RuntimeConfig {
+ *   readonly apiUrl: string;
+ * }
+ *
+ * const RUNTIME_CONFIG = new InjectionToken<RuntimeConfig>("RUNTIME_CONFIG");
  *
  * const container = new Container({
- *   bindings: [{ token: API_URL, value: "https://api.example.com" }],
+ *   bindings: [{ token: RUNTIME_CONFIG, value: { apiUrl: "https://api.example.com" } }],
  * });
  *
  * @Injectable()
  * class ApiClient {
- *   // `url` is typed as string, no cast needed.
- *   public constructor(private readonly url = inject(API_URL)) {}
+ *   public constructor(private readonly config = inject(RUNTIME_CONFIG)) {}
  * }
  * ```
  */
 export class InjectionToken<T> {
   /**
    * Phantom field that ties the token to its value type.
-   * Never assigned at runtime. It exists so `InjectionToken<A>` is not
-   * assignable to `InjectionToken<B>`.
+   * It exists so `InjectionToken<A>` is not assignable to `InjectionToken<B>`.
    */
   protected readonly _type?: T;
 
