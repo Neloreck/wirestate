@@ -6,14 +6,17 @@ import { WirestateError } from "../error/wirestate-error";
 import type { ContainerConfig } from "./container";
 
 /**
- * Checks a container config before creating a container.
+ * Validates container construction config without creating a container.
  *
  * @remarks
- * Use it when an adapter stores config for later but still wants fast feedback.
+ * Use it in framework adapters or tests that accept `ContainerConfig` and want
+ * fast feedback before a `Container` is constructed. The same validation runs
+ * in the `Container` constructor.
  *
  * @group Container
  *
  * @param config - Container configuration to validate.
+ * @throws {@link WirestateError} If `onError` is not a function.
  * @throws {@link WirestateError} If `activate` references a token missing from `bindings`.
  *
  * @example

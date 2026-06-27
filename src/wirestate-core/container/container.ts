@@ -28,42 +28,62 @@ import { ContainerKernel } from "./container-kernel";
 import { validateTransientInstanceBinding } from "./container-transient-binding-validation";
 
 /**
- * Describes reusable {@link Container} construction config.
+ * Defines one {@link Container} scope at construction time.
+ *
+ * @remarks
+ * Bind services and values here when they belong to the container from the
+ * start. Use {@link validateContainerConfig} when a framework adapter stores
+ * config before it creates the container.
  *
  * @group Container
  */
 export interface ContainerConfig {
   /**
-   * Controls eager resolution during container construction.
+   * Controls which configured bindings are resolved during construction.
    *
    * @remarks
-   * Pass `true` to resolve every configured binding, an array to resolve
-   * selected tokens, or omit it to keep services lazy.
+   * Pass `true` to resolve every entry in `bindings`. Pass an array to
+   * resolve selected tokens from `bindings`. Omit it, or pass `false`, to keep
+   * services lazy.
    */
   readonly activate?: boolean | ReadonlyArray<ServiceToken>;
 
   /**
-   * Services or binding descriptors to register.
+   * Services or binding descriptors registered on this container.
+   *
+   * @remarks
+   * Bare service classes bind as singleton instance bindings keyed by the
+   * class itself. Descriptors can bind tokens to instances, factories, or
+   * values.
    */
   readonly bindings?: ReadonlyArray<Binding>;
 
   /**
-   * Parent container for inherited bindings.
+   * Parent container used for inherited bindings.
+   *
+   * @remarks
+   * A child checks its own bindings first, then walks the parent chain. Local
+   * bindings can replace parent bindings for the child scope.
    */
   readonly parent?: Container;
 
   /**
    * Handles isolated internal errors that Wirestate catches instead of
    * rethrowing, such as event handler failures and lifecycle rejections.
+   *
+   * @remarks
+   * Child containers inherit the nearest parent handler when they do not
+   * provide their own.
    */
   readonly onError?: InternalErrorHandler;
 
   /**
-   * Lifecycle plugins registered on this container.
+   * Plugins registered on this container.
    *
    * @remarks
-   * Plugins observe or extend the container lifecycle and are inherited by
-   * descendant containers. `install` runs once, here, at construction.
+   * Own plugins may install bindings, such as message buses, during
+   * construction. Plugin lifecycle observers are effective for descendant
+   * containers through the parent chain.
    */
   readonly plugins?: ReadonlyArray<WirestatePlugin>;
 }
@@ -73,12 +93,13 @@ export interface ContainerConfig {
  *
  * @remarks
  * A container owns its local bindings and the instances created from them.
- * Child containers inherit parent bindings while keeping their own local
- * registrations, lifecycle state, and plugin-provided buses.
+ * It also owns provider lifecycle state and the plugin bindings installed on
+ * that container. Child containers inherit parent bindings while keeping their
+ * own local registrations and lifecycle state.
  *
  * @group Container
  *
- * @throws {@link WirestateError} If `activate` names a token missing from `bindings`.
+ * @throws {@link WirestateError} If the config is invalid or `activate` names a token missing from `bindings`.
  *
  * @example
  * ```typescript
@@ -103,6 +124,8 @@ export class Container extends ContainerKernel {
    * Creates a Wirestate container.
    *
    * @param config - Container setup config.
+   *
+   * @throws {@link WirestateError} If the config is invalid.
    */
   public constructor(config: ContainerConfig = {}) {
     validateContainerConfig(config);
@@ -146,6 +169,11 @@ export class Container extends ContainerKernel {
 
   /**
    * Binds a service class or a binding descriptor to this container.
+   *
+   * @remarks
+   * A bare service class binds as a singleton instance binding keyed by the
+   * class itself. Binding a descriptor lets you use an explicit token,
+   * implementation class, factory, value, or transient scope.
    *
    * @param binding - Service class or binding descriptor to register.
    * @returns The same container for chaining.
@@ -199,8 +227,11 @@ export class Container extends ContainerKernel {
   }
 
   /**
-   * Unbinds a token, deprovisioning the owned provider lifecycle instance it
-   * represents before the kernel deactivates it.
+   * Unbinds a local token and deactivates values created from it.
+   *
+   * @remarks
+   * If the binding owns a provisioned provider lifecycle instance,
+   * `@OnDeprovision` runs before `@OnDeactivation`.
    *
    * @param token - Token to unbind.
    * @returns The same container for chaining.
@@ -214,8 +245,11 @@ export class Container extends ContainerKernel {
   }
 
   /**
-   * Unbinds all bindings, deprovisioning owned provider lifecycle instances
-   * before the kernel deactivates them.
+   * Unbinds every local binding and deactivates this container's instances.
+   *
+   * @remarks
+   * Provider lifecycle instances are deprovisioned before they deactivate.
+   * Parent bindings and parent instances are not changed.
    *
    * @returns The same container for chaining.
    */
