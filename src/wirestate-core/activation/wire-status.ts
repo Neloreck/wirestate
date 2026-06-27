@@ -51,14 +51,14 @@ export interface InstanceRecord {
  * `WireStatus.for(instance).provisionId` to ignore async work from an older
  * provision cycle.
  *
- * @group Container
+ * @group Lifecycle
  */
 export type ProvisionId = number;
 
 /**
  * Options reserved for Wirestate lifecycle internals.
  *
- * @group Container
+ * @group Lifecycle
  */
 export interface WireStatusLookupOptions {
   /**
@@ -76,7 +76,7 @@ export interface WireStatusLookupOptions {
  * time, so application code can keep a reference and read current lifecycle
  * flags without mutating the instance or requiring a base class.
  *
- * @group Container
+ * @group Lifecycle
  */
 export class WireStatus {
   /**
@@ -86,7 +86,7 @@ export class WireStatus {
    * Use this inside service methods when async work needs to check whether the
    * service has been disposed or deprovisioned.
    *
-   * @group Container
+   * @group Lifecycle
    *
    * @param instance - Resolved service instance to inspect.
    * @param options - Reserved for Wirestate internals.

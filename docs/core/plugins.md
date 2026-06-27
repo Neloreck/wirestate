@@ -30,6 +30,9 @@ const container: Container = new Container({
 A service that declares a messaging handler throws at provision unless the matching plugin is registered somewhere in the
 container chain. See [Events](/core/events), [Commands](/core/commands), and [Queries](/core/queries).
 
+Register a messaging plugin on a child container when that child needs a local bus. Omit it on the child when handlers
+should use the nearest ancestor bus.
+
 ## Writing a Plugin
 
 Implement [`WirestatePlugin`](/api/wirestate-core/interfaces/WirestatePlugin). Every hook is optional. Implement only
@@ -38,7 +41,7 @@ the phases you need.
 ```ts
 import { Container, WirestatePlugin } from "@wirestate/core";
 
-class DevToolsPlugin implements WirestatePlugin {
+class CustomDevToolsPlugin implements WirestatePlugin {
   public onContainerProvision(container: Container): void {
     console.log("container provisioned", container);
   }
@@ -56,7 +59,7 @@ class DevToolsPlugin implements WirestatePlugin {
   }
 }
 
-new Container({ bindings: [CartService], plugins: [new DevToolsPlugin()] });
+new Container({ bindings: [CartService], plugins: [new CustomDevToolsPlugin()] });
 ```
 
 ## Hooks
@@ -66,10 +69,10 @@ new Container({ bindings: [CartService], plugins: [new DevToolsPlugin()] });
 | `install(container)`                            | Once, when the plugin is registered. Contribute bindings here.              |
 | `participates(token)`                           | At provision, per binding token. Return `true` to force-activate it.        |
 | `onContainerProvision(container)`               | Once, at the start of each provision cycle, before any instance wiring.     |
-| `onActivate(instance, container)`               | After a service is activated.                                               |
+| `onActivate(instance, container)`               | After a service is activated, before `@OnActivated`.                        |
 | `onProvision(instance, container, addDisposer)` | When a provisioned instance is wired. Register teardown with `addDisposer`. |
-| `onDeprovision(instance, container)`            | When a provisioned instance is torn down.                                   |
-| `onDeactivate(instance, container)`             | As a service is deactivated.                                                |
+| `onDeprovision(instance, container)`            | After the instance's `@OnDeprovision`.                                      |
+| `onDeactivate(instance, container)`             | After the instance's `@OnDeactivation`.                                     |
 | `onContainerDeprovision(container)`             | Once, at the very end of each deprovision cycle.                            |
 
 ## Ordering
@@ -106,16 +109,19 @@ class PersistencePlugin implements WirestatePlugin {
 }
 ```
 
-Setup hooks (`install`, `onActivate`, `onProvision`, `onContainerProvision`) are **atomic**: a throw unwinds the whole
-activation or provision cycle. Teardown hooks and disposers are **failsafe**: a throw is reported and swallowed.
+Setup hooks (`install`, `onActivate`, `onProvision`, `onContainerProvision`) are **atomic**: a throw unwinds the current
+construction, activation, or provision cycle. Teardown hooks and disposers are **failsafe**: a throw is swallowed and
+teardown continues. Plugin teardown failures are not routed to the container error handler.
 
 ## Inheritance
 
-Plugins resolve up the parent chain, so one registered on the root container reaches the whole subtree. A single
-devtools plugin observes every nested container, and an inherited messaging plugin wires a child service's handler onto
-the ancestor's bus. Registering a plugin of the same kind on a child shadows the inherited one for that subtree (for
-messaging, this gives the child a local bus); observer plugins are never shadowed, so ancestors keep observing
-descendants.
+Plugins resolve up the parent chain, nearest container first. One registered on the root container reaches the whole
+subtree. A single devtools plugin observes every nested container, and an inherited messaging plugin wires a child
+service's handler onto the ancestor's bus.
+
+Plugins that declare `handles` can be shadowed by a nearer plugin that claims the same kind. This is how a child
+container with its own `EventsPlugin`, `CommandsPlugin`, or `QueriesPlugin` gets a local bus. Observer plugins that do
+not declare `handles` are not shadowed, so ancestors keep observing descendants.
 
 ## API Reference
 

@@ -40,7 +40,9 @@ interface EventSubscription {
  * Broadcasts events to every subscriber registered on one container bus.
  *
  * @remarks
- * Events are fire-and-forget "this happened" notifications.
+ * Events are fire-and-forget "this happened" notifications. A container that
+ * registers {@link EventsPlugin} gets one bus for that container. Children that
+ * do not register their own event plugin resolve the nearest ancestor bus.
  *
  * @group Events
  *
@@ -72,6 +74,7 @@ export class EventBus {
    * Handlers are snapshotted before dispatch, so subscriptions can change while
    * an event is being emitted. If a handler throws, Wirestate reports it through
    * the container error handler and continues with the next subscriber.
+   * Catch-all subscribers run before type-specific subscribers.
    *
    * @template P - Payload type.
    * @template T - Event type.
@@ -119,6 +122,9 @@ export class EventBus {
   /**
    * Subscribes to every event on this bus.
    *
+   * @remarks
+   * Equivalent to `subscribe(null, handler)`.
+   *
    * @param handler - Event handler invoked for every emitted event.
    * @returns Function that removes this subscription.
    *
@@ -137,7 +143,8 @@ export class EventBus {
    * @remarks
    * Pass `null` to subscribe to every event. Each call is independent:
    * subscribing the same function twice delivers the event twice, and each
-   * returned unsubscriber removes only its own subscription.
+   * returned unsubscriber removes only its own subscription. An empty type list
+   * subscribes to nothing.
    *
    * @param types - Event type, list of event types, or `null` for every event.
    * @param handler - Event handler invoked for matching events.

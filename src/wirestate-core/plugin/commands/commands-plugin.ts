@@ -10,7 +10,10 @@ import { COMMAND_REGISTRATION } from "./on-command";
  * {@link CommandBus} and wire `@OnCommand` handlers at provision. Importing this
  * class is what pulls the command bus into the bundle.
  *
- * @group Plugin
+ * A child container can register its own `CommandsPlugin` for a local bus, or
+ * omit it to use the nearest ancestor bus.
+ *
+ * @group Plugins
  *
  * @example
  * ```typescript

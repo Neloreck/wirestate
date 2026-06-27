@@ -4,6 +4,9 @@ Events are broadcast notifications. They say "this happened" and do not return a
 
 Each container owns its own `EventBus`. Events stay in that container and do not bubble to a parent container.
 
+Event types can be strings, symbols, or numbers. Payload and source are optional. `undefined` payloads and sources are
+omitted from the delivered event object, while other falsy values such as `null`, `0`, and `false` are preserved.
+
 ## Register the Plugin
 
 The event bus is opt-in. Register `EventsPlugin` on the container so `inject(EventBus)`, direct subscriptions, and
@@ -36,6 +39,8 @@ export class CartService {
 }
 ```
 
+Use `source` when handlers need to know where the event came from. It is diagnostic context, not a routing key.
+
 ## Handle with a Decorator
 
 ```ts
@@ -59,6 +64,10 @@ Useful forms:
 - `@OnEvent("TYPE")` listens to one type.
 - `@OnEvent(["A", "B"])` listens to several types.
 - `@OnEvent()` listens to everything on the container event bus.
+
+Decorated handlers subscribe during container provision and unsubscribe during deprovision. They can receive events
+emitted from `@OnProvision` and `@OnDeprovision`, because handlers are wired before provision hooks run and removed
+after deprovision hooks finish.
 
 ## Subscribe Directly
 
@@ -86,6 +95,12 @@ const unsubscribe = bus.subscribe(["CART_VIEWED", "CART_CLEARED"], (event) => {
   console.log(event.type);
 });
 ```
+
+Pass `null`, or call `subscribe(handler)`, to subscribe to every event. Catch-all handlers run before type-specific
+handlers for the same emit. An empty type array subscribes to nothing.
+
+Each subscription is independent. Subscribing the same function twice receives the event twice, and the returned
+unsubscriber removes only the subscription it came from.
 
 ## Subscribe from a Service
 
@@ -121,12 +136,16 @@ export class CartActivityService {
 
 Use this pattern when the subscription depends on runtime state or cannot be expressed with `@OnEvent`.
 
-If an event handler throws, Wirestate logs the error and continues with the next handler.
+If an event handler throws, Wirestate reports the failure through the container error handler and continues with the next
+handler.
 
 ## API Reference
 
 [`EventBus`](/api/wirestate-core/classes/EventBus), [`EventsPlugin`](/api/wirestate-core/classes/EventsPlugin),
 [`OnEvent`](/api/wirestate-core/functions/OnEvent), [`WireEvent`](/api/wirestate-core/interfaces/WireEvent),
+[`EventType`](/api/wirestate-core/type-aliases/EventType),
+[`EventHandler`](/api/wirestate-core/type-aliases/EventHandler),
 [`EventUnsubscribe`](/api/wirestate-core/type-aliases/EventUnsubscribe),
+[`EventEmitOptions`](/api/wirestate-core/interfaces/EventEmitOptions),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision).

@@ -13,12 +13,14 @@ import type { Container } from "../container/container";
  * (`install`, `onActivate`, `onContainerProvision`, `onProvision`) are atomic, so
  * a throw unwinds the activation/provision cycle. Teardown hooks (`onDeactivate`,
  * `onDeprovision`, `onContainerDeprovision`) and disposers are failsafe, so a
- * throw is swallowed and teardown continues.
+ * throw is swallowed and teardown continues. Plugin teardown failures are not
+ * reported through the container error handler.
  *
  * A plugin reaches its container and every descendant (plugins resolve up the
- * parent chain), so one registered on the root observes the whole subtree.
+ * parent chain, nearest first), so one registered on the root observes the whole
+ * subtree unless a nearer plugin shadows a handled kind.
  *
- * @group Plugin
+ * @group Plugins
  *
  * @example
  * ```typescript
@@ -66,7 +68,7 @@ export interface WirestatePlugin {
    * Used by the built-in messaging plugins. Provision matches declared handler
    * metadata against the union of registered plugins' kinds and throws on a kind
    * no plugin handles. A nearer plugin owning a kind shadows an ancestor's of the
-   * same kind.
+   * same kind. Observer plugins usually omit this field.
    */
   readonly handles?: ReadonlyArray<symbol>;
 

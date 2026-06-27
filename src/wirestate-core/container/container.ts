@@ -116,7 +116,7 @@ export interface ContainerConfig {
  *   bindings: [CounterService, LoggerService],
  * });
  *
- * const logger = container.get(LoggerService);
+ * const loggerService: LoggerService = container.get(LoggerService);
  * ```
  */
 export class Container extends ContainerKernel {

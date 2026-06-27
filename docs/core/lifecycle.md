@@ -21,12 +21,13 @@ Constructor resolution and activation belong to the container. A service can be 
 `container.get(Token)`. It can also be resolved eagerly when `new Container({ activate })` or a managed provider
 activates bindings.
 
-`@OnActivated` runs during that first resolution. It is synchronous from the container's point of view: if the hook
-returns a promise, Wirestate reports rejections through the container error handler but does not block resolution.
+`@OnActivated` runs during that first resolution. Synchronous failures are reported through the container error handler
+and rethrown, so activation can roll back. If the hook returns a promise, Wirestate reports rejections through the
+container error handler but does not block resolution.
 
-Use activation for work that does not depend on provider ownership, such as normalizing
-in-memory state. Do not open cleanup-requiring resources there. `@OnActivated` runs before provision, so it is
-outside the messaging window and cannot emit, execute, or query.
+Use activation for work that does not depend on provider ownership, such as normalizing in-memory state. Do not open
+cleanup-requiring resources there. `@OnActivated` runs before provision, so provision-scoped `@OnEvent`, `@OnCommand`,
+and `@OnQuery` handlers are not wired yet.
 
 ## Provider Layer
 
@@ -37,13 +38,14 @@ lifecycle participants before calling provision hooks, calls provision hooks in 
 hooks in reverse order.
 
 Message handlers are also wired here. `@OnEvent`, `@OnCommand`, and `@OnQuery` subscribe at provision and unsubscribe
-at deprovision, so the messaging window is `@OnProvision` through `@OnDeprovision`. Provision force-activates every
-service that declares a handler, and a handler's bus resolves up the parent chain, so a child service can handle an
-ancestor's bus. Because subscriptions are provision-scoped, messaging requires the container to be provisioned: a UI
-provider does this automatically, while plain-core usage and tests call `container.provision()` (and
-`container.deprovision()`).
-`@OnActivated` runs before provision and `@OnDeactivation` runs after deprovision, so neither can emit, execute, or
-query; put setup and teardown messaging in `@OnProvision` and `@OnDeprovision`.
+after `@OnDeprovision`, so the decorated-handler window is `@OnProvision` through `@OnDeprovision`. Provision
+force-activates every service that declares a handler, and a handler's bus resolves up the parent chain, so a child
+service can handle an ancestor's bus. Because subscriptions are provision-scoped, decorated messaging requires the
+container to be provisioned: a UI provider does this automatically, while plain-core usage and tests call
+`container.provision()` and `container.deprovision()`.
+
+Put setup and teardown messaging in `@OnProvision` and `@OnDeprovision`. Buses remain live during `@OnDeprovision`, and
+handlers are removed after deprovision hooks run.
 
 ## Ownership
 
@@ -57,8 +59,8 @@ boundary, but they never dispose it. The code that created the external containe
 ## WireStatus
 
 Wirestate tracks lifecycle state for each resolved service instance. Use `WireStatus.for(this)` inside a service when
-async work needs to know whether the instance is still active - typically to drop a late `await` result after the
-service has been deprovisioned or disposed.
+async work needs to know whether the instance is still active. This is most useful for dropping a late `await` result
+after the service has been deprovisioned or disposed.
 
 [`WireStatus`](/api/wirestate-core/classes/WireStatus) exposes lifecycle state for late async guards:
 

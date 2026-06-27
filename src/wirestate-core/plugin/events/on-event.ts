@@ -58,7 +58,8 @@ export interface OnEventHandlerDecorator {
  * unregistered when that provision cycle ends. Register {@link EventsPlugin}
  * on the container, or on an ancestor container, to enable event handlers.
  *
- * Omit `types` to receive every event emitted on the active event bus.
+ * Omit `types` to receive every event emitted on the active event bus. Repeated
+ * types are deduplicated for one decorated method.
  *
  * @group Events
  *

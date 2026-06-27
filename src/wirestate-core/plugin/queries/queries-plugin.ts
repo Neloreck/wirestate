@@ -10,7 +10,10 @@ import { QUERY_REGISTRATION } from "./on-query";
  * {@link QueryBus} and wire `@OnQuery` handlers at provision. Importing this class
  * is what pulls the query bus into the bundle.
  *
- * @group Plugin
+ * A child container can register its own `QueriesPlugin` for a local bus, or
+ * omit it to use the nearest ancestor bus.
+ *
+ * @group Plugins
  *
  * @example
  * ```typescript
