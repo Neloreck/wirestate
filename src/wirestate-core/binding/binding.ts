@@ -71,24 +71,41 @@ export interface ValueBindingDescriptor<T = unknown> {
 }
 
 /**
- * Describes a class binding behind a custom token,
- * which may be the same class as the token, or a subclass.
+ * Describes a token-bound service instance constructed from an injectable class.
+ *
+ * @remarks
+ * Use an instance binding when the token callers resolve should be explicit:
+ * an interface-shaped {@link InjectionToken}, an abstract class, a base class,
+ * or a class token mapped to a subclass implementation. A bare class binding is
+ * shorthand for an instance binding whose `token` and `value` are the same class.
+ *
+ * Singleton instance bindings are cached, owned by the container, and wired into
+ * service lifecycle, provider lifecycle, and messaging. Transient instance bindings
+ * create a fresh instance for every resolution and are not cached or owned.
+ * `Container` rejects transient instance classes that declare lifecycle or messaging
+ * handlers because those handlers would have no owned lifetime.
  *
  * @group Bind
+ *
+ * @template T - Instance type resolved for the token.
  */
 export interface InstanceBindingDescriptor<T = unknown> {
   /**
-   * Binding strategy.
+   * Binding strategy for injectable class construction.
    */
   readonly type: "Instance";
 
   /**
-   * Token used to resolve the instance.
+   * Token used to resolve the constructed instance.
    */
   readonly token: ServiceToken<T>;
 
   /**
-   * Service constructor to bind.
+   * Injectable service constructor used to create the instance.
+   *
+   * @remarks
+   * The constructor must be assignable to the token's resolved type and must be
+   * decorated with `@Injectable()`.
    */
   readonly value: Newable<NoInfer<T>>;
 

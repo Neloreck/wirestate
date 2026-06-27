@@ -222,30 +222,29 @@ export class NotificationService {
 }
 ```
 
-## Constants and Factories
+## Binding Descriptors
 
 Use descriptors when a binding needs an explicit token or binding strategy. This includes constants, factories, and
 service classes registered behind an explicit token. Reach for a typed [`InjectionToken`](#injection-tokens) when the
 resolved value should keep its type.
 
+### Value Bindings
+
+Use a value binding for constants, configuration, already-created objects, or environment data. Values are always
+singletons.
+
 ```ts
-import { BindingScope, BindingType, Container, InjectionToken } from "@wirestate/core";
+import { Container, InjectionToken } from "@wirestate/core";
 
 const API_URL = new InjectionToken<string>("API_URL");
-const CURRENT_TIME = new InjectionToken<Date>("CURRENT_TIME");
 const container = new Container();
 
 container.bind({ token: API_URL, value: "https://api.example.com" });
-container.bind({
-  token: CURRENT_TIME,
-  type: BindingType.Factory,
-  scope: BindingScope.Transient,
-  factory: () => new Date(),
-});
 ```
 
-A plain string or symbol works as a token too, but resolves as `unknown`; use one only for interop or when you do not
-need the value typed.
+A plain string or symbol works as a token too, but resolves as `unknown`.
+
+### Factory Bindings
 
 A factory binding creates the value lazily when its token is resolved. It receives the current container, and it also
 runs inside the injection context, so it can read other bindings with either the container argument or `inject()`.
@@ -281,6 +280,39 @@ const container = new Container({
 Factory results are ordinary resolved values, not container-owned service instances. If the returned object needs
 Wirestate lifecycle decorators, messaging decorators, or deactivation cleanup, bind an `@Injectable()` class with an
 instance descriptor instead.
+
+### Instance Bindings
+
+A bare service class is shorthand for an instance binding where the token and implementation are the same class. Use an
+instance descriptor when callers should resolve a different token than the implementation constructor: a typed
+`InjectionToken`, an abstract class, a base class, or a class token mapped to a subclass.
+
+```ts
+import { BindingType, Container, Injectable, InjectionToken } from "@wirestate/core";
+
+interface Logger {
+  log(message: string): void;
+}
+
+const LOGGER = new InjectionToken<Logger>("LOGGER");
+
+@Injectable()
+class ConsoleLogger implements Logger {
+  public log(message: string): void {
+    console.info(message);
+  }
+}
+
+const container = new Container({
+  bindings: [{ token: LOGGER, type: BindingType.Instance, value: ConsoleLogger }],
+});
+
+const logger = container.get(LOGGER);
+```
+
+The `value` constructor must be decorated with `@Injectable()` and must produce a value assignable to the token type.
+Singleton instance bindings are cached, owned by the container, and participate in Wirestate lifecycle and messaging.
+Use `scope: BindingScope.Transient` only for plain injectable classes without lifecycle or messaging decorators.
 
 ## Remove Services
 
