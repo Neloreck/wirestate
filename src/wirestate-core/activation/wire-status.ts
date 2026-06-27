@@ -30,7 +30,7 @@ const INSTANCE_RECORD: unique symbol = Symbol("@wirestate/core/wire-status/recor
  */
 export interface InstanceRecord {
   /**
-   * Container that activated the instance; nulled on deactivation so a
+   * Container that activated the instance. It is nulled on deactivation so a
    * user-held deactivated instance does not pin its container.
    */
   container: Optional<ContainerKernel>;

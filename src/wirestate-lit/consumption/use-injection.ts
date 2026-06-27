@@ -48,7 +48,7 @@ export interface UseInjectionOptions<T, F = undefined> {
   optional?: boolean;
 
   /**
-   * Value used when the token is not bound; providing it makes the lookup optional.
+   * Value used when the token is not bound. Providing it makes the lookup optional.
    */
   fallback?: InjectionFallback<F>;
 }
@@ -75,7 +75,7 @@ export interface UseInjectionValue<T, F = never> {
  *
  * @remarks
  * Returns a holder whose `value` updates when the container context changes,
- * unless `once` is set. Throws when the token is not bound; pass `optional` to
+ * unless `once` is set. Throws when the token is not bound. Pass `optional` to
  * hold `undefined` on a miss, or a `fallback` (which implies `optional`) to hold
  * a default.
  *

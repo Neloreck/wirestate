@@ -35,7 +35,7 @@ import { type CycleEntry, type ProvisionState, getOrCreateProvisionState, getPro
  * {@link WireStatus} reflects provider ownership.
  *
  * A container is provisioned by at most one provider at a time. Provisioning a
- * container that is already provisioned throws; deprovision it first.
+ * container that is already provisioned throws. Deprovision it first.
  *
  * @group Container
  * @internal

@@ -12,7 +12,7 @@ import type { Container } from "../container/container";
  *
  * Plugins are the framework layer that brackets the user layer
  * (`@OnActivated` / `@OnProvision`): on setup phases plugin hooks run before
- * the matching user hook; on teardown phases they run *after* it.
+ * the matching user hook. On teardown phases they run *after* it.
  *
  * Setup hooks (`install`, `onActivate`, `onContainerProvision`, `onProvision`) are
  * atomic: a throw unwinds the activation/provision cycle. Teardown hooks
@@ -70,7 +70,7 @@ export interface WirestatePlugin {
    * @remarks
    * Used by the built-in messaging plugins. Provision matches declared handler
    * metadata against the union of registered plugins' kinds and throws on a kind
-   * no plugin handles; a nearer plugin owning a kind shadows an ancestor's of the
+   * no plugin handles. A nearer plugin owning a kind shadows an ancestor's of the
    * same kind.
    */
   readonly handles?: ReadonlyArray<symbol>;
@@ -109,7 +109,7 @@ export interface WirestatePlugin {
    * Wires a provisioned instance, before any user `@OnProvision`.
    *
    * @remarks
-   * Register teardown with `addDisposer`; disposers run (reverse order, failsafe)
+   * Register teardown with `addDisposer`. Disposers run (reverse order, failsafe)
    * at deprovision. A throw here unwinds the whole provision cycle.
    *
    * @param instance - The provisioned instance.

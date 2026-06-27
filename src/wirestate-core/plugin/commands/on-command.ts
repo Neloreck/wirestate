@@ -19,7 +19,7 @@ import { COMMAND_HANDLER_METADATA, COMMAND_METADATA_KEY } from "./commands-regis
  *
  * @remarks
  * Declared beside the commands code so importing `@OnCommand` (or {@link CommandsPlugin})
- * is what pulls {@link CommandBus} into the bundle; the dispatcher stays bus-agnostic.
+ * is what pulls {@link CommandBus} into the bundle. The dispatcher stays bus-agnostic.
  *
  * @internal
  */

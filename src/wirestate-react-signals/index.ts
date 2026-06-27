@@ -1,8 +1,8 @@
 /**
  * Preact Signals React reactivity binding (`@preact/signals-react`) for Wirestate React services.
  *
- * Signal state is defined with `@wirestate/signals`; this package wires those signals into
- * React rendering through `@preact/signals-react`.
+ * Signal state is defined with `@wirestate/signals`.
+ * This package wires those signals into React rendering through `@preact/signals-react`.
  *
  * @packageDocumentation
  */

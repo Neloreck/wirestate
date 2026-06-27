@@ -54,7 +54,7 @@ export interface CreateLifecycleServiceOptions {
  *
  * @remarks
  * Each call returns a fresh injectable class with static `METHODS`, `EVENTS`,
- * and `SUFFIX` members. By default the class owns a new event log; pass
+ * and `SUFFIX` members. By default the class owns a new event log. Pass
  * {@link CreateLifecycleServiceOptions.events} when multiple generated classes
  * should write to one shared log.
  *

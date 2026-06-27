@@ -149,7 +149,7 @@ class DevtoolsHookHost implements DevtoolsHook {
  * @remarks
  * The only place that writes to `globalThis`. Called from a plugin's `install`,
  * never by core, so the global appears exactly when (and only when) a
- * {@link DevToolsPlugin} is registered. First-installer wins; later plugins reuse it.
+ * {@link DevToolsPlugin} is registered. First-installer wins. Later plugins reuse it.
  *
  * @group DevTools
  *

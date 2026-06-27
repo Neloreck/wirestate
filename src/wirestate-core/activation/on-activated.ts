@@ -50,8 +50,8 @@ export function OnActivated(): SingleMethodDecorator {
  *
  * @remarks
  * A class hierarchy may declare one activation hook name. Subclasses can
- * override a decorated base method and may redecorate that same method name;
- * declaring a different decorated method in the same hierarchy is a validation
+ * override a decorated base method and may redecorate that same method name.
+ * Declaring a different decorated method in the same hierarchy is a validation
  * error.
  *
  * @group Lifecycle

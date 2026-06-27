@@ -96,11 +96,11 @@ export interface InstanceBindingDescriptor<T = unknown> {
    * Lifetime scope for the instance.
    *
    * @remarks
-   * Defaults to `Singleton` (constructed once, cached, owned by the container with
-   * full instance lifecycle). A `Transient` instance is constructed fresh on every
-   * resolution and never owned or tracked - construct-and-forget - so its class must
-   * declare no wirestate lifecycle or messaging handlers (rejected at bind time
-   * otherwise).
+   * Defaults to `Singleton`: the value is constructed once, cached, and owned by the
+   * container with full instance lifecycle. A `Transient` value is constructed fresh on
+   * every resolution and is never cached or owned, so its class must declare no wirestate
+   * lifecycle or messaging handlers. The container rejects a transient instance class that
+   * declares handlers at bind time.
    */
   readonly scope?: BindingScopeValue;
 }

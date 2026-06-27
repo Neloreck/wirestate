@@ -3,7 +3,7 @@ import { isFactoryDescriptor, isInstanceDescriptor } from "./binding-guards";
 
 /**
  * Resolves the caching scope of a binding descriptor.
- * Value descriptors are always singletons; factory and instance descriptors
+ * Value descriptors are always singletons. Factory and instance descriptors
  * may declare a `Transient` scope and otherwise default to `Singleton`.
  *
  * @param binding - Binding descriptor to inspect.

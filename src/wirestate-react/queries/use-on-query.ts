@@ -8,7 +8,7 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * Registers a query handler for the component's lifetime.
  *
  * @remarks
- * Only one handler is active per type; the newest registration shadows older
+ * Only one handler is active per type. The newest registration shadows older
  * ones. The handler is unregistered when the component unmounts or the active
  * container changes, and may change between renders without re-registering.
  *

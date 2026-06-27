@@ -1,7 +1,7 @@
 import { type MaybePromise } from "../../types/general";
 
 /**
- * Represents the type used to dispatch and handle queries.
+ * Identifies a query and routes it to its handler.
  *
  * @remarks
  * Queries use a request-response pattern. Using symbols is recommended for
@@ -17,7 +17,7 @@ import { type MaybePromise } from "../../types/general";
 export type QueryType = string | symbol | number;
 
 /**
- * Represents the function that handles a query.
+ * Answers a dispatched query and returns its result.
  *
  * @remarks
  * Query handlers can be synchronous or asynchronous. They receive a payload
@@ -41,7 +41,7 @@ export type QueryHandler<R = unknown, P = unknown, T extends QueryType = QueryTy
 };
 
 /**
- * Represents the function returned by query registration.
+ * Removes the query handler it was returned for.
  *
  * @group Queries
  *

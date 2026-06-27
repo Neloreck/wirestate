@@ -130,7 +130,7 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    * Registers a query handler.
    *
    * @remarks
-   * Multiple handlers for one type form a stack. The newest handler answers.
+   * Registering another handler for the same type shadows the previous one. Unregistering the newest restores it.
    *
    * @template R - Type of the query result.
    * @template P - Type of the query payload.

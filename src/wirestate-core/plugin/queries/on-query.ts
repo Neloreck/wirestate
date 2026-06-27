@@ -19,7 +19,7 @@ import { QueryBus } from "./query-bus";
  *
  * @remarks
  * Declared beside the queries code so importing `@OnQuery` (or {@link QueriesPlugin})
- * is what pulls {@link QueryBus} into the bundle; the dispatcher stays bus-agnostic.
+ * is what pulls {@link QueryBus} into the bundle. The dispatcher stays bus-agnostic.
  *
  * @internal
  */

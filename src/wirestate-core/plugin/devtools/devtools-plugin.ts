@@ -57,7 +57,7 @@ export class DevToolsPlugin implements WirestatePlugin {
   /**
    * Currently-provisioned (live) containers, keyed by id for dedupe and held weakly so
    * the plugin never extends a container's lifetime. Populated on provision, drained on
-   * deprovision; dead entries are pruned lazily on snapshot as a backstop.
+   * deprovision. Dead entries are pruned lazily on snapshot as a backstop.
    */
   private readonly observed: Map<DevtoolsContainerId, WeakRef<ContainerKernel>> = new Map();
 
@@ -291,7 +291,7 @@ export class DevToolsPlugin implements WirestatePlugin {
    * Reads the raw value at `path` within the `Value` binding identified by `bindingId`, scanning the
    * observed containers' own bindings. Reads the stored value directly - never resolves or constructs
    * - so it is side-effect-free and works even before the binding is first resolved. Only `Value`
-   * bindings are addressable here; an `Instance`/`Factory` binding's id never matches.
+   * bindings are addressable here. An `Instance`/`Factory` binding's id never matches.
    *
    * @param bindingId - Binding to read from.
    * @param path - Object keys / array indices from the binding's value to the target.
@@ -321,7 +321,7 @@ export class DevToolsPlugin implements WirestatePlugin {
 
   /**
    * If `value` is one of this root's tracked active instances, returns a reference to it (so the
-   * inspector can mark a field that points at another service and offer a jump); else `undefined`.
+   * inspector can mark a field that points at another service and offer a jump). Otherwise `undefined`.
    *
    * @param value - Raw value at an inspected field.
    * @returns A service reference, or `undefined`.

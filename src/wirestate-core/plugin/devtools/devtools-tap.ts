@@ -224,7 +224,7 @@ function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
 
 /**
  * Resolves the event types a subscribe/unsubscribe call targets, mirroring the bus
- * overloads: a lone handler is catch-all (`"*"`); otherwise the first argument is the
+ * overloads: a lone handler is catch-all (`"*"`). Otherwise the first argument is the
  * type(s).
  *
  * @param typesOrHandler - First argument of the call.

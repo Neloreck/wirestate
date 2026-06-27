@@ -47,7 +47,7 @@ export type CommandHandler<R = unknown, P = unknown, T extends CommandType = Com
 /**
  * Represents the function returned by command registration.
  *
- * Call it to remove that exact handler.
+ * Call it to unregister that exact handler.
  *
  * @group Commands
  *

@@ -69,7 +69,7 @@ export interface InjectionOptions<T, F = undefined> {
   optional?: boolean;
 
   /**
-   * Value used when the token is not bound; providing it makes the lookup optional.
+   * Value used when the token is not bound. Providing it makes the lookup optional.
    */
   fallback?: InjectionFallback<F>;
 }
@@ -79,7 +79,7 @@ export interface InjectionOptions<T, F = undefined> {
  *
  * @remarks
  * Follows the nearest container context unless `once` is set. Throws when the
- * token is not bound; pass `optional` to assign `undefined` on a miss, or a
+ * token is not bound. Pass `optional` to assign `undefined` on a miss, or a
  * `fallback` (which implies `optional`) to assign a default.
  *
  * @group Consumption

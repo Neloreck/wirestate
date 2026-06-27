@@ -17,7 +17,7 @@ import { type ActivationRecord, type BindingMap, type InstanceMap } from "./cont
  * resolved instances of your services.
  *
  * @remarks
- * This is the base class that {@link Container} extends; the public
+ * This is the base class that {@link Container} extends. The public
  * {@link Container} adds messaging and scope support on top. Application
  * code interacts with `Container`, not `ContainerKernel` directly.
  *
@@ -190,7 +190,7 @@ export class ContainerKernel {
   /**
    * Returns the service instances this container constructed for singleton instance
    * bindings, in creation order. Values constructed for value and factory bindings are
-   * not service instances and are not included; neither are transient instances, which
+   * not service instances and are not included. Transient instances are excluded too. They
    * are construct-and-forget and never owned or tracked by the container.
    *
    * @returns Snapshot of this container's active service instances.

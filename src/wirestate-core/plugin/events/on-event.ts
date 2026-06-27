@@ -18,7 +18,7 @@ import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "./events-registry";
  *
  * @remarks
  * Declared beside the events code so importing `@OnEvent` (or {@link EventsPlugin})
- * is what pulls {@link EventBus} into the bundle; the dispatcher stays bus-agnostic.
+ * is what pulls {@link EventBus} into the bundle. The dispatcher stays bus-agnostic.
  *
  * @internal
  */

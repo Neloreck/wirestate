@@ -145,7 +145,7 @@ export class Container extends ContainerKernel {
   }
 
   /**
-   * Binds a service class or a binding descriptor, then delegates to the kernel.
+   * Binds a service class or a binding descriptor to this container.
    *
    * @param binding - Service class or binding descriptor to register.
    * @returns The same container for chaining.
@@ -170,9 +170,8 @@ export class Container extends ContainerKernel {
    *
    * @remarks
    * Resolves provider lifecycle participants and runs `@OnProvision` once for
-   * this provision cycle. A container is provisioned by at most one provider at
-   * a time. Provisioning an already provisioned container throws; deprovision it
-   * first.
+   * this provision cycle. A container is provisioned by at most one provider at a time.
+   * Provisioning an already provisioned container throws. Deprovision it first.
    *
    * @returns The same container for chaining.
    *

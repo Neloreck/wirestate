@@ -39,7 +39,14 @@ export type MaybePromise<T> = T | Promise<T>;
 export type Maybe<T> = T | null | undefined;
 
 /**
- * Constructable class reference.
+ * Constructor reference for a class the container can instantiate.
+ *
+ * @remarks
+ * Used as a binding token and as the type for service classes bound by class.
+ *
+ * @template T - Instance type the constructor produces.
+ *
+ * @group general-types
  */
 export type Newable<T = unknown> = new (...args: Array<never>) => T;
 

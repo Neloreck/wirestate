@@ -129,7 +129,7 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    * Registers a command handler.
    *
    * @remarks
-   * Multiple handlers for one type form a stack. The newest handler is active.
+   * Registering another handler for the same type shadows the previous one. Unregistering the newest restores it.
    *
    * @template R - Type of the command execution result.
    * @template P - Type of the command payload.

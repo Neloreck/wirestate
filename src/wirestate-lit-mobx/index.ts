@@ -1,8 +1,8 @@
 /**
  * MobX Lit reactivity binding (Adobe's `@adobe/lit-mobx`) for Wirestate Lit services.
  *
- * Observable service state is defined with `@wirestate/mobx`; this package wires those
- * observables into Lit rendering through Adobe's `@adobe/lit-mobx` adapter.
+ * Observable service state is defined with `@wirestate/mobx`.
+ * This package wires those observables into Lit rendering through Adobe's `@adobe/lit-mobx` adapter.
  *
  * @packageDocumentation
  */

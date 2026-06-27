@@ -24,7 +24,7 @@ export function useOnEvents(types: ReadonlyArray<EventType>, handler: EventHandl
  * @group Events
  *
  * @param typesOrHandler - The event type, an array of event types, or the handler itself to receive every event.
- * @param maybeHandler - The handler invoked for matching events; omit it when the first argument is the handler.
+ * @param maybeHandler - The handler invoked for matching events. Omit it when the first argument is the handler.
  *
  * @example
  * ```tsx

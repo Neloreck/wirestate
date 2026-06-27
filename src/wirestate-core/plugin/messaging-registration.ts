@@ -55,7 +55,7 @@ export const MESSAGING_REGISTRATIONS: WeakMap<object, Array<MessagingRegistratio
  * Collects the distinct messaging registrations declared across an instance's hierarchy.
  *
  * @remarks
- * A decorator appends its kind's registration once per decorated method; the
+ * A decorator appends its kind's registration once per decorated method. The
  * same kind is also re-declared by each class in a hierarchy. Both are collapsed
  * here so each kind wires exactly once per activation.
  *

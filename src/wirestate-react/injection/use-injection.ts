@@ -29,7 +29,7 @@ export type InjectionFallback<F> = F | ((container: Container) => F);
  * @param options - Resolution options.
  *
  * @param options.optional - Resolve `undefined` instead of throwing when the token is not bound.
- * @param options.fallback - Value used when the token is not bound; providing it implies `optional`.
+ * @param options.fallback - Value used when the token is not bound. Providing it implies `optional`.
  * @returns The resolved value, the fallback, or `undefined` on a miss.
  *
  * @throws `WirestateError` when the token is not bound and the lookup is neither optional nor given a fallback.

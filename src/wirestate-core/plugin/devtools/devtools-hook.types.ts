@@ -77,7 +77,7 @@ export interface DevtoolsBinding {
   readonly scope: BindingScopeValue;
 
   /**
-   * Implementation class name for instance bindings; absent otherwise.
+   * Implementation class name for instance bindings. Absent otherwise.
    */
   readonly implementation: Optional<string>;
 }
@@ -122,7 +122,7 @@ export interface DevtoolsHandler {
   readonly channel: DevtoolsMessageChannel;
 
   /**
-   * Stringified message type the handler covers; `"*"` for a catch-all event handler.
+   * Stringified message type the handler covers. `"*"` for a catch-all event handler.
    */
   readonly type: string;
 
@@ -233,7 +233,7 @@ export interface DevtoolsPluginInfo {
   readonly name: string;
 
   /**
-   * Messaging-handler kind descriptions the plugin owns; empty for pure observers.
+   * Messaging-handler kind descriptions the plugin owns. Empty for pure observers.
    */
   readonly handles: ReadonlyArray<string>;
 }
@@ -292,7 +292,7 @@ export interface DevtoolsRootSnapshot {
   readonly containers: ReadonlyArray<DevtoolsContainerSnapshot>;
 
   /**
-   * Optional human label for the root, set via `new DevToolsPlugin({ label })`; `undefined` when
+   * Optional human label for the root, set via `new DevToolsPlugin({ label })`. `undefined` when
    * the app did not name it (a consumer may derive a hint instead).
    */
   readonly label: Optional<string>;
@@ -366,7 +366,7 @@ export type DevtoolsMessageChannel = "event" | "command" | "query";
  */
 export interface DevtoolsMessage {
   /**
-   * Correlation id, unique per dispatch; a {@link DevtoolsMessageResultEvent} references it via
+   * Correlation id, unique per dispatch. A {@link DevtoolsMessageResultEvent} references it via
    * `messageId`. Events carry an id too, but never produce a result.
    */
   readonly id: number;
@@ -387,7 +387,7 @@ export interface DevtoolsMessage {
   readonly payload: unknown;
 
   /**
-   * Raw event source (events only); `undefined` for commands and queries.
+   * Raw event source (events only). `undefined` for commands and queries.
    */
   readonly source: Optional<unknown>;
 
@@ -501,7 +501,7 @@ export interface DevtoolsRegistration {
   readonly channel: DevtoolsMessageChannel;
 
   /**
-   * Stringified message type the handler covers; `"*"` for a catch-all event subscriber.
+   * Stringified message type the handler covers. `"*"` for a catch-all event subscriber.
    */
   readonly type: string;
 
@@ -601,7 +601,7 @@ export interface DevtoolsRootRegister {
 
   /**
    * Reads the raw live value at `path` within the instance identified by `instanceId`, or
-   * `undefined` when the instance is not in this root. Read-only; the consumer serializes the
+   * `undefined` when the instance is not in this root. Read-only. The consumer serializes the
    * result.
    *
    * @param instanceId - Instance to read from.
@@ -621,7 +621,7 @@ export interface DevtoolsRootRegister {
 
   /**
    * If `value` is a service instance this root tracks, returns a reference to it (so the inspector
-   * can mark a field that points at another service and offer a jump); otherwise `undefined`.
+   * can mark a field that points at another service and offer a jump). Otherwise `undefined`.
    *
    * @param value - The raw value at an inspected field.
    * @returns A service reference, or `undefined` when the value isn't a tracked instance.
@@ -655,7 +655,7 @@ export type DevtoolsListener = (event: DevtoolsEvent) => void;
  * @remarks
  * Created lazily on `globalThis` by the first plugin to install and shared by every
  * later plugin (including ones from other library copies on the page). The plugin
- * registers a root and emits lifecycle deltas; the backend snapshots current roots
+ * registers a root and emits lifecycle deltas. The backend snapshots current roots
  * on attach and subscribes for deltas thereafter.
  *
  * @group DevTools
@@ -684,7 +684,7 @@ export interface DevtoolsHook {
   /**
    * Allocates (or returns) the stable id for a container.
    *
-   * @param container - Container to identify; keyed by object identity, so copies
+   * @param container - Container to identify. Keyed by object identity, so copies
    *   from any library version share one allocator.
    * @returns The container's stable id.
    */
@@ -693,7 +693,7 @@ export interface DevtoolsHook {
   /**
    * Allocates (or returns) the stable id for a service instance.
    *
-   * @param instance - Instance to identify; keyed by object identity, so copies from any library
+   * @param instance - Instance to identify. Keyed by object identity, so copies from any library
    *   version share one allocator.
    * @returns The instance's stable id.
    */
@@ -702,7 +702,7 @@ export interface DevtoolsHook {
   /**
    * Allocates (or returns) the stable id for a binding.
    *
-   * @param descriptor - Binding descriptor to identify; keyed by object identity, so copies from any
+   * @param descriptor - Binding descriptor to identify. Keyed by object identity, so copies from any
    *   library version share one allocator (and a primitive-valued binding still gets a stable id).
    * @returns The binding's stable id.
    */

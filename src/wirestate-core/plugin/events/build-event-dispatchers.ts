@@ -39,7 +39,7 @@ interface DispatcherPlan {
  *
  * @param instance - The instance to scan for handlers.
  * @param container - ContainerKernel that owns the instance.
- * @returns One subscription descriptor per decorated method; empty when none are declared.
+ * @returns One subscription descriptor per decorated method. Empty when none are declared.
  *
  * @example
  * ```typescript
