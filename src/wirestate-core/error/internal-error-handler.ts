@@ -3,7 +3,9 @@ import { type WireEvent } from "../plugin/events/events";
 import { type Maybe } from "../types/general";
 
 /**
- * Subsystem that isolated an internal Wirestate error.
+ * @remarks
+ * Use it to group logs by failure category. It is diagnostic context, not a
+ * recovery instruction.
  *
  * @group Error
  */
@@ -16,19 +18,23 @@ export type InternalErrorSource =
   | "provider-deprovision";
 
 /**
- * Describes an internal error that Wirestate reports without aborting the
- * current container operation.
+ * Describes an isolated failure reported through a container error handler.
+ *
+ * @remarks
+ * The descriptor carries the original thrown or rejected value plus the
+ * Wirestate context known at the catch site. Some fields are present only for
+ * specific sources, such as `event` for event handler failures.
  *
  * @group Error
  */
 export interface InternalErrorDescriptor {
   /**
-   * Container that owns the failed work, when one is available.
+   * Container that owns the failed work, when known.
    */
   readonly container?: ContainerKernel;
 
   /**
-   * Extra diagnostic values provided by the failing subsystem.
+   * Extra diagnostic values from the failing subsystem.
    */
   readonly details?: ReadonlyArray<unknown>;
 
@@ -43,7 +49,7 @@ export interface InternalErrorDescriptor {
   readonly error: unknown;
 
   /**
-   * Summary of the failure.
+   * Human-readable failure summary.
    */
   readonly message: string;
 
@@ -69,7 +75,13 @@ export interface InternalErrorDescriptor {
 }
 
 /**
- * Handles isolated Wirestate errors.
+ * Handles isolated Wirestate errors for a container.
+ *
+ * @remarks
+ * Register it as `new Container({ onError })`. If it throws, Wirestate falls
+ * back to {@link defaultInternalErrorHandler} and reports both failures.
+ *
+ * @param descriptor - Isolated failure descriptor.
  *
  * @group Error
  */
@@ -82,6 +94,10 @@ const WIRESTATE_INTERNAL_ERROR_HANDLERS: WeakMap<ContainerKernel, InternalErrorH
 
 /**
  * Reports isolated Wirestate errors to `console.error`.
+ *
+ * @remarks
+ * This is the fallback used when a container has no `onError` handler, or when
+ * a custom handler throws.
  *
  * @group Error
  *
