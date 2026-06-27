@@ -91,8 +91,9 @@ function CheckoutQueries(props: { cart: Array<{ price: number }> }) {
 }
 ```
 
-Handlers unregister when the component unmounts or the active container changes. If several handlers use the same query
-type, the newest one handles the query.
+Handlers unregister when the component unmounts, the query type changes, or the active container changes. The hook keeps
+the latest handler without re-registering. If several handlers use the same query type, the newest one handles the
+query.
 
 ## API Reference
 

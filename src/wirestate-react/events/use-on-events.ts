@@ -20,11 +20,14 @@ export function useOnEvents(types: ReadonlyArray<EventType>, handler: EventHandl
  * every event, mirroring {@link EventBus.subscribe}. The subscription is scoped
  * to the component and is removed automatically when it unmounts, the active
  * container changes, or the set of listened types changes.
+ * Requires `EventBus` to be bound in the active container or an ancestor.
  *
  * @group Events
  *
  * @param typesOrHandler - The event type, an array of event types, or the handler itself to receive every event.
  * @param maybeHandler - The handler invoked for matching events. Omit it when the first argument is the handler.
+ *
+ * @throws `WirestateError` if the active container cannot resolve `EventBus`.
  *
  * @example
  * ```tsx

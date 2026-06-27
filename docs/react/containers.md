@@ -23,7 +23,8 @@ export function Application() {
 }
 ```
 
-Managed containers activate all bindings by default. Pass `activate: false` to resolve services lazily.
+Managed containers activate all bindings by default. Pass `activate: false` to resolve regular services lazily.
+Services with provider lifecycle hooks are still resolved when the provider provisions the container.
 
 Do not start resource work during activation. React creates managed containers before the provider effect commits, and
 Strict Mode may create and discard an extra container. Start timers, subscriptions, sockets, and provider-scoped async
@@ -57,11 +58,11 @@ function CheckoutFlow() {
 
 To share a parent's bus instead of giving the subtree a local one, set `config.parent` and do not register the matching
 plugin on this container; the child then inherits the bus up the parent chain. Registering a local plugin instead gives
-the subtree its own bus. Senders, consumer hooks, and service-level `@OnEvent`, `@OnCommand`, and `@OnQuery` handlers all
-resolve buses up the parent chain, so a nested provider reuses an ancestor's bus and a child service can handle an
-ancestor's bus. Those handlers subscribe when the container is provisioned and unsubscribe when it is deprovisioned. A
-service that declares an `@On*` handler fails fast at provision unless the matching plugin is registered somewhere in the
-chain.
+the subtree its own bus. Bus injections, React handler hooks, and service-level `@OnEvent`, `@OnCommand`, and `@OnQuery`
+handlers all resolve buses up the parent chain. A nested provider can reuse an ancestor's bus, and a child service can
+handle messages on that ancestor bus. Service-level handlers subscribe when the container is provisioned and unsubscribe
+when it is deprovisioned. A service that declares an `@On*` handler fails fast at provision unless the matching plugin is
+registered somewhere in the chain.
 
 ## External Root Container
 

@@ -33,7 +33,8 @@ function Diagnostics() {
 }
 ```
 
-Provide a `fallback` - which implies `optional` - for the unbound case, either a raw value or a `(container) => value` factory.
+Provide a `fallback`, which implies `optional`, for the unbound case. The fallback can be a raw value or a
+`(container) => value` factory.
 
 ```tsx
 // Raw value: used as-is when the token is not bound.

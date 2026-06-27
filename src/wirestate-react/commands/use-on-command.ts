@@ -11,6 +11,7 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  * Only one handler is active per type. The newest registration shadows older
  * ones. The handler is unregistered when the component unmounts or the active
  * container changes, and may change between renders without re-registering.
+ * Requires `CommandBus` to be bound in the active container or an ancestor.
  *
  * @group Commands
  *
@@ -20,6 +21,8 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  *
  * @param type - Command type to handle.
  * @param handler - Function that handles the command and returns its result.
+ *
+ * @throws `WirestateError` if the active container cannot resolve `CommandBus`.
  *
  * @example
  * ```tsx

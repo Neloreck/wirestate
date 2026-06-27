@@ -80,8 +80,8 @@ fit together.
 
 - `ContainerProvider` publishes containers through React context.
 - `useInjection` and `useContainer` read from the active container.
-- To **send** messages, inject the bus — `useInjection(EventBus)`, `useInjection(CommandBus)`, `useInjection(QueryBus)` —
-  and call `emit` / `execute` / `query`.
+- To **send** messages, inject the bus with `useInjection(EventBus)`, `useInjection(CommandBus)`, or
+  `useInjection(QueryBus)`, then call `emit`, `execute`, or `query`.
 - To **subscribe**, use the lifecycle-managed hooks: `useOnEvents`, `useOnCommand`, `useOnQuery`.
 
 ## API Reference

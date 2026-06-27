@@ -39,7 +39,7 @@ dependency list.
 
 ## Execute an Async Command
 
-Use `executeAsync` when the handler may return a Promise, or when the component should always work in an async way — it
+Use `executeAsync` when the handler may return a Promise, or when the component should always work in an async way. It
 always resolves to a Promise.
 
 ```tsx
@@ -112,8 +112,9 @@ function SearchPanel() {
 }
 ```
 
-Handlers unregister when the component unmounts or the active container changes. If several handlers use the same
-command type, the newest one handles the command.
+Handlers unregister when the component unmounts, the command type changes, or the active container changes. The hook
+keeps the latest handler without re-registering. If several handlers use the same command type, the newest one handles
+the command.
 
 ## API Reference
 
