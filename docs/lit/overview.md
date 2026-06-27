@@ -1,10 +1,9 @@
 # Lit Overview
 
-`@wirestate/lit` connects Wirestate containers to Lit elements.
+`@wirestate/lit` connects Wirestate containers to Lit elements through Lit context and reactive controllers.
 
-Use it when Lit elements need access to a Wirestate container:
-[container providers](/api/wirestate-lit/functions/provideContainer), injection helpers, and element handlers for local
-events, commands, and queries.
+Use it when Lit elements need access to a Wirestate container: container providers, injection helpers, and
+element-scoped handlers for events, commands, and queries.
 
 Use [Lit Signals](/lit-signals/overview) or [Lit MobX](/lit-mobx/overview) when service state should update templates.
 
@@ -72,6 +71,12 @@ in `@OnProvision`, such as timers, subscriptions, and sockets. Clean it up in `@
 cheap setup that does not need cleanup. The core [lifecycle map](/core/lifecycle) shows where Lit connect, disconnect,
 activation, and disposal fit together.
 
+Managed providers create a container on connect, provision it, deprovision it on disconnect, and dispose it. External
+providers provision and deprovision the container they were given, but disposal stays with the owner that created it.
+
+Injection and element handler helpers follow the nearest container context by default. When a provider replaces its
+container, consumers move to the new container and handlers re-register on the new bus.
+
 ## Lit Package Surface
 
 - `provideContainer` and `useContainerProvider` publish containers.
@@ -83,5 +88,8 @@ activation, and disposal fit together.
 ## API Reference
 
 [`provideContainer`](/api/wirestate-lit/functions/provideContainer),
-[`ContainerProvider`](/api/wirestate-lit/classes/ContainerProvider), [`injection`](/api/wirestate-lit/functions/injection),
-[`onEvent`](/api/wirestate-lit/functions/onEvent), [`useOnQuery`](/api/wirestate-lit/functions/useOnQuery).
+[`ContainerProvider`](/api/wirestate-lit/classes/ContainerProvider),
+[`useContainerProvider`](/api/wirestate-lit/functions/useContainerProvider),
+[`injection`](/api/wirestate-lit/functions/injection),
+[`useInjection`](/api/wirestate-lit/functions/useInjection), [`onEvent`](/api/wirestate-lit/functions/onEvent),
+[`onCommand`](/api/wirestate-lit/functions/onCommand), [`onQuery`](/api/wirestate-lit/functions/onQuery).

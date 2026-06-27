@@ -22,6 +22,11 @@ export interface UseOnCommandOptions<R = unknown, P = unknown, T extends Command
 /**
  * Registers a command handler for the host element's lifetime.
  *
+ * @remarks
+ * Registers when the host connects, unregisters when it disconnects, and
+ * re-registers when the nearest container context changes. Command handlers are
+ * stack-based on the active command bus.
+ *
  * @group Commands
  *
  * @param host - Host element.

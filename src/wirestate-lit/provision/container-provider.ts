@@ -141,6 +141,20 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
     super.setValue(undefined as unknown as Container);
   }
 
+  /**
+   * Replaces the external container published by this provider.
+   *
+   * @remarks
+   * Only external-container providers can use this method. Connected providers
+   * deprovision the previous container, provision the new one, and publish it
+   * through context. Disconnected providers store the container for the next
+   * connection.
+   *
+   * @param container - External container to publish.
+   * @param force - Whether Lit context consumers should be notified even if the value is unchanged.
+   *
+   * @throws WirestateError If this provider owns managed containers.
+   */
   public setValue(container: Container, force?: boolean): void {
     if (this.config) {
       throw new WirestateError(

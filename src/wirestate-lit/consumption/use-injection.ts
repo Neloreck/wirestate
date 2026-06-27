@@ -39,6 +39,9 @@ export interface UseInjectionOptions<T, F = undefined> {
 
   /**
    * Initial value held until the context resolves.
+   *
+   * @remarks
+   * Useful when templates may read the holder before the first context callback runs.
    */
   value?: Nullable<T | F>;
 
@@ -49,6 +52,9 @@ export interface UseInjectionOptions<T, F = undefined> {
 
   /**
    * Value used when the token is not bound. Providing it makes the lookup optional.
+   *
+   * @remarks
+   * A function fallback is treated as a factory and receives the active container.
    */
   fallback?: InjectionFallback<F>;
 }

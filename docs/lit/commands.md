@@ -5,7 +5,7 @@ Command helpers let Lit elements register command handlers on the active contain
 ## Register the Plugin
 
 These helpers use the active container's `CommandBus`, which exists only when `CommandsPlugin` is registered in the
-provider's `config.plugins`. See [Lit Containers › Messaging](/lit/containers#messaging).
+provider's `config.plugins`. See [Lit Containers > Messaging](/lit/containers#messaging).
 
 ## Decorator Handler
 
@@ -29,6 +29,9 @@ export class SearchPanel extends LitElement {
   }
 }
 ```
+
+The handler registers when the element connects, unregisters when it disconnects, and moves to the new bus when the
+nearest container context changes.
 
 ## Controller Handler
 
@@ -122,7 +125,9 @@ Use optional commands when a missing handler is valid.
 await this.commands.executeOptionalAsync("EXPORT_TRACE");
 ```
 
-If several handlers use the same command type, the newest one handles the command.
+Command handlers are stack-based. If several connected elements register the same command type, the newest active
+handler handles the command. When that element disconnects or moves to another container, the previous handler becomes
+active again. See [Core Commands](/core/commands).
 
 ## API Reference
 

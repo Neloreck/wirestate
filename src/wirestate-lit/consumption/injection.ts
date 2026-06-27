@@ -70,6 +70,9 @@ export interface InjectionOptions<T, F = undefined> {
 
   /**
    * Value used when the token is not bound. Providing it makes the lookup optional.
+   *
+   * @remarks
+   * A function fallback is treated as a factory and receives the active container.
    */
   fallback?: InjectionFallback<F>;
 }

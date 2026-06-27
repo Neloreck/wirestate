@@ -22,6 +22,11 @@ export interface UseOnQueryOptions<R = unknown, P = unknown, T extends QueryType
 /**
  * Registers a query handler for the host element's lifetime.
  *
+ * @remarks
+ * Registers when the host connects, unregisters when it disconnects, and
+ * re-registers when the nearest container context changes. Query handlers are
+ * stack-based on the active query bus.
+ *
  * @group Queries
  *
  * @param host - Host element.

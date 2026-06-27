@@ -28,7 +28,9 @@ export interface OnCommandDecorator<R = unknown, P = unknown, T extends CommandT
  * Decorator for Lit element methods that handle a specific command.
  *
  * @remarks
- * The handler is registered when the host connects and unregistered when it disconnects.
+ * The handler is registered when the host connects, unregistered when it
+ * disconnects, and re-registered when the nearest container context changes.
+ * Command handlers are stack-based on the active command bus.
  *
  * @group Commands
  *

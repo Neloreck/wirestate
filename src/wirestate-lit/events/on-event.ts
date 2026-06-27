@@ -27,7 +27,9 @@ export interface OnEventDecorator<E extends WireEvent = WireEvent> {
  * Decorator for Lit element methods that handle events from the event bus.
  *
  * @remarks
- * The handler is registered when the host connects and unregistered when it disconnects.
+ * The handler is registered when the host connects, unregistered when it
+ * disconnects, and re-subscribed when the nearest container context changes.
+ * Omit `types` to receive every event from the active event bus.
  *
  * @group Events
  *

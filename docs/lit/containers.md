@@ -26,6 +26,8 @@ export class ApplicationRoot extends LitElement {
 Managed containers are created when the host connects and disposed when it disconnects. They activate all bindings by
 default unless `activate` is provided.
 
+Before the host connects, and after it disconnects, no container value is published from that provider.
+
 Use `@OnProvision` for resource work tied to the connected provider lifetime. Use `@OnDeprovision` to clean it up. Keep
 `@OnActivated` for cheap setup that does not open timers, subscriptions, or external handles. See
 [Core Lifecycle](/core/lifecycle).
@@ -87,6 +89,14 @@ class ApplicationRoot extends LitElement {
   private provider!: ContainerProvider;
 }
 ```
+
+Use `provider.setValue(nextContainer)` to replace an external container. When the host is connected, the provider
+deprovisions the previous container, provisions the next one, and publishes it. When the host is disconnected, the
+replacement is stored for the next connection.
+
+Use `provider.setConfig(nextConfig)` to replace a managed provider's config. When connected, the provider deprovisions
+and disposes the current managed container, creates a new one, provisions it, and publishes it. When disconnected, the
+new config is stored for the next connection.
 
 ## API Reference
 

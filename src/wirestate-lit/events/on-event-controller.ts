@@ -10,7 +10,7 @@ import { type Nullable } from "../types/general";
  *
  * @remarks
  * Registers on host connect. Unregisters on disconnect. Re-subscribes when the
- * nearest container changes.
+ * nearest container context changes.
  *
  * @group Events
  *

@@ -5,7 +5,7 @@ Query helpers let Lit elements register query handlers on the active container w
 ## Register the Plugin
 
 These helpers use the active container's `QueryBus`, which exists only when `QueriesPlugin` is registered in the
-provider's `config.plugins`. See [Lit Containers › Messaging](/lit/containers#messaging).
+provider's `config.plugins`. See [Lit Containers > Messaging](/lit/containers#messaging).
 
 ## Decorator Handler
 
@@ -22,6 +22,9 @@ export class CheckoutAnswer extends LitElement {
   }
 }
 ```
+
+The handler registers when the element connects, unregisters when it disconnects, and moves to the new bus when the
+nearest container context changes.
 
 ## Controller Handler
 
@@ -67,7 +70,12 @@ export class CheckoutSummaryButton extends LitElement {
 }
 ```
 
-If several handlers use the same query type, the newest one handles the query.
+Use `queryAsync` when callers need Promise-normalized results, and `queryOptional` or `queryOptionalAsync` when a
+missing handler is valid.
+
+Query handlers are stack-based. If several connected elements register the same query type, the newest active handler
+answers the query. When that element disconnects or moves to another container, the previous handler becomes active
+again. See [Core Queries](/core/queries).
 
 ## API Reference
 

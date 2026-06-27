@@ -24,6 +24,11 @@ export interface UseOnEventsOptions<E extends WireEvent = WireEvent> {
 /**
  * Subscribes to events for the host element's lifetime.
  *
+ * @remarks
+ * Registers when the host connects, unregisters when it disconnects, and
+ * re-subscribes when the nearest container context changes. Omit `types`, or
+ * pass `null`, to receive every event.
+ *
  * @group Events
  *
  * @param host - Host element.

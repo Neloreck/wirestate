@@ -4,8 +4,8 @@ Event helpers let Lit elements subscribe to events on the active container while
 
 ## Register the Plugin
 
-These helpers use the active container's `EventBus`, which exists only when `EventsPlugin` is registered in the provider's
-`config.plugins`. See [Lit Containers › Messaging](/lit/containers#messaging).
+These helpers use the active container's `EventBus`, which exists only when `EventsPlugin` is registered in the
+provider's `config.plugins`. See [Lit Containers > Messaging](/lit/containers#messaging).
 
 ## Decorator Handler
 
@@ -30,6 +30,9 @@ Useful forms:
 - `@onEvent(["A", "B"])` listens to several types.
 - `@onEvent()` listens to all events.
 
+The handler registers when the element connects, unregisters when it disconnects, and moves to the new bus when the
+nearest container context changes.
+
 ## Controller Handler
 
 ```ts
@@ -43,6 +46,9 @@ class CartLogger extends LitElement {
   });
 }
 ```
+
+Pass `types: null` or omit `types` to receive all events. Pass a single type or an array to receive only matching
+events.
 
 ## Emit from an Element
 
@@ -63,7 +69,9 @@ class CartButton extends LitElement {
 }
 ```
 
-Handlers unregister when the element disconnects or its active container changes.
+Event delivery follows the core event rules: catch-all subscriptions run before type-specific subscriptions, handler
+failures are reported through the container error handler, and one failing handler does not stop the next handler. See
+[Core Events](/core/events).
 
 ## API Reference
 

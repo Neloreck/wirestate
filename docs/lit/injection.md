@@ -29,9 +29,11 @@ stay fixed.
 private cart!: CartService;
 ```
 
-## Optional Injection
+The decorator supports standard decorators on fields and accessors, and legacy TypeScript field decorators.
 
-Pass `optional` when a missing value is valid - the property is assigned `undefined` instead of throwing.
+## Optional Values
+
+Pass `optional` when a missing value is valid. The property is assigned `undefined` instead of throwing.
 
 ```ts
 import { injection } from "@wirestate/lit";
@@ -42,7 +44,8 @@ class DiagnosticsPanel extends LitElement {
 }
 ```
 
-Provide a `fallback` - which implies `optional` - for the unbound case, either a raw value or a `(container) => value` factory.
+Provide a `fallback`, which implies `optional`, for the unbound case. It can be a raw value or a `(container) => value`
+factory.
 
 ```ts
 class DiagnosticsPanel extends LitElement {
@@ -56,11 +59,14 @@ class DiagnosticsPanel extends LitElement {
 }
 ```
 
-The same `optional` and `fallback` options work on the `useInjection` controller helper.
+Fallback factories run only when the token is not bound. They receive the active container, so they can resolve another
+token. A function fallback is treated as a factory. To fall back to a function value, return that function from the
+factory.
 
 ## Controller Helpers
 
-`useInjection` returns a mutable holder. Read `holder.value` in element methods and templates.
+`useInjection` returns a mutable holder. Read `holder.value` in element methods and templates. Like the decorator, it
+follows container context changes unless `once: true` is set.
 
 ```ts
 import { useInjection } from "@wirestate/lit";
@@ -72,6 +78,16 @@ class CartIcon extends LitElement {
     return html`<span>${this.cart.value.items.length}</span>`;
   }
 }
+```
+
+Pass `value` to set the holder's initial value before the first container context callback runs.
+
+```ts
+private readonly name = useInjection(this, {
+  token: UserName,
+  value: "loading",
+  fallback: "guest",
+});
 ```
 
 `useContainer` exposes the active container for container-level operations.
