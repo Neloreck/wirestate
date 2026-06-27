@@ -1,5 +1,5 @@
 import { type BindingDescriptor, type FactoryBindingDescriptor } from "../binding/binding";
-import { ERROR_CODE_CIRCULAR_DEPENDENCY } from "../error/error-code";
+import { ERROR_CODE_CIRCULAR_DEPENDENCY, ERROR_CODE_UNKNOWN_BINDING_TYPE } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 
 import { Container } from "./container";
@@ -67,12 +67,15 @@ describe("Factory", () => {
       expect(factoryFn).toHaveBeenCalledWith(container);
     });
 
-    it("should throw 'Invalid state.' for a descriptor with no construction strategy", () => {
+    it("should throw the unknown-binding-type code for a descriptor with no construction strategy", () => {
       const factory: Factory = new Factory(container);
       const binding = { token: "BROKEN" } as unknown as BindingDescriptor;
 
       expect(() => factory.construct(binding)).toThrow(WirestateError);
-      expect(() => factory.construct(binding)).toThrow("Invalid state.");
+      expect(() => factory.construct(binding)).toThrow(
+        expect.objectContaining({ code: ERROR_CODE_UNKNOWN_BINDING_TYPE })
+      );
+      expect(() => factory.construct(binding)).toThrow("unsupported binding descriptor type.");
     });
   });
 

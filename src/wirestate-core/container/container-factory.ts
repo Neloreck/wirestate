@@ -1,7 +1,7 @@
 import type { BindingDescriptor } from "../binding/binding";
 import { isFactoryDescriptor, isInstanceDescriptor, isValueDescriptor } from "../binding/binding-guards";
 import { tokenToString } from "../binding/binding-tokens";
-import { ERROR_CODE_CIRCULAR_DEPENDENCY, ERROR_CODE_GENERIC } from "../error/error-code";
+import { ERROR_CODE_CIRCULAR_DEPENDENCY, ERROR_CODE_UNKNOWN_BINDING_TYPE } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 
 import type { ContainerKernel } from "./container-kernel";
@@ -54,6 +54,9 @@ export class Factory {
       return binding.value;
     }
 
-    throw new WirestateError("Invalid state.", ERROR_CODE_GENERIC);
+    throw new WirestateError(
+      `Cannot construct a value for '${tokenToString((binding as BindingDescriptor<T>).token)}': unsupported binding descriptor type.`,
+      ERROR_CODE_UNKNOWN_BINDING_TYPE
+    );
   }
 }
