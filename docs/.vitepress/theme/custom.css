@@ -87,6 +87,11 @@
   letter-spacing: -0.02em;
 }
 
+.api-reference .vp-doc :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--vp-font-family-mono);
+  letter-spacing: normal;
+}
+
 /* Feature cards: lift + teal border on hover so the landing feels alive. */
 .VPFeatures .VPFeature {
   transition:

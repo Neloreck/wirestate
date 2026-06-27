@@ -9,6 +9,10 @@ export default defineConfig({
     theme: { light: "github-light", dark: "night-owl" },
   },
   async transformPageData(pageData) {
+    if (pageData.relativePath.startsWith("api/")) {
+      pageData.frontmatter.pageClass = "api-reference";
+    }
+
     if (pageData.relativePath.startsWith("api/wirestate-")) {
       pageData.frontmatter.prev = false;
       pageData.frontmatter.next = false;
