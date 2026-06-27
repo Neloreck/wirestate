@@ -59,17 +59,18 @@ function DebugFlag() {
 
 ## Messaging
 
-Injection hooks resolve services and values. For messaging, use the dedicated hooks: `useEventEmitter` and `useOnEvents` for
-events, `useCommandExecutor` and `useOnCommand` for commands, and `useQueryExecutor` and `useOnQuery` for
-queries.
+Injection hooks resolve services and values, including the message buses. To **send**, inject the bus and call it:
+`useInjection(EventBus).emit(...)`, `useInjection(CommandBus).execute(...)`, `useInjection(QueryBus).query(...)`. To
+**subscribe**, use the lifecycle-managed hooks `useOnEvents` / `useOnCommand` / `useOnQuery`.
 
 ```tsx
-import { useEventEmitter } from "@wirestate/react";
+import { EventBus } from "@wirestate/core";
+import { useInjection } from "@wirestate/react";
 
 function DebugButton() {
-  const emit = useEventEmitter();
+  const eventBus = useInjection(EventBus);
 
-  return <button onClick={() => emit("DEBUG_CLICKED")}>Debug</button>;
+  return <button onClick={() => eventBus.emit("DEBUG_CLICKED")}>Debug</button>;
 }
 ```
 

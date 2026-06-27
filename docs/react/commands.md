@@ -1,27 +1,29 @@
 # React Commands
 
-Command hooks let React components send commands to the active container and register handlers while the component is
-mounted.
+A React component sends commands by injecting the active container's `CommandBus`, and registers handlers while the
+component is mounted with `useOnCommand`.
 
 ## Register the Plugin
 
-These hooks use the active container's `CommandBus`, which exists only when `CommandsPlugin` is registered in your
+Commands use the active container's `CommandBus`, which exists only when `CommandsPlugin` is registered in your
 provider's `config.plugins`. See [React Containers > Messaging](/react/containers#messaging).
 
 ## Execute a Command
 
-Use `useCommandExecutor` when the active handler is synchronous and the caller needs the result immediately.
+Inject the `CommandBus` with `useInjection` and call `execute`. It returns the handler result synchronously and throws
+when no handler exists.
 
 ```tsx
-import { useCommandExecutor } from "@wirestate/react";
+import { CommandBus } from "@wirestate/core";
+import { useInjection } from "@wirestate/react";
 
 function AddItemButton({ item }: { item: CartItem }) {
-  const executeCommand = useCommandExecutor();
+  const commandBus = useInjection(CommandBus);
 
   return (
     <button
       onClick={() => {
-        const itemCount: number = executeCommand("ADD_CART_ITEM", item);
+        const itemCount: number = commandBus.execute("ADD_CART_ITEM", item);
 
         console.info("Cart item count:", itemCount);
       }}
@@ -32,30 +34,32 @@ function AddItemButton({ item }: { item: CartItem }) {
 }
 ```
 
-`useCommandExecutor` throws when no handler exists.
+The injected bus is stable while the active container is unchanged, so it is safe to use in a `useCallback` or effect
+dependency list.
 
 ## Execute an Async Command
 
-Use `useCommandExecutorAsync` when the handler may return a Promise, or when
-the component should always work in an async way.
+Use `executeAsync` when the handler may return a Promise, or when the component should always work in an async way — it
+always resolves to a Promise.
 
 ```tsx
-import { useCommandExecutorAsync } from "@wirestate/react";
+import { CommandBus } from "@wirestate/core";
+import { useInjection } from "@wirestate/react";
 import { useCallback, useState } from "react";
 
 function LogoutButton() {
-  const executeCommandAsync = useCommandExecutorAsync();
+  const commandBus = useInjection(CommandBus);
   const [pending, setPending] = useState(false);
 
   const logout = useCallback(async () => {
     setPending(true);
 
     try {
-      await executeCommandAsync("LOGOUT");
+      await commandBus.executeAsync("LOGOUT");
     } finally {
       setPending(false);
     }
-  }, [executeCommandAsync]);
+  }, [commandBus]);
 
   return (
     <button disabled={pending} onClick={() => void logout()}>
@@ -71,22 +75,27 @@ When a command handler may be absent in some containers, pass a literal `{ optio
 returns `undefined` instead of throwing.
 
 ```tsx
-import { useCommandExecutor, useCommandExecutorAsync } from "@wirestate/react";
+import { CommandBus } from "@wirestate/core";
+import { useInjection } from "@wirestate/react";
 
 function DevtoolsButtons() {
-  const executeCommand = useCommandExecutor();
-  const executeCommandAsync = useCommandExecutorAsync();
+  const commandBus = useInjection(CommandBus);
 
   return (
     <>
-      <button onClick={() => executeCommand("TOGGLE_DEVTOOLS", undefined, { optional: true })}>Toggle devtools</button>
-      <button onClick={() => void executeCommandAsync("EXPORT_DEVTOOLS_TRACE", undefined, { optional: true })}>
+      <button onClick={() => commandBus.execute("TOGGLE_DEVTOOLS", undefined, { optional: true })}>
+        Toggle devtools
+      </button>
+      <button onClick={() => void commandBus.executeAsync("EXPORT_DEVTOOLS_TRACE", undefined, { optional: true })}>
         Export trace
       </button>
     </>
   );
 }
 ```
+
+If the `CommandBus` itself may be absent (no `CommandsPlugin` registered), resolve it optionally with
+`useInjection(CommandBus, { optional: true })` and guard before calling.
 
 ## Handle a Command
 
@@ -108,9 +117,7 @@ command type, the newest one handles the command.
 
 ## API Reference
 
-[`useCommandExecutor`](/api/wirestate-react/functions/useCommandExecutor),
-[`useCommandExecutorAsync`](/api/wirestate-react/functions/useCommandExecutorAsync),
-[`CommandExecutor`](/api/wirestate-react/interfaces/CommandExecutor),
-[`CommandExecutorAsync`](/api/wirestate-react/interfaces/CommandExecutorAsync),
+[`CommandBus`](/api/wirestate-core/classes/CommandBus),
 [`CommandDispatchOptions`](/api/wirestate-core/interfaces/CommandDispatchOptions),
+[`useInjection`](/api/wirestate-react/functions/useInjection),
 [`useOnCommand`](/api/wirestate-react/functions/useOnCommand).

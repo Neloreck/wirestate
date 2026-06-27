@@ -80,13 +80,14 @@ fit together.
 
 - `ContainerProvider` publishes containers through React context.
 - `useInjection` and `useContainer` read from the active container.
-- `useOnEvents` and `useEventEmitter` work with the event bus.
-- `useCommandExecutor`, `useCommandExecutorAsync`, and `useOnCommand` work with the command bus.
-- `useQueryExecutor`, `useQueryExecutorAsync`, and `useOnQuery` work with the query bus.
+- To **send** messages, inject the bus — `useInjection(EventBus)`, `useInjection(CommandBus)`, `useInjection(QueryBus)` —
+  and call `emit` / `execute` / `query`.
+- To **subscribe**, use the lifecycle-managed hooks: `useOnEvents`, `useOnCommand`, `useOnQuery`.
 
 ## API Reference
 
 [`ContainerProvider`](/api/wirestate-react/functions/ContainerProvider),
 [`useInjection`](/api/wirestate-react/functions/useInjection),
-[`useCommandExecutor`](/api/wirestate-react/functions/useCommandExecutor),
-[`useQueryExecutor`](/api/wirestate-react/functions/useQueryExecutor).
+[`useOnEvents`](/api/wirestate-react/functions/useOnEvents),
+[`useOnCommand`](/api/wirestate-react/functions/useOnCommand),
+[`useOnQuery`](/api/wirestate-react/functions/useOnQuery).

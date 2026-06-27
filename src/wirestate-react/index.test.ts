@@ -6,26 +6,13 @@ describe("Library exported API from wirestate-react", () => {
       values: [
         "ContainerContext",
         "ContainerProvider",
-        "useCommandExecutor",
-        "useCommandExecutorAsync",
         "useContainer",
-        "useEventEmitter",
         "useInjection",
         "useOnCommand",
         "useOnEvents",
         "useOnQuery",
-        "useQueryExecutor",
-        "useQueryExecutorAsync",
       ],
-      types: [
-        "CommandExecutor",
-        "CommandExecutorAsync",
-        "ContainerProviderProps",
-        "EventEmitter",
-        "InjectionFallback",
-        "QueryExecutor",
-        "QueryExecutorAsync",
-      ],
+      types: ["ContainerProviderProps", "InjectionFallback"],
     });
   });
 });

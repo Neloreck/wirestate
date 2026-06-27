@@ -124,14 +124,14 @@ stable with `useMemo`, or hoist it to module scope - the same rule that applies 
 Prefer `useInjection` for normal service use. Use `useContainer` when a component needs container-level operations.
 
 ```tsx
-import { Container } from "@wirestate/core";
-import { useContainer, useEventEmitter } from "@wirestate/react";
+import { Container, EventBus } from "@wirestate/core";
+import { useContainer, useInjection } from "@wirestate/react";
 
 function DevTools() {
   const container: Container = useContainer();
-  const emit = useEventEmitter();
+  const eventBus = useInjection(EventBus);
 
-  return <button onClick={() => emit("DEVTOOLS_OPENED")}>{String(container.has("DEBUG"))}</button>;
+  return <button onClick={() => eventBus.emit("DEVTOOLS_OPENED")}>{String(container.has("DEBUG"))}</button>;
 }
 ```
 

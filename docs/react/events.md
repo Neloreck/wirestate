@@ -1,22 +1,26 @@
 # React Events
 
-Event hooks let React components emit and subscribe to events on the active container's `EventBus`. Subscriptions are
-tied to the component lifetime.
+A React component emits events by injecting the active container's `EventBus`, and subscribes with `useOnEvents`.
+Subscriptions are tied to the component lifetime.
 
 ## Register the Plugin
 
-These hooks use the active container's `EventBus`, which exists only when `EventsPlugin` is registered in your provider's
+Events use the active container's `EventBus`, which exists only when `EventsPlugin` is registered in your provider's
 `config.plugins`. See [React Containers > Messaging](/react/containers#messaging).
 
 ## Emit Events
 
+Inject the `EventBus` with `useInjection` and call `emit`. The injected bus is stable while the active container is
+unchanged.
+
 ```tsx
-import { useEventEmitter } from "@wirestate/react";
+import { EventBus } from "@wirestate/core";
+import { useInjection } from "@wirestate/react";
 
 function CartButton() {
-  const emit = useEventEmitter();
+  const eventBus = useInjection(EventBus);
 
-  return <button onClick={() => emit("CART_VIEWED")}>Open cart</button>;
+  return <button onClick={() => eventBus.emit("CART_VIEWED")}>Open cart</button>;
 }
 ```
 
@@ -56,5 +60,6 @@ types to scope the subscription.
 
 ## API Reference
 
-[`useEventEmitter`](/api/wirestate-react/functions/useEventEmitter),
+[`EventBus`](/api/wirestate-core/classes/EventBus),
+[`useInjection`](/api/wirestate-react/functions/useInjection),
 [`useOnEvents`](/api/wirestate-react/functions/useOnEvents).
