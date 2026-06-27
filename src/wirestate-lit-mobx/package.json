@@ -42,11 +42,10 @@
     "store",
     "typescript"
   ],
-  "dependencies": {
-    "@adobe/lit-mobx": "^2.0.0"
-  },
+  "dependencies": {},
   "peerDependencies": {
-    "lit": ">=2.0.0",
+    "@adobe/lit-mobx": ">=2.0.0",
+    "lit": ">=3.0.0",
     "mobx": ">=6.0.0"
   },
   "optionalDependencies": {}

@@ -254,11 +254,7 @@ importers:
 
   src/wirestate-lit: {}
 
-  src/wirestate-lit-mobx:
-    dependencies:
-      '@adobe/lit-mobx':
-        specifier: ^2.0.0
-        version: 2.2.2(lit@3.3.3)(mobx@6.16.1)
+  src/wirestate-lit-mobx: {}
 
   src/wirestate-lit-signals: {}
 
@@ -266,11 +262,7 @@ importers:
 
   src/wirestate-react: {}
 
-  src/wirestate-react-mobx:
-    dependencies:
-      mobx-react-lite:
-        specifier: ^4.0.0
-        version: 4.1.1(mobx@6.16.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+  src/wirestate-react-mobx: {}
 
   src/wirestate-react-signals: {}
 

@@ -40,11 +40,10 @@
     "store",
     "typescript"
   ],
-  "dependencies": {
-    "mobx-react-lite": "^4.0.0"
-  },
+  "dependencies": {},
   "peerDependencies": {
     "mobx": ">=6.0.0",
+    "mobx-react-lite": ">=4.0.0",
     "react": ">=16.8.0 <20.0.0"
   },
   "optionalDependencies": {}
