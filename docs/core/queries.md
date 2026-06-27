@@ -1,9 +1,11 @@
 # Core Queries
 
-Queries read data owned elsewhere. A query has one active handler and returns that handler's result.
+Queries are request/response messages for read-oriented work: current user, labels, cached state, etc.
 
-Each query type uses a stack of handlers. The newest registration answers the query. When it unregisters, the previous
-handler becomes active again.
+Each query type has one active handler. Registering another handler for the same type shadows the previous one. When
+the newest handler unregisters, the previous handler becomes active again.
+
+Use required queries when a missing handler is an error. Use optional queries when a missing handler is valid.
 
 ## Register the Plugin
 
@@ -24,8 +26,11 @@ See [Core Plugins](/core/plugins) for inheritance and registering the plugin on 
 
 ## Handle a Query
 
+Use `@OnQuery(type)` when an injectable service owns the handler. The handler is registered when the container is
+provisioned and unregistered when the provision cycle ends.
+
 ```ts
-import { Injectable, OnQuery, inject } from "@wirestate/core";
+import { Injectable, OnQuery } from "@wirestate/core";
 
 @Injectable()
 export class CartSummaryService {
@@ -41,7 +46,12 @@ export class CartSummaryService {
 }
 ```
 
-## Run a Query
+One query call goes to one handler. The method receives the optional payload and returns the query result.
+
+## Run Required Queries
+
+`query` returns the active handler result as-is. If the handler returns a Promise, `query` returns that Promise.
+`query` throws `WirestateError` when no handler is registered.
 
 ```ts
 import { Injectable, QueryBus, inject } from "@wirestate/core";
@@ -56,17 +66,28 @@ export class HeaderCartService {
 }
 ```
 
-Choose the query call by return shape:
+Use `queryAsync` when the caller should always receive a Promise. It wraps synchronous handler results and passes
+Promise results through.
 
-- `query` returns the handler result as-is.
-- `queryAsync` always returns a Promise.
-- `queryOptional` returns `null` if no handler exists.
-- `queryOptionalAsync` combines optional lookup and Promise wrapping.
+```ts
+const summary = await this.queries.queryAsync<{ itemCount: number; total: number }>("CHECKOUT_SUMMARY");
+```
 
-Use an async variant when the handler may return a Promise. Callers can then always `await` the result without checking
-whether the handler is sync or async.
+## Run Optional Queries
+
+Use optional execution when a missing handler is valid. Optional query calls return `undefined` when no handler is
+registered.
+
+```ts
+const featureFlags = this.queries.queryOptional<FeatureFlags>("FEATURE_FLAGS");
+
+const remoteProfile = await this.queries.queryOptionalAsync<UserProfile, string>("REMOTE_PROFILE", userId);
+```
 
 ## Register Directly
+
+Use `QueryBus.register` when the handler is not a service method or needs a shorter lifetime than provider
+provisioning. The returned callback removes that exact registration.
 
 ```ts
 import { Container, QueriesPlugin, QueryBus } from "@wirestate/core";
@@ -83,14 +104,14 @@ unregister();
 ## Register from a Service
 
 When a service owns a dynamic query handler, register it during provider lifecycle and unregister it during
-deprovision.
+deprovision. Use this pattern when the handler depends on runtime state or cannot be expressed with `@OnQuery`.
 
 ```ts
 import { Injectable, OnDeprovision, OnProvision, QueryBus, QueryUnregister, inject } from "@wirestate/core";
 
 @Injectable()
 export class ShippingQuoteQueryService {
-  private unregisterShippingQuote: QueryUnregister | null = null;
+  private unregisterShippingQuote: QueryUnregister = () => void 0;
   private quote = { etaDays: 3, price: 12 };
 
   public constructor(private readonly queries: QueryBus = inject(QueryBus)) {}
@@ -102,18 +123,17 @@ export class ShippingQuoteQueryService {
 
   @OnDeprovision()
   public onDeprovision(): void {
-    this.unregisterShippingQuote?.();
-    this.unregisterShippingQuote = null;
+    this.unregisterShippingQuote();
+    this.unregisterShippingQuote = () => void 0;
   }
 }
 ```
 
-Use this pattern when the query handler depends on runtime state or cannot be expressed with `@OnQuery`.
-
 ## API Reference
 
 [`QueryBus`](/api/wirestate-core/classes/QueryBus), [`QueriesPlugin`](/api/wirestate-core/classes/QueriesPlugin),
-[`OnQuery`](/api/wirestate-core/functions/OnQuery), [`QueryHandler`](/api/wirestate-core/type-aliases/QueryHandler),
+[`OnQuery`](/api/wirestate-core/functions/OnQuery), [`QueryType`](/api/wirestate-core/type-aliases/QueryType),
+[`QueryHandler`](/api/wirestate-core/type-aliases/QueryHandler),
 [`QueryUnregister`](/api/wirestate-core/type-aliases/QueryUnregister),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision).

@@ -7,12 +7,13 @@ import { HandlerStackBus } from "../bus/handler-stack-bus";
 import { type QueryHandler, type QueryType, type QueryUnregister } from "./queries";
 
 /**
- * Dispatches queries to one active handler per query type.
+ * Dispatches queries to the active handler for each query type.
  *
  * @remarks
  * Queries represent read-oriented work such as current user, labels, or cached
  * state. Handlers are stacked by type: the newest handler is active until it
- * unregisters.
+ * unregisters. Required queries throw when no handler exists. Optional queries
+ * return `undefined` for a miss.
  *
  * @group Queries
  *
@@ -22,9 +23,10 @@ import { type QueryHandler, type QueryType, type QueryUnregister } from "./queri
  *
  * const container = new Container({ plugins: [new QueriesPlugin()] });
  * const bus = container.get(QueryBus);
- * bus.register("CURRENT_USER", () => ({ id: "u1" }));
+ * const unregister = bus.register("CURRENT_USER", () => ({ id: "u1" }));
  *
  * const user = bus.query<{ id: string }>("CURRENT_USER");
+ * unregister();
  * ```
  */
 @Injectable()
@@ -43,11 +45,12 @@ export class QueryBus extends HandlerStackBus<QueryType> {
   }
 
   /**
-   * Dispatches a query and returns the handler result as-is.
+   * Dispatches a required query and returns the handler result as-is.
    *
    * @remarks
-   * If a handler returns a Promise, this method returns that Promise. Use
-   * {@link queryAsync} when the caller should always receive a Promise.
+   * Throws when no handler is registered. If a handler returns a Promise, this
+   * method returns that Promise. Use {@link queryAsync} when the caller should
+   * always receive a Promise.
    *
    * @template R - Result type.
    * @template P - Payload type.
@@ -69,11 +72,11 @@ export class QueryBus extends HandlerStackBus<QueryType> {
   }
 
   /**
-   * Dispatches a query and returns a Promise for the result.
+   * Dispatches a required query and returns a Promise for the result.
    *
    * @remarks
-   * Synchronous handler results are wrapped. Promises returned by handlers are
-   * passed through.
+   * Throws when no handler is registered. Synchronous handler results are wrapped.
+   * Promises returned by handlers are passed through.
    *
    * @template R - Result type.
    * @template P - Payload type.
@@ -93,8 +96,9 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    * Dispatches a query if a handler exists.
    *
    * @remarks
-   * Returns the handler result as-is. Use {@link queryOptionalAsync} when the
-   * caller should always receive a Promise.
+   * Returns the handler result as-is. If the handler returns a Promise, this
+   * method returns that Promise. Use {@link queryOptionalAsync} when the caller
+   * should always receive a Promise.
    *
    * @template R - Result type.
    * @template P - Payload type.
@@ -109,7 +113,11 @@ export class QueryBus extends HandlerStackBus<QueryType> {
   }
 
   /**
-   * Dispatches an optional query and Promise-wraps the result.
+   * Dispatches an optional query and returns a Promise for the result.
+   *
+   * @remarks
+   * Synchronous handler results are wrapped. Promises returned by handlers are
+   * passed through. Resolves to `undefined` when no handler exists.
    *
    * @template R - Result type.
    * @template P - Payload type.

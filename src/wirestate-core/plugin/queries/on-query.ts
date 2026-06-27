@@ -60,15 +60,15 @@ export interface OnQueryHandlerDecorator {
 }
 
 /**
- * Marks a service method as a query handler.
+ * Marks an injectable service method as a provision-scoped query handler.
  *
  * @remarks
  * The handler is registered when the owning container is provisioned and
  * unregistered when that provision cycle ends. Register {@link QueriesPlugin}
  * on the container, or on an ancestor container, to enable query handlers.
  *
- * Queries answer read-oriented requests. If several handlers use the same
- * token, the newest registered handler answers.
+ * Queries answer read-oriented requests. One query call goes to one handler:
+ * the newest registered handler for the query token.
  *
  * @group Queries
  *
@@ -82,7 +82,7 @@ export interface OnQueryHandlerDecorator {
  * @Injectable()
  * class UserProfileService {
  *   @OnQuery("GET_USER_AVATAR")
- *   private async onGetUserAvatar(userId: string): Promise<string> {
+ *   public async onGetUserAvatar(userId: string): Promise<string> {
  *     const user: User = await this.userRepository.findById(userId);
  *
  *     return user.avatarUrl;

@@ -1,22 +1,30 @@
 import { type MaybePromise } from "../../types/general";
 
 /**
- * Identifies a query and routes it to its handler.
+ * Identifies one read-oriented message handled by a query handler.
  *
  * @remarks
- * Prefer symbols for private queries to avoid name collisions.
+ * Queries represent request/response reads such as current user, labels, cached
+ * state, or computed view data. Prefer strings for public query contracts and
+ * symbols for private queries that should not collide with other packages.
  *
  * @group Queries
  *
  * @example
  * ```typescript
- * const GET_USER_QUERY: QueryType = Symbol("GET_USER");
+ * const CURRENT_USER: QueryType = "USER/CURRENT";
+ *
+ * const LOCAL_SUMMARY: QueryType = Symbol("LOCAL_SUMMARY");
  * ```
  */
 export type QueryType = string | symbol | number;
 
 /**
- * Answers a dispatched query and returns its result.
+ * Answers a dispatched query payload and returns the query result.
+ *
+ * @remarks
+ * A handler may return a plain value or a Promise. `QueryBus.query(...)`
+ * returns that result as-is. `QueryBus.queryAsync(...)` Promise-normalizes it.
  *
  * @group Queries
  *
@@ -26,7 +34,7 @@ export type QueryType = string | symbol | number;
  *
  * @example
  * ```typescript
- * const handler: QueryHandler<User, string> = (userId) => userRepository.find(userId);
+ * const currentUserHandler: QueryHandler<User> = () => userRepository.current();
  * ```
  */
 export type QueryHandler<R = unknown, P = unknown, T extends QueryType = QueryType> = ((
@@ -36,7 +44,12 @@ export type QueryHandler<R = unknown, P = unknown, T extends QueryType = QueryTy
 };
 
 /**
- * Removes the query handler it was returned for.
+ * Removes one query handler registration.
+ *
+ * @remarks
+ * The callback returned by `QueryBus.register(...)` removes that exact
+ * registration. If a query has a shadowed handler underneath it, unregistering
+ * the active handler restores the previous one.
  *
  * @group Queries
  *
