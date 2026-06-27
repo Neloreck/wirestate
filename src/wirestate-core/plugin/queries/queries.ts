@@ -63,6 +63,26 @@ export type QueryHandler<R = unknown, P = unknown, T extends QueryType = QueryTy
 export type QueryUnregister = () => void;
 
 /**
+ * Per-dispatch options for {@link QueryBus.query} and {@link QueryBus.queryAsync}.
+ *
+ * @group Queries
+ *
+ * @example
+ * ```typescript
+ * const flags = queryBus.query<FeatureFlags>("FEATURE_FLAGS", undefined, { optional: true });
+ * ```
+ */
+export interface QueryDispatchOptions {
+  /**
+   * Allows a missing handler and returns `undefined` instead of throwing.
+   *
+   * @remarks
+   * Pass a literal `true` so TypeScript selects the optional overload.
+   */
+  readonly optional?: boolean;
+}
+
+/**
  * Metadata for `@OnQuery` decorated methods.
  *
  * @group Queries

@@ -163,53 +163,61 @@ describe("QueryBus", () => {
     expect(bus.query(type)).toBe("symbol-result");
   });
 
-  describe("queryOptional", () => {
+  describe("optional dispatch", () => {
     it("should return result when handler exists", () => {
       const bus: QueryBus = new QueryBus();
 
       bus.register("TYPE", () => "value");
 
-      expect(bus.queryOptional("TYPE")).toBe("value");
+      expect(bus.query("TYPE", undefined, { optional: true })).toBe("value");
     });
 
     it("should return undefined when no handler is registered", () => {
       const bus: QueryBus = new QueryBus();
 
-      expect(bus.queryOptional("MISSING")).toBeUndefined();
+      expect(bus.query("MISSING", undefined, { optional: true })).toBeUndefined();
     });
 
-    it("should return promise values from queryOptional when the handler returns a Promise", async () => {
+    it("should return promise values from optional query when the handler returns a Promise", async () => {
       const bus: QueryBus = new QueryBus();
 
       bus.register("ASYNC", async () => "async-value");
 
-      const result: Optional<Promise<string>> = bus.queryOptional<Promise<string>>("ASYNC");
+      const result: Optional<Promise<string>> = bus.query<Promise<string>>("ASYNC", undefined, { optional: true });
 
       await expect(result).resolves.toBe("async-value");
     });
 
-    it("should support async handlers through queryOptionalAsync", async () => {
+    it("should support async handlers through optional queryAsync", async () => {
       const bus: QueryBus = new QueryBus();
 
       bus.register("ASYNC", async () => "async-value");
 
-      const result: Optional<string> = await bus.queryOptionalAsync("ASYNC");
+      const result: Optional<string> = await bus.queryAsync("ASYNC", undefined, { optional: true });
 
       expect(result).toBe("async-value");
     });
 
-    it("should wrap sync handler results through queryOptionalAsync", async () => {
+    it("should wrap sync handler results through optional queryAsync", async () => {
       const bus: QueryBus = new QueryBus();
 
       bus.register("SYNC", () => "sync-value");
 
-      await expect(bus.queryOptionalAsync("SYNC")).resolves.toBe("sync-value");
+      await expect(bus.queryAsync("SYNC", undefined, { optional: true })).resolves.toBe("sync-value");
     });
 
-    it("should resolve undefined through queryOptionalAsync when no handler is registered", async () => {
+    it("should resolve undefined through optional queryAsync when no handler is registered", async () => {
       const bus: QueryBus = new QueryBus();
 
-      await expect(bus.queryOptionalAsync("MISSING")).resolves.toBeUndefined();
+      await expect(bus.queryAsync("MISSING", undefined, { optional: true })).resolves.toBeUndefined();
+    });
+
+    it("should throw when optional is false and no handler is registered", () => {
+      const bus: QueryBus = new QueryBus();
+
+      expect(() => bus.query("MISSING", undefined, { optional: false })).toThrow(
+        "No query handler registered in container for type: 'MISSING'."
+      );
     });
 
     it("should support symbol query types", () => {
@@ -218,7 +226,7 @@ describe("QueryBus", () => {
 
       bus.register(type, () => "symbol-result");
 
-      expect(bus.queryOptional(type)).toBe("symbol-result");
+      expect(bus.query(type, undefined, { optional: true })).toBe("symbol-result");
     });
 
     it("should return undefined after unregistering last handler", () => {
@@ -226,11 +234,11 @@ describe("QueryBus", () => {
 
       const unregister: QueryUnregister = bus.register("TYPE", () => "value");
 
-      expect(bus.queryOptional("TYPE")).toBe("value");
+      expect(bus.query("TYPE", undefined, { optional: true })).toBe("value");
 
       unregister();
 
-      expect(bus.queryOptional("TYPE")).toBeUndefined();
+      expect(bus.query("TYPE", undefined, { optional: true })).toBeUndefined();
     });
   });
 

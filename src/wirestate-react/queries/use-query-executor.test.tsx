@@ -6,8 +6,8 @@ import { render } from "@testing-library/react";
 import { Container, QueryBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { type QueryExecutor } from "../types/queries";
 
+import { type QueryExecutor } from "./queries";
 import { useQueryExecutor } from "./use-query-executor";
 
 describe("useQueryExecutor", () => {
@@ -38,7 +38,7 @@ describe("useQueryExecutor", () => {
 
     expect(result).toBe("some-payload-result");
     expect(handler).toHaveBeenCalledWith("some-payload");
-    expect(bus.query).toHaveBeenCalledWith("TEST_QUERY", "some-payload");
+    expect(bus.query).toHaveBeenCalledWith("TEST_QUERY", "some-payload", undefined);
   });
 
   it("should throw on unhandled queries", () => {
@@ -64,7 +64,7 @@ describe("useQueryExecutor", () => {
     expect(() => (executor as QueryExecutor)("NOT_EXISTING", "payload")).toThrow(
       "No query handler registered in container for type: 'NOT_EXISTING'."
     );
-    expect(bus.query).toHaveBeenCalledWith("NOT_EXISTING", "payload");
+    expect(bus.query).toHaveBeenCalledWith("NOT_EXISTING", "payload", undefined);
   });
 
   it("should return promise values when the active handler returns a Promise", async () => {
@@ -140,5 +140,24 @@ describe("useQueryExecutor", () => {
     );
 
     expect((executor as QueryExecutor)(type)).toBe("symbol-result");
+  });
+
+  it("should return undefined for a missing handler when optional", () => {
+    const container: Container = new Container({ bindings: [QueryBus] });
+    let executor = null as unknown as QueryExecutor;
+
+    function TestComponent() {
+      executor = useQueryExecutor();
+
+      return null;
+    }
+
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
+
+    expect((executor as QueryExecutor)("MISSING_QUERY", undefined, { optional: true })).toBeUndefined();
   });
 });

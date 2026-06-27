@@ -95,13 +95,13 @@ export class HeaderService {
 
 ## Execute Optional Commands
 
-Use optional execution when a missing handler is valid, such as an optional DevTools integration. Optional command calls
-return `undefined` when no handler is registered.
+Use optional execution when a missing handler is valid, such as an optional DevTools integration. Pass a literal
+`{ optional: true }` so a missing handler returns `undefined` instead of throwing.
 
 ```ts
-const refreshed = this.commands.executeOptional<boolean>("REFRESH_DEVTOOLS");
+const refreshed = this.commands.execute<boolean>("REFRESH_DEVTOOLS", undefined, { optional: true });
 
-const uploaded = await this.commands.executeOptionalAsync<UploadReceipt, Draft>("UPLOAD_DRAFT", draft);
+const uploaded = await this.commands.executeAsync<UploadReceipt, Draft>("UPLOAD_DRAFT", draft, { optional: true });
 ```
 
 ## Register Directly
@@ -171,6 +171,7 @@ export class CartCommandService {
 [`OnCommand`](/api/wirestate-core/functions/OnCommand),
 [`CommandType`](/api/wirestate-core/type-aliases/CommandType),
 [`CommandHandler`](/api/wirestate-core/type-aliases/CommandHandler),
+[`CommandDispatchOptions`](/api/wirestate-core/interfaces/CommandDispatchOptions),
 [`CommandUnregister`](/api/wirestate-core/type-aliases/CommandUnregister),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision).

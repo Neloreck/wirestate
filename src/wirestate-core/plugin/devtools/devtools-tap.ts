@@ -53,12 +53,12 @@ let nextMessageId = 0;
 /**
  * `CommandBus` public dispatch methods wrapped to observe traffic.
  */
-const COMMAND_METHODS: ReadonlyArray<string> = ["execute", "executeAsync", "executeOptional", "executeOptionalAsync"];
+const COMMAND_METHODS: ReadonlyArray<string> = ["execute", "executeAsync"];
 
 /**
  * `QueryBus` public dispatch methods wrapped to observe traffic.
  */
-const QUERY_METHODS: ReadonlyArray<string> = ["query", "queryAsync", "queryOptional", "queryOptionalAsync"];
+const QUERY_METHODS: ReadonlyArray<string> = ["query", "queryAsync"];
 
 /**
  * Taps the messaging buses a container resolves, so dispatches and handler
@@ -159,7 +159,7 @@ function tapDispatchBus(
 
     const original: BusMethod = target[name].bind(bus);
 
-    target[name] = (type: unknown, payload?: unknown): unknown => {
+    target[name] = (type: unknown, payload?: unknown, options?: unknown): unknown => {
       const id: number = nextMessageId++;
 
       sink.message({ id, channel, type: String(type), payload, source: undefined, timestamp: Date.now() });
@@ -167,7 +167,7 @@ function tapDispatchBus(
       let result: unknown;
 
       try {
-        result = original(type, payload);
+        result = original(type, payload, options);
       } catch (error: unknown) {
         sink.result({ messageId: id, outcome: "rejected", value: error });
         throw error;

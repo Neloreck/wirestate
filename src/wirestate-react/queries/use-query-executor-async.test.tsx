@@ -6,8 +6,8 @@ import { render } from "@testing-library/react";
 import { Container, QueryBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { type QueryExecutorAsync } from "../types/queries";
 
+import { type QueryExecutorAsync } from "./queries";
 import { useQueryExecutorAsync } from "./use-query-executor-async";
 
 describe("useQueryExecutorAsync", () => {
@@ -38,7 +38,7 @@ describe("useQueryExecutorAsync", () => {
 
     expect(result).toBe("some-payload-result");
     expect(handler).toHaveBeenCalledWith("some-payload");
-    expect(bus.queryAsync).toHaveBeenCalledWith("TEST_QUERY", "some-payload");
+    expect(bus.queryAsync).toHaveBeenCalledWith("TEST_QUERY", "some-payload", undefined);
   });
 
   it("should forward async handler results", async () => {
@@ -89,7 +89,7 @@ describe("useQueryExecutorAsync", () => {
     await expect((executor as QueryExecutorAsync)("NOT_EXISTING", "payload")).rejects.toThrow(
       "No query handler registered in container for type: 'NOT_EXISTING'."
     );
-    expect(bus.queryAsync).toHaveBeenCalledWith("NOT_EXISTING", "payload");
+    expect(bus.queryAsync).toHaveBeenCalledWith("NOT_EXISTING", "payload", undefined);
   });
 
   it("should return a stable executor between re-renders", () => {
@@ -140,5 +140,26 @@ describe("useQueryExecutorAsync", () => {
     );
 
     await expect((executor as QueryExecutorAsync)(type)).resolves.toBe("symbol-result");
+  });
+
+  it("should resolve undefined for a missing handler when optional", async () => {
+    const container: Container = new Container({ bindings: [QueryBus] });
+    let executor = null as unknown as QueryExecutorAsync;
+
+    function TestComponent() {
+      executor = useQueryExecutorAsync();
+
+      return null;
+    }
+
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
+
+    await expect(
+      (executor as QueryExecutorAsync)("MISSING_QUERY", undefined, { optional: true })
+    ).resolves.toBeUndefined();
   });
 });

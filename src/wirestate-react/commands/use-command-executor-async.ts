@@ -1,8 +1,9 @@
-import { type Container, type CommandType, CommandBus } from "@wirestate/core";
+import { type CommandDispatchOptions, type Container, type CommandType, CommandBus } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { type CommandExecutorAsync } from "../types/commands";
+
+import { type CommandExecutorAsync } from "./commands";
 
 /**
  * Returns a stable function to dispatch commands with Promise-normalized results.
@@ -10,7 +11,8 @@ import { type CommandExecutorAsync } from "../types/commands";
  * @remarks
  * Always returns a Promise, whether the handler is synchronous or asynchronous,
  * so callers can `await` the result without checking. The function is stable
- * while the active container is unchanged.
+ * while the active container is unchanged. Pass `{ optional: true }` per dispatch
+ * when a missing handler should resolve to `undefined`.
  *
  * @group Commands
  *
@@ -31,8 +33,8 @@ export function useCommandExecutorAsync(): CommandExecutorAsync {
   return useMemo(() => {
     const bus: CommandBus = container.get(CommandBus);
 
-    return ((type: CommandType, payload?: unknown) => {
-      return bus.executeAsync(type, payload);
+    return ((type: CommandType, payload?: unknown, options?: CommandDispatchOptions) => {
+      return bus.executeAsync(type, payload, options);
     }) as CommandExecutorAsync;
   }, [container]);
 }

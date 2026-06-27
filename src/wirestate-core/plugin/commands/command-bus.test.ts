@@ -178,53 +178,61 @@ describe("CommandBus", () => {
     expect(bus.execute(type)).toBe("symbol-result");
   });
 
-  describe("executeOptional", () => {
+  describe("optional dispatch", () => {
     it("should return a command result when handler exists", () => {
       const bus: CommandBus = new CommandBus();
 
       bus.register("TYPE", () => "value");
 
-      expect(bus.executeOptional("TYPE")).toBe("value");
+      expect(bus.execute("TYPE", undefined, { optional: true })).toBe("value");
     });
 
     it("should return undefined when no handler is registered", () => {
       const bus: CommandBus = new CommandBus();
 
-      expect(bus.executeOptional("MISSING")).toBeUndefined();
+      expect(bus.execute("MISSING", undefined, { optional: true })).toBeUndefined();
     });
 
-    it("should return promise values from executeOptional when the handler returns a Promise", async () => {
+    it("should return promise values from optional execute when the handler returns a Promise", async () => {
       const bus: CommandBus = new CommandBus();
 
       bus.register("ASYNC", async () => "async-value");
 
-      const result: Optional<Promise<string>> = bus.executeOptional<Promise<string>>("ASYNC");
+      const result: Optional<Promise<string>> = bus.execute<Promise<string>>("ASYNC", undefined, { optional: true });
 
       await expect(result).resolves.toBe("async-value");
     });
 
-    it("should support async handlers through executeOptionalAsync", async () => {
+    it("should support async handlers through optional executeAsync", async () => {
       const bus: CommandBus = new CommandBus();
 
       bus.register("ASYNC", async () => "async-value");
 
-      const result: Optional<string> = await bus.executeOptionalAsync("ASYNC");
+      const result: Optional<string> = await bus.executeAsync("ASYNC", undefined, { optional: true });
 
       expect(result).toBe("async-value");
     });
 
-    it("should wrap sync handler results through executeOptionalAsync", async () => {
+    it("should wrap sync handler results through optional executeAsync", async () => {
       const bus: CommandBus = new CommandBus();
 
       bus.register("SYNC", () => "sync-value");
 
-      await expect(bus.executeOptionalAsync("SYNC")).resolves.toBe("sync-value");
+      await expect(bus.executeAsync("SYNC", undefined, { optional: true })).resolves.toBe("sync-value");
     });
 
-    it("should resolve undefined through executeOptionalAsync when no handler is registered", async () => {
+    it("should resolve undefined through optional executeAsync when no handler is registered", async () => {
       const bus: CommandBus = new CommandBus();
 
-      await expect(bus.executeOptionalAsync("MISSING")).resolves.toBeUndefined();
+      await expect(bus.executeAsync("MISSING", undefined, { optional: true })).resolves.toBeUndefined();
+    });
+
+    it("should throw when optional is false and no handler is registered", () => {
+      const bus: CommandBus = new CommandBus();
+
+      expect(() => bus.execute("MISSING", undefined, { optional: false })).toThrow(
+        "No command handler registered in container for type: 'MISSING'."
+      );
     });
 
     it("should support symbol command types", () => {
@@ -233,7 +241,7 @@ describe("CommandBus", () => {
 
       bus.register(type, () => "symbol-result");
 
-      expect(bus.executeOptional(type)).toBe("symbol-result");
+      expect(bus.execute(type, undefined, { optional: true })).toBe("symbol-result");
     });
 
     it("should return undefined after unregistering last handler", () => {
@@ -241,11 +249,11 @@ describe("CommandBus", () => {
 
       const unregister: CommandUnregister = bus.register("TYPE", () => "value");
 
-      expect(bus.executeOptional("TYPE")).toBe("value");
+      expect(bus.execute("TYPE", undefined, { optional: true })).toBe("value");
 
       unregister();
 
-      expect(bus.executeOptional("TYPE")).toBeUndefined();
+      expect(bus.execute("TYPE", undefined, { optional: true })).toBeUndefined();
     });
   });
 

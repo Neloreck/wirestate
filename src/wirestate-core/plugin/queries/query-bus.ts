@@ -4,7 +4,7 @@ import { Injectable } from "../../metadata/metadata-injectable";
 import { type Optional } from "../../types/general";
 import { HandlerStackBus } from "../bus/handler-stack-bus";
 
-import { type QueryHandler, type QueryType, type QueryUnregister } from "./queries";
+import { type QueryDispatchOptions, type QueryHandler, type QueryType, type QueryUnregister } from "./queries";
 
 /**
  * Dispatches queries to the active handler for each query type.
@@ -45,6 +45,29 @@ export class QueryBus extends HandlerStackBus<QueryType> {
   }
 
   /**
+   * Dispatches an optional query and returns the handler result as-is.
+   *
+   * @remarks
+   * Returns `undefined` when no handler exists. If a handler returns a Promise,
+   * this returns that Promise. Pass a literal `{ optional: true }` so the result
+   * narrows to `Optional<R>`.
+   *
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Query type.
+   *
+   * @param type - Query type.
+   * @param payload - Optional payload for the handler.
+   * @param options - Dispatch options with `optional: true`.
+   * @returns The query result, or `undefined` when no handler exists.
+   */
+  public query<R = unknown, P = unknown, T extends QueryType = QueryType>(
+    type: T,
+    payload: Optional<P>,
+    options: QueryDispatchOptions & { optional: true }
+  ): Optional<R>;
+
+  /**
    * Dispatches a required query and returns the handler result as-is.
    *
    * @remarks
@@ -58,6 +81,7 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    *
    * @param type - Query type.
    * @param payload - Optional payload for the handler.
+   * @param options - Dispatch options.
    * @returns The result of the query execution.
    *
    * @throws {@link WirestateError} If no handler is registered for the given type.
@@ -67,9 +91,42 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    * const user: User = queryBus.query<User, string>("FIND_USER", "user-id-123");
    * ```
    */
-  public query<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): R {
-    return this.dispatch<R, P>(type, payload);
+  public query<R = unknown, P = unknown, T extends QueryType = QueryType>(
+    type: T,
+    payload?: P,
+    options?: QueryDispatchOptions
+  ): R;
+
+  public query<R = unknown, P = unknown, T extends QueryType = QueryType>(
+    type: T,
+    payload?: P,
+    options?: QueryDispatchOptions
+  ): R | Optional<R> {
+    return options?.optional ? this.dispatchOptional<R, P>(type, payload) : this.dispatch<R, P>(type, payload);
   }
+
+  /**
+   * Dispatches an optional query and returns a Promise for the result.
+   *
+   * @remarks
+   * Synchronous handler results are wrapped. Resolves to `undefined` when no
+   * handler exists. Pass a literal `{ optional: true }` so the result narrows to
+   * `Optional<R>`.
+   *
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Query type.
+   *
+   * @param type - Query type.
+   * @param payload - Optional payload for the handler.
+   * @param options - Dispatch options with `optional: true`.
+   * @returns A Promise resolving to the query result, or `undefined` when no handler exists.
+   */
+  public queryAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(
+    type: T,
+    payload: Optional<P>,
+    options: QueryDispatchOptions & { optional: true }
+  ): Promise<Optional<R>>;
 
   /**
    * Dispatches a required query and returns a Promise for the result.
@@ -84,54 +141,25 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    *
    * @param type - Query type.
    * @param payload - Optional payload for the handler.
+   * @param options - Dispatch options.
    * @returns A Promise resolving to the query result.
    *
    * @throws {@link WirestateError} If no handler is registered for the given type.
    */
-  public queryAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): Promise<R> {
-    return this.dispatchAsync<R, P>(type, payload);
-  }
-
-  /**
-   * Dispatches a query if a handler exists.
-   *
-   * @remarks
-   * Returns the handler result as-is. If the handler returns a Promise, this
-   * method returns that Promise. Use {@link queryOptionalAsync} when the caller
-   * should always receive a Promise.
-   *
-   * @template R - Result type.
-   * @template P - Payload type.
-   * @template T - Query type.
-   *
-   * @param type - Query type.
-   * @param payload - Optional payload for the handler.
-   * @returns The query handler result as-is, or `undefined` if no handler is found.
-   */
-  public queryOptional<R = unknown, P = unknown, T extends QueryType = QueryType>(type: T, payload?: P): Optional<R> {
-    return this.dispatchOptional<R, P>(type, payload);
-  }
-
-  /**
-   * Dispatches an optional query and returns a Promise for the result.
-   *
-   * @remarks
-   * Synchronous handler results are wrapped. Promises returned by handlers are
-   * passed through. Resolves to `undefined` when no handler exists.
-   *
-   * @template R - Result type.
-   * @template P - Payload type.
-   * @template T - Query type.
-   *
-   * @param type - Query type.
-   * @param payload - Optional payload for the handler.
-   * @returns A Promise resolving to the query result, or `undefined` if no handler is found.
-   */
-  public queryOptionalAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(
+  public queryAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(
     type: T,
-    payload?: P
-  ): Promise<Optional<R>> {
-    return this.dispatchOptionalAsync<R, P>(type, payload);
+    payload?: P,
+    options?: QueryDispatchOptions
+  ): Promise<R>;
+
+  public queryAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(
+    type: T,
+    payload?: P,
+    options?: QueryDispatchOptions
+  ): Promise<R | Optional<R>> {
+    return options?.optional
+      ? this.dispatchOptionalAsync<R, P>(type, payload)
+      : this.dispatchAsync<R, P>(type, payload);
   }
 
   /**

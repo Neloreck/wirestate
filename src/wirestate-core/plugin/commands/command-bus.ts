@@ -4,7 +4,7 @@ import { Injectable } from "../../metadata/metadata-injectable";
 import { type Optional } from "../../types/general";
 import { HandlerStackBus } from "../bus/handler-stack-bus";
 
-import { type CommandHandler, type CommandType, type CommandUnregister } from "./commands";
+import { type CommandDispatchOptions, type CommandHandler, type CommandType, type CommandUnregister } from "./commands";
 
 /**
  * Dispatches commands to the active handler for each command type.
@@ -46,7 +46,12 @@ export class CommandBus extends HandlerStackBus<CommandType> {
   }
 
   /**
-   * Dispatches a required command and returns the handler result as-is.
+   * Dispatches an optional command and returns the handler result as-is.
+   *
+   * @remarks
+   * Returns `undefined` when no handler exists. If a handler returns a Promise,
+   * this returns that Promise. Pass a literal `{ optional: true }` so the result
+   * narrows to `Optional<R>`.
    *
    * @template R - Result type.
    * @template P - Payload type.
@@ -54,6 +59,30 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    *
    * @param type - Command token.
    * @param payload - Command payload.
+   * @param options - Dispatch options with `optional: true`.
+   * @returns The command result, or `undefined` when no handler exists.
+   */
+  public execute<R = unknown, P = unknown, T extends CommandType = CommandType>(
+    type: T,
+    payload: Optional<P>,
+    options: CommandDispatchOptions & { optional: true }
+  ): Optional<R>;
+
+  /**
+   * Dispatches a required command and returns the handler result as-is.
+   *
+   * @remarks
+   * Throws when no handler is registered. If a handler returns a Promise, this
+   * returns that Promise. Use {@link executeAsync} when the caller should always
+   * receive a Promise.
+   *
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Command type.
+   *
+   * @param type - Command token.
+   * @param payload - Command payload.
+   * @param options - Dispatch options.
    * @returns The command handler result.
    *
    * @throws {@link WirestateError} If no handler is registered.
@@ -63,15 +92,48 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    * const saved: SaveResult = commandBus.execute<SaveResult, Draft>("SAVE_DRAFT", draft);
    * ```
    */
-  public execute<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R {
-    return this.dispatch<R, P>(type, payload);
+  public execute<R = unknown, P = unknown, T extends CommandType = CommandType>(
+    type: T,
+    payload?: P,
+    options?: CommandDispatchOptions
+  ): R;
+
+  public execute<R = unknown, P = unknown, T extends CommandType = CommandType>(
+    type: T,
+    payload?: P,
+    options?: CommandDispatchOptions
+  ): R | Optional<R> {
+    return options?.optional ? this.dispatchOptional<R, P>(type, payload) : this.dispatch<R, P>(type, payload);
   }
+
+  /**
+   * Dispatches an optional command and returns a Promise for the result.
+   *
+   * @remarks
+   * Synchronous handler results are wrapped. Resolves to `undefined` when no
+   * handler exists. Pass a literal `{ optional: true }` so the result narrows to
+   * `Optional<R>`.
+   *
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Command type.
+   *
+   * @param type - Command token.
+   * @param payload - Command payload.
+   * @param options - Dispatch options with `optional: true`.
+   * @returns A Promise resolving to the command result, or `undefined` when no handler exists.
+   */
+  public executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
+    type: T,
+    payload: Optional<P>,
+    options: CommandDispatchOptions & { optional: true }
+  ): Promise<Optional<R>>;
 
   /**
    * Dispatches a required command and returns a Promise for the result.
    *
    * @remarks
-   * Synchronous handler results are wrapped.
+   * Throws when no handler is registered. Synchronous handler results are wrapped.
    * Promises returned by handlers are passed through.
    *
    * @template R - Result type.
@@ -80,55 +142,25 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    *
    * @param type - Command token.
    * @param payload - Command payload.
+   * @param options - Dispatch options.
    * @returns A Promise resolving to the command result.
    *
    * @throws {@link WirestateError} If no handler is registered.
    */
-  public executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): Promise<R> {
-    return this.dispatchAsync<R, P>(type, payload);
-  }
-
-  /**
-   * Dispatches a command if a handler exists.
-   *
-   * @remarks
-   * Returns the handler result as-is.
-   *
-   * @template R - Result type.
-   * @template P - Payload type.
-   * @template T - Command type.
-   *
-   * @param type - Command type.
-   * @param payload - Optional payload for the handler.
-   * @returns The command result, or `undefined` when no handler exists.
-   */
-  public executeOptional<R = unknown, P = unknown, T extends CommandType = CommandType>(
+  public executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,
-    payload?: P
-  ): Optional<R> {
-    return this.dispatchOptional<R, P>(type, payload);
-  }
+    payload?: P,
+    options?: CommandDispatchOptions
+  ): Promise<R>;
 
-  /**
-   * Dispatches an optional command and returns a Promise for the result.
-   *
-   * @remarks
-   * Synchronous handler results are wrapped. Promises returned by handlers are
-   * passed through. Resolves to `undefined` when no handler exists.
-   *
-   * @template R - Result type.
-   * @template P - Payload type.
-   * @template T - Command type.
-   *
-   * @param type - Command type.
-   * @param payload - Optional payload for the handler.
-   * @returns A Promise resolving to the command result, or `undefined` if no handler is found.
-   */
-  public executeOptionalAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
+  public executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,
-    payload?: P
-  ): Promise<Optional<R>> {
-    return this.dispatchOptionalAsync<R, P>(type, payload);
+    payload?: P,
+    options?: CommandDispatchOptions
+  ): Promise<R | Optional<R>> {
+    return options?.optional
+      ? this.dispatchOptionalAsync<R, P>(type, payload)
+      : this.dispatchAsync<R, P>(type, payload);
   }
 
   /**

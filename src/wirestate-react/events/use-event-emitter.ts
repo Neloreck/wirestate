@@ -2,7 +2,8 @@ import { type Container, type EventEmitOptions, type EventType, EventBus } from 
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { type EventEmitter } from "../types/events";
+
+import { type EventEmitter } from "./events";
 
 /**
  * Returns a stable function to emit events via the {@link EventBus}.

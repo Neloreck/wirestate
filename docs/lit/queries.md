@@ -70,8 +70,10 @@ export class CheckoutSummaryButton extends LitElement {
 }
 ```
 
-Use `queryAsync` when callers need Promise-normalized results, and `queryOptional` or `queryOptionalAsync` when a
-missing handler is valid.
+Use `queryAsync` when callers need Promise-normalized results, and pass a literal `{ optional: true }` to `query` or
+`queryAsync` when a missing handler is valid.
+
+The optional call returns `undefined` instead of throwing when no handler is registered.
 
 Query handlers are stack-based. If several connected elements register the same query type, the newest active handler
 answers the query. When that element disconnects or moves to another container, the previous handler becomes active
@@ -79,5 +81,8 @@ again. See [Core Queries](/core/queries).
 
 ## API Reference
 
-[`onQuery`](/api/wirestate-lit/functions/onQuery), [`useOnQuery`](/api/wirestate-lit/functions/useOnQuery),
-[`OnQueryController`](/api/wirestate-lit/classes/OnQueryController).
+[`onQuery`](/api/wirestate-lit/functions/onQuery),
+[`useOnQuery`](/api/wirestate-lit/functions/useOnQuery),
+[`OnQueryController`](/api/wirestate-lit/classes/OnQueryController),
+[`QueryBus`](/api/wirestate-core/classes/QueryBus),
+[`QueryDispatchOptions`](/api/wirestate-core/interfaces/QueryDispatchOptions).

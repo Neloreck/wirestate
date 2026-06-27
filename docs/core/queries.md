@@ -75,13 +75,13 @@ const summary = await this.queries.queryAsync<{ itemCount: number; total: number
 
 ## Run Optional Queries
 
-Use optional execution when a missing handler is valid. Optional query calls return `undefined` when no handler is
-registered.
+Use optional execution when a missing handler is valid. Pass a literal `{ optional: true }` so a missing handler returns
+`undefined` instead of throwing.
 
 ```ts
-const featureFlags = this.queries.queryOptional<FeatureFlags>("FEATURE_FLAGS");
+const featureFlags = this.queries.query<FeatureFlags>("FEATURE_FLAGS", undefined, { optional: true });
 
-const remoteProfile = await this.queries.queryOptionalAsync<UserProfile, string>("REMOTE_PROFILE", userId);
+const remoteProfile = await this.queries.queryAsync<UserProfile, string>("REMOTE_PROFILE", userId, { optional: true });
 ```
 
 ## Register Directly
@@ -134,6 +134,7 @@ export class ShippingQuoteQueryService {
 [`QueryBus`](/api/wirestate-core/classes/QueryBus), [`QueriesPlugin`](/api/wirestate-core/classes/QueriesPlugin),
 [`OnQuery`](/api/wirestate-core/functions/OnQuery), [`QueryType`](/api/wirestate-core/type-aliases/QueryType),
 [`QueryHandler`](/api/wirestate-core/type-aliases/QueryHandler),
+[`QueryDispatchOptions`](/api/wirestate-core/interfaces/QueryDispatchOptions),
 [`QueryUnregister`](/api/wirestate-core/type-aliases/QueryUnregister),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision).

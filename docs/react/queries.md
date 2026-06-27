@@ -8,7 +8,7 @@ them from an effect, event handler, or memoized callback and render cached compo
 ## Register the Plugin
 
 These hooks use the active container's `QueryBus`, which exists only when `QueriesPlugin` is registered in your provider's
-`config.plugins`. See [React Containers › Messaging](/react/containers#messaging).
+`config.plugins`. See [React Containers > Messaging](/react/containers#messaging).
 
 ## Execute a Query
 
@@ -35,18 +35,17 @@ function CheckoutSummaryBadge() {
 
 ## Async and Optional Executors
 
-Choose the hook by return shape:
+Choose the hook by return shape, then pass `{ optional: true }` for a lenient lookup:
 
 - `useQueryExecutor` returns the handler result as-is.
 - `useQueryExecutorAsync` always returns a Promise.
-- `useQueryExecutorOptional` returns `undefined` when no handler exists.
-- `useQueryExecutorOptionalAsync` combines optional lookup and Promise wrapping.
+- Pass a literal `{ optional: true }` to either so a missing handler returns `undefined` instead of throwing.
 
 Use an async variant when the handler may return a Promise. Callers can then always `await` the result without checking
 whether the handler is sync or async.
 
 ```tsx
-import { useQueryExecutorOptional } from "@wirestate/react";
+import { useQueryExecutor } from "@wirestate/react";
 import { useCallback, useState } from "react";
 
 interface ShippingQuote {
@@ -55,11 +54,11 @@ interface ShippingQuote {
 }
 
 function ShippingQuoteButton() {
-  const query = useQueryExecutorOptional();
+  const query = useQueryExecutor();
   const [quote, setQuote] = useState<ShippingQuote | null>(null);
 
   const refreshQuote = useCallback(() => {
-    setQuote(query<ShippingQuote>("SHIPPING_QUOTE"));
+    setQuote(query<ShippingQuote>("SHIPPING_QUOTE", undefined, { optional: true }) ?? null);
   }, [query]);
 
   return <button onClick={refreshQuote}>{quote ? `$${quote.price}` : "Check shipping"}</button>;
@@ -88,6 +87,7 @@ type, the newest one handles the query.
 
 [`useQueryExecutor`](/api/wirestate-react/functions/useQueryExecutor),
 [`useQueryExecutorAsync`](/api/wirestate-react/functions/useQueryExecutorAsync),
-[`useQueryExecutorOptional`](/api/wirestate-react/functions/useQueryExecutorOptional),
-[`useQueryExecutorOptionalAsync`](/api/wirestate-react/functions/useQueryExecutorOptionalAsync),
+[`QueryExecutor`](/api/wirestate-react/interfaces/QueryExecutor),
+[`QueryExecutorAsync`](/api/wirestate-react/interfaces/QueryExecutorAsync),
+[`QueryDispatchOptions`](/api/wirestate-core/interfaces/QueryDispatchOptions),
 [`useOnQuery`](/api/wirestate-react/functions/useOnQuery).

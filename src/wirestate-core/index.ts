@@ -42,7 +42,12 @@ export { Injectable, isInjectable } from "./metadata/metadata-injectable";
 
 export { CommandBus } from "./plugin/commands/command-bus";
 export { CommandsPlugin } from "./plugin/commands/commands-plugin";
-export { type CommandHandler, type CommandType, type CommandUnregister } from "./plugin/commands/commands";
+export {
+  type CommandDispatchOptions,
+  type CommandHandler,
+  type CommandType,
+  type CommandUnregister,
+} from "./plugin/commands/commands";
 export { type OnCommandHandlerDecorator } from "./plugin/commands/on-command";
 export { OnCommand } from "./plugin/commands/on-command";
 export { type OnEventHandlerDecorator } from "./plugin/events/on-event";
@@ -56,7 +61,12 @@ export {
   type EventUnsubscribe,
   type WireEvent,
 } from "./plugin/events/events";
-export { type QueryHandler, type QueryType, type QueryUnregister } from "./plugin/queries/queries";
+export {
+  type QueryDispatchOptions,
+  type QueryHandler,
+  type QueryType,
+  type QueryUnregister,
+} from "./plugin/queries/queries";
 export { QueryBus } from "./plugin/queries/query-bus";
 export { QueriesPlugin } from "./plugin/queries/queries-plugin";
 export { type OnQueryHandlerDecorator } from "./plugin/queries/on-query";

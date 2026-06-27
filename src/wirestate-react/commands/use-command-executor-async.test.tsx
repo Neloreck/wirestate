@@ -6,8 +6,8 @@ import { render, cleanup } from "@testing-library/react";
 import { Container, CommandBus } from "@wirestate/core";
 
 import { ContainerProvider } from "../provision/container-provider";
-import { type CommandExecutorAsync } from "../types/commands";
 
+import { type CommandExecutorAsync } from "./commands";
 import { useCommandExecutorAsync } from "./use-command-executor-async";
 
 describe("useCommandExecutorAsync", () => {
@@ -39,7 +39,7 @@ describe("useCommandExecutorAsync", () => {
 
     await expect(executor<string, string>("TEST_COMMAND", "some-payload")).resolves.toBe("some-payload-result");
     expect(handler).toHaveBeenCalledWith("some-payload");
-    expect(bus.executeAsync).toHaveBeenCalledWith("TEST_COMMAND", "some-payload");
+    expect(bus.executeAsync).toHaveBeenCalledWith("TEST_COMMAND", "some-payload", undefined);
   });
 
   it("should dispatch async command handlers", async () => {
@@ -83,5 +83,24 @@ describe("useCommandExecutorAsync", () => {
     await expect(executor("NOT_EXISTING", 1000)).rejects.toThrow(
       "No command handler registered in container for type: 'NOT_EXISTING'."
     );
+  });
+
+  it("should resolve undefined for a missing handler when optional", async () => {
+    const container: Container = new Container({ bindings: [CommandBus] });
+    let executor: CommandExecutorAsync = null as unknown as CommandExecutorAsync;
+
+    function TestComponent() {
+      executor = useCommandExecutorAsync();
+
+      return null;
+    }
+
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
+
+    await expect(executor("MISSING_COMMAND", undefined, { optional: true })).resolves.toBeUndefined();
   });
 });

@@ -6,7 +6,7 @@ tied to the component lifetime.
 ## Register the Plugin
 
 These hooks use the active container's `EventBus`, which exists only when `EventsPlugin` is registered in your provider's
-`config.plugins`. See [React Containers › Messaging](/react/containers#messaging).
+`config.plugins`. See [React Containers > Messaging](/react/containers#messaging).
 
 ## Emit Events
 

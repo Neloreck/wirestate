@@ -63,6 +63,23 @@ export type CommandHandler<R = unknown, P = unknown, T extends CommandType = Com
 export type CommandUnregister = () => void;
 
 /**
+ * Per-dispatch options for {@link CommandBus.execute} and {@link CommandBus.executeAsync}.
+ *
+ * @group Commands
+ *
+ * @example
+ * ```typescript
+ * const receipt = commandBus.execute<Receipt>("UPLOAD", draft, { optional: true });
+ * ```
+ */
+export interface CommandDispatchOptions {
+  /**
+   * Allows a missing handler and returns `undefined` instead of throwing.
+   */
+  readonly optional?: boolean;
+}
+
+/**
  * Metadata for `@OnCommand` decorated methods.
  *
  * @group Commands

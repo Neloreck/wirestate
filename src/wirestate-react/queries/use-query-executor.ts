@@ -1,8 +1,9 @@
-import { type Container, type QueryType, QueryBus } from "@wirestate/core";
+import { type QueryDispatchOptions, type Container, type QueryType, QueryBus } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { type QueryExecutor } from "../types/queries";
+
+import { type QueryExecutor } from "./queries";
 
 /**
  * Returns a stable function to dispatch synchronous queries on the active container.
@@ -12,6 +13,7 @@ import { type QueryExecutor } from "../types/queries";
  * registered. The function is stable while the active container is unchanged, so
  * it is safe to use as an effect or callback dependency. Use
  * {@link useQueryExecutorAsync} when the result should always be a Promise.
+ * Pass `{ optional: true }` per dispatch when a missing handler is valid.
  *
  * @group Queries
  *
@@ -33,8 +35,8 @@ export function useQueryExecutor(): QueryExecutor {
   return useMemo(() => {
     const bus: QueryBus = container.get(QueryBus);
 
-    return ((type: QueryType, payload?: unknown) => {
-      return bus.query(type, payload);
+    return ((type: QueryType, payload?: unknown, options?: QueryDispatchOptions) => {
+      return bus.query(type, payload, options);
     }) as QueryExecutor;
   }, [container]);
 }

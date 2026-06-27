@@ -1,8 +1,9 @@
-import { type Container, type CommandType, CommandBus } from "@wirestate/core";
+import { type CommandDispatchOptions, type Container, type CommandType, CommandBus } from "@wirestate/core";
 import { useMemo } from "react";
 
 import { useContainer } from "../context/use-container";
-import { type CommandExecutor } from "../types/commands";
+
+import { type CommandExecutor } from "./commands";
 
 /**
  * Returns a stable function to dispatch commands on the active container.
@@ -12,6 +13,7 @@ import { type CommandExecutor } from "../types/commands";
  * registered. The function is stable while the active container is unchanged, so
  * it is safe to use as an effect or callback dependency. Use
  * {@link useCommandExecutorAsync} when the result should always be a Promise.
+ * Pass `{ optional: true }` per dispatch when a missing handler is valid.
  *
  * @group Commands
  *
@@ -32,8 +34,8 @@ export function useCommandExecutor(): CommandExecutor {
   return useMemo(() => {
     const bus: CommandBus = container.get(CommandBus);
 
-    return <R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R => {
-      return bus.execute<R, P, T>(type, payload);
-    };
+    return ((type: CommandType, payload?: unknown, options?: CommandDispatchOptions) => {
+      return bus.execute(type, payload, options);
+    }) as CommandExecutor;
   }, [container]);
 }

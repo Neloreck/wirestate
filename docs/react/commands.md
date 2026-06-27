@@ -6,7 +6,7 @@ mounted.
 ## Register the Plugin
 
 These hooks use the active container's `CommandBus`, which exists only when `CommandsPlugin` is registered in your
-provider's `config.plugins`. See [React Containers › Messaging](/react/containers#messaging).
+provider's `config.plugins`. See [React Containers > Messaging](/react/containers#messaging).
 
 ## Execute a Command
 
@@ -67,19 +67,22 @@ function LogoutButton() {
 
 ## Execute Optional Commands
 
-Use optional executors when a command handler may be absent in some containers.
+When a command handler may be absent in some containers, pass a literal `{ optional: true }` so a missing handler
+returns `undefined` instead of throwing.
 
 ```tsx
-import { useCommandExecutorOptionalAsync, useCommandExecutorOptional } from "@wirestate/react";
+import { useCommandExecutor, useCommandExecutorAsync } from "@wirestate/react";
 
 function DevtoolsButtons() {
-  const executeOptionalCommand = useCommandExecutorOptional();
-  const executeOptionalCommandAsync = useCommandExecutorOptionalAsync();
+  const executeCommand = useCommandExecutor();
+  const executeCommandAsync = useCommandExecutorAsync();
 
   return (
     <>
-      <button onClick={() => executeOptionalCommand("TOGGLE_DEVTOOLS")}>Toggle devtools</button>
-      <button onClick={() => void executeOptionalCommandAsync("EXPORT_DEVTOOLS_TRACE")}>Export trace</button>
+      <button onClick={() => executeCommand("TOGGLE_DEVTOOLS", undefined, { optional: true })}>Toggle devtools</button>
+      <button onClick={() => void executeCommandAsync("EXPORT_DEVTOOLS_TRACE", undefined, { optional: true })}>
+        Export trace
+      </button>
     </>
   );
 }
@@ -107,6 +110,7 @@ command type, the newest one handles the command.
 
 [`useCommandExecutor`](/api/wirestate-react/functions/useCommandExecutor),
 [`useCommandExecutorAsync`](/api/wirestate-react/functions/useCommandExecutorAsync),
-[`useCommandExecutorOptional`](/api/wirestate-react/functions/useCommandExecutorOptional),
-[`useCommandExecutorOptionalAsync`](/api/wirestate-react/functions/useCommandExecutorOptionalAsync),
+[`CommandExecutor`](/api/wirestate-react/interfaces/CommandExecutor),
+[`CommandExecutorAsync`](/api/wirestate-react/interfaces/CommandExecutorAsync),
+[`CommandDispatchOptions`](/api/wirestate-core/interfaces/CommandDispatchOptions),
 [`useOnCommand`](/api/wirestate-react/functions/useOnCommand).

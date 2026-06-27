@@ -32,6 +32,7 @@ describe("Library exported API from wirestate-core", () => {
       types: [
         "Binding",
         "BindingDescriptor",
+        "CommandDispatchOptions",
         "CommandHandler",
         "CommandType",
         "CommandUnregister",
@@ -50,6 +51,7 @@ describe("Library exported API from wirestate-core", () => {
         "OnEventHandlerDecorator",
         "OnQueryHandlerDecorator",
         "ProvisionId",
+        "QueryDispatchOptions",
         "QueryHandler",
         "QueryType",
         "QueryUnregister",

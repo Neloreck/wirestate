@@ -119,11 +119,13 @@ class SaveButton extends LitElement {
 }
 ```
 
-Use optional commands when a missing handler is valid.
+Use optional commands when a missing handler is valid. Pass a literal `{ optional: true }`.
 
 ```ts
-await this.commands.executeOptionalAsync("EXPORT_TRACE");
+await this.commands.executeAsync("EXPORT_TRACE", undefined, { optional: true });
 ```
+
+The optional call returns `undefined` instead of throwing when no handler is registered.
 
 Command handlers are stack-based. If several connected elements register the same command type, the newest active
 handler handles the command. When that element disconnects or moves to another container, the previous handler becomes
@@ -133,4 +135,6 @@ active again. See [Core Commands](/core/commands).
 
 [`onCommand`](/api/wirestate-lit/functions/onCommand),
 [`useOnCommand`](/api/wirestate-lit/functions/useOnCommand),
-[`OnCommandController`](/api/wirestate-lit/classes/OnCommandController).
+[`OnCommandController`](/api/wirestate-lit/classes/OnCommandController),
+[`CommandBus`](/api/wirestate-core/classes/CommandBus),
+[`CommandDispatchOptions`](/api/wirestate-core/interfaces/CommandDispatchOptions).
