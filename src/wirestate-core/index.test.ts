@@ -32,7 +32,6 @@ describe("Library exported API from wirestate-core", () => {
       types: [
         "Binding",
         "BindingDescriptor",
-        "Bindings",
         "CommandHandler",
         "CommandType",
         "CommandUnregister",

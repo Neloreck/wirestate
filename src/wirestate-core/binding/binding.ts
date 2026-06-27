@@ -171,13 +171,3 @@ export type BindingDescriptor<T = unknown> =
  * @group Bind
  */
 export type Binding = Newable<object> | BindingDescriptor;
-
-/**
- * Represents bindings accepted by Wirestate registration APIs.
- *
- * @remarks
- * Each item is either a class reference or an {@link BindingDescriptor}.
- *
- * @group Bind
- */
-export type Bindings = ReadonlyArray<Binding>;

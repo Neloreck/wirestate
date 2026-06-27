@@ -3,8 +3,8 @@ import { wirestateActivationAdapter } from "../activation/activation-lifecycle";
 import {
   BindingScope,
   BindingType,
+  type Binding,
   type BindingDescriptor,
-  type Bindings,
   type InstanceBindingDescriptor,
   type ServiceToken,
 } from "../binding/binding";
@@ -45,7 +45,7 @@ export interface ContainerConfig {
   /**
    * Services or binding descriptors to register.
    */
-  readonly bindings?: Bindings;
+  readonly bindings?: ReadonlyArray<Binding>;
 
   /**
    * Parent container for inherited bindings.

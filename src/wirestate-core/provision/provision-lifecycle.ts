@@ -5,7 +5,7 @@ import {
   getInstanceRecord,
   WireStatus,
 } from "../activation/wire-status";
-import { type Binding, type Bindings, type ServiceToken, BindingType } from "../binding/binding";
+import { type Binding, type ServiceToken, BindingType } from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
 import type { Container } from "../container/container";
 import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
@@ -45,7 +45,10 @@ import { type CycleEntry, type ProvisionState, getOrCreateProvisionState, getPro
  *
  * @throws {@link WirestateError} If the container is already provisioned.
  */
-export function provisionContainer(container: Container, bindings: Bindings = container.getOwnBindings()): void {
+export function provisionContainer(
+  container: Container,
+  bindings: ReadonlyArray<Binding> = container.getOwnBindings()
+): void {
   const state: ProvisionState = getOrCreateProvisionState(container);
 
   if (state.status === true) {
@@ -169,7 +172,11 @@ export function deprovisionContainerBinding(container: Container, token: Service
  * @param bindings - Bindings controlled by the provider.
  * @returns Instances that were resolved for provider lifecycle management.
  */
-export function provisionInstances(container: Container, state: ProvisionState, bindings: Bindings): Array<object> {
+export function provisionInstances(
+  container: Container,
+  state: ProvisionState,
+  bindings: ReadonlyArray<Binding>
+): Array<object> {
   // Plugins observe the provision cycle boundary before any instance wiring.
   dispatchPluginContainerProvision(container);
 
@@ -197,7 +204,7 @@ export function provisionInstances(container: Container, state: ProvisionState, 
  * @param bindings - Bindings controlled by the provider.
  * @throws {@link WirestateError} If a participant is not owned, or a handler kind is unhandled.
  */
-function validateBindings(container: Container, bindings: Bindings): void {
+function validateBindings(container: Container, bindings: ReadonlyArray<Binding>): void {
   // A container owns provider lifecycle only for the bindings it declares.
   for (const binding of bindings) {
     const token: ServiceToken = getBindingToken(binding);
@@ -255,7 +262,7 @@ function validateBindings(container: Container, bindings: Bindings): void {
 function resolveParticipants(
   container: Container,
   state: ProvisionState,
-  bindings: Bindings
+  bindings: ReadonlyArray<Binding>
 ): { instances: Array<object>; trackedTokens: Array<readonly [object, ServiceToken]> } {
   const instances: Array<object> = [];
   const trackedTokens: Array<readonly [object, ServiceToken]> = [];

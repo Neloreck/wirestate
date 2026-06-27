@@ -15,14 +15,6 @@ Reactivity stays outside the core. Use MobX, Preact Signals, or your own state b
 - Container-local events, commands, and queries.
 - React and Lit adapters for connecting containers to UI trees.
 
-## When It Fits
-
-Use Wirestate when feature logic, state, or workflows should live outside UI components. It fits when you need:
-
-- Services scoped to an app, subtree, modal, tenant, or test.
-- Logic that can be tested without rendering UI.
-- Clear boundaries between UI components and application services.
-
 ## Start Here
 
 - [Core](/core/overview) covers framework-agnostic services, containers, lifecycle, messaging, and tests.
