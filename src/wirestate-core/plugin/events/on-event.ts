@@ -42,7 +42,7 @@ export const EVENT_REGISTRATION: MessagingRegistration = {
  *
  * @group Events
  */
-export interface OnEventHandlerDecorator {
+export interface OnEventDecorator {
   // Standard (TC39). Parameters are `never[]`: contravariance keeps handlers with
   // narrowed event payloads assignable, matching {@link OnCommand} and {@link OnQuery}.
   <This>(value: (this: This, ...args: Array<never>) => unknown, context: ClassMethodDecoratorContext<This>): void;
@@ -51,7 +51,7 @@ export interface OnEventHandlerDecorator {
 }
 
 /**
- * Marks a service method as an event handler.
+ * Marks an injectable service method as a provision-scoped event handler.
  *
  * @remarks
  * The handler is registered when the owning container is provisioned and
@@ -81,7 +81,7 @@ export interface OnEventHandlerDecorator {
  * }
  * ```
  */
-export function OnEvent(types?: EventType | ReadonlyArray<EventType>): OnEventHandlerDecorator {
+export function OnEvent(types?: EventType | ReadonlyArray<EventType>): OnEventDecorator {
   // Normalize types to a deduplicated array, or null for catch-all.
   const normalized: Nullable<ReadonlyArray<EventType>> =
     types === undefined
@@ -109,5 +109,5 @@ export function OnEvent(types?: EventType | ReadonlyArray<EventType>): OnEventHa
       });
       appendHandlerMetadata(MESSAGING_REGISTRATIONS, target.constructor, EVENT_REGISTRATION);
     }
-  }) as OnEventHandlerDecorator;
+  }) as OnEventDecorator;
 }

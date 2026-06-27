@@ -84,7 +84,7 @@ export class WireStatus {
    *
    * @remarks
    * Use this inside service methods when async work needs to check whether the
-   * service has been disposed or deprovisioned.
+   * service has been deactivated or deprovisioned.
    *
    * @group Lifecycle
    *

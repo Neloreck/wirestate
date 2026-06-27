@@ -52,7 +52,7 @@ export const COMMAND_REGISTRATION: MessagingRegistration = {
  *
  * @group Commands
  */
-export interface OnCommandHandlerDecorator {
+export interface OnCommandDecorator {
   // Standard (TC39):
   <This>(value: (this: This, ...args: Array<never>) => unknown, context: ClassMethodDecoratorContext<This>): void;
   // Legacy/experimental:
@@ -89,7 +89,7 @@ export interface OnCommandHandlerDecorator {
  * }
  * ```
  */
-export function OnCommand(type: CommandType): OnCommandHandlerDecorator {
+export function OnCommand(type: CommandType): OnCommandDecorator {
   return ((target: object, nameOrContext: string | symbol | ClassMethodDecoratorContext): void => {
     if (typeof nameOrContext === "object") {
       // Standard decorators:
@@ -103,7 +103,7 @@ export function OnCommand(type: CommandType): OnCommandHandlerDecorator {
       appendHandlerMetadata(COMMAND_HANDLER_METADATA, target.constructor, { methodName: nameOrContext, type });
       appendHandlerMetadata(MESSAGING_REGISTRATIONS, target.constructor, COMMAND_REGISTRATION);
     }
-  }) as OnCommandHandlerDecorator;
+  }) as OnCommandDecorator;
 }
 
 /**

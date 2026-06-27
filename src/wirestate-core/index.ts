@@ -48,9 +48,9 @@ export {
   type CommandType,
   type CommandUnregister,
 } from "./plugin/commands/commands";
-export { type OnCommandHandlerDecorator } from "./plugin/commands/on-command";
+export { type OnCommandDecorator } from "./plugin/commands/on-command";
 export { OnCommand } from "./plugin/commands/on-command";
-export { type OnEventHandlerDecorator } from "./plugin/events/on-event";
+export { type OnEventDecorator } from "./plugin/events/on-event";
 export { OnEvent } from "./plugin/events/on-event";
 export { EventBus } from "./plugin/events/event-bus";
 export { EventsPlugin } from "./plugin/events/events-plugin";
@@ -69,7 +69,7 @@ export {
 } from "./plugin/queries/queries";
 export { QueryBus } from "./plugin/queries/query-bus";
 export { QueriesPlugin } from "./plugin/queries/queries-plugin";
-export { type OnQueryHandlerDecorator } from "./plugin/queries/on-query";
+export { type OnQueryDecorator } from "./plugin/queries/on-query";
 export { OnQuery } from "./plugin/queries/on-query";
 export { type WirestatePlugin } from "./plugin/plugin";
 

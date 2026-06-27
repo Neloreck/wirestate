@@ -52,7 +52,7 @@ export const QUERY_REGISTRATION: MessagingRegistration = {
  *
  * @group Queries
  */
-export interface OnQueryHandlerDecorator {
+export interface OnQueryDecorator {
   // Standard (TC39):
   <This>(value: (this: This, ...args: Array<never>) => unknown, context: ClassMethodDecoratorContext<This>): void;
   // Legacy/experimental:
@@ -90,7 +90,7 @@ export interface OnQueryHandlerDecorator {
  * }
  * ```
  */
-export function OnQuery(type: QueryType): OnQueryHandlerDecorator {
+export function OnQuery(type: QueryType): OnQueryDecorator {
   return ((target: object, nameOrContext: string | symbol | ClassMethodDecoratorContext): void => {
     if (typeof nameOrContext === "object") {
       // Standard decorators:
@@ -104,7 +104,7 @@ export function OnQuery(type: QueryType): OnQueryHandlerDecorator {
       appendHandlerMetadata(QUERY_HANDLER_METADATA, target.constructor, { methodName: nameOrContext, type });
       appendHandlerMetadata(MESSAGING_REGISTRATIONS, target.constructor, QUERY_REGISTRATION);
     }
-  }) as OnQueryHandlerDecorator;
+  }) as OnQueryDecorator;
 }
 
 /**
