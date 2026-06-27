@@ -19,17 +19,65 @@ class NeedsInjectionContextError extends Error {
  *
  * @remarks
  * Use `inject()` in constructor defaults or field initializers of
- * `@Injectable()` classes. Optional lookups return `undefined` instead of
- * throwing, and lazy lookups return a function that resolves the dependency
- * when called.
+ * `@Injectable()` classes, or inside factory bindings. Dependency resolution
+ * uses the same rules as `Container.get()`, including parent lookup.
+ *
+ * @group Container
+ *
+ * @template T - Value type resolved for the token.
  *
  * @param token - Token to resolve from the current container.
- * @returns The resolved value, a lazy resolver, or `undefined` for optional misses.
+ * @returns The resolved value.
+ *
+ * @throws {@link WirestateError} If the token is not bound.
+ * @throws Error If there is no active injection context.
  */
 export function inject<T>(token: ServiceToken<T>): T;
+
+/**
+ * Optionally resolves a dependency from the current injection context.
+ *
+ * @template T - Value type resolved for the token.
+ *
+ * @param token - Token to resolve from the current container.
+ * @param options - Optional lookup options.
+ * @param options.optional - Return `undefined` instead of throwing on a miss.
+ * @returns The resolved value, or `undefined` when the token is not bound.
+ */
 export function inject<T>(token: ServiceToken<T>, options: { optional: true }): Optional<T>;
+
+/**
+ * Returns a lazy resolver for a dependency in the current injection context.
+ *
+ * @remarks
+ * The returned function closes over the active container and resolves the token
+ * when called. Use it to break circular dependencies or avoid constructing a
+ * dependency until a method needs it.
+ *
+ * @template T - Value type resolved for the token.
+ *
+ * @param token - Token to resolve from the current container.
+ * @param options - Lazy lookup options.
+ * @param options.lazy - Return a resolver function instead of resolving immediately.
+ * @returns Function that resolves the token when called.
+ *
+ * @throws Error If there is no active injection context.
+ */
 export function inject<T>(token: ServiceToken<T>, options: { lazy: true }): () => T;
+
+/**
+ * Returns a lazy optional resolver for a dependency in the current injection context.
+ *
+ * @template T - Value type resolved for the token.
+ *
+ * @param token - Token to resolve from the current container.
+ * @param options - Lazy optional lookup options.
+ * @param options.lazy - Return a resolver function instead of resolving immediately.
+ * @param options.optional - Return `undefined` from the resolver on a miss.
+ * @returns Function that resolves the token when called, or returns `undefined` when missing.
+ */
 export function inject<T>(token: ServiceToken<T>, options: { lazy: true; optional: true }): () => Optional<T>;
+
 export function inject<T>(
   token: ServiceToken<T>,
   options?: { optional?: boolean; lazy?: boolean }

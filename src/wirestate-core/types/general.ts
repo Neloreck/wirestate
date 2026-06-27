@@ -39,10 +39,10 @@ export type MaybePromise<T> = T | Promise<T>;
 export type Maybe<T> = T | null | undefined;
 
 /**
- * Constructor reference for a class the container can instantiate.
+ * Constructor type for a concrete class Wirestate can instantiate.
  *
  * @remarks
- * Used as a binding token and as the type for service classes bound by class.
+ * Used for service classes, class tokens, and instance binding implementations.
  *
  * @template T - Instance type the constructor produces.
  *

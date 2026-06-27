@@ -12,6 +12,8 @@ const INJECTABLE_CLASSES: WeakSet<Newable<object>> = new WeakSet();
  *
  * @remarks
  * Supports both TC39 and legacy experimental decorators.
+ *
+ * @internal
  */
 export interface InjectableDecorator {
   // Standard (TC39):
@@ -21,9 +23,21 @@ export interface InjectableDecorator {
 }
 
 /**
- * Marks a class as eligible for container instance bindings.
+ * Marks a class as eligible for Wirestate instance bindings.
+ *
+ * @remarks
+ * Instance bindings require the implementation class to be decorated with
+ * `@Injectable()`. The mark is stored on the exact class. Subclasses must be
+ * decorated separately when they are bound directly.
+ *
+ * The decorator supports both TC39 standard decorators and legacy TypeScript
+ * decorators.
+ *
+ * @group Container
  *
  * @returns A class decorator registering the class as injectable.
+ *
+ * @throws {@link WirestateError} If the decorator is applied to a non-class TC39 target.
  */
 export function Injectable(): InjectableDecorator {
   return (<T extends Newable<object>>(value: T, context?: ClassDecoratorContext): void => {
@@ -36,7 +50,13 @@ export function Injectable(): InjectableDecorator {
 }
 
 /**
- * Checks whether a class was marked with {@link Injectable}.
+ * Checks whether a class was directly marked with {@link Injectable}.
+ *
+ * @remarks
+ * The check does not walk the prototype chain. A subclass of an injectable
+ * class returns `false` until that subclass is decorated too.
+ *
+ * @group Container
  *
  * @param target - Class to check.
  * @returns Whether the class is marked as injectable.

@@ -42,9 +42,17 @@ export const BindingScope = {
 export type BindingScopeValue = keyof typeof BindingScope;
 
 /**
- * A service token is a reference to a service in the dependency injection (DI) container:
- * class constructor, abstract class, string, symbol, or {@link InjectionToken}.
- * When obtaining a service from the container, you should use its service token.
+ * Token accepted by container lookup and injection APIs.
+ *
+ * @remarks
+ * A token can be an injectable class constructor, abstract class token, string,
+ * symbol, or {@link InjectionToken}. Class tokens and `InjectionToken<T>`
+ * carry the resolved value type. Plain strings and symbols resolve as
+ * `unknown` unless the call site supplies a type argument.
+ *
+ * @group Container
+ *
+ * @template T - Value type resolved for the token.
  */
 export type ServiceToken<T = unknown> = Newable<T> | AbstractClass<T> | string | symbol | InjectionToken<T>;
 

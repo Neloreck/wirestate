@@ -18,6 +18,12 @@ export class UserService {
 }
 ```
 
+`@Injectable()` marks the class as a valid implementation for instance bindings. It does not register the class by
+itself. Bind the class on a container before resolving it.
+
+The marker belongs to the exact class that is decorated. A subclass of an injectable class must also be decorated when
+you bind the subclass directly.
+
 ## Bind Services
 
 `new Container({ bindings })` registers services and descriptors during container creation.
@@ -43,12 +49,11 @@ const container = new Container();
 container.bind(UserService);
 ```
 
+Wirestate rejects instance bindings whose implementation class is not decorated with `@Injectable()`.
+
 ## Constructor Injection
 
-Use `inject(token)` in constructor parameter defaults or field initializers. A token can be a class, string, symbol,
-or [`InjectionToken`](#injection-tokens). Pass `{ optional: true }` to resolve `undefined` instead of throwing when the
-token is not bound. Because `inject()` is a plain function call, dependency declarations do not need parameter
-decorators or `emitDecoratorMetadata`.
+Use `inject(token)` in constructor parameter defaults or field initializers.
 
 ```ts
 import { Injectable, inject } from "@wirestate/core";
@@ -61,6 +66,54 @@ export class OrderService {
   ) {}
 }
 ```
+
+`inject()` resolves from the container that is currently constructing the service. It follows the same lookup rules as
+`container.get()`, including parent containers.
+
+Use `{ optional: true }` when a dependency is allowed to be missing.
+
+```ts
+@Injectable()
+export class DebugPanelService {
+  public constructor(private readonly logger = inject(LoggerService, { optional: true })) {}
+
+  public open(): void {
+    this.logger?.log("debug panel opened");
+  }
+}
+```
+
+Use `{ lazy: true }` when the dependency should be resolved later. The returned function closes over the constructing
+container.
+
+```ts
+@Injectable()
+export class NotificationService {
+  public constructor(private readonly getLogger = inject(LoggerService, { lazy: true, optional: true })) {}
+
+  public notify(message: string): void {
+    this.getLogger()?.log(message);
+  }
+}
+```
+
+Calling required `inject()` outside an active injection context throws. Keep it in constructor defaults, field
+initializers, or factory bindings.
+
+## Service Tokens
+
+A [`ServiceToken<T>`](/api/wirestate-core/type-aliases/ServiceToken) is anything Wirestate can use as a lookup key:
+class constructor, abstract class token, string, symbol, or [`InjectionToken<T>`](#injection-tokens).
+
+Class tokens and `InjectionToken<T>` carry the resolved value type:
+
+```ts
+const users = inject(UserService);
+const config = inject(RUNTIME_CONFIG);
+```
+
+Plain strings and symbols work for interop and extension points, but they resolve as `unknown` unless you provide a type
+argument at the call site.
 
 ## Injection Tokens
 
@@ -330,7 +383,10 @@ create a new one for future work.
 ## API Reference
 
 [`Injectable`](/api/wirestate-core/functions/Injectable), [`inject`](/api/wirestate-core/functions/inject),
+[`isInjectable`](/api/wirestate-core/functions/isInjectable),
 [`InjectionToken`](/api/wirestate-core/classes/InjectionToken),
+[`ServiceToken`](/api/wirestate-core/type-aliases/ServiceToken),
+[`Newable`](/api/wirestate-core/type-aliases/Newable),
 [`Container`](/api/wirestate-core/classes/Container), [`WireStatus`](/api/wirestate-core/classes/WireStatus),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision),
