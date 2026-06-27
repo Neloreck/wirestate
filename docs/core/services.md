@@ -230,8 +230,8 @@ resolved value should keep its type.
 
 ### Value Bindings
 
-Use a value binding for constants, configuration, already-created objects, or environment data. Values are always
-singletons.
+Use a value binding for constants, configuration, already-created objects, environment data, or external objects that
+Wirestate should resolve as-is. Values are always singletons and do not participate in service lifecycle or messaging.
 
 ```ts
 import { Container, InjectionToken } from "@wirestate/core";

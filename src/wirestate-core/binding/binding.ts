@@ -49,23 +49,34 @@ export type BindingScopeValue = keyof typeof BindingScope;
 export type ServiceToken<T = unknown> = Newable<T> | AbstractClass<T> | string | symbol | InjectionToken<T>;
 
 /**
- * Describes a static value binding. Values are always singletons.
+ * Describes a token-bound value stored directly in the container.
+ *
+ * @remarks
+ * Use a value binding for constants, configuration, already-created objects,
+ * environment data, or external objects that Wirestate should resolve as-is.
+ * Value bindings are always singletons. They are cached as the provided value
+ * and are not wired into service lifecycle, provider lifecycle, or messaging.
+ *
+ * The `type` field is optional for value bindings. Value-shaped descriptors
+ * do not support transient scope.
  *
  * @group Bind
+ *
+ * @template T - Value type resolved for the token.
  */
 export interface ValueBindingDescriptor<T = unknown> {
   /**
-   * Binding strategy.
+   * Binding strategy. Optional for ordinary value descriptors.
    */
   readonly type?: "Value";
 
   /**
-   * Token used to resolve the binding.
+   * Token used to resolve the stored value.
    */
   readonly token: ServiceToken<T>;
 
   /**
-   * Value to bind.
+   * Value returned when the token is resolved.
    */
   readonly value: T;
 }
@@ -167,10 +178,16 @@ export interface FactoryBindingDescriptor<T = unknown> {
 }
 
 /**
- * Describes one binding descriptor: a token together with a construction strategy.
+ * Descriptor object that binds a token to a value, class, or factory strategy.
  *
  * @remarks
- * Descriptors without `type` are treated as `Value` bindings.
+ * Use a descriptor when a bare service class is not enough: typed values,
+ * factory-created values, or an injectable class registered behind an explicit
+ * token.
+ *
+ * `type: "Instance"` selects class construction. A descriptor with a
+ * `factory` field is a factory binding. A descriptor with a `value` field and
+ * no instance type is a value binding.
  *
  * @group Bind
  *
@@ -182,11 +199,13 @@ export type BindingDescriptor<T = unknown> =
   | FactoryBindingDescriptor<T>;
 
 /**
- * Represents a single binding accepted by Wirestate registration APIs.
+ * Binding entry accepted by container registration APIs.
  *
  * @remarks
- * A binding is either a class {@link Newable} constructor or a {@link BindingDescriptor}
- * for values, factories, or custom-token class bindings.
+ * Pass a bare `@Injectable()` class when the class should be its own singleton
+ * token. Pass a {@link BindingDescriptor} when the binding needs an explicit
+ * token, a stored value, a factory, or non-default scope. `ContainerConfig.bindings`
+ * and `container.bind(...)` both accept this shape.
  *
  * @group Bind
  */
