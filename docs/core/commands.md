@@ -1,12 +1,11 @@
 # Core Commands
 
-Commands trigger work. A command has one active handler.
+Commands are imperative messages for write-oriented work: save, login, reset, submit, send, etc.
 
-Use synchronous APIs when the handler is synchronous and the caller needs the result immediately. Use async APIs when the
-handler may return a Promise or the caller should always receive a Promise.
+Each command type has one active handler. Registering another handler for the same type shadows the previous one. When
+the newest handler unregisters, the previous handler becomes active again.
 
-Each command type uses a stack of handlers. The newest registration handles the command. When it unregisters, the
-previous handler becomes active again.
+Use required execution when a missing handler is an error. Use optional execution when a missing handler is valid.
 
 ## Register the Plugin
 
@@ -27,6 +26,9 @@ See [Core Plugins](/core/plugins) for inheritance and registering the plugin on 
 
 ## Handle a Command
 
+Use `@OnCommand(type)` when an injectable service owns the handler. The handler is registered when the container is
+provisioned and unregistered when the provision cycle ends.
+
 ```ts
 import { Injectable, OnCommand, inject } from "@wirestate/core";
 
@@ -43,7 +45,12 @@ export class SearchService {
 }
 ```
 
-## Execute a Command
+One command call goes to one handler. The method receives the optional payload and returns the command result.
+
+## Execute Required Commands
+
+`execute` returns the active handler result as-is. If the handler returns a Promise, `execute` returns that Promise.
+`execute` throws `WirestateError` when no handler is registered.
 
 ```ts
 import { CommandBus, Injectable, inject } from "@wirestate/core";
@@ -62,9 +69,8 @@ export class HeaderService {
 }
 ```
 
-`execute` throws `WirestateError` when no handler exists.
-
-## Handle an Async Command
+Use `executeAsync` when the caller should always receive a Promise. It wraps synchronous handler results and passes
+Promise results through.
 
 ```ts
 import { CommandBus, Injectable, OnCommand, inject } from "@wirestate/core";
@@ -87,19 +93,21 @@ export class HeaderService {
 }
 ```
 
-`executeAsync` wraps synchronous handler results in a Promise and passes asynchronous results through.
-
 ## Execute Optional Commands
 
-Use optional commands when a missing handler is valid, such as an optional devtools integration.
+Use optional execution when a missing handler is valid, such as an optional DevTools integration. Optional command calls
+return `undefined` when no handler is registered.
 
 ```ts
-const refreshed: boolean | null = this.commands.executeOptional("REFRESH_DEVTOOLS");
+const refreshed = this.commands.executeOptional<boolean>("REFRESH_DEVTOOLS");
 
-const uploaded: UploadReceipt | null = await this.commands.executeOptionalAsync("UPLOAD_DRAFT", draft);
+const uploaded = await this.commands.executeOptionalAsync<UploadReceipt, Draft>("UPLOAD_DRAFT", draft);
 ```
 
 ## Register Directly
+
+Use `CommandBus.register` when the handler is not a service method or needs a shorter lifetime than provider
+provisioning. The returned callback removes that exact registration.
 
 ```ts
 import { CommandBus, CommandsPlugin, Container } from "@wirestate/core";
@@ -126,14 +134,14 @@ bus.execute("RESET_CART");
 ## Register from a Service
 
 When a service owns a dynamic command handler, register it during provider lifecycle and unregister it during
-deprovision.
+deprovision. Use this pattern when the handler depends on runtime state or cannot be expressed with `@OnCommand`.
 
 ```ts
 import { CommandBus, CommandUnregister, Injectable, OnDeprovision, OnProvision, inject } from "@wirestate/core";
 
 @Injectable()
 export class CartCommandService {
-  private unregisterSaveCart: CommandUnregister | null = null;
+  private unregisterSaveCart: CommandUnregister = () => void 0;
 
   public constructor(private readonly commands: CommandBus = inject(CommandBus)) {}
 
@@ -146,8 +154,8 @@ export class CartCommandService {
 
   @OnDeprovision()
   public onDeprovision(): void {
-    this.unregisterSaveCart?.();
-    this.unregisterSaveCart = null;
+    this.unregisterSaveCart();
+    this.unregisterSaveCart = () => void 0;
   }
 
   private async saveCart(cart: Cart): Promise<void> {
@@ -156,13 +164,13 @@ export class CartCommandService {
 }
 ```
 
-Use this pattern when the command handler depends on runtime state or cannot be expressed with `@OnCommand`.
-
 ## API Reference
 
 [`CommandBus`](/api/wirestate-core/classes/CommandBus),
 [`CommandsPlugin`](/api/wirestate-core/classes/CommandsPlugin),
 [`OnCommand`](/api/wirestate-core/functions/OnCommand),
+[`CommandType`](/api/wirestate-core/type-aliases/CommandType),
+[`CommandHandler`](/api/wirestate-core/type-aliases/CommandHandler),
 [`CommandUnregister`](/api/wirestate-core/type-aliases/CommandUnregister),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision).

@@ -1,24 +1,30 @@
 import { type MaybePromise } from "../../types/general";
 
 /**
- * Identifies a command and routes it to its handler.
+ * Identifies one imperative message handled by a command handler.
  *
  * @remarks
- * Prefer strings for public commands and symbols for private ones to avoid collisions.
+ * Commands represent write-oriented work such as save, login, reset, etc.
+ * Prefer strings for public command contracts and symbols for private commands
+ * that should not collide with other packages.
  *
  * @group Commands
  *
  * @example
  * ```typescript
- * const PUBLIC_COMMAND: CommandType = "USER/LOGIN";
+ * const LOGIN: CommandType = "USER/LOGIN";
  *
- * const PRIVATE_COMMAND: CommandType = Symbol("INTERNAL/SYNC");
+ * const LOCAL_RESET: CommandType = Symbol("LOCAL_RESET");
  * ```
  */
 export type CommandType = string | symbol | number;
 
 /**
- * Handles a dispatched command and returns its result.
+ * Handles a dispatched command payload and returns the command result.
+ *
+ * @remarks
+ * A handler may return a plain value or a Promise. `CommandBus.execute(...)`
+ * returns that result as-is. `CommandBus.executeAsync(...)` Promise-normalizes it.
  *
  * @group Commands
  *
@@ -28,7 +34,7 @@ export type CommandType = string | symbol | number;
  *
  * @example
  * ```typescript
- * const loginHandler: CommandHandler<Session, Credentials> = (payload) => auth.login(payload);
+ * const loginHandler: CommandHandler<Session, Credentials> = (credentials) => auth.login(credentials);
  * ```
  */
 export type CommandHandler<R = unknown, P = unknown, T extends CommandType = CommandType> = ((
@@ -38,7 +44,12 @@ export type CommandHandler<R = unknown, P = unknown, T extends CommandType = Com
 };
 
 /**
- * Removes the command handler it was returned for.
+ * Removes one command handler registration.
+ *
+ * @remarks
+ * The callback returned by `CommandBus.register(...)` removes that exact
+ * registration. If a command has a shadowed handler underneath it, unregistering
+ * the active handler restores the previous one.
  *
  * @group Commands
  *

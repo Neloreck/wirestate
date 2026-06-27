@@ -118,7 +118,7 @@ export abstract class HandlerStackBus<T extends string | symbol | number> {
   }
 
   /**
-   * Dispatches to the active handler if one exists, otherwise returns `null`.
+   * Dispatches to the active handler if one exists, otherwise returns `undefined`.
    *
    * @template R - Type of the handler result.
    * @template P - Type of the payload.
@@ -135,7 +135,7 @@ export abstract class HandlerStackBus<T extends string | symbol | number> {
 
   /**
    * Dispatches to the active handler if one exists and Promise-wraps the result,
-   * otherwise resolves to `null`.
+   * otherwise resolves to `undefined`.
    *
    * @template R - Type of the handler result.
    * @template P - Type of the payload.

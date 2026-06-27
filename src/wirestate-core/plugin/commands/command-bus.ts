@@ -7,12 +7,14 @@ import { HandlerStackBus } from "../bus/handler-stack-bus";
 import { type CommandHandler, type CommandType, type CommandUnregister } from "./commands";
 
 /**
- * Dispatches commands to one active handler per command type.
+ * Dispatches commands to the active handler for each command type.
  *
  * @remarks
  * Commands represent write-oriented work such as save, login, reset, or send.
  * Handlers are stacked by type: the newest handler is active until it
  * unregisters.
+ * Required execution throws when no handler exists. Optional
+ * execution returns `undefined` for a miss.
  *
  * @group Commands
  *
@@ -22,9 +24,10 @@ import { type CommandHandler, type CommandType, type CommandUnregister } from ".
  *
  * const container = new Container({ plugins: [new CommandsPlugin()] });
  * const bus = container.get(CommandBus);
- * bus.register("SAVE_USER", async (user: User) => saveUser(user));
+ * const unregister = bus.register("SAVE_USER", async (user: User) => saveUser(user));
  *
  * await bus.executeAsync<void, User>("SAVE_USER", user);
+ * unregister();
  * ```
  */
 @Injectable()
@@ -43,11 +46,7 @@ export class CommandBus extends HandlerStackBus<CommandType> {
   }
 
   /**
-   * Dispatches a command and returns the handler result as-is.
-   *
-   * @remarks
-   * If a handler returns a Promise, this method returns that Promise. Use
-   * {@link executeAsync} when the caller should always receive a Promise.
+   * Dispatches a required command and returns the handler result as-is.
    *
    * @template R - Result type.
    * @template P - Payload type.
@@ -61,7 +60,7 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    *
    * @example
    * ```typescript
-   * const user: User = commandBus.execute<User, string>("GET_USER", "id-123");
+   * const saved: SaveResult = commandBus.execute<SaveResult, Draft>("SAVE_DRAFT", draft);
    * ```
    */
   public execute<R = unknown, P = unknown, T extends CommandType = CommandType>(type: T, payload?: P): R {
@@ -69,11 +68,11 @@ export class CommandBus extends HandlerStackBus<CommandType> {
   }
 
   /**
-   * Dispatches a command and returns a Promise for the result.
+   * Dispatches a required command and returns a Promise for the result.
    *
    * @remarks
-   * Synchronous handler results are wrapped. Promises returned by handlers are
-   * passed through.
+   * Synchronous handler results are wrapped.
+   * Promises returned by handlers are passed through.
    *
    * @template R - Result type.
    * @template P - Payload type.
@@ -92,6 +91,9 @@ export class CommandBus extends HandlerStackBus<CommandType> {
   /**
    * Dispatches a command if a handler exists.
    *
+   * @remarks
+   * Returns the handler result as-is.
+   *
    * @template R - Result type.
    * @template P - Payload type.
    * @template T - Command type.
@@ -108,7 +110,11 @@ export class CommandBus extends HandlerStackBus<CommandType> {
   }
 
   /**
-   * Dispatches an optional command and Promise-wraps the result.
+   * Dispatches an optional command and returns a Promise for the result.
+   *
+   * @remarks
+   * Synchronous handler results are wrapped. Promises returned by handlers are
+   * passed through. Resolves to `undefined` when no handler exists.
    *
    * @template R - Result type.
    * @template P - Payload type.

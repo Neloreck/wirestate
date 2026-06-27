@@ -60,15 +60,16 @@ export interface OnCommandHandlerDecorator {
 }
 
 /**
- * Marks a service method as a command handler.
+ * Marks an injectable service method as a provision-scoped command handler.
  *
  * @remarks
  * The handler is registered when the owning container is provisioned and
  * unregistered when that provision cycle ends. Register {@link CommandsPlugin}
  * on the container, or on an ancestor container, to enable command handlers.
  *
- * One command call goes to one handler: the newest registered handler for that
- * token.
+ * One command call goes to one handler: the newest registered handler for the
+ * command token. The method receives the command payload and may return either a
+ * plain value or a Promise.
  *
  * @group Commands
  *
@@ -82,7 +83,7 @@ export interface OnCommandHandlerDecorator {
  * @Injectable()
  * class UserService {
  *   @OnCommand("USER_LOGIN")
- *   private onUserLogin(credentials: Credentials): Promise<Session> {
+ *   public onUserLogin(credentials: Credentials): Promise<Session> {
  *     return auth.login(credentials);
  *   }
  * }
