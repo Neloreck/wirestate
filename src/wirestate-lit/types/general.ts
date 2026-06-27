@@ -17,7 +17,7 @@ export type Nullable<T> = T | null;
  * Represents value that can be `T` or `undefined`.
  *
  * @template T - The base type.
- * @group general-types
+ * @group General Types
  */
 export type Optional<T> = T | undefined;
 

@@ -1,7 +1,7 @@
 /**
  * Generic object with string or symbol keys and any value.
  *
- * @group general-types
+ * @group General Types
  */
 // eslint-disable-next-line
 export type AnyObject = Record<string | symbol, any>;
@@ -10,7 +10,7 @@ export type AnyObject = Record<string | symbol, any>;
  * Represents value that can be `T` or `null`.
  *
  * @template T - The base type.
- * @group general-types
+ * @group General Types
  */
 export type Nullable<T> = T | null;
 
@@ -18,7 +18,7 @@ export type Nullable<T> = T | null;
  * Represents value that can be `T` or `undefined`.
  *
  * @template T - The base type.
- * @group general-types
+ * @group General Types
  */
 export type Optional<T> = T | undefined;
 
@@ -26,7 +26,7 @@ export type Optional<T> = T | undefined;
  * Represents value that can be `T` or a Promise of `T`.
  *
  * @template T - The base type.
- * @group general-types
+ * @group General Types
  */
 export type MaybePromise<T> = T | Promise<T>;
 
@@ -34,7 +34,7 @@ export type MaybePromise<T> = T | Promise<T>;
  * Represents value that can be `T`, `null`, or `undefined`.
  *
  * @template T - The base type.
- * @group general-types
+ * @group General Types
  */
 export type Maybe<T> = T | null | undefined;
 
@@ -46,7 +46,7 @@ export type Maybe<T> = T | null | undefined;
  *
  * @template T - Instance type the constructor produces.
  *
- * @group general-types
+ * @group General Types
  */
 export type Newable<T = unknown> = new (...args: Array<never>) => T;
 
