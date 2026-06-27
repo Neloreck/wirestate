@@ -2,12 +2,12 @@ import { ContextConsumer } from "@lit/context";
 import { type ReactiveControllerHost } from "@lit/reactive-element";
 import { type Container } from "@wirestate/core";
 
-import { ContainerContext } from "../context/container-context";
+import { ContainerContext } from "../container/container-context";
 
 /**
  * Describes value returned by {@link useContainer}.
  *
- * @group Consumption
+ * @group Injection
  */
 export interface UseContainerValue {
   /**
@@ -22,7 +22,7 @@ export interface UseContainerValue {
  * @remarks
  * The returned value updates when the nearest provided container changes.
  *
- * @group Consumption
+ * @group Injection
  *
  * @param host - Host element.
  * @returns Mutable container holder.

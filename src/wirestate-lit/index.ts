@@ -29,11 +29,11 @@ export { OnQueryController } from "./queries/on-query-controller";
 export { type UseOnQueryOptions } from "./queries/use-on-query";
 export { useOnQuery } from "./queries/use-on-query";
 
-export { ContainerContext } from "./context/container-context";
+export { ContainerContext } from "./container/container-context";
 
-export { type ContainerProviderOptions } from "./provision/container-provider";
-export { ContainerProvider } from "./provision/container-provider";
-export { type ProvideContainerDecorator } from "./provision/provide-container";
-export { provideContainer } from "./provision/provide-container";
-export { type UseContainerProviderOptions } from "./provision/use-container-provision";
-export { useContainerProvider } from "./provision/use-container-provision";
+export { type ContainerProviderOptions } from "./container/container-provider";
+export { ContainerProvider } from "./container/container-provider";
+export { type ProvideContainerDecorator } from "./container/provide-container";
+export { provideContainer } from "./container/provide-container";
+export { type UseContainerProviderOptions } from "./container/use-container-provision";
+export { useContainerProvider } from "./container/use-container-provision";

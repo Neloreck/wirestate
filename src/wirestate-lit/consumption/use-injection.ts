@@ -2,7 +2,7 @@ import { ContextConsumer } from "@lit/context";
 import { type ReactiveControllerHost } from "@lit/reactive-element";
 import { type Container, type ServiceToken } from "@wirestate/core";
 
-import { ContainerContext } from "../context/container-context";
+import { ContainerContext } from "../container/container-context";
 import { type Nullable } from "../types/general";
 
 /**
@@ -13,14 +13,14 @@ import { type Nullable } from "../types/general";
  * A bare function is always treated as the factory - to fall back to a function
  * value, return it from the factory (`() => fn`).
  *
- * @group Consumption
+ * @group Injection
  */
 export type InjectionFallback<F> = F | ((container: Container) => F);
 
 /**
  * Describes options for {@link useInjection}.
  *
- * @group Consumption
+ * @group Injection
  */
 export interface UseInjectionOptions<T, F = undefined> {
   /**
@@ -62,7 +62,7 @@ export interface UseInjectionOptions<T, F = undefined> {
 /**
  * Describes value returned by {@link useInjection}.
  *
- * @group Consumption
+ * @group Injection
  */
 export interface UseInjectionValue<T, F = never> {
   /**
@@ -85,7 +85,7 @@ export interface UseInjectionValue<T, F = never> {
  * hold `undefined` on a miss, or a `fallback` (which implies `optional`) to hold
  * a default.
  *
- * @group Consumption
+ * @group Injection
  *
  * @param host - Host element.
  * @param token - Token to inject, or options carrying the token plus `once`/`value`/`optional`/`fallback`.

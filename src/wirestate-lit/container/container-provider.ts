@@ -2,9 +2,10 @@ import { ContextProvider } from "@lit/context";
 import { type ReactiveController, type ReactiveControllerHost } from "@lit/reactive-element";
 import { type ContainerConfig, Container, WirestateError, validateContainerConfig } from "@wirestate/core";
 
-import { ContainerContext } from "../context/container-context";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { type Maybe } from "../types/general";
+
+import { ContainerContext } from "./container-context";
 
 /**
  * Describes options for {@link ContainerProvider}.
@@ -12,7 +13,7 @@ import { type Maybe } from "../types/general";
  * @remarks
  * Pass either `container` or `config`. Passing both is an error.
  *
- * @group Provision
+ * @group Container
  */
 export interface ContainerProviderOptions {
   /**
@@ -49,7 +50,7 @@ export interface ContainerProviderOptions {
  * Managed containers activate all bindings by default. Before connect and after
  * disconnect, the context value is `undefined`.
  *
- * @group Provision
+ * @group Container
  *
  * @example
  * ```typescript

@@ -2,7 +2,7 @@ import { ContextConsumer } from "@lit/context";
 import { type ReactiveController, type ReactiveElement } from "@lit/reactive-element";
 import { type CommandHandler, type CommandType, type CommandUnregister, CommandBus } from "@wirestate/core";
 
-import { ContainerContext } from "../context/container-context";
+import { ContainerContext } from "../container/container-context";
 import { type Nullable } from "../types/general";
 
 /**

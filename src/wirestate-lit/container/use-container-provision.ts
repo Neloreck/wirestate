@@ -5,7 +5,7 @@ import { type ContainerProviderOptions, ContainerProvider } from "./container-pr
 /**
  * Describes options for {@link useContainerProvider}.
  *
- * @group Provision
+ * @group Container
  */
 export type UseContainerProviderOptions = ContainerProviderOptions;
 
@@ -22,7 +22,7 @@ export type UseContainerProviderOptions = ContainerProviderOptions;
  * connected. Before the first connection and after disconnection, the provider
  * value is `undefined`.
  *
- * @group Provision
+ * @group Container
  *
  * @param host - The host element.
  * @param options - Provisioning options.

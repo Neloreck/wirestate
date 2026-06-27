@@ -2,7 +2,7 @@ import { ContextConsumer } from "@lit/context";
 import { type ReactiveElement } from "@lit/reactive-element";
 import { type Container, type ServiceToken } from "@wirestate/core";
 
-import { ContainerContext } from "../context/container-context";
+import { ContainerContext } from "../container/container-context";
 import {
   type AnyObject,
   type FieldMustMatchProvidedType,
@@ -21,7 +21,7 @@ import { type InjectionFallback } from "./use-injection";
  * the resolved value type - `T` for a required injection, `T | undefined` for an
  * optional one, or `T | F` when a fallback is given.
  *
- * @group Consumption
+ * @group Injection
  */
 export interface InjectionDecorator<T> {
   // Standard, `accessor` declarations. Wider accessor types are accepted; the
@@ -46,7 +46,7 @@ export interface InjectionDecorator<T> {
 /**
  * Describes options for {@link injection}.
  *
- * @group Consumption
+ * @group Injection
  */
 export interface InjectionOptions<T, F = undefined> {
   /**
@@ -85,7 +85,7 @@ export interface InjectionOptions<T, F = undefined> {
  * token is not bound. Pass `optional` to assign `undefined` on a miss, or a
  * `fallback` (which implies `optional`) to assign a default.
  *
- * @group Consumption
+ * @group Injection
  *
  * @param token - Token to inject, or options carrying the token plus `once`/`optional`/`fallback`.
  * @returns Lit property decorator.

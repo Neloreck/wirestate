@@ -7,9 +7,9 @@ import { ReactiveElement } from "@lit/reactive-element";
 import { Container } from "@wirestate/core";
 import { customElement } from "lit/decorators.js";
 
-import { ContainerContext } from "../context/container-context";
 import { type Maybe } from "../types/general";
 
+import { ContainerContext } from "./container-context";
 import { ContainerProvider } from "./container-provider";
 import { useContainerProvider } from "./use-container-provision";
 

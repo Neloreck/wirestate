@@ -15,7 +15,7 @@ import { type ContainerProviderOptions, ContainerProvider } from "./container-pr
  * @remarks
  * Supports both TC39 and legacy experimental decorators.
  *
- * @group Provision
+ * @group Container
  */
 export interface ProvideContainerDecorator<E extends ReactiveElement = ReactiveElement> {
   // Standard, `accessor` declarations. Wider accessor types are accepted; the
@@ -53,7 +53,7 @@ export interface ProvideContainerDecorator<E extends ReactiveElement = ReactiveE
  * connected. Before the first connection and after disconnection, the provider
  * value is `undefined`.
  *
- * @group Provision
+ * @group Container
  *
  * @param options - Provisioning options.
  * @param options.container - External container instance to provide.

@@ -22,9 +22,9 @@ import { GenericService } from "@/fixtures/services/generic-service";
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { useInjection } from "../consumption/use-injection";
-import { ContainerContext } from "../context/container-context";
 import { type Maybe } from "../types/general";
 
+import { ContainerContext } from "./container-context";
 import { ContainerProvider } from "./container-provider";
 
 describe("ContainerProvider", () => {
