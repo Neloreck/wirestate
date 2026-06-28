@@ -110,17 +110,20 @@ describe("HandlerStackBus", () => {
     expect(() => bus.run("TYPE")).toThrow("No handler for 'TYPE'.");
   });
 
-  it("should clear all handlers and support symbol and number tokens", () => {
+  it("should support symbol and number tokens", () => {
     const bus: Bus = new Bus();
     const symbolType: unique symbol = Symbol("type");
+    const symbolHandler = (): string => "symbol";
+    const numberHandler = (): string => "number";
 
-    bus.add(symbolType, () => "symbol");
-    bus.add(7, () => "number");
+    bus.add(symbolType, symbolHandler);
+    bus.add(7, numberHandler);
 
     expect(bus.run(symbolType)).toBe("symbol");
     expect(bus.run(7)).toBe("number");
 
-    bus.clear();
+    bus.remove(symbolType, symbolHandler);
+    bus.remove(7, numberHandler);
 
     expect(bus.hasHandler(symbolType)).toBe(false);
     expect(bus.hasHandler(7)).toBe(false);

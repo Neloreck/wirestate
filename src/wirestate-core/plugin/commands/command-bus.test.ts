@@ -149,18 +149,6 @@ describe("CommandBus", () => {
     expect(bus.hasHandler("TYPE")).toBe(true);
   });
 
-  it("should clear all handlers", () => {
-    const bus: CommandBus = new CommandBus();
-
-    bus.register("A", () => null);
-    bus.register("B", () => null);
-
-    bus.clear();
-
-    expect(bus.hasHandler("A")).toBe(false);
-    expect(bus.hasHandler("B")).toBe(false);
-  });
-
   it("should handle unregistering when stack is already empty", () => {
     const bus: CommandBus = new CommandBus();
     const unregister: CommandUnregister = bus.register("TYPE", () => null);

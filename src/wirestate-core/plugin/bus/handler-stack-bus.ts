@@ -47,15 +47,6 @@ export abstract class HandlerStackBus<T extends string | symbol | number> {
   }
 
   /**
-   * Removes all registered handlers from the bus.
-   *
-   * @internal
-   */
-  public clear(): void {
-    this.handlers.clear();
-  }
-
-  /**
    * Returns the active (newest) handler for a type, or `undefined`.
    *
    * @param type - Token to inspect.

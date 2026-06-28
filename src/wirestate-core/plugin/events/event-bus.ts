@@ -240,15 +240,6 @@ export class EventBus {
   }
 
   /**
-   * Removes all registered handlers from the bus.
-   *
-   * @internal
-   */
-  public clear(): void {
-    this.handlers.clear();
-  }
-
-  /**
    * Resolves the bucket keys a subscription targets.
    *
    * @remarks

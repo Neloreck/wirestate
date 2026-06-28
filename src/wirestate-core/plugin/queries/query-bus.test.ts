@@ -119,23 +119,11 @@ describe("QueryBus", () => {
     expect(bus.hasHandler("TYPE")).toBe(true);
   });
 
-  it("should clear all handlers", () => {
-    const bus: QueryBus = new QueryBus();
-
-    bus.register("A", () => null);
-    bus.register("B", () => null);
-
-    bus.clear();
-
-    expect(bus.hasHandler("A")).toBe(false);
-    expect(bus.hasHandler("B")).toBe(false);
-  });
-
-  it("should not throw when calling unregister after clear", () => {
+  it("should not throw when calling unregister after the handler is gone", () => {
     const bus: QueryBus = new QueryBus();
     const unregister: QueryUnregister = bus.register("TYPE", () => "value");
 
-    bus.clear();
+    unregister();
 
     expect(() => unregister()).not.toThrow();
     expect(bus.hasHandler("TYPE")).toBe(false);

@@ -149,20 +149,6 @@ describe("EventBus", () => {
     expect(handlerB).toHaveBeenCalledTimes(1);
   });
 
-  it("should clear all handlers", () => {
-    const bus: EventBus = new EventBus();
-    const firstHandler = jest.fn();
-    const secondHandler = jest.fn();
-
-    bus.subscribe(firstHandler);
-    bus.subscribe(secondHandler);
-    bus.clear();
-    bus.emit("TEST");
-
-    expect(firstHandler).not.toHaveBeenCalled();
-    expect(secondHandler).not.toHaveBeenCalled();
-  });
-
   it("should report handler errors to container error handler", () => {
     const error = new Error("handler error");
     const onError = jest.fn();
