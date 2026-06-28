@@ -33,6 +33,25 @@ container chain. See [Events](/core/events), [Commands](/core/commands), and [Qu
 Register a messaging plugin on a child container when that child needs a local bus. Omit it on the child when handlers
 should use the nearest ancestor bus.
 
+## Built-in DevTools Plugin
+
+`DevToolsPlugin` exposes the container tree through the page-global DevTools hook. Guard registration with
+`process.env.NODE_ENV` so the plugin and hook stay out of production bundles.
+
+```ts
+import { Container, EventsPlugin } from "@wirestate/core";
+import { DevToolsPlugin } from "@wirestate/core/devtools";
+
+const container = new Container({
+  plugins: [
+    new EventsPlugin(),
+    ...(process.env.NODE_ENV === "production" ? [] : [new DevToolsPlugin({ label: "checkout-app" })]),
+  ],
+});
+```
+
+See [Core DevTools](/core/devtools) for the full setup and stability notes.
+
 ## Writing a Plugin
 
 Implement [`WirestatePlugin`](/api/wirestate-core/interfaces/WirestatePlugin). Every hook is optional. Implement only

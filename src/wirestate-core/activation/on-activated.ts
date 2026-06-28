@@ -36,7 +36,7 @@ const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
  * class FeedService {
  *   @OnActivated()
  *   public onActivated(): void {
- *     this.initializeFromSeed();
+ *     this.initializeDefaults();
  *   }
  * }
  * ```

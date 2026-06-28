@@ -26,9 +26,9 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  *
  * @example
  * ```tsx
- * useOnCommand("SAVE_COMMAND", (payload) => {
- *   return api.save(payload);
- * });
+ * const api = useInjection(ApiService);
+ *
+ * useOnCommand("SAVE_COMMAND", (payload) => api.save(payload));
  * ```
  */
 export function useOnCommand<R = unknown, P = unknown, T extends CommandType = CommandType>(

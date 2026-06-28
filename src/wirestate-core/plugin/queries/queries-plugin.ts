@@ -17,7 +17,10 @@ import { QUERY_REGISTRATION } from "./on-query";
  *
  * @example
  * ```typescript
- * import { Container, QueriesPlugin } from "@wirestate/core";
+ * import { Container, QueriesPlugin, Injectable } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class CartService {}
  *
  * const container = new Container({ bindings: [CartService], plugins: [new QueriesPlugin()] });
  * ```

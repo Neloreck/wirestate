@@ -127,6 +127,9 @@ await this.commands.executeAsync("EXPORT_TRACE", undefined, { optional: true });
 
 The optional call returns `undefined` instead of throwing when no handler is registered.
 
+If the `CommandBus` itself may be absent (no `CommandsPlugin` registered in the active container chain), inject it
+optionally with `@injection({ token: CommandBus, optional: true })` and guard before calling.
+
 Command handlers are stack-based. If several connected elements register the same command type, the newest active
 handler handles the command. When that element disconnects or moves to another container, the previous handler becomes
 active again. See [Core Commands](/core/commands).

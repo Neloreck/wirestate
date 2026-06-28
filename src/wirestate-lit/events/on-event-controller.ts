@@ -9,8 +9,8 @@ import { type Nullable } from "../types/general";
  * Reactive controller that subscribes to container events.
  *
  * @remarks
- * Registers on host connect. Unregisters on disconnect. Re-subscribes when the
- * nearest container context changes.
+ * Subscribes on host connect. Unsubscribes on disconnect.
+ * Re-subscribes when the nearest container context changes.
  *
  * @group Events
  *

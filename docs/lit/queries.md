@@ -42,7 +42,8 @@ class CheckoutAnswer extends LitElement {
 
 ## Execute from an Element
 
-Inject `QueryBus` when an element needs to run queries.
+Inject `QueryBus` when an element needs to run queries. Run queries from an event handler or a `@state`-backed method,
+not from `render()`. Query execution can resolve services and run user handlers.
 
 ```ts
 import { QueryBus } from "@wirestate/core";
@@ -74,6 +75,9 @@ Use `queryAsync` when callers need Promise-normalized results, and pass a litera
 `queryAsync` when a missing handler is valid.
 
 The optional call returns `undefined` instead of throwing when no handler is registered.
+
+If the `QueryBus` itself may be absent (no `QueriesPlugin` registered in the active container chain), inject it
+optionally with `@injection({ token: QueryBus, optional: true })` and guard before calling.
 
 Query handlers are stack-based. If several connected elements register the same query type, the newest active handler
 answers the query. When that element disconnects or moves to another container, the previous handler becomes active

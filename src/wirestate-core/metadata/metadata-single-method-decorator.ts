@@ -8,7 +8,7 @@ import { getPrototypeChainMetadata } from "./metadata-prototype-chain";
 /**
  * Method decorator attached by single-method lifecycle hooks such as `@OnActivated`.
  *
- * @group Lifecycle
+ * @internal
  */
 export interface SingleMethodDecorator {
   // Standard (TC39):

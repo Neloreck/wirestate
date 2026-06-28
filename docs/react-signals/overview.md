@@ -78,3 +78,8 @@ export class CounterState {
 
 [`signal`](/api/wirestate-signals/functions/signal), [`Signal`](/api/wirestate-signals/classes/Signal),
 [`computed`](/api/wirestate-signals/functions/computed), [`useSignal`](/api/wirestate-react-signals/functions/useSignal).
+
+## See Also
+
+- [React guide](/react/overview): providers, injection hooks, and component-owned handlers.
+- [React Signals introduction](/introduction/react-signals): install and a minimal example.

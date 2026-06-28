@@ -14,6 +14,9 @@ import { OnCommandController } from "./on-command-controller";
  * @group Commands
  */
 export interface OnCommandDecorator<R = unknown, P = unknown, T extends CommandType = CommandType> {
+  /**
+   * Phantom field carrying the command type `T`.
+   */
   readonly type?: T;
   // Standard (TC39):
   <This extends Interface<Omit<ReactiveElement, "renderRoot">>>(

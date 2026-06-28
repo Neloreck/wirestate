@@ -45,6 +45,7 @@ counterService.increment();
 - `WireStatus` and `ProvisionId` for lifecycle guards on resolved service instances.
 - `EventBus`, `CommandBus`, `QueryBus`, and their decorators (`OnEvent`, `OnCommand`, `OnQuery`), enabled by
   registering `EventsPlugin`, `CommandsPlugin`, or `QueriesPlugin`.
+- An optional `@wirestate/core/devtools` subpath (`DevToolsPlugin`) for development-time container inspection.
 
 React and Lit integration live in [`@wirestate/react`](https://www.npmjs.com/package/@wirestate/react) and
 [`@wirestate/lit`](https://www.npmjs.com/package/@wirestate/lit).

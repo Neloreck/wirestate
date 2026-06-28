@@ -92,6 +92,9 @@ export interface InjectionOptions<T, F = undefined> {
  *
  * @example
  * ```typescript
+ * import { injection } from "@wirestate/lit";
+ * import { LitElement } from "lit";
+ *
  * class MyElement extends LitElement {
  *   @injection(MyService)
  *   private service!: MyService;

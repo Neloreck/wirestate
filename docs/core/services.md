@@ -186,7 +186,7 @@ const container: Container = new Container({
 });
 ```
 
-A child container that wants the parent's bus simply does not register its own plugin. Buses resolve up the parent
+A child container that wants the parent's bus does not register its own plugin. Buses resolve up the parent
 chain, so a child service can reach an ancestor's bus.
 
 A service that declares an `@OnEvent`, `@OnCommand`, or `@OnQuery` handler throws at provision unless the matching

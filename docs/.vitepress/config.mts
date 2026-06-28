@@ -62,6 +62,7 @@ export default defineConfig({
           { text: "Commands", link: "/core/commands" },
           { text: "Queries", link: "/core/queries" },
           { text: "Plugins", link: "/core/plugins" },
+          { text: "DevTools", link: "/core/devtools" },
           { text: "Testing", link: "/core/testing" },
         ],
       },
@@ -114,6 +115,7 @@ export default defineConfig({
             text: "Packages",
             items: [
               { text: "@wirestate/core", link: "/api/wirestate-core/" },
+              { text: "@wirestate/core/devtools", link: "/api/wirestate-core/devtools/" },
               { text: "@wirestate/mobx", link: "/api/wirestate-mobx/" },
               { text: "@wirestate/signals", link: "/api/wirestate-signals/" },
               { text: "@wirestate/lit", link: "/api/wirestate-lit/" },

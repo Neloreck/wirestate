@@ -19,7 +19,7 @@ import { ERROR_CODE_GENERIC } from "./error-code";
  * const container = new Container();
  *
  * try {
- *   container.get(SomeService);
+ *   container.get(MissingService);
  * } catch (error) {
  *   if (error instanceof WirestateError) {
  *     console.error(error.code, error.message);

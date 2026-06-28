@@ -29,11 +29,13 @@ export interface UseContainerValue {
  *
  * @example
  * ```typescript
+ * import { LitElement, html } from "lit";
+ *
  * class MyElement extends LitElement {
  *   private container: UseContainerValue = useContainer(this);
  *
  *   public render() {
- *     return html`<div>${this.container.value.has(MyService)}</div>`;
+ *     return html`<div>${this.container.value?.has(MyService)}</div>`;
  *   }
  * }
  * ```

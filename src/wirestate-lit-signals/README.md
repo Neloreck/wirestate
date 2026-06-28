@@ -40,7 +40,7 @@ import { customElement } from "lit/decorators.js";
 
 @customElement("w-counter")
 export class Counter extends SignalWatcher(LitElement) {
-  @injection({ token: CounterService })
+  @injection(CounterService)
   private readonly counter!: CounterService;
 
   public render() {

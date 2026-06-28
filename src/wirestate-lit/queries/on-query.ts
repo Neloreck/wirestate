@@ -14,6 +14,10 @@ import { OnQueryController } from "./on-query-controller";
  * @group Queries
  */
 export interface OnQueryDecorator<R = unknown, P = unknown, T extends QueryType = QueryType> {
+  /**
+   * Phantom brand carrying the query type `T`,
+   * never populated at runtime.
+   */
   readonly type?: T;
   // Standard (TC39):
   <This extends Interface<Omit<ReactiveElement, "renderRoot">>>(

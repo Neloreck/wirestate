@@ -3,6 +3,7 @@
   "name": "Wirestate API",
   "entryPoints": [
     "src/wirestate-core/index.ts",
+    "src/wirestate-core/devtools.ts",
     "src/wirestate-lit/index.ts",
     "src/wirestate-lit-mobx/index.ts",
     "src/wirestate-lit-signals/index.ts",

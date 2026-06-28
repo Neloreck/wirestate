@@ -60,7 +60,7 @@ export class HeaderService {
   public constructor(private readonly commands: CommandBus = inject(CommandBus)) {}
 
   public openSearch(): void {
-    const opened: boolean = this.commands.execute("OPEN_SEARCH");
+    const opened: boolean = this.commands.execute<boolean>("OPEN_SEARCH");
 
     if (!opened) {
       console.error("Failed to open search");

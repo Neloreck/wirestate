@@ -26,7 +26,7 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
  *
  * @example
  * ```tsx
- * useOnQuery("GET_DATA", (payload) => {
+ * useOnQuery<{ id: string; value: string }, { id: string }>("GET_DATA", (payload) => {
  *   return { id: payload.id, value: "Resolved" };
  * });
  * ```

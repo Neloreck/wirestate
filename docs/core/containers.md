@@ -127,8 +127,8 @@ const container = new Container({
 ```
 
 `inject(API_CONFIG)` is typed, so reads need no cast. A child resolves a parent-bound token through the normal
-resolution chain, so bind the data once on the root and every descendant injects the same value. Data is just a binding:
-there is no separate construction step and no merge.
+resolution chain, so bind the data once on the root and every descendant injects the same value. Data uses the same
+binding table as services. There is no separate construction step and no merge.
 
 To avoid declaring a token per value, bind one `Map` keyed by service class and read it with `this.constructor`. This
 trades type safety for fewer tokens, because reads are `unknown` and need a cast. Prefer typed `InjectionToken`s unless

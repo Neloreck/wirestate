@@ -29,7 +29,9 @@ class NeedsInjectionContextError extends Error {
  * @param token - Token to resolve from the current container.
  * @returns The resolved value.
  *
- * @throws {@link WirestateError} If the token is not bound.
+ * @throws {@link WirestateError} If the token is not bound,
+ *   or if a circular dependency is detected while constructing the value.
+ *   Errors thrown by a binding's constructor or factory propagate unchanged.
  * @throws Error If there is no active injection context.
  */
 export function inject<T>(token: ServiceToken<T>): T;

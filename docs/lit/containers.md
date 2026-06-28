@@ -23,8 +23,9 @@ export class ApplicationRoot extends LitElement {
 }
 ```
 
-Managed containers are created when the host connects and disposed when it disconnects. They activate all bindings by
-default unless `activate` is provided.
+Managed containers are created when the host connects and torn down when it disconnects. Teardown deprovisions the
+container, then releases its bindings with `unbindAll`. They activate all bindings by default unless `activate` is
+provided.
 
 Before the host connects, and after it disconnects, no container value is published from that provider.
 
@@ -36,7 +37,7 @@ Use `@OnProvision` for resource work tied to the connected provider lifetime. Us
 
 Messaging is opt-in and composable. A container only has the buses contributed by the messaging plugins it registers, so
 add `EventsPlugin`, `CommandsPlugin`, or `QueriesPlugin` to `config.plugins` when the element subtree needs them. Each
-plugin's `install()` binds its bus.
+plugin's `install` binds its bus.
 
 ```ts
 import { Container, EventsPlugin } from "@wirestate/core";

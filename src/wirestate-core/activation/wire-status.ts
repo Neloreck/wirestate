@@ -58,7 +58,7 @@ export type ProvisionId = number;
 /**
  * Options reserved for Wirestate lifecycle internals.
  *
- * @group Lifecycle
+ * @internal
  */
 export interface WireStatusLookupOptions {
   /**

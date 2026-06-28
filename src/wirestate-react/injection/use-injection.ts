@@ -38,7 +38,7 @@ export type InjectionFallback<F> = F | ((container: Container) => F);
  * ```tsx
  * const api = useInjection(ApiService); // throws if unbound
  * const logger = useInjection(Logger, { optional: true }); // Logger | undefined
- * const name = useInjection(UserName, { fallback: "guest" }); // string
+ * const name = useInjection(UserName, { fallback: "guest" }); // UserName | string
  * ```
  */
 export function useInjection<T>(token: ServiceToken<T>, options?: { optional?: false; fallback?: undefined }): T;

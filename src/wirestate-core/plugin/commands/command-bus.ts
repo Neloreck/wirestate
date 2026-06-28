@@ -24,9 +24,11 @@ import { type CommandDispatchOptions, type CommandHandler, type CommandType, typ
  *
  * const container = new Container({ plugins: [new CommandsPlugin()] });
  * const bus = container.get(CommandBus);
- * const unregister = bus.register("SAVE_USER", async (user: User) => saveUser(user));
+ * const unregister = bus.register<void, User>("SAVE_USER", async (user: User) => {
+ *   // persist the user
+ * });
  *
- * await bus.executeAsync<void, User>("SAVE_USER", user);
+ * await bus.executeAsync<void, User>("SAVE_USER", { id: "u1" });
  * unregister();
  * ```
  */

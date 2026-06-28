@@ -26,13 +26,13 @@ import type { Container } from "../container/container";
  * ```typescript
  * import { Container, WirestatePlugin } from "@wirestate/core";
  *
- * class DevToolsPlugin implements WirestatePlugin {
+ * class LogPlugin implements WirestatePlugin {
  *   public onActivate(instance: object): void {
  *     console.log("activated", instance.constructor.name);
  *   }
  * }
  *
- * new Container({ plugins: [new DevToolsPlugin()] });
+ * new Container({ plugins: [new LogPlugin()] });
  * ```
  */
 export interface WirestatePlugin {

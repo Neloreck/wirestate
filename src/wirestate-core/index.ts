@@ -17,6 +17,8 @@ export { OnDeactivation } from "./activation/on-deactivation";
 export {
   type Binding,
   type BindingDescriptor,
+  type BindingScopeValue,
+  type BindingTypeValue,
   type FactoryBindingDescriptor,
   type ServiceToken,
   type InstanceBindingDescriptor,

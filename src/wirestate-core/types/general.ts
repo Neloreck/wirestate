@@ -53,6 +53,10 @@ export type Newable<T = unknown> = new (...args: Array<never>) => T;
 /**
  * Abstract class reference that cannot be constructed directly,
  * but can serve as a binding token.
+ *
+ * @template T - Instance type the abstract class describes.
+ *
+ * @group General Types
  */
 export interface AbstractClass<T> {
   prototype: T;

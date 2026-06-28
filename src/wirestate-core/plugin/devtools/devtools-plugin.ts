@@ -44,10 +44,12 @@ export interface DevToolsPluginConfig {
  *
  * @example
  * ```typescript
- * import { Container } from "@wirestate/core";
+ * import { Container, type WirestatePlugin } from "@wirestate/core";
  * import { DevToolsPlugin } from "@wirestate/core/devtools";
  *
- * new Container({ plugins: [new DevToolsPlugin()] });
+ * const plugins: Array<WirestatePlugin> = process.env.NODE_ENV === "production" ? [] : [new DevToolsPlugin()];
+ *
+ * new Container({ plugins });
  * ```
  */
 export class DevToolsPlugin implements WirestatePlugin {
@@ -186,7 +188,7 @@ export class DevToolsPlugin implements WirestatePlugin {
   /**
    * Adds a provisioned container to the live set so it appears in snapshots.
    *
-   * @param container - Container that just provisioned.
+   * @param container - Container that completed provision.
    */
   private observe(container: ContainerKernel): void {
     if (!this.hook) {
@@ -201,10 +203,10 @@ export class DevToolsPlugin implements WirestatePlugin {
   }
 
   /**
-   * Removes a container from the live set when it deprovisions, so a torn-down (or
-   * discarded) container drops out of snapshots immediately.
+   * Removes a container from the live set when it deprovisions, so a torn-down or discarded container drops out of
+   * snapshots immediately.
    *
-   * @param container - Container that just deprovisioned.
+   * @param container - Container that completed deprovision.
    */
   private unobserve(container: ContainerKernel): void {
     if (!this.hook) {
@@ -258,8 +260,8 @@ export class DevToolsPlugin implements WirestatePlugin {
   }
 
   /**
-   * Reads the raw live value at `path` within the instance identified by `instanceId`, scanning the
-   * observed containers' active instances. Read-only - never mutates.
+   * Reads the raw live value at `path` within the instance identified by `instanceId`, scanning the observed containers'
+   * active instances. It never mutates application state.
    *
    * @param instanceId - Instance to read from.
    * @param path - Object keys / array indices from the instance to the value.
@@ -288,10 +290,10 @@ export class DevToolsPlugin implements WirestatePlugin {
   }
 
   /**
-   * Reads the raw value at `path` within the `Value` binding identified by `bindingId`, scanning the
-   * observed containers' own bindings. Reads the stored value directly - never resolves or constructs
-   * - so it is side-effect-free and works even before the binding is first resolved. Only `Value`
-   * bindings are addressable here. An `Instance`/`Factory` binding's id never matches.
+   * Reads the raw value at `path` within the `Value` binding identified by `bindingId`, scanning the observed
+   * containers' own bindings. It reads the stored value directly and never resolves or constructs a service, so it is
+   * side-effect-free and works even before the binding is first resolved. Only `Value` bindings are addressable here.
+   * An `Instance` or `Factory` binding's id never matches.
    *
    * @param bindingId - Binding to read from.
    * @param path - Object keys / array indices from the binding's value to the target.
@@ -354,8 +356,10 @@ export class DevToolsPlugin implements WirestatePlugin {
 }
 
 /**
- * Walks object keys / array indices from a root value, returning the value at the path - or
- * `undefined` if a step is missing or its getter throws (a getter must never crash devtools).
+ * Walks object keys and array indices from a root value.
+ *
+ * @remarks
+ * Returns `undefined` if a step is missing or its getter throws. A getter must never crash DevTools inspection.
  *
  * @param root - Value to walk from.
  * @param path - Keys / indices to follow.

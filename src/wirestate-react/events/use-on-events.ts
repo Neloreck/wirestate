@@ -8,8 +8,27 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
 
 type EventTypeSelector = Nullable<EventType | ReadonlyArray<EventType>>;
 
+/**
+ * Subscribes the component to every event on the active {@link EventBus}.
+ *
+ * @param handler - Handler invoked for every event.
+ */
 export function useOnEvents(handler: EventHandler): void;
+
+/**
+ * Subscribes the component to one event type on the active {@link EventBus}.
+ *
+ * @param type - Event type to listen for.
+ * @param handler - Handler invoked for matching events.
+ */
 export function useOnEvents(type: EventType, handler: EventHandler): void;
+
+/**
+ * Subscribes the component to several event types on the active {@link EventBus}.
+ *
+ * @param types - Event types to listen for.
+ * @param handler - Handler invoked for matching events.
+ */
 export function useOnEvents(types: ReadonlyArray<EventType>, handler: EventHandler): void;
 
 /**

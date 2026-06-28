@@ -10,8 +10,9 @@ provider's `config.plugins`. See [React Containers > Messaging](/react/container
 
 ## Execute a Command
 
-Inject the `CommandBus` with `useInjection` and call `execute`. It returns the handler result synchronously and throws
-when no handler exists.
+Inject the `CommandBus` with `useInjection` and call `execute`. It runs the active handler and returns its result as-is,
+including a Promise if the handler is async. It throws when no handler exists. Use `executeAsync` when callers should
+always receive a Promise.
 
 ```tsx
 import { CommandBus } from "@wirestate/core";

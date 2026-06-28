@@ -81,11 +81,11 @@ export interface OnQueryDecorator {
  *
  * @Injectable()
  * class UserProfileService {
- *   @OnQuery("GET_USER_AVATAR")
- *   public async onGetUserAvatar(userId: string): Promise<string> {
- *     const user: User = await this.userRepository.findById(userId);
+ *   private readonly avatars = new Map<string, string>();
  *
- *     return user.avatarUrl;
+ *   @OnQuery("GET_USER_AVATAR")
+ *   public onGetUserAvatar(userId: string): string {
+ *     return this.avatars.get(userId) ?? "";
  *   }
  * }
  * ```

@@ -73,5 +73,11 @@ export class CounterState {
 
 [`SignalWatcher`](/api/wirestate-lit-signals/functions/SignalWatcher),
 [`watch`](/api/wirestate-lit-signals/variables/watch),
-[`withWatch`](/api/wirestate-lit-signals/variables/withWatch), [`signal`](/api/wirestate-signals/functions/signal),
+[`withWatch`](/api/wirestate-lit-signals/variables/withWatch), [`html`](/api/wirestate-lit-signals/variables/html),
+[`svg`](/api/wirestate-lit-signals/variables/svg), [`signal`](/api/wirestate-signals/functions/signal),
 [`computed`](/api/wirestate-signals/functions/computed).
+
+## See Also
+
+- [Lit guide](/lit/overview): providers, decorators, controllers, and element handlers.
+- [Lit Signals introduction](/introduction/lit-signals): install and a minimal example.

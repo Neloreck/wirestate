@@ -92,3 +92,8 @@ export class CounterService {
 [`MobxReactionUpdate`](/api/wirestate-lit-mobx/functions/MobxReactionUpdate),
 [`Observable`](/api/wirestate-mobx/functions/Observable), [`Action`](/api/wirestate-mobx/functions/Action),
 [`Computed`](/api/wirestate-mobx/functions/Computed).
+
+## See Also
+
+- [Lit guide](/lit/overview): providers, decorators, controllers, and element handlers.
+- [Lit MobX introduction](/introduction/lit-mobx): install and a minimal example.

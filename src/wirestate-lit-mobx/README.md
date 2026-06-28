@@ -45,7 +45,7 @@ import { customElement } from "lit/decorators.js";
 
 @customElement("w-counter")
 export class Counter extends MobxLitElement {
-  @injection({ token: CounterService })
+  @injection(CounterService)
   private readonly counter!: CounterService;
 
   public render() {
@@ -67,6 +67,7 @@ Observable definitions and decorator aliases (`Observable`, `Action`, `Computed`
 
 ## Learn More
 
+- [Lit MobX guide](https://Neloreck.github.io/wirestate/lit-mobx/overview)
 - [API reference](https://Neloreck.github.io/wirestate/api/wirestate-lit-mobx/)
 - [`@adobe/lit-mobx` package](https://www.npmjs.com/package/@adobe/lit-mobx)
 

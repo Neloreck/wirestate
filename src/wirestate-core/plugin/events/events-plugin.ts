@@ -17,7 +17,10 @@ import { EVENT_REGISTRATION } from "./on-event";
  *
  * @example
  * ```typescript
- * import { Container, EventsPlugin } from "@wirestate/core";
+ * import { Container, EventsPlugin, Injectable } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class CartService {}
  *
  * const container = new Container({ bindings: [CartService], plugins: [new EventsPlugin()] });
  * ```

@@ -71,8 +71,9 @@ in `@OnProvision`, such as timers, subscriptions, and sockets. Clean it up in `@
 cheap setup that does not need cleanup. The core [lifecycle map](/core/lifecycle) shows where Lit connect, disconnect,
 activation, and disposal fit together.
 
-Managed providers create a container on connect, provision it, deprovision it on disconnect, and dispose it. External
-providers provision and deprovision the container they were given, but disposal stays with the owner that created it.
+Managed providers create a container on connect, provision it, then on disconnect deprovision it and release its
+bindings with `unbindAll` (there is no `Container.dispose()`). External providers provision and deprovision the
+container they were given, but releasing its bindings stays with the owner that created it.
 
 Injection and element handler helpers follow the nearest container context by default. When a provider replaces its
 container, consumers move to the new container and handlers re-register on the new bus.
@@ -81,9 +82,11 @@ container, consumers move to the new container and handlers re-register on the n
 
 - `provideContainer` and `useContainerProvider` publish containers.
 - `injection`, `useInjection`, and `useContainer` consume values.
-- `onEvent`, `useOnEvents`, and `OnEventController` work with the event bus.
-- `onCommand`, `useOnCommand`, and `OnCommandController` work with the command bus.
-- `onQuery`, `useOnQuery`, and `OnQueryController` work with the query bus.
+- To send messages, inject the bus (`useInjection(EventBus)`, `useInjection(CommandBus)`, `useInjection(QueryBus)`) and
+  call `emit` / `execute` / `query`.
+- To subscribe or handle, use the decorators and controllers: `onEvent` / `OnEventController` / `useOnEvents` (events),
+  `onCommand` / `OnCommandController` / `useOnCommand` (commands), `onQuery` / `OnQueryController` / `useOnQuery`
+  (queries).
 
 ## API Reference
 

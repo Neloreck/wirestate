@@ -7,7 +7,7 @@
 Wirestate is a TypeScript state-management toolkit built around dependency-injected services.
 
 Application logic lives in `@Injectable` classes. React and Lit adapters provide those services to UI trees. Reactivity
-is separate: use MobX, Preact Signals, plain values, or another state bridge inside your services.
+is separate: use MobX, Preact Signals, plain values, or another reactivity adapter inside your services.
 
 Use Wirestate when you want service-owned state and workflows that can be scoped to an app, subtree, feature, modal,
 tenant, or test.

@@ -72,6 +72,10 @@ export interface OnEventDecorator {
  * ```typescript
  * import { Injectable, OnEvent, WireEvent } from "@wirestate/core";
  *
+ * interface User {
+ *   id: string;
+ * }
+ *
  * @Injectable()
  * class MyService {
  *   @OnEvent("USER_LOGGED_IN")

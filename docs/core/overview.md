@@ -61,6 +61,8 @@ counter.increment();
 - Queries for one-handler read operations.
 - Provision-scoped message handlers: `@OnEvent`, `@OnCommand`, and `@OnQuery` subscribe at provision and unsubscribe at
   deprovision.
+- Optional development-time inspection through the [`@wirestate/core/devtools`](/core/devtools) subpath
+  (`DevToolsPlugin`).
 
 ## API Reference
 

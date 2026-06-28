@@ -118,7 +118,9 @@ export class ContainerKernel {
    * @param token - Token to resolve.
    * @returns The resolved value, thunk, or `undefined` for optional misses.
    *
-   * @throws {@link WirestateError} If the token is not bound and not optional.
+   * @throws {@link WirestateError} If the token is not bound and not optional,
+   *   or if a circular dependency is detected while constructing the value.
+   *   Errors thrown by a binding's constructor or actory propagate unchanged.
    */
   public get<T>(token: ServiceToken<T>): T;
   public get<T>(token: ServiceToken<T>, options: { optional: true }): Optional<T>;
@@ -274,8 +276,9 @@ export class ContainerKernel {
   }
 
   /**
-   * Deactivates one container-owned value: instance bindings run the installed
-   * activation adapter's cleanup, other binding kinds are simply dropped.
+   * Deactivates one container-owned value.
+   * Instance bindings run the installed activation adapter's cleanup.
+   * Other binding kinds are dropped from the active record map.
    *
    * @param record - Activation record being deactivated.
    */

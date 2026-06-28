@@ -17,7 +17,10 @@ import { COMMAND_REGISTRATION } from "./on-command";
  *
  * @example
  * ```typescript
- * import { CommandsPlugin, Container } from "@wirestate/core";
+ * import { CommandsPlugin, Container, Injectable } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class CartService {}
  *
  * const container = new Container({ bindings: [CartService], plugins: [new CommandsPlugin()] });
  * ```

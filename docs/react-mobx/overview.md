@@ -82,3 +82,8 @@ export class CounterService {
 [`BoundAction`](/api/wirestate-mobx/functions/BoundAction), [`Computed`](/api/wirestate-mobx/functions/Computed),
 [`makeObservable`](/api/wirestate-mobx/functions/makeObservable),
 [`observer`](/api/wirestate-react-mobx/functions/observer).
+
+## See Also
+
+- [React guide](/react/overview): providers, injection hooks, and component-owned handlers.
+- [React MobX introduction](/introduction/react-mobx): install and a minimal example.

@@ -1,8 +1,8 @@
 /**
  * Framework-agnostic MobX re-exports with Wirestate-friendly decorator aliases.
  *
- * Shared by `@wirestate/react-mobx` and `@wirestate/lit-mobx` so that observable
- * services can be defined once and consumed from either React or Lit applications.
+ * Define observable service state here once, then render it with `@wirestate/react-mobx` (React) or
+ * `@wirestate/lit-mobx` (Lit).
  *
  * @packageDocumentation
  */
@@ -67,6 +67,11 @@ export {
   type IWhenOptions,
   type Lambda,
 } from "mobx";
+
+/**
+ * @group MobX
+ * @see {@link https://mobx.js.org/README.html}
+ */
 export {
   $mobx,
   FlowCancellationError,

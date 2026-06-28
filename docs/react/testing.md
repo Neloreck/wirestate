@@ -24,6 +24,9 @@ test("renders count", () => {
 });
 ```
 
+`toBeInTheDocument` comes from [`@testing-library/jest-dom`](https://github.com/testing-library/jest-dom); import it in
+your test setup (or use `.toBeTruthy()` for a self-contained assertion).
+
 ## Test Hook Handlers Through UI
 
 Command, query, and event hooks register against the active container. Render the component with a container, then drive

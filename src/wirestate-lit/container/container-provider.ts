@@ -20,9 +20,9 @@ export interface ContainerProviderOptions {
    * External container instance to provide as-is.
    *
    * @remarks
-   * External containers are never activated, recreated, or disposed by this
-   * provider. They are published through context while the host is connected.
-   * Provider lifecycle hooks run while the host is connected.
+   * External containers are provisioned by this provider while the host is connected. Provision can force-activate
+   * handler-bearing services and run provider lifecycle hooks. The provider never recreates or disposes external
+   * containers.
    */
   readonly container?: Container;
 
@@ -80,6 +80,8 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
    * @param options - Provisioning options.
    * @param options.container - External container instance to provide.
    * @param options.config - Managed container creation config.
+   *
+   * @throws WirestateError If neither `container` nor `config` is provided.
    */
   public constructor(host: E, options: ContainerProviderOptions) {
     if (!options.container && !options.config) {
@@ -199,6 +201,8 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
    * managed providers store the config for the next connection.
    *
    * @param config - Container creation options to use from now on.
+   *
+   * @throws WirestateError If this provider was created with an external container and cannot switch to managed mode.
    */
   public setConfig(config: ContainerConfig): void {
     if (!this.config) {
