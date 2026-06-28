@@ -1,12 +1,7 @@
 import "./GeneralControls.css";
 
-import {
-  type CommandExecutor,
-  type EventEmitter,
-  useCommandExecutor,
-  useEventEmitter,
-  useInjection,
-} from "@wirestate/react";
+import { CommandBus, EventBus } from "@wirestate/core";
+import { useInjection } from "@wirestate/react";
 import { useCallback } from "react";
 
 import { EGlobalCommand } from "@/constants/commands";
@@ -15,43 +10,42 @@ import { CounterService } from "@/services/CounterService";
 import { ThemeService } from "@/services/ThemeService";
 
 export function GeneralControls() {
-  const { count, isEven, increment, reset } = useInjection(CounterService);
-  const { theme, toggle } = useInjection(ThemeService);
-
-  const execute: CommandExecutor = useCommandExecutor();
-  const emit: EventEmitter = useEventEmitter();
+  const commandBus: CommandBus = useInjection(CommandBus);
+  const eventBus: EventBus = useInjection(EventBus);
+  const counterService: CounterService = useInjection(CounterService);
+  const themeService: ThemeService = useInjection(ThemeService);
 
   const onDumpData = useCallback(() => {
-    const result = execute(EGlobalCommand.DUMP_DATA, {
+    const result = commandBus.execute(EGlobalCommand.DUMP_DATA, {
       at: Date.now(),
     });
 
     console.info("[GeneralControls] Dump data result:", result);
-  }, [execute]);
+  }, [commandBus]);
 
   const onUserPinged = useCallback(() => {
-    emit(EGlobalEvent.USER_PINGED, { at: Date.now() });
-  }, [emit]);
+    eventBus.emit(EGlobalEvent.USER_PINGED, { at: Date.now() });
+  }, [eventBus]);
 
   return (
     <div className={"general-controls"}>
       <div className={"counter-row"}>
-        <button className={"counter"} onClick={increment}>
-          Increment — count: {count} ({isEven ? "even" : "odd"})
+        <button className={"counter"} onClick={counterService.increment}>
+          Increment — count: {counterService.count} ({counterService.isEven ? "even" : "odd"})
         </button>
-        <button className={"counter ghost"} onClick={reset}>
+        <button className={"counter ghost"} onClick={counterService.reset}>
           Reset counter
         </button>
 
-        <button className={"counter ghost"} onClick={toggle}>
-          Toggle theme ({theme})
+        <button className={"counter ghost"} onClick={themeService.toggle}>
+          Toggle theme ({themeService.theme})
         </button>
 
-        <button className={"counter ghost"} onClick={() => onUserPinged()}>
+        <button className={"counter ghost"} onClick={onUserPinged}>
           Ping (emit event)
         </button>
 
-        <button className={"counter ghost"} onClick={() => onDumpData()}>
+        <button className={"counter ghost"} onClick={onDumpData}>
           Dump services (run command)
         </button>
       </div>

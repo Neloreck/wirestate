@@ -1,6 +1,6 @@
 import "./Application.css";
 
-import { useAllEvents, useEvent, useEvents, useInjection } from "@wirestate/react";
+import { useInjection, useOnEvents } from "@wirestate/react";
 import { useEffect } from "react";
 
 import { EventsLog } from "@/components/EventsLog";
@@ -10,25 +10,25 @@ import { EGlobalEvent } from "@/constants/events";
 import { GLOBAL_CONFIG } from "@/constants/id";
 import { ThemeService } from "@/services/ThemeService";
 
-export const Application = () => {
-  const { theme } = useInjection(ThemeService);
+export function Application() {
+  const themeService: ThemeService = useInjection(ThemeService);
   const globalConfig: object = useInjection(GLOBAL_CONFIG);
 
-  useEvent(EGlobalEvent.COUNTER_RESET, () => {
+  useOnEvents(EGlobalEvent.COUNTER_RESET, () => {
     console.info("[Application] Counter was reset (specific event)");
   });
 
-  useEvents([EGlobalEvent.COUNTER_RESET], () => {
+  useOnEvents([EGlobalEvent.COUNTER_RESET], () => {
     console.info("[Application] Counter was reset (array of events)");
   });
 
-  useAllEvents((event) => {
+  useOnEvents((event) => {
     console.info("[Application] Log all events:", event.type, event.payload, event.source);
   });
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-  }, [theme]);
+    document.documentElement.dataset.theme = themeService.theme;
+  }, [themeService.theme]);
 
   return (
     <div className={"app"}>
@@ -67,4 +67,4 @@ export const Application = () => {
       </section>
     </div>
   );
-};
+}

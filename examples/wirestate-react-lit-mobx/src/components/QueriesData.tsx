@@ -1,13 +1,7 @@
 import "./QueriesData.css";
 
-import {
-  type AsyncQueryExecutor,
-  type QueryExecutor,
-  useAsyncQueryExecutor,
-  useInjection,
-  useQueryExecutor,
-  useQueryHandler,
-} from "@wirestate/react";
+import { QueryBus } from "@wirestate/core";
+import { useInjection, useOnQuery } from "@wirestate/react";
 import { useCallback, useState } from "react";
 
 import { EGlobalQuery } from "@/constants/queries";
@@ -20,29 +14,29 @@ export function QueriesData() {
   const [snapshot, setSnapshot] = useState<Optional<ICounterSnapshot>>(null);
   const [summary, setSummary] = useState<Optional<ICounterSummary>>(null);
 
-  const { log } = useInjection(LoggerService);
-  const { theme } = useInjection(ThemeService);
-
-  const query: QueryExecutor = useQueryExecutor();
-  const queryAsync: AsyncQueryExecutor = useAsyncQueryExecutor();
+  const queryBus: QueryBus = useInjection(QueryBus);
+  const loggerService: LoggerService = useInjection(LoggerService);
+  const themeService: ThemeService = useInjection(ThemeService);
 
   const onPullSummary = useCallback(() => {
-    const value: ICounterSummary = query<ICounterSummary>(ECounterServiceQuery.GET_COUNTER_SUMMARY, {
+    const value: ICounterSummary = queryBus.query<ICounterSummary>(ECounterServiceQuery.GET_COUNTER_SUMMARY, {
       value: "some-data",
     });
 
     setSummary(value);
-  }, [query]);
+  }, [queryBus]);
 
   const onFetchSnapshot = useCallback(async () => {
-    const value: ICounterSnapshot = await queryAsync<ICounterSnapshot>(ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT);
+    const value: ICounterSnapshot = await queryBus.queryAsync<ICounterSnapshot>(
+      ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT,
+    );
 
     setSnapshot(value);
 
-    log(`[QueriesData] Fetched snapshot:`, value);
-  }, [log, queryAsync]);
+    loggerService.log(`[QueriesData] Fetched snapshot:`, value);
+  }, [loggerService, queryBus]);
 
-  useQueryHandler<Theme>(EGlobalQuery.GET_ACTIVE_THEME, () => theme);
+  useOnQuery<Theme>(EGlobalQuery.GET_ACTIVE_THEME, () => themeService.theme);
 
   return (
     <div className={"queries"}>

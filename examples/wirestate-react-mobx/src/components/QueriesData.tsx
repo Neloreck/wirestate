@@ -1,14 +1,7 @@
 import "./QueriesData.css";
 
-import {
-  type AsyncQueryExecutor,
-  type QueryExecutor,
-  useAsyncQueryExecutor,
-  useInjection,
-  useOptionalInjection,
-  useQueryExecutor,
-  useQueryHandler,
-} from "@wirestate/react";
+import { QueryBus } from "@wirestate/core";
+import { useInjection, useOnQuery } from "@wirestate/react";
 import { useCallback, useState } from "react";
 
 import { EGlobalQuery } from "@/constants/queries";
@@ -17,35 +10,35 @@ import { LoggerService } from "@/services/LoggerService";
 import { ThemeService } from "@/services/ThemeService";
 import { type Nullable, type Theme } from "@/types";
 
-export const QueriesData = () => {
+export function QueriesData() {
   const [snapshot, setSnapshot] = useState<Nullable<ICounterSnapshot>>(null);
   const [summary, setSummary] = useState<Nullable<ICounterSummary>>(null);
 
+  const queryBus: QueryBus = useInjection(QueryBus);
+  const loggerService: LoggerService = useInjection(LoggerService);
   const themeService: ThemeService = useInjection(ThemeService);
-  const loggerService: Nullable<LoggerService> = useOptionalInjection(LoggerService);
-
-  const query: QueryExecutor = useQueryExecutor();
-  const queryAsync: AsyncQueryExecutor = useAsyncQueryExecutor();
 
   const onPullSummary = useCallback(() => {
-    const value: ICounterSummary = query<ICounterSummary>(ECounterServiceQuery.GET_COUNTER_SUMMARY, {
+    const value: ICounterSummary = queryBus.query<ICounterSummary>(ECounterServiceQuery.GET_COUNTER_SUMMARY, {
       value: "some-data",
     });
 
     setSummary(value);
-  }, [query]);
+  }, [queryBus]);
 
   const onFetchSnapshot = useCallback(async () => {
-    const value: ICounterSnapshot = await queryAsync<ICounterSnapshot>(ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT);
+    const value: ICounterSnapshot = await queryBus.queryAsync<ICounterSnapshot>(
+      ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT,
+    );
 
     setSnapshot(value);
 
     if (loggerService) {
       loggerService.log(`[QueriesData] Fetched snapshot:`, value);
     }
-  }, [queryAsync, loggerService]);
+  }, [queryBus, loggerService]);
 
-  useQueryHandler<Theme>(EGlobalQuery.GET_ACTIVE_THEME, () => themeService.theme);
+  useOnQuery<Theme>(EGlobalQuery.GET_ACTIVE_THEME, () => themeService.theme);
 
   return (
     <div className={"queries"}>
@@ -73,4 +66,4 @@ export const QueriesData = () => {
       ) : null}
     </div>
   );
-};
+}

@@ -8,14 +8,14 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc -b",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@wirestate/core": "^1.0.0-experimental.12",
-    "@wirestate/mobx": "^1.0.0-experimental.12",
-    "@wirestate/react": "^1.0.0-experimental.12",
-    "@wirestate/react-mobx": "^1.0.0-experimental.12",
+    "@wirestate/core": "^1.0.0-experimental.14",
+    "@wirestate/mobx": "^1.0.0-experimental.14",
+    "@wirestate/react": "^1.0.0-experimental.14",
+    "@wirestate/react-mobx": "^1.0.0-experimental.14",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },

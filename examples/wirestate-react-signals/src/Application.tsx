@@ -1,6 +1,6 @@
 import "./Application.css";
 
-import { useInjection, useEvent, useAllEvents, useEvents } from "@wirestate/react";
+import { useInjection, useOnEvents } from "@wirestate/react";
 import { useEffect } from "react";
 
 import { EventsLog } from "@/components/EventsLog";
@@ -14,15 +14,15 @@ export function Application() {
   const themeService: ThemeService = useInjection(ThemeService);
   const globalConfig: object = useInjection(GLOBAL_CONFIG);
 
-  useEvent(EGlobalEvent.COUNTER_RESET, () => {
+  useOnEvents(EGlobalEvent.COUNTER_RESET, () => {
     console.info("[Application] Counter was reset (specific event)");
   });
 
-  useEvents([EGlobalEvent.COUNTER_RESET], () => {
+  useOnEvents([EGlobalEvent.COUNTER_RESET], () => {
     console.info("[Application] Counter was reset (array of events)");
   });
 
-  useAllEvents((event) => {
+  useOnEvents((event) => {
     console.info("[Application] Log all events:", event.type, event.payload, event.source);
   });
 

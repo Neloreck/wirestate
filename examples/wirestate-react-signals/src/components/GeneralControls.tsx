@@ -1,12 +1,7 @@
 import "./GeneralControls.css";
 
-import {
-  type EventEmitter,
-  useInjection,
-  useEventEmitter,
-  useCommandExecutor,
-  type CommandExecutor,
-} from "@wirestate/react";
+import { CommandBus, EventBus } from "@wirestate/core";
+import { useInjection } from "@wirestate/react";
 import { useCallback } from "react";
 
 import { EGlobalCommand } from "@/constants/commands";
@@ -15,23 +10,22 @@ import { CounterService } from "@/services/CounterService";
 import { ThemeService } from "@/services/ThemeService";
 
 export function GeneralControls() {
+  const commandBus: CommandBus = useInjection(CommandBus);
+  const eventBus: EventBus = useInjection(EventBus);
   const counterService: CounterService = useInjection(CounterService);
   const themeService: ThemeService = useInjection(ThemeService);
 
-  const execute: CommandExecutor = useCommandExecutor();
-  const emit: EventEmitter = useEventEmitter();
-
   const onDumpData = useCallback(() => {
-    const result = execute(EGlobalCommand.DUMP_DATA, {
+    const result = commandBus.execute(EGlobalCommand.DUMP_DATA, {
       at: Date.now(),
     });
 
     console.info("[GeneralControls] Dump data result:", result);
-  }, [execute]);
+  }, [commandBus]);
 
   const onUserPinged = useCallback(() => {
-    emit(EGlobalEvent.USER_PINGED, { at: Date.now() });
-  }, [emit]);
+    eventBus.emit(EGlobalEvent.USER_PINGED, { at: Date.now() });
+  }, [eventBus]);
 
   return (
     <div className={"general-controls"}>
@@ -47,11 +41,11 @@ export function GeneralControls() {
           Toggle theme ({themeService.theme.value})
         </button>
 
-        <button className={"counter ghost"} onClick={() => onUserPinged()}>
+        <button className={"counter ghost"} onClick={onUserPinged}>
           Ping (emit event)
         </button>
 
-        <button className={"counter ghost"} onClick={() => onDumpData()}>
+        <button className={"counter ghost"} onClick={onDumpData}>
           Dump services (run command)
         </button>
       </div>

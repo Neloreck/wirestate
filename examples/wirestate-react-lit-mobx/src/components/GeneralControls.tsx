@@ -1,12 +1,7 @@
 import "./GeneralControls.css";
 
-import {
-  type CommandExecutor,
-  type EventEmitter,
-  useCommandExecutor,
-  useEventEmitter,
-  useInjection,
-} from "@wirestate/react";
+import { CommandBus, EventBus } from "@wirestate/core";
+import { useInjection } from "@wirestate/react";
 import { useCallback } from "react";
 
 import { EGlobalCommand } from "@/constants/commands";
@@ -18,20 +13,20 @@ export function GeneralControls() {
   const { count, isEven, increment, reset } = useInjection(CounterService);
   const { theme, toggle } = useInjection(ThemeService);
 
-  const execute: CommandExecutor = useCommandExecutor();
-  const emit: EventEmitter = useEventEmitter();
+  const commandBus: CommandBus = useInjection(CommandBus);
+  const eventBus: EventBus = useInjection(EventBus);
 
   const onDumpData = useCallback(() => {
-    const result = execute(EGlobalCommand.DUMP_DATA, {
+    const result = commandBus.execute(EGlobalCommand.DUMP_DATA, {
       at: Date.now(),
     });
 
     console.info("[GeneralControls] Dump data result:", result);
-  }, [execute]);
+  }, [commandBus]);
 
   const onUserPinged = useCallback(() => {
-    emit(EGlobalEvent.USER_PINGED, { at: Date.now() });
-  }, [emit]);
+    eventBus.emit(EGlobalEvent.USER_PINGED, { at: Date.now() });
+  }, [eventBus]);
 
   return (
     <div className={"general-controls"}>

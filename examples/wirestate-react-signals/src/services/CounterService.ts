@@ -83,7 +83,7 @@ export class CounterService {
 
   /*
    * Synchronous query handler. Any caller — another service, a React
-   * component via `useQueryExecutor`, or `query()` from bootstrap — can pull
+   * component via the injected `QueryBus`, or `query()` from bootstrap — can pull
    * a fresh summary on demand.
    */
   @OnQuery(ECounterServiceQuery.GET_COUNTER_SUMMARY)
@@ -99,7 +99,7 @@ export class CounterService {
 
   /*
    * Async query handler — simulates a network round-trip. Callers can
-   * simply `await` the return of `query` / `useAsyncQueryExecutor` without
+   * simply `await` the return of `query` / `queryAsync` without
    * caring whether the responder is sync or async.
    */
   @OnQuery(ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT)

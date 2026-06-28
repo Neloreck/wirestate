@@ -1,13 +1,7 @@
 import "./QueriesData.css";
 
-import {
-  type AsyncQueryExecutor,
-  type QueryExecutor,
-  useAsyncQueryExecutor,
-  useInjection,
-  useQueryExecutor,
-  useQueryHandler,
-} from "@wirestate/react";
+import { QueryBus } from "@wirestate/core";
+import { useInjection, useOnQuery } from "@wirestate/react";
 import { useCallback, useState } from "react";
 
 import { EGlobalQuery } from "@/constants/queries";
@@ -20,31 +14,29 @@ export function QueriesData() {
   const [snapshot, setSnapshot] = useState<Optional<ICounterSnapshot>>(null);
   const [summary, setSummary] = useState<Optional<ICounterSummary>>(null);
 
+  const queryBus: QueryBus = useInjection(QueryBus);
   const themeService: ThemeService = useInjection(ThemeService);
   const loggerService: LoggerService = useInjection(LoggerService);
 
-  const query: QueryExecutor = useQueryExecutor();
-  const queryAsync: AsyncQueryExecutor = useAsyncQueryExecutor();
-
   const onPullSummary = useCallback(() => {
-    const value: ICounterSummary = query<ICounterSummary>(ECounterServiceQuery.GET_COUNTER_SUMMARY, {
+    const value: ICounterSummary = queryBus.query(ECounterServiceQuery.GET_COUNTER_SUMMARY, {
       value: "some-data",
     });
 
     setSummary(value);
-  }, [query]);
+  }, [queryBus]);
 
   const onFetchSnapshot = useCallback(async () => {
-    const value: ICounterSnapshot = await queryAsync<ICounterSnapshot>(ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT);
+    const value: ICounterSnapshot = await queryBus.queryAsync(ECounterServiceQuery.FETCH_COUNTER_SNAPSHOT);
 
     setSnapshot(value);
 
     if (loggerService) {
       loggerService.log(`[QueriesData] Fetched snapshot:`, value);
     }
-  }, [queryAsync, loggerService]);
+  }, [queryBus, loggerService]);
 
-  useQueryHandler<Theme>(EGlobalQuery.GET_ACTIVE_THEME, () => themeService.theme.value);
+  useOnQuery<Theme>(EGlobalQuery.GET_ACTIVE_THEME, () => themeService.theme.value);
 
   return (
     <div className={"queries"}>
