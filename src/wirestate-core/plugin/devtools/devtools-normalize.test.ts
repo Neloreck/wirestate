@@ -1,6 +1,6 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { OnActivated } from "../../activation/on-activated";
+import { OnActivation } from "../../activation/on-activation";
 import { OnDeactivation } from "../../activation/on-deactivation";
 import { InjectionToken } from "../../binding/binding-tokens";
 import { Injectable } from "../../metadata/metadata-injectable";
@@ -186,14 +186,14 @@ describe("normalizeInstance", () => {
     const { lifecycle, methods } = normalizeInstance(new LifecycleService(), 1);
 
     expect(lifecycle).toEqual([
-      { hook: "onActivated", method: "onActivated" },
+      { hook: "onActivation", method: "onActivation" },
       { hook: "onProvision", method: "onProvision" },
       { hook: "onDeprovision", method: "onDeprovision" },
       { hook: "onDeactivation", method: "onDeactivation" },
     ]);
 
     expect(methods.map((method) => method.name)).toEqual([
-      "onActivated",
+      "onActivation",
       "onDeactivation",
       "onProvision",
       "onDeprovision",
@@ -203,8 +203,8 @@ describe("normalizeInstance", () => {
   it("skips a hook whose metadata read throws (hierarchy conflict) without dropping the others", () => {
     @Injectable()
     class Base {
-      @OnActivated()
-      public onActivated(): void {}
+      @OnActivation()
+      public onActivation(): void {}
 
       @OnDeactivation()
       public onDeactivation(): void {}
@@ -226,7 +226,7 @@ describe("normalizeInstance", () => {
     expect(() => normalizeInstance(new Derived(), 1)).not.toThrow();
 
     expect(normalizeInstance(new Derived(), 1).lifecycle).toEqual([
-      { hook: "onActivated", method: "onActivated" },
+      { hook: "onActivation", method: "onActivation" },
       { hook: "onDeprovision", method: "onDeprovision" },
       { hook: "onDeactivation", method: "onDeactivation" },
     ]);

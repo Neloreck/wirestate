@@ -13,7 +13,7 @@ describe("Library exported API from wirestate-core", () => {
         "EventsPlugin",
         "Injectable",
         "InjectionToken",
-        "OnActivated",
+        "OnActivation",
         "OnCommand",
         "OnDeactivation",
         "OnDeprovision",

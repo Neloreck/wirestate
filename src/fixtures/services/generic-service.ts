@@ -3,7 +3,7 @@ import {
   EventBus,
   inject,
   Injectable,
-  OnActivated,
+  OnActivation,
   OnCommand,
   OnDeactivation,
   OnEvent,
@@ -30,13 +30,13 @@ export class GenericService {
     private readonly queryBus: QueryBus = inject(QueryBus)
   ) {}
 
-  @OnActivated()
-  public activate(): void {
+  @OnActivation()
+  public onActivation(): void {
     this.isActivated = true;
   }
 
   @OnDeactivation()
-  public deactivate(): void {
+  public onDeactivation(): void {
     this.isActivated = false;
   }
 

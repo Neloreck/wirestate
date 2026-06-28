@@ -249,7 +249,7 @@ function validateBindings(container: Container, bindings: ReadonlyArray<Binding>
 
 /**
  * Resolves each distinct provider-lifecycle participant, forcing activation so
- * `@OnActivated` runs before any provision hook, and tracks the token that
+ * `@OnActivation` runs before any provision hook, and tracks the token that
  * provisioned it.
  *
  * @internal

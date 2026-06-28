@@ -1,4 +1,4 @@
-import { getActivatedHandlerMetadata } from "../activation/on-activated";
+import { getActivationHandlerMetadata } from "../activation/on-activation";
 import { getDeactivationHandlerMetadata } from "../activation/on-deactivation";
 import { type InstanceBindingDescriptor } from "../binding/binding";
 import { tokenToString } from "../binding/binding-tokens";
@@ -15,7 +15,7 @@ import { getProvisionHandlerMetadata } from "../provision/on-provision";
  * @remarks
  * A `Transient` instance binding is construct-and-forget: the container never owns
  * or tracks the instance, so none of the owned-lifecycle machinery
- * (`@OnActivated`/`@OnDeactivation`/`@OnProvision`/`@OnDeprovision`) and no
+ * (`@OnActivation`/`@OnDeactivation`/`@OnProvision`/`@OnDeprovision`) and no
  * provision-scoped messaging subscription (`@OnEvent`/`@OnCommand`/`@OnQuery`) can
  * fire for it. Allowing the binding while the class declares such a handler would
  * silently drop it, so this fails fast at bind time.
@@ -38,8 +38,8 @@ export function validateTransientInstanceBinding(binding: InstanceBindingDescrip
   const prototype: object = value.prototype as object;
   const offenders: Array<string> = [];
 
-  if (getActivatedHandlerMetadata(prototype)) {
-    offenders.push("@OnActivated");
+  if (getActivationHandlerMetadata(prototype)) {
+    offenders.push("@OnActivation");
   }
 
   if (getDeactivationHandlerMetadata(prototype)) {

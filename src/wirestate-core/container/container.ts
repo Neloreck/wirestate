@@ -140,7 +140,7 @@ export class Container extends ContainerKernel {
     }
 
     // Installed before any binding activates: the Wirestate instance lifecycle
-    // (status, @OnActivated/@OnDeactivation) layered on the pure-DI kernel.
+    // (status, @OnActivation/@OnDeactivation) layered on the pure-DI kernel.
     setActivationAdapter(this, wirestateActivationAdapter);
 
     // Registered before any binding activates so the activation/provision dispatch can resolve them.

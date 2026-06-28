@@ -6,7 +6,7 @@ belong.
 | Application                 | Wirestate                                                                                  | Use it for                                                                                              |
 | --------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
 | Constructor resolution      | Service constructor and constructor dependencies.                                          | Assign injected dependencies and cheap field defaults. Avoid side effects that need cleanup.            |
-| Container activation        | `@OnActivated` after the service instance is resolved.                                     | Do cheap setup that can run before a UI boundary is committed.                                          |
+| Container activation        | `@OnActivation` after the service instance is resolved.                                    | Do cheap setup that can run before a UI boundary is committed.                                          |
 | Provider mount/connect      | `@OnProvision` in binding order. Provider lifecycle participants are resolved first.       | Start provider-owned timers, subscriptions, sockets, observers, and async loops.                        |
 | Provider unmount/disconnect | `@OnDeprovision` in reverse provision order, then the provider releases the container.     | Stop every resource started in `@OnProvision`. Make cleanup complete and repeatable.                    |
 | Container disposal          | `container.unbind` or `container.unbindAll`, then `@OnDeactivation` for resolved services. | Tear down service-level registrations and final service state. Discard the container after `unbindAll`. |
@@ -21,12 +21,12 @@ Constructor resolution and activation belong to the container. A service can be 
 `container.get(Token)`. It can also be resolved eagerly when `new Container({ activate })` or a managed provider
 activates bindings.
 
-`@OnActivated` runs during that first resolution. Synchronous failures are reported through the container error handler
+`@OnActivation` runs during that first resolution. Synchronous failures are reported through the container error handler
 and rethrown, so activation can roll back. If the hook returns a promise, Wirestate reports rejections through the
 container error handler but does not block resolution.
 
 Use activation for work that does not depend on provider ownership, such as normalizing in-memory state. Do not open
-cleanup-requiring resources there. `@OnActivated` runs before provision, so provision-scoped `@OnEvent`, `@OnCommand`,
+cleanup-requiring resources there. `@OnActivation` runs before provision, so provision-scoped `@OnEvent`, `@OnCommand`,
 and `@OnQuery` handlers are not wired yet.
 
 ## Provider Layer
@@ -101,7 +101,7 @@ current state.
 
 ## API Reference
 
-[`OnActivated`](/api/wirestate-core/functions/OnActivated),
+[`OnActivation`](/api/wirestate-core/functions/OnActivation),
 [`OnDeactivation`](/api/wirestate-core/functions/OnDeactivation),
 [`OnProvision`](/api/wirestate-core/functions/OnProvision),
 [`OnDeprovision`](/api/wirestate-core/functions/OnDeprovision),

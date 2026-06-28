@@ -4,7 +4,7 @@ import {
   EventsPlugin,
   inject,
   Injectable,
-  OnActivated,
+  OnActivation,
   OnDeactivation,
   OnDeprovision,
   OnEvent,
@@ -71,8 +71,8 @@ describe("core event messaging integration", () => {
 
     @Injectable()
     class PrimaryHandlerService {
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         lifecycle.push("primary:activated");
       }
 
@@ -89,8 +89,8 @@ describe("core event messaging integration", () => {
 
     @Injectable()
     class SecondaryHandlerService {
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         lifecycle.push("secondary:activated");
       }
 

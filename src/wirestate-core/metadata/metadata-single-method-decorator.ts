@@ -6,7 +6,7 @@ import { validateStandardMethodContext } from "./metadata-decorator-context";
 import { getPrototypeChainMetadata } from "./metadata-prototype-chain";
 
 /**
- * Method decorator attached by single-method lifecycle hooks such as `@OnActivated`.
+ * Method decorator attached by single-method lifecycle hooks such as `@OnActivation`.
  *
  * @internal
  */
@@ -39,7 +39,7 @@ export interface SingleMethodDecoratorOptions {
   readonly metadataKey?: symbol;
 
   /**
-   * Decorator name used in diagnostics, for example `OnActivated`.
+   * Decorator name used in diagnostics, for example `OnActivation`.
    */
   readonly name: string;
 

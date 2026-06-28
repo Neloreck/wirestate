@@ -4,7 +4,7 @@ import {
   Container,
   inject,
   Injectable,
-  OnActivated,
+  OnActivation,
   OnCommand,
   OnDeactivation,
   OnDeprovision,
@@ -90,8 +90,8 @@ describe("core command messaging integration", () => {
     class PrimaryHandlerService {
       private value: string = "primary";
 
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         lifecycle.push("primary:activated");
       }
 
@@ -112,8 +112,8 @@ describe("core command messaging integration", () => {
     class SecondaryHandlerService {
       private value: string = "secondary";
 
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         lifecycle.push("secondary:activated");
       }
 

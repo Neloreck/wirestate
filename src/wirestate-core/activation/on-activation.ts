@@ -5,16 +5,16 @@ import {
 import { type Optional } from "../types/general";
 
 const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
-  name: "OnActivated",
+  name: "OnActivation",
   registry: new WeakMap(),
-  metadataKey: Symbol("@wirestate/core/lifecycle/activated"),
-  duplicateMessage: (className) => `Only one @OnActivated method can be declared on '${className}'.`,
+  metadataKey: Symbol("@wirestate/core/lifecycle/activation"),
+  duplicateMessage: (className) => `Only one @OnActivation method can be declared on '${className}'.`,
   hierarchyMessage: (className) =>
-    `Only one @OnActivated method can be declared across class hierarchy for '${className}'.`,
+    `Only one @OnActivation method can be declared across class hierarchy for '${className}'.`,
 });
 
 /**
- * Runs an instance method after container activation.
+ * Runs an instance method after container activation completes.
  *
  * @remarks
  * Activation happens the first time the singleton instance is resolved.
@@ -30,23 +30,23 @@ const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
  *
  * @example
  * ```typescript
- * import { Injectable, OnActivated } from "@wirestate/core";
+ * import { Injectable, OnActivation } from "@wirestate/core";
  *
  * @Injectable()
  * class FeedService {
- *   @OnActivated()
- *   public onActivated(): void {
+ *   @OnActivation()
+ *   public onActivation(): void {
  *     this.initializeDefaults();
  *   }
  * }
  * ```
  */
-export function OnActivated(): SingleMethodDecorator {
+export function OnActivation(): SingleMethodDecorator {
   return decorator();
 }
 
 /**
- * Retrieves the method decorated with {@link OnActivated} by traversing the prototype chain.
+ * Retrieves the method decorated with {@link OnActivation} by traversing the prototype chain.
  *
  * @remarks
  * A class hierarchy may declare one activation hook name. Subclasses can
@@ -62,10 +62,10 @@ export function OnActivated(): SingleMethodDecorator {
  *
  * @example
  * ```typescript
- * const method = getActivatedHandlerMetadata(myService);
+ * const method = getActivationHandlerMetadata(myService);
  * method && (myService as any)[method]();
  * ```
  */
-export function getActivatedHandlerMetadata(instance: object): Optional<string | symbol> {
+export function getActivationHandlerMetadata(instance: object): Optional<string | symbol> {
   return getMetadata(instance);
 }

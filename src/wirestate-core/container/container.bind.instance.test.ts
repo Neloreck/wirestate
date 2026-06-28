@@ -1,6 +1,6 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
-import { OnActivated } from "../activation/on-activated";
+import { OnActivation } from "../activation/on-activation";
 import { OnDeactivation } from "../activation/on-deactivation";
 import { WireStatus } from "../activation/wire-status";
 import {
@@ -165,8 +165,8 @@ describe("container.bind instance", () => {
   describe("activation lifecycle", () => {
     @Injectable()
     class AsyncFailService {
-      @OnActivated()
-      public async onActivated(): Promise<void> {
+      @OnActivation()
+      public async onActivation(): Promise<void> {
         throw new Error("async-fail");
       }
     }
@@ -175,8 +175,8 @@ describe("container.bind instance", () => {
     class SyncFailActivationService {
       public wasResolved: boolean = false;
 
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         this.wasResolved = true;
 
         throw new Error("sync-activation-fail");
@@ -205,7 +205,7 @@ describe("container.bind instance", () => {
       public corruptedQuery: string = "not-a-function";
 
       // @ts-ignore - Sabotage with non-function
-      @OnActivated()
+      @OnActivation()
       public sabotagedActivated: string = "not-a-function";
     }
 
@@ -298,7 +298,7 @@ describe("container.bind instance", () => {
       expect(() => container.bind(binding as never)).toThrow("Binding descriptor has unknown scope 'UNKNOWN'.");
     });
 
-    it("should handle async @OnActivated and catch errors", async () => {
+    it("should handle async @OnActivation and catch errors", async () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
       const container: Container = new Container();
@@ -311,21 +311,21 @@ describe("container.bind instance", () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        "[wirestate] @OnActivated rejected:",
+        "[wirestate] @OnActivation rejected:",
         {
           source: "instance-activation",
           instanceName: "AsyncFailService",
-          methodName: "onActivated",
+          methodName: "onActivation",
         },
         "AsyncFailService",
-        "onActivated",
+        "onActivation",
         expect.any(Error)
       );
 
       consoleSpy.mockRestore();
     });
 
-    it("should throw on failing @OnActivated methods without failing resolution", () => {
+    it("should throw on failing @OnActivation methods without failing resolution", () => {
       const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
       const container: Container = new Container();
@@ -337,7 +337,7 @@ describe("container.bind instance", () => {
       consoleSpy.mockRestore();
     });
 
-    it("should report sync @OnActivated errors to container error handler before rethrowing", () => {
+    it("should report sync @OnActivation errors to container error handler before rethrowing", () => {
       const onError = jest.fn();
       const container: Container = new Container({
         onError,
@@ -349,15 +349,15 @@ describe("container.bind instance", () => {
       expect(onError).toHaveBeenCalledWith(
         expect.objectContaining({
           container,
-          details: ["SyncFailActivationService", "onActivated"],
-          message: "@OnActivated failed",
+          details: ["SyncFailActivationService", "onActivation"],
+          message: "@OnActivation failed",
           instanceName: "SyncFailActivationService",
           source: "instance-activation",
         })
       );
     });
 
-    it("should clean up handlers and container tracking when @OnActivated throws synchronously", () => {
+    it("should clean up handlers and container tracking when @OnActivation throws synchronously", () => {
       const ACTIVATION_FAILURE_EVENT: string = "ACTIVATION_FAILURE_EVENT";
       const ACTIVATION_FAILURE_COMMAND: string = "ACTIVATION_FAILURE_COMMAND";
       const ACTIVATION_FAILURE_QUERY: string = "ACTIVATION_FAILURE_QUERY";
@@ -374,8 +374,8 @@ describe("container.bind instance", () => {
           containerRef.current = container;
         }
 
-        @OnActivated()
-        public onActivated(): void {
+        @OnActivation()
+        public onActivation(): void {
           throw new Error("sync-activation-handlers-fail");
         }
 
@@ -467,7 +467,7 @@ describe("container.bind instance", () => {
       consoleSpy.mockRestore();
     });
 
-    it("should report async @OnActivated errors to container error handler", async () => {
+    it("should report async @OnActivation errors to container error handler", async () => {
       const onError = jest.fn();
       const container: Container = new Container({
         activate: true,
@@ -481,8 +481,8 @@ describe("container.bind instance", () => {
       expect(onError).toHaveBeenCalledWith(
         expect.objectContaining({
           container,
-          details: ["AsyncFailService", "onActivated"],
-          message: "@OnActivated rejected",
+          details: ["AsyncFailService", "onActivation"],
+          message: "@OnActivation rejected",
           instanceName: "AsyncFailService",
           source: "instance-activation",
         })
@@ -574,14 +574,14 @@ describe("container.bind instance", () => {
       expect(onEvent).toHaveBeenCalledTimes(2);
     });
 
-    it("should skip non-function @OnQuery and @OnActivated members through activation and provision", () => {
+    it("should skip non-function @OnQuery and @OnActivation members through activation and provision", () => {
       const container: Container = new Container({
         bindings: [CorruptedService],
         plugins: [new QueriesPlugin()],
       });
 
       // Provision force-activates the participant and runs the messaging registration:
-      // both the sabotaged @OnActivated and the sabotaged @OnQuery members are skipped, no throw.
+      // both the sabotaged @OnActivation and the sabotaged @OnQuery members are skipped, no throw.
       expect(() => container.provision()).not.toThrow();
 
       const instance: CorruptedService = container.get(CorruptedService);

@@ -11,7 +11,7 @@ import "./metadata/metadata-symbol-polyfill";
 
 export { type ProvisionId } from "./activation/wire-status";
 export { WireStatus } from "./activation/wire-status";
-export { OnActivated } from "./activation/on-activated";
+export { OnActivation } from "./activation/on-activation";
 export { OnDeactivation } from "./activation/on-deactivation";
 
 export {

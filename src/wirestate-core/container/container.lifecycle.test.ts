@@ -1,4 +1,4 @@
-import { OnActivated } from "../activation/on-activated";
+import { OnActivation } from "../activation/on-activation";
 import { OnDeactivation } from "../activation/on-deactivation";
 import { InjectionToken } from "../binding/binding-tokens";
 import { Injectable } from "../metadata/metadata-injectable";
@@ -12,8 +12,8 @@ describe("instance lifecycle guarantees", () => {
 
     @Injectable()
     class MyService {
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         events.push("activated");
       }
     }

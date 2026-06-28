@@ -8,7 +8,7 @@ import type { Optional, Maybe } from "../types/general";
  * @remarks
  * The composition root ({@link Container}) installs an adapter that layers
  * Wirestate instance lifecycle - instance/container tracking, `WireStatus`,
- * `@OnActivated` / `@OnDeactivation` hooks, and messaging registration - on top
+ * `@OnActivation` / `@OnDeactivation` hooks, and messaging registration - on top
  * of the pure-DI kernel. A bare {@link ContainerKernel} with no adapter performs
  * construction and caching only.
  *

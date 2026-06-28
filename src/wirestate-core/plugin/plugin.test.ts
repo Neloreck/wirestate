@@ -4,7 +4,7 @@ import {
   Container,
   EventsPlugin,
   Injectable,
-  OnActivated,
+  OnActivation,
   OnDeactivation,
   OnDeprovision,
   OnEvent,
@@ -17,8 +17,8 @@ describe("container plugins", () => {
 
     @Injectable()
     class Svc {
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         log.push("user:activated");
       }
 
@@ -66,7 +66,7 @@ describe("container plugins", () => {
 
     const container: Container = new Container({ bindings: [Svc], activate: [Svc], plugins: [new Observer()] });
 
-    // Setup: plugin onActivate runs before the user @OnActivated.
+    // Setup: plugin onActivate runs before the user @OnActivation.
     expect(log).toEqual(["plugin:activate:Svc", "user:activated"]);
 
     log.length = 0;

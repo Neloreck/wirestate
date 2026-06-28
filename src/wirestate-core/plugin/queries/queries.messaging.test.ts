@@ -2,7 +2,7 @@ import {
   Container,
   inject,
   Injectable,
-  OnActivated,
+  OnActivation,
   OnDeactivation,
   OnDeprovision,
   OnQuery,
@@ -84,8 +84,8 @@ describe("core query messaging integration", () => {
     class PrimaryHandlerService {
       private value: string = "primary";
 
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         lifecycle.push("primary:activated");
       }
 
@@ -104,8 +104,8 @@ describe("core query messaging integration", () => {
     class SecondaryHandlerService {
       private value: string = "secondary";
 
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         lifecycle.push("secondary:activated");
       }
 

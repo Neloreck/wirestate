@@ -1,4 +1,4 @@
-import { OnActivated } from "../activation/on-activated";
+import { OnActivation } from "../activation/on-activation";
 import { OnDeactivation } from "../activation/on-deactivation";
 import { BindingScope, BindingType } from "../binding/binding";
 import { ERROR_CODE_INVALID_BINDING_SCOPE } from "../error/error-code";
@@ -89,11 +89,11 @@ describe("container.bind transient instance", () => {
   });
 
   describe("rejected at bind time: declared lifecycle / messaging handlers", () => {
-    it("should reject a transient instance declaring @OnActivated", () => {
+    it("should reject a transient instance declaring @OnActivation", () => {
       @Injectable()
       class Service {
-        @OnActivated()
-        public onActivated(): void {}
+        @OnActivation()
+        public onActivation(): void {}
       }
 
       const container: Container = new Container();
@@ -105,7 +105,7 @@ describe("container.bind transient instance", () => {
           code: ERROR_CODE_INVALID_BINDING_SCOPE,
           message:
             "Cannot bind 'Service' as a Transient instance: a transient instance binding must declare no lifecycle or" +
-            " messaging handlers, but found @OnActivated. Bind it as Singleton, or use a Transient factory binding.",
+            " messaging handlers, but found @OnActivation. Bind it as Singleton, or use a Transient factory binding.",
         })
       );
     });
@@ -206,8 +206,8 @@ describe("container.bind transient instance", () => {
     it("should list every offending handler in the error message", () => {
       @Injectable()
       class Service {
-        @OnActivated()
-        public onActivated(): void {}
+        @OnActivation()
+        public onActivation(): void {}
 
         @OnEvent("SOME_EVENT")
         public onEvent(): void {}
@@ -218,7 +218,7 @@ describe("container.bind transient instance", () => {
       const bind = (): unknown =>
         container.bind({ token: Service, type: BindingType.Instance, value: Service, scope: BindingScope.Transient });
 
-      expect(bind).toThrow("@OnActivated");
+      expect(bind).toThrow("@OnActivation");
       expect(bind).toThrow("messaging handler");
       expect(bind).toThrow("Bind it as Singleton, or use a Transient factory binding.");
     });

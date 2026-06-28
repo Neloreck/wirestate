@@ -1,4 +1,4 @@
-import { getActivatedHandlerMetadata, OnActivated } from "../activation/on-activated";
+import { getActivationHandlerMetadata, OnActivation } from "../activation/on-activation";
 import { OnDeactivation } from "../activation/on-deactivation";
 import { Container } from "../container/container";
 import { WirestateError } from "../error/wirestate-error";
@@ -72,8 +72,8 @@ describe("dual-mode method decorators", () => {
 
     @Injectable()
     class LifecycleProbeService {
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         log.push("activated");
       }
 
@@ -135,8 +135,8 @@ describe("dual-mode method decorators", () => {
     class BaseMessagingService {
       public events: Array<string> = [];
 
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         log.push("base-activated");
       }
 
@@ -180,16 +180,16 @@ describe("dual-mode method decorators", () => {
 
     @Injectable()
     class BaseLifecycleService {
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         log.push("base-activated");
       }
     }
 
     @Injectable()
     class RedecoratedChildService extends BaseLifecycleService {
-      @OnActivated()
-      public override onActivated(): void {
+      @OnActivation()
+      public override onActivation(): void {
         log.push("child-activated");
       }
     }
@@ -203,39 +203,39 @@ describe("dual-mode method decorators", () => {
 
   it("should resolve lifecycle metadata declared only on the base class", () => {
     class BaseOnlyService {
-      @OnActivated()
-      public onActivated(): void {}
+      @OnActivation()
+      public onActivation(): void {}
     }
 
     class UndecoratedChildService extends BaseOnlyService {}
 
-    expect(getActivatedHandlerMetadata(new UndecoratedChildService())).toBe("onActivated");
+    expect(getActivationHandlerMetadata(new UndecoratedChildService())).toBe("onActivation");
   });
 
   it("should throw a hierarchy conflict when two different lifecycle methods are decorated", () => {
     class ConflictBaseService {
-      @OnActivated()
+      @OnActivation()
       public first(): void {}
     }
 
     class ConflictChildService extends ConflictBaseService {
-      @OnActivated()
+      @OnActivation()
       public second(): void {}
     }
 
-    expect(() => getActivatedHandlerMetadata(new ConflictChildService())).toThrow(WirestateError);
-    expect(() => getActivatedHandlerMetadata(new ConflictChildService())).toThrow(
-      /Only one @OnActivated method can be declared across class hierarchy/
+    expect(() => getActivationHandlerMetadata(new ConflictChildService())).toThrow(WirestateError);
+    expect(() => getActivationHandlerMetadata(new ConflictChildService())).toThrow(
+      /Only one @OnActivation method can be declared across class hierarchy/
     );
   });
 
-  it("should reject duplicate @OnActivated methods on one class at decoration time", () => {
+  it("should reject duplicate @OnActivation methods on one class at decoration time", () => {
     expect(() => {
       class DuplicatedActivationService {
-        @OnActivated()
+        @OnActivation()
         public first(): void {}
 
-        @OnActivated()
+        @OnActivation()
         public second(): void {}
       }
 
@@ -244,15 +244,15 @@ describe("dual-mode method decorators", () => {
 
     expect(() => {
       class DuplicatedActivationMessageService {
-        @OnActivated()
+        @OnActivation()
         public first(): void {}
 
-        @OnActivated()
+        @OnActivation()
         public second(): void {}
       }
 
       return DuplicatedActivationMessageService;
-    }).toThrow(/Only one @OnActivated method can be declared/);
+    }).toThrow(/Only one @OnActivation method can be declared/);
   });
 
   it("should reject duplicate @OnProvision methods on one class at decoration time", () => {

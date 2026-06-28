@@ -11,7 +11,7 @@ import { QueryBus } from "../plugin/queries/query-bus";
 import { setContainerProvisioned } from "../provision/provision-state";
 
 import { finalizeInstanceStatus, initializeInstanceStatus } from "./activation-lifecycle";
-import { OnActivated } from "./on-activated";
+import { OnActivation } from "./on-activation";
 import { getInstanceContainer, WireStatus } from "./wire-status";
 
 describe("instance lifecycle tracking", () => {
@@ -34,8 +34,8 @@ describe("instance lifecycle tracking", () => {
   it("should clean up tracked instances when activation fails", () => {
     @Injectable()
     class FailingService {
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         throw new Error("activation-fail");
       }
     }

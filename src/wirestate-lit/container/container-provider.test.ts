@@ -11,7 +11,7 @@ import {
   EventBus,
   EventsPlugin,
   Injectable,
-  OnActivated,
+  OnActivation,
   OnDeactivation,
   OnProvision,
   QueriesPlugin,
@@ -588,8 +588,8 @@ describe("ContainerProvider", () => {
 
     @Injectable()
     class LifecycleService {
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         lifecycleEvents.push("activate");
       }
 
@@ -638,16 +638,16 @@ describe("ContainerProvider", () => {
 
     @Injectable()
     class FirstService {
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         lifecycleEvents.push("first");
       }
     }
 
     @Injectable()
     class SecondService {
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         lifecycleEvents.push("second");
       }
     }

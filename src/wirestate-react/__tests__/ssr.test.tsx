@@ -1,4 +1,4 @@
-import { Container, inject, Injectable, OnActivated } from "@wirestate/core";
+import { Container, inject, Injectable, OnActivation } from "@wirestate/core";
 import { renderToString } from "react-dom/server";
 
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
@@ -26,7 +26,7 @@ describe("React SSR", () => {
 
       public constructor(private readonly container: Container = inject(Container)) {}
 
-      @OnActivated()
+      @OnActivation()
       public initialize(): void {
         const root: RootData = this.container.get<RootData>(ROOT_TOKEN);
         const service = this.container.get<ServiceData>(SERVICE_TOKEN, { optional: true });
@@ -70,8 +70,8 @@ describe("React SSR", () => {
 
       public constructor(private readonly container: Container = inject(Container)) {}
 
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         events.push("activated");
 
         this.value = this.container.get<ServiceData>(SERVICE_TOKEN, { optional: true })?.userId ?? "missing";

@@ -152,7 +152,7 @@ export interface DevtoolsMethod {
  *
  * @group DevTools
  */
-export type DevtoolsLifecycleHook = "onActivated" | "onDeactivation" | "onProvision" | "onDeprovision";
+export type DevtoolsLifecycleHook = "onActivation" | "onDeactivation" | "onProvision" | "onDeprovision";
 
 /**
  * A lifecycle hook a service declares, paired with its implementing method.

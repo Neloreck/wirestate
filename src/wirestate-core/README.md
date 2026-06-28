@@ -41,7 +41,7 @@ counterService.increment();
 
 - DI primitives such as `Injectable`, `inject`, `Container`, `ServiceToken`, and `InjectionToken`.
 - `Container` and container methods such as `bind`, `unbind`, `unbindAll`, `get`, `has`, and `getOwnBindings`.
-- `OnActivated`, `OnDeactivation`, `OnProvision`, and `OnDeprovision`.
+- `OnActivation`, `OnDeactivation`, `OnProvision`, and `OnDeprovision`.
 - `WireStatus` and `ProvisionId` for lifecycle guards on resolved service instances.
 - `EventBus`, `CommandBus`, `QueryBus`, and their decorators (`OnEvent`, `OnCommand`, `OnQuery`), enabled by
   registering `EventsPlugin`, `CommandsPlugin`, or `QueriesPlugin`.

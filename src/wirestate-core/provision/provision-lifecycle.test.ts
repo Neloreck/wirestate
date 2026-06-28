@@ -1,6 +1,6 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
-import { OnActivated } from "../activation/on-activated";
+import { OnActivation } from "../activation/on-activation";
 import { type ProvisionId, WireStatus } from "../activation/wire-status";
 import { BindingType } from "../binding/binding";
 import { Container } from "../container/container";
@@ -118,8 +118,8 @@ describe("provision lifecycle", () => {
 
     @Injectable()
     class PlainService {
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         events.push("activated");
       }
     }
@@ -138,8 +138,8 @@ describe("provision lifecycle", () => {
 
     @Injectable()
     class PlainService {
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         events.push("activated");
       }
     }
@@ -247,8 +247,8 @@ describe("provision lifecycle", () => {
     class ResolvingLifecycleService {
       public constructor(private readonly container: Container = inject(Container)) {}
 
-      @OnActivated()
-      public onActivated(): void {
+      @OnActivation()
+      public onActivation(): void {
         this.container.get(PlainService);
       }
 

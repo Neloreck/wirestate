@@ -88,7 +88,7 @@ new Container({ bindings: [CartService], plugins: [new CustomDevToolsPlugin()] }
 | `install(container)`                            | Once, when the plugin is registered. Contribute bindings here.              |
 | `participates(token)`                           | At provision, per binding token. Return `true` to force-activate it.        |
 | `onContainerProvision(container)`               | Once, at the start of each provision cycle, before any instance wiring.     |
-| `onActivate(instance, container)`               | After a service is activated, before `@OnActivated`.                        |
+| `onActivate(instance, container)`               | After a service is activated, before `@OnActivation`.                       |
 | `onProvision(instance, container, addDisposer)` | When a provisioned instance is wired. Register teardown with `addDisposer`. |
 | `onDeprovision(instance, container)`            | After the instance's `@OnDeprovision`.                                      |
 | `onDeactivate(instance, container)`             | After the instance's `@OnDeactivation`.                                     |
@@ -96,7 +96,7 @@ new Container({ bindings: [CartService], plugins: [new CustomDevToolsPlugin()] }
 
 ## Ordering
 
-Plugins are the **framework layer** that brackets the **user layer** (`@OnActivated` / `@OnProvision`):
+Plugins are the **framework layer** that brackets the **user layer** (`@OnActivation` / `@OnProvision`):
 
 - On **setup** (activate, provision), plugin hooks run **before** the matching user hook.
 - On **teardown** (deactivate, deprovision), they run **after** it.

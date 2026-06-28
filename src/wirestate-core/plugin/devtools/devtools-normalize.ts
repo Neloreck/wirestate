@@ -1,4 +1,4 @@
-import { getActivatedHandlerMetadata } from "../../activation/on-activated";
+import { getActivationHandlerMetadata } from "../../activation/on-activation";
 import { getDeactivationHandlerMetadata } from "../../activation/on-deactivation";
 import { WireStatus } from "../../activation/wire-status";
 import { type BindingDescriptor, type ServiceToken } from "../../binding/binding";
@@ -33,7 +33,7 @@ import {
 const LIFECYCLE_HOOK_READERS: ReadonlyArray<
   readonly [DevtoolsLifecycleHook, (instance: object) => Optional<string | symbol>]
 > = [
-  ["onActivated", getActivatedHandlerMetadata],
+  ["onActivation", getActivationHandlerMetadata],
   ["onProvision", getProvisionHandlerMetadata],
   ["onDeprovision", getDeprovisionHandlerMetadata],
   ["onDeactivation", getDeactivationHandlerMetadata],

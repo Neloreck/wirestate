@@ -7,7 +7,7 @@ import { type LifecyclePhasePresentation, getLifecyclePhasePresentation } from "
  * view reuses the same color + `↑`/`↓` glyph as the "lifecycle history" event view.
  */
 const LIFECYCLE_HOOK_PHASE: Record<DevtoolsLifecycleHook, DevtoolsLifecyclePhase> = {
-  onActivated: "activate",
+  onActivation: "activate",
   onDeactivation: "deactivate",
   onProvision: "provision",
   onDeprovision: "deprovision",

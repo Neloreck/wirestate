@@ -8,7 +8,7 @@ import type { Container } from "../container/container";
  * Register plugins on a {@link Container} via `config.plugins`. A plugin is a
  * class instance, so it can hold per-instance state, and every hook is optional.
  *
- * Plugins bracket the user layer (`@OnActivated` / `@OnProvision`): setup hooks
+ * Plugins bracket the user layer (`@OnActivation` / `@OnProvision`): setup hooks
  * run before the matching user hook, teardown hooks run after it. Setup hooks
  * (`install`, `onActivate`, `onContainerProvision`, `onProvision`) are atomic, so
  * a throw unwinds the activation/provision cycle. Teardown hooks (`onDeactivate`,
@@ -87,7 +87,7 @@ export interface WirestatePlugin {
   onContainerDeprovision?(container: Container): void;
 
   /**
-   * Runs after a service instance is activated, before its `@OnActivated`.
+   * Runs after a service instance is activated, before its `@OnActivation`.
    *
    * @param instance - The activated instance.
    * @param container - Container that activated it.

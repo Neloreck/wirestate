@@ -217,7 +217,7 @@ window.
 
 Wirestate has service lifecycle and provider lifecycle:
 
-- `@OnActivated` runs when the service is first resolved.
+- `@OnActivation` runs when the service is first resolved.
 - `@OnDeactivation` runs when the service is unbound or the container is disposed.
 - `@OnProvision` runs when a provider takes ownership of the container.
 - `@OnDeprovision` runs before that provider releases or replaces the container.

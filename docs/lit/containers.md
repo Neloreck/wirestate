@@ -30,7 +30,7 @@ provided.
 Before the host connects, and after it disconnects, no container value is published from that provider.
 
 Use `@OnProvision` for resource work tied to the connected provider lifetime. Use `@OnDeprovision` to clean it up. Keep
-`@OnActivated` for cheap setup that does not open timers, subscriptions, or external handles. See
+`@OnActivation` for cheap setup that does not open timers, subscriptions, or external handles. See
 [Core Lifecycle](/core/lifecycle).
 
 ## Messaging
