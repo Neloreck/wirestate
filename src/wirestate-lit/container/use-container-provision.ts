@@ -35,7 +35,6 @@ export type UseContainerProviderOptions = ContainerProviderOptions;
  * class MyRootElement extends LitElement {
  *   private containerProvider: ContainerProvider = useContainerProvider(this, {
  *     config: {
- *       activate: [LoggerService],
  *       bindings: [LoggerService],
  *     },
  *   });

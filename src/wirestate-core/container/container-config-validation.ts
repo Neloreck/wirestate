@@ -27,7 +27,6 @@ import type { ContainerConfig } from "./container";
  * class LoggerService {}
  *
  * validateContainerConfig({
- *   activate: [LoggerService],
  *   bindings: [LoggerService],
  * });
  * ```

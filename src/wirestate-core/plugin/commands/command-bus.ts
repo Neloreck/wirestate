@@ -29,6 +29,7 @@ import { type CommandDispatchOptions, type CommandHandler, type CommandType, typ
  * });
  *
  * await bus.executeAsync<void, User>("SAVE_USER", { id: "u1" });
+ *
  * unregister();
  * ```
  */

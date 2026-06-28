@@ -112,7 +112,6 @@ export interface ContainerConfig {
  * class CounterService {}
  *
  * const container: Container = new Container({
- *   activate: [LoggerService],
  *   bindings: [CounterService, LoggerService],
  * });
  *
