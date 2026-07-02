@@ -12,15 +12,6 @@ is separate: use MobX, Preact Signals, plain values, or another reactivity adapt
 Use Wirestate when you want service-owned state and workflows that can be scoped to an app, subtree, feature, modal,
 tenant, or test.
 
-## Core Ideas
-
-- Services own state, workflows, and cross-component coordination.
-- Containers define scope and lifetime.
-- Events broadcast notifications inside a container.
-- Commands run one active write handler.
-- Queries run one active read handler.
-- Provider lifecycle hooks connect service work to React or Lit ownership.
-
 ## Packages
 
 | Package                                                               | Purpose                                                                                           |
@@ -69,28 +60,30 @@ decorators, enable `experimentalDecorators`.
 
 ```tsx
 import { Injectable } from "@wirestate/core";
+import { makeAutoObservable } from "@wirestate/mobx";
 import { ContainerProvider, useInjection } from "@wirestate/react";
-import { useSignals } from "@wirestate/react-signals";
-import { Signal, signal } from "@wirestate/signals";
+import { observer } from "@wirestate/react-mobx";
 
 @Injectable()
 class CounterService {
-  public readonly count: Signal<number> = signal(0);
+  public count: number = 0;
+
+  public constructor() {
+    makeAutoObservable(this);
+  }
 
   public increment(): void {
-    this.count.value++;
+    this.count += 1;
   }
 }
 
-function Counter() {
-  useSignals();
-
+const Counter = observer(function Counter() {
   const counter = useInjection(CounterService);
 
-  return <button onClick={() => counter.increment()}>Count: {counter.count.value}</button>;
-}
+  return <button onClick={() => counter.increment()}>Count: {counter.count}</button>;
+});
 
-export function App() {
+export function Application() {
   return (
     <ContainerProvider config={{ bindings: [CounterService] }}>
       <Counter />
@@ -99,8 +92,8 @@ export function App() {
 }
 ```
 
-`@wirestate/react` connects the component to the service. `useSignals()` subscribes this component to signal reads
-during render. The same service pattern can use MobX or Preact Signals in React or Lit.
+`@wirestate/react` connects the component to the service. `observer` subscribes `Counter` to the MobX observables it
+reads during render. The same service pattern can use MobX or Preact Signals in React or Lit.
 
 ## Documentation
 
