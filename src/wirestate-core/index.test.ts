@@ -48,6 +48,7 @@ describe("Library exported API from wirestate-core", () => {
         "InternalErrorDescriptor",
         "InternalErrorHandler",
         "InternalErrorSource",
+        "LifecycleDecorator",
         "Newable",
         "OnCommandDecorator",
         "OnEventDecorator",

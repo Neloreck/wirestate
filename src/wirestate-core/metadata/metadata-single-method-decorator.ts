@@ -6,11 +6,12 @@ import { validateStandardMethodContext } from "./metadata-decorator-context";
 import { getPrototypeChainMetadata } from "./metadata-prototype-chain";
 
 /**
- * Method decorator attached by single-method lifecycle hooks such as `@OnActivation`.
+ * Method decorator returned by the single-method lifecycle hooks:
+ * `@OnActivation`, `@OnDeactivation`, `@OnProvision`, and `@OnDeprovision`.
  *
- * @internal
+ * @group Lifecycle
  */
-export interface SingleMethodDecorator {
+export interface LifecycleDecorator {
   // Standard (TC39):
   <This>(value: (this: This, ...args: Array<never>) => unknown, context: ClassMethodDecoratorContext<This>): void;
   // Legacy/experimental:
@@ -71,7 +72,7 @@ export interface SingleMethodDecoratorDescriptor {
   /**
    * Method decorator factory that records the decorated method name.
    */
-  readonly decorator: () => SingleMethodDecorator;
+  readonly decorator: () => LifecycleDecorator;
 
   /**
    * Resolves the decorated method name for an instance, or `undefined` when none exists.
@@ -94,7 +95,7 @@ export function createSingleMethodDecoratorDescriptor(
   const { registry, metadataKey, name, duplicateMessage, hierarchyMessage } = options;
 
   return {
-    decorator: (): SingleMethodDecorator => {
+    decorator: (): LifecycleDecorator => {
       return ((target: object, nameOrContext: string | symbol | ClassMethodDecoratorContext): void => {
         if (typeof nameOrContext === "object") {
           // Standard decorators:
@@ -130,7 +131,7 @@ export function createSingleMethodDecoratorDescriptor(
 
           registry.set(constructor, nameOrContext);
         }
-      }) as SingleMethodDecorator;
+      }) as LifecycleDecorator;
     },
     getMetadata: (instance: object): Optional<string | symbol> => {
       let handler: Optional<string | symbol> = undefined;

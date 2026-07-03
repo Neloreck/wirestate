@@ -41,6 +41,7 @@ export { defaultInternalErrorHandler } from "./error/internal-error-handler";
 export { WirestateError } from "./error/wirestate-error";
 
 export { Injectable, isInjectable } from "./metadata/metadata-injectable";
+export { type LifecycleDecorator } from "./metadata/metadata-single-method-decorator";
 
 export { CommandBus } from "./plugin/commands/command-bus";
 export { CommandsPlugin } from "./plugin/commands/commands-plugin";

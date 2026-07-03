@@ -1,5 +1,5 @@
 import {
-  type SingleMethodDecorator,
+  type LifecycleDecorator,
   createSingleMethodDecoratorDescriptor,
 } from "../metadata/metadata-single-method-decorator";
 import { type Optional } from "../types/general";
@@ -41,7 +41,7 @@ const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
  * }
  * ```
  */
-export function OnDeprovision(): SingleMethodDecorator {
+export function OnDeprovision(): LifecycleDecorator {
   return decorator();
 }
 
