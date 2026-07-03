@@ -1,4 +1,4 @@
-import { type Container, type EventHandler, type EventType, EventBus } from "@wirestate/core";
+import { type Container, type EventHandler, type EventType, type WireEvent, EventBus } from "@wirestate/core";
 import { type RefObject, useRef } from "react";
 
 import { useContainer } from "../container/use-container";
@@ -13,7 +13,7 @@ type EventTypeSelector = Nullable<EventType | ReadonlyArray<EventType>>;
  *
  * @param handler - Handler invoked for every event.
  */
-export function useOnEvents(handler: EventHandler): void;
+export function useOnEvents<E extends WireEvent = WireEvent>(handler: EventHandler<E>): void;
 
 /**
  * Subscribes the component to one event type on the active {@link EventBus}.
@@ -21,7 +21,7 @@ export function useOnEvents(handler: EventHandler): void;
  * @param type - Event type to listen for.
  * @param handler - Handler invoked for matching events.
  */
-export function useOnEvents(type: EventType, handler: EventHandler): void;
+export function useOnEvents<E extends WireEvent = WireEvent>(type: EventType, handler: EventHandler<E>): void;
 
 /**
  * Subscribes the component to several event types on the active {@link EventBus}.
@@ -29,7 +29,10 @@ export function useOnEvents(type: EventType, handler: EventHandler): void;
  * @param types - Event types to listen for.
  * @param handler - Handler invoked for matching events.
  */
-export function useOnEvents(types: ReadonlyArray<EventType>, handler: EventHandler): void;
+export function useOnEvents<E extends WireEvent = WireEvent>(
+  types: ReadonlyArray<EventType>,
+  handler: EventHandler<E>
+): void;
 
 /**
  * Subscribes the component to events on the active container's {@link EventBus}.

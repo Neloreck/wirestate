@@ -1,9 +1,23 @@
 import { Container } from "../../container/container";
 
 import { EventBus } from "./event-bus";
-import { type EventUnsubscribe } from "./events";
+import { type EventUnsubscribe, type WireEvent } from "./events";
 
 describe("EventBus", () => {
+  it("should accept a handler typed with a narrowed payload (F-6)", () => {
+    type CartEvent = WireEvent<{ id: string }, "CART_ITEM_ADDED">;
+
+    const bus: EventBus = new EventBus();
+
+    const handler = (event: CartEvent): void => void event.payload?.id;
+    const unsubscribe: EventUnsubscribe = bus.subscribe<CartEvent>("CART_ITEM_ADDED", handler);
+
+    bus.subscribe(handler);
+    bus.unsubscribe("CART_ITEM_ADDED", handler);
+
+    unsubscribe();
+  });
+
   it("should emit event to subscribed handler", () => {
     const bus: EventBus = new EventBus();
     const handler = jest.fn();

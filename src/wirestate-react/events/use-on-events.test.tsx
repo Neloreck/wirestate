@@ -3,16 +3,41 @@
  */
 
 import { render, cleanup, act } from "@testing-library/react";
-import { Container, EventBus } from "@wirestate/core";
+import { type WireEvent, Container, EventBus } from "@wirestate/core";
 import { useLayoutEffect } from "react";
 
 import { ContainerProvider } from "../provision/container-provider";
+import { type Optional } from "../types/general";
 
 import { useOnEvents } from "./use-on-events";
 
 describe("useOnEvents", () => {
   afterEach(() => {
     cleanup();
+  });
+
+  it("should accept a handler typed with a narrowed payload (F-6)", () => {
+    type CartEvent = WireEvent<{ id: string }, "CART_ITEM_ADDED">;
+
+    const container: Container = new Container({ bindings: [EventBus] });
+    const bus: EventBus = container.get(EventBus);
+    const received: Array<Optional<string>> = [];
+
+    function TestComponent() {
+      useOnEvents<CartEvent>("CART_ITEM_ADDED", (event) => received.push(event.payload?.id));
+
+      return null;
+    }
+
+    render(
+      <ContainerProvider container={container}>
+        <TestComponent />
+      </ContainerProvider>
+    );
+
+    act(() => bus.emit("CART_ITEM_ADDED", { id: "a1" }));
+
+    expect(received).toEqual(["a1"]);
   });
 
   describe("single event type", () => {

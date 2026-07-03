@@ -135,7 +135,7 @@ export class EventBus {
    * });
    * ```
    */
-  public subscribe(handler: EventHandler): EventUnsubscribe;
+  public subscribe<E extends WireEvent = WireEvent>(handler: EventHandler<E>): EventUnsubscribe;
 
   /**
    * Subscribes to one or more event types.
@@ -157,7 +157,10 @@ export class EventBus {
    * });
    * ```
    */
-  public subscribe(types: Nullable<EventType | ReadonlyArray<EventType>>, handler: EventHandler): EventUnsubscribe;
+  public subscribe<E extends WireEvent = WireEvent>(
+    types: Nullable<EventType | ReadonlyArray<EventType>>,
+    handler: EventHandler<E>
+  ): EventUnsubscribe;
 
   public subscribe(
     typesOrHandler: EventHandler | Nullable<EventType | ReadonlyArray<EventType>>,
@@ -202,7 +205,7 @@ export class EventBus {
    *
    * @param handler - The handler function instance to remove.
    */
-  public unsubscribe(handler: EventHandler): void;
+  public unsubscribe<E extends WireEvent = WireEvent>(handler: EventHandler<E>): void;
 
   /**
    * Removes one of a handler's subscriptions for one or more event types.
@@ -214,7 +217,10 @@ export class EventBus {
    * @param types - Event type, list of event types, or `null` for catch-all.
    * @param handler - The handler function instance to remove.
    */
-  public unsubscribe(types: Nullable<EventType | ReadonlyArray<EventType>>, handler: EventHandler): void;
+  public unsubscribe<E extends WireEvent = WireEvent>(
+    types: Nullable<EventType | ReadonlyArray<EventType>>,
+    handler: EventHandler<E>
+  ): void;
 
   public unsubscribe(
     typesOrHandler: EventHandler | Nullable<EventType | ReadonlyArray<EventType>>,
