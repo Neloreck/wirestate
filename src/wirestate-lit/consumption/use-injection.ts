@@ -1,8 +1,9 @@
 import { ContextConsumer } from "@lit/context";
 import { type ReactiveControllerHost } from "@lit/reactive-element";
-import { type Container, type ServiceToken } from "@wirestate/core";
+import { type Container, type ServiceToken, WirestateError } from "@wirestate/core";
 
 import { ContainerContext } from "../container/container-context";
+import { ERROR_CODE_INVALID_CONTEXT } from "../error/error-code";
 import { type Nullable } from "../types/general";
 
 /**
@@ -26,16 +27,7 @@ export interface UseInjectionOptions<T, F = undefined> {
   /**
    * The token to inject.
    */
-  token: ServiceToken<T>;
-
-  /**
-   * Resolve only the first context value.
-   *
-   * @remarks
-   * If true, the value will not update when the container context changes.
-   * Defaults to `false`.
-   */
-  once?: boolean;
+  readonly token: ServiceToken<T>;
 
   /**
    * Initial value held until the context resolves.
@@ -43,12 +35,12 @@ export interface UseInjectionOptions<T, F = undefined> {
    * @remarks
    * Useful when templates may read the holder before the first context callback runs.
    */
-  value?: Nullable<T | F>;
+  readonly value?: Nullable<T | F>;
 
   /**
    * Resolve `undefined` instead of throwing when the token is not bound.
    */
-  optional?: boolean;
+  readonly optional?: boolean;
 
   /**
    * Value used when the token is not bound. Providing it makes the lookup optional.
@@ -56,7 +48,7 @@ export interface UseInjectionOptions<T, F = undefined> {
    * @remarks
    * A function fallback is treated as a factory and receives the active container.
    */
-  fallback?: InjectionFallback<F>;
+  readonly fallback?: InjectionFallback<F>;
 }
 
 /**
@@ -68,27 +60,36 @@ export interface UseInjectionValue<T, F = never> {
   /**
    * The token used for injection.
    */
-  token: ServiceToken<T>;
+  readonly token: ServiceToken<T>;
 
   /**
    * The injected value.
+   *
+   * @remarks
+   * For a required lookup, reading this before the context resolves - i.e. the
+   * host is not nested under a container provider - throws a {@link WirestateError},
+   * unless an initial `value` was supplied. Optional / fallback lookups hold
+   * `undefined` until resolution instead of throwing.
+   *
+   * @throws `WirestateError` When a required value is read before the container context resolves.
    */
-  value: T | F;
+  readonly value: T | F;
 }
 
 /**
  * Consumes a value from the nearest Lit container context.
  *
  * @remarks
- * Returns a holder whose `value` updates when the container context changes,
- * unless `once` is set. Throws when the token is not bound. Pass `optional` to
- * hold `undefined` on a miss, or a `fallback` (which implies `optional`) to hold
- * a default.
+ * Returns a holder whose `value` updates when the container context changes.
+ * Throws when the token is not bound. Pass `optional` to hold `undefined` on a
+ * miss, or a `fallback` (which implies `optional`) to hold a default. For a
+ * required lookup, reading `value` before the context resolves (no container
+ * provider above the host) throws, unless an initial `value` is set.
  *
  * @group Injection
  *
  * @param host - Host element.
- * @param token - Token to inject, or options carrying the token plus `once`/`value`/`optional`/`fallback`.
+ * @param token - Token to inject, or options carrying the token plus `value`/`optional`/`fallback`.
  * @returns Injection holder.
  *
  * @example
@@ -123,27 +124,56 @@ export function useInjection<T, F = undefined>(
       ? optionsOrToken
       : { token: optionsOrToken as ServiceToken<T> };
 
-  const { once, token, value, optional, fallback } = options;
+  const { token, value, optional, fallback } = options;
 
-  const current: UseInjectionValue<T, F> = { value: value as T | F, token };
+  // A required lookup has neither `optional` nor `fallback`; only then is an unresolved read a misuse.
+  const required: boolean = !optional && fallback === undefined;
+  // An explicit initial value is held (and returned) until the context resolves.
+  const hasInitialValue: boolean = value !== undefined && value !== null;
+
+  let resolved: boolean = false;
+  let current: T | F;
 
   new ContextConsumer(host, {
     context: ContainerContext,
-    subscribe: !once,
+    subscribe: true,
     callback: (container) => {
       // Required lookup (neither optional nor fallback): resolve directly so the container throws on a miss.
-      if (!optional && fallback === undefined) {
-        current.value = container.get(token);
+      if (required) {
+        current = container.get(token);
       } else if (container.has(token)) {
-        current.value = container.get(token);
+        current = container.get(token);
       } else if (fallback !== undefined) {
-        current.value =
-          typeof fallback === "function" ? (fallback as (container: Container) => F)(container) : fallback;
+        current = typeof fallback === "function" ? (fallback as (container: Container) => F)(container) : fallback;
       } else {
-        current.value = undefined as F;
+        current = undefined as F;
       }
+
+      resolved = true;
     },
   });
 
-  return current;
+  return {
+    token,
+    get value(): T | F {
+      if (resolved) {
+        return current;
+      }
+
+      if (hasInitialValue) {
+        return value as T | F;
+      }
+
+      // A required injection read before the context resolves means no provider above the host.
+      if (required) {
+        throw new WirestateError(
+          "Trying to inject a value from a Lit element not nested under a container provider.",
+          ERROR_CODE_INVALID_CONTEXT
+        );
+      }
+
+      // Optional / fallback lookups legitimately hold `undefined` until the context resolves.
+      return undefined as F;
+    },
+  };
 }

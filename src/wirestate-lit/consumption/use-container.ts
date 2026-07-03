@@ -1,8 +1,9 @@
 import { ContextConsumer } from "@lit/context";
 import { type ReactiveControllerHost } from "@lit/reactive-element";
-import { type Container } from "@wirestate/core";
+import { type Container, WirestateError } from "@wirestate/core";
 
 import { ContainerContext } from "../container/container-context";
+import { ERROR_CODE_INVALID_CONTEXT } from "../error/error-code";
 
 /**
  * Describes value returned by {@link useContainer}.
@@ -12,8 +13,10 @@ import { ContainerContext } from "../container/container-context";
 export interface UseContainerValue {
   /**
    * The active container from the nearest parent context.
+   *
+   * @throws `WirestateError` When read before the container context resolves.
    */
-  value: Container;
+  readonly value: Container;
 }
 
 /**
@@ -21,11 +24,12 @@ export interface UseContainerValue {
  *
  * @remarks
  * The returned value updates when the nearest provided container changes.
+ * Reading `value` before the context resolves (no container provider above the host) throws.
  *
  * @group Injection
  *
  * @param host - Host element.
- * @returns Mutable container holder.
+ * @returns Container holder that resolves to the active container.
  *
  * @example
  * ```typescript
@@ -35,21 +39,34 @@ export interface UseContainerValue {
  *   private container: UseContainerValue = useContainer(this);
  *
  *   public render() {
- *     return html`<div>${this.container.value?.has(MyService)}</div>`;
+ *     return html`<div>${this.container.value.has(MyService)}</div>`;
  *   }
  * }
  * ```
  */
 export function useContainer<E extends ReactiveControllerHost & HTMLElement>(host: E): UseContainerValue {
-  const current: UseContainerValue = { value: null as unknown as Container };
+  let resolved: boolean = false;
+  let current: Container;
 
   new ContextConsumer(host, {
     context: ContainerContext,
     subscribe: true,
     callback: (container) => {
-      current.value = container;
+      current = container;
+      resolved = true;
     },
   });
 
-  return current;
+  return {
+    get value(): Container {
+      if (!resolved) {
+        throw new WirestateError(
+          "Trying to access container context from a Lit element not nested under a container provider.",
+          ERROR_CODE_INVALID_CONTEXT
+        );
+      }
+
+      return current;
+    },
+  };
 }

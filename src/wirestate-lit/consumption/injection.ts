@@ -52,21 +52,12 @@ export interface InjectionOptions<T, F = undefined> {
   /**
    * The token to inject.
    */
-  token: ServiceToken<T>;
-
-  /**
-   * Resolve only the first context value.
-   *
-   * @remarks
-   * If true, the property will not update when the container context changes.
-   * Defaults to `false`.
-   */
-  once?: boolean;
+  readonly token: ServiceToken<T>;
 
   /**
    * Resolve `undefined` instead of throwing when the token is not bound.
    */
-  optional?: boolean;
+  readonly optional?: boolean;
 
   /**
    * Value used when the token is not bound. Providing it makes the lookup optional.
@@ -74,20 +65,20 @@ export interface InjectionOptions<T, F = undefined> {
    * @remarks
    * A function fallback is treated as a factory and receives the active container.
    */
-  fallback?: InjectionFallback<F>;
+  readonly fallback?: InjectionFallback<F>;
 }
 
 /**
  * Injects a container value into a Lit element property.
  *
  * @remarks
- * Follows the nearest container context unless `once` is set. Throws when the
- * token is not bound. Pass `optional` to assign `undefined` on a miss, or a
- * `fallback` (which implies `optional`) to assign a default.
+ * Follows the nearest container context. Throws when the token is not bound.
+ * Pass `optional` to assign `undefined` on a miss, or a `fallback` (which
+ * implies `optional`) to assign a default.
  *
  * @group Injection
  *
- * @param token - Token to inject, or options carrying the token plus `once`/`optional`/`fallback`.
+ * @param token - Token to inject, or options carrying the token plus `optional`/`fallback`.
  * @returns Lit property decorator.
  *
  * @example
@@ -110,19 +101,16 @@ export interface InjectionOptions<T, F = undefined> {
 export function injection<T>(token: ServiceToken<T>): InjectionDecorator<T>;
 export function injection<T>(options: {
   token: ServiceToken<T>;
-  once?: boolean;
   optional?: false;
   fallback?: undefined;
 }): InjectionDecorator<T>;
 export function injection<T>(options: {
   token: ServiceToken<T>;
-  once?: boolean;
   optional: true;
   fallback?: undefined;
 }): InjectionDecorator<Optional<T>>;
 export function injection<T, F>(options: {
   token: ServiceToken<T>;
-  once?: boolean;
   optional?: boolean;
   fallback: InjectionFallback<F>;
 }): InjectionDecorator<T | F>;
@@ -134,7 +122,7 @@ export function injection<T, F = undefined>(
       ? optionsOrToken
       : { token: optionsOrToken as ServiceToken<T> };
 
-  const { once, token, optional, fallback } = options;
+  const { token, optional, fallback } = options;
 
   function resolve(container: Container): T | F {
     // Required lookup (neither optional nor fallback): resolve directly so the container throws on a miss.
@@ -165,7 +153,7 @@ export function injection<T, F = undefined>(
           callback: (container) => {
             nameOrContext.access.set(this, resolve(container));
           },
-          subscribe: !once,
+          subscribe: true,
         });
       });
     } else {
@@ -176,7 +164,7 @@ export function injection<T, F = undefined>(
           callback: (container) => {
             (element as AnyObject)[nameOrContext] = resolve(container);
           },
-          subscribe: !once,
+          subscribe: true,
         });
       });
     }

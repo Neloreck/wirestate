@@ -21,13 +21,7 @@ export class CartIcon extends LitElement {
 }
 ```
 
-By default, the property follows the nearest container context. Pass `once: true` when the first resolved value should
-stay fixed.
-
-```ts
-@injection({ token: CartService, once: true })
-private cart!: CartService;
-```
+The property follows the nearest container context, updating whenever the provided container changes.
 
 The decorator supports standard decorators on fields and accessors, and legacy TypeScript field decorators.
 
@@ -66,7 +60,7 @@ factory.
 ## Controller Helpers
 
 `useInjection` returns a mutable holder. Read `holder.value` in element methods and templates. Like the decorator, it
-follows container context changes unless `once: true` is set.
+follows container context changes.
 
 ```ts
 import { useInjection } from "@wirestate/lit";
