@@ -7,7 +7,7 @@ describe("EventBus", () => {
   it("should accept a handler typed with a narrowed payload (F-6)", () => {
     type CartEvent = WireEvent<{ id: string }, "CART_ITEM_ADDED">;
 
-    const bus: EventBus = new EventBus();
+    const bus: EventBus = new EventBus(new Container());
 
     const handler = (event: CartEvent): void => void event.payload?.id;
     const unsubscribe: EventUnsubscribe = bus.subscribe<CartEvent>("CART_ITEM_ADDED", handler);
@@ -19,7 +19,7 @@ describe("EventBus", () => {
   });
 
   it("should emit event to subscribed handler", () => {
-    const bus: EventBus = new EventBus();
+    const bus: EventBus = new EventBus(new Container());
     const handler = jest.fn();
 
     bus.subscribe(handler);
@@ -29,7 +29,7 @@ describe("EventBus", () => {
   });
 
   it("should omit payload and source fields when they are undefined", () => {
-    const bus: EventBus = new EventBus();
+    const bus: EventBus = new EventBus(new Container());
     const handler = jest.fn();
 
     bus.subscribe(handler);
@@ -43,7 +43,7 @@ describe("EventBus", () => {
   });
 
   it("should omit only undefined fields while preserving provided fields", () => {
-    const bus: EventBus = new EventBus();
+    const bus: EventBus = new EventBus(new Container());
     const handler = jest.fn();
 
     bus.subscribe(handler);
@@ -61,7 +61,7 @@ describe("EventBus", () => {
   });
 
   it("should preserve falsy payload and source values when they are not undefined", () => {
-    const bus: EventBus = new EventBus();
+    const bus: EventBus = new EventBus(new Container());
     const handler = jest.fn();
 
     bus.subscribe(handler);
@@ -75,7 +75,7 @@ describe("EventBus", () => {
   });
 
   it("should support multiple subscribers", () => {
-    const bus: EventBus = new EventBus();
+    const bus: EventBus = new EventBus(new Container());
     const handler1 = jest.fn();
     const handler2 = jest.fn();
 
@@ -88,7 +88,7 @@ describe("EventBus", () => {
   });
 
   it("should unsubscribe handler", () => {
-    const bus = new EventBus();
+    const bus = new EventBus(new Container());
     const handler = jest.fn();
 
     const unsubscribe: EventUnsubscribe = bus.subscribe(handler);
@@ -102,7 +102,7 @@ describe("EventBus", () => {
   it("should catch handler errors without affecting other handlers", () => {
     const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
-    const bus: EventBus = new EventBus();
+    const bus: EventBus = new EventBus(new Container());
 
     const firstHandler = jest.fn();
     const secondHandler = jest.fn();
@@ -129,7 +129,7 @@ describe("EventBus", () => {
   });
 
   it("should unsubscribe handler by reference", () => {
-    const bus: EventBus = new EventBus();
+    const bus: EventBus = new EventBus(new Container());
     const handler = jest.fn();
 
     bus.subscribe(handler);
@@ -142,14 +142,14 @@ describe("EventBus", () => {
   });
 
   it("should not throw when unsubscribing a handler that was not subscribed", () => {
-    const bus: EventBus = new EventBus();
+    const bus: EventBus = new EventBus(new Container());
     const handler = jest.fn();
 
     expect(() => bus.unsubscribe(handler)).not.toThrow();
   });
 
   it("should only remove the specified handler when multiple are subscribed", () => {
-    const bus: EventBus = new EventBus();
+    const bus: EventBus = new EventBus(new Container());
     const handlerA = jest.fn();
     const handlerB = jest.fn();
 
@@ -188,7 +188,7 @@ describe("EventBus", () => {
 
   describe("type-indexed subscriptions", () => {
     it("should only deliver matching events to a single-type subscriber", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       bus.subscribe("A", handler);
@@ -202,7 +202,7 @@ describe("EventBus", () => {
     });
 
     it("should deliver matching events to a multi-type subscriber", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       bus.subscribe(["A", "B"], handler);
@@ -217,7 +217,7 @@ describe("EventBus", () => {
     });
 
     it("should treat an 0 type list as a catch-all subscription", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       bus.subscribe(0, handler);
@@ -230,7 +230,7 @@ describe("EventBus", () => {
     });
 
     it("should treat an undefined type list as a catch-all subscription", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       bus.subscribe(handler);
@@ -242,7 +242,7 @@ describe("EventBus", () => {
     });
 
     it("should treat a null type list as a catch-all subscription", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       bus.subscribe(null, handler);
@@ -254,7 +254,7 @@ describe("EventBus", () => {
     });
 
     it("should not deliver events to an empty type list subscriber", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       bus.subscribe([], handler);
@@ -266,7 +266,7 @@ describe("EventBus", () => {
     });
 
     it("should deduplicate repeated types and invoke the handler once per emit", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       bus.subscribe(["DUPLICATED", "DUPLICATED"], handler);
@@ -276,7 +276,7 @@ describe("EventBus", () => {
     });
 
     it("should run catch-all handlers before type-specific handlers", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const calls: Array<string> = [];
 
       bus.subscribe("TYPED", () => calls.push("TYPED"));
@@ -288,7 +288,7 @@ describe("EventBus", () => {
     });
 
     it("should unsubscribe a typed handler via the returned function", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       const unsubscribe: EventUnsubscribe = bus.subscribe(["A", "B"], handler);
@@ -302,7 +302,7 @@ describe("EventBus", () => {
     });
 
     it("should keep a shared type bucket alive until its last handler unsubscribes", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const first = jest.fn();
       const second = jest.fn();
 
@@ -320,7 +320,7 @@ describe("EventBus", () => {
 
     it("should report typed handler errors without stopping other handlers", () => {
       const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
 
       const survivor = jest.fn();
       const failing = jest.fn().mockImplementation(() => {
@@ -343,7 +343,7 @@ describe("EventBus", () => {
     });
 
     it("should not invoke handlers subscribed during the same emit", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const late = jest.fn();
 
       bus.subscribe("CHAIN", () => {
@@ -360,7 +360,7 @@ describe("EventBus", () => {
     });
 
     it("should allow a handler to unsubscribe itself during emit", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       const unsubscribe: EventUnsubscribe = bus.subscribe("ONCE", () => {
@@ -375,7 +375,7 @@ describe("EventBus", () => {
     });
 
     it("should report no subscribers once all typed and catch-all handlers are removed", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
 
       const unsubscribeTyped: EventUnsubscribe = bus.subscribe("A", jest.fn());
       const unsubscribeCatchAll: EventUnsubscribe = bus.subscribe(jest.fn());
@@ -392,7 +392,7 @@ describe("EventBus", () => {
 
   describe("registration identity", () => {
     it("should deliver an event once per separate subscription of the same handler", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       bus.subscribe("A", handler);
@@ -404,7 +404,7 @@ describe("EventBus", () => {
     });
 
     it("should remove only its own subscription via the returned unsubscriber", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       const unsubscribeFirst: EventUnsubscribe = bus.subscribe("A", handler);
@@ -418,7 +418,7 @@ describe("EventBus", () => {
     });
 
     it("should manage overlapping multi-type subscriptions of one handler independently", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       const unsubscribeFirst: EventUnsubscribe = bus.subscribe(["A", "B"], handler);
@@ -438,7 +438,7 @@ describe("EventBus", () => {
     });
 
     it("should remove a handler only for the given types via unsubscribe(types, handler)", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       bus.subscribe(["A", "B"], handler);
@@ -452,7 +452,7 @@ describe("EventBus", () => {
     });
 
     it("should remove only one subscription per unsubscribe(type, handler) call", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       const unsubscribeFirst = bus.subscribe("A", handler);
@@ -472,7 +472,7 @@ describe("EventBus", () => {
     });
 
     it("should not let catch-all unsubscribe touch typed subscriptions", () => {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();
 
       bus.subscribe(handler);

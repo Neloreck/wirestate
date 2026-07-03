@@ -1,3 +1,4 @@
+import { Container } from "../../container/container";
 import { type Nullable } from "../../types/general";
 
 import { buildEventDispatchers } from "./build-event-dispatchers";
@@ -175,7 +176,7 @@ describe("buildEventDispatcher", () => {
 
   describe("a method decorated multiple times", () => {
     function subscribeAll(instance: object): EventBus {
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
 
       for (const dispatch of buildEventDispatchers(instance)) {
         bus.subscribe(dispatch.types, dispatch.handler);
@@ -252,7 +253,7 @@ describe("buildEventDispatcher", () => {
       expect(dispatches).toHaveLength(1);
       expect(dispatches[0].types).toBeNull();
 
-      const bus: EventBus = new EventBus();
+      const bus: EventBus = new EventBus(new Container());
 
       for (const dispatch of dispatches) {
         bus.subscribe(dispatch.types, dispatch.handler);

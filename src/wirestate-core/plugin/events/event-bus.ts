@@ -65,7 +65,7 @@ export class EventBus {
    */
   private readonly handlers: Map<EventType, Set<EventSubscription>> = new Map();
 
-  public constructor(private readonly container: Optional<Container> = inject(Container, { optional: true })) {}
+  public constructor(private readonly container: Container = inject(Container)) {}
 
   /**
    * Emits an event to matching subscribers.
