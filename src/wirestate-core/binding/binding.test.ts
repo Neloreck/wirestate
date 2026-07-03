@@ -281,12 +281,15 @@ describe("Bindings", () => {
       expect(fooService.doSomething()).toBeUndefined();
     });
 
-    it("inject() should fail outside injection context", () => {
+    it("inject() should fail outside injection context for every form, including optional", () => {
       class FooService {}
 
-      expect(() => inject(FooService, { lazy: true })).toThrow(
-        "You can only invoke inject() within an injection context"
-      );
+      const message = "You can only invoke inject() within an injection context";
+
+      expect(() => inject(FooService)).toThrow(message);
+      expect(() => inject(FooService, { optional: true })).toThrow(message);
+      expect(() => inject(FooService, { lazy: true })).toThrow(message);
+      expect(() => inject(FooService, { lazy: true, optional: true })).toThrow(message);
     });
   });
 });

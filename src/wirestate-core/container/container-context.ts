@@ -45,6 +45,8 @@ export function inject<T>(token: ServiceToken<T>): T;
  * @param options - Optional lookup options.
  * @param options.optional - Return `undefined` instead of throwing on a miss.
  * @returns The resolved value, or `undefined` when the token is not bound.
+ *
+ * @throws Error If there is no active injection context.
  */
 export function inject<T>(token: ServiceToken<T>, options: { optional: true }): Optional<T>;
 
@@ -77,6 +79,8 @@ export function inject<T>(token: ServiceToken<T>, options: { lazy: true }): () =
  * @param options.lazy - Return a resolver function instead of resolving immediately.
  * @param options.optional - Return `undefined` from the resolver on a miss.
  * @returns Function that resolves the token when called, or returns `undefined` when missing.
+ *
+ * @throws Error If there is no active injection context (thrown eagerly, before the resolver is returned).
  */
 export function inject<T>(token: ServiceToken<T>, options: { lazy: true; optional: true }): () => Optional<T>;
 
@@ -84,15 +88,7 @@ export function inject<T>(
   token: ServiceToken<T>,
   options?: { optional?: boolean; lazy?: boolean }
 ): Optional<T> | (() => Optional<T>) {
-  try {
-    return currentContext.run((container) => container.get(token, options));
-  } catch (error) {
-    if (error instanceof NeedsInjectionContextError && options?.optional === true) {
-      return undefined;
-    }
-
-    throw error;
-  }
+  return currentContext.run((container) => container.get(token, options));
 }
 
 /**
