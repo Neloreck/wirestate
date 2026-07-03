@@ -4,6 +4,7 @@ import { tokenToString } from "../binding/binding-tokens";
 import { ERROR_CODE_CIRCULAR_DEPENDENCY, ERROR_CODE_UNKNOWN_BINDING_TYPE } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 
+import type { Container } from "./container";
 import type { ContainerKernel } from "./container-kernel";
 
 /**
@@ -49,7 +50,8 @@ export class Factory {
     if (isInstanceDescriptor(binding)) {
       return new binding.value();
     } else if (isFactoryDescriptor(binding)) {
-      return binding.factory(this.container);
+      // The public FactoryBindingDescriptor types the param as `Container`:
+      return binding.factory(this.container as Container);
     } else if (isValueDescriptor(binding)) {
       return binding.value;
     }

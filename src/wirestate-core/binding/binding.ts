@@ -1,4 +1,4 @@
-import type { ContainerKernel } from "../container/container-kernel";
+import type { Container } from "../container/container";
 import type { AbstractClass, Newable } from "../types/general";
 
 import type { InjectionToken } from "./binding-tokens";
@@ -173,7 +173,7 @@ export interface FactoryBindingDescriptor<T = unknown> {
    * Receives the current container and runs inside the injection context, so
    * both `current.get(...)` and `inject(...)` can read other bindings.
    */
-  readonly factory: (container: ContainerKernel) => NoInfer<T>;
+  readonly factory: (container: Container) => NoInfer<T>;
 
   /**
    * Lifetime scope for factory results.
