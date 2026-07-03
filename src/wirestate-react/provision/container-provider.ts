@@ -2,7 +2,7 @@ import { type ContainerConfig, Container, WirestateError } from "@wirestate/core
 import { type ReactElement, type ReactNode, createElement, useEffect, useRef, useState } from "react";
 
 import { ContainerContext } from "../container/container-context";
-import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
+import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { type Maybe, type Nullable } from "../types/general";
 import { shallowEqualActivation, shallowEqualArrays } from "../utils/shallow-equal";
 
@@ -107,22 +107,22 @@ export function ContainerProvider(props: ContainerProviderProps): ReactElement {
   if (hasConfig && (configValue === null || typeof configValue !== "object" || Array.isArray(configValue))) {
     throw new WirestateError(
       "ContainerProvider requires a valid container instance or creation config.",
-      ERROR_CODE_VALIDATION_ERROR
+      ERROR_CODE_INVALID_ARGUMENTS
     );
   } else if (!props.container && !hasConfig) {
     throw new WirestateError(
       "ContainerProvider requires a valid container instance or creation config.",
-      ERROR_CODE_VALIDATION_ERROR
+      ERROR_CODE_INVALID_ARGUMENTS
     );
   } else if (props.container && hasConfig) {
     throw new WirestateError(
       "ContainerProvider requires only container or valid config object to be provided.",
-      ERROR_CODE_VALIDATION_ERROR
+      ERROR_CODE_INVALID_ARGUMENTS
     );
   } else if (props.container !== undefined && !(props.container instanceof Container)) {
     throw new WirestateError(
       "ContainerProvider requires a valid container instance or creation config.",
-      ERROR_CODE_VALIDATION_ERROR
+      ERROR_CODE_INVALID_ARGUMENTS
     );
   }
 
@@ -149,7 +149,7 @@ export function ContainerProvider(props: ContainerProviderProps): ReactElement {
   if (ownedRef.current !== owned) {
     throw new WirestateError(
       "ContainerProvider cannot switch between external and managed container modes. Pass a React key to remount the provider.",
-      ERROR_CODE_VALIDATION_ERROR
+      ERROR_CODE_INVALID_ARGUMENTS
     );
   }
 
