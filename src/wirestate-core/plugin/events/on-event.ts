@@ -63,8 +63,6 @@ export interface OnEventDecorator {
  *
  * @group Events
  *
- * @template E - Event type received by the decorated method.
- *
  * @param types - Event token or tokens. Omit for all events.
  * @returns Method decorator.
  *
