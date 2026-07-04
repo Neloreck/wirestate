@@ -151,6 +151,42 @@ describe("container activation adapter seam", () => {
     expect(container.getActiveInstances()).toEqual([]);
   });
 
+  it("should return the committed instance when activation resolves the same token", () => {
+    const constructed = jest.fn();
+    let activateCount = 0;
+    let reentrant: unknown;
+
+    @Injectable()
+    class TestService {
+      public constructor() {
+        constructed();
+      }
+    }
+
+    const container = new ContainerKernel();
+
+    setActivationAdapter(
+      container,
+      mockAdapter({
+        activate: (host) => {
+          activateCount += 1;
+          // Re-resolving the token mid-activation must hit the committed cache, not construct a
+          // duplicate (which previously recursed until the stack overflowed).
+          reentrant = host.get(TestService);
+        },
+      })
+    );
+
+    container.bind({ token: TestService, type: "Instance", value: TestService });
+
+    const instance: TestService = container.get(TestService);
+
+    expect(constructed).toHaveBeenCalledTimes(1);
+    expect(activateCount).toBe(1);
+    expect(reentrant).toBe(instance);
+    expect(container.getActiveInstances()).toEqual([instance]);
+  });
+
   it("should construct and drop instances without an installed adapter", () => {
     @Injectable()
     class TestService {}

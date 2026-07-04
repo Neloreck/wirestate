@@ -1,6 +1,7 @@
 import { GenericService } from "@/fixtures/services/generic-service";
 
 import { Container } from "../container/container";
+import { inject } from "../container/container-context";
 import { Injectable } from "../metadata/metadata-injectable";
 import { CommandBus } from "../plugin/commands/command-bus";
 import { CommandsPlugin } from "../plugin/commands/commands-plugin";
@@ -29,6 +30,39 @@ describe("instance lifecycle tracking", () => {
 
     expect(container.getActiveInstances()).toEqual([instance]);
     expect(getInstanceContainer(instance)).toBe(container);
+  });
+
+  it("should not re-construct a singleton when @OnActivation resolves the same token", () => {
+    const constructed = jest.fn();
+    const activated = jest.fn();
+
+    @Injectable()
+    class SelfResolvingService {
+      public self?: SelfResolvingService;
+
+      public constructor() {
+        constructed();
+      }
+
+      @OnActivation()
+      public onActivation(): void {
+        activated();
+        // Transitively resolving the same token during activation must return this instance,
+        // not construct a duplicate singleton (which previously recursed until the stack overflowed).
+        this.self = inject(SelfResolvingService);
+      }
+    }
+
+    const container: Container = new Container({ bindings: [SelfResolvingService] });
+
+    const first: SelfResolvingService = container.get(SelfResolvingService);
+    const second: SelfResolvingService = container.get(SelfResolvingService);
+
+    expect(first).toBe(second);
+    expect(first.self).toBe(first);
+    expect(constructed).toHaveBeenCalledTimes(1);
+    expect(activated).toHaveBeenCalledTimes(1);
+    expect(container.getActiveInstances()).toEqual([first]);
   });
 
   it("should clean up tracked instances when activation fails", () => {

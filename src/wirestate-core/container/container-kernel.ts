@@ -231,6 +231,11 @@ export class ContainerKernel {
       instance: this.factory.construct(binding),
     };
 
+    // Commit to the cache before dispatching activation.
+    // An @OnActivation hook that transitively resolves the same token then gets this instance from the cache,
+    // instead of silently constructing a duplicate singleton or recursing until the stack overflows.
+    this.commit(record);
+
     if (isInstanceDescriptor(binding)) {
       const adapter = getActivationAdapter(this);
 
@@ -238,14 +243,14 @@ export class ContainerKernel {
         try {
           adapter.activate(this, record);
         } catch (error) {
+          this.evict(record);
+
           adapter.rollback(this, record);
 
           throw error;
         }
       }
     }
-
-    this.commit(record);
 
     return record.instance as T;
   }
@@ -258,6 +263,22 @@ export class ContainerKernel {
   private commit(record: ActivationRecord): void {
     this.instances.set(record.binding, record.instance);
     this.activated.push(record);
+  }
+
+  /**
+   * Removes a record committed before activation when that activation fails, undoing {@link commit}
+   * so a failed instance is never cached or scheduled for deactivation.
+   *
+   * @param record - Activation record to evict.
+   */
+  private evict(record: ActivationRecord): void {
+    this.instances.delete(record.binding);
+
+    const index: number = this.activated.indexOf(record);
+
+    if (index !== -1) {
+      this.activated.splice(index, 1);
+    }
   }
 
   /**

@@ -13,14 +13,16 @@ import type { Optional, Maybe } from "../types/general";
  * construction and caching only.
  *
  * The kernel invokes these hooks for instance bindings: `activate` after the
- * instance is constructed (before it is committed), `deactivate` before a
- * committed instance is dropped on unbind, and `rollback` when activation fails.
+ * instance is constructed and committed to the cache (so an `@OnActivation` hook
+ * that transitively re-resolves the same token gets this instance rather than a
+ * duplicate), `deactivate` before a committed instance is dropped on unbind, and
+ * `rollback` when activation fails - after which the kernel evicts the instance.
  *
  * @internal
  */
 export interface ActivationAdapter {
   /**
-   * Runs after a service instance is constructed, before it is committed.
+   * Runs after a service instance is constructed and committed to the cache.
    *
    * @param container - Container resolving the instance binding.
    * @param record - Activation record carrying the constructed instance.
