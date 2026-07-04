@@ -3,7 +3,7 @@
  */
 
 import { render } from "@testing-library/react";
-import { type ContainerConfig, BindingType, Container, EventBus } from "@wirestate/core";
+import { type ContainerConfig, BindingType, CommandsPlugin, Container, EventBus, EventsPlugin } from "@wirestate/core";
 import { StrictMode } from "react";
 
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
@@ -89,7 +89,7 @@ describe("ContainerProvider", () => {
     ).toThrow("ContainerProvider cannot switch between external and managed container modes.");
   });
 
-  it("should recreate managed container when bindings change", () => {
+  it("should ignore managed config changes after mount", () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
     const containers: Array<Container> = [];
 
@@ -117,11 +117,11 @@ describe("ContainerProvider", () => {
     );
 
     expect(containers).toHaveLength(2);
-    expect(containers[1]).not.toBe(containers[0]);
-    expect(getByTestId("value").textContent).toBe("second");
+    expect(containers[1]).toBe(containers[0]);
+    expect(getByTestId("value").textContent).toBe("first");
   });
 
-  it("should keep managed container when bindings are shallow-equal", () => {
+  it("should keep managed container across rerenders", () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
     const binding = { token: CONFIG_TOKEN, value: "stable" };
     const containers: Array<Container> = [];
@@ -152,7 +152,7 @@ describe("ContainerProvider", () => {
     expect(getByTestId("value").textContent).toBe("stable");
   });
 
-  it("should recreate managed container when parent changes", () => {
+  it("should recreate managed container when the provider key changes", () => {
     const PARENT_TOKEN: string = "PARENT_TOKEN";
     const firstParent: Container = new Container();
     const secondParent: Container = new Container();
@@ -171,7 +171,7 @@ describe("ContainerProvider", () => {
     }
 
     const { getByTestId, rerender } = render(
-      <ContainerProvider config={{ parent: firstParent }}>
+      <ContainerProvider key={"first"} config={{ parent: firstParent }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
@@ -179,7 +179,7 @@ describe("ContainerProvider", () => {
     expect(getByTestId("value").textContent).toBe("first-parent");
 
     rerender(
-      <ContainerProvider config={{ parent: secondParent }}>
+      <ContainerProvider key={"second"} config={{ parent: secondParent }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
@@ -231,7 +231,7 @@ describe("ContainerProvider", () => {
     expect(eventBuses[0]).toBe(parent.get(EventBus));
   });
 
-  it("should recreate managed container when activate changes", () => {
+  it("should ignore activate changes after mount", () => {
     const { LifecycleService, events } = createLifecycleService({ methods: ["activated"] });
 
     const { rerender } = render(<ContainerProvider config={{ bindings: [LifecycleService], activate: false }} />);
@@ -240,11 +240,10 @@ describe("ContainerProvider", () => {
 
     rerender(<ContainerProvider config={{ bindings: [LifecycleService], activate: true }} />);
 
-    expect(events).toEqual(["activated", "activated"]);
+    expect(events).toEqual(["activated"]);
   });
 
-  it("should recreate managed container when bindings change", () => {
-    const CONFIG_TOKEN: string = "CONFIG_TOKEN";
+  it("should ignore a changed plugin list after mount", () => {
     const containers: Array<Container> = [];
 
     function TrackingConsumer() {
@@ -254,22 +253,22 @@ describe("ContainerProvider", () => {
     }
 
     const { rerender } = render(
-      <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "first" }] }}>
+      <ContainerProvider config={{ plugins: [new EventsPlugin()] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
 
     rerender(
-      <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "second" }] }}>
+      <ContainerProvider config={{ plugins: [new EventsPlugin(), new CommandsPlugin()] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
 
     expect(containers).toHaveLength(2);
-    expect(containers[1]).not.toBe(containers[0]);
+    expect(containers[1]).toBe(containers[0]);
   });
 
-  it("should dispose previous managed container when replacement commits", async () => {
+  it("should dispose previous managed container when the provider key changes", async () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
     const containers: Array<Container> = [];
 
@@ -280,13 +279,13 @@ describe("ContainerProvider", () => {
     }
 
     const { rerender } = render(
-      <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "first" }] }}>
+      <ContainerProvider key={"first"} config={{ bindings: [{ token: CONFIG_TOKEN, value: "first" }] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
 
     rerender(
-      <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "second" }] }}>
+      <ContainerProvider key={"second"} config={{ bindings: [{ token: CONFIG_TOKEN, value: "second" }] }}>
         <TrackingConsumer />
       </ContainerProvider>
     );
@@ -297,7 +296,7 @@ describe("ContainerProvider", () => {
     expect(containers).toHaveLength(2);
   });
 
-  it("should dispose previous managed container when replacement commits in strict mode", () => {
+  it("should dispose previous managed container when the provider key changes in strict mode", () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
     const containers: Array<Container> = [];
 
@@ -309,7 +308,7 @@ describe("ContainerProvider", () => {
 
     const { rerender } = render(
       <StrictMode>
-        <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "first" }] }}>
+        <ContainerProvider key={"first"} config={{ bindings: [{ token: CONFIG_TOKEN, value: "first" }] }}>
           <TrackingConsumer />
         </ContainerProvider>
       </StrictMode>
@@ -317,7 +316,7 @@ describe("ContainerProvider", () => {
 
     rerender(
       <StrictMode>
-        <ContainerProvider config={{ bindings: [{ token: CONFIG_TOKEN, value: "second" }] }}>
+        <ContainerProvider key={"second"} config={{ bindings: [{ token: CONFIG_TOKEN, value: "second" }] }}>
           <TrackingConsumer />
         </ContainerProvider>
       </StrictMode>
@@ -330,7 +329,7 @@ describe("ContainerProvider", () => {
     expect(containers[2]).not.toBe(containers[0]);
   });
 
-  it("should recreate managed container with strict mode", () => {
+  it("should create managed container in strict mode", () => {
     const CONFIG_TOKEN: string = "CONFIG_TOKEN";
 
     function TrackingConsumer() {
@@ -532,6 +531,7 @@ describe("ContainerProvider lifecycle", () => {
 
     const { rerender } = render(
       <ContainerProvider
+        key={"first"}
         config={{
           bindings: [FirstLifecycleService],
         }}
@@ -542,6 +542,7 @@ describe("ContainerProvider lifecycle", () => {
 
     rerender(
       <ContainerProvider
+        key={"second"}
         config={{
           bindings: [SecondLifecycleService],
         }}
@@ -576,6 +577,7 @@ describe("ContainerProvider lifecycle", () => {
     const { rerender } = render(
       <StrictMode>
         <ContainerProvider
+          key={"first"}
           config={{
             bindings: [FirstLifecycleService],
           }}
@@ -594,6 +596,7 @@ describe("ContainerProvider lifecycle", () => {
     rerender(
       <StrictMode>
         <ContainerProvider
+          key={"second"}
           config={{
             bindings: [SecondLifecycleService],
           }}
@@ -608,19 +611,26 @@ describe("ContainerProvider lifecycle", () => {
       "deprovision-first",
       "provision-first",
       "activated-second",
+      "activated-second",
       "deprovision-first",
+      "provision-second",
+      "deprovision-second",
       "provision-second",
     ]);
 
     await new Promise((resolve) => setTimeout(resolve, 0));
+
     expect(events).toEqual([
       "activated-first", // [strict mode] Additional creation, dropped right after construction.
       "activated-first",
       "provision-first", // [strict mode] Strict mode cycle to shake off side effects.
       "deprovision-first", // [strict mode] Strict mode cycle to shake off side effects.
       "provision-first",
+      "activated-second", // [strict mode] Additional creation, dropped right after construction.
       "activated-second",
       "deprovision-first",
+      "provision-second", // [strict mode] Strict mode cycle to shake off side effects.
+      "deprovision-second", // [strict mode] Strict mode cycle to shake off side effects.
       "provision-second",
       "deactivation-first",
     ]);

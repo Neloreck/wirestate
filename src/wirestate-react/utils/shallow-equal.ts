@@ -1,48 +1,4 @@
-import { type ServiceToken } from "@wirestate/core";
-
-import { type AnyObject, type Maybe } from "../types/general";
-
-/**
- * Checks whether two objects are shallowly equal.
- *
- * @remarks
- * Objects are considered equal when they have the same enumerable string keys
- * and each value is strictly equal (`===`).
- *
- * @group Utils
- * @internal
- *
- * @param left - First object to compare.
- * @param right - Second object to compare.
- * @returns `true` when objects are shallowly equal, otherwise `false`.
- */
-export function shallowEqualObjects(left: Maybe<AnyObject>, right: Maybe<AnyObject>): boolean {
-  if (left === right) {
-    return true;
-  }
-
-  if (!left || !right) {
-    return false;
-  }
-
-  const leftKeys: Array<string> = Object.keys(left);
-  const rightKeys: Array<string> = Object.keys(right);
-  const length: number = leftKeys.length;
-
-  if (rightKeys.length !== length) {
-    return false;
-  }
-
-  for (let index: number = 0; index < length; index++) {
-    const key: string = leftKeys[index];
-
-    if (left[key] !== right[key] || !Object.prototype.hasOwnProperty.call(right, key)) {
-      return false;
-    }
-  }
-
-  return true;
-}
+import { type Maybe } from "../types/general";
 
 /**
  * Checks whether two arrays are shallowly equal.
@@ -80,25 +36,4 @@ export function shallowEqualArrays<T>(left: Maybe<ReadonlyArray<T>>, right: Mayb
   }
 
   return true;
-}
-
-/**
- * Checks whether two container activation options are shallowly equal.
- *
- * @remarks
- * Boolean activation values are compared by identity. Activation arrays are
- * compared by item identity.
- *
- * @group Utils
- * @internal
- *
- * @param left - First activation option to compare.
- * @param right - Second activation option to compare.
- * @returns `true` when activation options are shallowly equal, otherwise `false`.
- */
-export function shallowEqualActivation(
-  left: Maybe<boolean | ReadonlyArray<ServiceToken>>,
-  right: Maybe<boolean | ReadonlyArray<ServiceToken>>
-): boolean {
-  return left === right || (Array.isArray(left) && Array.isArray(right) && shallowEqualArrays(left, right));
 }

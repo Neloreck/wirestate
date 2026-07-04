@@ -30,8 +30,17 @@ Do not start resource work during activation. React creates managed containers b
 Strict Mode may create and discard an extra container. Start timers, subscriptions, sockets, and provider-scoped async
 work in `@OnProvision`; clean them up in `@OnDeprovision`. See [Core Lifecycle](/core/lifecycle).
 
-Managed providers recreate the container when `parent`, `onError`, `bindings`, or `activate` changes by
-shallow comparison. Keep config objects and arrays stable with `useMemo` when the container should not be replaced.
+The provider reads `config` once when it mounts; later changes to the prop are ignored. To replace the managed
+container, remount the provider with a React `key`:
+
+```tsx
+<ContainerProvider key={tenantId} config={{ bindings: [TenantService] }}>
+  <TenantDashboard />
+</ContainerProvider>
+```
+
+Remounting disposes the previous container and creates a new one from the current config. Because the config is read
+only once, inline config objects are safe.
 
 ## Messaging
 
@@ -116,9 +125,8 @@ export function Application() {
 }
 ```
 
-`bindings` is shallow-compared, so an inline hydration object recreates the container on every render. Keep the config
-stable with `useMemo`, or hoist it to module scope - the same rule that applies to every managed container (see
-[Managed Root Container](#managed-root-container)).
+The provider reads the config once on mount, so the hydration binding is captured exactly once even when the config is
+built inline (see [Managed Root Container](#managed-root-container)).
 
 ## Direct Access
 

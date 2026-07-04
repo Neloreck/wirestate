@@ -4,7 +4,6 @@ import { type ReactElement, type ReactNode, createElement, useEffect, useRef, us
 import { ContainerContext } from "../container/container-context";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { type Maybe, type Nullable } from "../types/general";
-import { shallowEqualActivation, shallowEqualArrays } from "../utils/shallow-equal";
 
 import {
   type ReactContainerProvisionLifecycle,
@@ -35,9 +34,9 @@ export interface ContainerProviderProps {
    *
    * @remarks
    * Managed containers created from config are disposed on unmount and activate
-   * all bindings by default unless `activate` is provided explicitly. Managed
-   * containers are recreated when the normalized config changes by shallow
-   * comparison.
+   * all bindings by default unless `activate` is provided explicitly. The config
+   * is read once when the provider mounts: later changes are ignored. Pass a
+   * React `key` to the provider to recreate the container.
    */
   readonly config?: ContainerConfig;
 
@@ -45,14 +44,6 @@ export interface ContainerProviderProps {
    * React subtree that receives the active container.
    */
   readonly children?: ReactNode;
-}
-
-/**
- * Active provider state stored in the component state.
- */
-interface ContainerProviderState {
-  readonly container: Container;
-  readonly source: ContainerConfig;
 }
 
 /**
@@ -73,6 +64,10 @@ interface ContainerProvisionError {
  *
  * Managed containers activate all bindings by default. Pass `activate: false`
  * to keep them lazy.
+ *
+ * Managed config is construction-only: it is read once when the provider
+ * mounts, and later changes are ignored. Pass a React `key` to the provider
+ * to recreate the container explicitly.
  *
  * @group Provision
  *
@@ -132,18 +127,10 @@ export function ContainerProvider(props: ContainerProviderProps): ReactElement {
   const ownedRef = useRef<boolean>(owned);
 
   const pendingDestructionRef = useRef<Nullable<ReactContainerProvisionLifecycle>>(null);
-  const normalizedSource: Maybe<ContainerConfig> = managedSource
-    ? { ...managedSource, activate: managedSource.activate ?? true }
-    : null;
 
   const [error, setError] = useState<Nullable<ContainerProvisionError>>(null);
-  const [state, setState] = useState<Nullable<ContainerProviderState>>(() =>
-    normalizedSource
-      ? {
-          container: new Container(normalizedSource),
-          source: normalizedSource,
-        }
-      : null
+  const [managedContainer] = useState<Nullable<Container>>(() =>
+    managedSource ? new Container({ ...managedSource, activate: managedSource.activate ?? true }) : null
   );
 
   if (ownedRef.current !== owned) {
@@ -153,27 +140,7 @@ export function ContainerProvider(props: ContainerProviderProps): ReactElement {
     );
   }
 
-  const needsReplacement: boolean = Boolean(
-    state &&
-    normalizedSource &&
-    (state.source.parent !== normalizedSource.parent ||
-      state.source.onError !== normalizedSource.onError ||
-      !shallowEqualArrays(state.source.bindings, normalizedSource.bindings) ||
-      !shallowEqualActivation(state.source.activate, normalizedSource.activate))
-  );
-
-  let activeState: Nullable<ContainerProviderState> = state;
-
-  if (needsReplacement && normalizedSource) {
-    activeState = {
-      container: new Container(normalizedSource),
-      source: normalizedSource,
-    };
-
-    setState(activeState);
-  }
-
-  const activeContainer: Container = activeState ? activeState.container : (externalContainer as Container);
+  const activeContainer: Container = managedContainer ?? (externalContainer as Container);
 
   useEffect(() => {
     const pendingDestruction: ReactContainerProvisionLifecycle = (pendingDestructionRef.current ??= new Map());
