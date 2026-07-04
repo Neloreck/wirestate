@@ -2,7 +2,7 @@ import { Container } from "../../container/container";
 import { inject } from "../../container/container-context";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
 import { Injectable } from "../../metadata/metadata-injectable";
-import { type Optional, type Maybe, type Nullable } from "../../types/general";
+import { type Maybe, type Nullable } from "../../types/general";
 
 import {
   type EventEmitOptions,
