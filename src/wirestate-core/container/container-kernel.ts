@@ -90,14 +90,15 @@ export class ContainerKernel {
   }
 
   /**
-   * Unbinds all bindings, deactivating container-owned values in creation order.
+   * Unbinds all bindings, deactivating container-owned values in reverse creation
+   * order, so a dependent's `@OnDeactivation` runs before its dependencies tear down.
    * Bindings stay resolvable until every deactivation handler has run, so
    * deactivating services can still talk to each other.
    *
    * @returns The same container for chaining.
    */
   public unbindAll(): this {
-    for (const record of [...this.activated]) {
+    for (const record of [...this.activated].reverse()) {
       this.deactivateRecord(record);
     }
 

@@ -117,8 +117,8 @@ describe("container unbind deprovision", () => {
       "provision-b",
       "deprovision-b",
       "deprovision-a",
-      "deactivation-a",
       "deactivation-b",
+      "deactivation-a",
     ]);
   });
 

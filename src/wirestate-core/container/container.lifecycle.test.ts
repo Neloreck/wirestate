@@ -145,7 +145,7 @@ describe("instance lifecycle guarantees", () => {
     expect(deactivations).toEqual(["foo"]);
   });
 
-  it("should deactivate in creation order on unbindAll", () => {
+  it("should deactivate in reverse creation order on unbindAll", () => {
     const deactivations: Array<string> = [];
 
     @Injectable()
@@ -171,11 +171,12 @@ describe("instance lifecycle guarantees", () => {
     container.bind({ token: BarService, type: "Instance", value: BarService });
     container.bind({ token: FooService, type: "Instance", value: FooService });
 
-    // constructing FooService constructs BarService first
+    // Constructing FooService constructs BarService first, so BarService (the dependency)
+    // deactivates last: the dependent FooService tears down while BarService is still alive.
     container.get(FooService);
     container.unbindAll();
 
-    expect(deactivations).toEqual(["bar", "foo"]);
+    expect(deactivations).toEqual(["foo", "bar"]);
   });
 
   it("should keep bindings resolvable while unbindAll deactivation handlers run", () => {

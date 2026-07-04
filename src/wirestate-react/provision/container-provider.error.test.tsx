@@ -126,9 +126,9 @@ describe("ContainerProvider provision errors", () => {
       "provision-failing",
       "deprovision-failing",
       "deprovision-first",
-      "deactivation-first",
-      "deactivation-failing",
       "deactivation-third",
+      "deactivation-failing",
+      "deactivation-first",
     ]);
   });
 

@@ -83,8 +83,8 @@ describe("provision lifecycle", () => {
       "provision-second",
       "deprovision-second",
       "deprovision-first",
-      "deactivation-first",
       "deactivation-second",
+      "deactivation-first",
     ]);
   });
 
