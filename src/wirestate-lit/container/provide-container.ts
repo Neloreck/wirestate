@@ -62,14 +62,15 @@ export interface ProvideContainerDecorator<E extends ReactiveElement = ReactiveE
  *
  * @example
  * ```typescript
- * import { EventBus } from "@wirestate/core";
+ * import { EventsPlugin } from "@wirestate/core";
  * import { ContainerProvider, provideContainer } from "@wirestate/lit";
  * import { LitElement } from "lit";
  *
  * class MyRootElement extends LitElement {
  *   @provideContainer({
  *     config: {
- *       bindings: [LoggerService, EventBus],
+ *       bindings: [LoggerService],
+ *       plugins: [new EventsPlugin()],
  *     },
  *   })
  *   private containerProvider!: ContainerProvider;
