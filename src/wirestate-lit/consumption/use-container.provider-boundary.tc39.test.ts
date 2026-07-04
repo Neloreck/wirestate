@@ -74,9 +74,7 @@ describe("useContainer provider boundary", () => {
     const element: TestElement = new TestElement();
 
     expect(() => element.container.value).toThrow(WirestateError);
-    expect(() => element.container.value).toThrow(
-      expect.objectContaining({ code: ERROR_CODE_INVALID_CONTEXT })
-    );
+    expect(() => element.container.value).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_CONTEXT }));
   });
 
   it("should throw when connected outside any container provider", () => {
@@ -91,8 +89,6 @@ describe("useContainer provider boundary", () => {
     document.body.appendChild(element);
     orphans.push(element);
 
-    expect(() => element.container.value).toThrow(
-      expect.objectContaining({ code: ERROR_CODE_INVALID_CONTEXT })
-    );
+    expect(() => element.container.value).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_CONTEXT }));
   });
 });

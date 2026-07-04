@@ -86,9 +86,7 @@ describe("useInjection provider boundary", () => {
     const element: TestElement = new TestElement();
 
     expect(() => element.service.value).toThrow(WirestateError);
-    expect(() => element.service.value).toThrow(
-      expect.objectContaining({ code: ERROR_CODE_INVALID_CONTEXT })
-    );
+    expect(() => element.service.value).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_CONTEXT }));
   });
 
   it("should throw for a required value when connected outside any provider", () => {
@@ -102,9 +100,7 @@ describe("useInjection provider boundary", () => {
     document.body.appendChild(element);
     orphans.push(element);
 
-    expect(() => element.service.value).toThrow(
-      expect.objectContaining({ code: ERROR_CODE_INVALID_CONTEXT })
-    );
+    expect(() => element.service.value).toThrow(expect.objectContaining({ code: ERROR_CODE_INVALID_CONTEXT }));
   });
 
   it("should hold undefined for an optional lookup before the context resolves (no throw)", () => {
