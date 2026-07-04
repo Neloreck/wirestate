@@ -30,11 +30,15 @@ For external API details, use the official docs for [React](https://react.dev/re
 npm install @wirestate/core @wirestate/signals @wirestate/react @wirestate/react-signals
 ```
 
+See the [React Signals overview](/react-signals/overview) for services, components, and transform setup.
+
 ### React + MobX
 
 ```bash
 npm install @wirestate/core @wirestate/mobx @wirestate/react @wirestate/react-mobx
 ```
+
+See the [React MobX overview](/react-mobx/overview) for services, components, and computed state.
 
 ### Lit + Signals
 
@@ -42,11 +46,15 @@ npm install @wirestate/core @wirestate/mobx @wirestate/react @wirestate/react-mo
 npm install @wirestate/core @wirestate/signals @wirestate/lit @wirestate/lit-signals
 ```
 
+See the [Lit Signals overview](/lit-signals/overview) for services, templates, and computed signals.
+
 ### Lit + MobX
 
 ```bash
 npm install @wirestate/core @wirestate/mobx @wirestate/lit @wirestate/lit-mobx
 ```
+
+See the [Lit MobX overview](/lit-mobx/overview) for services, elements, and computed state.
 
 ## TypeScript
 

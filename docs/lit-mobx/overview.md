@@ -96,4 +96,4 @@ export class CounterService {
 ## See Also
 
 - [Lit guide](/lit/overview): providers, decorators, controllers, and element handlers.
-- [Lit MobX introduction](/introduction/lit-mobx): install and a minimal example.
+- [Installation](/introduction/installation): packages for every stack.

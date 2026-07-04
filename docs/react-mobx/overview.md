@@ -86,4 +86,4 @@ export class CounterService {
 ## See Also
 
 - [React guide](/react/overview): providers, injection hooks, and component-owned handlers.
-- [React MobX introduction](/introduction/react-mobx): install and a minimal example.
+- [Installation](/introduction/installation): packages for every stack.

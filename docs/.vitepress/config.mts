@@ -45,10 +45,6 @@ export default defineConfig({
         items: [
           { text: "About", link: "/introduction/about" },
           { text: "Installation", link: "/introduction/installation" },
-          { text: "React Signals", link: "/introduction/react-signals" },
-          { text: "React MobX", link: "/introduction/react-mobx" },
-          { text: "Lit Signals", link: "/introduction/lit-signals" },
-          { text: "Lit MobX", link: "/introduction/lit-mobx" },
         ],
       },
       {
@@ -79,14 +75,6 @@ export default defineConfig({
         ],
       },
       {
-        text: "React Signals",
-        items: [{ text: "Overview", link: "/react-signals/overview" }],
-      },
-      {
-        text: "React MobX",
-        items: [{ text: "Overview", link: "/react-mobx/overview" }],
-      },
-      {
         text: "Lit",
         items: [
           { text: "Overview", link: "/lit/overview" },
@@ -99,12 +87,13 @@ export default defineConfig({
         ],
       },
       {
-        text: "Lit Signals",
-        items: [{ text: "Overview", link: "/lit-signals/overview" }],
-      },
-      {
-        text: "Lit MobX",
-        items: [{ text: "Overview", link: "/lit-mobx/overview" }],
+        text: "Reactivity Adapters",
+        items: [
+          { text: "React Signals", link: "/react-signals/overview" },
+          { text: "React MobX", link: "/react-mobx/overview" },
+          { text: "Lit Signals", link: "/lit-signals/overview" },
+          { text: "Lit MobX", link: "/lit-mobx/overview" },
+        ],
       },
       {
         text: "API Reference",

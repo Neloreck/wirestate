@@ -82,4 +82,4 @@ export class CounterState {
 ## See Also
 
 - [React guide](/react/overview): providers, injection hooks, and component-owned handlers.
-- [React Signals introduction](/introduction/react-signals): install and a minimal example.
+- [Installation](/introduction/installation): packages for every stack.

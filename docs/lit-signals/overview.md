@@ -80,4 +80,4 @@ export class CounterState {
 ## See Also
 
 - [Lit guide](/lit/overview): providers, decorators, controllers, and element handlers.
-- [Lit Signals introduction](/introduction/lit-signals): install and a minimal example.
+- [Installation](/introduction/installation): packages for every stack.
