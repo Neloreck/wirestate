@@ -13,7 +13,7 @@ const INJECTABLE_CLASSES: WeakSet<Newable<object>> = new WeakSet();
  * @remarks
  * Supports both TC39 and legacy experimental decorators.
  *
- * @internal
+ * @group Container
  */
 export interface InjectableDecorator {
   // Standard (TC39):

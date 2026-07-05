@@ -44,6 +44,7 @@ describe("Library exported API from wirestate-core", () => {
         "EventType",
         "EventUnsubscribe",
         "FactoryBindingDescriptor",
+        "InjectableDecorator",
         "InstanceBindingDescriptor",
         "InternalErrorDescriptor",
         "InternalErrorHandler",

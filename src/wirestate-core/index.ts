@@ -40,6 +40,7 @@ export {
 export { defaultInternalErrorHandler } from "./error/internal-error-handler";
 export { WirestateError } from "./error/wirestate-error";
 
+export { type InjectableDecorator } from "./metadata/metadata-injectable";
 export { Injectable, isInjectable } from "./metadata/metadata-injectable";
 export { type LifecycleDecorator } from "./metadata/metadata-single-method-decorator";
 

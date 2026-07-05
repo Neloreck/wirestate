@@ -1,18 +1,9 @@
 import type { ServiceToken } from "../binding/binding";
+import { ERROR_CODE_NO_INJECTION_CONTEXT } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
 import type { Optional } from "../types/general";
 
 import type { ContainerKernel } from "./container-kernel";
-
-/**
- * An error that occurs when `inject()` is used outside an injection context.
- *
- * @internal
- */
-class NeedsInjectionContextError extends Error {
-  public constructor() {
-    super(`You can only invoke inject() within an injection context`);
-  }
-}
 
 /**
  * Resolves a dependency from the container currently constructing a service.
@@ -107,7 +98,10 @@ interface Context {
  */
 class GlobalContext implements Context {
   public run<T>(): T {
-    throw new NeedsInjectionContextError();
+    throw new WirestateError(
+      "You can only invoke inject() within an injection context",
+      ERROR_CODE_NO_INJECTION_CONTEXT
+    );
   }
 }
 

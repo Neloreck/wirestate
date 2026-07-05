@@ -1,5 +1,7 @@
 import { inject } from "../container/container-context";
 import { ContainerKernel } from "../container/container-kernel";
+import { ERROR_CODE_NO_INJECTION_CONTEXT } from "../error/error-code";
+import { WirestateError } from "../error/wirestate-error";
 import { Injectable } from "../metadata/metadata-injectable";
 import { type Optional } from "../types/general";
 
@@ -290,6 +292,12 @@ describe("Bindings", () => {
       expect(() => inject(FooService, { optional: true })).toThrow(message);
       expect(() => inject(FooService, { lazy: true })).toThrow(message);
       expect(() => inject(FooService, { lazy: true, optional: true })).toThrow(message);
+
+      // A WirestateError with a dedicated code, not a bare Error (D8: single error class).
+      expect(() => inject(FooService)).toThrow(
+        expect.objectContaining({ code: ERROR_CODE_NO_INJECTION_CONTEXT })
+      );
+      expect(() => inject(FooService)).toThrow(WirestateError);
     });
   });
 });
