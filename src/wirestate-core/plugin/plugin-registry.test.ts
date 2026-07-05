@@ -43,6 +43,25 @@ describe("getEffectivePlugins", () => {
     expect(getEffectivePlugins(parent)).toEqual([ancestor]);
   });
 
+  it("memoizes the effective set per container and invalidates it when plugins are re-set", () => {
+    const first: WirestatePlugin = {};
+    const second: WirestatePlugin = {};
+    const container: ContainerKernel = new ContainerKernel();
+
+    setContainerPlugins(container, [first]);
+
+    const initial: ReadonlyArray<WirestatePlugin> = getEffectivePlugins(container);
+
+    // Repeated calls reuse the memoized array (same reference, no re-allocation).
+    expect(getEffectivePlugins(container)).toBe(initial);
+
+    // Re-setting the container's plugins invalidates the memo and reflects the new set.
+    setContainerPlugins(container, [second]);
+
+    expect(getEffectivePlugins(container)).toEqual([second]);
+    expect(getEffectivePlugins(container)).not.toBe(initial);
+  });
+
   it("keeps an ancestor plugin that still owns a kind no nearer plugin claims", () => {
     const shared: symbol = Symbol("SHARED");
     const extra: symbol = Symbol("EXTRA");

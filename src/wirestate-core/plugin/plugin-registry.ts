@@ -18,6 +18,17 @@ import type { WirestatePlugin } from "./plugin";
 const CONTAINER_PLUGINS: WeakMap<ContainerKernel, ReadonlyArray<WirestatePlugin>> = new WeakMap();
 
 /**
+ * Memoized effective plugin set per container.
+ *
+ * @remarks
+ * The effective set is a pure function of a container's own plugins plus its (immutable) parent
+ * chain, all fixed once the container is constructed - so it is computed once and reused.
+ *
+ * @internal
+ */
+const EFFECTIVE_PLUGINS: WeakMap<ContainerKernel, ReadonlyArray<WirestatePlugin>> = new WeakMap();
+
+/**
  * Stores the plugins a container is registered with.
  *
  * @internal
@@ -27,6 +38,7 @@ const CONTAINER_PLUGINS: WeakMap<ContainerKernel, ReadonlyArray<WirestatePlugin>
  */
 export function setContainerPlugins(container: ContainerKernel, plugins: ReadonlyArray<WirestatePlugin>): void {
   CONTAINER_PLUGINS.set(container, plugins);
+  EFFECTIVE_PLUGINS.delete(container);
 }
 
 /**
@@ -51,6 +63,12 @@ export function getOwnPlugins(container: ContainerKernel): ReadonlyArray<Wiresta
  * @returns Effective plugins, nearest container first.
  */
 export function getEffectivePlugins(container: ContainerKernel): ReadonlyArray<WirestatePlugin> {
+  const cached: Maybe<ReadonlyArray<WirestatePlugin>> = EFFECTIVE_PLUGINS.get(container);
+
+  if (cached) {
+    return cached;
+  }
+
   const result: Array<WirestatePlugin> = [];
   const seen: Set<WirestatePlugin> = new Set();
   const claimedKinds: Set<symbol> = new Set();
@@ -81,6 +99,8 @@ export function getEffectivePlugins(container: ContainerKernel): ReadonlyArray<W
 
     current = current.parent;
   }
+
+  EFFECTIVE_PLUGINS.set(container, result);
 
   return result;
 }
