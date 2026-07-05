@@ -697,3 +697,42 @@ function isProviderLifecycleParticipant(token: ServiceToken): boolean {
     ? Boolean(getProvisionHandlerMetadata(prototype) || getDeprovisionHandlerMetadata(prototype))
     : false;
 }
+
+/**
+ * Guards against binding a handler-bearing service onto an already-provisioned container.
+ *
+ * @remarks
+ * Messaging handlers and `@OnProvision`/`@OnDeprovision` hooks are wired only during a provision
+ * cycle. Binding such a service after provision would leave its handlers silently dead until the
+ * next cycle, contrary to the fail-fast posture everywhere else, so this throws instead. Plain
+ * services (no messaging or provider-lifecycle hooks) bind freely - they activate lazily on the
+ * next resolution and need no cycle.
+ *
+ * @internal
+ *
+ * @param container - Container being bound onto.
+ * @param binding - Binding about to be registered.
+ * @throws {@link WirestateError} If the container is provisioned and the binding declares messaging
+ *   or provider-lifecycle handlers.
+ */
+export function assertBindableWhileProvisioned(container: Container, binding: Binding): void {
+  if (getProvisionState(container)?.status !== true) {
+    return;
+  }
+
+  const metadataToken: ServiceToken = getProviderLifecycleMetadataToken(binding);
+  const prototype: Optional<object> =
+    typeof metadataToken === "function" ? (metadataToken.prototype as Optional<object>) : undefined;
+  const declaresMessaging: boolean = prototype !== undefined && getMessagingRegistrations(prototype).length > 0;
+
+  if (declaresMessaging || isProviderLifecycleParticipant(metadataToken)) {
+    const name: string = typeof metadataToken === "function" ? metadataToken.name : String(metadataToken);
+
+    throw new WirestateError(
+      `Cannot bind '${name}' on an already-provisioned container: its messaging or provider-lifecycle handlers ` +
+        `would not wire until the next provision cycle. Bind it before provisioning, or deprovision and ` +
+        `reprovision the container.`,
+      ERROR_CODE_VALIDATION_ERROR
+    );
+  }
+}

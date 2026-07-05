@@ -17,6 +17,7 @@ import {
 import { type WirestatePlugin } from "../plugin/plugin";
 import { installOwnPlugins, setContainerPlugins } from "../plugin/plugin-registry";
 import {
+  assertBindableWhileProvisioned,
   deprovisionContainer,
   deprovisionContainerBinding,
   provisionContainer,
@@ -188,6 +189,8 @@ export class Container extends ContainerKernel {
     ) {
       validateTransientInstanceBinding(binding as InstanceBindingDescriptor<T>);
     }
+
+    assertBindableWhileProvisioned(this, binding as Binding);
 
     return super.bind(binding);
   }

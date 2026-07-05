@@ -1,7 +1,9 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { WireStatus } from "../activation/wire-status";
+import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
+import { OnEvent } from "../plugin/events/on-event";
 import { getProvisionState } from "../provision/provision-state";
 
 import { Container } from "./container";
@@ -128,6 +130,65 @@ describe("Container provision", () => {
       container.deprovision();
       expect(status.isDeprovisioned).toBe(true);
       expect(status.isInactive).toBe(true);
+    });
+  });
+
+  describe("binding after provision", () => {
+    it("throws when binding a provider-lifecycle service onto a provisioned container", () => {
+      const { LifecycleService } = createLifecycleService({ methods: ["provision"] });
+      const container: Container = new Container();
+
+      container.provision();
+
+      expect(() => container.bind(LifecycleService)).toThrow(
+        /already-provisioned container.*would not wire until the next provision cycle/
+      );
+      expect(() => container.bind(LifecycleService)).toThrow(
+        expect.objectContaining({ code: ERROR_CODE_VALIDATION_ERROR })
+      );
+    });
+
+    it("throws when binding a messaging-handler service onto a provisioned container", () => {
+      const handled: Array<boolean> = [];
+
+      @Injectable()
+      class ListenerService {
+        @OnEvent("SOME_EVENT")
+        public onEvent(): void {
+          handled.push(true);
+        }
+      }
+
+      const container: Container = new Container();
+
+      container.provision();
+
+      // Throws even without EventsPlugin: the bind-time guard fires before provision's plugin check.
+      expect(() => container.bind(ListenerService)).toThrow(
+        expect.objectContaining({ code: ERROR_CODE_VALIDATION_ERROR })
+      );
+    });
+
+    it("allows binding a plain service onto a provisioned container", () => {
+      @Injectable()
+      class PlainService {}
+
+      const container: Container = new Container();
+
+      container.provision();
+
+      expect(() => container.bind(PlainService)).not.toThrow();
+      expect(container.get(PlainService)).toBeInstanceOf(PlainService);
+    });
+
+    it("allows binding a handler service before provision and wires it normally", () => {
+      const { LifecycleService, events } = createLifecycleService({ methods: ["provision"] });
+      const container: Container = new Container();
+
+      container.bind(LifecycleService);
+      container.provision();
+
+      expect(events).toEqual(["provision"]);
     });
   });
 
