@@ -84,6 +84,45 @@ describe("instance lifecycle tracking", () => {
     expect(container.getActiveInstances()).toEqual([]);
   });
 
+  it("evicts the failed instance from the cache so a later get() reconstructs it", () => {
+    const onError = jest.fn();
+    let constructions = 0;
+    let failActivation = true;
+
+    @Injectable()
+    class FlakyService {
+      public constructor() {
+        constructions += 1;
+      }
+
+      @OnActivation()
+      public onActivation(): void {
+        if (failActivation) {
+          failActivation = false;
+
+          throw new Error("activation-fail");
+        }
+      }
+    }
+
+    const container: Container = new Container({ onError });
+
+    container.bind({ token: FlakyService, type: "Instance", value: FlakyService });
+
+    // First resolution fails activation and must evict the half-activated instance from the cache.
+    expect(() => container.get(FlakyService)).toThrow("activation-fail");
+    expect(constructions).toBe(1);
+
+    // Because it was evicted (not just dropped from `activated`), a second get() reconstructs a
+    // fresh instance instead of returning the poisoned cached one. Removing `instances.delete`
+    // in evict() would return the first instance here and leave `constructions` at 1.
+    const instance: FlakyService = container.get(FlakyService);
+
+    expect(instance).toBeInstanceOf(FlakyService);
+    expect(constructions).toBe(2);
+    expect(container.getActiveInstances()).toEqual([instance]);
+  });
+
   it("should untrack deactivated instances by container", () => {
     @Injectable()
     class TestService {}

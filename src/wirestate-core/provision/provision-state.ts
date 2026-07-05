@@ -42,6 +42,16 @@ export interface ProvisionState {
   status: Optional<boolean>;
 
   /**
+   * Whether a provision cycle is currently running for this container.
+   *
+   * @remarks
+   * `status` is transiently `undefined` for the duration of a cycle, which is
+   * indistinguishable from "never provisioned"; this flag makes the in-flight
+   * window observable (e.g. so a mid-cycle `@OnProvision` bind can be rejected).
+   */
+  provisioning: boolean;
+
+  /**
    * Resolved provider lifecycle participant instances, in provision order.
    *
    * @remarks
@@ -89,7 +99,7 @@ export function getOrCreateProvisionState(container: ContainerKernel): Provision
   let state: Optional<ProvisionState> = PROVISION_STATE.get(container);
 
   if (!state) {
-    state = { status: undefined, instances: null, cycleByInstance: new Map() };
+    state = { status: undefined, provisioning: false, instances: null, cycleByInstance: new Map() };
     PROVISION_STATE.set(container, state);
   }
 

@@ -59,8 +59,14 @@ export function provisionContainer(
   }
 
   state.status = undefined;
-  state.instances = provisionInstances(container, state, bindings);
-  state.status = true;
+  state.provisioning = true;
+
+  try {
+    state.instances = provisionInstances(container, state, bindings);
+    state.status = true;
+  } finally {
+    state.provisioning = false;
+  }
 }
 
 /**
@@ -716,7 +722,10 @@ function isProviderLifecycleParticipant(token: ServiceToken): boolean {
  *   or provider-lifecycle handlers.
  */
 export function assertBindableWhileProvisioned(container: Container, binding: Binding): void {
-  if (getProvisionState(container)?.status !== true) {
+  const state: Optional<ProvisionState> = getProvisionState(container);
+
+  // Fire while the container is provisioned AND during a live provision cycle.
+  if (!state || (state.status !== true && !state.provisioning)) {
     return;
   }
 
@@ -729,9 +738,9 @@ export function assertBindableWhileProvisioned(container: Container, binding: Bi
     const name: string = typeof metadataToken === "function" ? metadataToken.name : String(metadataToken);
 
     throw new WirestateError(
-      `Cannot bind '${name}' on an already-provisioned container: its messaging or provider-lifecycle handlers ` +
-        `would not wire until the next provision cycle. Bind it before provisioning, or deprovision and ` +
-        `reprovision the container.`,
+      `Cannot bind '${name}' while the container is provisioned or provisioning: its messaging or ` +
+        `provider-lifecycle handlers would not wire until the next provision cycle. Bind it before ` +
+        `provisioning, or deprovision and reprovision the container.`,
       ERROR_CODE_VALIDATION_ERROR
     );
   }

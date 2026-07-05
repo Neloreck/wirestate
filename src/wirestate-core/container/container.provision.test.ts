@@ -4,9 +4,11 @@ import { WireStatus } from "../activation/wire-status";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
 import { OnEvent } from "../plugin/events/on-event";
+import { OnProvision } from "../provision/on-provision";
 import { getProvisionState } from "../provision/provision-state";
 
 import { Container } from "./container";
+import { inject } from "./container-context";
 
 describe("Container provision", () => {
   describe("provision and deprovision", () => {
@@ -141,11 +143,37 @@ describe("Container provision", () => {
       container.provision();
 
       expect(() => container.bind(LifecycleService)).toThrow(
-        /already-provisioned container.*would not wire until the next provision cycle/
+        /provisioned or provisioning.*would not wire until the next provision cycle/
       );
       expect(() => container.bind(LifecycleService)).toThrow(
         expect.objectContaining({ code: ERROR_CODE_VALIDATION_ERROR })
       );
+    });
+
+    it("throws when an @OnProvision hook binds a handler-bearing service mid-cycle (guard not bypassable)", () => {
+      @Injectable()
+      class LateService {
+        @OnEvent("SOME_EVENT")
+        public onEvent(): void {
+          // Never wired: the guard rejects the bind before this could ever subscribe.
+        }
+      }
+
+      @Injectable()
+      class ProvisioningService {
+        public constructor(public readonly host = inject(Container)) {}
+
+        @OnProvision()
+        public onProvision(): void {
+          // Re-entrant bind during the cycle: `status` is transiently `undefined` here, so the
+          // guard must fall back to the `provisioning` flag rather than silently allowing it.
+          this.host.bind(LateService);
+        }
+      }
+
+      const container: Container = new Container({ bindings: [ProvisioningService] });
+
+      expect(() => container.provision()).toThrow(expect.objectContaining({ code: ERROR_CODE_VALIDATION_ERROR }));
     });
 
     it("throws when binding a messaging-handler service onto a provisioned container", () => {
