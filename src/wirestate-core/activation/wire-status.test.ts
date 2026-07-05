@@ -1,6 +1,7 @@
 import { OnDeprovision, OnProvision } from "@wirestate/core";
 
 import { Container } from "../container/container";
+import { ERROR_CODE_NOT_TRACKED } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
 
@@ -9,6 +10,7 @@ import { WireStatus } from "./wire-status";
 describe("WireStatus", () => {
   it("should throw for unmanaged objects without initialization", () => {
     expect(() => WireStatus.for({})).toThrow("Object is not tracked by Wirestate.");
+    expect(() => WireStatus.for({})).toThrow(expect.objectContaining({ code: ERROR_CODE_NOT_TRACKED }));
   });
 
   it("should reuse a status reserved during construction", () => {

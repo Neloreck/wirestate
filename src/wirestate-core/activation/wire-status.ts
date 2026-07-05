@@ -1,4 +1,5 @@
 import { type ContainerKernel } from "../container/container-kernel";
+import { ERROR_CODE_NOT_TRACKED } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { type Nullable, type Optional } from "../types/general";
 
@@ -95,7 +96,7 @@ export class WireStatus {
    * @throws {@link WirestateError} If the object is not tracked by Wirestate.
    */
   public static for(instance: object, options?: WireStatusLookupOptions): WireStatus {
-    let status = INSTANCE_STATUSES_BY_INSTANCE.get(instance);
+    let status: Optional<WireStatus> = INSTANCE_STATUSES_BY_INSTANCE.get(instance);
 
     if (status) {
       return status;
@@ -108,7 +109,7 @@ export class WireStatus {
       return status;
     }
 
-    throw new WirestateError("Object is not tracked by Wirestate.");
+    throw new WirestateError("Object is not tracked by Wirestate.", ERROR_CODE_NOT_TRACKED);
   }
 
   /**
