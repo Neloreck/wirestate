@@ -294,9 +294,7 @@ describe("Bindings", () => {
       expect(() => inject(FooService, { lazy: true, optional: true })).toThrow(message);
 
       // A WirestateError with a dedicated code, not a bare Error (D8: single error class).
-      expect(() => inject(FooService)).toThrow(
-        expect.objectContaining({ code: ERROR_CODE_NO_INJECTION_CONTEXT })
-      );
+      expect(() => inject(FooService)).toThrow(expect.objectContaining({ code: ERROR_CODE_NO_INJECTION_CONTEXT }));
       expect(() => inject(FooService)).toThrow(WirestateError);
     });
   });
