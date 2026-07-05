@@ -13,6 +13,7 @@ import { setContainerProvisioned } from "../provision/provision-state";
 
 import { finalizeInstanceStatus, initializeInstanceStatus } from "./activation-lifecycle";
 import { OnActivation } from "./on-activation";
+import { OnDeactivation } from "./on-deactivation";
 import { getInstanceContainer, WireStatus } from "./wire-status";
 
 describe("instance lifecycle tracking", () => {
@@ -63,6 +64,41 @@ describe("instance lifecycle tracking", () => {
     expect(constructed).toHaveBeenCalledTimes(1);
     expect(activated).toHaveBeenCalledTimes(1);
     expect(container.getActiveInstances()).toEqual([first]);
+  });
+
+  // Pathological edge, pinned intentionally: unbinding a token from within its own  @OnActivation.
+  it("returns a deactivated, untracked instance when @OnActivation unbinds its own token", () => {
+    const events: Array<string> = [];
+
+    @Injectable()
+    class SelfUnbindService {
+      public constructor(public readonly host = inject(Container)) {}
+
+      @OnActivation()
+      public onActivation(): void {
+        events.push("activation");
+        this.host.unbind(SelfUnbindService);
+      }
+
+      @OnDeactivation()
+      public onDeactivation(): void {
+        events.push("deactivation");
+      }
+    }
+
+    const container: Container = new Container();
+
+    container.bind({ token: SelfUnbindService, type: "Instance", value: SelfUnbindService });
+
+    const instance: SelfUnbindService = container.get(SelfUnbindService);
+
+    expect(instance).toBeInstanceOf(SelfUnbindService);
+    // @OnDeactivation runs mid-activation, right after @OnActivation's unbind call.
+    expect(events).toEqual(["activation", "deactivation"]);
+    expect(WireStatus.for(instance).isDeactivated).toBe(true);
+    expect(container.getActiveInstances()).toEqual([]);
+    // The token is unbound, so a later resolution fails rather than returning the orphan.
+    expect(() => container.get(SelfUnbindService)).toThrow("No binding(s) found");
   });
 
   it("should clean up tracked instances when activation fails", () => {

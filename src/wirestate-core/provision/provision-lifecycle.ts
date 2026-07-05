@@ -363,8 +363,14 @@ function runProvisionHooks(
   trackedTokens: ReadonlyArray<readonly [object, ServiceToken]>
 ): void {
   for (const instance of instances) {
-    const methodName: Maybe<string | symbol> = getProvisionHandlerMetadata(instance);
     const status: WireStatus = WireStatus.for(instance);
+
+    // Never run @OnProvision on (or bump the provision id of) a dead instance.
+    if (status.isDeactivated) {
+      continue;
+    }
+
+    const methodName: Maybe<string | symbol> = getProvisionHandlerMetadata(instance);
     const record: InstanceRecord = getInstanceRecord(status);
     const provisionId: ProvisionId = (record.provisionIdCounter ?? 0) + 1;
 

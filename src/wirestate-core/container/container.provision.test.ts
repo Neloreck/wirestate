@@ -1,5 +1,6 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
+import { OnDeactivation } from "../activation/on-deactivation";
 import { WireStatus } from "../activation/wire-status";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
@@ -217,6 +218,45 @@ describe("Container provision", () => {
       container.provision();
 
       expect(events).toEqual(["provision"]);
+    });
+  });
+
+  describe("re-entrant unbind during provision", () => {
+    it("does not run @OnProvision on a participant a prior @OnProvision hook unbound", () => {
+      const events: Array<string> = [];
+
+      @Injectable()
+      class LaterService {
+        @OnProvision()
+        public onProvision(): void {
+          events.push("provision-later");
+        }
+
+        @OnDeactivation()
+        public onDeactivation(): void {
+          events.push("deactivation-later");
+        }
+      }
+
+      @Injectable()
+      class FirstService {
+        public constructor(public readonly host = inject(Container)) {}
+
+        @OnProvision()
+        public onProvision(): void {
+          events.push("provision-first");
+          // Deactivates LaterService mid-cycle.
+          // Its @OnProvision must then be skipped, not run on the just-deactivated instance.
+          this.host.unbind(LaterService);
+        }
+      }
+
+      const container: Container = new Container({ bindings: [FirstService, LaterService] });
+
+      container.provision();
+
+      expect(events).toEqual(["provision-first", "deactivation-later"]);
+      expect(events).not.toContain("provision-later");
     });
   });
 
