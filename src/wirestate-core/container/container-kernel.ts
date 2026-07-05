@@ -136,27 +136,33 @@ export class ContainerKernel {
     token: ServiceToken<T>,
     options?: { optional?: boolean; lazy?: boolean }
   ): Optional<T> | (() => Optional<T>) {
-    const lazy = options?.lazy ?? false;
-
-    if (lazy) {
+    if (options?.lazy) {
       return () => this.get(token, { ...options, lazy: false });
     }
 
-    const binding = this.bindings.get(token);
+    const own: Optional<BindingDescriptor<T>> = this.bindings.get(token);
 
-    if (!binding) {
-      if (this.parent) {
-        return this.parent.get(token, { ...options, lazy: false });
-      }
-
-      if (options?.optional) {
-        return undefined;
-      }
-
-      throw new WirestateError(`No binding(s) found for '${tokenToString(token)}'.`, ERROR_CODE_NO_BINDING_FOUND);
+    if (own) {
+      return this.resolve(own);
     }
 
-    return injectionContext(this).run(() => this.resolve(binding));
+    let current: Optional<ContainerKernel> = this.parent;
+
+    while (current) {
+      const binding: Optional<BindingDescriptor<T>> = current.bindings.get(token);
+
+      if (binding) {
+        return current.resolve(binding);
+      }
+
+      current = current.parent;
+    }
+
+    if (options?.optional) {
+      return undefined;
+    }
+
+    throw new WirestateError(`No binding(s) found for '${tokenToString(token)}'.`, ERROR_CODE_NO_BINDING_FOUND);
   }
 
   /**
@@ -218,42 +224,51 @@ export class ContainerKernel {
    * @returns The resolved value.
    */
   private resolve<T>(binding: BindingDescriptor<T>): T {
-    if (getBindingScope(binding) === "Transient") {
-      return this.factory.construct(binding);
-    }
+    const transient: boolean = getBindingScope(binding) === "Transient";
 
-    if (this.instances.has(binding)) {
+    // Hot path: a cached singleton is returned without entering an injection context. The context
+    // (and its closure + try/finally swap) is only needed while constructing, so a cached get() -
+    // the most common operation - allocates nothing.
+    if (!transient && this.instances.has(binding)) {
       return this.instances.get(binding) as T;
     }
 
-    const record: ActivationRecord = {
-      token: binding.token,
-      binding,
-      instance: this.factory.construct(binding),
-    };
+    // Construction runs inside an injection context so `inject()` in constructors, field
+    // initializers, and (post-commit) @OnActivation hooks resolves against this container.
+    return injectionContext(this).run(() => {
+      if (transient) {
+        return this.factory.construct(binding);
+      }
 
-    // Commit to the cache before dispatching activation.
-    // An @OnActivation hook that transitively resolves the same token then gets this instance from the cache,
-    // instead of silently constructing a duplicate singleton or recursing until the stack overflows.
-    this.commit(record);
+      const record: ActivationRecord = {
+        token: binding.token,
+        binding,
+        instance: this.factory.construct(binding),
+      };
 
-    if (isInstanceDescriptor(binding)) {
-      const adapter = getActivationAdapter(this);
+      // Commit to the cache before dispatching activation. An @OnActivation hook that transitively
+      // resolves the same token then gets this instance from the cache, instead of silently
+      // constructing a duplicate singleton or recursing until the stack overflows.
+      this.commit(record);
 
-      if (adapter) {
-        try {
-          adapter.activate(this, record);
-        } catch (error) {
-          this.evict(record);
+      if (isInstanceDescriptor(binding)) {
+        const adapter = getActivationAdapter(this);
 
-          adapter.rollback(this, record);
+        if (adapter) {
+          try {
+            adapter.activate(this, record);
+          } catch (error) {
+            this.evict(record);
 
-          throw error;
+            adapter.rollback(this, record);
+
+            throw error;
+          }
         }
       }
-    }
 
-    return record.instance as T;
+      return record.instance as T;
+    });
   }
 
   /**
