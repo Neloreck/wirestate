@@ -44,7 +44,7 @@ export function Application() {
 
 This package wires services into React. It does not make service fields reactive by itself; pair it with
 [`@wirestate/react-mobx`](https://www.npmjs.com/package/@wirestate/react-mobx),
-[`@wirestate/react-signals`](https://www.npmjs.com/package/@wirestate/react-signals), or your own React state bridge
+[`@wirestate/react-signals`](https://www.npmjs.com/package/@wirestate/react-signals), or your own React reactivity adapter
 when components need to re-render from service changes.
 
 ## Learn More

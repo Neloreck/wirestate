@@ -30,6 +30,7 @@ describe("Library exported API from wirestate-core", () => {
         "validateContainerConfig",
       ],
       types: [
+        "AbstractClass",
         "Binding",
         "BindingDescriptor",
         "BindingScopeValue",

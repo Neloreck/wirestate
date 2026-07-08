@@ -7,8 +7,8 @@ import { type Nullable } from "../types/general";
  * React context carrying the container.
  *
  * @remarks
- * This context is internal to Wirestate. Consumers should use provided hooks
- * like {@link useContainer} or {@link useInjection} to access the container and resolved services.
+ * Exported for advanced integrations such as custom providers, SSR, and testing.
+ * Prefer the {@link useContainer} / {@link useInjection} hooks for everyday access to the container and resolved services.
  *
  * @group Container
  */

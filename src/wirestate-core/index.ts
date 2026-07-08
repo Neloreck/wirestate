@@ -80,4 +80,4 @@ export { type WirestatePlugin } from "./plugin/plugin";
 export { OnDeprovision } from "./provision/on-deprovision";
 export { OnProvision } from "./provision/on-provision";
 
-export { type Newable } from "./types/general";
+export { type AbstractClass, type Newable } from "./types/general";

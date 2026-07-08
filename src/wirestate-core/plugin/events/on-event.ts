@@ -68,7 +68,7 @@ export interface OnEventDecorator {
  *
  * @example
  * ```typescript
- * import { Injectable, OnEvent, WireEvent } from "@wirestate/core";
+ * import { Injectable, OnEvent, type WireEvent } from "@wirestate/core";
  *
  * interface User {
  *   id: string;
@@ -78,7 +78,7 @@ export interface OnEventDecorator {
  * class MyService {
  *   @OnEvent("USER_LOGGED_IN")
  *   private onLogin(event: WireEvent<User>): void {
- *     console.log(event.payload.id);
+ *     console.log(event.payload?.id);
  *   }
  * }
  * ```

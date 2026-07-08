@@ -121,7 +121,7 @@ export class ContainerKernel {
    *
    * @throws {@link WirestateError} If the token is not bound and not optional,
    *   or if a circular dependency is detected while constructing the value.
-   *   Errors thrown by a binding's constructor or actory propagate unchanged.
+   *   Errors thrown by a binding's constructor or factory propagate unchanged.
    */
   public get<T>(token: ServiceToken<T>): T;
   public get<T>(token: ServiceToken<T>, options: { optional: true }): Optional<T>;
