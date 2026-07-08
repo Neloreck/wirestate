@@ -1,6 +1,6 @@
 {
   "name": "@wirestate/signals",
-  "version": "1.0.0-experimental.14",
+  "version": "1.0.0-experimental.15",
   "description": "Framework-agnostic Preact Signals re-exports for Wirestate services",
   "sideEffects": false,
   "author": "Syrotenko Igor",
