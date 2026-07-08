@@ -135,21 +135,21 @@ trades type safety for fewer tokens, because reads are `unknown` and need a cast
 the indirection earns its place.
 
 ```ts
-const SEEDS = new InjectionToken<Map<Function, unknown>>("SEEDS");
+const SERVICE_DATA = new InjectionToken<Map<Function, unknown>>("SERVICE_DATA");
 
 @Injectable()
 class CounterService {
-  private readonly data = inject(SEEDS).get(this.constructor) as { count: number };
+  private readonly data = inject(SERVICE_DATA).get(this.constructor) as { count: number };
 }
 
 new Container({
-  bindings: [CounterService, { token: SEEDS, value: new Map([[CounterService, { count: 10 }]]) }],
+  bindings: [CounterService, { token: SERVICE_DATA, value: new Map([[CounterService, { count: 10 }]]) }],
 });
 ```
 
 ## Direct Container Work
 
-`Container` is the registration and disposal API. Binding a service class through `container.bind()` makes it available
+`Container` is the registration and teardown API. Binding a service class through `container.bind()` makes it available
 for Wirestate lifecycle handling.
 
 ```ts
@@ -161,6 +161,11 @@ if (container.has(UserService)) {
 ```
 
 Use `has()` to include parent containers in the check. Use `hasOwn()` when only local bindings matter.
+
+Bind handler-bearing services before provisioning. Binding a service that declares a messaging
+(`@OnEvent`/`@OnCommand`/`@OnQuery`) or provider-lifecycle (`@OnProvision`/`@OnDeprovision`) handler onto a container
+that is already provisioned (or mid-provision) throws, because its handlers would not wire until the next provision
+cycle. Bind such services before `provision()`, or `deprovision()` and reprovision.
 
 `getOwnBindings()` returns this container's registered descriptors in registration order. It does not include parent
 bindings.

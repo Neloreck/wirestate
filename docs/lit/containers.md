@@ -77,7 +77,15 @@ export class ApplicationRoot extends LitElement {
 ## External Container
 
 Pass `container` to expose an existing container. The Lit provider provisions it while connected and deprovisions it on
-disconnect, but does not dispose it.
+disconnect, but does not tear it down.
+
+**Managed vs external lifetime.** A **managed** container (`config`) lives for the host's _connection_: it is destroyed
+on every disconnect and rebuilt on the next connect - DOM moves included, since moving an element disconnects then
+reconnects it. An **external** container (`container`) is owned by whoever created it and survives moves: the provider
+only deprovisions it on disconnect and reprovisions it on reconnect, via the deprovision/provision cycle. So an element
+that moves in the DOM and must keep its container's state and singletons needs an **external** container. Note that
+`@OnDeactivation` never runs for an external container that is merely garbage-collected - if the owner relies on
+deactivation hooks, it must call `container.unbindAll()` explicitly.
 
 ```ts
 import { Container } from "@wirestate/core";
@@ -96,7 +104,7 @@ deprovisions the previous container, provisions the next one, and publishes it. 
 replacement is stored for the next connection.
 
 Use `provider.setConfig(nextConfig)` to replace a managed provider's config. When connected, the provider deprovisions
-and disposes the current managed container, creates a new one, provisions it, and publishes it. When disconnected, the
+and tears down the current managed container, creates a new one, provisions it, and publishes it. When disconnected, the
 new config is stored for the next connection.
 
 ## API Reference

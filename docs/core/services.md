@@ -97,8 +97,9 @@ export class NotificationService {
 }
 ```
 
-Calling required `inject()` outside an active injection context throws. Keep it in constructor defaults, field
-initializers, or factory bindings.
+Calling `inject()` outside an active injection context throws for every form, including `{ optional: true }` and
+`{ lazy: true }` - `optional` suppresses a not-bound miss, not a missing context. Keep `inject()` in constructor
+defaults, field initializers, or factory bindings.
 
 ## Service Tokens
 

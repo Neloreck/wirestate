@@ -27,5 +27,5 @@ features:
   - icon:
       src: /icons/reactivity.svg
     title: Bring Reactivity
-    details: Use MobX, Preact Signals, or another state bridge.
+    details: Use MobX, Preact Signals, or another reactivity adapter.
 ---

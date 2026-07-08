@@ -4,8 +4,8 @@
 
 ## Managed Root Container
 
-Pass `config` when React should create and own the container. The provider provisions it while mounted and disposes it
-on unmount.
+Pass `config` when React should create and own the container. The provider provisions it while mounted and tears it
+down on unmount.
 
 ```tsx
 import { ContainerProvider } from "@wirestate/react";
@@ -39,7 +39,7 @@ container, remount the provider with a React `key`:
 </ContainerProvider>
 ```
 
-Remounting disposes the previous container and creates a new one from the current config. Because the config is read
+Remounting tears down the previous container and creates a new one from the current config. Because the config is read
 only once, inline config objects are safe.
 
 ## Messaging

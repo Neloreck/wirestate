@@ -66,7 +66,7 @@ const Counter = observer(function Counter() {
 ```
 
 Plain service fields still work for non-UI state, but they do not trigger React renders by themselves. Use
-`@wirestate/react-mobx`, `@wirestate/react-signals`, or your own React state bridge when components need to update from
+`@wirestate/react-mobx`, `@wirestate/react-signals`, or your own React reactivity adapter when components need to update from
 service state changes.
 
 ## Provider Lifecycle

@@ -60,7 +60,9 @@ factory.
 ## Controller Helpers
 
 `useInjection` returns a mutable holder. Read `holder.value` in element methods and templates. Like the decorator, it
-follows container context changes.
+follows container context changes. A **required** `holder.value` read before the context resolves (no container provider
+above the host) throws. `optional` and `fallback` holders return `undefined` until then, and an explicit `value` seeds
+the holder in the meantime.
 
 ```ts
 import { useInjection } from "@wirestate/lit";

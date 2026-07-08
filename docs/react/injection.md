@@ -21,7 +21,9 @@ export function Counter() {
 
 ## Optional Injection
 
-Pass `optional` when a missing value is valid - the hook returns `undefined` instead of throwing.
+Pass `optional` when a missing binding is valid - the hook returns `undefined` instead of throwing when the token is
+not bound. It still throws when the component is not rendered under a `<ContainerProvider>`: `optional` covers an
+unbound token, not a missing container.
 
 ```tsx
 import { useInjection } from "@wirestate/react";

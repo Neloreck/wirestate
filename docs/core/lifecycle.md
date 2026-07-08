@@ -9,10 +9,10 @@ belong.
 | Container activation        | `@OnActivation` after the service instance is resolved.                                    | Do cheap setup that can run before a UI boundary is committed.                                          |
 | Provider mount/connect      | `@OnProvision` in binding order. Provider lifecycle participants are resolved first.       | Start provider-owned timers, subscriptions, sockets, observers, and async loops.                        |
 | Provider unmount/disconnect | `@OnDeprovision` in reverse provision order, then the provider releases the container.     | Stop every resource started in `@OnProvision`. Make cleanup complete and repeatable.                    |
-| Container disposal          | `container.unbind` or `container.unbindAll`, then `@OnDeactivation` for resolved services. | Tear down service-level registrations and final service state. Discard the container after `unbindAll`. |
+| Container teardown          | `container.unbind` or `container.unbindAll`, then `@OnDeactivation` for resolved services. | Tear down service-level registrations and final service state. Discard the container after `unbindAll`. |
 
-Managed providers activate all bindings by default unless `activate` is set, then dispose owned containers after
-deprovision. External providers provision and deprovision the passed `container`, but disposal stays with the external
+Managed providers activate all bindings by default unless `activate` is set, then tear down owned containers after
+deprovision. External providers provision and deprovision the passed `container`, but teardown stays with the external
 owner.
 
 ## Service Layer
@@ -50,17 +50,17 @@ handlers are removed after deprovision hooks run.
 ## Ownership
 
 Managed providers own the container they create from `config`. They provision it while mounted or connected,
-deprovision it when that boundary ends, and then dispose it with `container.unbindAll()`.
+deprovision it when that boundary ends, and then tear it down with `container.unbindAll()`.
 
 External providers publish a container passed through `container`. They provision and deprovision it for their own
-boundary, but they never dispose it. The code that created the external container remains responsible for
+boundary, but they never tear it down. The code that created the external container remains responsible for
 `container.unbind` or `container.unbindAll`.
 
 ## WireStatus
 
 Wirestate tracks lifecycle state for each resolved service instance. Use `WireStatus.for(this)` inside a service when
 async work needs to know whether the instance is still active. This is most useful for dropping a late `await` result
-after the service has been deprovisioned or disposed.
+after the service has been deprovisioned or deactivated.
 
 [`WireStatus`](/api/wirestate-core/classes/WireStatus) exposes lifecycle state for late async guards:
 
@@ -68,7 +68,7 @@ after the service has been deprovisioned or disposed.
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | `isDeactivated`   | `true` after service deactivation.                                                                                            |
 | `isDeprovisioned` | `null` before provider provisioning reaches the service, `false` while provider-owned, and `true` after provider deprovision. |
-| `isInactive`      | `true` when the service has been disposed or deprovisioned.                                                                   |
+| `isInactive`      | `true` when the service has been deactivated or deprovisioned.                                                                |
 | `provisionId`     | Current provider provision cycle ID, or `null` before provider lifecycle reaches the service.                                 |
 
 ```ts
@@ -95,7 +95,7 @@ export class SearchService {
 ```
 
 Capture the `provisionId` passed to `@OnProvision` before awaiting, then after the await bail when `isInactive` is
-`true` (the service was disposed or deprovisioned) or when `provisionId` no longer matches - a newer provision cycle
+`true` (the service was deactivated or deprovisioned) or when `provisionId` no longer matches - a newer provision cycle
 has superseded this one, for example a Strict Mode remount or a DOM move. This stops a stale response from overwriting
 current state.
 
