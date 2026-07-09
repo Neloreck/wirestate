@@ -45,5 +45,5 @@ the plugin and the hook out of production builds.
 ## API Reference
 
 [`DevToolsPlugin`](/api/wirestate-core/devtools/classes/DevToolsPlugin),
-[`DevToolsPluginConfig`](/api/wirestate-core/devtools/interfaces/DevToolsPluginConfig),
+[`DevToolsPluginOptions`](/api/wirestate-core/devtools/interfaces/DevToolsPluginOptions),
 [`WirestatePlugin`](/api/wirestate-core/interfaces/WirestatePlugin).

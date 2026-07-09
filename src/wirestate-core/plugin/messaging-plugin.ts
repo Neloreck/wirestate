@@ -8,6 +8,20 @@ import { getMessagingRegistrations, type MessagingRegistration } from "./messagi
 import { type WirestatePlugin } from "./plugin";
 
 /**
+ * Messaging kinds declared by each built-in messaging plugin.
+ *
+ * @internal
+ */
+const MESSAGING_PLUGIN_HANDLED_KINDS: WeakMap<MessagingPlugin, ReadonlyArray<symbol>> = new WeakMap();
+
+/**
+ * Empty handled-kind list returned for non-messaging plugins.
+ *
+ * @internal
+ */
+const NO_MESSAGING_PLUGIN_HANDLED_KINDS: ReadonlyArray<symbol> = [];
+
+/**
  * Built-in base for the messaging plugins (`EventsPlugin` / `CommandsPlugin` /
  * `QueriesPlugin`).
  *
@@ -18,10 +32,8 @@ import { type WirestatePlugin } from "./plugin";
  * @internal
  */
 export abstract class MessagingPlugin implements WirestatePlugin {
-  protected constructor(private readonly registration: MessagingRegistration) {}
-
-  public get handles(): ReadonlyArray<symbol> {
-    return [this.registration.kind];
+  protected constructor(private readonly registration: MessagingRegistration) {
+    MESSAGING_PLUGIN_HANDLED_KINDS.set(this, [registration.kind]);
   }
 
   public install(container: Container): void {
@@ -64,4 +76,22 @@ export abstract class MessagingPlugin implements WirestatePlugin {
       );
     }
   }
+}
+
+/**
+ * Returns the messaging kinds a built-in messaging plugin owns.
+ *
+ * @remarks
+ * Custom {@link WirestatePlugin} implementations cannot claim messaging kinds
+ * until Wirestate exposes the complete custom messaging-plugin contract.
+ *
+ * @internal
+ *
+ * @param plugin - Plugin to inspect.
+ * @returns The plugin's built-in messaging kinds, or an empty list.
+ */
+export function getMessagingPluginHandledKinds(plugin: WirestatePlugin): ReadonlyArray<symbol> {
+  return plugin instanceof MessagingPlugin
+    ? (MESSAGING_PLUGIN_HANDLED_KINDS.get(plugin) ?? NO_MESSAGING_PLUGIN_HANDLED_KINDS)
+    : NO_MESSAGING_PLUGIN_HANDLED_KINDS;
 }

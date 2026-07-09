@@ -138,9 +138,9 @@ Plugins resolve up the parent chain, nearest container first. One registered on 
 subtree. A single devtools plugin observes every nested container, and an inherited messaging plugin wires a child
 service's handler onto the ancestor's bus.
 
-Plugins that declare `handles` can be shadowed by a nearer plugin that claims the same kind. This is how a child
-container with its own `EventsPlugin`, `CommandsPlugin`, or `QueriesPlugin` gets a local bus. Observer plugins that do
-not declare `handles` are not shadowed, so ancestors keep observing descendants.
+Built-in messaging plugins are shadowed by a nearer built-in plugin of the same kind. This is how a child container
+with its own `EventsPlugin`, `CommandsPlugin`, or `QueriesPlugin` gets a local bus. Observer plugins are never
+shadowed, so ancestors keep observing descendants.
 
 ## API Reference
 

@@ -2,7 +2,7 @@ import { OnActivation } from "../activation/on-activation";
 import { WireStatus } from "../activation/wire-status";
 import { Container } from "../container/container";
 import { Injectable } from "../metadata/metadata-injectable";
-import { OnEvent } from "../plugin/events/on-event";
+import { EVENT_REGISTRATION, OnEvent } from "../plugin/events/on-event";
 import { type WirestatePlugin } from "../plugin/plugin";
 
 import { OnDeprovision } from "./on-deprovision";
@@ -223,6 +223,29 @@ describe("provision lifecycle errors", () => {
 
     // Bound, but no EventsPlugin registered - the declared @OnEvent kind is unhandled.
     const container: Container = new Container({ bindings: [EventListenerService] });
+
+    expect(() => provisionContainer(container, [EventListenerService])).toThrow(
+      "Service 'EventListenerService' declares a messaging handler but no registered plugin handles it."
+    );
+  });
+
+  it("does not let a custom plugin claim a messaging kind", () => {
+    class CustomPlugin implements WirestatePlugin {
+      public readonly handles: ReadonlyArray<symbol> = [EVENT_REGISTRATION.kind];
+
+      public onContainerProvision(): void {}
+    }
+
+    @Injectable()
+    class EventListenerService {
+      @OnEvent("PING")
+      public onPing(): void {}
+    }
+
+    const container: Container = new Container({
+      bindings: [EventListenerService],
+      plugins: [new CustomPlugin()],
+    });
 
     expect(() => provisionContainer(container, [EventListenerService])).toThrow(
       "Service 'EventListenerService' declares a messaging handler but no registered plugin handles it."

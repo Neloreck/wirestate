@@ -18,7 +18,7 @@ import type { Container } from "../container/container";
  *
  * A plugin reaches its container and every descendant (plugins resolve up the
  * parent chain, nearest first), so one registered on the root observes the whole
- * subtree unless a nearer plugin shadows a handled kind.
+ * subtree unless a nearer built-in messaging plugin shadows the same kind.
  *
  * @group Plugins
  *
@@ -60,17 +60,6 @@ export interface WirestatePlugin {
    * @returns Whether the plugin participates in this token.
    */
   participates?(token: ServiceToken): boolean;
-
-  /**
-   * Messaging-handler kinds this plugin owns (advanced).
-   *
-   * @remarks
-   * Used by the built-in messaging plugins. Provision matches declared handler
-   * metadata against the union of registered plugins' kinds and throws on a kind
-   * no plugin handles. A nearer plugin owning a kind shadows an ancestor's of the
-   * same kind. Observer plugins usually omit this field.
-   */
-  readonly handles?: ReadonlyArray<symbol>;
 
   /**
    * Runs once at the start of a container provision cycle, before instance wiring.

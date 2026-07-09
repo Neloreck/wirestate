@@ -11,6 +11,7 @@ import type { Container } from "../container/container";
 import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
+import { getMessagingPluginHandledKinds } from "../plugin/messaging-plugin";
 import { getMessagingRegistrations } from "../plugin/messaging-registration";
 import {
   dispatchPluginContainerDeprovision,
@@ -229,7 +230,7 @@ function validateBindings(container: Container, bindings: ReadonlyArray<Binding>
   const handledKinds: Set<symbol> = new Set();
 
   for (const plugin of getEffectivePlugins(container)) {
-    for (const kind of plugin.handles ?? []) {
+    for (const kind of getMessagingPluginHandledKinds(plugin)) {
       handledKinds.add(kind);
     }
   }

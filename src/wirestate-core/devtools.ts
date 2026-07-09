@@ -5,4 +5,4 @@
  * @packageDocumentation
  */
 
-export { DevToolsPlugin, type DevToolsPluginConfig } from "./plugin/devtools/devtools-plugin";
+export { DevToolsPlugin, type DevToolsPluginOptions } from "./plugin/devtools/devtools-plugin";

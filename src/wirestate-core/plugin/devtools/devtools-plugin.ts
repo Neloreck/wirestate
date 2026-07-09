@@ -27,7 +27,7 @@ import { tapContainerBuses } from "./devtools-tap";
  *
  * @group DevTools
  */
-export interface DevToolsPluginConfig {
+export interface DevToolsPluginOptions {
   /**
    * Optional human label for this root, shown by the inspector to tell it apart from other roots on
    * the page (a root is otherwise identified only by a numeric id). When omitted, a consumer may
@@ -64,15 +64,15 @@ export class DevToolsPlugin implements WirestatePlugin {
   private readonly observed: Map<DevtoolsContainerId, WeakRef<ContainerKernel>> = new Map();
 
   /**
-   * Optional human label for this root, surfaced in the snapshot. See {@link DevToolsPluginConfig.label}.
+   * Optional human label for this root, surfaced in the snapshot. See {@link DevToolsPluginOptions.label}.
    */
   private readonly label: Optional<string>;
 
   /**
-   * @param config - Optional plugin configuration (see {@link DevToolsPluginConfig}).
+   * @param options - Optional plugin options (see {@link DevToolsPluginOptions}).
    */
-  public constructor(config?: DevToolsPluginConfig) {
-    this.label = config?.label;
+  public constructor(options?: DevToolsPluginOptions) {
+    this.label = options?.label;
   }
 
   public install(): void {

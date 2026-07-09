@@ -7,6 +7,7 @@ import { Injectable } from "../../metadata/metadata-injectable";
 import { OnDeprovision } from "../../provision/on-deprovision";
 import { OnProvision } from "../../provision/on-provision";
 import { OnCommand } from "../commands/on-command";
+import { EventsPlugin } from "../events/events-plugin";
 import { OnEvent } from "../events/on-event";
 
 import { normalizeBinding, normalizeInstance, normalizePlugin, normalizeToken } from "./devtools-normalize";
@@ -66,12 +67,11 @@ describe("normalizeBinding", () => {
 });
 
 describe("normalizePlugin", () => {
-  it("reads the plugin class name and maps handled-kind symbols to their descriptions", () => {
-    class MessagingPlugin {
-      public readonly handles: ReadonlyArray<symbol> = [Symbol("event"), Symbol("command")];
-    }
-
-    expect(normalizePlugin(new MessagingPlugin())).toEqual({ name: "MessagingPlugin", handles: ["event", "command"] });
+  it("reads the built-in messaging plugin class name and handled kind", () => {
+    expect(normalizePlugin(new EventsPlugin())).toEqual({
+      name: "EventsPlugin",
+      handles: ["@wirestate/core/messaging/event"],
+    });
   });
 
   it("reports no handled kinds for a pure observer plugin", () => {

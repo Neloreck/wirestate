@@ -1,5 +1,8 @@
 import { ContainerKernel } from "../container/container-kernel";
 
+import { CommandsPlugin } from "./commands/commands-plugin";
+import { EventsPlugin } from "./events/events-plugin";
+import { EVENT_REGISTRATION } from "./events/on-event";
 import { type WirestatePlugin } from "./plugin";
 import { getEffectivePlugins, setContainerPlugins } from "./plugin-registry";
 
@@ -27,17 +30,16 @@ describe("getEffectivePlugins", () => {
     expect(getEffectivePlugins(child)).toEqual([shared]);
   });
 
-  it("shadows an ancestor plugin whose every kind is claimed by a nearer plugin", () => {
-    const kind: symbol = Symbol("KIND");
-    const nearer: WirestatePlugin = { handles: [kind] };
-    const ancestor: WirestatePlugin = { handles: [kind] };
+  it("shadows an ancestor built-in messaging plugin with the same kind", () => {
+    const nearer: EventsPlugin = new EventsPlugin();
+    const ancestor: EventsPlugin = new EventsPlugin();
     const parent: ContainerKernel = new ContainerKernel();
     const child: ContainerKernel = new ContainerKernel(parent);
 
     setContainerPlugins(parent, [ancestor]);
     setContainerPlugins(child, [nearer]);
 
-    // The nearer plugin owns the kind, so the ancestor's same-kind plugin is dropped.
+    // The nearer built-in plugin owns the kind, so the ancestor's same-kind plugin is dropped.
     expect(getEffectivePlugins(child)).toEqual([nearer]);
     // From the ancestor's own perspective there is nothing nearer to shadow it.
     expect(getEffectivePlugins(parent)).toEqual([ancestor]);
@@ -62,18 +64,36 @@ describe("getEffectivePlugins", () => {
     expect(getEffectivePlugins(container)).not.toBe(initial);
   });
 
-  it("keeps an ancestor plugin that still owns a kind no nearer plugin claims", () => {
-    const shared: symbol = Symbol("SHARED");
-    const extra: symbol = Symbol("EXTRA");
-    const nearer: WirestatePlugin = { handles: [shared] };
-    const ancestor: WirestatePlugin = { handles: [shared, extra] };
+  it("keeps an ancestor built-in messaging plugin for a different kind", () => {
+    const nearer: EventsPlugin = new EventsPlugin();
+    const ancestor: CommandsPlugin = new CommandsPlugin();
     const parent: ContainerKernel = new ContainerKernel();
     const child: ContainerKernel = new ContainerKernel(parent);
 
     setContainerPlugins(parent, [ancestor]);
     setContainerPlugins(child, [nearer]);
 
-    // `shared` is claimed by the nearer plugin, but the ancestor still owns `extra`, so it survives.
+    // The plugins own different built-in kinds, so both survive.
     expect(getEffectivePlugins(child)).toEqual([nearer, ancestor]);
+  });
+
+  it("does not let a custom plugin claim a built-in messaging kind", () => {
+    const customPlugin: WirestatePlugin = {};
+    const ancestor: EventsPlugin = new EventsPlugin();
+    const parent: ContainerKernel = new ContainerKernel();
+    const child: ContainerKernel = new ContainerKernel(parent);
+
+    // Untyped callers can still add arbitrary properties, but they do not participate in internal kind ownership.
+    Object.assign(customPlugin, { handles: [EVENT_REGISTRATION.kind] });
+    setContainerPlugins(parent, [ancestor]);
+    setContainerPlugins(child, [customPlugin]);
+
+    expect(getEffectivePlugins(child)).toEqual([customPlugin, ancestor]);
+  });
+
+  it("does not expose handled kinds through the public plugin contract", () => {
+    const hasHandles: "handles" extends keyof WirestatePlugin ? true : false = false;
+
+    expect(hasHandles).toBe(false);
   });
 });

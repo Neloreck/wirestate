@@ -10,6 +10,7 @@ import { getProvisionHandlerMetadata } from "../../provision/on-provision";
 import { type Optional } from "../../types/general";
 import { getCommandHandlerMetadata } from "../commands/on-command";
 import { getEventHandlerMetadata } from "../events/events-registry";
+import { getMessagingPluginHandledKinds } from "../messaging-plugin";
 import { type WirestatePlugin } from "../plugin";
 import { getQueryHandlerMetadata } from "../queries/on-query";
 
@@ -93,7 +94,7 @@ export function normalizeBinding(binding: BindingDescriptor<unknown>, bindingId:
 export function normalizePlugin(plugin: WirestatePlugin): DevtoolsPluginInfo {
   return {
     name: plugin.constructor.name,
-    handles: (plugin.handles ?? []).map((kind: symbol): string => kind.description ?? String(kind)),
+    handles: getMessagingPluginHandledKinds(plugin).map((kind: symbol): string => kind.description ?? String(kind)),
   };
 }
 

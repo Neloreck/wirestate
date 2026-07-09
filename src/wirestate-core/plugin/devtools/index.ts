@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-export { DevToolsPlugin, type DevToolsPluginConfig } from "./devtools-plugin";
+export { DevToolsPlugin, type DevToolsPluginOptions } from "./devtools-plugin";
 export { DEVTOOLS_HOOK_KEY, DEVTOOLS_PROTOCOL_VERSION, getDevtoolsHook, installDevtoolsHook } from "./devtools-hook";
 
 export {

@@ -3,6 +3,7 @@ import type { Container } from "../container/container";
 import type { ContainerKernel } from "../container/container-kernel";
 import type { Maybe } from "../types/general";
 
+import { getMessagingPluginHandledKinds } from "./messaging-plugin";
 import type { WirestatePlugin } from "./plugin";
 
 /**
@@ -81,19 +82,17 @@ export function getEffectivePlugins(container: ContainerKernel): ReadonlyArray<W
         continue;
       }
 
-      const kinds: Maybe<ReadonlyArray<symbol>> = plugin.handles;
+      const kinds: ReadonlyArray<symbol> = getMessagingPluginHandledKinds(plugin);
 
-      if (kinds && kinds.length > 0 && kinds.every((kind: symbol) => claimedKinds.has(kind))) {
+      if (kinds.length > 0 && kinds.every((kind: symbol) => claimedKinds.has(kind))) {
         continue;
       }
 
       seen.add(plugin);
       result.push(plugin);
 
-      if (kinds) {
-        for (const kind of kinds) {
-          claimedKinds.add(kind);
-        }
+      for (const kind of kinds) {
+        claimedKinds.add(kind);
       }
     }
 

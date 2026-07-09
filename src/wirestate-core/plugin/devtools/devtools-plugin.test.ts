@@ -468,7 +468,7 @@ describe("DevToolsPlugin", () => {
 
     expect(names).toContain("EventsPlugin");
     expect(names).toContain("DevToolsPlugin");
-    // A messaging plugin declares the kind it owns; a pure observer declares none.
+    // A built-in messaging plugin reports the kind it owns; a pure observer reports none.
     expect(plugins.find((plugin) => plugin.name === "EventsPlugin")?.handles.length).toBeGreaterThan(0);
     expect(plugins.find((plugin) => plugin.name === "DevToolsPlugin")?.handles).toEqual([]);
     expect(container).toBeInstanceOf(Container);
