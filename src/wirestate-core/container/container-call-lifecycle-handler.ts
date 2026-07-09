@@ -86,7 +86,7 @@ export function callLifecycleHandler(options: CallLifecycleHandlerOptions): void
     );
 
     if (result && typeof (result as Promise<void>).then === "function") {
-      (result as Promise<void>).catch((error) => {
+      Promise.resolve(result).catch((error) => {
         reportWirestateInternalError({
           container,
           details,

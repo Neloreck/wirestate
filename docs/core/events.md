@@ -136,8 +136,9 @@ export class CartActivityService {
 
 Use this pattern when the subscription depends on runtime state or cannot be expressed with `@OnEvent`.
 
-If an event handler throws, Wirestate reports the failure through the container error handler and continues with the next
-handler.
+Events are fire-and-forget. `EventBus` does not await a handler's asynchronous work, so one slow handler never delays
+other subscribers. If a handler throws or returns a promise that rejects, Wirestate reports the failure through the
+container error handler and continues with the next handler.
 
 ## API Reference
 

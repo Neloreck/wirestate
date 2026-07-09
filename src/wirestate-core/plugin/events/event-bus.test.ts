@@ -1,7 +1,7 @@
 import { Container } from "../../container/container";
 
 import { EventBus } from "./event-bus";
-import { type EventUnsubscribe, type WireEvent } from "./events";
+import { type EventHandler, type EventUnsubscribe, type WireEvent } from "./events";
 
 describe("EventBus", () => {
   it("should accept a handler typed with a narrowed payload (F-6)", () => {
@@ -181,6 +181,63 @@ describe("EventBus", () => {
         error,
         event: { type: "TEST", payload: 42 },
         message: "Event handler threw",
+        source: "event-handler",
+      })
+    );
+  });
+
+  it("should report rejected handler promises without delaying other subscribers", async () => {
+    const error: Error = new Error("handler rejection");
+    const onError = jest.fn();
+    const container: Container = new Container({ onError, bindings: [EventBus] });
+    const bus: EventBus = container.get(EventBus);
+    const secondHandler = jest.fn();
+    const rejectingHandler: EventHandler = async (): Promise<void> => {
+      throw error;
+    };
+
+    bus.subscribe(rejectingHandler);
+    bus.subscribe(secondHandler);
+
+    expect(bus.emit("TEST", 42)).toBeUndefined();
+    expect(secondHandler).toHaveBeenCalledWith({ type: "TEST", payload: 42 });
+    expect(onError).not.toHaveBeenCalled();
+
+    await Promise.resolve();
+
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        container,
+        error,
+        event: { type: "TEST", payload: 42 },
+        message: "Event handler rejected",
+        source: "event-handler",
+      })
+    );
+  });
+
+  it("should report rejected handler thenables without a catch method", async () => {
+    const error: Error = new Error("handler thenable rejection");
+    const onError = jest.fn();
+    const container: Container = new Container({ onError, bindings: [EventBus] });
+    const bus: EventBus = container.get(EventBus);
+    const rejectingHandler: EventHandler = () => ({
+      then(): void {
+        throw error;
+      },
+    });
+
+    bus.subscribe(rejectingHandler);
+    bus.emit("TEST", 42);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        container,
+        error,
+        event: { type: "TEST", payload: 42 },
+        message: "Event handler rejected",
         source: "event-handler",
       })
     );

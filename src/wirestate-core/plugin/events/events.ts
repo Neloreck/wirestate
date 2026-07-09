@@ -62,6 +62,10 @@ export interface EventEmitOptions<S = unknown> {
 /**
  * Receives an emitted event from the bus.
  *
+ * @remarks
+ * May start asynchronous work. The bus does not await a returned promise, and
+ * reports a rejection through the container error handler.
+ *
  * @template E - Event shape delivered to the handler.
  *
  * @group Events

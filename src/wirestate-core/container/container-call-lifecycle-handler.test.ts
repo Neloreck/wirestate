@@ -169,6 +169,45 @@ describe("callLifecycleHandler", () => {
     );
   });
 
+  it("should report rejected lifecycle thenables without a catch method", async () => {
+    const error = new Error("thenable-fail");
+
+    class TestService {
+      public onLifecycle(): { then: () => void } {
+        return {
+          then(): void {
+            throw error;
+          },
+        };
+      }
+    }
+
+    const onError = jest.fn();
+    const container: Container = new Container({ onError });
+    const instance: TestService = new TestService();
+
+    callLifecycleHandler({
+      container,
+      instance,
+      methodName: "onLifecycle",
+      name: "@OnTest",
+      source: "instance-deactivation",
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        container,
+        error,
+        instance,
+        message: "@OnTest rejected",
+        methodName: "onLifecycle",
+        source: "instance-deactivation",
+      })
+    );
+  });
+
   it("should use instance constructor details when diagnostics are not provided", () => {
     const error = new Error("default-details");
 

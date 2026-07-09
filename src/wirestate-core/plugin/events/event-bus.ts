@@ -72,9 +72,10 @@ export class EventBus {
    *
    * @remarks
    * Handlers are snapshotted before dispatch, so subscriptions can change while
-   * an event is being emitted. If a handler throws, Wirestate reports it through
-   * the container error handler and continues with the next subscriber.
-   * Catch-all subscribers run before type-specific subscribers.
+   * an event is being emitted. Dispatch does not await handler promises. If a
+   * handler throws or rejects, Wirestate reports it through the container error
+   * handler and continues with the next subscriber. Catch-all subscribers run
+   * before type-specific subscribers.
    *
    * @template P - Payload type.
    * @template T - Event type.
@@ -313,7 +314,19 @@ export class EventBus {
   private dispatch(subscriptions: ReadonlyArray<EventSubscription>, event: WireEvent): void {
     for (const subscription of subscriptions) {
       try {
-        subscription.handler(event);
+        const result: unknown = subscription.handler(event);
+
+        if (result && typeof (result as Promise<void>).then === "function") {
+          Promise.resolve(result).catch((error) => {
+            reportWirestateInternalError({
+              container: this.container,
+              error,
+              event,
+              message: "Event handler rejected",
+              source: "event-handler",
+            });
+          });
+        }
       } catch (error) {
         // Prevent one failing listener from stalling the entire bus.
         reportWirestateInternalError({
