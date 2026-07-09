@@ -56,7 +56,6 @@ npm install @wirestate/core @wirestate/mobx @wirestate/lit @wirestate/lit-mobx
 
 See the [Lit MobX overview](/lit-mobx/overview) for services, elements, and computed state.
 
-
 ## Next Steps
 
 - Start with [Core overview](/core/overview) for services and containers.
