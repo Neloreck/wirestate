@@ -56,18 +56,6 @@ npm install @wirestate/core @wirestate/mobx @wirestate/lit @wirestate/lit-mobx
 
 See the [Lit MobX overview](/lit-mobx/overview) for services, elements, and computed state.
 
-## TypeScript
-
-Wirestate decorators work with legacy TypeScript decorators and TC39 standard decorators. For legacy TypeScript
-decorators, enable `experimentalDecorators`.
-
-```json
-{
-  "compilerOptions": {
-    "experimentalDecorators": true
-  }
-}
-```
 
 ## Next Steps
 
