@@ -1,6 +1,9 @@
+import { OnActivation } from "../activation/on-activation";
+import { WireStatus } from "../activation/wire-status";
 import { Container } from "../container/container";
 import { Injectable } from "../metadata/metadata-injectable";
 import { OnEvent } from "../plugin/events/on-event";
+import { type WirestatePlugin } from "../plugin/plugin";
 
 import { OnDeprovision } from "./on-deprovision";
 import { OnProvision } from "./on-provision";
@@ -8,6 +11,112 @@ import { provisionContainer } from "./provision-lifecycle";
 import { getProvisionState } from "./provision-state";
 
 describe("provision lifecycle errors", () => {
+  it("rolls back prior container hooks when a later container-provision plugin throws", () => {
+    const error = new Error("container-provision-fail");
+    const events: Array<string> = [];
+
+    class FirstPlugin implements WirestatePlugin {
+      public onContainerProvision(): void {
+        events.push("first-provision");
+      }
+
+      public onContainerDeprovision(): void {
+        events.push("first-deprovision");
+      }
+    }
+
+    class FailingPlugin implements WirestatePlugin {
+      public onContainerProvision(): void {
+        events.push("failing-provision");
+
+        throw error;
+      }
+    }
+
+    const container: Container = new Container({ plugins: [new FirstPlugin(), new FailingPlugin()] });
+
+    expect(() => provisionContainer(container)).toThrow(error);
+
+    expect(events).toEqual(["first-provision", "failing-provision", "first-deprovision"]);
+    expect(getProvisionState(container)?.status).toBe(false);
+  });
+
+  it("rolls back container hooks when binding validation fails", () => {
+    const events: Array<string> = [];
+
+    class ObserverPlugin implements WirestatePlugin {
+      public onContainerProvision(): void {
+        events.push("container-provision");
+      }
+
+      public onContainerDeprovision(): void {
+        events.push("container-deprovision");
+      }
+    }
+
+    @Injectable()
+    class UnhandledListenerService {
+      @OnEvent("PING")
+      public onPing(): void {}
+    }
+
+    const container: Container = new Container({
+      bindings: [UnhandledListenerService],
+      plugins: [new ObserverPlugin()],
+    });
+
+    expect(() => provisionContainer(container)).toThrow(
+      "Service 'UnhandledListenerService' declares a messaging handler but no registered plugin handles it."
+    );
+
+    expect(events).toEqual(["container-provision", "container-deprovision"]);
+    expect(getProvisionState(container)?.status).toBe(false);
+  });
+
+  it("rolls back resolved participants when a later participant fails activation", () => {
+    const error = new Error("activation-fail");
+    const events: Array<string> = [];
+
+    class ObserverPlugin implements WirestatePlugin {
+      public onContainerProvision(): void {
+        events.push("container-provision");
+      }
+
+      public onContainerDeprovision(): void {
+        events.push("container-deprovision");
+      }
+    }
+
+    @Injectable()
+    class FirstService {
+      @OnProvision()
+      public onProvision(): void {}
+    }
+
+    @Injectable()
+    class FailingActivationService {
+      @OnActivation()
+      public onActivation(): void {
+        throw error;
+      }
+
+      @OnProvision()
+      public onProvision(): void {}
+    }
+
+    const container: Container = new Container({
+      bindings: [FirstService, FailingActivationService],
+      plugins: [new ObserverPlugin()],
+    });
+
+    expect(() => provisionContainer(container)).toThrow(error);
+
+    expect(events).toEqual(["container-provision", "container-deprovision"]);
+    expect(WireStatus.for(container.get(FirstService)).isDeprovisioned).toBe(true);
+    expect(getProvisionState(container)?.cycleByInstance).toEqual(new Map());
+    expect(getProvisionState(container)?.status).toBe(false);
+  });
+
   it("should report provider lifecycle errors to container error handler", () => {
     const error = new Error("provision-fail");
     const onError = jest.fn();
