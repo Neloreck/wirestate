@@ -204,13 +204,27 @@ export function dispatchPluginDeprovision(container: ContainerKernel, instance: 
 /**
  * Dispatches `onContainerProvision` to the effective plugins (setup: may throw).
  *
+ * @remarks
+ * If a hook throws, deprovisions the earlier hooks in reverse order before rethrowing the setup error.
+ *
  * @internal
  *
  * @param container - Container being provisioned.
  */
 export function dispatchPluginContainerProvision(container: ContainerKernel): void {
+  const provisioned: Array<WirestatePlugin> = [];
+
   for (const plugin of getEffectivePlugins(container)) {
-    plugin.onContainerProvision?.(container as Container);
+    try {
+      plugin.onContainerProvision?.(container as Container);
+      provisioned.push(plugin);
+    } catch (error) {
+      for (const priorPlugin of reversed(provisioned)) {
+        runFailsafe(() => priorPlugin.onContainerDeprovision?.(container as Container));
+      }
+
+      throw error;
+    }
   }
 }
 

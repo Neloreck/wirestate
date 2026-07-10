@@ -65,6 +65,11 @@ export function provisionContainer(
   try {
     state.instances = provisionInstances(container, state, bindings);
     state.status = true;
+  } catch (error) {
+    state.instances = null;
+    state.status = false;
+
+    throw error;
   } finally {
     state.provisioning = false;
   }
@@ -187,16 +192,22 @@ export function provisionInstances(
   // Plugins observe the provision cycle boundary before any instance wiring.
   dispatchPluginContainerProvision(container);
 
-  validateBindings(container, bindings);
+  try {
+    validateBindings(container, bindings);
 
-  const { instances, trackedTokens } = resolveParticipants(container, state, bindings);
+    const { instances } = resolveParticipants(container, state, bindings);
 
-  markInFlight(container);
-  wirePlugins(container, state, instances, trackedTokens);
-  runProvisionHooks(container, state, instances, trackedTokens);
-  markProvisioned(container);
+    markInFlight(container);
+    wirePlugins(container, state);
+    runProvisionHooks(container, instances);
+    markProvisioned(container);
 
-  return instances;
+    return instances;
+  } catch (error) {
+    rollbackProvision(container, state);
+
+    throw error;
+  }
 }
 
 /**
@@ -324,25 +335,12 @@ function markInFlight(container: Container): void {
  *
  * @param container - Container being provisioned.
  * @param state - Provider lifecycle state for the container.
- * @param instances - Participant instances resolved this cycle.
- * @param trackedTokens - Instance/token pairs tracked this cycle (for rollback).
  */
-function wirePlugins(
-  container: Container,
-  state: ProvisionState,
-  instances: ReadonlyArray<object>,
-  trackedTokens: ReadonlyArray<readonly [object, ServiceToken]>
-): void {
+function wirePlugins(container: Container, state: ProvisionState): void {
   for (const instance of container.getActiveInstances()) {
-    try {
-      dispatchPluginProvision(container, instance, (dispose: () => void): void =>
-        appendDisposer(state, instance, dispose)
-      );
-    } catch (error) {
-      rollbackProvision(container, state, instances, trackedTokens);
-
-      throw error;
-    }
+    dispatchPluginProvision(container, instance, (dispose: () => void): void =>
+      appendDisposer(state, instance, dispose)
+    );
   }
 }
 
@@ -353,16 +351,9 @@ function wirePlugins(
  * @internal
  *
  * @param container - Container being provisioned.
- * @param state - Provider lifecycle state for the container.
  * @param instances - Participant instances resolved this cycle.
- * @param trackedTokens - Instance/token pairs tracked this cycle (for rollback).
  */
-function runProvisionHooks(
-  container: Container,
-  state: ProvisionState,
-  instances: ReadonlyArray<object>,
-  trackedTokens: ReadonlyArray<readonly [object, ServiceToken]>
-): void {
+function runProvisionHooks(container: Container, instances: ReadonlyArray<object>): void {
   for (const instance of instances) {
     const status: WireStatus = WireStatus.for(instance);
 
@@ -380,25 +371,19 @@ function runProvisionHooks(
     status.isDeprovisioned = false;
     status.provisionId = provisionId;
 
-    try {
-      if (methodName) {
-        callLifecycleHandler({
-          args: [provisionId],
-          container: getInstanceContainer(instance),
-          name: "@OnProvision",
-          details: [instance.constructor.name, String(methodName)],
-          instance,
-          instanceName: instance.constructor.name,
-          methodName,
-          rethrowSync: true,
-          source: "provider-provision",
-          syncFailureMessage: "@OnProvision failed for",
-        });
-      }
-    } catch (error) {
-      rollbackProvision(container, state, instances, trackedTokens);
-
-      throw error;
+    if (methodName) {
+      callLifecycleHandler({
+        args: [provisionId],
+        container: getInstanceContainer(instance),
+        name: "@OnProvision",
+        details: [instance.constructor.name, String(methodName)],
+        instance,
+        instanceName: instance.constructor.name,
+        methodName,
+        rethrowSync: true,
+        source: "provider-provision",
+        syncFailureMessage: "@OnProvision failed for",
+      });
     }
   }
 }
@@ -538,7 +523,7 @@ function unsubscribeInstance(state: ProvisionState, instance: object): void {
 }
 
 /**
- * Unwinds a partially provisioned cycle after a subscribe or `@OnProvision` failure.
+ * Unwinds a partially provisioned cycle after a provision-phase failure.
  *
  * @remarks
  * Atomic provision: runs `@OnDeprovision` for instances that reached
@@ -549,16 +534,11 @@ function unsubscribeInstance(state: ProvisionState, instance: object): void {
  *
  * @param container - Container being provisioned.
  * @param state - Provider lifecycle state for the container.
- * @param instances - All participant instances resolved this cycle.
- * @param trackedTokens - Instance/token pairs tracked this cycle.
  */
-function rollbackProvision(
-  container: Container,
-  state: ProvisionState,
-  instances: ReadonlyArray<object>,
-  trackedTokens: ReadonlyArray<readonly [object, ServiceToken]>
-): void {
+function rollbackProvision(container: Container, state: ProvisionState): void {
   state.status = false;
+
+  const instances: ReadonlyArray<object> = [...state.cycleByInstance.keys()];
 
   deprovisionInstances(container, state, instances);
 
@@ -570,9 +550,7 @@ function rollbackProvision(
     WireStatus.for(activeInstance).isDeprovisioned = true;
   }
 
-  for (const [trackedInstance, token] of trackedTokens) {
-    untrackProvisionToken(state, [trackedInstance], token);
-  }
+  state.cycleByInstance.clear();
 
   dispatchPluginContainerDeprovision(container);
 }
