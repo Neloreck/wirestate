@@ -1,4 +1,5 @@
 import {
+  BindingType,
   Container,
   EventBus,
   EventsPlugin,
@@ -253,5 +254,48 @@ describe("core event messaging integration", () => {
     bus.emit(ALPHA);
 
     expect(audit.seen).toEqual([ALPHA, BETA]);
+  });
+
+  it("subscribes and tears down an @OnEvent handler bound behind a custom token", () => {
+    const LOG_EVENT: string = "LOG_EVENT";
+    const TOKEN: unique symbol = Symbol("listener");
+
+    @Injectable()
+    class ListenerService {
+      public readonly events: Array<string> = [];
+
+      @OnEvent(LOG_EVENT)
+      public onLogEvent(event: { readonly payload?: string }): void {
+        this.events.push(event.payload ?? "empty");
+      }
+    }
+
+    // An instance descriptor declares its handlers on `value`, not on the token it is
+    // bound behind, so the messaging plugin has to recognise the participant through the class.
+    const container: Container = new Container({
+      bindings: [{ type: BindingType.Instance, token: TOKEN, value: ListenerService }],
+      plugins: [new EventsPlugin()],
+    }).provision();
+
+    const listener: ListenerService = container.get<ListenerService>(TOKEN);
+    const bus: EventBus = container.get(EventBus);
+
+    bus.emit(LOG_EVENT, "wired");
+
+    expect(listener.events).toEqual(["wired"]);
+
+    container.deprovision();
+
+    expect(bus.hasSubscribers()).toBe(false);
+
+    bus.emit(LOG_EVENT, "after-deprovision");
+
+    expect(listener.events).toEqual(["wired"]);
+
+    // Reprovisioning resubscribes exactly once instead of stacking a second subscription.
+    container.provision();
+    bus.emit(LOG_EVENT, "rewired");
+
+    expect(listener.events).toEqual(["wired", "rewired"]);
   });
 });

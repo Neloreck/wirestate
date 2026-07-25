@@ -105,10 +105,6 @@ export function deprovisionContainer(container: Container): void {
 
     markActiveInstancesDeprovisioned(container);
 
-    for (const instance of instances) {
-      state.cycleByInstance.delete(instance);
-    }
-
     state.instances = null;
   } else if (wasProvisioned) {
     // Unbinding the last lifecycle binding already cleared the instances entry,
@@ -118,6 +114,11 @@ export function deprovisionContainer(container: Container): void {
 
   // Plugins observe the cycle boundary at the very end, once, when the container was provisioned.
   if (instances || wasProvisioned) {
+    // Sweep any disposer a plugin parked on a non-participant instance, so deprovision never
+    // leaves a subscription behind, then drop the cycle: the next provision re-tracks it.
+    clearRemainingDisposers(state);
+    state.cycleByInstance.clear();
+
     dispatchPluginContainerDeprovision(container);
   }
 }
@@ -292,7 +293,7 @@ function resolveParticipants(
 
     if (
       !visited.has(token) &&
-      (isProviderLifecycleParticipant(metadataToken) || isPluginParticipant(container, token))
+      (isProviderLifecycleParticipant(metadataToken) || isPluginParticipant(container, metadataToken))
     ) {
       visited.add(token);
 

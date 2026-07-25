@@ -293,4 +293,44 @@ describe("container plugins", () => {
     expect(() => container.deprovision()).not.toThrow();
     expect(log).toEqual(["unwire:First", "unwire:Second"]);
   });
+
+  it("runs disposers parked on non-participant instances at deprovision", () => {
+    const log: Array<string> = [];
+
+    @Injectable()
+    class PlainService {}
+
+    // Claims no participants, but `onProvision` still reaches every active instance and may
+    // park a disposer on one, so deprovision has to sweep those too.
+    class BystanderPlugin implements WirestatePlugin {
+      public onProvision(instance: object, _container: Container, addDisposer: (dispose: () => void) => void): void {
+        addDisposer(() => log.push(`unwire:${instance.constructor.name}`));
+      }
+    }
+
+    const container: Container = new Container({
+      activate: [PlainService],
+      bindings: [PlainService],
+      plugins: [new BystanderPlugin()],
+    });
+
+    container.provision();
+
+    expect(log).toEqual([]);
+
+    container.deprovision();
+
+    expect(log).toEqual(["unwire:PlainService"]);
+
+    // The cycle is dropped at deprovision, so a repeated deprovision cannot re-run it.
+    container.deprovision();
+
+    expect(log).toEqual(["unwire:PlainService"]);
+
+    // A new cycle parks a fresh disposer that tears down on its own deprovision.
+    container.provision();
+    container.deprovision();
+
+    expect(log).toEqual(["unwire:PlainService", "unwire:PlainService"]);
+  });
 });
