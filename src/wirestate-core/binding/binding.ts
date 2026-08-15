@@ -64,6 +64,9 @@ export type ServiceToken<T = unknown> = Newable<T> | AbstractClass<T> | string |
  * environment data, or external objects that Wirestate should resolve as-is.
  * Value bindings are always singletons. They are cached as the provided value
  * and are not wired into service lifecycle, provider lifecycle, or messaging.
+ * `Container` rejects a value bound under a class token that declares
+ * `@OnProvision`, `@OnDeprovision`, or a messaging handler, because it owns no
+ * instance to run them on.
  *
  * The `type` field is optional for value bindings. Value-shaped descriptors
  * do not support transient scope.
@@ -150,6 +153,9 @@ export interface InstanceBindingDescriptor<T = unknown> {
  * value for each resolution with `Transient` scope. Singleton factories are cached
  * after the first resolution. Factory results are not service instances, so service
  * lifecycle decorators and messaging handlers are not wired for the returned value.
+ * `Container` rejects a factory bound under a class token that declares
+ * `@OnProvision`, `@OnDeprovision`, or a messaging handler, because it owns no
+ * instance to run them on.
  *
  * @group Bind
  *

@@ -286,6 +286,8 @@ resolved value should keep its type.
 
 Use a value binding for constants, configuration, already-created objects, environment data, or external objects that
 Wirestate should resolve as-is. Values are always singletons and do not participate in service lifecycle or messaging.
+Binding a value under a class token that declares `@OnProvision`, `@OnDeprovision`, or a messaging handler throws,
+because the container never owns an instance those handlers could run on.
 
 ```ts
 import { Container, InjectionToken } from "@wirestate/core";
@@ -333,7 +335,8 @@ const container = new Container({
 
 Factory results are ordinary resolved values, not container-owned service instances. If the returned object needs
 Wirestate lifecycle decorators, messaging decorators, or deactivation cleanup, bind an `@Injectable()` class with an
-instance descriptor instead.
+instance descriptor instead. Binding a factory under a class token that declares `@OnProvision`, `@OnDeprovision`, or a
+messaging handler throws, since those handlers would never fire.
 
 ### Instance Bindings
 

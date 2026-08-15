@@ -1,12 +1,9 @@
-import { getActivationHandlerMetadata } from "../activation/on-activation";
-import { getDeactivationHandlerMetadata } from "../activation/on-deactivation";
 import { type InstanceBindingDescriptor } from "../binding/binding";
 import { tokenToString } from "../binding/binding-tokens";
 import { ERROR_CODE_INVALID_BINDING_SCOPE } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-import { getMessagingRegistrations } from "../plugin/messaging-registration";
-import { getDeprovisionHandlerMetadata } from "../provision/on-deprovision";
-import { getProvisionHandlerMetadata } from "../provision/on-provision";
+
+import { collectDeclaredLifecycleHandlers } from "./container-declared-lifecycle-handlers";
 
 /**
  * Rejects a transient instance binding whose class declares any wirestate
@@ -20,6 +17,9 @@ import { getProvisionHandlerMetadata } from "../provision/on-provision";
  * fire for it. Allowing the binding while the class declares such a handler would
  * silently drop it, so this fails fast at bind time.
  *
+ * Expects a structurally valid descriptor: `Container.bind` validates the shape first, so
+ * a malformed descriptor reports its own error rather than this one.
+ *
  * @internal
  *
  * @param binding - The transient instance binding descriptor to check.
@@ -30,39 +30,18 @@ import { getProvisionHandlerMetadata } from "../provision/on-provision";
 export function validateTransientInstanceBinding(binding: InstanceBindingDescriptor): void {
   const value: unknown = binding.value;
 
-  // A non-constructor value is a structural error the kernel's validateBinding reports.
+  // A non-constructor value is a structural error, already reported by binding validation.
   if (typeof value !== "function" || !value.prototype) {
     return;
   }
 
-  const prototype: object = value.prototype as object;
-  const offenders: Array<string> = [];
-
-  if (getActivationHandlerMetadata(prototype)) {
-    offenders.push("@OnActivation");
-  }
-
-  if (getDeactivationHandlerMetadata(prototype)) {
-    offenders.push("@OnDeactivation");
-  }
-
-  if (getProvisionHandlerMetadata(prototype)) {
-    offenders.push("@OnProvision");
-  }
-
-  if (getDeprovisionHandlerMetadata(prototype)) {
-    offenders.push("@OnDeprovision");
-  }
-
-  if (getMessagingRegistrations(prototype).length > 0) {
-    offenders.push("a messaging handler (@OnEvent/@OnCommand/@OnQuery)");
-  }
+  const offenders: Array<string> = collectDeclaredLifecycleHandlers(value.prototype as object);
 
   if (offenders.length > 0) {
     throw new WirestateError(
       `Cannot bind '${tokenToString(binding.token)}' as a Transient instance: a transient instance binding ` +
         `must declare no lifecycle or messaging handlers, but found ${offenders.join(", ")}. ` +
-        `Bind it as Singleton, or use a Transient factory binding.`,
+        `Bind it as a Singleton instance binding, or remove the handlers.`,
       ERROR_CODE_INVALID_BINDING_SCOPE
     );
   }

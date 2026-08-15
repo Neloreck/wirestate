@@ -105,7 +105,8 @@ describe("container.bind transient instance", () => {
           code: ERROR_CODE_INVALID_BINDING_SCOPE,
           message:
             "Cannot bind 'Service' as a Transient instance: a transient instance binding must declare no lifecycle or" +
-            " messaging handlers, but found @OnActivation. Bind it as Singleton, or use a Transient factory binding.",
+            " messaging handlers, but found @OnActivation. Bind it as a Singleton instance binding, or remove the" +
+            " handlers.",
         })
       );
     });
@@ -220,7 +221,7 @@ describe("container.bind transient instance", () => {
 
       expect(bind).toThrow("@OnActivation");
       expect(bind).toThrow("messaging handler");
-      expect(bind).toThrow("Bind it as Singleton, or use a Transient factory binding.");
+      expect(bind).toThrow("Bind it as a Singleton instance binding, or remove the handlers.");
     });
   });
 });

@@ -8,17 +8,15 @@ import { isInjectable } from "../metadata/metadata-injectable";
 import { type Newable } from "../types/general";
 
 import { type ServiceToken, BindingScope, BindingType, type BindingDescriptor } from "./binding";
-import { isFactoryDescriptor } from "./binding-guards";
+import { getBindingType } from "./binding-lifecycle";
 import { tokenToString } from "./binding-tokens";
 
 /**
  * Validates a binding descriptor before registration.
  *
  * @remarks
- * Bare classes are normalized to instance descriptors before validation, so
- * every binding reaching this point must be a descriptor object. Validation
- * covers token presence, known `type`/`scope` names, per-kind field checks,
- * `@Injectable()` enforcement for instance bindings, and rebind safety.
+ * Runs the structural checks of {@link validateBindingStructure} and then rejects
+ * a rebind of a token whose existing binding already constructed values.
  *
  * @internal
  *
@@ -26,16 +24,47 @@ import { tokenToString } from "./binding-tokens";
  * @param binding - Binding descriptor to validate.
  * @param hasConstructedValues - Whether the token's existing binding already constructed values.
  *
- * @throws {@link WirestateError} If the binding is not a descriptor object with a token,
- * uses an unknown `type` or `scope`, misses fields required by its binding kind,
- * an instance binding's class is not marked with `@Injectable()`, or the token's
- * existing binding already constructed values.
+ * @throws {@link WirestateError} If the descriptor is structurally invalid, or the
+ * token's existing binding already constructed values.
  */
 export function validateBinding<T>(
   token: ServiceToken<T>,
   binding: BindingDescriptor<T>,
   hasConstructedValues: boolean
 ): void {
+  validateBindingStructure(token, binding);
+
+  if (hasConstructedValues) {
+    throw new WirestateError(
+      `Cannot bind a new binding for '${tokenToString(token)}', since the existing binding was already constructed.`,
+      ERROR_CODE_VALIDATION_ERROR
+    );
+  }
+}
+
+/**
+ * Validates the shape of a binding descriptor.
+ *
+ * @remarks
+ * Bare classes are normalized to instance descriptors before validation, so
+ * every binding reaching this point must be a descriptor object. Covers token
+ * presence, known `type`/`scope` names, per-kind field checks, and `@Injectable()`
+ * enforcement for instance bindings.
+ *
+ * Kept separate from {@link validateBinding} so `Container` can settle the shape
+ * of a descriptor before its own kind-specific guards run, keeping a structural
+ * error from being reported as a lifecycle one.
+ *
+ * @internal
+ *
+ * @param token - Token the descriptor is registered under.
+ * @param binding - Binding descriptor to validate.
+ *
+ * @throws {@link WirestateError} If the binding is not a descriptor object with a token,
+ * uses an unknown `type` or `scope`, misses fields required by its binding kind, or is an
+ * instance binding whose class is not marked with `@Injectable()`.
+ */
+export function validateBindingStructure<T>(token: ServiceToken<T>, binding: BindingDescriptor<T>): void {
   if (binding === null || typeof binding !== "object") {
     throw new WirestateError(
       "Cannot bind: expected a service class or a binding descriptor object.",
@@ -63,7 +92,7 @@ export function validateBinding<T>(
     );
   }
 
-  const type = binding.type ?? (isFactoryDescriptor(binding) ? BindingType.Factory : BindingType.Value);
+  const type = getBindingType(binding);
 
   if (type === BindingType.Instance) {
     const value: unknown = (binding as { value?: unknown }).value;
@@ -90,12 +119,5 @@ export function validateBinding<T>(
     if (!Object.prototype.hasOwnProperty.call(binding, "value")) {
       throw new WirestateError("Value descriptor must provide a 'value' property.", ERROR_CODE_INVALID_ARGUMENTS);
     }
-  }
-
-  if (hasConstructedValues) {
-    throw new WirestateError(
-      `Cannot bind a new binding for '${tokenToString(token)}', since the existing binding was already constructed.`,
-      ERROR_CODE_VALIDATION_ERROR
-    );
   }
 }

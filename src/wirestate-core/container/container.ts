@@ -9,6 +9,7 @@ import {
   type ServiceToken,
 } from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
+import { validateBindingStructure } from "../binding/binding-validation";
 import {
   type InternalErrorHandler,
   getConfiguredInternalErrorHandler,
@@ -27,6 +28,7 @@ import { type Maybe, type Newable } from "../types/general";
 import { validateContainerConfig } from "./container-config-validation";
 import { ContainerKernel } from "./container-kernel";
 import { validateTransientInstanceBinding } from "./container-transient-binding-validation";
+import { validateUnownedBinding } from "./container-unowned-binding-validation";
 
 /**
  * Defines one {@link Container} scope at construction time.
@@ -175,19 +177,36 @@ export class Container extends ContainerKernel {
    * class itself. Binding a descriptor lets you use an explicit token,
    * implementation class, factory, value, or transient scope.
    *
+   * A binding kind the container does not own is rejected when its class declares
+   * handlers that kind can never run: a transient instance binding declaring any
+   * lifecycle or messaging handler, or a value or factory binding whose class token
+   * declares `@OnProvision`, `@OnDeprovision`, or a messaging handler.
+   *
    * @param binding - Service class or binding descriptor to register.
    * @returns The same container for chaining.
    *
-   * @throws {@link WirestateError} If the binding is invalid, or a transient instance
-   * binding's class declares a lifecycle or messaging handler.
+   * @throws {@link WirestateError} If the binding is invalid, or its class declares
+   * handlers the binding kind can never run.
    */
   public override bind<T>(binding: Newable<object> | BindingDescriptor<T>): this {
-    if (
-      typeof binding !== "function" &&
-      binding.type === BindingType.Instance &&
-      (binding as InstanceBindingDescriptor<T>).scope === BindingScope.Transient
-    ) {
-      validateTransientInstanceBinding(binding as InstanceBindingDescriptor<T>);
+    // A bare class always binds as a singleton instance, so only descriptors need a kind check.
+    if (typeof binding !== "function") {
+      const descriptor: BindingDescriptor<T> = binding as BindingDescriptor<T>;
+
+      // Settle the shape first, so a malformed descriptor reports its own structural error
+      // instead of a lifecycle one. The kernel validates it again on the way in.
+      validateBindingStructure(descriptor?.token, descriptor);
+
+      if (descriptor.type === BindingType.Instance) {
+        if ((descriptor as InstanceBindingDescriptor<T>).scope === BindingScope.Transient) {
+          validateTransientInstanceBinding(descriptor as InstanceBindingDescriptor<T>);
+        }
+      } else {
+        // Every other kind is a value or factory binding, which produces nothing the
+        // container owns, so a class token declaring provision-phase handlers can never
+        // have them fire.
+        validateUnownedBinding(descriptor as BindingDescriptor);
+      }
     }
 
     assertBindableWhileProvisioned(this, binding as Binding);
