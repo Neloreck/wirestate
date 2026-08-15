@@ -56,6 +56,27 @@ describe("validateContainerConfig", () => {
     ).toThrow("is listed in 'activate' but was not provided in 'bindings'.");
   });
 
+  it("should name a missing class token instead of dumping its source", () => {
+    @Injectable()
+    class BoundService {}
+
+    @Injectable()
+    class MissingService {
+      public compute(input: number): number {
+        return input * 2;
+      }
+    }
+
+    // `String(SomeClass)` stringifies the whole class body, which spans lines and breaks both log
+    // formatting and single-line assertions.
+    expect(() =>
+      validateContainerConfig({
+        activate: [MissingService],
+        bindings: [BoundService],
+      })
+    ).toThrow("Container: 'MissingService' is listed in 'activate' but was not provided in 'bindings'.");
+  });
+
   it("should throw if onError is not a function", () => {
     expect(() =>
       validateContainerConfig({

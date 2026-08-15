@@ -1,5 +1,5 @@
 import type { ServiceToken } from "../binding/binding";
-import { getBindingToken } from "../binding/binding-tokens";
+import { getBindingToken, tokenToString } from "../binding/binding-tokens";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 
@@ -55,7 +55,7 @@ export function validateContainerConfig(config: ContainerConfig): void {
   for (const eager of activate) {
     if (!bindingTokens.has(eager)) {
       throw new WirestateError(
-        `Container: '${String(eager)}' is listed in 'activate' but was not provided in 'bindings'.`,
+        `Container: '${tokenToString(eager)}' is listed in 'activate' but was not provided in 'bindings'.`,
         ERROR_CODE_VALIDATION_ERROR
       );
     }
