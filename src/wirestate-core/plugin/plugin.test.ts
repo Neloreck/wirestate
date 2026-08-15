@@ -513,15 +513,15 @@ describe("container plugins", () => {
     log.length = 0;
     container.deprovision();
 
-    // ...and must not receive `onDeprovision` either. Everything that was wired tears down, in
-    // reverse ledger order: participants enter the ledger first (they are force-activated before
-    // plugins are wired), so they tear down last.
-    expect(log).toEqual(["-PlainService", "-Participant"]);
+    // ...and must not receive `onDeprovision` either. Everything that was wired tears down in the
+    // exact reverse of the order it was wired in: both passes run over creation order, so a plugin
+    // sees its own `onProvision` sequence mirrored rather than repeated.
+    expect(log).toEqual(["-Participant", "-PlainService"]);
 
     // The cycle is dropped at deprovision, so a repeated deprovision cannot re-run it.
     container.deprovision();
 
-    expect(log).toEqual(["-PlainService", "-Participant"]);
+    expect(log).toEqual(["-Participant", "-PlainService"]);
   });
 
   it("keeps @OnDeprovision in reverse provision order while plugins tear down the wider set", () => {

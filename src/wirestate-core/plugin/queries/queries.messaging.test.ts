@@ -228,7 +228,7 @@ describe("core query messaging integration", () => {
     }
 
     new Container({
-      activate: [DeactivationCoordinatorService, DeactivationPeerService],
+      activate: [DeactivationPeerService, DeactivationCoordinatorService],
       bindings: [DeactivationPeerService, DeactivationCoordinatorService],
       plugins: [new QueriesPlugin()],
     })

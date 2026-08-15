@@ -235,7 +235,9 @@ export class Container extends ContainerKernel {
    *
    * @remarks
    * Resolves provider lifecycle participants and runs `@OnProvision` once for
-   * this provision cycle. A container is provisioned by at most one provider at a time.
+   * this provision cycle, in creation order: a dependency provisions before the dependent that
+   * injected it. Participants unrelated by injection keep the order their bindings were
+   * registered in. A container is provisioned by at most one provider at a time.
    * Provisioning an already provisioned container throws. Deprovision it first.
    *
    * @returns The same container for chaining.
@@ -256,8 +258,10 @@ export class Container extends ContainerKernel {
    * Deprovisions this container for a framework provider.
    *
    * @remarks
-   * Runs `@OnDeprovision` in reverse provision order. Idempotent: deprovisioning
-   * a container that is not currently provisioned is a no-op.
+   * Runs `@OnDeprovision` in the exact reverse of provision order, so the first instance
+   * provisioned is the last one deprovisioned and a dependent tears down before the dependencies
+   * it injected. Idempotent: deprovisioning a container that is not currently provisioned is a
+   * no-op.
    *
    * @returns The same container for chaining.
    */

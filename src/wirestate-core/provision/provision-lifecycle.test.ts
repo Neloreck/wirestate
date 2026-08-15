@@ -88,6 +88,108 @@ describe("provision lifecycle", () => {
     ]);
   });
 
+  describe("first-in / last-out ordering", () => {
+    function createGraph(events: Array<string>) {
+      @Injectable()
+      class DependencyService {
+        @OnProvision()
+        public onProvision(): void {
+          events.push("provision-dependency");
+        }
+
+        @OnDeprovision()
+        public onDeprovision(): void {
+          events.push("deprovision-dependency");
+        }
+      }
+
+      @Injectable()
+      class DependentService {
+        public constructor(public readonly dependency: DependencyService = inject(DependencyService)) {}
+
+        @OnProvision()
+        public onProvision(): void {
+          events.push("provision-dependent");
+        }
+
+        @OnDeprovision()
+        public onDeprovision(): void {
+          events.push("deprovision-dependent");
+        }
+      }
+
+      return { DependencyService, DependentService };
+    }
+
+    // Constructor injection decides creation order regardless of how the bindings were written,
+    // so both declaration orders have to produce the same hook order.
+    it.each([
+      ["dependent first", true],
+      ["dependency first", false],
+    ])("should provision a dependency before its dependent when bound %s", (_label, dependentFirst) => {
+      const events: Array<string> = [];
+      const { DependencyService, DependentService } = createGraph(events);
+
+      const container: Container = new Container({
+        bindings: dependentFirst ? [DependentService, DependencyService] : [DependencyService, DependentService],
+      });
+
+      provisionContainer(container);
+
+      expect(events).toEqual(["provision-dependency", "provision-dependent"]);
+
+      deprovisionContainer(container);
+
+      // The exact reverse: the dependent stops first, so it can still use the dependency it
+      // injected while it tears down.
+      expect(events).toEqual([
+        "provision-dependency",
+        "provision-dependent",
+        "deprovision-dependent",
+        "deprovision-dependency",
+      ]);
+    });
+
+    it("should keep binding order for participants unrelated by injection", () => {
+      const events: Array<string> = [];
+      const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
+      const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
+
+      // Nothing injects anything, so resolution follows the binding list and creation order
+      // collapses back onto it. Ordering by creation is a refinement of binding order, not a
+      // different rule.
+      const container: Container = new Container({ activate: false, bindings: [SecondService, FirstService] });
+
+      provisionContainer(container);
+
+      expect(events.slice(2)).toEqual(["provision-second", "provision-first"]);
+
+      deprovisionContainer(container);
+
+      expect(events.slice(4)).toEqual(["deprovision-first", "deprovision-second"]);
+    });
+
+    it("should let an earlier resolution decide the order of unrelated participants", () => {
+      const events: Array<string> = [];
+      const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
+      const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
+
+      const container: Container = new Container({ activate: false, bindings: [FirstService, SecondService] });
+
+      // Resolved before the cycle starts, so it is constructed first and provisions first, ahead
+      // of the participant declared before it. First in, last out.
+      container.get(SecondService);
+
+      provisionContainer(container);
+
+      expect(events.slice(2)).toEqual(["provision-second", "provision-first"]);
+
+      deprovisionContainer(container);
+
+      expect(events.slice(4)).toEqual(["deprovision-first", "deprovision-second"]);
+    });
+  });
+
   it("should keep the reverse deprovision order when non-participants share the cycle", () => {
     const events: Array<string> = [];
     const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });

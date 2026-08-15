@@ -1,14 +1,14 @@
 # Core Lifecycle
 
 Wirestate lifecycle has one service layer and one provider layer. Use this map to choose where service setup and cleanup
-belong.
+belong, and [Hook Order](#hook-order) for the order hooks run in.
 
 | Application                 | Wirestate                                                                                  | Use it for                                                                                                         |
 | --------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
 | Constructor resolution      | Service constructor and constructor dependencies.                                          | Assign injected dependencies and cheap field defaults. Avoid side effects that need cleanup.                       |
 | Container activation        | `@OnActivation` after the service instance is resolved.                                    | Do cheap setup that can run before a UI boundary is committed.                                                     |
-| Provider mount/connect      | `@OnProvision` in binding order. Provider lifecycle participants are resolved first.       | Start provider-owned timers, subscriptions, sockets, observers, and async loops.                                   |
-| Provider unmount/disconnect | `@OnDeprovision` in reverse provision order, then the provider releases the container.     | Stop every resource started in `@OnProvision`. Make cleanup complete and repeatable.                               |
+| Provider mount/connect      | `@OnProvision`. Provider lifecycle participants are resolved first.                        | Start provider-owned timers, subscriptions, sockets, observers, and async loops.                                   |
+| Provider unmount/disconnect | `@OnDeprovision`, then the provider releases the container.                                | Stop every resource started in `@OnProvision`. Make cleanup complete and repeatable.                               |
 | Container teardown          | `container.unbind`, `container.unbindAll`, or `container.destroy`, then `@OnDeactivation`. | Tear down service-level registrations and final service state. `unbindAll` resets; `destroy` closes the container. |
 
 Managed providers activate all bindings by default unless `activate` is set, then tear down owned containers after
@@ -33,9 +33,9 @@ and `@OnQuery` handlers are not wired yet.
 
 Provision and deprovision belong to the owner that exposes a container to an application boundary.
 
-`@OnProvision` and `@OnDeprovision` are the right place for provider-owned resources. Wirestate resolves provider
-lifecycle participants before calling provision hooks, calls provision hooks in binding order, and calls deprovision
-hooks in reverse order.
+`@OnProvision` and `@OnDeprovision` are the right place for provider-owned resources. Wirestate resolves every provider
+lifecycle participant before calling any provision hook, so a hook never runs against an unresolved service. See
+[Hook Order](#hook-order) for the order the hooks run in.
 
 Message handlers are also wired here. `@OnEvent`, `@OnCommand`, and `@OnQuery` subscribe at provision and unsubscribe
 after `@OnDeprovision`, so the decorated-handler window is `@OnProvision` through `@OnDeprovision`. Provision
@@ -46,6 +46,60 @@ container to be provisioned: a UI provider does this automatically, while plain-
 
 Put setup and teardown messaging in `@OnProvision` and `@OnDeprovision`. Buses remain live during `@OnDeprovision`, and
 handlers are removed after deprovision hooks run.
+
+## Hook Order
+
+Every hook runs on one axis: the order the container constructed the instances. Setup runs in that order, teardown runs
+in the exact reverse.
+
+| Hook              | Order                  |
+| ----------------- | ---------------------- |
+| `@OnActivation`   | Creation order         |
+| `@OnProvision`    | Creation order         |
+| `@OnDeprovision`  | Reverse creation order |
+| `@OnDeactivation` | Reverse creation order |
+
+A dependency is constructed before the dependent that injected it. So a service can rely on its injected dependencies
+having provisioned already, and can still use them while it deprovisions. The order the bindings were declared in does
+not change that:
+
+```ts
+import { Container, Injectable, OnProvision, inject } from "@wirestate/core";
+
+@Injectable()
+class ApiService {
+  @OnProvision()
+  public onProvision(): void {
+    this.connect();
+  }
+}
+
+@Injectable()
+class CartService {
+  public constructor(private readonly api: ApiService = inject(ApiService)) {}
+
+  @OnProvision()
+  public onProvision(): void {
+    this.api.load();
+  }
+}
+
+// CartService is declared first, but constructing it constructs ApiService first. ApiService
+// therefore provisions first and deprovisions last, and `this.api` is ready in both hooks.
+new Container({ bindings: [CartService, ApiService] }).provision();
+```
+
+Services with no injection between them are constructed in the order their bindings were registered, so that is the
+order they provision in. Constructing one earlier moves it earlier: an explicit `activate: [Token]` list, or a
+`container.get(Token)` before `provision()`, both decide creation order for the services they touch.
+
+The rule follows constructor injection. A dependency first reached through `inject(token, { lazy: true })`, through a
+`container.get(token)` inside a hook, or from a parent container is not constructed as part of the dependent, so the two
+are not ordered against each other. Resolve it in the constructor when the order matters.
+
+Order applies within one container. `container.destroy()` does not cascade to child containers, so a hierarchy is torn
+down by whoever owns each container: a framework provider when it created the container, your own code otherwise. Tear a
+child down before its parent, so its services can still resolve upwards while they deprovision.
 
 ## Ownership
 

@@ -107,7 +107,9 @@ export function deprovisionContainer(container: Container): void {
   const instances: Nullable<Array<object>> = state.instances;
 
   if (instances) {
-    deprovisionInstances(container, state, [...state.cycleByInstance.keys()]);
+    // The whole cycle unwinds on the same axis provision ran on, so teardown is its exact reverse:
+    // the first instance provisioned is the last one deprovisioned.
+    deprovisionInstances(container, state, orderByCreation(container, new Set(state.cycleByInstance.keys())));
 
     markActiveInstancesDeprovisioned(container);
 
@@ -127,6 +129,53 @@ export function deprovisionContainer(container: Container): void {
 
     dispatchPluginContainerDeprovision(container);
   }
+}
+
+/**
+ * Orders instances by the container's creation order, so provider lifecycle runs first-in /
+ * last-out over them.
+ *
+ * @remarks
+ * The single ordering rule of the provider layer. Participants are resolved by walking the
+ * binding list and calling `get`, which is a depth-first walk of the constructor-injection
+ * graph, so the container's creation order is a topological order of it: a dependency is
+ * committed before the dependent that injected it. Ordering by creation therefore runs
+ * `@OnProvision` dependencies-first, and the reverse pass unwinds dependents-first - matching
+ * `@OnActivation` / `@OnDeactivation`, which order on the same axis.
+ *
+ * Binding order is not that axis: it says only how the caller happened to write the list. Where
+ * no dependency relates two participants the two orders coincide, so ordering by creation
+ * changes nothing for them.
+ *
+ * It is a topological order for constructor injection only. A dependency first reached through
+ * `inject(..., { lazy: true })`, through a `get` inside a provision hook, or from a parent
+ * container is created outside this walk and is not ranked by it.
+ *
+ * @internal
+ *
+ * @param container - Container that owns the instances.
+ * @param instances - Instances to order.
+ * @returns The instances in creation order.
+ */
+function orderByCreation(container: Container, instances: ReadonlySet<object>): Array<object> {
+  const ordered: Array<object> = [];
+
+  for (const instance of container.getActiveInstances()) {
+    if (instances.has(instance)) {
+      ordered.push(instance);
+    }
+  }
+
+  // An instance the container stopped listing as active - deactivated part-way through the cycle -
+  // has no creation rank left. Keep those ahead of the ranked ones, so a reverse pass still
+  // unwinds them last and an unrankable instance can never be dropped from the cycle.
+  if (ordered.length !== instances.size) {
+    const ranked: ReadonlySet<object> = new Set(ordered);
+
+    ordered.unshift(...[...instances].filter((instance: object): boolean => !ranked.has(instance)));
+  }
+
+  return ordered;
 }
 
 /**
@@ -202,7 +251,7 @@ export function provisionInstances(
   try {
     validateBindings(container, bindings);
 
-    const { instances } = resolveParticipants(container, state, bindings);
+    const instances: Array<object> = resolveParticipants(container, state, bindings);
 
     markInFlight(container);
     wirePlugins(container, state);
@@ -277,20 +326,24 @@ function validateBindings(container: Container, bindings: ReadonlyArray<Binding>
  * `@OnActivation` runs before any provision hook, and tracks the token that
  * provisioned it.
  *
+ * @remarks
+ * Bindings are walked in registration order, which is what decides when each participant is
+ * constructed. The participants are then returned in creation order, so provision hooks run
+ * first-in and deprovision hooks last-out over the same axis. See {@link orderByCreation}.
+ *
  * @internal
  *
  * @param container - Container being provisioned.
  * @param state - Provider lifecycle state for the container.
  * @param bindings - Bindings controlled by the provider.
- * @returns The resolved participant instances and the instance/token pairs tracked this cycle.
+ * @returns The resolved participant instances, in creation order.
  */
 function resolveParticipants(
   container: Container,
   state: ProvisionState,
   bindings: ReadonlyArray<Binding>
-): { instances: Array<object>; trackedTokens: Array<readonly [object, ServiceToken]> } {
-  const instances: Array<object> = [];
-  const trackedTokens: Array<readonly [object, ServiceToken]> = [];
+): Array<object> {
+  const participants: Set<object> = new Set();
   const visited: Set<ServiceToken> = new Set();
 
   for (const binding of bindings) {
@@ -306,12 +359,11 @@ function resolveParticipants(
       const instance: object = container.get(token) as object;
 
       trackProvisionToken(state, instance, token);
-      trackedTokens.push([instance, token]);
-      instances.push(instance);
+      participants.add(instance);
     }
   }
 
-  return { instances, trackedTokens };
+  return orderByCreation(container, participants);
 }
 
 /**
@@ -450,9 +502,13 @@ export function deprovisionInstances(
  * Runs `@OnDeprovision` for every currently-provisioned instance in reverse
  * provision order, while buses are still live.
  *
+ * @remarks
+ * Callers pass the cycle in creation order, so this reverse pass is first-in / last-out: a
+ * dependent's `@OnDeprovision` runs before the dependencies it injected tear down.
+ *
  * @internal
  *
- * @param instances - Instances resolved during provider provisioning.
+ * @param instances - Instances resolved during provider provisioning, in creation order.
  * @returns The instances that were deprovisioned, in reverse provision order.
  */
 function runDeprovisionHooks(instances: ReadonlyArray<object>): ReadonlyArray<object> {
@@ -550,7 +606,9 @@ function unsubscribeInstance(state: ProvisionState, instance: object): void {
 function rollbackProvision(container: Container, state: ProvisionState): void {
   state.status = false;
 
-  const instances: ReadonlyArray<object> = [...state.cycleByInstance.keys()];
+  // Unwound on the same axis a completed cycle uses, so a partial cycle tears down in the same
+  // order it would have, just from wherever it got to.
+  const instances: ReadonlyArray<object> = orderByCreation(container, new Set(state.cycleByInstance.keys()));
 
   deprovisionInstances(container, state, instances);
 

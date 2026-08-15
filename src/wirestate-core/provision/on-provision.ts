@@ -24,6 +24,9 @@ const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
  * work, or any resource that should be cleaned up when the provider releases
  * the container. A class hierarchy may have one provision hook name.
  *
+ * Hooks run in creation order, so a service can rely on the dependencies it injected having
+ * provisioned already. `@OnDeprovision` unwinds the exact reverse.
+ *
  * @group Lifecycle
  *
  * @returns Method decorator.

@@ -23,6 +23,9 @@ const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
  * Use it to clean up work started by `@OnProvision`. A class hierarchy may
  * have one deprovision hook name.
  *
+ * Hooks run in the exact reverse of `@OnProvision` order, so a service can still use the
+ * dependencies it injected: they deprovision after it does.
+ *
  * @group Lifecycle
  *
  * @returns Method decorator.

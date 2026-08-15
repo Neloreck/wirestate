@@ -52,7 +52,8 @@ export interface ProvisionState {
   provisioning: boolean;
 
   /**
-   * Resolved provider lifecycle participant instances, in provision order.
+   * Resolved provider lifecycle participant instances, in creation order - which is the order
+   * their `@OnProvision` ran in, and the reverse of the order their `@OnDeprovision` will.
    *
    * @remarks
    * `null` means no instances entry is currently tracked: either the container

@@ -101,6 +101,9 @@ Plugins are the **framework layer** that brackets the **user layer** (`@OnActiva
 - On **setup** (activate, provision), plugin hooks run **before** the matching user hook.
 - On **teardown** (deactivate, deprovision), they run **after** it.
 - Across plugins, hooks run in **registration order** on setup and reverse on teardown.
+- Across instances, `onProvision` visits them in creation order and `onDeprovision` in the exact reverse, so a plugin
+  tears each instance down in the opposite order it wired them. See
+  [Hook Order](/core/lifecycle#hook-order).
 
 So a plugin's `onProvision` always runs before any service's `@OnProvision`. This is how a persistence plugin can
 hydrate state a provision hook then reads, and how messaging handlers are live before provision hooks emit.

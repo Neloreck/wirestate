@@ -246,7 +246,7 @@ describe("core command messaging integration", () => {
     }
 
     new Container({
-      activate: [DeactivationCoordinatorService, DeactivationPeerService],
+      activate: [DeactivationPeerService, DeactivationCoordinatorService],
       bindings: [DeactivationPeerService, DeactivationCoordinatorService],
       plugins: [new CommandsPlugin()],
     })
