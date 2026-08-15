@@ -10,6 +10,7 @@ import { default as manifest } from "./manifest.config";
 const SRC_DIR: string = fileURLToPath(new URL("./src", import.meta.url));
 const PROTOCOL_SRC: string = fileURLToPath(new URL("../src/wirestate-core/plugin/devtools/index.ts", import.meta.url));
 const CORE_SRC: string = fileURLToPath(new URL("../src/wirestate-core/index.ts", import.meta.url));
+const CORE_HOT_SRC: string = fileURLToPath(new URL("../src/wirestate-core/hot.ts", import.meta.url));
 const REACT_SRC: string = fileURLToPath(new URL("../src/wirestate-react/index.ts", import.meta.url));
 const MOBX_SRC: string = fileURLToPath(new URL("../src/wirestate-mobx/index.ts", import.meta.url));
 const REACT_MOBX_SRC: string = fileURLToPath(new URL("../src/wirestate-react-mobx/index.ts", import.meta.url));
@@ -25,6 +26,7 @@ export default defineConfig({
       "@wirestate/react-mobx": REACT_MOBX_SRC,
       "@wirestate/react": REACT_SRC,
       "@wirestate/mobx": MOBX_SRC,
+      "@wirestate/core/hot": CORE_HOT_SRC,
       "@wirestate/core": CORE_SRC,
     },
   },

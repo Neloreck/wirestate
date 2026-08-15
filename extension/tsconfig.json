@@ -17,6 +17,7 @@
       "#/devtools": ["../src/wirestate-core/plugin/devtools/index.ts"],
       "@/*": ["./src/*"],
       "@wirestate/core/devtools": ["../src/wirestate-core/devtools.ts"],
+      "@wirestate/core/hot": ["../src/wirestate-core/hot.ts"],
       "@wirestate/react-mobx": ["../src/wirestate-react-mobx/index.ts"],
       "@wirestate/react": ["../src/wirestate-react/index.ts"],
       "@wirestate/mobx": ["../src/wirestate-mobx/index.ts"],

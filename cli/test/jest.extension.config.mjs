@@ -23,6 +23,7 @@ export default {
     "^#/devtools$": "<rootDir>/src/wirestate-core/plugin/devtools/index",
     "^@/(.*)$": "<rootDir>/extension/src/$1",
     "^@wirestate/core/devtools$": "<rootDir>/src/wirestate-core/devtools",
+    "^@wirestate/core/hot$": "<rootDir>/src/wirestate-core/hot",
     "^@wirestate/react-mobx$": "<rootDir>/src/wirestate-react-mobx/index",
     "^@wirestate/react$": "<rootDir>/src/wirestate-react/index",
     "^@wirestate/mobx$": "<rootDir>/src/wirestate-mobx/index",
