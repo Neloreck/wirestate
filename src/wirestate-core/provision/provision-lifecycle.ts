@@ -422,10 +422,7 @@ function runProvisionHooks(container: Container, instances: ReadonlyArray<object
     }
 
     const methodName: Maybe<string | symbol> = getProvisionHandlerMetadata(instance);
-    const record: InstanceRecord = getInstanceRecord(status);
-    const provisionId: ProvisionId = (record.provisionIdCounter ?? 0) + 1;
-
-    record.provisionIdCounter = provisionId;
+    const provisionId: ProvisionId = nextProvisionId(status);
 
     status.isDeprovisioned = false;
     status.provisionId = provisionId;
@@ -448,6 +445,28 @@ function runProvisionHooks(container: Container, instances: ReadonlyArray<object
 }
 
 /**
+ * Issues the next provision-cycle id for an instance.
+ *
+ * @remarks
+ * Ids are per-instance and monotonic. The counter lives on the instance record so it survives the
+ * `null` reset {@link markInFlight} applies at the start of every cycle, which is what keeps a
+ * reprovisioned instance from reusing the id its previous cycle handed out.
+ *
+ * @internal
+ *
+ * @param status - Status of the instance entering the cycle.
+ * @returns The id for this cycle.
+ */
+function nextProvisionId(status: WireStatus): ProvisionId {
+  const record: InstanceRecord = getInstanceRecord(status);
+  const provisionId: ProvisionId = (record.provisionIdCounter ?? 0) + 1;
+
+  record.provisionIdCounter = provisionId;
+
+  return provisionId;
+}
+
+/**
  * Marks every remaining active instance as provisioned after all hooks have run.
  *
  * @internal
@@ -458,8 +477,15 @@ function markProvisioned(container: Container): void {
   for (const instance of container.getActiveInstances()) {
     const status: WireStatus = WireStatus.for(instance);
 
-    if (!status.isDeactivated) {
-      status.isDeprovisioned = false;
+    if (status.isDeactivated) {
+      continue;
+    }
+
+    status.isDeprovisioned = false;
+
+    // A participant already carries the id its hook received.
+    if (status.provisionId === null) {
+      status.provisionId = nextProvisionId(status);
     }
   }
 }

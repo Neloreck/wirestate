@@ -151,8 +151,13 @@ export class WireStatus {
    * Current provider provision cycle ID for the instance.
    *
    * @remarks
-   * `null` means the instance has not entered a tracked provider provision
-   * cycle.
+   * Every instance a container owns is stamped for the cycle, not only the ones declaring
+   * `@OnProvision` or `@OnDeprovision`, so {@link WireStatus.isStale} can report a superseded
+   * cycle for any service.
+   *
+   * `null` means the instance has not entered a tracked provider provision cycle: it is not owned
+   * by a provisioned container, or it was resolved after the current cycle had already wired its
+   * instances, in which case the next cycle stamps it.
    */
   public provisionId: Nullable<ProvisionId> = null;
 

@@ -4,8 +4,9 @@ import { Container } from "../container/container";
 import { ERROR_CODE_NOT_TRACKED } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
+import { type Nullable } from "../types/general";
 
-import { WireStatus } from "./wire-status";
+import { type ProvisionId, WireStatus } from "./wire-status";
 
 describe("WireStatus", () => {
   it("should throw for untracked objects", () => {
@@ -71,12 +72,14 @@ describe("WireStatus", () => {
 
     provisionContainer(container, [TestService]);
 
+    // Declaring no hook does not keep a service out of the cycle, so it is stamped like any other
+    // instance the container owns. Without an id, `isStale` could not tell a later cycle apart.
     expect(WireStatus.for(service)).toBe(status);
     expect(WireStatus.for(service)).toEqual({
       isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
-      provisionId: null,
+      provisionId: 1,
     });
 
     deprovisionContainer(container);
@@ -85,7 +88,7 @@ describe("WireStatus", () => {
       isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
-      provisionId: null,
+      provisionId: 1,
     });
 
     container.unbind(TestService);
@@ -94,7 +97,7 @@ describe("WireStatus", () => {
       isDeactivated: true,
       isDeprovisioned: true,
       isInactive: true,
-      provisionId: null,
+      provisionId: 1,
     });
   });
 
@@ -253,6 +256,31 @@ describe("WireStatus", () => {
       expect(status.isDeactivated).toBe(true);
       expect(status.provisionId).toBe(1);
       expect(status.isStale(1)).toBe(true);
+    });
+
+    it("should be stale for a service declaring no provider hooks once a newer cycle starts", () => {
+      // The shape the docs recommend for guarding async work outside the lifecycle hooks: no
+      // @OnProvision, status held as a field, id snapshotted before the await. Leaving such a
+      // service unstamped would pin its id at null across every cycle, so `isStale` could only
+      // ever report deactivation and would let a result from a superseded cycle through.
+      @Injectable()
+      class PlainService {}
+
+      const container: Container = new Container({ bindings: [PlainService] });
+      const status: WireStatus = WireStatus.for(container.get(PlainService));
+
+      provisionContainer(container, [PlainService]);
+
+      const snapshot: Nullable<ProvisionId> = status.provisionId;
+
+      expect(snapshot).toBe(1);
+      expect(status.isStale(snapshot)).toBe(false);
+
+      deprovisionContainer(container);
+      provisionContainer(container, [PlainService]);
+
+      expect(status.provisionId).toBe(2);
+      expect(status.isStale(snapshot)).toBe(true);
     });
 
     it("should treat a null snapshot as current until a provision cycle starts", () => {

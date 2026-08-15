@@ -283,12 +283,13 @@ describe("provision lifecycle", () => {
 
     provisionContainer(container, [PlainService]);
 
+    // No provider hook runs, but the service was owned for the cycle, so it carries its id.
     expect(events).toEqual(["activated"]);
     expect(status).toEqual({
       isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
-      provisionId: null,
+      provisionId: 1,
     });
 
     deprovisionContainer(container);
@@ -298,7 +299,7 @@ describe("provision lifecycle", () => {
       isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
-      provisionId: null,
+      provisionId: 1,
     });
   });
 
@@ -396,11 +397,13 @@ describe("provision lifecycle", () => {
     const service: PlainService = container.get(PlainService);
     const status: WireStatus = WireStatus.for(service);
 
+    // Pulled in by a participant's @OnActivation, so it was active before the cycle finished
+    // wiring and is stamped with it.
     expect(status).toEqual({
       isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
-      provisionId: null,
+      provisionId: 1,
     });
 
     deprovisionContainer(container);
@@ -409,7 +412,7 @@ describe("provision lifecycle", () => {
       isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
-      provisionId: null,
+      provisionId: 1,
     });
   });
 
