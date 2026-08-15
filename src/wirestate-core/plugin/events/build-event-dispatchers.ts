@@ -2,7 +2,7 @@ import { type ContainerKernel } from "../../container/container-kernel";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
 import { type Maybe } from "../../types/general";
 
-import { type EventDispatch, type EventHandler, type EventType } from "./events";
+import { type EventDispatch, type EventHandler, type EventType, type WireEvent } from "./events";
 import { getEventHandlerMetadata } from "./events-registry";
 
 /**
@@ -31,6 +31,11 @@ interface DispatcherPlan {
  * whole method catch-all. A method is therefore invoked at most once per event,
  * regardless of how many times it was decorated. Methods keep parent-to-child
  * first-seen order.
+ *
+ * A method that throws, and an async method that rejects, are both isolated the same
+ * way: reported through the container error handler and never propagated to the bus,
+ * so one failing handler can neither stall the others nor surface as an unhandled
+ * rejection.
  *
  * @group Events
  * @internal
@@ -87,23 +92,32 @@ export function buildEventDispatchers<T extends object>(
   const dispatchers: Array<EventDispatch> = [];
 
   for (const plan of plans.values()) {
+    const report = (error: unknown, event: WireEvent, message: string): void =>
+      reportWirestateInternalError({
+        container,
+        error,
+        event,
+        message,
+        methodName: plan.methodName,
+        instance: instance,
+        instanceName: instance.constructor.name,
+        source: "instance-event-handler",
+      });
+
     dispatchers.push({
       types: plan.catchAll ? null : Array.from(plan.types),
       handler: (event) => {
         try {
-          plan.invoke(event);
+          const result: unknown = plan.invoke(event);
+
+          // An async method has nobody to await it - events are fire-and-forget - so its rejection is
+          // reported here rather than escaping as an unhandled rejection.
+          if (result && typeof (result as Promise<void>).then === "function") {
+            Promise.resolve(result).catch((error: unknown) => report(error, event, "Event handler rejected"));
+          }
         } catch (error) {
           // Isolate each method so one failure cannot stall the others.
-          reportWirestateInternalError({
-            container,
-            error,
-            event,
-            message: "Event handler threw",
-            methodName: plan.methodName,
-            instance: instance,
-            instanceName: instance.constructor.name,
-            source: "instance-event-handler",
-          });
+          report(error, event, "Event handler threw");
         }
       },
     });

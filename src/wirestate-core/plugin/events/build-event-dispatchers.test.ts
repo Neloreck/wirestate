@@ -160,6 +160,85 @@ describe("buildEventDispatcher", () => {
     errorSpy.mockRestore();
   });
 
+  it("should isolate and report a rejected async handler with instance context", async () => {
+    const error = new Error("handler rejected");
+    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    class TestService {
+      @OnEvent("TEST")
+      public async onEvent(): Promise<void> {
+        throw error;
+      }
+    }
+
+    const dispatches: ReadonlyArray<EventDispatch> = buildEventDispatchers(new TestService());
+    const dispatch: Nullable<EventDispatch> = dispatches[0] ?? null;
+
+    expect(() => dispatch?.handler({ type: "TEST" })).not.toThrow();
+
+    await Promise.resolve();
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      "[wirestate] Event handler rejected:",
+      {
+        source: "instance-event-handler",
+        instanceName: "TestService",
+        methodName: "onEvent",
+        event: { type: "TEST" },
+      },
+      error
+    );
+
+    errorSpy.mockRestore();
+  });
+
+  it("should not hand an async handler's promise back to the bus", async () => {
+    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    class TestService {
+      @OnEvent("TEST")
+      public async onEvent(): Promise<void> {
+        throw new Error("handler rejected");
+      }
+    }
+
+    const bus: EventBus = new EventBus(new Container());
+
+    for (const dispatch of buildEventDispatchers(new TestService())) {
+      bus.subscribe(dispatch.types, dispatch.handler);
+    }
+
+    bus.emit("TEST");
+
+    await Promise.resolve();
+
+    // The dispatcher reports the rejection itself; the bus must not report it a second time.
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+
+    errorSpy.mockRestore();
+  });
+
+  it("should leave a resolved async handler unreported", async () => {
+    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    class TestService {
+      @OnEvent("TEST")
+      public async onEvent(): Promise<void> {
+        return void 0;
+      }
+    }
+
+    const dispatches: ReadonlyArray<EventDispatch> = buildEventDispatchers(new TestService());
+
+    dispatches[0].handler({ type: "TEST" });
+
+    await Promise.resolve();
+
+    expect(errorSpy).not.toHaveBeenCalled();
+
+    errorSpy.mockRestore();
+  });
+
   it("should subscribe a catch-all method with null types", () => {
     class TestService {
       @OnEvent()

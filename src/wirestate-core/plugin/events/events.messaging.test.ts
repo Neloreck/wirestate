@@ -305,4 +305,41 @@ describe("core event messaging integration", () => {
 
     expect(listener.events).toEqual(["wired", "rewired"]);
   });
+
+  it("reports a rejected async @OnEvent handler through the container error handler", async () => {
+    const LOG_EVENT: string = "LOG_EVENT";
+    const failure: Error = new Error("async handler failed");
+    const onError = jest.fn();
+
+    @Injectable()
+    class ListenerService {
+      @OnEvent(LOG_EVENT)
+      public async onLogEvent(): Promise<void> {
+        throw failure;
+      }
+    }
+
+    const container: Container = new Container({
+      bindings: [ListenerService],
+      onError: onError,
+      plugins: [new EventsPlugin()],
+    }).provision();
+
+    // Events are fire-and-forget, so nothing awaits the handler. Its rejection has to reach the
+    // container error handler rather than escaping as an unhandled rejection.
+    container.get(EventBus).emit(LOG_EVENT);
+
+    await Promise.resolve();
+
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: failure,
+        message: "Event handler rejected",
+        methodName: "onLogEvent",
+        instanceName: "ListenerService",
+        source: "instance-event-handler",
+      })
+    );
+  });
 });
