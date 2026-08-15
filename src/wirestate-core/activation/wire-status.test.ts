@@ -8,15 +8,30 @@ import { deprovisionContainer, provisionContainer } from "../provision/provision
 import { WireStatus } from "./wire-status";
 
 describe("WireStatus", () => {
-  it("should throw for unmanaged objects without initialization", () => {
+  it("should throw for untracked objects", () => {
     expect(() => WireStatus.for({})).toThrow("Object is not tracked by Wirestate.");
     expect(() => WireStatus.for({})).toThrow(expect.objectContaining({ code: ERROR_CODE_NOT_TRACKED }));
+  });
+
+  it("should start tracking an untracked object and reuse the status on repeated tracking", () => {
+    const instance: object = {};
+    const status: WireStatus = WireStatus.track(instance);
+
+    expect(status).toBeInstanceOf(WireStatus);
+    expect(WireStatus.for(instance)).toBe(status);
+    expect(WireStatus.track(instance)).toBe(status);
+    expect(status).toEqual({
+      isDeactivated: false,
+      isDeprovisioned: null,
+      isInactive: false,
+      provisionId: null,
+    });
   });
 
   it("should reuse a status reserved during construction", () => {
     @Injectable()
     class TestService {
-      public readonly status: WireStatus = WireStatus.for(this, { initialize: true });
+      public readonly status: WireStatus = WireStatus.track(this);
     }
 
     const container: Container = new Container();
@@ -180,5 +195,77 @@ describe("WireStatus", () => {
     deprovisionContainer(deprovisioned);
 
     expect(WireStatus.for(deprovisioned.get(Service)).isDeprovisioned).toBe(true);
+  });
+
+  describe("isStale", () => {
+    @Injectable()
+    class TestService {
+      @OnProvision()
+      public onProvision(): void {}
+
+      @OnDeprovision()
+      public onDeprovision(): void {}
+    }
+
+    it("should not be stale within the provision cycle the work belongs to", () => {
+      const container: Container = new Container({ bindings: [TestService] });
+      const status: WireStatus = WireStatus.for(container.get(TestService));
+
+      provisionContainer(container, [TestService]);
+
+      expect(status.provisionId).toBe(1);
+      expect(status.isStale(1)).toBe(false);
+    });
+
+    it("should be stale once a newer provision cycle supersedes the work", () => {
+      const container: Container = new Container({ bindings: [TestService] });
+      const status: WireStatus = WireStatus.for(container.get(TestService));
+
+      provisionContainer(container, [TestService]);
+      deprovisionContainer(container);
+      provisionContainer(container, [TestService]);
+
+      expect(status.provisionId).toBe(2);
+      expect(status.isStale(1)).toBe(true);
+      expect(status.isStale(2)).toBe(false);
+    });
+
+    it("should be stale after deprovision, where the provision id alone still matches", () => {
+      const container: Container = new Container({ bindings: [TestService] });
+      const status: WireStatus = WireStatus.for(container.get(TestService));
+
+      provisionContainer(container, [TestService]);
+      deprovisionContainer(container);
+
+      // Deprovision restores the id the hook received, so an id comparison alone would pass here.
+      expect(status.provisionId).toBe(1);
+      expect(status.isStale(1)).toBe(true);
+    });
+
+    it("should be stale after deactivation, where the provision id alone still matches", () => {
+      const container: Container = new Container({ bindings: [TestService] });
+      const status: WireStatus = WireStatus.for(container.get(TestService));
+
+      provisionContainer(container, [TestService]);
+      container.unbind(TestService);
+
+      // Deactivation never touches the id, so an id comparison alone would pass here too.
+      expect(status.isDeactivated).toBe(true);
+      expect(status.provisionId).toBe(1);
+      expect(status.isStale(1)).toBe(true);
+    });
+
+    it("should treat a null snapshot as current until a provision cycle starts", () => {
+      const container: Container = new Container({ bindings: [TestService] });
+      const status: WireStatus = WireStatus.for(container.get(TestService));
+
+      // Snapshotted before any provider lifecycle reached the instance.
+      expect(status.provisionId).toBeNull();
+      expect(status.isStale(null)).toBe(false);
+
+      provisionContainer(container, [TestService]);
+
+      expect(status.isStale(null)).toBe(true);
+    });
   });
 });

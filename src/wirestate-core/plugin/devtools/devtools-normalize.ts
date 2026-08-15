@@ -1,6 +1,6 @@
 import { getActivationHandlerMetadata } from "../../activation/on-activation";
 import { getDeactivationHandlerMetadata } from "../../activation/on-deactivation";
-import { WireStatus } from "../../activation/wire-status";
+import { type WireStatus, tryGetWireStatus } from "../../activation/wire-status";
 import { type BindingDescriptor, type ServiceToken } from "../../binding/binding";
 import { isInstanceDescriptor } from "../../binding/binding-guards";
 import { getBindingScope } from "../../binding/binding-lifecycle";
@@ -210,16 +210,14 @@ function normalizeMethods(instance: object): ReadonlyArray<DevtoolsMethod> {
  * @returns The normalized status, or `undefined` when the instance is not tracked.
  */
 function readStatus(instance: object): Optional<DevtoolsInstanceStatus> {
-  try {
-    const status: Optional<WireStatus> = WireStatus.for(instance);
+  const status: Optional<WireStatus> = tryGetWireStatus(instance);
 
-    return {
-      isDeactivated: status.isDeactivated,
-      isDeprovisioned: status.isDeprovisioned,
-      isInactive: status.isInactive,
-      provisionId: status.provisionId,
-    };
-  } catch {
-    return undefined;
-  }
+  return status
+    ? {
+        isDeactivated: status.isDeactivated,
+        isDeprovisioned: status.isDeprovisioned,
+        isInactive: status.isInactive,
+        provisionId: status.provisionId,
+      }
+    : undefined;
 }

@@ -41,7 +41,7 @@ export class BridgeService {
   private pending: Map<number, (node: InspectNode) => void> = new Map();
 
   public constructor(
-    private readonly status: WireStatus = WireStatus.for(this, { initialize: true }),
+    private readonly status: WireStatus = WireStatus.track(this),
     private readonly transport: PanelTransport = inject(PanelTransport)
   ) {
     makeObservable(this);

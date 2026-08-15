@@ -47,26 +47,13 @@ export interface InstanceRecord {
  * Numeric ID for one provider provision cycle of a service instance.
  *
  * @remarks
- * IDs are unique only within a single service instance. Use the value passed to
- * `@OnProvision` and `@OnDeprovision` with
- * `WireStatus.for(instance).provisionId` to ignore async work from an older
- * provision cycle.
+ * IDs are unique only within a single service instance. Pass the value handed to
+ * `@OnProvision` and `@OnDeprovision` to {@link WireStatus.isStale} to ignore
+ * async work from an older provision cycle.
  *
  * @group Lifecycle
  */
 export type ProvisionId = number;
-
-/**
- * Options reserved for Wirestate lifecycle internals.
- *
- * @internal
- */
-export interface WireStatusLookupOptions {
-  /**
-   * Creates a tracked status when one does not exist.
-   */
-  readonly initialize?: boolean;
-}
 
 /**
  * Lifecycle status for one resolved service instance.
@@ -85,31 +72,56 @@ export class WireStatus {
    *
    * @remarks
    * Use this inside service methods when async work needs to check whether the
-   * service has been deactivated or deprovisioned.
+   * service has been deactivated or deprovisioned. The instance must already be
+   * tracked, which it is from activation onward, so every lifecycle hook and any
+   * method reachable from one can call it. To start tracking from a constructor,
+   * where activation has not run yet, use {@link WireStatus.track} instead.
    *
    * @group Lifecycle
    *
    * @param instance - Resolved service instance to inspect.
-   * @param options - Reserved for Wirestate internals.
    * @returns The stable lifecycle status for the instance.
    *
    * @throws {@link WirestateError} If the object is not tracked by Wirestate.
    */
-  public static for(instance: object, options?: WireStatusLookupOptions): WireStatus {
-    let status: Optional<WireStatus> = INSTANCE_STATUSES_BY_INSTANCE.get(instance);
+  public static for(instance: object): WireStatus {
+    const status: Optional<WireStatus> = INSTANCE_STATUSES_BY_INSTANCE.get(instance);
 
     if (status) {
       return status;
     }
 
-    if (options?.initialize) {
+    throw new WirestateError("Object is not tracked by Wirestate.", ERROR_CODE_NOT_TRACKED);
+  }
+
+  /**
+   * Starts lifecycle tracking for an instance and returns its status.
+   *
+   * @remarks
+   * Use this in a service constructor to hold the status as a field, which is
+   * the only form that reaches async methods outside the lifecycle hooks:
+   *
+   * ```ts
+   * public constructor(private readonly status: WireStatus = WireStatus.track(this)) {}
+   * ```
+   *
+   * Idempotent: an already-tracked instance keeps its existing status object, so
+   * a constructor call and the later activation share one stable status.
+   *
+   * @group Lifecycle
+   *
+   * @param instance - Service instance to track.
+   * @returns The stable lifecycle status for the instance.
+   */
+  public static track(instance: object): WireStatus {
+    let status: Optional<WireStatus> = INSTANCE_STATUSES_BY_INSTANCE.get(instance);
+
+    if (!status) {
       status = new WireStatus();
       INSTANCE_STATUSES_BY_INSTANCE.set(instance, status);
-
-      return status;
     }
 
-    throw new WirestateError("Object is not tracked by Wirestate.", ERROR_CODE_NOT_TRACKED);
+    return status;
   }
 
   /**
@@ -164,6 +176,60 @@ export class WireStatus {
       value: { container: undefined, provisionIdCounter: undefined } satisfies InstanceRecord,
     });
   }
+
+  /**
+   * Reports whether work started in a provision cycle should be discarded.
+   *
+   * @remarks
+   * The guard for anything that resumes after an `await`. It is stale when the
+   * instance ended its lifecycle (deactivated or deprovisioned) or when a newer
+   * provision cycle has superseded the one the work belongs to:
+   *
+   * ```ts
+   * public async onProvision(provisionId: ProvisionId): Promise<void> {
+   *   const result = await loadResult();
+   *
+   *   if (this.status.isStale(provisionId)) {
+   *     return;
+   *   }
+   *
+   *   this.applyResult(result);
+   * }
+   * ```
+   *
+   * Both clauses matter. Deprovision restores `provisionId` to the value the hook
+   * received, and deactivation leaves it untouched, so an id comparison alone stays
+   * equal and lets a late result through after the lifecycle has ended.
+   *
+   * Outside a provision hook, snapshot `provisionId` before the `await` and pass
+   * the snapshot back. A `null` snapshot means the instance had not been
+   * provisioned yet, and stays current until a cycle starts.
+   *
+   * @group Lifecycle
+   *
+   * @param provisionId - Provision cycle the work belongs to, as passed to
+   *   `@OnProvision` or snapshotted from {@link WireStatus.provisionId}.
+   * @returns Whether the work belongs to an ended or superseded lifecycle.
+   */
+  public isStale(provisionId: Nullable<ProvisionId>): boolean {
+    return this.isInactive || this.provisionId !== provisionId;
+  }
+}
+
+/**
+ * Returns the lifecycle status of an instance, or `undefined` when it is not tracked.
+ *
+ * @remarks
+ * The non-throwing counterpart of {@link WireStatus.for}, for internal callers that
+ * inspect arbitrary objects rather than their own instance.
+ *
+ * @internal
+ *
+ * @param instance - Object to look up.
+ * @returns The instance's lifecycle status, or `undefined` when it is not tracked.
+ */
+export function tryGetWireStatus(instance: object): Optional<WireStatus> {
+  return INSTANCE_STATUSES_BY_INSTANCE.get(instance);
 }
 
 /**

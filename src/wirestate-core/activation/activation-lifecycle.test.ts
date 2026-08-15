@@ -266,7 +266,7 @@ describe("instance status", () => {
   it("should reuse and reset a reserved status during initialization", () => {
     const container: Container = new Container();
     const instance: object = {};
-    const status: WireStatus = WireStatus.for(instance, { initialize: true });
+    const status: WireStatus = WireStatus.track(instance);
 
     status.isDeactivated = true;
     status.isDeprovisioned = true;

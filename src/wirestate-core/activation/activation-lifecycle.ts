@@ -88,7 +88,7 @@ export const wirestateActivationAdapter: ActivationAdapter = {
  * @internal
  */
 export function initializeInstanceStatus(container: ContainerKernel, instance: object): void {
-  const status: WireStatus = WireStatus.for(instance, { initialize: true });
+  const status: WireStatus = WireStatus.track(instance);
 
   getInstanceRecord(status).container = container;
 

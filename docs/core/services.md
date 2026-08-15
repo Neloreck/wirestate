@@ -253,8 +253,9 @@ export class PollingService {
 }
 ```
 
-When async work in a provider hook needs to know whether the instance is still active, guard it with
-`WireStatus.for(this)`. See [WireStatus](/core/lifecycle#wirestatus).
+Async work in a provider hook can resume after the service was deprovisioned, deactivated, or provisioned again. Hold a
+`WireStatus.track(this)` field and guard the continuation with `isStale(provisionId)`. See
+[WireStatus](/core/lifecycle#wirestatus).
 
 ## Lazy Resolution
 

@@ -58,30 +58,22 @@ boundary, but they never tear it down. The code that created the external contai
 
 ## WireStatus
 
-Wirestate tracks lifecycle state for each resolved service instance. Use `WireStatus.for(this)` inside a service when
-async work needs to know whether the instance is still active. This is most useful for dropping a late `await` result
-after the service has been deprovisioned or deactivated.
-
-[`WireStatus`](/api/wirestate-core/classes/WireStatus) exposes lifecycle state for late async guards:
-
-| Field             | Meaning                                                                                                                       |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `isDeactivated`   | `true` after service deactivation.                                                                                            |
-| `isDeprovisioned` | `null` before provider provisioning reaches the service, `false` while provider-owned, and `true` after provider deprovision. |
-| `isInactive`      | `true` when the service has been deactivated or deprovisioned.                                                                |
-| `provisionId`     | Current provider provision cycle ID, or `null` before provider lifecycle reaches the service.                                 |
+Wirestate tracks lifecycle state for each resolved service instance. Hold that status as a field with
+`WireStatus.track(this)`, then guard anything that resumes after an `await` with `isStale()`. This stops a late result
+from overwriting current state after the service was deprovisioned, deactivated, or provisioned again.
 
 ```ts
 import { Injectable, OnProvision, ProvisionId, WireStatus } from "@wirestate/core";
 
 @Injectable()
 export class SearchService {
+  public constructor(private readonly status: WireStatus = WireStatus.track(this)) {}
+
   @OnProvision()
   public async onProvision(provisionId: ProvisionId): Promise<void> {
     const result = await fetch("/api/search").then((response) => response.json());
-    const status = WireStatus.for(this);
 
-    if (status.isInactive || status.provisionId !== provisionId) {
+    if (this.status.isStale(provisionId)) {
       return;
     }
 
@@ -94,10 +86,63 @@ export class SearchService {
 }
 ```
 
-Capture the `provisionId` passed to `@OnProvision` before awaiting, then after the await bail when `isInactive` is
-`true` (the service was deactivated or deprovisioned) or when `provisionId` no longer matches - a newer provision cycle
-has superseded this one, for example a Strict Mode remount or a DOM move. This stops a stale response from overwriting
-current state.
+`isStale(provisionId)` is `true` when the instance has ended its lifecycle, or when a newer provision cycle has
+superseded the one the work belongs to - for example a Strict Mode remount or a DOM move. Both halves matter: the
+provision ID alone still matches after deprovision and after deactivation, so comparing IDs by hand lets a late result
+through.
+
+Methods outside the lifecycle hooks are not handed a provision ID. Snapshot the current one before the `await` and pass
+it back to `isStale()`:
+
+```ts
+import { Injectable, WireStatus } from "@wirestate/core";
+
+@Injectable()
+export class PageService {
+  public constructor(private readonly status: WireStatus = WireStatus.track(this)) {}
+
+  public async loadPage(page: number): Promise<void> {
+    const provisionId = this.status.provisionId;
+    const result = await fetch(`/api/search?page=${page}`).then((response) => response.json());
+
+    if (this.status.isStale(provisionId)) {
+      return;
+    }
+
+    this.applyResult(result);
+  }
+
+  private applyResult(result: unknown): void {
+    // update service state
+  }
+}
+```
+
+A snapshot taken before provider lifecycle reached the service is `null`, and stays current until a provision cycle
+starts.
+
+Get a status through either static on [`WireStatus`](/api/wirestate-core/classes/WireStatus):
+
+| Static                       | Result                                                                                                                       |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `WireStatus.track(instance)` | Starts tracking and returns the instance's status. Idempotent, so a constructor call and activation share one status object. |
+| `WireStatus.for(instance)`   | Returns the status of an already-tracked instance. Throws for anything Wirestate does not track.                             |
+
+Instances are tracked from activation onward, so `for()` works in any lifecycle hook and in any method reachable from
+one. A constructor runs before activation, which is why the field initializer above uses `track()`.
+
+The status exposes:
+
+| Member                 | Meaning                                                                                                                       |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `isStale(provisionId)` | `true` when the work belongs to an ended or superseded lifecycle.                                                             |
+| `isDeactivated`        | `true` after service deactivation.                                                                                            |
+| `isDeprovisioned`      | `null` before provider provisioning reaches the service, `false` while provider-owned, and `true` after provider deprovision. |
+| `isInactive`           | `true` when the service has been deactivated or deprovisioned.                                                                |
+| `provisionId`          | Current provider provision cycle ID, or `null` before provider lifecycle reaches the service.                                 |
+
+A service that guards in exactly one place can skip the field and read the status inline with
+`WireStatus.for(this).isStale(provisionId)`.
 
 ## API Reference
 
