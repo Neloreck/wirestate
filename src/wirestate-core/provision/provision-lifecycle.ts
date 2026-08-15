@@ -57,6 +57,12 @@ export function provisionContainer(
       "Container is already provisioned. Deprovision it before provisioning it again.",
       ERROR_CODE_VALIDATION_ERROR
     );
+  } else if (state.provisioning) {
+    throw new WirestateError(
+      "Container is already provisioning. A provision cycle cannot start another one, for example " +
+        "by calling provision() from an @OnProvision hook.",
+      ERROR_CODE_VALIDATION_ERROR
+    );
   }
 
   state.status = undefined;

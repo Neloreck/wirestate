@@ -336,6 +336,42 @@ describe("provision lifecycle", () => {
     expect(events).toEqual(["provision", "deprovision", "deactivation"]);
   });
 
+  it("should reject a provision started from inside a provision cycle", () => {
+    const events: Array<string> = [];
+
+    let caught: string = "";
+
+    @Injectable()
+    class ReentrantService {
+      @OnProvision()
+      public onProvision(): void {
+        events.push("provision");
+
+        try {
+          container.provision();
+        } catch (error) {
+          caught = (error as Error).message;
+        }
+      }
+    }
+
+    const container: Container = new Container({ bindings: [ReentrantService] });
+
+    container.provision();
+
+    // The outer cycle leaves `status` undefined while it runs, so the already-provisioned check
+    // cannot see it. Unguarded, the nested cycle re-runs this very hook until the stack overflows.
+    expect(events).toEqual(["provision"]);
+    expect(caught).toContain("Container is already provisioning");
+
+    // The outer cycle still completes normally: the rejection is contained to the nested call.
+    expect(getProvisionState(container)?.status).toBe(true);
+
+    deprovisionContainer(container);
+
+    expect(() => container.provision()).not.toThrow();
+  });
+
   it("should reset deprovision markers before reprovision and mark active instances one by one", () => {
     const events: Array<string> = [];
 
