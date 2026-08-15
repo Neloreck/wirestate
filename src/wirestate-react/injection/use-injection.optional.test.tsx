@@ -255,6 +255,43 @@ describe("useInjection (optional)", () => {
     expect(captured).toBe(fallbackFn);
   });
 
+  it("should re-resolve when the optional flag flips", () => {
+    const container: Container = new Container();
+    const token: ServiceToken<string> = Symbol("flipping-token");
+
+    let captured: unknown = "untouched";
+    let thrown: unknown = null;
+
+    function RawComponent({ optional }: { optional: boolean }) {
+      captured = useInjection(token, { optional } as { optional: true });
+
+      return null;
+    }
+
+    const { rerender } = render(
+      <ContainerProvider container={container}>
+        <RawComponent optional={true} />
+      </ContainerProvider>
+    );
+
+    expect(captured).toBeUndefined();
+
+    // `optional` decides whether a miss is an answer or an error, so a memo that ignored it would
+    // keep returning the earlier `undefined` instead of throwing.
+    try {
+      rerender(
+        <ContainerProvider container={container}>
+          <RawComponent optional={false} />
+        </ContainerProvider>
+      );
+    } catch (error) {
+      thrown = error;
+    }
+
+    expect(thrown).not.toBeNull();
+    expect((thrown as Error).message).toContain("No binding(s) found");
+  });
+
   it("should ignore the fallback when the token is bound", () => {
     const container: Container = new Container();
     const token: ServiceToken<string> = Symbol("optional-token");

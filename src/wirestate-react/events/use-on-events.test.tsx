@@ -236,6 +236,48 @@ describe("useOnEvents", () => {
       expect(handler).toHaveBeenLastCalledWith({ type: "C" });
     });
 
+    it("should distinguish symbol event types that share a description", () => {
+      const container: Container = new Container({ bindings: [EventBus] });
+      const bus: EventBus = container.get(EventBus);
+      const handler = jest.fn();
+
+      // `EventType` admits symbols, and two symbols can carry the same description while being
+      // distinct keys. The membership check compares them by identity for that reason: deriving a
+      // string dep instead would throw on `join()` or, with `String()`, collapse these two into
+      // one key and silently skip the resubscribe below.
+      const first: symbol = Symbol("SAME_LABEL");
+      const second: symbol = Symbol("SAME_LABEL");
+
+      function TestComponent({ types }: { types: ReadonlyArray<symbol> }) {
+        useOnEvents(types, handler);
+
+        return null;
+      }
+
+      const { rerender } = render(
+        <ContainerProvider container={container}>
+          <TestComponent types={[first]} />
+        </ContainerProvider>
+      );
+
+      act(() => bus.emit(first));
+      act(() => bus.emit(second));
+
+      expect(handler).toHaveBeenCalledTimes(1);
+
+      rerender(
+        <ContainerProvider container={container}>
+          <TestComponent types={[second]} />
+        </ContainerProvider>
+      );
+
+      act(() => bus.emit(first));
+      act(() => bus.emit(second));
+
+      expect(handler).toHaveBeenCalledTimes(2);
+      expect(handler).toHaveBeenLastCalledWith({ type: second });
+    });
+
     it("should not leak subscriptions when re-rendered with an equal inline type array", () => {
       const container: Container = new Container({ bindings: [EventBus] });
       const bus: EventBus = container.get(EventBus);

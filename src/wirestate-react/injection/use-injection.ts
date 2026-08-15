@@ -99,12 +99,13 @@ export function useInjection<T, F = undefined>(
   options?: { optional?: boolean; fallback?: InjectionFallback<F> }
 ): Optional<T | F> {
   const container: Container = useContainer();
+  const optional: Optional<boolean> = options?.optional;
 
   return useMemo(() => {
     const fallback: Optional<InjectionFallback<F>> = options?.fallback;
 
     // Required lookup (neither optional nor fallback): resolve directly so the container throws on a miss.
-    if (!options?.optional && fallback === undefined) {
+    if (!optional && fallback === undefined) {
       return container.get<T>(token);
     }
 
@@ -117,7 +118,10 @@ export function useInjection<T, F = undefined>(
     }
 
     return undefined;
-    // Fallback is intentionally excluded from deps: only a container or token change re-resolves.
+    // `optional` is a dep because it decides whether a miss throws or resolves to undefined, so a
+    // stale memo would answer the wrong question. It is a boolean, so a caller that never changes
+    // it never re-resolves. `fallback` stays out on purpose: it only supplies the value for a miss,
+    // and including it would re-resolve on every render for an inline value or factory.
     // eslint-disable-next-line
-  }, [container, token]);
+  }, [container, token, optional]);
 }
