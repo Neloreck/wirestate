@@ -3,6 +3,7 @@ packages:
   - 'extension/'
   - 'src/'
   - 'src/wirestate-core'
+  - 'src/wirestate-dev'
   - 'src/wirestate-lit'
   - 'src/wirestate-lit-mobx'
   - 'src/wirestate-lit-signals'
@@ -21,10 +22,10 @@ allowBuilds:
   unrs-resolver: true
 
 overrides:
-  '@types/react': 19.2.15
-  '@types/react-dom': 19.2.3
-  react: 19.2.6
-  react-dom: 19.2.6
+  '@types/react': 19.2.18
+  '@types/react-dom': 19.2.4
+  react: 19.2.8
+  react-dom: 19.2.8
 
 minimumReleaseAge: 1440 # minutes (1 day)
 minimumReleaseAgeExclude:

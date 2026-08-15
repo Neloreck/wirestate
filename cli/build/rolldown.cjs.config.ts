@@ -13,6 +13,9 @@ export default PACKAGES.map((pkg) => {
   return {
     external: isExternal(pkg),
     input: pkg.entries,
+    // Keeps `process.env.NODE_ENV` verbatim in library output, so development-only branches
+    // are folded by the consumer bundler (which knows the real mode), not at lib-build time.
+    platform: "neutral" as const,
     output: {
       chunkFileNames: "lib.js",
       dir,

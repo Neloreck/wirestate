@@ -1,4 +1,5 @@
 import { type ContainerConfig, Container, WirestateError } from "@wirestate/core";
+import { type HotSwapOwner, registerHotSwapOwner } from "@wirestate/core/hot";
 import { type ReactElement, type ReactNode, createElement, useEffect, useRef, useState } from "react";
 
 import { ContainerContext } from "../container/container-context";
@@ -129,9 +130,14 @@ export function ContainerProvider(props: ContainerProviderProps): ReactElement {
   const pendingDestructionRef = useRef<Nullable<ReactContainerProvisionLifecycle>>(null);
 
   const [error, setError] = useState<Nullable<ContainerProvisionError>>(null);
-  const [managedContainer] = useState<Nullable<Container>>(() =>
+  const [managedContainer, setManagedContainer] = useState<Nullable<Container>>(() =>
     managedSource ? new Container({ ...managedSource, activate: managedSource.activate ?? true }) : null
   );
+
+  // Construction-only semantics: the config that built the managed container is the one
+  // a development hot swap rebuilds from, regardless of later prop changes.
+  const mountConfigRef = useRef<Maybe<ContainerConfig>>(managedSource);
+  const hotOwnerRef = useRef<Nullable<HotSwapOwner>>(null);
 
   if (ownedRef.current !== owned) {
     throw new WirestateError(
@@ -162,7 +168,25 @@ export function ContainerProvider(props: ContainerProviderProps): ReactElement {
       return;
     }
 
+    let unregisterHotOwner: Nullable<() => void> = null;
+
+    // Development-only: register this provider as the hot-swap owner of its managed container.
+    if (process.env.NODE_ENV !== "production" && owned && mountConfigRef.current) {
+      // One owner for the lifetime of the provider.
+      const hotOwner: HotSwapOwner = (hotOwnerRef.current ??= {
+        container: activeContainer,
+        config: mountConfigRef.current,
+        create: (config: ContainerConfig): Container => new Container({ ...config, activate: config.activate ?? true }),
+        commit: (container: Container): void => setManagedContainer(container),
+      });
+
+      hotOwner.container = activeContainer;
+      unregisterHotOwner = registerHotSwapOwner(hotOwner);
+    }
+
     return () => {
+      unregisterHotOwner?.();
+
       if (owned) {
         scheduleContainerDestruction(activeContainer, pendingDestruction);
       } else {

@@ -59,6 +59,7 @@ export default defineConfig({
           { text: "Queries", link: "/core/queries" },
           { text: "Plugins", link: "/core/plugins" },
           { text: "DevTools", link: "/core/devtools" },
+          { text: "Hot Reload", link: "/core/hot-reload" },
           { text: "Testing", link: "/core/testing" },
         ],
       },

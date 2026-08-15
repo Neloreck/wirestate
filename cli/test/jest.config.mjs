@@ -16,6 +16,7 @@ const shared = {
     "^#/(.*)$": "<rootDir>/cli/$1",
     "^@/fixtures/(.*)$": "<rootDir>/src/fixtures/$1",
     "^@wirestate/core/devtools$": "<rootDir>/src/wirestate-core/devtools",
+    "^@wirestate/core/hot$": "<rootDir>/src/wirestate-core/hot",
     "^@wirestate/core$": "<rootDir>/src/wirestate-core/index",
     "^@wirestate/lit$": "<rootDir>/src/wirestate-lit/index",
     "^@wirestate/lit-mobx$": "<rootDir>/src/wirestate-lit-mobx/index",

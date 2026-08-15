@@ -189,6 +189,9 @@ export class Container extends ContainerKernel {
    * handlers the binding kind can never run.
    */
   public override bind<T>(binding: Newable<object> | BindingDescriptor<T>): this {
+    // Rewritten before validation so a hot-replaced class is validated as the class that will actually be registered.
+    binding = this.getHotBinding(binding);
+
     // A bare class always binds as a singleton instance, so only descriptors need a kind check.
     if (typeof binding !== "function") {
       const descriptor: BindingDescriptor<T> = binding as BindingDescriptor<T>;
@@ -258,6 +261,8 @@ export class Container extends ContainerKernel {
    * @returns The same container for chaining.
    */
   public override unbind<T>(token: ServiceToken<T>): this {
+    token = this.getHotToken(token);
+
     if (this.hasOwn(token)) {
       deprovisionContainerBinding(this, token);
     }

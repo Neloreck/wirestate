@@ -13,7 +13,16 @@ export interface BuildPackage {
 export const PACKAGES: Array<BuildPackage> = [
   {
     name: "wirestate-core",
-    entries: [path.resolve(SRC_PATH, "wirestate-core/index.ts"), path.resolve(SRC_PATH, "wirestate-core/devtools.ts")],
+    entries: [
+      path.resolve(SRC_PATH, "wirestate-core/index.ts"),
+      path.resolve(SRC_PATH, "wirestate-core/devtools.ts"),
+      path.resolve(SRC_PATH, "wirestate-core/hot.ts"),
+    ],
+    external: EXTERNAL_DEPENDENCIES,
+  },
+  {
+    name: "wirestate-dev",
+    entries: [path.resolve(SRC_PATH, "wirestate-dev/index.ts"), path.resolve(SRC_PATH, "wirestate-dev/vite.ts")],
     external: EXTERNAL_DEPENDENCIES,
   },
   {

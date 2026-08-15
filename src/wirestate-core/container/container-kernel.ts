@@ -1,11 +1,13 @@
 import { getActivationAdapter } from "../activation/activation-adapter";
-import { type BindingDescriptor, type ServiceToken } from "../binding/binding";
+import { type Binding, type BindingDescriptor, type ServiceToken } from "../binding/binding";
 import { isInstanceDescriptor } from "../binding/binding-guards";
 import { getBindingScope } from "../binding/binding-lifecycle";
 import { tokenToString } from "../binding/binding-tokens";
 import { validateBinding } from "../binding/binding-validation";
 import { ERROR_CODE_NO_BINDING_FOUND } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
+import { getLatestHotClass } from "../hot/hot-registry";
+import { remapHotBinding } from "../hot/hot-remap";
 import { type Optional, type Newable } from "../types/general";
 
 import { injectionContext } from "./container-context";
@@ -56,6 +58,8 @@ export class ContainerKernel {
    * binding already constructed values.
    */
   public bind<T>(binding: Newable<object> | BindingDescriptor<T>): this {
+    binding = this.getHotBinding(binding);
+
     const descriptor: BindingDescriptor<T> =
       typeof binding === "function"
         ? ({ token: binding, type: "Instance", value: binding } as unknown as BindingDescriptor<T>)
@@ -76,6 +80,8 @@ export class ContainerKernel {
    * @returns The same container for chaining.
    */
   public unbind<T>(token: ServiceToken<T>): this {
+    token = this.getHotToken(token);
+
     this.deactivate(token);
 
     const binding = this.bindings.get(token);
@@ -140,6 +146,8 @@ export class ContainerKernel {
       return () => this.get(token, { ...options, lazy: false });
     }
 
+    token = this.getHotToken(token);
+
     const own: Optional<BindingDescriptor<T>> = this.bindings.get(token);
 
     if (own) {
@@ -172,7 +180,7 @@ export class ContainerKernel {
    * @returns Whether the token can be resolved from this container.
    */
   public has<T>(token: ServiceToken<T>): boolean {
-    return this.bindings.has(token) || (this.parent?.has(token) ?? false);
+    return this.hasBinding(this.getHotToken(token));
   }
 
   /**
@@ -183,7 +191,21 @@ export class ContainerKernel {
    * @returns Whether this container owns a binding for the token.
    */
   public hasOwn<T>(token: ServiceToken<T>): boolean {
-    return this.bindings.has(token);
+    return this.bindings.has(this.getHotToken(token));
+  }
+
+  /**
+   * Checks the parent chain for a binding, without hot-reload rewriting.
+   *
+   * @remarks
+   * Separate from {@link ContainerKernel.has} so {@link ContainerKernel.getHotToken} can test a
+   * candidate token without recursing back through the rewrite.
+   *
+   * @param token - Token to look up as given.
+   * @returns Whether the token is bound on this container or an ancestor.
+   */
+  private hasBinding<T>(token: ServiceToken<T>): boolean {
+    return this.bindings.has(token) || (this.parent?.hasBinding(token) ?? false);
   }
 
   /**
@@ -214,6 +236,54 @@ export class ContainerKernel {
     }
 
     return instances;
+  }
+
+  /**
+   * Rewrites a token to the newest generation of a hot-replaced class.
+   *
+   * @remarks
+   * Development-only, and the single place that decision is made: every public API taking a
+   * token routes through it, so hot-reload support cannot drift between them. Modules that were
+   * not part of a hot update keep referencing an older generation of a replaced class, and this
+   * keeps those references answerable after a container hot swap.
+   *
+   * The newest generation is used only when it is actually bound in this chain. Containers bound
+   * before the update, such as external containers no provider owns, keep the original token.
+   *
+   * In production the guard folds away and this returns its argument.
+   *
+   * @param token - Token supplied by the caller.
+   * @returns Token to look the binding up by.
+   */
+  protected getHotToken<T>(token: ServiceToken<T>): ServiceToken<T> {
+    if (process.env.NODE_ENV === "production") {
+      return token;
+    } else {
+      const latest: ServiceToken<T> = getLatestHotClass(token);
+
+      return latest !== token && this.hasBinding(latest) ? latest : token;
+    }
+  }
+
+  /**
+   * Rewrites a binding to the newest generations of the classes it references.
+   *
+   * @remarks
+   * The registration counterpart of {@link ContainerKernel.getHotToken}, keeping registration keys
+   * consistent with lookups no matter which code path constructed the container. In production
+   * the guard folds away and this returns its argument.
+   *
+   * @template T - Bound value type.
+   *
+   * @param binding - Binding supplied by the caller.
+   * @returns Binding to register.
+   */
+  protected getHotBinding<T>(binding: Newable<object> | BindingDescriptor<T>): Newable<object> | BindingDescriptor<T> {
+    if (process.env.NODE_ENV === "production") {
+      return binding;
+    } else {
+      return remapHotBinding(binding as Binding) as Newable<object> | BindingDescriptor<T>;
+    }
   }
 
   /**

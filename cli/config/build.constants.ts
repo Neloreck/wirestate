@@ -12,6 +12,7 @@ export const EXTERNAL_DEPENDENCIES: Array<string> = [
   "@preact/signals-react/runtime",
   "@swc/helpers",
   "@wirestate/core",
+  "@wirestate/dev",
   "@wirestate/lit-mobx",
   "@wirestate/lit-signals",
   "@wirestate/mobx",

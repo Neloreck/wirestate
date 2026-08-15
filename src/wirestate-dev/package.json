@@ -1,0 +1,43 @@
+{
+  "name": "@wirestate/dev",
+  "version": "1.0.0-experimental.15",
+  "description": "Development bundler plugins enabling hot reload for Wirestate services",
+  "sideEffects": false,
+  "author": "Syrotenko Igor",
+  "homepage": "https://github.com/Neloreck/wirestate#readme",
+  "license": "MIT",
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./esm/index.js",
+      "require": "./cjs/index.js"
+    },
+    "./vite": {
+      "types": "./vite.d.ts",
+      "import": "./esm/vite.js",
+      "require": "./cjs/vite.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Neloreck/wirestate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Neloreck/wirestate/issues"
+  },
+  "keywords": [
+    "wirestate",
+    "hmr",
+    "hot-reload",
+    "vite-plugin",
+    "dependency-injection",
+    "typescript"
+  ],
+  "dependencies": {},
+  "peerDependencies": {
+    "@wirestate/core": "1.0.0-experimental.15"
+  }
+}

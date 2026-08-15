@@ -15,6 +15,7 @@
       "@/fixtures/*": ["./src/fixtures/*"],
       "@wirestate/core": ["./src/wirestate-core"],
       "@wirestate/core/devtools": ["./src/wirestate-core/devtools"],
+      "@wirestate/core/hot": ["./src/wirestate-core/hot"],
       "@wirestate/lit": ["./src/wirestate-lit"],
       "@wirestate/lit-mobx": ["./src/wirestate-lit-mobx"],
       "@wirestate/lit-signals": ["./src/wirestate-lit-signals"],

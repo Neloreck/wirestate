@@ -20,6 +20,9 @@ your package manager reports a missing peer, install that package directly.
 Signal services use the framework-agnostic `@wirestate/signals` package. MobX services use `@wirestate/mobx`. The same
 service definitions can be shared across React and Lit.
 
+`@wirestate/dev` is an optional development dependency that adds hot reload for service files. See
+[Hot Reload](/core/hot-reload).
+
 For external API details, use the official docs for [React](https://react.dev/reference/react),
 [Lit](https://lit.dev/docs/), [Preact Signals](https://preactjs.com/guide/v10/signals), and
 [MobX](https://mobx.js.org/README.html).
@@ -63,3 +66,4 @@ See the [Lit MobX overview](/lit-mobx/overview) for services, elements, and comp
 - Use [Lit overview](/lit/overview) for Lit applications.
 - Use [React Signals](/react-signals/overview), [React MobX](/react-mobx/overview),
   [Lit Signals](/lit-signals/overview), or [Lit MobX](/lit-mobx/overview) for framework reactivity packages.
+- Add [Hot Reload](/core/hot-reload) to keep the application mounted while editing services.

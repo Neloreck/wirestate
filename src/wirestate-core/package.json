@@ -21,6 +21,11 @@
       "types": "./devtools.d.ts",
       "import": "./esm/devtools.js",
       "require": "./cjs/devtools.js"
+    },
+    "./hot": {
+      "types": "./hot.d.ts",
+      "import": "./esm/hot.js",
+      "require": "./cjs/hot.js"
     }
   },
   "repository": {

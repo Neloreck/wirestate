@@ -42,6 +42,9 @@ container, remount the provider with a React `key`:
 Remounting tears down the previous container and creates a new one from the current config. Because the config is read
 only once, inline config objects are safe.
 
+During development, editing a service file replaces its class. Install [`@wirestate/dev`](/core/hot-reload) to rebuild
+the affected containers in place instead of remounting the tree.
+
 ## Messaging
 
 Messaging is opt-in and composable. A container only has the buses contributed by its registered plugins, so add
@@ -96,6 +99,10 @@ export function Application() {
 
 External containers are provisioned while the provider is mounted, but they are not disposed. Disposal remains the
 caller's responsibility.
+
+The same ownership rule applies during development: because the provider does not own an external container, it does not
+hot-swap one either. Prefer a managed `config` for containers holding services you edit often, or register the container
+as its own [hot-swap owner](/core/hot-reload#owning-the-swap).
 
 ## SSR and Hydration
 

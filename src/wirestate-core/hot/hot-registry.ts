@@ -1,0 +1,137 @@
+import { type Newable, type Optional } from "../types/general";
+
+import { type HotSwapOwner } from "./hot-owner";
+
+/**
+ * Property key carrying a class's stable hot-reload identity.
+ *
+ * @remarks
+ * `Symbol.for` so identity survives duplicate copies of this module in one page
+ * (for example an ESM and a CJS copy loaded side by side during development).
+ *
+ * @internal
+ */
+export const HOT_CLASS_ID: unique symbol = Symbol.for("wirestate.hot.id") as never;
+
+/**
+ * Anchor key for the process-wide hot-reload state.
+ *
+ * @internal
+ */
+const HOT_STATE_KEY: symbol = Symbol.for("wirestate.hot.state");
+
+/**
+ * Process-wide hot-reload state shared by every copy of this module.
+ *
+ * @internal
+ */
+export interface HotState {
+  /** Latest class registered for each stable id. */
+  readonly latest: Map<string, Newable<object>>;
+  /** Stable ids whose class changed since the last swap. */
+  readonly dirty: Set<string>;
+  /** Live provider registrations able to rebuild their containers. */
+  readonly owners: Set<HotSwapOwner>;
+  /** Whether a swap flush is already scheduled. */
+  scheduled: boolean;
+  /** Whether a swap is executing right now. */
+  swapping: boolean;
+}
+
+/**
+ * Returns the process-wide hot-reload state, creating it on first access.
+ *
+ * @internal
+ *
+ * @returns Shared hot-reload state.
+ */
+export function getHotState(): HotState {
+  const anchor: Record<symbol, HotState> = globalThis as never;
+
+  return (anchor[HOT_STATE_KEY] ??= {
+    latest: new Map(),
+    dirty: new Set(),
+    owners: new Set(),
+    scheduled: false,
+    swapping: false,
+  });
+}
+
+/**
+ * Registers the classes one module version exports, stamping each with a stable id.
+ *
+ * @remarks
+ * Called by the dev-plugin footer every time a module executes. The first
+ * registration of an id only records it. A later registration with a different
+ * class marks the id dirty, so the next {@link requestHotSwap} rebuilds the
+ * containers still bound to an older class.
+ *
+ * @group Hot
+ *
+ * @param moduleId - Stable module identifier, usually the root-relative path.
+ * @param classes - Exported classes keyed by their local declaration name.
+ */
+export function registerHotModule(moduleId: string, classes: Record<string, unknown>): void {
+  const state: HotState = getHotState();
+
+  for (const [name, value] of Object.entries(classes)) {
+    if (typeof value !== "function") {
+      continue;
+    }
+
+    const clazz: Newable<object> = value as Newable<object>;
+    const id: string = `${moduleId}#${name}`;
+    const previous: Optional<Newable<object>> = state.latest.get(id);
+
+    // Stamps are configurable so a re-executed module can restamp its classes freely.
+    Object.defineProperty(clazz, HOT_CLASS_ID, { value: id, configurable: true });
+
+    state.latest.set(id, clazz);
+
+    if (previous && previous !== clazz) {
+      state.dirty.add(id);
+    }
+  }
+}
+
+/**
+ * Resolves the newest registered generation of a class.
+ *
+ * @remarks
+ * Values that are not classes, or classes never stamped by
+ * {@link registerHotModule}, resolve to themselves.
+ *
+ * @internal
+ *
+ * @template T - Value type being resolved.
+ *
+ * @param value - Possibly stale class reference.
+ * @returns The newest generation of the class, or the value unchanged.
+ */
+export function getLatestHotClass<T>(value: T): T {
+  // Own property only: a static property is inherited through the class chain, so a subclass the
+  // transform never reached would otherwise read its base class id and resolve to the base class.
+  if (typeof value !== "function" || !Object.prototype.hasOwnProperty.call(value, HOT_CLASS_ID)) {
+    return value;
+  }
+
+  const id: string = (value as unknown as { [HOT_CLASS_ID]: string })[HOT_CLASS_ID];
+
+  return (getHotState().latest.get(id) as Optional<T>) ?? value;
+}
+
+/**
+ * Returns whether a hot swap is executing right now.
+ *
+ * @remarks
+ * True only inside the synchronous swap block. A React integration uses it to
+ * replace a confusing missing-binding error with a clear diagnostic when
+ * something forces rendering from inside a lifecycle handler during a swap.
+ *
+ * @group Hot
+ *
+ * @returns Whether containers are being swapped at this moment.
+ */
+export function isHotSwapping(): boolean {
+  return getHotState().swapping;
+}
