@@ -106,6 +106,9 @@ export default defineConfig({
             items: [
               { text: "@wirestate/core", link: "/api/wirestate-core/" },
               { text: "@wirestate/core/devtools", link: "/api/wirestate-core/devtools/" },
+              { text: "@wirestate/core/hot", link: "/api/wirestate-core/hot/" },
+              { text: "@wirestate/dev", link: "/api/wirestate-dev/" },
+              { text: "@wirestate/dev/vite", link: "/api/wirestate-dev/vite/" },
               { text: "@wirestate/mobx", link: "/api/wirestate-mobx/" },
               { text: "@wirestate/signals", link: "/api/wirestate-signals/" },
               { text: "@wirestate/lit", link: "/api/wirestate-lit/" },
