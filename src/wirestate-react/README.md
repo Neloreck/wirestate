@@ -47,6 +47,9 @@ This package wires services into React. It does not make service fields reactive
 [`@wirestate/react-signals`](https://www.npmjs.com/package/@wirestate/react-signals), or your own React reactivity adapter
 when components need to re-render from service changes.
 
+During development, [`@wirestate/dev`](https://www.npmjs.com/package/@wirestate/dev) swaps the containers a provider owns
+when a service module changes, so React state, DOM state, and form inputs survive the edit.
+
 ## Learn More
 
 - [React guide](https://Neloreck.github.io/wirestate/react/overview)

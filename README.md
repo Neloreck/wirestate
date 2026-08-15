@@ -25,6 +25,7 @@ tenant, or test.
 | [`@wirestate/signals`](./src/wirestate-signals/README.md)             | Framework-agnostic Preact Signals exports for shared services.                                    |
 | [`@wirestate/react-signals`](./src/wirestate-react-signals/README.md) | Preact Signals React reactivity binding.                                                          |
 | [`@wirestate/lit-signals`](./src/wirestate-lit-signals/README.md)     | Preact Signals Lit reactivity binding (`@lit-labs/preact-signals`).                               |
+| [`@wirestate/dev`](./src/wirestate-dev/README.md)                     | Development bundler plugins that hot reload services behind a React provider.                     |
 | [`wirestate`](./src/wirestate/README.md)                              | React-oriented compatibility package for the unscoped package name.                               |
 
 ## Install
@@ -43,6 +44,13 @@ npm install @wirestate/core @wirestate/signals @wirestate/lit @wirestate/lit-sig
 
 # Lit + MobX
 npm install @wirestate/core @wirestate/mobx @wirestate/lit @wirestate/lit-mobx
+```
+
+Optionally add hot reload for services during development. It is a dev dependency and has no effect on production
+builds.
+
+```bash
+npm install --save-dev @wirestate/dev
 ```
 
 ## Example

@@ -46,6 +46,9 @@ counterService.increment();
 - `EventBus`, `CommandBus`, `QueryBus`, and their decorators (`OnEvent`, `OnCommand`, `OnQuery`), enabled by
   registering `EventsPlugin`, `CommandsPlugin`, or `QueriesPlugin`.
 - An optional `@wirestate/core/devtools` subpath (`DevToolsPlugin`) for development-time container inspection.
+- An optional `@wirestate/core/hot` subpath carrying the runtime that swaps containers when a service module is hot
+  replaced. Applications do not call it directly: install
+  [`@wirestate/dev`](https://www.npmjs.com/package/@wirestate/dev) and its bundler plugin drives it.
 
 React and Lit integration live in [`@wirestate/react`](https://www.npmjs.com/package/@wirestate/react) and
 [`@wirestate/lit`](https://www.npmjs.com/package/@wirestate/lit).

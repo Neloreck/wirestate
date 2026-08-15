@@ -8,6 +8,11 @@ Bundler plugins enabling hot reload for Wirestate services.
 Use this package during development so that editing a service file swaps the affected containers in place instead of
 remounting the application tree. It applies to the dev server only and has no effect on production builds.
 
+The swap rebuilds containers that have a registered owner. `ContainerProvider` from
+[`@wirestate/react`](https://www.npmjs.com/package/@wirestate/react) registers the managed containers it creates, so
+React applications need no setup. A container created elsewhere, including one provided to Lit, is rebuilt only after it
+is registered as its own [hot-swap owner](https://Neloreck.github.io/wirestate/core/hot-reload#owning-the-swap).
+
 ## Install
 
 ```bash
