@@ -1,6 +1,6 @@
 name: Publish Packages
 
-run-name: Publish ${{ inputs.experimental && 'experimental' || 'normal' }} packages
+run-name: Publish ${{ inputs.experimental && 'experimental' || 'normal' }} packages${{ inputs.resume && ' (resume)' || '' }}
 
 on:
   workflow_dispatch:
@@ -10,6 +10,11 @@ on:
         required: true
         type: boolean
         default: true
+      resume:
+        description: "Resume an interrupted release: publish only the packages missing from the registry at this version"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -27,6 +32,7 @@ jobs:
     environment: npm-publish
     env:
       PUBLISH_SCRIPT: ${{ inputs.experimental && 'deploy:experimental' || 'deploy' }}
+      PUBLISH_ARGS: ${{ inputs.resume && '--resume' || '' }}
 
     steps:
       - name: Require repository admin permissions
@@ -61,7 +67,7 @@ jobs:
         run: pnpm install
 
       - name: Publish packages
-        run: pnpm ${{ env.PUBLISH_SCRIPT }}
+        run: pnpm ${{ env.PUBLISH_SCRIPT }} ${{ env.PUBLISH_ARGS }}
 
       - name: Resolve published version
         id: version
@@ -88,5 +94,12 @@ jobs:
           VERSION: ${{ steps.version.outputs.version }}
           GH_TOKEN: ${{ github.token }}
         run: |
+          # A resumed release reaches this step with the release already created by the run that
+          # published the earlier packages, and `gh release create` fails on an existing one.
+          if gh release view "v${VERSION}" >/dev/null 2>&1; then
+            echo "Release v${VERSION} already exists; skipping."
+            exit 0
+          fi
+
           pnpm tsx cli/deploy/print-release-notes.ts "${VERSION}" > release-notes.md
           gh release create "v${VERSION}" --title "v${VERSION}" --notes-file release-notes.md
