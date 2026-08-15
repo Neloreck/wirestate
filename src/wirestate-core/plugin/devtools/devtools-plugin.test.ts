@@ -145,6 +145,31 @@ describe("DevToolsPlugin", () => {
     container.deprovision();
   });
 
+  it("keeps teardown deltas attributed to the root that produced them", () => {
+    const container: Container = new Container({
+      activate: true,
+      bindings: [Service],
+      plugins: [new DevToolsPlugin()],
+    });
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+
+    const seen: Array<{ rootId: number; phase?: string }> = [];
+
+    hook.subscribe((event) => seen.push({ rootId: event.rootId, phase: (event as { phase?: string }).phase }));
+
+    container.provision();
+
+    const rootId: number = hook.getRoots()[0].rootId;
+
+    // `destroy` deprovisions first, which deregisters the root, and only then deactivates. Those
+    // trailing deltas still belong to this root: a consumer filters the stream by root id, so an
+    // unattributed delta would reach no panel at all.
+    container.destroy();
+
+    expect(seen.some((event) => event.phase === "deactivate")).toBe(true);
+    expect(seen.every((event) => event.rootId === rootId)).toBe(true);
+  });
+
   it("streams lifecycle deltas to a subscribed backend", () => {
     @Injectable()
     class LifecycleService {

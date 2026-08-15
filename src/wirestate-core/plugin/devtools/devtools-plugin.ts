@@ -54,7 +54,26 @@ export interface DevToolsPluginOptions {
  */
 export class DevToolsPlugin implements WirestatePlugin {
   private hook: Optional<DevtoolsHook>;
+
+  /**
+   * Root id every delta of this plugin is tagged with.
+   *
+   * @remarks
+   * `0` only until the first registration, and never reset afterwards. Teardown keeps emitting
+   * after the root is deregistered - `container.destroy()` deactivates instances once the
+   * container already deprovisioned - and a consumer filters the delta stream by root id, so a
+   * delta that dropped back to `0` would belong to no root and never reach a panel. Holding the
+   * last id keeps those final deltas attributable to the root that produced them.
+   */
   private rootId: DevtoolsRootId = 0;
+
+  /**
+   * Whether {@link DevToolsPlugin.rootId} is currently registered on the hook.
+   *
+   * @remarks
+   * Tracked apart from the id, which outlives the registration.
+   */
+  private registered: boolean = false;
 
   /**
    * Currently-provisioned (live) containers, keyed by id for dedupe and held weakly so
@@ -98,10 +117,11 @@ export class DevToolsPlugin implements WirestatePlugin {
    * Exactly one root per plugin instance at a time.
    */
   private ensureRoot(): void {
-    if (!this.hook || this.rootId !== 0) {
+    if (!this.hook || this.registered) {
       return;
     }
 
+    this.registered = true;
     this.rootId = this.hook.registerRoot({
       snapshot: () => this.snapshot(),
       inspect: (instanceId, path) => this.inspect(instanceId, path),
@@ -116,12 +136,15 @@ export class DevToolsPlugin implements WirestatePlugin {
    * root, mount a fresh one) don't accumulate empty roots over a long dev session.
    */
   private releaseRoot(): void {
-    if (!this.hook || this.rootId === 0 || this.observed.size > 0) {
+    if (!this.hook || !this.registered || this.observed.size > 0) {
       return;
     }
 
     this.hook.deregisterRoot(this.rootId);
-    this.rootId = 0;
+
+    // The id is kept, so the deactivation deltas that `container.destroy()` still emits after this
+    // point stay tagged with the root they came from. A later provision registers a fresh id.
+    this.registered = false;
   }
 
   public onActivate(instance: object, container: Container): void {

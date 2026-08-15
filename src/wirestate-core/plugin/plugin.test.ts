@@ -567,6 +567,55 @@ describe("container plugins", () => {
     expect(log.slice(2).sort()).toEqual(["plugin:-First", "plugin:-PlainService", "plugin:-Second"]);
   });
 
+  it("still tears the cycle down after the last participant was unbound mid-cycle", () => {
+    const log: Array<string> = [];
+
+    @Injectable()
+    class PlainService {}
+
+    @Injectable()
+    class Participant {
+      @OnProvision()
+      public onProvision(): void {}
+    }
+
+    class BystanderPlugin implements WirestatePlugin {
+      public onProvision(instance: object, _container: Container, addDisposer: (dispose: () => void) => void): void {
+        log.push(`+${instance.constructor.name}`);
+        addDisposer(() => log.push(`unwire:${instance.constructor.name}`));
+      }
+
+      public onDeprovision(instance: object): void {
+        log.push(`-${instance.constructor.name}`);
+      }
+    }
+
+    const container: Container = new Container({
+      activate: [PlainService],
+      bindings: [PlainService, Participant],
+      plugins: [new BystanderPlugin()],
+    });
+
+    container.provision();
+
+    expect(log).toEqual(["+PlainService", "+Participant"]);
+
+    log.length = 0;
+
+    // Unbinding the only participant drops the tracked-instance entry, but the cycle still holds
+    // the non-participant the plugin wired.
+    container.unbind(Participant);
+
+    expect(log).toEqual(["-Participant", "unwire:Participant"]);
+
+    log.length = 0;
+    container.deprovision();
+
+    // The container is only leaving provider ownership now, and PlainService is still owed the
+    // `onDeprovision` that pairs with the `onProvision` it received.
+    expect(log).toEqual(["-PlainService", "unwire:PlainService"]);
+  });
+
   it("runs disposers parked on non-participant instances at deprovision", () => {
     const log: Array<string> = [];
 
