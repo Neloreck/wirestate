@@ -56,7 +56,16 @@ export interface WirestateVitePlugin {
   readonly apply: "serve";
   readonly enforce: "pre";
   configResolved(config: ViteResolvedConfigLike): void;
-  transform(code: string, id: string): Nullable<{ code: string; map: null }>;
+  transform(code: string, id: string, options?: ViteTransformOptionsLike): Nullable<{ code: string; map: null }>;
+}
+
+/**
+ * Structural subset of the per-transform options Vite passes.
+ *
+ * @group Vite
+ */
+interface ViteTransformOptionsLike {
+  readonly ssr?: boolean;
 }
 
 /**
@@ -105,10 +114,12 @@ export function wirestate(options: WirestateVitePluginOptions = {}): WirestateVi
     configResolved(config: ViteResolvedConfigLike): void {
       root = config.root;
     },
-    transform(code: string, id: string): Nullable<{ code: string; map: null }> {
+    transform(code: string, id: string, options?: ViteTransformOptionsLike): Nullable<{ code: string; map: null }> {
       const [file] = id.split("?", 1);
 
-      if (file.includes("/node_modules/") || !include.test(file) || exclude.test(file)) {
+      // Server modules are skipped: the footer wires a browser hot-update boundary, and there is
+      // no rendered tree on the server holding a container to swap.
+      if (options?.ssr || file.includes("/node_modules/") || !include.test(file) || exclude.test(file)) {
         return null;
       }
 

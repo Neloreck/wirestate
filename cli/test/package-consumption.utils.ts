@@ -26,6 +26,7 @@ interface CommandResultDescriptor {
 
 export const STAGED_PACKAGES: Array<StagedPackageDescriptor> = [
   { directory: "wirestate-core", name: "@wirestate/core" },
+  { directory: "wirestate-dev", name: "@wirestate/dev" },
   { directory: "wirestate-react", name: "@wirestate/react" },
   { directory: "wirestate-mobx", name: "@wirestate/mobx" },
   { directory: "wirestate-react-mobx", name: "@wirestate/react-mobx" },
@@ -39,6 +40,12 @@ export const STAGED_PACKAGES: Array<StagedPackageDescriptor> = [
 
 export const PACKAGE_CHECKS: Array<PackageCheckDescriptor> = [
   { exportName: "Container", name: "@wirestate/core" },
+  // Subpath entries: development tooling is loaded from config files and test runners, which
+  // are the places CommonJS is still the default.
+  { exportName: "DevToolsPlugin", name: "@wirestate/core/devtools" },
+  { exportName: "isHotSwapping", name: "@wirestate/core/hot" },
+  { exportName: "transformHotModule", name: "@wirestate/dev" },
+  { exportName: "wirestate", name: "@wirestate/dev/vite" },
   { exportName: "ContainerProvider", name: "@wirestate/react" },
   { exportName: "Action", name: "@wirestate/mobx" },
   { exportName: "observer", name: "@wirestate/react-mobx" },
