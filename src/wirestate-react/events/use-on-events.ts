@@ -73,28 +73,25 @@ export function useOnEvents(
     maybeHandler === undefined ? null : (typesOrHandler as EventType | ReadonlyArray<EventType>);
 
   const container: Container = useContainer();
-  const typesRef: RefObject<EventTypeSelector> = useRef(types);
+  const subscribedRef: RefObject<EventTypeSelector> = useRef(types);
   const handlerRef: RefObject<EventHandler> = useRef(handler);
 
-  // Keep a stable reference while membership is unchanged so inline type arrays do not resubscribe on every render.
-  const previous: EventTypeSelector = typesRef.current;
+  const previous: EventTypeSelector = subscribedRef.current;
   const isSame: boolean =
     previous === types ||
     (Array.isArray(previous) &&
       Array.isArray(types) &&
       shallowEqualArrays(previous as ReadonlyArray<EventType>, types as ReadonlyArray<EventType>));
 
-  if (!isSame) {
-    typesRef.current = types;
-  }
-
-  const subscribedTypes: EventTypeSelector = typesRef.current;
+  const subscribedTypes: EventTypeSelector = isSame ? previous : types;
 
   useIsomorphicLayoutEffect(() => {
     handlerRef.current = handler;
   });
 
   useIsomorphicLayoutEffect(() => {
+    subscribedRef.current = subscribedTypes;
+
     return container.get(EventBus).subscribe(subscribedTypes, (event) => handlerRef.current?.(event));
   }, [container, subscribedTypes]);
 }

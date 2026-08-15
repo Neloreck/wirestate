@@ -4,7 +4,7 @@
 
 import { render, cleanup, act } from "@testing-library/react";
 import { type WireEvent, Container, EventBus } from "@wirestate/core";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 
 import { ContainerProvider } from "../provision/container-provider";
 import { type Optional } from "../types/general";
@@ -234,6 +234,52 @@ describe("useOnEvents", () => {
 
       expect(handler).toHaveBeenCalledTimes(2);
       expect(handler).toHaveBeenLastCalledWith({ type: "C" });
+    });
+
+    it("should not resubscribe because of a render React discarded", () => {
+      const container: Container = new Container({ bindings: [EventBus] });
+      const bus: EventBus = container.get(EventBus);
+      const handler = jest.fn();
+      const subscribe = jest.spyOn(bus, "subscribe");
+
+      // A render-phase state update makes React throw the first attempt away and re-run the
+      // component. Refs live on the fiber and survive that, so a hook writing one while rendering
+      // carries the discarded attempt's value into the next committed render.
+      function TestComponent({ types, phase }: { types: ReadonlyArray<string>; phase: number }) {
+        const [rendered, setRendered] = useState(phase);
+
+        if (rendered !== phase) {
+          setRendered(phase);
+        }
+
+        useOnEvents(rendered === phase ? types : ["DISCARDED"], handler);
+
+        return null;
+      }
+
+      const { rerender } = render(
+        <ContainerProvider container={container}>
+          <TestComponent phase={0} types={["A"]} />
+        </ContainerProvider>
+      );
+
+      expect(subscribe).toHaveBeenCalledTimes(1);
+
+      // Same membership, fresh array identity: the subscription must be reused even though the
+      // discarded attempt in between rendered a different type list.
+      rerender(
+        <ContainerProvider container={container}>
+          <TestComponent phase={1} types={["A"]} />
+        </ContainerProvider>
+      );
+
+      expect(subscribe).toHaveBeenCalledTimes(1);
+
+      act(() => bus.emit("A"));
+
+      expect(handler).toHaveBeenCalledTimes(1);
+
+      subscribe.mockRestore();
     });
 
     it("should distinguish symbol event types that share a description", () => {
