@@ -25,7 +25,8 @@ export {
   type ValueBindingDescriptor,
 } from "./binding/binding";
 export { BindingScope, BindingType } from "./binding/binding";
-export { InjectionToken } from "./binding/binding-tokens";
+export { getBindingScope, getBindingType } from "./binding/binding-lifecycle";
+export { InjectionToken, getBindingToken } from "./binding/binding-tokens";
 
 export { type ContainerConfig } from "./container/container";
 export { Container } from "./container/container";

@@ -1,6 +1,4 @@
-﻿import { type Newable } from "../types/general";
-
-import { type BindingDescriptor, type ServiceToken } from "./binding";
+﻿import { type Binding, type ServiceToken } from "./binding";
 
 /**
  * Typed reference token for dependencies stored in a container.
@@ -77,15 +75,31 @@ export function tokenToString<T>(token: ServiceToken<T>): string {
 }
 
 /**
- * Returns the token for a binding.
+ * Returns the token a binding resolves under.
  *
- * @internal
+ * @remarks
+ * A bare service class is its own token, and a descriptor carries an explicit one.
+ * Use it when working with the {@link Binding} union, such as the entries of
+ * `ContainerConfig.bindings`, instead of narrowing the union at each call site.
  *
- * @template T - Injectable type.
+ * @group Bind
  *
- * @param binding - Service class or descriptor.
+ * @param binding - Service class or descriptor to inspect.
  * @returns Token used for container resolution.
+ *
+ * @example
+ * ```typescript
+ * import { getBindingToken, Injectable, InjectionToken } from "@wirestate/core";
+ *
+ * @Injectable()
+ * class LoggerService {}
+ *
+ * const API_URL = new InjectionToken<string>("API_URL");
+ *
+ * getBindingToken(LoggerService); // LoggerService
+ * getBindingToken({ token: API_URL, value: "https://api.example.com" }); // API_URL
+ * ```
  */
-export function getBindingToken<T extends object = object>(binding: Newable<T> | BindingDescriptor): ServiceToken {
+export function getBindingToken(binding: Binding): ServiceToken {
   return typeof binding === "function" ? binding : binding.token;
 }

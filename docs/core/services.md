@@ -371,6 +371,27 @@ The `value` constructor must be decorated with `@Injectable()` and must produce 
 Singleton instance bindings are cached, owned by the container, and participate in Wirestate lifecycle and messaging.
 Use `scope: BindingScope.Transient` only for plain injectable classes without lifecycle or messaging decorators.
 
+### Inspect Bindings
+
+`getBindingToken`, `getBindingType`, and `getBindingScope` read a binding without repeating its defaulting rules: a
+bare class is its own token and binds as a singleton instance, `type` is optional on value and factory descriptors, and
+`scope` is absent on value descriptors. Use them in adapters, plugins, and tooling that receive bindings and need the
+token, kind, or scope.
+
+```ts
+import { BindingType, getBindingScope, getBindingToken, getBindingType, Injectable } from "@wirestate/core";
+
+@Injectable()
+class UserService {}
+
+getBindingToken(UserService); // UserService
+getBindingType(UserService); // "Instance"
+getBindingScope(UserService); // "Singleton"
+
+getBindingType({ token: "API_URL", value: "https://api.example.com" }); // "Value"
+getBindingScope({ token: "API_CLIENT", type: BindingType.Factory, factory: () => createClient() }); // "Singleton"
+```
+
 ## Remove Services
 
 Use `container.unbind` when removing one binding. Use `container.unbindAll` when disposing the whole container.
@@ -398,4 +419,7 @@ create a new one for future work.
 [`QueryBus`](/api/wirestate-core/classes/QueryBus), [`EventsPlugin`](/api/wirestate-core/classes/EventsPlugin),
 [`CommandsPlugin`](/api/wirestate-core/classes/CommandsPlugin),
 [`QueriesPlugin`](/api/wirestate-core/classes/QueriesPlugin),
-[`BindingDescriptor`](/api/wirestate-core/type-aliases/BindingDescriptor).
+[`BindingDescriptor`](/api/wirestate-core/type-aliases/BindingDescriptor),
+[`getBindingToken`](/api/wirestate-core/functions/getBindingToken),
+[`getBindingType`](/api/wirestate-core/functions/getBindingType),
+[`getBindingScope`](/api/wirestate-core/functions/getBindingScope).
