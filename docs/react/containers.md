@@ -104,6 +104,70 @@ The same ownership rule applies during development: because the provider does no
 hot-swap one either. Prefer a managed `config` for containers holding services you edit often, or register the container
 as its own [hot-swap owner](/core/hot-reload#owning-the-swap).
 
+## Provision Timing
+
+`ContainerProvider` provisions its container in a layout effect. Handlers declared with `@OnEvent`, `@OnCommand`, and
+`@OnQuery` are registered at provision, and React runs a parent's layout effect before any descendant's `useEffect`, so
+a component can send from its mount effect.
+
+```tsx
+function CheckoutSummaryBadge() {
+  const queryBus = useInjection(QueryBus);
+  const [summary, setSummary] = useState<CheckoutSummary>({ itemCount: 0 });
+
+  useEffect(() => {
+    // Handlers are already registered by the time this runs.
+    setSummary(queryBus.query<CheckoutSummary>("CHECKOUT_SUMMARY"));
+  }, [queryBus]);
+
+  return <span>{summary.itemCount} items</span>;
+}
+```
+
+Provision runs before the browser paints, so keep `@OnProvision` to starting work rather than doing it.
+
+Three ordering limits remain, all because React commits effects child-first:
+
+- A descendant's own `useLayoutEffect` runs before the provider provisions. Send from `useEffect` instead.
+- A nested `ContainerProvider` provisions its container before the outer one, so a child container's `@OnProvision`
+  cannot reach a handler owned by a service in a parent container.
+- On unmount the container deprovisions before a descendant's `useEffect` cleanup, so a component cannot send from its
+  cleanup. Use `@OnDeprovision` on a service, which runs while the buses are still live.
+
+## Hidden and Revealed Subtrees
+
+A managed container is destroyed shortly after its provider unmounts. React features that unmount effects and later
+re-run them on the same component, such as `<Activity mode="hidden">`, can stay hidden past that point. Revealing the
+subtree then provisions a container that no longer exists, and the render throws:
+
+```text
+Container was destroyed and cannot be used again. Create a new container instead.
+```
+
+Use an external `container` for a provider that can be hidden and revealed. The provider deprovisions an external
+container when the subtree hides and provisions it again when it returns, and never destroys it, so services keep their
+state across the cycle.
+
+```tsx
+import { Container } from "@wirestate/core";
+import { ContainerProvider } from "@wirestate/react";
+import { Activity, useMemo } from "react";
+
+function Panel({ visible }: { visible: boolean }) {
+  const container = useMemo(() => new Container({ bindings: [CounterService] }), []);
+
+  return (
+    <Activity mode={visible ? "visible" : "hidden"}>
+      <ContainerProvider container={container}>
+        <Counter />
+      </ContainerProvider>
+    </Activity>
+  );
+}
+```
+
+Disposal stays with the code that created the container. Call `container.destroy()` when the owner is finished with it.
+
 ## SSR and Hydration
 
 To hydrate a managed container with server-serialized state, fold that state into `bindings` as a value binding, exactly

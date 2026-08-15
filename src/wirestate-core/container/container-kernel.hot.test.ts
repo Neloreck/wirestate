@@ -36,6 +36,7 @@ const INTERNAL_METHODS: ReadonlyArray<string> = [
   "deactivate",
   "deactivateRecord",
   "evict",
+  "findDestroyedAncestor",
   "hasBinding",
   "hasConstructedBinding",
   "getHotBinding",

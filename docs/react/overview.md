@@ -71,10 +71,11 @@ service state changes.
 
 ## Provider Lifecycle
 
-`ContainerProvider` provisions containers from a React effect. In React Strict Mode, React may create a managed
-container, discard it, then continue with another one. Put provider-owned work in `@OnProvision`, and clean it up in
-`@OnDeprovision`. The core [lifecycle map](/core/lifecycle) shows where React mount, unmount, activation, and disposal
-fit together.
+`ContainerProvider` provisions its container in a layout effect, before any descendant's `useEffect`, so components can
+send messages from their mount effects. See [Provision Timing](/react/containers#provision-timing) for the ordering
+guarantee and its limits. In React Strict Mode, React may create a managed container, discard it, then continue with
+another one. Put provider-owned work in `@OnProvision`, and clean it up in `@OnDeprovision`. The core
+[lifecycle map](/core/lifecycle) shows where React mount, unmount, activation, and disposal fit together.
 
 ## React Package Surface
 

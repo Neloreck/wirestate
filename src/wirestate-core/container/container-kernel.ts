@@ -245,7 +245,16 @@ export class ContainerKernel {
       return undefined;
     }
 
-    throw new WirestateError(`No binding(s) found for '${tokenToString(token)}'.`, ERROR_CODE_NO_BINDING_FOUND);
+    // If cannot find and have destroyed parent, surface the guess because it may be not as obvious otherwise.
+    if (this.findDestroyedAncestor()) {
+      throw new WirestateError(
+        `No binding(s) found for '${tokenToString(token)}': a parent container was destroyed, so the bindings it ` +
+          `provided are gone. Destroy a container only once nothing resolves through it.`,
+        ERROR_CODE_CONTAINER_DESTROYED
+      );
+    } else {
+      throw new WirestateError(`No binding(s) found for '${tokenToString(token)}'.`, ERROR_CODE_NO_BINDING_FOUND);
+    }
   }
 
   /**
@@ -506,6 +515,30 @@ export class ContainerKernel {
     const binding = this.bindings.get(token);
 
     return binding !== undefined && this.instances.has(binding);
+  }
+
+  /**
+   * Returns the nearest destroyed ancestor, if the parent chain holds one.
+   *
+   * @remarks
+   * Containers keep no child pointers by design, so `destroy` cannot cascade downwards. A
+   * descendant therefore stays live over a destroyed ancestor and only notices when a lookup that
+   * used to resolve through it misses.
+   *
+   * @returns The nearest destroyed ancestor, or `undefined` when the chain is intact.
+   */
+  private findDestroyedAncestor(): Optional<ContainerKernel> {
+    let current: Optional<ContainerKernel> = this.parent;
+
+    while (current) {
+      if (current.destroyed) {
+        return current;
+      }
+
+      current = current.parent;
+    }
+
+    return undefined;
   }
 
   /**

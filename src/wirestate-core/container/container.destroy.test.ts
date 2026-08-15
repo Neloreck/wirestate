@@ -117,6 +117,33 @@ describe("Container reset and destroy", () => {
       expect(parent.get(EventBus)).toBeInstanceOf(EventBus);
     });
 
+    it("should explain a miss caused by a destroyed ancestor", () => {
+      @Injectable()
+      class ParentService {}
+
+      @Injectable()
+      class ChildService {}
+
+      const parent: Container = new Container({ bindings: [ParentService], plugins: [new EventsPlugin()] });
+      const child: Container = new Container({ parent, bindings: [ChildService] });
+
+      child.get(ChildService);
+      parent.destroy();
+
+      expect(child.get(EventBus, { optional: true })).toBeUndefined();
+
+      // Destroy cannot cascade, since containers keep no child pointers, so the child stays live
+      // and only notices through lookups that used to resolve upwards. Reporting a plain miss
+      // there names the token instead of the reason.
+      expect(() => child.get(EventBus)).toThrow("a parent container was destroyed");
+      expect(() => child.get(ParentService)).toThrow("a parent container was destroyed");
+      expect(() => child.get(EventBus)).toThrow(expect.objectContaining({ code: ERROR_CODE_CONTAINER_DESTROYED }));
+
+      // The child's own scope is unaffected.
+      expect(child.get(ChildService)).toBeInstanceOf(ChildService);
+      expect(child.has(EventBus)).toBe(false);
+    });
+
     it("should keep a reset child resolving its own scope rather than its parent's", () => {
       const parent: Container = new Container({ plugins: [new EventsPlugin()] });
       const child: Container = new Container({ parent, plugins: [new EventsPlugin()] });
