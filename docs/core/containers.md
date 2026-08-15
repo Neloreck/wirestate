@@ -187,15 +187,43 @@ is a no-op.
 
 ## Removing Bindings
 
-Use `container.unbind()` when removing one binding. Use `container.unbindAll()` when disposing a container completely.
+Use `container.unbind()` to remove one binding, and `container.unbindAll()` to remove every binding you registered.
 
 ```ts
 container.unbind(UserService);
-child.unbindAll();
 ```
 
 The container deactivates removed singleton services. If a provider owns the service, `@OnDeprovision` runs before
-service deactivation. After `unbindAll()`, discard the container.
+service deactivation.
+
+`unbindAll()` is a reset, not a disposal. It removes the bindings you registered and deactivates the services they
+created, but keeps the bindings the container owns, so `inject(Container)` and any bus a plugin installed keep
+resolving. The container stays usable:
+
+```ts
+container.unbindAll();
+container.bind(UserService);
+container.provision();
+```
+
+A bus you bind yourself counts as a binding you registered, so a reset removes it. Register the matching plugin instead
+when the bus should survive.
+
+## Destroying a Container
+
+`container.destroy()` deprovisions the container, deactivates every service, and removes the container's own bindings
+as well. Use it when the container is finished.
+
+```ts
+container.destroy();
+```
+
+A destroyed container is closed for good. `get()`, `bind()`, `unbind()`, `unbindAll()`, and `provision()` throw
+`CORE_CONTAINER_DESTROYED`. `get(token, { optional: true })` throws as well, because a closed container is a mistake
+rather than a missing binding.
+
+Inspection stays available, so teardown code can still read a closed container: `has()`, `hasOwn()`,
+`getOwnBindings()`, and `getActiveInstances()` do not throw. `deprovision()` and `destroy()` are safe to call again.
 
 ## API Reference
 

@@ -80,7 +80,7 @@ function performHotSwap(state: HotState): void {
     // Teardown deepest-first: a child's handlers may still resolve through its parent.
     for (let index = affected.length - 1; index >= 0; index--) {
       affected[index].container.deprovision();
-      affected[index].container.unbindAll();
+      affected[index].container.destroy();
     }
 
     // Rebuild root-first, threading swapped parents into child configs. Provisioning is

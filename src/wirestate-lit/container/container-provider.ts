@@ -247,6 +247,6 @@ export class ContainerProvider<E extends ReactiveControllerHost & HTMLElement = 
 
     this.container = null;
 
-    container.unbindAll();
+    container.destroy();
   }
 }

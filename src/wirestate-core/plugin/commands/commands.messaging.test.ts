@@ -202,6 +202,13 @@ describe("core command messaging integration", () => {
     expect(await commandResult).toBe("command-result");
     expect(logs).toEqual(["settings:cleanup-label", "command"]);
     expect(container.has(CleanupService)).toBe(false);
+
+    // The bus is plugin infrastructure, not a caller binding, so a reset keeps it and the
+    // container stays usable for a fresh set of services.
+    expect(container.has(CommandBus)).toBe(true);
+
+    container.destroy();
+
     expect(container.has(CommandBus)).toBe(false);
   });
 

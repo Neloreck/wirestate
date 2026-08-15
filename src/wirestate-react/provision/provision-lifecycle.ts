@@ -57,7 +57,7 @@ export function scheduleContainerDestruction(
     container,
     setTimeout(() => {
       pendingDestruction.delete(container);
-      container.unbindAll();
+      container.destroy();
     }, 0)
   );
 }

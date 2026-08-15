@@ -49,7 +49,7 @@ describe("CounterView", () => {
 
   afterEach(() => {
     host.remove();
-    container.unbindAll();
+    container.destroy();
   });
 
   test("injects from the test container", () => {
@@ -65,7 +65,7 @@ describe("CounterView", () => {
 Append elements under the host so they can consume the provided context.
 
 When tests pass an external container to `ContainerProvider`, the provider deprovisions it on host removal but does not
-dispose it. The test that created the container should call `container.unbindAll()`.
+close it. The test that created the container should call `container.destroy()`.
 
 ## API Reference
 

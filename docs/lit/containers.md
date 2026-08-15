@@ -24,8 +24,7 @@ export class ApplicationRoot extends LitElement {
 ```
 
 Managed containers are created when the host connects and torn down when it disconnects. Teardown deprovisions the
-container, then releases its bindings with `unbindAll`. They activate all bindings by default unless `activate` is
-provided.
+container, then closes it with `destroy`. They activate all bindings by default unless `activate` is provided.
 
 Before the host connects, and after it disconnects, no container value is published from that provider.
 
@@ -85,7 +84,7 @@ reconnects it. An **external** container (`container`) is owned by whoever creat
 only deprovisions it on disconnect and reprovisions it on reconnect, via the deprovision/provision cycle. So an element
 that moves in the DOM and must keep its container's state and singletons needs an **external** container. Note that
 `@OnDeactivation` never runs for an external container that is merely garbage-collected - if the owner relies on
-deactivation hooks, it must call `container.unbindAll()` explicitly.
+deactivation hooks, it must call `container.destroy()` explicitly.
 
 ```ts
 import { Container } from "@wirestate/core";

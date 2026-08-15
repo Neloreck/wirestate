@@ -20,6 +20,7 @@ const TOKEN_ACCEPTING_METHODS: ReadonlyArray<string> = ["bind", "get", "has", "h
 const TOKEN_FREE_METHODS: ReadonlyArray<string> = [
   "constructor",
   "deprovision",
+  "destroy",
   "getActiveInstances",
   "getOwnBindings",
   "provision",
@@ -30,6 +31,7 @@ const TOKEN_FREE_METHODS: ReadonlyArray<string> = [
  * Internals reached only through the methods above, which receive already-rewritten tokens.
  */
 const INTERNAL_METHODS: ReadonlyArray<string> = [
+  "assertUsable",
   "commit",
   "deactivate",
   "deactivateRecord",
@@ -39,6 +41,7 @@ const INTERNAL_METHODS: ReadonlyArray<string> = [
   "getHotBinding",
   "getHotToken",
   "resolve",
+  "retainBinding",
 ];
 
 describe("ContainerKernel hot-reload token rewriting", () => {

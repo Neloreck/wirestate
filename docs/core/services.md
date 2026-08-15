@@ -394,16 +394,22 @@ getBindingScope({ token: "API_CLIENT", type: BindingType.Factory, factory: () =>
 
 ## Remove Services
 
-Use `container.unbind` when removing one binding. Use `container.unbindAll` when disposing the whole container.
+Use `container.unbind` to remove one binding, `container.unbindAll` to remove every binding you registered, and
+`container.destroy` when the container is finished.
 
 ```ts
 container.unbind(UserService);
 container.unbindAll();
+container.destroy();
 ```
 
 The container deactivates removed services and keeps provider lifecycle state in sync. If a provider owns a service
-when it is removed, `@OnDeprovision` runs before `@OnDeactivation`. After `unbindAll`, discard the container and
-create a new one for future work.
+when it is removed, `@OnDeprovision` runs before `@OnDeactivation`.
+
+`unbindAll` is a reset: the bindings the container owns, such as its own `Container` handle and any bus a plugin
+installed, survive, so the container can be re-populated and re-provisioned. `destroy` removes those too and closes the
+container, after which resolving from it or binding to it throws `CORE_CONTAINER_DESTROYED`. See
+[Core Containers](/core/containers#destroying-a-container) for the full teardown rules.
 
 ## API Reference
 

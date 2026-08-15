@@ -150,7 +150,10 @@ export class Container extends ContainerKernel {
       setContainerPlugins(this, config.plugins);
     }
 
+    // The container's own handle on itself: infrastructure, so `unbindAll` keeps it. Without that a reset child would
+    // answer `inject(Container)` with its parent - the wrong scope, silently.
     this.bind({ token: Container, value: this });
+    this.retainBinding(Container);
 
     if (config.bindings) {
       for (const binding of config.bindings) {
@@ -158,8 +161,18 @@ export class Container extends ContainerKernel {
       }
     }
 
+    const userTokens: ReadonlySet<ServiceToken> = new Set(this.getOwnBindings().map(getBindingToken));
+
     // Plugins contribute their bindings after user bindings are registered, before anything activates.
     installOwnPlugins(this);
+
+    // Whatever a plugin's `install` added belongs to the container, not the caller, so a reset
+    // keeps it: `install` runs once at registration and never again.
+    for (const binding of this.getOwnBindings()) {
+      if (!userTokens.has(binding.token)) {
+        this.retainBinding(binding.token);
+      }
+    }
 
     const activate: ReadonlyArray<ServiceToken> =
       (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
@@ -230,6 +243,10 @@ export class Container extends ContainerKernel {
    * @throws {@link WirestateError} If the container is already provisioned.
    */
   public provision(): this {
+    // A destroyed container has no bindings left, so provisioning it would quietly succeed and
+    // hand the provider a container that resolves nothing.
+    this.assertUsable();
+
     provisionContainer(this);
 
     return this;
@@ -271,17 +288,52 @@ export class Container extends ContainerKernel {
   }
 
   /**
-   * Unbinds every local binding and deactivates this container's instances.
+   * Resets the container: unbinds every binding registered by the caller and deactivates the
+   * instances they created.
    *
    * @remarks
-   * Provider lifecycle instances are deprovisioned before they deactivate.
-   * Parent bindings and parent instances are not changed.
+   * The container survives and can be re-populated and re-provisioned. Its own infrastructure
+   * stays bound - the `Container` self-binding and every binding a plugin's `install`
+   * contributed - so `inject(Container)` and the message buses keep resolving. Provider
+   * lifecycle instances are deprovisioned before they deactivate. Parent bindings and parent
+   * instances are not changed.
+   *
+   * Use {@link destroy} to tear the container down for good.
    *
    * @returns The same container for chaining.
+   *
+   * @throws {@link WirestateError} If the container was destroyed.
    */
   public override unbindAll(): this {
     deprovisionContainer(this);
 
     return super.unbindAll();
+  }
+
+  /**
+   * Tears the container down for good: deprovisions it, then deactivates every instance it
+   * created, its own infrastructure included.
+   *
+   * @remarks
+   * Terminal, unlike {@link unbindAll}: a destroyed container throws on any later `bind`,
+   * `unbind`, `unbindAll`, `provision`, or `get`, `{ optional: true }` included. Inspection
+   * still works - `has`, `hasOwn`, `getOwnBindings`, and `getActiveInstances` do not throw.
+   * Call it when a provider unmounts or a test ends and the container will never be used again.
+   * Idempotent, and it deprovisions first, so teardown paths can call it on its own.
+   *
+   * @returns The same container for chaining.
+   *
+   * @example
+   * ```typescript
+   * const container: Container = new Container({ bindings: [CounterService] });
+   *
+   * container.provision();
+   * container.destroy();
+   * ```
+   */
+  public override destroy(): this {
+    deprovisionContainer(this);
+
+    return super.destroy();
   }
 }

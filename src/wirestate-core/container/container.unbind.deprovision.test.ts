@@ -45,7 +45,17 @@ describe("container unbind deprovision", () => {
 
     expect(container.hasOwn(LifecycleService)).toBe(false);
     expect(container.hasOwn("CONFIG")).toBe(false);
+
+    // A reset drops what the caller registered and keeps what the container owns, so it stays
+    // usable: only the self-binding survives here.
+    expect(container.getOwnBindings()).toEqual([{ token: Container, value: container }]);
+    expect(container.get(Container)).toBe(container);
+
+    // Destroying takes the infrastructure with it and closes the container for good.
+    container.destroy();
+
     expect(container.getOwnBindings()).toEqual([]);
+    expect(() => container.get(Container)).toThrow("Container was destroyed");
   });
 
   it("should deprovision owned provider lifecycle services before unbinding", () => {

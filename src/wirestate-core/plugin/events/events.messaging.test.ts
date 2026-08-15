@@ -174,6 +174,13 @@ describe("core event messaging integration", () => {
 
     expect(logs).toEqual(["settings:cleanup-label", "event:cleanup"]);
     expect(container.has(CleanupService)).toBe(false);
+
+    // The bus is plugin infrastructure, not a caller binding, so a reset keeps it and the
+    // container stays usable for a fresh set of services.
+    expect(container.has(EventBus)).toBe(true);
+
+    container.destroy();
+
     expect(container.has(EventBus)).toBe(false);
   });
 

@@ -43,8 +43,8 @@ test("increments count", () => {
 `new Container(...)` binds a group of services. Use `activate` when activation behavior needs to run before assertions.
 Call `container.provision()` whenever the behavior under test relies on messaging: auto-wired `@OnEvent`, `@OnCommand`,
 and `@OnQuery` handlers subscribe at provision and unsubscribe at deprovision, so without a UI provider a plain-core test
-must provision the container first. Tear down with `container.deprovision()` (or `container.unbindAll()`, which
-deprovisions first).
+must provision the container first. Tear down with `container.deprovision()` when the container is reused, or
+`container.destroy()` when the test is finished with it. `destroy()` deprovisions first, so it can be called on its own.
 
 ```ts
 import { Container, EventBus, EventsPlugin } from "@wirestate/core";

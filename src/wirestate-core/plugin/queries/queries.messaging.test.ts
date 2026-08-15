@@ -186,6 +186,13 @@ describe("core query messaging integration", () => {
 
     expect(logs).toEqual(["settings:cleanup-label", "query", "query-result:query-result"]);
     expect(container.has(CleanupService)).toBe(false);
+
+    // The bus is plugin infrastructure, not a caller binding, so a reset keeps it and the
+    // container stays usable for a fresh set of services.
+    expect(container.has(QueryBus)).toBe(true);
+
+    container.destroy();
+
     expect(container.has(QueryBus)).toBe(false);
   });
 

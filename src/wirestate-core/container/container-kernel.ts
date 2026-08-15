@@ -4,7 +4,7 @@ import { isInstanceDescriptor } from "../binding/binding-guards";
 import { getBindingScope } from "../binding/binding-lifecycle";
 import { tokenToString } from "../binding/binding-tokens";
 import { validateBinding } from "../binding/binding-validation";
-import { ERROR_CODE_NO_BINDING_FOUND } from "../error/error-code";
+import { ERROR_CODE_CONTAINER_DESTROYED, ERROR_CODE_NO_BINDING_FOUND } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { getLatestHotClass } from "../hot/hot-registry";
 import { remapHotBinding } from "../hot/hot-remap";
@@ -32,10 +32,21 @@ export class ContainerKernel {
    */
   public readonly parent?: ContainerKernel;
 
+  /**
+   * Tokens the container owns rather than the caller, so `unbindAll` keeps them.
+   *
+   * @remarks
+   * A bare kernel retains nothing. {@link Container} marks its own self-binding and every
+   * binding a plugin's `install` contributed.
+   */
+  private readonly retained: Set<ServiceToken> = new Set();
+
   private readonly bindings: BindingMap = new Map();
   private readonly instances: InstanceMap = new Map();
   private readonly activated: Array<ActivationRecord> = [];
   private readonly factory: Factory;
+
+  private destroyed: boolean = false;
 
   public constructor(parent?: ContainerKernel) {
     this.parent = parent;
@@ -58,6 +69,8 @@ export class ContainerKernel {
    * binding already constructed values.
    */
   public bind<T>(binding: Newable<object> | BindingDescriptor<T>): this {
+    this.assertUsable();
+
     binding = this.getHotBinding(binding);
 
     const descriptor: BindingDescriptor<T> =
@@ -80,6 +93,8 @@ export class ContainerKernel {
    * @returns The same container for chaining.
    */
   public unbind<T>(token: ServiceToken<T>): this {
+    this.assertUsable();
+
     token = this.getHotToken(token);
 
     this.deactivate(token);
@@ -96,14 +111,69 @@ export class ContainerKernel {
   }
 
   /**
-   * Unbinds all bindings, deactivating container-owned values in reverse creation
-   * order, so a dependent's `@OnDeactivation` runs before its dependencies tear down.
-   * Bindings stay resolvable until every deactivation handler has run, so
-   * deactivating services can still talk to each other.
+   * Resets the container by unbinding every caller-registered binding, deactivating the values
+   * they constructed in reverse creation order, so a dependent's `@OnDeactivation` runs before
+   * its dependencies tear down. Bindings stay resolvable until every deactivation handler has
+   * run, so deactivating services can still talk to each other.
+   *
+   * @remarks
+   * The container stays usable: bindings it owns rather than the caller survive, so
+   * `inject(Container)` and any bus a plugin installed keep resolving and the container can be
+   * re-populated and re-provisioned. A bare {@link ContainerKernel} owns nothing, so every
+   * binding is removed. Use {@link destroy} to tear the container down for good.
+   *
+   * @returns The same container for chaining.
+   *
+   * @throws {@link WirestateError} If the container was destroyed.
+   */
+  public unbindAll(): this {
+    this.assertUsable();
+
+    const kept: Array<ActivationRecord> = [];
+    const dropped: Array<ActivationRecord> = [];
+
+    for (const record of this.activated) {
+      (this.retained.has(record.token) ? kept : dropped).push(record);
+    }
+
+    for (let index: number = dropped.length - 1; index >= 0; index -= 1) {
+      this.deactivateRecord(dropped[index]);
+    }
+
+    this.activated.length = 0;
+    this.activated.push(...kept);
+
+    for (const [token, binding] of [...this.bindings]) {
+      if (!this.retained.has(token)) {
+        this.bindings.delete(token);
+        this.instances.delete(binding);
+      }
+    }
+
+    return this;
+  }
+
+  /**
+   * Tears the container down for good, deactivating every value it constructed - retained
+   * bindings included - in reverse creation order.
+   *
+   * @remarks
+   * Terminal, unlike {@link unbindAll}: a destroyed container throws on `bind`, `unbind`,
+   * `unbindAll`, and every `get`, including `{ optional: true }`. Enforcing that is the point -
+   * a destroyed container that still answered lookups would resolve its parent's bindings and
+   * hand callers the wrong scope.
+   *
+   * Inspection stays available so teardown code can still read the container: `has`, `hasOwn`,
+   * `getOwnBindings`, and `getActiveInstances` do not throw, and `has` reports `false` rather
+   * than an ancestor's binding. Idempotent, so teardown paths can call it freely.
    *
    * @returns The same container for chaining.
    */
-  public unbindAll(): this {
+  public destroy(): this {
+    if (this.destroyed) {
+      return this;
+    }
+
     for (const record of [...this.activated].reverse()) {
       this.deactivateRecord(record);
     }
@@ -111,6 +181,9 @@ export class ContainerKernel {
     this.activated.length = 0;
     this.bindings.clear();
     this.instances.clear();
+    this.retained.clear();
+
+    this.destroyed = true;
 
     return this;
   }
@@ -142,6 +215,8 @@ export class ContainerKernel {
     token: ServiceToken<T>,
     options?: { optional?: boolean; lazy?: boolean }
   ): Optional<T> | (() => Optional<T>) {
+    this.assertUsable();
+
     if (options?.lazy) {
       return () => this.get(token, { ...options, lazy: false });
     }
@@ -205,6 +280,12 @@ export class ContainerKernel {
    * @returns Whether the token is bound on this container or an ancestor.
    */
   private hasBinding<T>(token: ServiceToken<T>): boolean {
+    // A destroyed container resolves nothing, so it must not report an ancestor's binding as its
+    // own answer. Introspection stays non-throwing, unlike `get`, so teardown code can still ask.
+    if (this.destroyed) {
+      return false;
+    }
+
     return this.bindings.has(token) || (this.parent?.hasBinding(token) ?? false);
   }
 
@@ -388,6 +469,21 @@ export class ContainerKernel {
   }
 
   /**
+   * Marks a token as container-owned, so {@link unbindAll} keeps its binding and instance.
+   *
+   * @remarks
+   * For composition roots to declare the infrastructure a reset must not take away. Only
+   * {@link destroy} removes a retained binding.
+   *
+   * @internal
+   *
+   * @param token - Token the container owns.
+   */
+  protected retainBinding(token: ServiceToken): void {
+    this.retained.add(token);
+  }
+
+  /**
    * Deactivates one container-owned value.
    * Instance bindings run the installed activation adapter's cleanup.
    * Other binding kinds are dropped from the active record map.
@@ -410,5 +506,25 @@ export class ContainerKernel {
     const binding = this.bindings.get(token);
 
     return binding !== undefined && this.instances.has(binding);
+  }
+
+  /**
+   * Throws when the container was destroyed.
+   *
+   * @remarks
+   * A destroyed container is a precondition failure rather than a structural miss, so this
+   * throws for `{ optional: true }` lookups too - the same rule `inject()` applies outside an
+   * injection context. Without it a destroyed child would silently resolve its parent's
+   * bindings, handing callers the wrong scope.
+   *
+   * @throws {@link WirestateError} If the container was destroyed.
+   */
+  protected assertUsable(): void {
+    if (this.destroyed) {
+      throw new WirestateError(
+        "Container was destroyed and cannot be used again. Create a new container instead.",
+        ERROR_CODE_CONTAINER_DESTROYED
+      );
+    }
   }
 }

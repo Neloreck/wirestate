@@ -71,9 +71,9 @@ in `@OnProvision`, such as timers, subscriptions, and sockets. Clean it up in `@
 cheap setup that does not need cleanup. The core [lifecycle map](/core/lifecycle) shows where Lit connect, disconnect,
 activation, and disposal fit together.
 
-Managed providers create a container on connect, provision it, then on disconnect deprovision it and release its
-bindings with `unbindAll` (there is no `Container.dispose()`). External providers provision and deprovision the
-container they were given, but releasing its bindings stays with the owner that created it.
+Managed providers create a container on connect, provision it, then on disconnect deprovision it and close it with
+`destroy`. External providers provision and deprovision the container they were given, but tearing it down stays with
+the owner that created it.
 
 Injection and element handler helpers follow the nearest container context by default. When a provider replaces its
 container, consumers move to the new container and handlers re-register on the new bus.
