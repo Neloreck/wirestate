@@ -435,8 +435,8 @@ export function deprovisionInstances(
     dispatchPluginDeprovision(container, instance);
   }
 
-  for (const instance of instances) {
-    unsubscribeInstance(state, instance);
+  for (let index: number = instances.length - 1; index >= 0; index -= 1) {
+    unsubscribeInstance(state, instances[index]);
   }
 }
 
@@ -582,8 +582,10 @@ function appendDisposer(state: ProvisionState, instance: object, dispose: () => 
  * @param state - Provider lifecycle state holding the cycle's disposers.
  */
 function clearRemainingDisposers(state: ProvisionState): void {
-  for (const instance of [...state.cycleByInstance.keys()]) {
-    unsubscribeInstance(state, instance);
+  const instances: ReadonlyArray<object> = [...state.cycleByInstance.keys()];
+
+  for (let index: number = instances.length - 1; index >= 0; index -= 1) {
+    unsubscribeInstance(state, instances[index]);
   }
 }
 

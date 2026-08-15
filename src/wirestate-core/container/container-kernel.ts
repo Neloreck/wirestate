@@ -368,7 +368,12 @@ export class ContainerKernel {
   }
 
   /**
-   * Deactivates all container-owned values of a token in creation order.
+   * Deactivates the container-owned value of a token.
+   *
+   * @remarks
+   * A token holds at most one activation record - `commit` is guarded by the instance cache, and
+   * `bind` rejects rebinding a token whose binding already constructed - so this needs no teardown
+   * ordering of its own. Ordering across several instances belongs to {@link unbindAll}.
    *
    * @param token - Token to deactivate.
    */

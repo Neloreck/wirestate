@@ -257,7 +257,115 @@ describe("container plugins", () => {
 
     log.length = 0;
     container.deprovision();
-    expect(log).toEqual(["unwire:First", "unwire:Second"]);
+
+    // Wired First then Second, so teardown unwinds them in the opposite direction.
+    expect(log).toEqual(["unwire:Second", "unwire:First"]);
+  });
+
+  it("unwinds every teardown phase in reverse across instances and disposers", () => {
+    const log: Array<string> = [];
+
+    @Injectable()
+    class First {
+      @OnDeprovision()
+      public onDeprovision(): void {
+        log.push("user:First");
+      }
+
+      @OnDeactivation()
+      public onDeactivation(): void {
+        log.push("deactivate:First");
+      }
+    }
+
+    @Injectable()
+    class Second {
+      @OnDeprovision()
+      public onDeprovision(): void {
+        log.push("user:Second");
+      }
+
+      @OnDeactivation()
+      public onDeactivation(): void {
+        log.push("deactivate:Second");
+      }
+    }
+
+    class TwoDisposerPlugin implements WirestatePlugin {
+      public onProvision(instance: object, _container: Container, addDisposer: (dispose: () => void) => void): void {
+        addDisposer(() => log.push(`dispose:${instance.constructor.name}:a`));
+        addDisposer(() => log.push(`dispose:${instance.constructor.name}:b`));
+      }
+
+      public onDeprovision(instance: object): void {
+        log.push(`plugin:${instance.constructor.name}`);
+      }
+    }
+
+    const container: Container = new Container({
+      activate: [First, Second],
+      bindings: [First, Second],
+      plugins: [new TwoDisposerPlugin()],
+    });
+
+    container.provision();
+    container.deprovision();
+
+    expect(log).toEqual([
+      // Phase 1 - user @OnDeprovision, instances reversed.
+      "user:Second",
+      "user:First",
+      // Phase 2 - plugin onDeprovision, instances reversed.
+      "plugin:Second",
+      "plugin:First",
+      // Phase 3 - disposers, instances reversed and each instance's disposers reversed.
+      "dispose:Second:b",
+      "dispose:Second:a",
+      "dispose:First:b",
+      "dispose:First:a",
+    ]);
+
+    log.length = 0;
+    container.unbindAll();
+
+    // Deactivation unwinds in reverse creation order too.
+    expect(log).toEqual(["deactivate:Second", "deactivate:First"]);
+  });
+
+  it("sweeps disposers registered during teardown, in reverse across instances", () => {
+    const log: Array<string> = [];
+
+    @Injectable()
+    class First {}
+
+    @Injectable()
+    class Second {}
+
+    // `unsubscribeInstance` detaches the list before running it, so a disposer that registers
+    // another one lands in a fresh list that only the post-pass sweep can reach.
+    class ReentrantDisposerPlugin implements WirestatePlugin {
+      public onProvision(instance: object, _container: Container, addDisposer: (dispose: () => void) => void): void {
+        const name: string = instance.constructor.name;
+
+        addDisposer(() => {
+          log.push(`dispose:${name}`);
+
+          addDisposer(() => log.push(`re-entrant:${name}`));
+        });
+      }
+    }
+
+    const container: Container = new Container({
+      activate: [First, Second],
+      bindings: [First, Second],
+      plugins: [new ReentrantDisposerPlugin()],
+    });
+
+    container.provision();
+    container.deprovision();
+
+    // Both passes walk instances in reverse, so the re-entrant disposers unwind the same way.
+    expect(log).toEqual(["dispose:Second", "dispose:First", "re-entrant:Second", "re-entrant:First"]);
   });
 
   it("runs an instance's disposers in reverse registration order", () => {
@@ -345,7 +453,9 @@ describe("container plugins", () => {
         addDisposer(() => {
           log.push(`unwire:${instance.constructor.name}`);
 
-          if (instance.constructor.name === "First") {
+          // Second is wired last, so it tears down first: the throw has to land before a
+          // sibling still has to run, or containment is not what this asserts.
+          if (instance.constructor.name === "Second") {
             throw new Error("dispose boom");
           }
         });
@@ -356,9 +466,9 @@ describe("container plugins", () => {
 
     container.provision();
 
-    // First's disposer throws, but the failure is contained so Second's disposer still runs.
+    // Second's disposer throws, but the failure is contained so First's disposer still runs.
     expect(() => container.deprovision()).not.toThrow();
-    expect(log).toEqual(["unwire:First", "unwire:Second"]);
+    expect(log).toEqual(["unwire:Second", "unwire:First"]);
   });
 
   it("pairs onDeprovision with onProvision for non-participant instances", () => {

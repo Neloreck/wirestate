@@ -88,6 +88,35 @@ describe("provision lifecycle", () => {
     ]);
   });
 
+  it("should keep the reverse deprovision order when non-participants share the cycle", () => {
+    const events: Array<string> = [];
+    const { LifecycleService: FirstService } = createLifecycleService({ events, suffix: "first" });
+    const { LifecycleService: SecondService } = createLifecycleService({ events, suffix: "second" });
+
+    @Injectable()
+    class PlainService {}
+
+    // The cycle tracks every active instance, not only the provision participants, so a plain
+    // service sits in the deprovision pass alongside them. It carries no hooks of its own and
+    // must not disturb the participants' reverse order.
+    const container: Container = new Container({
+      activate: [PlainService],
+      bindings: [PlainService, FirstService, SecondService],
+    });
+
+    provisionContainer(container);
+
+    expect(events).toEqual(["activated-first", "activated-second", "provision-first", "provision-second"]);
+
+    deprovisionContainer(container);
+
+    expect(events.slice(4)).toEqual(["deprovision-second", "deprovision-first"]);
+
+    container.unbindAll();
+
+    expect(events.slice(6)).toEqual(["deactivation-second", "deactivation-first"]);
+  });
+
   it("should provision instance descriptors bound behind custom tokens", () => {
     const TOKEN: unique symbol = Symbol("token");
     const { LifecycleService, events } = createLifecycleService({ methods: ["provision"] });
