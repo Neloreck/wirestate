@@ -73,7 +73,11 @@ export default {
           "babel-jest",
           { configFile: path.resolve(import.meta.dirname, "babel.tc39.config.mjs") },
         ],
-        "^.+\\.[tj]sx?$": swcTransform({ legacyDecorator: false, decoratorVersion: "2023-11" }),
+        "^.+\\.[tj]sx?$": swcTransform({
+          legacyDecorator: false,
+          decoratorVersion: "2023-11",
+          useDefineForClassFields: true,
+        }),
       },
     },
   ],
