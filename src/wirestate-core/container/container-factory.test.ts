@@ -146,6 +146,38 @@ describe("Factory", () => {
       expect(() => factory.construct(failing)).toThrow("boom");
     });
 
+    it("should keep tracking the caller after a nested circular error is caught", () => {
+      const factory: Factory = new Factory(container);
+      const cycle: FactoryBindingDescriptor = { token: "CYCLE", factory: () => factory.construct(cycle) };
+
+      let attempts: number = 0;
+
+      const outer: FactoryBindingDescriptor = {
+        token: "OUTER",
+        factory: () => {
+          attempts += 1;
+
+          // Bounded on purpose: if the guard is gone, OUTER re-enters itself instead of throwing,
+          // and an unbounded test would recurse until the stack overflows.
+          if (attempts > 1) {
+            return "re-entered";
+          }
+
+          try {
+            factory.construct(cycle);
+          } catch {
+            // Swallowed, as user code may legitimately do around an optional dependency.
+          }
+
+          // The swallowed error must not have popped OUTER off the stack: this is still a cycle.
+          return factory.construct(outer);
+        },
+      };
+
+      expect(() => factory.construct(outer)).toThrow("Detected circular dependency: OUTER -> OUTER");
+      expect(attempts).toBe(1);
+    });
+
     it("should support nested construction of different bindings", () => {
       const factory: Factory = new Factory(container);
       const inner: BindingDescriptor<string> = { token: "INNER", value: "inner-value" };

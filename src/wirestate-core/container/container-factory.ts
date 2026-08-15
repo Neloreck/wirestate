@@ -27,19 +27,19 @@ export class Factory {
    * @throws {@link WirestateError} When the descriptor is already under construction.
    */
   public construct<T>(binding: BindingDescriptor<T>): T {
+    if (this.underConstruction.includes(binding)) {
+      const dependencyGraph = this.underConstruction.map((it) => tokenToString(it.token));
+
+      throw new WirestateError(
+        `Detected circular dependency: ${dependencyGraph.join(" -> ")} -> ${tokenToString(binding.token)}. ` +
+          `Please change your dependency graph or use lazy injection instead.`,
+        ERROR_CODE_CIRCULAR_DEPENDENCY
+      );
+    }
+
+    this.underConstruction.push(binding);
+
     try {
-      if (this.underConstruction.includes(binding)) {
-        const dependencyGraph = [...this.underConstruction, binding].map((it) => tokenToString(it.token));
-
-        throw new WirestateError(
-          `Detected circular dependency: ${dependencyGraph.join(" -> ")}. ` +
-            `Please change your dependency graph or use lazy injection instead.`,
-          ERROR_CODE_CIRCULAR_DEPENDENCY
-        );
-      }
-
-      this.underConstruction.push(binding);
-
       return this.doConstruct(binding);
     } finally {
       this.underConstruction.pop();

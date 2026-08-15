@@ -52,4 +52,42 @@ describe("forward references with inject()", () => {
     expect(first.getSecond()).toBe(container.get(SecondService));
     expect(first.getSecond().first).toBe(first);
   });
+
+  it("still detects a service's own cycle after it swallowed an unrelated circular error", () => {
+    let constructions: number = 0;
+    let detected: boolean = false;
+
+    @Injectable()
+    class CycleService {
+      public constructor(public readonly self: CycleService = inject(CycleService)) {}
+    }
+
+    @Injectable()
+    class RootService {
+      public constructor() {
+        constructions += 1;
+
+        // A swallowed circular error must not un-track RootService itself...
+        try {
+          inject(CycleService);
+        } catch {
+          // Swallowed, as user code may legitimately do around an optional dependency.
+        }
+
+        // ...otherwise this self-reference recurses until the stack overflows.
+        try {
+          inject(RootService);
+        } catch {
+          detected = true;
+        }
+      }
+    }
+
+    const container: Container = new Container({ bindings: [RootService, CycleService] });
+
+    container.get(RootService);
+
+    expect(constructions).toBe(1);
+    expect(detected).toBe(true);
+  });
 });
