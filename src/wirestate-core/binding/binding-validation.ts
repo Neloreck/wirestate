@@ -92,6 +92,13 @@ export function validateBindingStructure<T>(token: ServiceToken<T>, binding: Bin
     );
   }
 
+  if ("factory" in binding && "value" in binding) {
+    throw new WirestateError(
+      "Binding descriptor must provide either 'value' or 'factory', not both.",
+      ERROR_CODE_INVALID_ARGUMENTS
+    );
+  }
+
   const type = getBindingType(binding);
 
   if (type === BindingType.Instance) {

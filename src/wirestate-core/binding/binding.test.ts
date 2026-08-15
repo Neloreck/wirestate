@@ -107,6 +107,20 @@ describe("Bindings", () => {
     expect(myServiceConstructorSpy).toHaveBeenCalledTimes(1);
   });
 
+  it("should reject a descriptor carrying both 'value' and 'factory'", () => {
+    const container = new ContainerKernel();
+
+    expect(() => container.bind({ token: "AMBIGUOUS", value: "from-value", factory: () => "from-factory" })).toThrow(
+      "Binding descriptor must provide either 'value' or 'factory', not both."
+    );
+
+    expect(() =>
+      container.bind({ token: "AMBIGUOUS", type: "Value", value: "from-value", factory: () => "from-factory" } as never)
+    ).toThrow("Binding descriptor must provide either 'value' or 'factory', not both.");
+
+    expect(container.has("AMBIGUOUS")).toBe(false);
+  });
+
   it("should pass the container to the factory", () => {
     const container = new ContainerKernel();
     const fooFactory = jest.fn(() => "Foo");
