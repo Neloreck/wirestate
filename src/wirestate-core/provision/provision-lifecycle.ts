@@ -21,7 +21,7 @@ import {
   getEffectivePlugins,
   isPluginParticipant,
 } from "../plugin/plugin-registry";
-import { type Maybe, type Nullable, type Optional } from "../types/general";
+import { type Maybe, type Optional } from "../types/general";
 
 import { getDeprovisionHandlerMetadata } from "./on-deprovision";
 import { getProvisionHandlerMetadata } from "./on-provision";
@@ -101,34 +101,32 @@ export function deprovisionContainer(container: Container): void {
   }
 
   const wasProvisioned: boolean = state.status === true;
+  const hadInstances: boolean = state.instances !== null;
 
   state.status = false;
 
-  const instances: Nullable<Array<object>> = state.instances;
-
-  if (instances) {
-    // The whole cycle unwinds on the same axis provision ran on, so teardown is its exact reverse:
-    // the first instance provisioned is the last one deprovisioned.
-    deprovisionInstances(container, state, orderByCreation(container, new Set(state.cycleByInstance.keys())));
-
-    markActiveInstancesDeprovisioned(container);
-
-    state.instances = null;
-  } else if (wasProvisioned) {
-    // Unbinding the last lifecycle binding already cleared the instances entry,
-    // but the container itself is only leaving provider ownership now.
-    markActiveInstancesDeprovisioned(container);
+  // Nothing to unwind for a container that was never provisioned, or already was.
+  if (!wasProvisioned && !hadInstances) {
+    return;
   }
 
-  // Plugins observe the cycle boundary at the very end, once, when the container was provisioned.
-  if (instances || wasProvisioned) {
-    // Sweep any disposer a plugin parked on a non-participant instance, so deprovision never
-    // leaves a subscription behind, then drop the cycle: the next provision re-tracks it.
-    clearRemainingDisposers(state);
-    state.cycleByInstance.clear();
+  // The cycle, not `state.instances`: unbinding the last participant clears that entry while the
+  // cycle still holds every non-participant a plugin wired, and those are owed an `onDeprovision`
+  // too. It unwinds on the same axis provision ran on, so teardown is its exact reverse - the
+  // first instance provisioned is the last one deprovisioned.
+  deprovisionInstances(container, state, orderByCreation(container, new Set(state.cycleByInstance.keys())));
 
-    dispatchPluginContainerDeprovision(container);
-  }
+  markActiveInstancesDeprovisioned(container);
+
+  state.instances = null;
+
+  // Sweep any disposer a plugin parked on a non-participant instance, so deprovision never
+  // leaves a subscription behind, then drop the cycle: the next provision re-tracks it.
+  clearRemainingDisposers(state);
+  state.cycleByInstance.clear();
+
+  // Plugins observe the cycle boundary at the very end, once.
+  dispatchPluginContainerDeprovision(container);
 }
 
 /**
