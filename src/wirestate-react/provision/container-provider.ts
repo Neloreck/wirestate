@@ -1,10 +1,11 @@
 import { type ContainerConfig, Container, WirestateError } from "@wirestate/core";
 import { type HotSwapOwner, registerHotSwapOwner } from "@wirestate/core/hot";
-import { type ReactElement, type ReactNode, createElement, useEffect, useRef, useState } from "react";
+import { type ReactElement, type ReactNode, createElement, useRef, useState } from "react";
 
 import { ContainerContext } from "../container/container-context";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { type Maybe, type Nullable } from "../types/general";
+import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect";
 
 import {
   type ReactContainerProvisionLifecycle,
@@ -69,6 +70,19 @@ interface ContainerProvisionError {
  * Managed config is construction-only: it is read once when the provider
  * mounts, and later changes are ignored. Pass a React `key` to the provider
  * to recreate the container explicitly.
+ *
+ * The container is provisioned in a layout effect, so messaging handlers are
+ * live before any descendant's `useEffect` runs and a child can emit, execute,
+ * or query from its mount effect. Three ordering limits remain, all from React
+ * committing effects child-first:
+ *
+ * - A descendant's own `useLayoutEffect` still runs before this provider
+ *   provisions. Send from `useEffect` instead.
+ * - A nested `ContainerProvider` provisions its container before this one, so a
+ *   child container's `@OnProvision` cannot reach a parent container's handler.
+ * - On unmount the container deprovisions before a descendant's `useEffect`
+ *   cleanup, so a child cannot send from its cleanup. Use `@OnDeprovision` on a
+ *   service instead, which runs while the buses are still live.
  *
  * @group Provision
  *
@@ -148,7 +162,7 @@ export function ContainerProvider(props: ContainerProviderProps): ReactElement {
 
   const activeContainer: Container = managedContainer ?? (externalContainer as Container);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const pendingDestruction: ReactContainerProvisionLifecycle = (pendingDestructionRef.current ??= new Map());
 
     retainContainer(activeContainer, pendingDestruction);
