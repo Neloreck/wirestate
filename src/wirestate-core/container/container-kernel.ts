@@ -48,6 +48,11 @@ export class ContainerKernel {
 
   private destroyed: boolean = false;
 
+  /**
+   * Whether {@link ContainerKernel.destroy} is running its deactivation pass.
+   */
+  private destroying: boolean = false;
+
   public constructor(parent?: ContainerKernel) {
     this.parent = parent;
     this.factory = new Factory(this);
@@ -136,12 +141,15 @@ export class ContainerKernel {
       (this.retained.has(record.token) ? kept : dropped).push(record);
     }
 
+    // Detached before dispatching, not after: an `@OnDeactivation` that re-enters teardown would
+    // otherwise still find these records and run them a second time, and a hook re-entering
+    // `unbindAll` itself would recurse without end.
+    this.activated.length = 0;
+    this.activated.push(...kept);
+
     for (let index: number = dropped.length - 1; index >= 0; index -= 1) {
       this.deactivateRecord(dropped[index]);
     }
-
-    this.activated.length = 0;
-    this.activated.push(...kept);
 
     for (const [token, binding] of [...this.bindings]) {
       if (!this.retained.has(token)) {
@@ -165,25 +173,36 @@ export class ContainerKernel {
    *
    * Inspection stays available so teardown code can still read the container: `has`, `hasOwn`,
    * `getOwnBindings`, and `getActiveInstances` do not throw, and `has` reports `false` rather
-   * than an ancestor's binding. Idempotent, so teardown paths can call it freely.
+   * than an ancestor's binding. Idempotent, so teardown paths can call it freely - including
+   * re-entrantly from an `@OnDeactivation` hook this very call is running, where the nested call
+   * returns without starting a second teardown.
    *
    * @returns The same container for chaining.
    */
   public destroy(): this {
-    if (this.destroyed) {
+    if (this.destroyed || this.destroying) {
       return this;
     }
 
-    for (const record of [...this.activated].reverse()) {
-      this.deactivateRecord(record);
+    this.destroying = true;
+
+    try {
+      // Drained before dispatching, not after: an `@OnDeactivation` that re-enters teardown would
+      // otherwise still find these records and run them a second time.
+      const records: ReadonlyArray<ActivationRecord> = this.activated.splice(0).reverse();
+
+      for (const record of records) {
+        this.deactivateRecord(record);
+      }
+
+      this.bindings.clear();
+      this.instances.clear();
+      this.retained.clear();
+
+      this.destroyed = true;
+    } finally {
+      this.destroying = false;
     }
-
-    this.activated.length = 0;
-    this.bindings.clear();
-    this.instances.clear();
-    this.retained.clear();
-
-    this.destroyed = true;
 
     return this;
   }
@@ -468,12 +487,17 @@ export class ContainerKernel {
    * @param token - Token to deactivate.
    */
   private deactivate<T>(token: ServiceToken<T>): void {
-    const records = this.activated.filter((record) => record.token === token);
+    const records: Array<ActivationRecord> = [];
+
+    for (let index: number = this.activated.length - 1; index >= 0; index -= 1) {
+      if (this.activated[index].token === token) {
+        records.push(this.activated[index]);
+        this.activated.splice(index, 1);
+      }
+    }
 
     for (const record of records) {
       this.deactivateRecord(record);
-
-      this.activated.splice(this.activated.indexOf(record), 1);
     }
   }
 

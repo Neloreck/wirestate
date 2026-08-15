@@ -1,3 +1,4 @@
+import { OnDeactivation } from "../activation/on-deactivation";
 import { ERROR_CODE_CONTAINER_DESTROYED } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
 import { EventBus } from "../plugin/events/event-bus";
@@ -156,6 +157,92 @@ describe("Container reset and destroy", () => {
 
       expect(child.get(Container)).toBe(child);
       expect(child.get(EventBus)).toBe(childBus);
+    });
+  });
+
+  // Teardown detaches an activation record before it dispatches the record's `@OnDeactivation`.
+  // Without that, a hook reaching back into the container it is tearing down finds its own record
+  // still listed and runs again, until the stack gives out.
+  describe("teardown re-entered from @OnDeactivation", () => {
+    it("should run a hook once when it calls destroy on its own container", () => {
+      const calls: Array<string> = [];
+
+      @Injectable()
+      class ReentrantService {
+        public constructor(private readonly container: Container = inject(Container)) {}
+
+        @OnDeactivation()
+        public onDeactivation(): void {
+          calls.push("deactivated");
+
+          this.container.destroy();
+        }
+      }
+
+      const container: Container = new Container({ activate: true, bindings: [ReentrantService] });
+
+      container.destroy();
+
+      expect(calls).toEqual(["deactivated"]);
+      expect(() => container.get(ReentrantService)).toThrow(
+        expect.objectContaining({ code: ERROR_CODE_CONTAINER_DESTROYED })
+      );
+    });
+
+    it("should run a hook once when it unbinds its own token", () => {
+      const calls: Array<string> = [];
+
+      @Injectable()
+      class ReentrantService {
+        public constructor(private readonly container: Container = inject(Container)) {}
+
+        @OnDeactivation()
+        public onDeactivation(): void {
+          calls.push("deactivated");
+
+          this.container.unbind(ReentrantService);
+        }
+      }
+
+      const container: Container = new Container({ activate: true, bindings: [ReentrantService] });
+
+      container.unbind(ReentrantService);
+
+      expect(calls).toEqual(["deactivated"]);
+      expect(container.has(ReentrantService)).toBe(false);
+    });
+
+    it("should run every hook once when one of them resets the container", () => {
+      const calls: Array<string> = [];
+
+      @Injectable()
+      class FirstService {
+        @OnDeactivation()
+        public onDeactivation(): void {
+          calls.push("first");
+        }
+      }
+
+      @Injectable()
+      class ReentrantService {
+        public constructor(private readonly container: Container = inject(Container)) {}
+
+        @OnDeactivation()
+        public onDeactivation(): void {
+          calls.push("reentrant");
+
+          this.container.unbindAll();
+        }
+      }
+
+      const container: Container = new Container({ activate: true, bindings: [FirstService, ReentrantService] });
+
+      container.unbindAll();
+
+      // Reverse creation order, each instance exactly once, and the container survives the reset.
+      expect(calls).toEqual(["reentrant", "first"]);
+      expect(container.get(Container)).toBe(container);
+      expect(container.getActiveInstances()).toEqual([]);
     });
   });
 });
