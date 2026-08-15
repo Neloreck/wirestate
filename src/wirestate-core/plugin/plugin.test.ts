@@ -260,6 +260,73 @@ describe("container plugins", () => {
     expect(log).toEqual(["unwire:First", "unwire:Second"]);
   });
 
+  it("runs an instance's disposers in reverse registration order", () => {
+    const log: Array<string> = [];
+
+    @Injectable()
+    class Svc {}
+
+    // Two plugins, and one plugin parking two disposers, so the order spans both a single
+    // `addDisposer` sequence and the plugin dispatch order that produced them.
+    class FirstPlugin implements WirestatePlugin {
+      public participates(token: ServiceToken): boolean {
+        return token === Svc;
+      }
+
+      public onProvision(_instance: object, _container: Container, addDisposer: (dispose: () => void) => void): void {
+        addDisposer(() => log.push("first:a"));
+        addDisposer(() => log.push("first:b"));
+      }
+    }
+
+    class SecondPlugin implements WirestatePlugin {
+      public onProvision(_instance: object, _container: Container, addDisposer: (dispose: () => void) => void): void {
+        addDisposer(() => log.push("second"));
+      }
+    }
+
+    const container: Container = new Container({
+      bindings: [Svc],
+      plugins: [new FirstPlugin(), new SecondPlugin()],
+    });
+
+    container.provision();
+    container.deprovision();
+
+    // Registered first:a, first:b, second - so teardown unwinds them last-in-first-out.
+    expect(log).toEqual(["second", "first:b", "first:a"]);
+  });
+
+  it("runs the remaining disposers when one throws, in reverse registration order", () => {
+    const log: Array<string> = [];
+
+    @Injectable()
+    class Svc {}
+
+    class ThrowingDisposerPlugin implements WirestatePlugin {
+      public participates(token: ServiceToken): boolean {
+        return token === Svc;
+      }
+
+      public onProvision(_instance: object, _container: Container, addDisposer: (dispose: () => void) => void): void {
+        addDisposer(() => log.push("first"));
+        addDisposer(() => {
+          log.push("second");
+
+          throw new Error("dispose boom");
+        });
+        addDisposer(() => log.push("third"));
+      }
+    }
+
+    const container: Container = new Container({ bindings: [Svc], plugins: [new ThrowingDisposerPlugin()] });
+
+    container.provision();
+
+    expect(() => container.deprovision()).not.toThrow();
+    expect(log).toEqual(["third", "second", "first"]);
+  });
+
   it("contains a throwing disposer so sibling instances still tear down", () => {
     const log: Array<string> = [];
 

@@ -495,9 +495,10 @@ function runDeprovisionHooks(instances: ReadonlyArray<object>): ReadonlyArray<ob
  * Runs and clears the provision-cycle messaging disposers for one instance.
  *
  * @remarks
- * Failsafe by contract: a disposer that throws never aborts
- * deprovision, so nested-provider teardown ordering can never error. No-op when
- * the instance subscribed nothing this cycle.
+ * Disposers run in reverse registration order, so a later disposer tears down before the earlier
+ * ones it may depend on. Failsafe by contract: a disposer that throws never aborts deprovision, so
+ * nested-provider teardown ordering can never error. No-op when the instance subscribed nothing
+ * this cycle.
  *
  * @internal
  *
@@ -516,9 +517,11 @@ function unsubscribeInstance(state: ProvisionState, instance: object): void {
 
   entry.disposers = [];
 
-  for (const dispose of disposers) {
+  // Reverse registration order, matching @OnDeprovision's reverse provision order and the
+  // reversed plugin dispatch: teardown unwinds setup.
+  for (let index: number = disposers.length - 1; index >= 0; index -= 1) {
     try {
-      dispose();
+      disposers[index]();
     } catch {
       // Failsafe: a disposer that throws must not abort the remaining disposers.
     }
