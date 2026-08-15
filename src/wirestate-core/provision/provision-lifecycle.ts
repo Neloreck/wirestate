@@ -101,7 +101,7 @@ export function deprovisionContainer(container: Container): void {
   const instances: Nullable<Array<object>> = state.instances;
 
   if (instances) {
-    deprovisionInstances(container, state, instances);
+    deprovisionInstances(container, state, [...state.cycleByInstance.keys()]);
 
     markActiveInstancesDeprovisioned(container);
 
@@ -339,6 +339,8 @@ function markInFlight(container: Container): void {
  */
 function wirePlugins(container: Container, state: ProvisionState): void {
   for (const instance of container.getActiveInstances()) {
+    getOrCreateCycleEntry(state, instance);
+
     dispatchPluginProvision(container, instance, (dispose: () => void): void =>
       appendDisposer(state, instance, dispose)
     );

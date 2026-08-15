@@ -294,6 +294,102 @@ describe("container plugins", () => {
     expect(log).toEqual(["unwire:First", "unwire:Second"]);
   });
 
+  it("pairs onDeprovision with onProvision for non-participant instances", () => {
+    const log: Array<string> = [];
+
+    @Injectable()
+    class PlainService {}
+
+    @Injectable()
+    class Participant {
+      @OnProvision()
+      public onProvision(): void {}
+    }
+
+    @Injectable()
+    class LazyService {}
+
+    // Claims no participants, so every instance it sees is one `onProvision` reached on its own.
+    class BystanderPlugin implements WirestatePlugin {
+      public onProvision(instance: object): void {
+        log.push(`+${instance.constructor.name}`);
+      }
+
+      public onDeprovision(instance: object): void {
+        log.push(`-${instance.constructor.name}`);
+      }
+    }
+
+    const container: Container = new Container({
+      activate: [PlainService],
+      bindings: [PlainService, Participant, LazyService],
+      plugins: [new BystanderPlugin()],
+    });
+
+    container.provision();
+
+    expect(log).toEqual(["+PlainService", "+Participant"]);
+
+    // Resolved after the cycle wired its instances, so this one never received `onProvision`...
+    container.get(LazyService);
+
+    log.length = 0;
+    container.deprovision();
+
+    // ...and must not receive `onDeprovision` either. Everything that was wired tears down, in
+    // reverse ledger order: participants enter the ledger first (they are force-activated before
+    // plugins are wired), so they tear down last.
+    expect(log).toEqual(["-PlainService", "-Participant"]);
+
+    // The cycle is dropped at deprovision, so a repeated deprovision cannot re-run it.
+    container.deprovision();
+
+    expect(log).toEqual(["-PlainService", "-Participant"]);
+  });
+
+  it("keeps @OnDeprovision in reverse provision order while plugins tear down the wider set", () => {
+    const log: Array<string> = [];
+
+    @Injectable()
+    class PlainService {}
+
+    @Injectable()
+    class First {
+      @OnDeprovision()
+      public onDeprovision(): void {
+        log.push("user:-First");
+      }
+    }
+
+    @Injectable()
+    class Second {
+      @OnDeprovision()
+      public onDeprovision(): void {
+        log.push("user:-Second");
+      }
+    }
+
+    class BystanderPlugin implements WirestatePlugin {
+      public onDeprovision(instance: object): void {
+        log.push(`plugin:-${instance.constructor.name}`);
+      }
+    }
+
+    const container: Container = new Container({
+      activate: [PlainService],
+      bindings: [PlainService, First, Second],
+      plugins: [new BystanderPlugin()],
+    });
+
+    container.provision();
+    container.deprovision();
+
+    // Widening the plugin set must not disturb the documented user-hook order: every
+    // @OnDeprovision still runs first, in reverse provision order, before any plugin teardown.
+    expect(log.slice(0, 2)).toEqual(["user:-Second", "user:-First"]);
+    expect(log.slice(2).sort()).toEqual(["plugin:-First", "plugin:-PlainService", "plugin:-Second"]);
+  });
+
   it("runs disposers parked on non-participant instances at deprovision", () => {
     const log: Array<string> = [];
 
