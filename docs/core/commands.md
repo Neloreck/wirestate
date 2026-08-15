@@ -50,8 +50,7 @@ One command call goes to one handler. The method receives the optional payload a
 ## Execute Required Commands
 
 `execute` returns the active handler result as-is. If the handler returns a Promise, `execute` returns that Promise.
-`execute` throws `WirestateError` when no handler is registered. `executeAsync` always returns a Promise, so the same
-miss arrives as a rejection instead: await it or attach a `.catch`, since a `try` around the call alone will not see it.
+`execute` throws `WirestateError` when no handler is registered.
 
 ```ts
 import { CommandBus, Injectable, inject } from "@wirestate/core";
@@ -71,7 +70,8 @@ export class HeaderService {
 ```
 
 Use `executeAsync` when the caller should always receive a Promise. It wraps synchronous handler results and passes
-Promise results through.
+Promise results through. A missing handler reaches you as a rejection rather than a thrown error, so await the call or
+attach a `.catch`. A `try` around the call alone will not see it.
 
 ```ts
 import { CommandBus, Injectable, OnCommand, inject } from "@wirestate/core";

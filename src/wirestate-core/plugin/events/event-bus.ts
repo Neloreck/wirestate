@@ -37,6 +37,20 @@ interface EventSubscription {
 }
 
 /**
+ * Copies a subscription bucket so dispatch is unaffected by changes made while it runs.
+ *
+ * @remarks
+ * An absent bucket copies to nothing rather than an empty array, so an emit with no subscribers
+ * for a type allocates nothing.
+ *
+ * @param bucket - Bucket to copy, if one exists for the type.
+ * @returns The bucket's subscriptions, or `undefined` when there is no bucket.
+ */
+function takeSubscriptionsSnapshot(bucket: Maybe<Set<EventSubscription>>): Maybe<ReadonlyArray<EventSubscription>> {
+  return bucket ? Array.from(bucket) : undefined;
+}
+
+/**
  * Broadcasts events to every subscriber registered on one container bus.
  *
  * @remarks
@@ -71,11 +85,12 @@ export class EventBus {
    * Emits an event to matching subscribers.
    *
    * @remarks
-   * Handlers are snapshotted before dispatch, so subscriptions can change while
-   * an event is being emitted. Dispatch does not await handler promises. If a
-   * handler throws or rejects, Wirestate reports it through the container error
-   * handler and continues with the next subscriber. Catch-all subscribers run
-   * before type-specific subscribers.
+   * Every matching handler is snapshotted before the first one runs, so subscriptions can change
+   * while an event is being emitted: one emit reaches exactly the subscribers that existed when it
+   * started, whether a handler subscribes or unsubscribes mid-dispatch. Those changes take effect
+   * from the next emit. Dispatch does not await handler promises. If a handler throws or rejects,
+   * Wirestate reports it through the container error handler and continues with the next
+   * subscriber. Catch-all subscribers run before type-specific subscribers.
    *
    * @template P - Payload type.
    * @template T - Event type.
@@ -105,18 +120,21 @@ export class EventBus {
       (event as { source: S }).source = options.source;
     }
 
-    // Snapshot each bucket so subscriptions may change during emit.
-    // Catch-all subscriptions run before type-specific ones.
-    const allEventsSubscriptions: Maybe<Set<EventSubscription>> = this.handlers.get(ALL_EVENTS_TYPE);
+    // Both buckets are snapshotted before either is dispatched, so the delivery set for one emit is
+    // fixed at emit time. Reading the typed bucket after the catch-all pass instead would let a
+    // catch-all handler that subscribes to this type receive the event it is still handling.
+    const catchAll: Maybe<ReadonlyArray<EventSubscription>> = takeSubscriptionsSnapshot(
+      this.handlers.get(ALL_EVENTS_TYPE)
+    );
+    const typed: Maybe<ReadonlyArray<EventSubscription>> = takeSubscriptionsSnapshot(this.handlers.get(type));
 
-    if (allEventsSubscriptions) {
-      this.dispatch(Array.from(allEventsSubscriptions), event);
+    // Catch-all subscriptions run before type-specific ones.
+    if (catchAll) {
+      this.dispatch(catchAll, event);
     }
 
-    const typedSubscriptions: Maybe<Set<EventSubscription>> = this.handlers.get(type);
-
-    if (typedSubscriptions) {
-      this.dispatch(Array.from(typedSubscriptions), event);
+    if (typed) {
+      this.dispatch(typed, event);
     }
   }
 

@@ -416,6 +416,44 @@ describe("EventBus", () => {
       expect(late).toHaveBeenCalledTimes(1);
     });
 
+    it("should not invoke a type subscribed by a catch-all handler during the same emit", () => {
+      const bus: EventBus = new EventBus(new Container());
+      const late = jest.fn();
+
+      // The catch-all bucket dispatches first, so the typed bucket must already be snapshotted by
+      // the time it runs. Reading it afterwards would hand this subscription the in-flight event.
+      bus.subscribe(() => {
+        bus.subscribe("CHAIN", late);
+      });
+
+      bus.emit("CHAIN");
+
+      expect(late).not.toHaveBeenCalled();
+
+      bus.emit("CHAIN");
+
+      expect(late).toHaveBeenCalledTimes(1);
+    });
+
+    it("should deliver to a typed handler a catch-all handler unsubscribed during the same emit", () => {
+      const bus: EventBus = new EventBus(new Container());
+      const typed = jest.fn();
+
+      const unsubscribeTyped: EventUnsubscribe = bus.subscribe("CHAIN", typed);
+
+      bus.subscribe(() => unsubscribeTyped());
+
+      bus.emit("CHAIN");
+
+      // The delivery set is fixed at emit time in both directions: a removal mid-dispatch takes
+      // effect from the next emit, exactly like an addition.
+      expect(typed).toHaveBeenCalledTimes(1);
+
+      bus.emit("CHAIN");
+
+      expect(typed).toHaveBeenCalledTimes(1);
+    });
+
     it("should allow a handler to unsubscribe itself during emit", () => {
       const bus: EventBus = new EventBus(new Container());
       const handler = jest.fn();

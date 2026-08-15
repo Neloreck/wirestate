@@ -136,9 +136,19 @@ export class CartActivityService {
 
 Use this pattern when the subscription depends on runtime state or cannot be expressed with `@OnEvent`.
 
+## Delivery
+
+These rules apply to every subscription above, whether it came from `@OnEvent` or from `subscribe`.
+
 Events are fire-and-forget. `EventBus` does not await a handler's asynchronous work, so one slow handler never delays
 other subscribers. If a handler throws or returns a promise that rejects, Wirestate reports the failure through the
 container error handler and continues with the next handler.
+
+One emit reaches exactly the subscribers that existed when it started. Subscribing or unsubscribing while an event is
+being delivered changes nothing for that event, and takes effect from the next one.
+
+That covers catch-all handlers too. They run first, but a subscription one of them adds for the event's own type still
+waits for the next emit rather than receiving the event in flight.
 
 ## API Reference
 
