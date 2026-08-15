@@ -136,8 +136,10 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    * Dispatches a required command and returns a Promise for the result.
    *
    * @remarks
-   * Throws when no handler is registered. Synchronous handler results are wrapped.
-   * Promises returned by handlers are passed through.
+   * Rejects when no handler is registered - it never throws synchronously, so the miss has to be
+   * caught by awaiting or by a `.catch`, not by a `try` around the call. Use {@link execute} when
+   * a missing handler should surface at the call site instead. Synchronous handler results are
+   * wrapped. Promises returned by handlers are passed through.
    *
    * @template R - Result type.
    * @template P - Payload type.
@@ -146,9 +148,8 @@ export class CommandBus extends HandlerStackBus<CommandType> {
    * @param type - Command token.
    * @param payload - Command payload.
    * @param options - Dispatch options.
-   * @returns A Promise resolving to the command result.
-   *
-   * @throws {@link WirestateError} If no handler is registered.
+   * @returns A Promise resolving to the command result, rejected with a
+   *   {@link WirestateError} when no handler is registered.
    */
   public executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,

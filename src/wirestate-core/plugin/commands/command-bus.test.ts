@@ -117,6 +117,19 @@ describe("CommandBus", () => {
     );
   });
 
+  it("should not surface a missing handler synchronously from executeAsync", async () => {
+    const bus: CommandBus = new CommandBus();
+    let pending: Promise<unknown> = Promise.resolve();
+
+    // A `try` around the call cannot catch the miss - only awaiting or a `.catch` can. Dropping
+    // `async` from the dispatch would break every caller written against that contract.
+    expect(() => {
+      pending = bus.executeAsync("MISSING");
+    }).not.toThrow();
+
+    await expect(pending).rejects.toThrow("No command handler registered in container for type: 'MISSING'.");
+  });
+
   it("should throw synchronous handler errors from execute", () => {
     const bus: CommandBus = new CommandBus();
     const error = new Error("command failed");

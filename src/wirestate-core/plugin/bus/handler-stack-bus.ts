@@ -87,16 +87,16 @@ export abstract class HandlerStackBus<T extends string | symbol | number> {
    * Dispatches to the active handler and Promise-wraps the result.
    *
    * @remarks
-   * Sync values are wrapped. Async values are passed through.
+   * Sync values are wrapped. Async values are passed through. The method is `async`, so a missing
+   * handler rejects the returned promise rather than throwing at the call site.
    *
    * @template R - Type of the handler result.
    * @template P - Type of the payload.
    *
    * @param type - Token to dispatch.
    * @param payload - Payload passed to the handler.
-   * @returns A Promise resolving to the handler result.
-   *
-   * @throws {@link WirestateError} If no handler is registered.
+   * @returns A Promise resolving to the handler result, rejected with a {@link WirestateError}
+   *   when no handler is registered.
    */
   protected async dispatchAsync<R, P>(type: T, payload?: P): Promise<R> {
     const handler: Maybe<HandlerDescriptor["handler"]> = this.peek(type);

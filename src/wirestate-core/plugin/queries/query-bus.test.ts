@@ -109,6 +109,19 @@ describe("QueryBus", () => {
     );
   });
 
+  it("should not surface a missing handler synchronously from queryAsync", async () => {
+    const bus: QueryBus = new QueryBus();
+    let pending: Promise<unknown> = Promise.resolve();
+
+    // A `try` around the call cannot catch the miss - only awaiting or a `.catch` can. Dropping
+    // `async` from the dispatch would break every caller written against that contract.
+    expect(() => {
+      pending = bus.queryAsync("MISSING");
+    }).not.toThrow();
+
+    await expect(pending).rejects.toThrow("No query handler registered in container for type: 'MISSING'.");
+  });
+
   it("should check if handler exists", () => {
     const bus: QueryBus = new QueryBus();
 

@@ -132,8 +132,10 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    * Dispatches a required query and returns a Promise for the result.
    *
    * @remarks
-   * Throws when no handler is registered. Synchronous handler results are wrapped.
-   * Promises returned by handlers are passed through.
+   * Rejects when no handler is registered - it never throws synchronously, so the miss has to be
+   * caught by awaiting or by a `.catch`, not by a `try` around the call. Use {@link query} when a
+   * missing handler should surface at the call site instead. Synchronous handler results are
+   * wrapped. Promises returned by handlers are passed through.
    *
    * @template R - Result type.
    * @template P - Payload type.
@@ -142,9 +144,8 @@ export class QueryBus extends HandlerStackBus<QueryType> {
    * @param type - Query type.
    * @param payload - Optional payload for the handler.
    * @param options - Dispatch options.
-   * @returns A Promise resolving to the query result.
-   *
-   * @throws {@link WirestateError} If no handler is registered for the given type.
+   * @returns A Promise resolving to the query result, rejected with a {@link WirestateError} when
+   *   no handler is registered for the given type.
    */
   public queryAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(
     type: T,
