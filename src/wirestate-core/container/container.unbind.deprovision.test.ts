@@ -1,11 +1,14 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
+import { OnDeactivation } from "../activation/on-deactivation";
 import { WireStatus } from "../activation/wire-status";
 import { Injectable } from "../metadata/metadata-injectable";
+import { OnDeprovision } from "../provision/on-deprovision";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
 import { getProvisionState } from "../provision/provision-state";
 
 import { Container } from "./container";
+import { inject } from "./container-context";
 
 describe("container unbind deprovision", () => {
   it("should unbind a token and remove the container's own binding", () => {
@@ -241,5 +244,78 @@ describe("container unbind deprovision", () => {
 
     expect(plainStatus.isDeprovisioned).toBe(false);
     expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
+  });
+
+  describe("teardown re-entered from @OnDeprovision", () => {
+    it("should complete reset after a hook resets its own container", () => {
+      const events: Array<string> = [];
+      let deprovisionCalls: number = 0;
+
+      @Injectable()
+      class ReentrantService {
+        public constructor(private readonly container: Container = inject(Container)) {}
+
+        @OnDeprovision()
+        public onDeprovision(): void {
+          deprovisionCalls += 1;
+          events.push("deprovision-start");
+
+          if (deprovisionCalls < 3) {
+            this.container.unbindAll();
+          }
+
+          events.push("deprovision-end");
+        }
+
+        @OnDeactivation()
+        public onDeactivation(): void {
+          events.push("deactivation");
+        }
+      }
+
+      const container: Container = new Container({ bindings: [ReentrantService] });
+
+      container.provision();
+      container.unbindAll();
+
+      expect(events).toEqual(["deprovision-start", "deprovision-end", "deactivation"]);
+      expect(container.hasOwn(ReentrantService)).toBe(false);
+      expect(container.get(Container)).toBe(container);
+    });
+
+    it("should complete unbind after a hook unbinds its own token", () => {
+      const events: Array<string> = [];
+      let deprovisionCalls: number = 0;
+
+      @Injectable()
+      class ReentrantService {
+        public constructor(private readonly container: Container = inject(Container)) {}
+
+        @OnDeprovision()
+        public onDeprovision(): void {
+          deprovisionCalls += 1;
+          events.push("deprovision-start");
+
+          if (deprovisionCalls < 3) {
+            this.container.unbind(ReentrantService);
+          }
+
+          events.push("deprovision-end");
+        }
+
+        @OnDeactivation()
+        public onDeactivation(): void {
+          events.push("deactivation");
+        }
+      }
+
+      const container: Container = new Container({ bindings: [ReentrantService] });
+
+      container.provision();
+      container.unbind(ReentrantService);
+
+      expect(events).toEqual(["deprovision-start", "deprovision-end", "deactivation"]);
+      expect(container.hasOwn(ReentrantService)).toBe(false);
+    });
   });
 });

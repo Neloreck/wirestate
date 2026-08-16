@@ -47,6 +47,9 @@ container to be provisioned: a UI provider does this automatically, while plain-
 Put setup and teardown messaging in `@OnProvision` and `@OnDeprovision`. Buses remain live during `@OnDeprovision`, and
 handlers are removed after deprovision hooks run.
 
+While `@OnDeprovision` runs, calls to `deprovision()`, `unbind()`, `unbindAll()`, or `destroy()` on the same container are
+no-ops. The operation that started deprovision continues after the callback, so `@OnDeactivation` cannot interrupt it.
+
 ## Hook Order
 
 Every hook runs on one axis: the order the container constructed the instances. Setup runs in that order, teardown runs

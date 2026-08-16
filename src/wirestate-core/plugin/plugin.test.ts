@@ -119,6 +119,43 @@ describe("container plugins", () => {
     expect(log).toEqual(["wire:Handler", "unwire:Handler"]);
   });
 
+  it("keeps one deprovision transaction across plugin teardown callbacks", () => {
+    const log: Array<string> = [];
+
+    @Injectable()
+    class Handler {}
+
+    class ReentrantPlugin implements WirestatePlugin {
+      public participates(token: ServiceToken): boolean {
+        return token === Handler;
+      }
+
+      public onProvision(_instance: object, container: Container, addDisposer: (dispose: () => void) => void): void {
+        addDisposer(() => {
+          log.push("dispose");
+          container.deprovision();
+        });
+      }
+
+      public onDeprovision(_instance: object, container: Container): void {
+        log.push("instance");
+        container.deprovision();
+      }
+
+      public onContainerDeprovision(container: Container): void {
+        log.push("container");
+        container.deprovision();
+      }
+    }
+
+    const container: Container = new Container({ bindings: [Handler], plugins: [new ReentrantPlugin()] });
+
+    container.provision();
+    container.deprovision();
+
+    expect(log).toEqual(["instance", "dispose", "container"]);
+  });
+
   it("inherited plugins observe descendant containers", () => {
     const seen: Array<string> = [];
 

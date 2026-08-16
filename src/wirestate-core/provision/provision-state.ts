@@ -37,7 +37,7 @@ export interface CycleEntry {
 export interface ProvisionState {
   /**
    * Tri-state provider ownership: `undefined` while never provisioned, `true`
-   * while provider-owned, and `false` after deprovisioning.
+   * while provider-owned, and `false` once deprovision begins.
    */
   status: Optional<boolean>;
 
@@ -50,6 +50,15 @@ export interface ProvisionState {
    * window observable (e.g. so a mid-cycle `@OnProvision` bind can be rejected).
    */
   provisioning: boolean;
+
+  /**
+   * Whether a deprovision transaction is currently unwinding this container.
+   *
+   * @remarks
+   * Prevents teardown callbacks from starting a second lifecycle pass. Remains true until every
+   * user hook, plugin hook, and disposer in the active pass has run.
+   */
+  deprovisioning: boolean;
 
   /**
    * Resolved provider lifecycle participant instances, in creation order - which is the order
@@ -88,6 +97,23 @@ export function getProvisionState(container: ContainerKernel): Optional<Provisio
 }
 
 /**
+ * Returns whether a container is currently unwinding provider ownership.
+ *
+ * @remarks
+ * Keeps activation-layer teardown from interrupting provider cleanup. The operation that started
+ * deprovision continues after the active transaction finishes.
+ *
+ * @group Container
+ * @internal
+ *
+ * @param container - Container whose provider lifecycle is being inspected.
+ * @returns Whether a provider-deprovision transaction currently owns teardown.
+ */
+export function isContainerDeprovisioning(container: ContainerKernel): boolean {
+  return PROVISION_STATE.get(container)?.deprovisioning ?? false;
+}
+
+/**
  * Returns the provider lifecycle state for a container, creating it on first use.
  *
  * @group Container
@@ -100,7 +126,13 @@ export function getOrCreateProvisionState(container: ContainerKernel): Provision
   let state: Optional<ProvisionState> = PROVISION_STATE.get(container);
 
   if (!state) {
-    state = { status: undefined, provisioning: false, instances: null, cycleByInstance: new Map() };
+    state = {
+      status: undefined,
+      provisioning: false,
+      deprovisioning: false,
+      instances: null,
+      cycleByInstance: new Map(),
+    };
     PROVISION_STATE.set(container, state);
   }
 
@@ -114,7 +146,7 @@ export function getOrCreateProvisionState(container: ContainerKernel): Provision
  * @internal
  *
  * @param container - Container to inspect.
- * @returns `true` while provider-owned, `false` after deprovisioning, or
+ * @returns `true` while provider-owned, `false` once deprovision begins, or
  * `undefined` when the container never entered provider ownership.
  */
 export function getContainerProvisionStatus(container: ContainerKernel): Optional<boolean> {

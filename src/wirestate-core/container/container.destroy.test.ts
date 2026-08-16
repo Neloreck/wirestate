@@ -3,6 +3,7 @@ import { ERROR_CODE_CONTAINER_DESTROYED } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
 import { EventBus } from "../plugin/events/event-bus";
 import { EventsPlugin } from "../plugin/events/events-plugin";
+import { OnDeprovision } from "../provision/on-deprovision";
 import { OnProvision } from "../provision/on-provision";
 
 import { Container } from "./container";
@@ -243,6 +244,45 @@ describe("Container reset and destroy", () => {
       expect(calls).toEqual(["reentrant", "first"]);
       expect(container.get(Container)).toBe(container);
       expect(container.getActiveInstances()).toEqual([]);
+    });
+  });
+
+  describe("teardown re-entered from @OnDeprovision", () => {
+    it("should complete destruction after a hook destroys its own container", () => {
+      const events: Array<string> = [];
+      let deprovisionCalls: number = 0;
+
+      @Injectable()
+      class ReentrantService {
+        public constructor(private readonly container: Container = inject(Container)) {}
+
+        @OnDeprovision()
+        public onDeprovision(): void {
+          deprovisionCalls += 1;
+          events.push("deprovision-start");
+
+          if (deprovisionCalls < 3) {
+            this.container.destroy();
+          }
+
+          events.push("deprovision-end");
+        }
+
+        @OnDeactivation()
+        public onDeactivation(): void {
+          events.push("deactivation");
+        }
+      }
+
+      const container: Container = new Container({ bindings: [ReentrantService] });
+
+      container.provision();
+      container.destroy();
+
+      expect(events).toEqual(["deprovision-start", "deprovision-end", "deactivation"]);
+      expect(() => container.get(ReentrantService)).toThrow(
+        expect.objectContaining({ code: ERROR_CODE_CONTAINER_DESTROYED })
+      );
     });
   });
 });

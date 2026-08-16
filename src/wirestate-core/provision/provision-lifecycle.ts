@@ -96,7 +96,7 @@ export function provisionContainer(
 export function deprovisionContainer(container: Container): void {
   const state: Optional<ProvisionState> = getProvisionState(container);
 
-  if (!state) {
+  if (!state || state.deprovisioning) {
     return;
   }
 
@@ -110,23 +110,29 @@ export function deprovisionContainer(container: Container): void {
     return;
   }
 
-  // The cycle, not `state.instances`: unbinding the last participant clears that entry while the
-  // cycle still holds every non-participant a plugin wired, and those are owed an `onDeprovision`
-  // too. It unwinds on the same axis provision ran on, so teardown is its exact reverse - the
-  // first instance provisioned is the last one deprovisioned.
-  deprovisionInstances(container, state, orderByCreation(container, new Set(state.cycleByInstance.keys())));
+  state.deprovisioning = true;
 
-  markActiveInstancesDeprovisioned(container);
+  try {
+    // The cycle, not `state.instances`: unbinding the last participant clears that entry while the
+    // cycle still holds every non-participant a plugin wired, and those are owed an `onDeprovision`
+    // too. It unwinds on the same axis provision ran on, so teardown is its exact reverse - the
+    // first instance provisioned is the last one deprovisioned.
+    deprovisionInstances(container, state, orderByCreation(container, new Set(state.cycleByInstance.keys())));
 
-  state.instances = null;
+    markActiveInstancesDeprovisioned(container);
 
-  // Sweep any disposer a plugin parked on a non-participant instance, so deprovision never
-  // leaves a subscription behind, then drop the cycle: the next provision re-tracks it.
-  clearRemainingDisposers(state);
-  state.cycleByInstance.clear();
+    state.instances = null;
 
-  // Plugins observe the cycle boundary at the very end, once.
-  dispatchPluginContainerDeprovision(container);
+    // Sweep any disposer a plugin parked on a non-participant instance, so deprovision never
+    // leaves a subscription behind, then drop the cycle: the next provision re-tracks it.
+    clearRemainingDisposers(state);
+    state.cycleByInstance.clear();
+
+    // Plugins observe the cycle boundary at the very end, once.
+    dispatchPluginContainerDeprovision(container);
+  } finally {
+    state.deprovisioning = false;
+  }
 }
 
 /**
@@ -202,7 +208,7 @@ export function deprovisionContainerBinding(container: Container, token: Service
   const state: Optional<ProvisionState> = getProvisionState(container);
   const instances: Maybe<Array<object>> = state?.instances;
 
-  if (!state || !instances) {
+  if (!state || !instances || state.deprovisioning) {
     return;
   }
 
@@ -221,10 +227,16 @@ export function deprovisionContainerBinding(container: Container, token: Service
     return;
   }
 
-  deprovisionInstances(container, state, removed);
-  untrackProvisionToken(state, removed, token);
+  state.deprovisioning = true;
 
-  state.instances = remaining.length > 0 ? remaining : null;
+  try {
+    deprovisionInstances(container, state, removed);
+    untrackProvisionToken(state, removed, token);
+
+    state.instances = remaining.length > 0 ? remaining : null;
+  } finally {
+    state.deprovisioning = false;
+  }
 }
 
 /**

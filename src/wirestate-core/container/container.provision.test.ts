@@ -5,8 +5,10 @@ import { WireStatus } from "../activation/wire-status";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
 import { OnEvent } from "../plugin/events/on-event";
+import { OnDeprovision } from "../provision/on-deprovision";
 import { OnProvision } from "../provision/on-provision";
 import { getProvisionState } from "../provision/provision-state";
+import { type Nullable } from "../types/general";
 
 import { Container } from "./container";
 import { inject } from "./container-context";
@@ -106,6 +108,36 @@ describe("Container provision", () => {
       container.deprovision();
 
       expect(events).toEqual(["provision", "deprovision"]);
+    });
+
+    it("coalesces deprovision re-entered from @OnDeprovision", () => {
+      let calls: number = 0;
+      const observedStatuses: Array<Nullable<boolean>> = [];
+
+      @Injectable()
+      class ReentrantService {
+        public constructor(private readonly container: Container = inject(Container)) {}
+
+        @OnDeprovision()
+        public onDeprovision(): void {
+          calls += 1;
+          observedStatuses.push(WireStatus.for(this).isDeprovisioned);
+
+          if (calls < 3) {
+            this.container.deprovision();
+          }
+        }
+      }
+
+      const container: Container = new Container({ bindings: [ReentrantService] });
+      const service: ReentrantService = container.get(ReentrantService);
+
+      container.provision();
+      container.deprovision();
+
+      expect(calls).toBe(1);
+      expect(observedStatuses).toEqual([false]);
+      expect(WireStatus.for(service).isDeprovisioned).toBe(true);
     });
 
     it("treats deprovision of a never-provisioned container as a no-op", () => {

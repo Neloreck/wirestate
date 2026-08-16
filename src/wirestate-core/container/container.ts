@@ -23,6 +23,7 @@ import {
   deprovisionContainerBinding,
   provisionContainer,
 } from "../provision/provision-lifecycle";
+import { isContainerDeprovisioning } from "../provision/provision-state";
 import { type Maybe, type Newable } from "../types/general";
 
 import { validateContainerConfig } from "./container-config-validation";
@@ -261,7 +262,8 @@ export class Container extends ContainerKernel {
    * Runs `@OnDeprovision` in the exact reverse of provision order, so the first instance
    * provisioned is the last one deprovisioned and a dependent tears down before the dependencies
    * it injected. Idempotent: deprovisioning a container that is not currently provisioned is a
-   * no-op.
+   * no-op. Teardown methods called on this container from `@OnDeprovision` are also no-ops because
+   * the active transaction owns cleanup until every hook and disposer has finished.
    *
    * @returns The same container for chaining.
    */
@@ -282,6 +284,10 @@ export class Container extends ContainerKernel {
    * @returns The same container for chaining.
    */
   public override unbind<T>(token: ServiceToken<T>): this {
+    if (isContainerDeprovisioning(this)) {
+      return this;
+    }
+
     token = this.getHotToken(token);
 
     if (this.hasOwn(token)) {
@@ -309,6 +315,10 @@ export class Container extends ContainerKernel {
    * @throws {@link WirestateError} If the container was destroyed.
    */
   public override unbindAll(): this {
+    if (isContainerDeprovisioning(this)) {
+      return this;
+    }
+
     deprovisionContainer(this);
 
     return super.unbindAll();
@@ -336,6 +346,10 @@ export class Container extends ContainerKernel {
    * ```
    */
   public override destroy(): this {
+    if (isContainerDeprovisioning(this)) {
+      return this;
+    }
+
     deprovisionContainer(this);
 
     return super.destroy();
