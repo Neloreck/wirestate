@@ -4,7 +4,15 @@ import { OnDeactivation } from "../activation/on-deactivation";
 import { WireStatus } from "../activation/wire-status";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { Injectable } from "../metadata/metadata-injectable";
+import { CommandBus } from "../plugin/commands/command-bus";
+import { CommandsPlugin } from "../plugin/commands/commands-plugin";
+import { OnCommand } from "../plugin/commands/on-command";
+import { EventBus } from "../plugin/events/event-bus";
+import { EventsPlugin } from "../plugin/events/events-plugin";
 import { OnEvent } from "../plugin/events/on-event";
+import { OnQuery } from "../plugin/queries/on-query";
+import { QueriesPlugin } from "../plugin/queries/queries-plugin";
+import { QueryBus } from "../plugin/queries/query-bus";
 import { OnDeprovision } from "../provision/on-deprovision";
 import { OnProvision } from "../provision/on-provision";
 import { getProvisionState } from "../provision/provision-state";
@@ -289,6 +297,58 @@ describe("Container provision", () => {
 
       expect(events).toEqual(["provision-first", "deactivation-later"]);
       expect(events).not.toContain("provision-later");
+    });
+
+    it("unwires a participant a prior @OnProvision hook unbound", () => {
+      const events: Array<string> = [];
+      const TEST_COMMAND: string = "TEST_COMMAND";
+      const TEST_EVENT: string = "TEST_EVENT";
+      const TEST_QUERY: string = "TEST_QUERY";
+
+      @Injectable()
+      class LaterService {
+        @OnCommand(TEST_COMMAND)
+        public onCommand(): void {
+          events.push("command");
+        }
+
+        @OnEvent(TEST_EVENT)
+        public onEvent(): void {
+          events.push("event");
+        }
+
+        @OnQuery(TEST_QUERY)
+        public onQuery(): string {
+          events.push("query");
+
+          return "handled";
+        }
+      }
+
+      @Injectable()
+      class FirstService {
+        public constructor(public readonly host = inject(Container)) {}
+
+        @OnProvision()
+        public onProvision(): void {
+          this.host.unbind(LaterService);
+        }
+      }
+
+      const container: Container = new Container({
+        bindings: [FirstService, LaterService],
+        plugins: [new CommandsPlugin(), new EventsPlugin(), new QueriesPlugin()],
+      });
+      const commandBus: CommandBus = container.get(CommandBus);
+      const eventBus: EventBus = container.get(EventBus);
+      const queryBus: QueryBus = container.get(QueryBus);
+
+      container.provision();
+      eventBus.emit(TEST_EVENT);
+
+      expect(commandBus.hasHandler(TEST_COMMAND)).toBe(false);
+      expect(queryBus.hasHandler(TEST_QUERY)).toBe(false);
+      expect(events).toEqual([]);
     });
   });
 

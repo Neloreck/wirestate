@@ -206,11 +206,12 @@ function markActiveInstancesDeprovisioned(container: Container): void {
  */
 export function deprovisionContainerBinding(container: Container, token: ServiceToken): void {
   const state: Optional<ProvisionState> = getProvisionState(container);
-  const instances: Maybe<Array<object>> = state?.instances;
 
-  if (!state || !instances || state.deprovisioning) {
+  if (!state || state.deprovisioning) {
     return;
   }
+
+  const instances: ReadonlyArray<object> = state.instances ?? [...state.cycleByInstance.keys()];
 
   const removed: Array<object> = [];
   const remaining: Array<object> = [];
@@ -233,7 +234,9 @@ export function deprovisionContainerBinding(container: Container, token: Service
     deprovisionInstances(container, state, removed);
     untrackProvisionToken(state, removed, token);
 
-    state.instances = remaining.length > 0 ? remaining : null;
+    if (state.instances) {
+      state.instances = remaining.length > 0 ? remaining : null;
+    }
   } finally {
     state.deprovisioning = false;
   }
