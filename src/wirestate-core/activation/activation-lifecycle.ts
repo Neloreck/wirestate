@@ -2,6 +2,7 @@ import { type InstanceBindingDescriptor } from "../binding/binding";
 import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
 import { type ContainerKernel } from "../container/container-kernel";
 import { type ActivationRecord } from "../container/container-storage";
+import { reportWirestateInternalError } from "../error/internal-error-handler";
 import { dispatchPluginActivate, dispatchPluginDeactivate } from "../plugin/plugin-registry";
 import { getContainerProvisionStatus } from "../provision/provision-state";
 import { type Optional, type Maybe } from "../types/general";
@@ -62,17 +63,29 @@ export const wirestateActivationAdapter: ActivationAdapter = {
     const binding: InstanceBindingDescriptor<object> = record.binding as InstanceBindingDescriptor<object>;
     const instance: object = record.instance as object;
 
-    const methodName: Maybe<string | symbol> = getDeactivationHandlerMetadata(instance);
+    try {
+      const methodName: Maybe<string | symbol> = getDeactivationHandlerMetadata(instance);
 
-    if (methodName) {
-      callLifecycleHandler({
+      if (methodName) {
+        callLifecycleHandler({
+          container,
+          name: "@OnDeactivation",
+          details: [binding.value.name, String(methodName)],
+          instance,
+          instanceName: binding.value.name,
+          methodName,
+          rethrowSync: false,
+          source: "instance-deactivation",
+        });
+      }
+    } catch (error) {
+      reportWirestateInternalError({
         container,
-        name: "@OnDeactivation",
-        details: [binding.value.name, String(methodName)],
+        details: [binding.value.name],
+        error,
         instance,
         instanceName: binding.value.name,
-        methodName,
-        rethrowSync: false,
+        message: "@OnDeactivation failed",
         source: "instance-deactivation",
       });
     }

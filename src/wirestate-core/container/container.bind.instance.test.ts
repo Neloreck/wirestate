@@ -467,6 +467,80 @@ describe("container.bind instance", () => {
       consoleSpy.mockRestore();
     });
 
+    it("should finish unbinding when inherited @OnDeactivation metadata conflicts", () => {
+      class BaseService {
+        @OnDeactivation()
+        public onBaseDeactivation(): void {}
+      }
+
+      @Injectable()
+      class ConflictingService extends BaseService {
+        @OnDeactivation()
+        public onDeactivation(): void {}
+      }
+
+      const onError = jest.fn();
+      const container: Container = new Container({
+        bindings: [ConflictingService],
+        onError,
+      });
+      const instance: ConflictingService = container.get(ConflictingService);
+
+      expect(() => container.unbind(ConflictingService)).not.toThrow();
+
+      expect(container.hasOwn(ConflictingService)).toBe(false);
+      expect(container.getActiveInstances()).toEqual([]);
+      expect(WireStatus.for(instance).isDeactivated).toBe(true);
+      expect(onError).toHaveBeenCalledWith(
+        expect.objectContaining({
+          container,
+          details: ["ConflictingService"],
+          instance,
+          instanceName: "ConflictingService",
+          message: "@OnDeactivation failed",
+          source: "instance-deactivation",
+        })
+      );
+    });
+
+    it("should continue bulk teardown when inherited @OnDeactivation metadata conflicts", () => {
+      const onHealthyDeactivation = jest.fn();
+
+      @Injectable()
+      class HealthyService {
+        @OnDeactivation()
+        public onDeactivation(): void {
+          onHealthyDeactivation();
+        }
+      }
+
+      class BaseService {
+        @OnDeactivation()
+        public onBaseDeactivation(): void {}
+      }
+
+      @Injectable()
+      class ConflictingService extends BaseService {
+        @OnDeactivation()
+        public onDeactivation(): void {}
+      }
+
+      const onError = jest.fn();
+      const container: Container = new Container({
+        activate: true,
+        bindings: [HealthyService, ConflictingService],
+        onError,
+      });
+
+      expect(() => container.unbindAll()).not.toThrow();
+
+      expect(onHealthyDeactivation).toHaveBeenCalledTimes(1);
+      expect(container.getActiveInstances()).toEqual([]);
+      expect(container.hasOwn(HealthyService)).toBe(false);
+      expect(container.hasOwn(ConflictingService)).toBe(false);
+      expect(onError).toHaveBeenCalledTimes(1);
+    });
+
     it("should report async @OnActivation errors to container error handler", async () => {
       const onError = jest.fn();
       const container: Container = new Container({
