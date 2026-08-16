@@ -122,7 +122,8 @@ builds a fresh container from it.
 
 **Only named module-scope classes declared with `@Injectable()` participate.** The plugin parses JavaScript and
 TypeScript modules before inspecting their top-level declarations. It ignores comments, strings, template text, and
-classes nested inside functions or blocks. Imported aliases of `Injectable` are supported.
+classes nested inside functions or blocks. Import `Injectable` directly from `@wirestate/core` or `wirestate`; aliases
+are supported. Imports through a local re-export are not detected.
 
 **A handler that forces synchronous rendering breaks the swap.** Calling `flushSync` from `@OnDeprovision` or
 `@OnDeactivation` renders while containers are being replaced. Wirestate detects this and throws a message naming the

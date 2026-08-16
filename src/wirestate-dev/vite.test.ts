@@ -2,6 +2,8 @@ import { type WirestateVitePlugin, wirestate } from "./vite";
 
 describe("wirestate vite plugin", () => {
   const SERVICE_CODE: string = `
+import { Injectable } from "@wirestate/core";
+
 @Injectable()
 export class CounterService {}
 `;

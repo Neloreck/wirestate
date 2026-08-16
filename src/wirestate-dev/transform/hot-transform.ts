@@ -11,6 +11,7 @@ import {
 import { type Nullable } from "../types/general";
 
 const DEFAULT_MODULE_ID: string = "module.ts";
+const INJECTABLE_IMPORT_SOURCES: ReadonlySet<string> = new Set(["@wirestate/core", "wirestate"]);
 const JAVASCRIPT_MODULE: RegExp = /\.(?:c|m)?jsx?$/i;
 const JSX_MODULE: RegExp = /\.[jt]sx$/i;
 
@@ -20,8 +21,9 @@ const JSX_MODULE: RegExp = /\.[jt]sx$/i;
  * @remarks
  * The module is parsed before inspection, so decorator-looking text in comments,
  * strings, and templates is ignored. Classes nested inside functions or blocks are
- * not module-scoped and do not participate. An imported alias of `Injectable` is
- * recognized from its import specifier.
+ * not module-scoped and do not participate. `Injectable` must be imported from
+ * `@wirestate/core` or `wirestate`; imported aliases from those entries are supported,
+ * while imports through other modules are ignored.
  *
  * @group Transform
  *
@@ -109,10 +111,10 @@ function createParseOptions(moduleId: string): ParseOptions {
 }
 
 function findInjectableDecoratorNames(module: Module): ReadonlySet<string> {
-  const names: Set<string> = new Set(["Injectable"]);
+  const names: Set<string> = new Set();
 
   for (const item of module.body) {
-    if (item.type !== "ImportDeclaration" || item.typeOnly) {
+    if (item.type !== "ImportDeclaration" || item.typeOnly || !INJECTABLE_IMPORT_SOURCES.has(item.source.value)) {
       continue;
     }
 

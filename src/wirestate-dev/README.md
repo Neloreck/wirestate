@@ -62,6 +62,9 @@ By default `.ts`, `.mts`, `.js`, and `.mjs` files are transformed, skipping `nod
 files, and server-side transforms. Component files (`.tsx`, `.jsx`) are excluded because React Fast Refresh already owns
 them, so keep services in their own modules.
 
+The transform recognizes `Injectable` imported directly from `@wirestate/core` or `wirestate`, including aliased
+imports. It ignores same-named decorators from other packages and imports through local re-exports.
+
 Requires [`@wirestate/core`](https://www.npmjs.com/package/@wirestate/core) in the application: the injected footer
 imports the `@wirestate/core/hot` runtime that performs the swap.
 
