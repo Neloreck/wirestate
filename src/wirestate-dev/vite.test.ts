@@ -11,10 +11,11 @@ export class CounterService {}
   /**
    * Creates the plugin with a resolved project root, as Vite does before transforming.
    *
+   * @param options - Plugin options to test.
    * @returns Plugin instance ready to transform modules.
    */
-  function createPlugin(): WirestateVitePlugin {
-    const plugin: WirestateVitePlugin = wirestate();
+  function createPlugin(options?: Parameters<typeof wirestate>[0]): WirestateVitePlugin {
+    const plugin: WirestateVitePlugin = wirestate(options);
 
     plugin.configResolved({ root: "/project" });
 
@@ -30,6 +31,37 @@ export class CounterService {}
     const result = createPlugin().transform(SERVICE_CODE, "/project/src/services/counter.ts");
 
     expect(result?.code).toContain('registerHotModule("src/services/counter.ts", { CounterService })');
+  });
+
+  it("should not strip a sibling directory that only shares the root prefix", () => {
+    const plugin: WirestateVitePlugin = createPlugin();
+    const sibling = plugin.transform(SERVICE_CODE, "/project-other/service.ts");
+    const insideRoot = plugin.transform(SERVICE_CODE, "/project/-other/service.ts");
+
+    expect(sibling?.code).toContain('registerHotModule("/project-other/service.ts", { CounterService })');
+    expect(insideRoot?.code).toContain('registerHotModule("-other/service.ts", { CounterService })');
+  });
+
+  it.each([
+    ["global", /\.ts$/g],
+    ["sticky", /^\/project\/.*\.ts$/y],
+  ])("should apply a %s include expression consistently", (_name, include) => {
+    const plugin: WirestateVitePlugin = createPlugin({ include });
+    const id: string = "/project/src/services/counter.ts";
+
+    expect(plugin.transform(SERVICE_CODE, id)).not.toBeNull();
+    expect(plugin.transform(SERVICE_CODE, id)).not.toBeNull();
+  });
+
+  it.each([
+    ["global", /\.service\.ts$/g],
+    ["sticky", /^\/project\/.*\.service\.ts$/y],
+  ])("should apply a %s exclude expression consistently", (_name, exclude) => {
+    const plugin: WirestateVitePlugin = createPlugin({ exclude });
+    const id: string = "/project/src/counter.service.ts";
+
+    expect(plugin.transform(SERVICE_CODE, id)).toBeNull();
+    expect(plugin.transform(SERVICE_CODE, id)).toBeNull();
   });
 
   it("should skip server transforms", () => {

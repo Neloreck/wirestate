@@ -119,7 +119,7 @@ export function wirestate(options: WirestateVitePluginOptions = {}): WirestateVi
 
       // Server modules are skipped: the footer wires a browser hot-update boundary, and there is
       // no rendered tree on the server holding a container to swap.
-      if (options?.ssr || file.includes("/node_modules/") || !include.test(file) || exclude.test(file)) {
+      if (options?.ssr || file.includes("/node_modules/") || !matches(include, file) || matches(exclude, file)) {
         return null;
       }
 
@@ -139,7 +139,32 @@ export function wirestate(options: WirestateVitePluginOptions = {}): WirestateVi
  * @returns Root-relative module id when possible, the absolute path otherwise.
  */
 function toModuleId(file: string, root: string): string {
-  return root && file.startsWith(root) ? file.slice(root.length).replace(/^\//, "") : file;
+  if (!root) {
+    return file;
+  }
+
+  const rootPrefix: string = root.endsWith("/") ? root : `${root}/`;
+
+  return file.startsWith(rootPrefix) ? file.slice(rootPrefix.length) : file;
+}
+
+/**
+ * Matches a file path without changing caller-owned regular expression state.
+ *
+ * @param expression - Regular expression supplied by the plugin or caller.
+ * @param value - File path to test.
+ * @returns Whether the expression matches the file path.
+ */
+function matches(expression: RegExp, value: string): boolean {
+  const lastIndex: number = expression.lastIndex;
+
+  expression.lastIndex = 0;
+
+  try {
+    return expression.test(value);
+  } finally {
+    expression.lastIndex = lastIndex;
+  }
 }
 
 export default wirestate;

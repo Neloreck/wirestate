@@ -18,13 +18,28 @@ import { ContainerProvider } from "./container-provider";
  */
 function resetHotState(): void {
   const state = (
-    globalThis as Record<symbol, { latest: Map<string, unknown>; dirty: Set<string>; owners: Set<unknown> }>
+    globalThis as Record<
+      symbol,
+      {
+        latest: Map<string, unknown>;
+        modules: Map<string, Set<string>>;
+        dirty: Set<string>;
+        owners: Set<unknown>;
+        reloadRequired: boolean;
+        scheduled: boolean;
+        swapping: boolean;
+      }
+    >
   )[Symbol.for("wirestate.hot.state")];
 
   if (state) {
     state.latest.clear();
+    state.modules.clear();
     state.dirty.clear();
     state.owners.clear();
+    state.reloadRequired = false;
+    state.scheduled = false;
+    state.swapping = false;
   }
 }
 

@@ -20,11 +20,24 @@ function flushMicrotasks(): Promise<void> {
   return Promise.resolve();
 }
 
+/**
+ * Clears process-wide hot state between tests.
+ */
+function resetHotState(): void {
+  const state = getHotState();
+
+  state.latest.clear();
+  state.modules.clear();
+  state.dirty.clear();
+  state.owners.clear();
+  state.reloadRequired = false;
+  state.scheduled = false;
+  state.swapping = false;
+}
+
 describe("hot registry", () => {
   beforeEach(() => {
-    getHotState().latest.clear();
-    getHotState().dirty.clear();
-    getHotState().owners.clear();
+    resetHotState();
   });
 
   it("should resolve unstamped values to themselves", () => {
@@ -64,7 +77,22 @@ describe("hot registry", () => {
     expect(getHotState().latest.size).toBe(0);
   });
 
-  it("should not resolve a subclass through an inherited stamp", () => {
+  it("should register sealed and frozen classes without modifying them", () => {
+    @Injectable()
+    class SealedService {}
+
+    @Injectable()
+    class FrozenService {}
+
+    Object.seal(SealedService);
+    Object.freeze(FrozenService);
+
+    expect(() => registerHotModule("services/locked.ts", { SealedService, FrozenService })).not.toThrow();
+    expect(getLatestHotClass(SealedService)).toBe(SealedService);
+    expect(getLatestHotClass(FrozenService)).toBe(FrozenService);
+  });
+
+  it("should not resolve an unregistered subclass through its registered base", () => {
     @Injectable()
     class BaseV1 {}
 
@@ -74,7 +102,7 @@ describe("hot registry", () => {
     registerHotModule("base.ts", { Base: BaseV1 });
 
     // Subclasses declared where the transform does not reach (a .tsx module, a test double)
-    // inherit the base stamp as a static property, so identity must be checked on own keys.
+    // have no direct registry identity and must remain independent from the registered base.
     @Injectable()
     class UntransformedChild extends BaseV1 {}
 
@@ -89,9 +117,7 @@ describe("hot registry", () => {
 
 describe("hot remap", () => {
   beforeEach(() => {
-    getHotState().latest.clear();
-    getHotState().dirty.clear();
-    getHotState().owners.clear();
+    resetHotState();
   });
 
   it("should remap bare classes, instance descriptors and class tokens", () => {
@@ -151,13 +177,12 @@ describe("hot remap", () => {
 
 describe("hot swap", () => {
   beforeEach(() => {
-    getHotState().latest.clear();
-    getHotState().dirty.clear();
-    getHotState().owners.clear();
+    resetHotState();
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
+    Reflect.deleteProperty(globalThis, "location");
   });
 
   /**
@@ -241,6 +266,61 @@ describe("hot swap", () => {
 
     expect(previous.hasOwn(ServiceV1)).toBe(false);
     expect(isHotSwapping()).toBe(false);
+  });
+
+  it("should reload without tearing down containers when an injectable class is renamed", async () => {
+    const reload = jest.fn();
+
+    Object.defineProperty(globalThis, "location", { value: { reload }, configurable: true, writable: true });
+
+    @Injectable()
+    class OldService {}
+
+    @Injectable()
+    class NewService {}
+
+    registerHotModule("renamed.ts", { OldService });
+
+    const { owner, commits } = createOwner({ bindings: [OldService] });
+    const previous: Container = owner.container;
+
+    registerHotModule("renamed.ts", { NewService });
+    requestHotSwap();
+    await flushMicrotasks();
+
+    expect(reload).toHaveBeenCalledTimes(1);
+    expect(commits).toHaveLength(0);
+    expect(owner.container).toBe(previous);
+    expect(previous.get(OldService)).toBeInstanceOf(OldService);
+  });
+
+  it("should reload when one injectable is removed from a module", async () => {
+    const reload = jest.fn();
+
+    Object.defineProperty(globalThis, "location", { value: { reload }, configurable: true, writable: true });
+
+    @Injectable()
+    class RemovedService {}
+
+    @Injectable()
+    class KeptServiceV1 {}
+
+    @Injectable()
+    class KeptServiceV2 {}
+
+    registerHotModule("partial.ts", { RemovedService, KeptService: KeptServiceV1 });
+
+    const { owner, commits } = createOwner({ bindings: [RemovedService] });
+    const previous: Container = owner.container;
+
+    registerHotModule("partial.ts", { KeptService: KeptServiceV2 });
+    requestHotSwap();
+    await flushMicrotasks();
+
+    expect(reload).toHaveBeenCalledTimes(1);
+    expect(commits).toHaveLength(0);
+    expect(owner.container).toBe(previous);
+    expect(previous.get(RemovedService)).toBeInstanceOf(RemovedService);
   });
 
   it("should rebuild descendants of a swapped container with the replacement parent", async () => {
@@ -455,8 +535,6 @@ describe("hot swap", () => {
 
     // The flag must not stay set, or every later render would report a swap in progress.
     expect(isHotSwapping()).toBe(false);
-
-    Reflect.deleteProperty(globalThis, "location");
   });
 
   it("should batch multiple update requests into one swap", async () => {

@@ -59,6 +59,17 @@ export function requestHotSwap(): void {
  * @param state - Shared hot-reload state.
  */
 function performHotSwap(state: HotState): void {
+  if (state.reloadRequired) {
+    state.reloadRequired = false;
+    state.dirty.clear();
+
+    if (typeof location !== "undefined") {
+      location.reload();
+    }
+
+    return;
+  }
+
   if (state.dirty.size === 0) {
     return;
   }

@@ -48,8 +48,12 @@ const INTERNAL_METHODS: ReadonlyArray<string> = [
 describe("ContainerKernel hot-reload token rewriting", () => {
   beforeEach(() => {
     getHotState().latest.clear();
+    getHotState().modules.clear();
     getHotState().dirty.clear();
     getHotState().owners.clear();
+    getHotState().reloadRequired = false;
+    getHotState().scheduled = false;
+    getHotState().swapping = false;
   });
 
   /**
