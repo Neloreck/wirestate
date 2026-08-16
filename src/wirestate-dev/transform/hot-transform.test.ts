@@ -57,6 +57,67 @@ describe("suite", () => {
     expect(transformHotModule(code, "src/factory.ts")).toBeNull();
   });
 
+  it("should ignore unindented classes declared inside blocks", () => {
+    const code: string = `
+if (process.env.NODE_ENV === "test") {
+@Injectable()
+class Fixture {}
+}
+`;
+
+    expect(findInjectableClassNames(code, "src/fixture.ts")).toEqual([]);
+    expect(transformHotModule(code, "src/fixture.ts")).toBeNull();
+  });
+
+  it("should ignore decorator-looking text in comments and templates", () => {
+    const code: string = `
+/*
+@Injectable()
+class CommentedService {}
+*/
+
+export const example = \`
+@Injectable()
+class TemplateService {}
+\`;
+`;
+
+    expect(findInjectableClassNames(code, "src/example.ts")).toEqual([]);
+    expect(transformHotModule(code, "src/example.ts")).toBeNull();
+  });
+
+  it("should resolve an aliased Injectable import", () => {
+    const code: string = `
+import { Injectable as Service } from "@wirestate/core";
+
+@Service()
+export class CounterService {}
+`;
+
+    expect(findInjectableClassNames(code, "src/counter.ts")).toEqual(["CounterService"]);
+    expect(transformHotModule(code, "src/counter.ts")).toContain("CounterService");
+  });
+
+  it("should parse component syntax when the caller includes component files", () => {
+    const code: string = `
+const element = <div />;
+
+@Injectable()
+export class ViewService {}
+`;
+
+    expect(findInjectableClassNames(code, "src/view.tsx")).toEqual(["ViewService"]);
+  });
+
+  it("should detect a named default-exported class", () => {
+    const code: string = `
+@Injectable()
+export default class DefaultService {}
+`;
+
+    expect(findInjectableClassNames(code, "src/default-service.ts")).toEqual(["DefaultService"]);
+  });
+
   it("should still detect module-scope classes that are not exported", () => {
     const code: string = `
 @Injectable()

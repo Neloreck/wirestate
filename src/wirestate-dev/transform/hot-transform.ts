@@ -1,53 +1,45 @@
+import {
+  type ClassDeclaration,
+  type ClassExpression,
+  type ImportDeclaration,
+  type Module,
+  type ModuleItem,
+  type ParseOptions,
+  parseSync,
+} from "@swc/core";
+
 import { type Nullable } from "../types/general";
 
+const DEFAULT_MODULE_ID: string = "module.ts";
+const JAVASCRIPT_MODULE: RegExp = /\.(?:c|m)?jsx?$/i;
+const JSX_MODULE: RegExp = /\.[jt]sx$/i;
+
 /**
- * Matches an `@Injectable(...)` decorator that starts its own line, with no indentation.
+ * Finds named module-scope classes declared with an `@Injectable()` decorator.
  *
  * @remarks
- * Anchoring to the start of a line keeps the footer to classes declared at module scope.
- * A decorated class nested inside a function or block is indented, and registering it would
- * emit a reference to a binding that does not exist at module scope.
- */
-const INJECTABLE_DECORATOR: RegExp = /^@Injectable\s*\(/gm;
-
-/**
- * Matches the first class declaration name after a decorator occurrence.
- */
-const CLASS_DECLARATION: RegExp = /\bclass\s+([A-Za-z_$][A-Za-z0-9_$]*)/;
-
-/**
- * Longest allowed distance between an `@Injectable()` decorator and its class keyword.
- *
- * Bounds the search so a decorator-looking string far away from any class does not
- * pick up an unrelated declaration.
- */
-const CLASS_SEARCH_WINDOW: number = 600;
-
-/**
- * Finds the names of classes declared with an `@Injectable()` decorator.
- *
- * @remarks
- * A lightweight lexical scan rather than a parse: it runs on every module of a
- * development server, and a false negative only means a service misses hot reload
- * while a false positive only registers a class that never binds. Anonymous classes,
- * decorated expressions, and classes declared inside functions or blocks are ignored.
+ * The module is parsed before inspection, so decorator-looking text in comments,
+ * strings, and templates is ignored. Classes nested inside functions or blocks are
+ * not module-scoped and do not participate. An imported alias of `Injectable` is
+ * recognized from its import specifier.
  *
  * @group Transform
  *
  * @param code - Module source code before compilation.
+ * @param moduleId - Module identifier used to select JavaScript, TypeScript, or JSX parsing.
  * @returns Unique class names in declaration order.
+ * @throws When SWC cannot parse the module source.
  */
-export function findInjectableClassNames(code: string): Array<string> {
+export function findInjectableClassNames(code: string, moduleId: string = DEFAULT_MODULE_ID): Array<string> {
+  const module: Module = parseSync(code, createParseOptions(moduleId));
+  const decoratorNames: ReadonlySet<string> = findInjectableDecoratorNames(module);
   const names: Set<string> = new Set();
 
-  INJECTABLE_DECORATOR.lastIndex = 0;
+  for (const item of module.body) {
+    const declaration: Nullable<ClassDeclaration | ClassExpression> = getModuleClass(item);
 
-  for (let match = INJECTABLE_DECORATOR.exec(code); match; match = INJECTABLE_DECORATOR.exec(code)) {
-    const window: string = code.slice(match.index, match.index + CLASS_SEARCH_WINDOW);
-    const declaration: ReturnType<string["match"]> = window.match(CLASS_DECLARATION);
-
-    if (declaration?.[1]) {
-      names.add(declaration[1]);
+    if (declaration?.identifier && hasInjectableDecorator(declaration.decorators, decoratorNames)) {
+      names.add(declaration.identifier.value);
     }
   }
 
@@ -91,17 +83,85 @@ export function createHotFooter(moduleId: string, classNames: ReadonlyArray<stri
  * @param code - Module source code before compilation.
  * @param moduleId - Stable module identifier, usually the root-relative path.
  * @returns Transformed code, or `null` when the module declares no injectable classes.
+ * @throws When SWC cannot parse a candidate module.
  */
 export function transformHotModule(code: string, moduleId: string): Nullable<string> {
-  if (!code.includes("@Injectable")) {
+  if (!code.includes("Injectable")) {
     return null;
   }
 
-  const classNames: Array<string> = findInjectableClassNames(code);
+  const classNames: Array<string> = findInjectableClassNames(code, moduleId);
 
   if (classNames.length === 0) {
     return null;
   }
 
   return code + createHotFooter(moduleId, classNames);
+}
+
+function createParseOptions(moduleId: string): ParseOptions {
+  const file: string = moduleId.split("?", 1)[0];
+  const jsx: boolean = JSX_MODULE.test(file);
+
+  return JAVASCRIPT_MODULE.test(file)
+    ? { comments: false, decorators: true, jsx, syntax: "ecmascript", target: "es2022" }
+    : { comments: false, decorators: true, syntax: "typescript", target: "es2022", tsx: jsx };
+}
+
+function findInjectableDecoratorNames(module: Module): ReadonlySet<string> {
+  const names: Set<string> = new Set(["Injectable"]);
+
+  for (const item of module.body) {
+    if (item.type !== "ImportDeclaration" || item.typeOnly) {
+      continue;
+    }
+
+    addInjectableImportNames(item, names);
+  }
+
+  return names;
+}
+
+function addInjectableImportNames(declaration: ImportDeclaration, names: Set<string>): void {
+  for (const specifier of declaration.specifiers) {
+    if (specifier.type !== "ImportSpecifier" || specifier.isTypeOnly) {
+      continue;
+    }
+
+    const importedName: string = specifier.imported?.value ?? specifier.local.value;
+
+    if (importedName === "Injectable") {
+      names.add(specifier.local.value);
+    }
+  }
+}
+
+function getModuleClass(item: ModuleItem): Nullable<ClassDeclaration | ClassExpression> {
+  if (item.type === "ClassDeclaration") {
+    return item;
+  }
+
+  if (item.type === "ExportDeclaration" && item.declaration.type === "ClassDeclaration") {
+    return item.declaration;
+  }
+
+  if (item.type === "ExportDefaultDeclaration" && item.decl.type === "ClassExpression") {
+    return item.decl;
+  }
+
+  return null;
+}
+
+function hasInjectableDecorator(
+  decorators: ClassDeclaration["decorators"],
+  decoratorNames: ReadonlySet<string>
+): boolean {
+  return (
+    decorators?.some(
+      ({ expression }) =>
+        expression.type === "CallExpression" &&
+        expression.callee.type === "Identifier" &&
+        decoratorNames.has(expression.callee.value)
+    ) ?? false
+  );
 }
