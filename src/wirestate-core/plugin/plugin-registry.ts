@@ -143,14 +143,28 @@ export function isPluginParticipant(container: ContainerKernel, token: ServiceTo
 /**
  * Dispatches `onActivate` to the effective plugins (setup: may throw, atomic).
  *
+ * @remarks
+ * If a hook throws, deactivates the earlier hooks in reverse order before rethrowing the setup error.
+ *
  * @internal
  *
  * @param container - Container that activated the instance.
  * @param instance - The activated instance.
  */
 export function dispatchPluginActivate(container: ContainerKernel, instance: object): void {
+  const activated: Array<WirestatePlugin> = [];
+
   for (const plugin of getEffectivePlugins(container)) {
-    plugin.onActivate?.(instance, container as Container);
+    try {
+      plugin.onActivate?.(instance, container as Container);
+      activated.push(plugin);
+    } catch (error) {
+      for (const priorPlugin of reversed(activated)) {
+        runFailsafe(() => priorPlugin.onDeactivate?.(instance, container as Container));
+      }
+
+      throw error;
+    }
   }
 }
 

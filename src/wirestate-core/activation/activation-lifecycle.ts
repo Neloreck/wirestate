@@ -34,19 +34,27 @@ export const wirestateActivationAdapter: ActivationAdapter = {
     // @OnActivation. A throw here is atomic: the kernel rolls the activation back.
     dispatchPluginActivate(container, instance);
 
-    const methodName: Maybe<string | symbol> = getActivationHandlerMetadata(instance);
+    try {
+      const methodName: Maybe<string | symbol> = getActivationHandlerMetadata(instance);
 
-    if (methodName) {
-      callLifecycleHandler({
-        container,
-        name: "@OnActivation",
-        details: [binding.value.name, String(methodName)],
-        instance,
-        instanceName: binding.value.name,
-        methodName,
-        rethrowSync: true,
-        source: "instance-activation",
-      });
+      if (methodName) {
+        callLifecycleHandler({
+          container,
+          name: "@OnActivation",
+          details: [binding.value.name, String(methodName)],
+          instance,
+          instanceName: binding.value.name,
+          methodName,
+          rethrowSync: true,
+          source: "instance-activation",
+        });
+      }
+    } catch (error) {
+      // The plugin setup phase completed, so user activation failure owes every plugin its
+      // matching teardown. Teardown is failsafe and the original activation error still wins.
+      dispatchPluginDeactivate(container, instance);
+
+      throw error;
     }
   },
 

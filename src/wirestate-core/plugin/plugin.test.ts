@@ -88,6 +88,95 @@ describe("container plugins", () => {
     expect(log).toEqual(["user:deactivation", "plugin:deactivate:Svc"]);
   });
 
+  it("unwinds successful plugin activation hooks when a later plugin throws", () => {
+    const error: Error = new Error("plugin activation failed");
+    const log: Array<string> = [];
+
+    @Injectable()
+    class Service {}
+
+    class FirstPlugin implements WirestatePlugin {
+      public onActivate(): void {
+        log.push("first:activate");
+      }
+
+      public onDeactivate(): void {
+        log.push("first:deactivate");
+      }
+    }
+
+    class FailingPlugin implements WirestatePlugin {
+      public onActivate(): void {
+        log.push("failing:activate");
+
+        throw error;
+      }
+
+      public onDeactivate(): void {
+        log.push("failing:deactivate");
+      }
+    }
+
+    const container: Container = new Container({
+      bindings: [Service],
+      onError: jest.fn(),
+      plugins: [new FirstPlugin(), new FailingPlugin()],
+    });
+
+    expect(() => container.get(Service)).toThrow(error);
+    expect(log).toEqual(["first:activate", "failing:activate", "first:deactivate"]);
+  });
+
+  it("unwinds plugin activation hooks when @OnActivation throws", () => {
+    const error: Error = new Error("user activation failed");
+    const log: Array<string> = [];
+
+    @Injectable()
+    class Service {
+      @OnActivation()
+      public onActivation(): void {
+        log.push("user:activate");
+
+        throw error;
+      }
+    }
+
+    class FirstPlugin implements WirestatePlugin {
+      public onActivate(): void {
+        log.push("first:activate");
+      }
+
+      public onDeactivate(): void {
+        log.push("first:deactivate");
+      }
+    }
+
+    class SecondPlugin implements WirestatePlugin {
+      public onActivate(): void {
+        log.push("second:activate");
+      }
+
+      public onDeactivate(): void {
+        log.push("second:deactivate");
+      }
+    }
+
+    const container: Container = new Container({
+      bindings: [Service],
+      onError: jest.fn(),
+      plugins: [new FirstPlugin(), new SecondPlugin()],
+    });
+
+    expect(() => container.get(Service)).toThrow(error);
+    expect(log).toEqual([
+      "first:activate",
+      "second:activate",
+      "user:activate",
+      "second:deactivate",
+      "first:deactivate",
+    ]);
+  });
+
   it("force-activates participants and runs disposers on deprovision", () => {
     const log: Array<string> = [];
 
