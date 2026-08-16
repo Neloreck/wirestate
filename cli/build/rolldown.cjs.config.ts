@@ -19,6 +19,8 @@ export default PACKAGES.map((pkg) => {
     output: {
       chunkFileNames: "lib.js",
       dir,
+      // The Vite entry keeps its default export on `.default` alongside the named export.
+      exports: pkg.name === "wirestate-dev" ? ("named" as const) : undefined,
       format: "cjs" as const,
       sourcemap: false,
     },

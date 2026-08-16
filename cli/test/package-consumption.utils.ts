@@ -10,6 +10,7 @@ export const CONSUMER_ROOT: string = path.resolve(PROJECT_ROOT, "target/pkg-cons
 type PackageExportCheckMode = "import" | "require";
 
 export interface PackageCheckDescriptor {
+  readonly defaultExport?: boolean;
   readonly exportName: string;
   readonly name: string;
 }
@@ -45,7 +46,7 @@ export const PACKAGE_CHECKS: Array<PackageCheckDescriptor> = [
   { exportName: "DevToolsPlugin", name: "@wirestate/core/devtools" },
   { exportName: "isHotSwapping", name: "@wirestate/core/hot" },
   { exportName: "transformHotModule", name: "@wirestate/dev" },
-  { exportName: "wirestate", name: "@wirestate/dev/vite" },
+  { defaultExport: true, exportName: "wirestate", name: "@wirestate/dev/vite" },
   { exportName: "ContainerProvider", name: "@wirestate/react" },
   { exportName: "Action", name: "@wirestate/mobx" },
   { exportName: "observer", name: "@wirestate/react-mobx" },
@@ -95,6 +96,9 @@ export function packageExportCheckScript(mode: PackageExportCheckMode): string {
     `  const mod = ${mode === "require" ? "require(check.name)" : "await import(check.name)"};`,
     "  if (typeof mod[check.exportName] === 'undefined') {",
     `    throw new Error(\`\${check.name} did not expose \${check.exportName} through ${mode}\`);`,
+    "  }",
+    "  if (check.defaultExport && mod.default !== mod[check.exportName]) {",
+    `    throw new Error(\`\${check.name} default export did not match \${check.exportName} through ${mode}\`);`,
     "  }",
     "}",
     "",

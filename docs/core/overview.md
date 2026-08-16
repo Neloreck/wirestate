@@ -52,6 +52,9 @@ counter.increment();
   deprovision.
 - Optional development-time inspection through the [`@wirestate/core/devtools`](/core/devtools) subpath
   (`DevToolsPlugin`).
+- Binding inspection helpers that resolve a binding's token, type, and scope without repeating descriptor defaults.
+- The development-only [`@wirestate/core/hot`](/core/hot-reload) runtime used by `@wirestate/dev`. Applications normally
+  configure the bundler plugin instead of calling this entry directly.
 
 ## API Reference
 
@@ -59,4 +62,7 @@ counter.increment();
 [`EventBus`](/api/wirestate-core/classes/EventBus), [`CommandBus`](/api/wirestate-core/classes/CommandBus),
 [`QueryBus`](/api/wirestate-core/classes/QueryBus), [`EventsPlugin`](/api/wirestate-core/classes/EventsPlugin),
 [`CommandsPlugin`](/api/wirestate-core/classes/CommandsPlugin),
-[`QueriesPlugin`](/api/wirestate-core/classes/QueriesPlugin).
+[`QueriesPlugin`](/api/wirestate-core/classes/QueriesPlugin),
+[`getBindingToken`](/api/wirestate-core/functions/getBindingToken),
+[`getBindingType`](/api/wirestate-core/functions/getBindingType), and
+[`getBindingScope`](/api/wirestate-core/functions/getBindingScope).

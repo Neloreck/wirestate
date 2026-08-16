@@ -41,13 +41,14 @@ counterService.increment();
 
 - DI primitives such as `Injectable`, `inject`, `Container`, `ServiceToken`, and `InjectionToken`.
 - `Container` and container methods such as `bind`, `unbind`, `unbindAll`, `get`, `has`, and `getOwnBindings`.
+- Binding inspection helpers: `getBindingToken`, `getBindingType`, and `getBindingScope`.
 - `OnActivation`, `OnDeactivation`, `OnProvision`, and `OnDeprovision`.
 - `WireStatus` and `ProvisionId` for lifecycle guards on resolved service instances.
 - `EventBus`, `CommandBus`, `QueryBus`, and their decorators (`OnEvent`, `OnCommand`, `OnQuery`), enabled by
   registering `EventsPlugin`, `CommandsPlugin`, or `QueriesPlugin`.
 - An optional `@wirestate/core/devtools` subpath (`DevToolsPlugin`) for development-time container inspection.
 - An optional `@wirestate/core/hot` subpath carrying the runtime that swaps containers when a service module is hot
-  replaced. Applications do not call it directly: install
+  replaced. Applications normally do not call it directly: install
   [`@wirestate/dev`](https://www.npmjs.com/package/@wirestate/dev) and its bundler plugin drives it.
 
 React and Lit integration live in [`@wirestate/react`](https://www.npmjs.com/package/@wirestate/react) and
