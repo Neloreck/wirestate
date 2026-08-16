@@ -94,9 +94,15 @@ export class DevToolsPlugin implements WirestatePlugin {
     this.label = options?.label;
   }
 
-  public install(): void {
+  public install(_container: Container, addRollback: (rollback: () => void) => void): void {
+    const registeredByThisInstall: boolean = !this.registered;
+
     this.hook = installDevtoolsHook();
     this.ensureRoot();
+
+    if (registeredByThisInstall) {
+      addRollback(() => this.releaseRoot());
+    }
   }
 
   public onContainerProvision(container: Container): void {

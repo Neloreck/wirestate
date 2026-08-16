@@ -109,16 +109,29 @@ export function getEffectivePlugins(container: ContainerKernel): ReadonlyArray<W
  *
  * @remarks
  * Inheriting children do not re-install an ancestor's plugin. A setup phase: a
- * throw propagates and fails container construction.
+ * throw runs registered install rollbacks in reverse before failing container construction.
  *
  * @internal
  *
  * @param container - Container the plugins are registered on.
+ * @returns Failsafe cleanup for a later container-construction failure.
  */
-export function installOwnPlugins(container: Container): void {
-  for (const plugin of getOwnPlugins(container)) {
-    plugin.install?.(container);
+export function installOwnPlugins(container: Container): () => void {
+  const rollbacks: Array<() => void> = [];
+
+  try {
+    for (const plugin of getOwnPlugins(container)) {
+      plugin.install?.(container, (rollback: () => void): void => {
+        rollbacks.push(rollback);
+      });
+    }
+  } catch (error) {
+    runInstallRollbacks(rollbacks);
+
+    throw error;
   }
+
+  return (): void => runInstallRollbacks(rollbacks);
 }
 
 /**
@@ -263,6 +276,21 @@ export function dispatchPluginContainerDeprovision(container: ContainerKernel): 
  */
 function reversed(plugins: ReadonlyArray<WirestatePlugin>): ReadonlyArray<WirestatePlugin> {
   return [...plugins].reverse();
+}
+
+/**
+ * Failsafe-runs install rollback callbacks in reverse registration order.
+ *
+ * @param rollbacks - Rollbacks registered by plugin install hooks.
+ */
+function runInstallRollbacks(rollbacks: Array<() => void>): void {
+  while (rollbacks.length > 0) {
+    const rollback: Maybe<() => void> = rollbacks.pop();
+
+    if (rollback) {
+      runFailsafe(rollback);
+    }
+  }
 }
 
 /**

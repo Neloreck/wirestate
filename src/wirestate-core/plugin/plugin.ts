@@ -43,9 +43,14 @@ export interface WirestatePlugin {
    * Runs once, on the container the plugin is registered on (not on inheriting children),
    * before any binding activates.
    *
+   * Register cleanup for install-time side effects with `addRollback`. Rollbacks run in reverse
+   * order if this or a later install throws, or if container construction fails afterwards.
+   * They are failsafe and do not run during normal container teardown.
+   *
    * @param container - Container the plugin is registered on.
+   * @param addRollback - Registers cleanup for a failed container construction.
    */
-  install?(container: Container): void;
+  install?(container: Container, addRollback: (rollback: () => void) => void): void;
 
   /**
    * Declares whether a binding token is a participant this plugin wires.

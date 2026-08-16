@@ -286,6 +286,34 @@ describe("container plugins", () => {
     expect(container.get<number>(TOKEN)).toBe(42);
   });
 
+  it("runs install rollbacks in reverse when a later install throws", () => {
+    const error: Error = new Error("install failed");
+    const log: Array<string> = [];
+
+    class FirstPlugin implements WirestatePlugin {
+      public install(_container: Container, addRollback: (rollback: () => void) => void): void {
+        log.push("first:install");
+        addRollback(() => log.push("first:rollback"));
+      }
+    }
+
+    class FailingPlugin implements WirestatePlugin {
+      public install(_container: Container, addRollback: (rollback: () => void) => void): void {
+        log.push("failing:install");
+        addRollback(() => {
+          log.push("failing:rollback");
+
+          throw new Error("rollback failed");
+        });
+
+        throw error;
+      }
+    }
+
+    expect(() => new Container({ plugins: [new FirstPlugin(), new FailingPlugin()] })).toThrow(error);
+    expect(log).toEqual(["first:install", "failing:install", "failing:rollback", "first:rollback"]);
+  });
+
   it("throws when a handler's kind is handled by a plugin but its bus is not bound", () => {
     // A messaging plugin that declares its kind (so provision validation passes) but
     // skips binding its bus - so onProvision finds no bus up the chain and must throw.

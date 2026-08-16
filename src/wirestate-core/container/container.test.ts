@@ -1,5 +1,7 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
+import { OnActivation } from "../activation/on-activation";
+import { OnDeactivation } from "../activation/on-deactivation";
 import { BindingType } from "../binding/binding";
 import { getConfiguredInternalErrorHandler } from "../error/internal-error-handler";
 import { Injectable } from "../metadata/metadata-injectable";
@@ -193,6 +195,44 @@ describe("Container", () => {
     });
 
     expect(lifecycleEvents).toEqual(["first", "second"]);
+  });
+
+  it("should deactivate earlier eager activations when construction fails", () => {
+    const error: Error = new Error("eager activation failed");
+    const lifecycleEvents: Array<string> = [];
+
+    @Injectable()
+    class FirstService {
+      @OnActivation()
+      public onActivation(): void {
+        lifecycleEvents.push("first:activate");
+      }
+
+      @OnDeactivation()
+      public onDeactivation(): void {
+        lifecycleEvents.push("first:deactivate");
+      }
+    }
+
+    @Injectable()
+    class FailingService {
+      @OnActivation()
+      public onActivation(): void {
+        lifecycleEvents.push("failing:activate");
+
+        throw error;
+      }
+    }
+
+    expect(
+      () =>
+        new Container({
+          activate: true,
+          bindings: [FirstService, FailingService],
+          onError: jest.fn(),
+        })
+    ).toThrow(error);
+    expect(lifecycleEvents).toEqual(["first:activate", "failing:activate", "first:deactivate"]);
   });
 
   it("should not activate provided bindings when activate is false", () => {

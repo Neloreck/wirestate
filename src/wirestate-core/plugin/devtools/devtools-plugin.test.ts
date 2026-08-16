@@ -1,3 +1,4 @@
+import { OnActivation } from "../../activation/on-activation";
 import { Container } from "../../container/container";
 import { Injectable } from "../../metadata/metadata-injectable";
 import { OnProvision } from "../../provision/on-provision";
@@ -7,6 +8,7 @@ import { OnCommand } from "../commands/on-command";
 import { EventBus } from "../events/event-bus";
 import { EventsPlugin } from "../events/events-plugin";
 import { OnEvent } from "../events/on-event";
+import { type WirestatePlugin } from "../plugin";
 import { OnQuery } from "../queries/on-query";
 import { QueriesPlugin } from "../queries/queries-plugin";
 import { QueryBus } from "../queries/query-bus";
@@ -63,6 +65,43 @@ describe("DevToolsPlugin", () => {
     new Container({ plugins: [new DevToolsPlugin()] });
 
     expect((getDevtoolsHook() as DevtoolsHook).getRoots()).toHaveLength(2);
+  });
+
+  it("deregisters the root when container construction fails after plugin installation", () => {
+    const error: Error = new Error("construction failed");
+
+    @Injectable()
+    class FailingService {
+      @OnActivation()
+      public onActivation(): void {
+        throw error;
+      }
+    }
+
+    expect(
+      () =>
+        new Container({
+          activate: true,
+          bindings: [FailingService],
+          onError: jest.fn(),
+          plugins: [new DevToolsPlugin()],
+        })
+    ).toThrow(error);
+
+    expect((getDevtoolsHook() as DevtoolsHook).getRoots()).toHaveLength(0);
+  });
+
+  it("deregisters the root when a later plugin installation throws", () => {
+    const error: Error = new Error("plugin installation failed");
+
+    class FailingPlugin implements WirestatePlugin {
+      public install(): void {
+        throw error;
+      }
+    }
+
+    expect(() => new Container({ plugins: [new DevToolsPlugin(), new FailingPlugin()] })).toThrow(error);
+    expect((getDevtoolsHook() as DevtoolsHook).getRoots()).toHaveLength(0);
   });
 
   it("registers one root and tracks only the live container when a plugin instance is installed twice", () => {

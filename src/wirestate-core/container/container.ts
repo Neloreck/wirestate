@@ -24,7 +24,7 @@ import {
   provisionContainer,
 } from "../provision/provision-lifecycle";
 import { isContainerDeprovisioning } from "../provision/provision-state";
-import { type Maybe, type Newable } from "../types/general";
+import { type Maybe, type Newable, type Optional } from "../types/general";
 
 import { validateContainerConfig } from "./container-config-validation";
 import { ContainerKernel } from "./container-kernel";
@@ -164,22 +164,34 @@ export class Container extends ContainerKernel {
 
     const userTokens: ReadonlySet<ServiceToken> = new Set(this.getOwnBindings().map(getBindingToken));
 
-    // Plugins contribute their bindings after user bindings are registered, before anything activates.
-    installOwnPlugins(this);
+    let rollbackPluginInstallations: Optional<() => void>;
 
-    // Whatever a plugin's `install` added belongs to the container, not the caller, so a reset
-    // keeps it: `install` runs once at registration and never again.
-    for (const binding of this.getOwnBindings()) {
-      if (!userTokens.has(binding.token)) {
-        this.retainBinding(binding.token);
+    try {
+      // Plugins contribute their bindings after user bindings are registered, before anything activates.
+      rollbackPluginInstallations = installOwnPlugins(this);
+
+      // Whatever a plugin's `install` added belongs to the container, not the caller, so a reset
+      // keeps it: `install` runs once at registration and never again.
+      for (const binding of this.getOwnBindings()) {
+        if (!userTokens.has(binding.token)) {
+          this.retainBinding(binding.token);
+        }
       }
-    }
 
-    const activate: ReadonlyArray<ServiceToken> =
-      (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
+      const activate: ReadonlyArray<ServiceToken> =
+        (config.activate === true ? config.bindings?.map(getBindingToken) : config.activate) || [];
 
-    for (const binding of activate) {
-      this.get(binding);
+      for (const binding of activate) {
+        this.get(binding);
+      }
+    } catch (error) {
+      // Activation teardown runs while plugin installation is still live, then install-time
+      // external resources unwind. Both paths are failsafe so the construction error still wins.
+      this.destroy();
+
+      rollbackPluginInstallations?.();
+
+      throw error;
     }
   }
 
