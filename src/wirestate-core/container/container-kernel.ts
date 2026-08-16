@@ -14,6 +14,8 @@ import { injectionContext } from "./container-context";
 import { Factory } from "./container-factory";
 import { type ActivationRecord, type BindingMap, type InstanceMap } from "./container-storage";
 
+const IS_PRODUCTION: boolean = process.env.NODE_ENV === "production";
+
 /**
  * Internal dependency injection (DI) engine: tracks bindings and holds the
  * resolved instances of your services.
@@ -365,7 +367,7 @@ export class ContainerKernel {
    * @returns Token to look the binding up by.
    */
   protected getHotToken<T>(token: ServiceToken<T>): ServiceToken<T> {
-    if (process.env.NODE_ENV === "production") {
+    if (IS_PRODUCTION) {
       return token;
     } else {
       const latest: ServiceToken<T> = getLatestHotClass(token);
@@ -388,7 +390,7 @@ export class ContainerKernel {
    * @returns Binding to register.
    */
   protected getHotBinding<T>(binding: Newable<object> | BindingDescriptor<T>): Newable<object> | BindingDescriptor<T> {
-    if (process.env.NODE_ENV === "production") {
+    if (IS_PRODUCTION) {
       return binding;
     } else {
       return remapHotBinding(binding as Binding) as Newable<object> | BindingDescriptor<T>;
