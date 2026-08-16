@@ -120,9 +120,9 @@ external container leaves the old instance running, and resolution keeps answeri
 not in a class. Editing that module is an ordinary hot update: it re-runs the config and, when the provider remounts,
 builds a fresh container from it.
 
-**Only module-scope classes declared with `@Injectable()` participate.** The plugin detects the decorator lexically, at
-the start of a line. A class produced by a factory, or declared inside a function or block, is not registered and does
-not trigger a swap.
+**Only named module-scope classes declared with `@Injectable()` participate.** The plugin parses JavaScript and
+TypeScript modules before inspecting their top-level declarations. It ignores comments, strings, template text, and
+classes nested inside functions or blocks. Imported aliases of `Injectable` are supported.
 
 **A handler that forces synchronous rendering breaks the swap.** Calling `flushSync` from `@OnDeprovision` or
 `@OnDeactivation` renders while containers are being replaced. Wirestate detects this and throws a message naming the
