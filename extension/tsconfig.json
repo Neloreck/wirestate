@@ -11,7 +11,7 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "types": ["chrome", "node", "jest"],
     "paths": {
       "#/devtools": ["../src/wirestate-core/plugin/devtools/index.ts"],
