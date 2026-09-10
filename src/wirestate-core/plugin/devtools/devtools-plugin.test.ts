@@ -60,14 +60,27 @@ describe("DevToolsPlugin", () => {
     expect(container).toBeInstanceOf(Container);
   });
 
-  it("registers many containers as many roots", () => {
-    new Container({ plugins: [new DevToolsPlugin()] });
-    new Container({ plugins: [new DevToolsPlugin()] });
+  it("registers many provisioned containers as many roots", () => {
+    new Container({ plugins: [new DevToolsPlugin()] }).provision();
+    new Container({ plugins: [new DevToolsPlugin()] }).provision();
 
     expect((getDevtoolsHook() as DevtoolsHook).getRoots()).toHaveLength(2);
   });
 
-  it("deregisters the root when container construction fails after plugin installation", () => {
+  it("registers no root for a container that is never provisioned", () => {
+    // A container constructed and dropped without ever mounting, such as a StrictMode throwaway or
+    // an abandoned server render, has no deprovision to clean up after, so it must never register.
+    const container: Container = new Container({ bindings: [Service], plugins: [new DevToolsPlugin()] });
+
+    expect(getDevtoolsHook()).toBeDefined();
+    expect((getDevtoolsHook() as DevtoolsHook).getRoots()).toHaveLength(0);
+
+    container.destroy();
+
+    expect((getDevtoolsHook() as DevtoolsHook).getRoots()).toHaveLength(0);
+  });
+
+  it("registers no root when container construction fails after plugin installation", () => {
     const error: Error = new Error("construction failed");
 
     @Injectable()
@@ -91,7 +104,7 @@ describe("DevToolsPlugin", () => {
     expect((getDevtoolsHook() as DevtoolsHook).getRoots()).toHaveLength(0);
   });
 
-  it("deregisters the root when a later plugin installation throws", () => {
+  it("registers no root when a later plugin installation throws", () => {
     const error: Error = new Error("plugin installation failed");
 
     class FailingPlugin implements WirestatePlugin {
@@ -102,6 +115,85 @@ describe("DevToolsPlugin", () => {
 
     expect(() => new Container({ plugins: [new DevToolsPlugin(), new FailingPlugin()] })).toThrow(error);
     expect((getDevtoolsHook() as DevtoolsHook).getRoots()).toHaveLength(0);
+  });
+
+  it("keeps application dispatch running when a listener throws", () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    @Injectable()
+    class Handler {
+      @OnCommand("PING")
+      public onPing(): string {
+        return "pong";
+      }
+    }
+
+    const container: Container = new Container({
+      bindings: [Handler],
+      plugins: [new CommandsPlugin(), new DevToolsPlugin()],
+    }).provision();
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+    const delivered: Array<string> = [];
+
+    hook.subscribe(() => {
+      throw new Error("listener boom");
+    });
+    hook.subscribe((event) => delivered.push(event.kind));
+
+    // The tap reports the message before the handler runs, so an unisolated listener would abort
+    // the command before the application ever saw it.
+    expect(container.get(CommandBus).execute("PING")).toBe("pong");
+    expect(delivered).toContain("message");
+    expect(consoleSpy).toHaveBeenCalledWith("[wirestate] DevTools listener threw:", expect.any(Error));
+
+    consoleSpy.mockRestore();
+  });
+
+  it("drops a root's backlog from replay once the root deregisters", () => {
+    const container: Container = new Container({
+      activate: true,
+      bindings: [Service],
+      plugins: [new EventsPlugin(), new DevToolsPlugin()],
+    }).provision();
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+    const retained: object = { large: true };
+
+    container.get(EventBus).emit("PAYLOAD", retained, { source: container });
+    container.destroy();
+
+    const replayed: Array<DevtoolsEvent> = [];
+
+    hook.subscribe((event) => replayed.push(event));
+
+    // The message carrying the payload and the container-as-source left with the root, so the hook
+    // no longer pins them for a late subscriber. Only the deactivation deltas `destroy` emitted
+    // after the root deregistered remain, and those carry normalized records, not live objects.
+    expect(replayed.some((event) => event.kind === "message")).toBe(false);
+    expect(replayed.every((event) => event.kind === "lifecycle" && event.phase === "deactivate")).toBe(true);
+    expect(JSON.stringify(replayed)).not.toContain("large");
+  });
+
+  it("attributes deltas produced before the first provision to the root once it registers", () => {
+    const container: Container = new Container({
+      activate: true,
+      bindings: [Service],
+      plugins: [new DevToolsPlugin()],
+    });
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+
+    // Activation happened at construction, before any provider mounted the container and before a
+    // root existed. It must still open the timeline, under the id the root eventually gets.
+    container.provision();
+
+    const rootId: number = hook.getRoots()[0].rootId;
+    const seen: Array<{ rootId: number; phase?: string }> = [];
+
+    hook.subscribe((event) => seen.push({ rootId: event.rootId, phase: (event as { phase?: string }).phase }));
+
+    expect(seen[0]).toEqual({ rootId, phase: "activate" });
+    expect(seen.every((event) => event.rootId === rootId)).toBe(true);
+
+    container.deprovision();
   });
 
   it("registers one root and tracks only the live container when a plugin instance is installed twice", () => {
@@ -207,62 +299,6 @@ describe("DevToolsPlugin", () => {
 
     expect(seen.some((event) => event.phase === "deactivate")).toBe(true);
     expect(seen.every((event) => event.rootId === rootId)).toBe(true);
-  });
-
-  it("keeps application dispatch running when a listener throws", () => {
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-
-    @Injectable()
-    class Handler {
-      @OnCommand("PING")
-      public onPing(): string {
-        return "pong";
-      }
-    }
-
-    const container: Container = new Container({
-      bindings: [Handler],
-      plugins: [new CommandsPlugin(), new DevToolsPlugin()],
-    }).provision();
-    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
-    const delivered: Array<string> = [];
-
-    hook.subscribe(() => {
-      throw new Error("listener boom");
-    });
-    hook.subscribe((event) => delivered.push(event.kind));
-
-    // The tap reports the message before the handler runs, so an unisolated listener would abort
-    // the command before the application ever saw it.
-    expect(container.get(CommandBus).execute("PING")).toBe("pong");
-    expect(delivered).toContain("message");
-    expect(consoleSpy).toHaveBeenCalledWith("[wirestate] DevTools listener threw:", expect.any(Error));
-
-    consoleSpy.mockRestore();
-  });
-
-  it("drops a root's backlog from replay once the root deregisters", () => {
-    const container: Container = new Container({
-      activate: true,
-      bindings: [Service],
-      plugins: [new EventsPlugin(), new DevToolsPlugin()],
-    }).provision();
-    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
-    const retained: object = { large: true };
-
-    container.get(EventBus).emit("PAYLOAD", retained, { source: container });
-    container.destroy();
-
-    const replayed: Array<DevtoolsEvent> = [];
-
-    hook.subscribe((event) => replayed.push(event));
-
-    // The message carrying the payload and the container-as-source left with the root, so the hook
-    // no longer pins them for a late subscriber. Only the deactivation deltas `destroy` emitted
-    // after the root deregistered remain, and those carry normalized records, not live objects.
-    expect(replayed.some((event) => event.kind === "message")).toBe(false);
-    expect(replayed.every((event) => event.kind === "lifecycle" && event.phase === "deactivate")).toBe(true);
-    expect(JSON.stringify(replayed)).not.toContain("large");
   });
 
   it("streams lifecycle deltas to a subscribed backend", () => {

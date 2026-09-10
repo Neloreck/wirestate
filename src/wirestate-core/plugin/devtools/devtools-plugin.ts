@@ -10,6 +10,7 @@ import {
   type DevtoolsBindingId,
   type DevtoolsContainerId,
   type DevtoolsContainerSnapshot,
+  type DevtoolsEvent,
   type DevtoolsHook,
   type DevtoolsInspectPath,
   type DevtoolsInstance,
@@ -21,6 +22,11 @@ import {
 } from "./devtools-hook.types";
 import { normalizeBinding, normalizeInstance, normalizePlugin } from "./devtools-normalize";
 import { tapContainerBuses } from "./devtools-tap";
+
+/**
+ * Most lifecycle deltas held back for a root that has not registered yet.
+ */
+const MAX_PENDING_DELTAS: number = 1024;
 
 /**
  * Configuration for {@link DevToolsPlugin}.
@@ -88,21 +94,28 @@ export class DevToolsPlugin implements WirestatePlugin {
   private readonly label: Optional<string>;
 
   /**
+   * Lifecycle deltas produced before the root first registered.
+   *
+   * @remarks
+   * A container activates services at construction, before any provider mounts it, and a root only
+   * registers once a container provisions. Those early deltas are held here and flushed under the
+   * root id at registration, so the timeline still starts at the first activation. A container that
+   * is never provisioned takes them down with the plugin instead of leaving a root behind.
+   */
+  private readonly pending: Array<DevtoolsEvent> = [];
+
+  /**
    * @param options - Optional plugin options (see {@link DevToolsPluginOptions}).
    */
   public constructor(options?: DevToolsPluginOptions) {
     this.label = options?.label;
   }
 
-  public install(_container: Container, addRollback: (rollback: () => void) => void): void {
-    const registeredByThisInstall: boolean = !this.registered;
-
+  public install(): void {
+    // Only the hook appears at install. The root registers when the first container provisions,
+    // so a container that is constructed and discarded without ever mounting, a StrictMode
+    // throwaway or an abandoned server render, never leaves an empty root behind.
     this.hook = installDevtoolsHook();
-    this.ensureRoot();
-
-    if (registeredByThisInstall) {
-      addRollback(() => this.releaseRoot());
-    }
   }
 
   public onContainerProvision(container: Container): void {
@@ -134,6 +147,10 @@ export class DevToolsPlugin implements WirestatePlugin {
       inspectBinding: (bindingId, path) => this.inspectBinding(bindingId, path),
       serviceRefOf: (value) => this.serviceRefOf(value),
     });
+
+    for (const event of this.pending.splice(0)) {
+      this.hook.emit({ ...event, rootId: this.rootId });
+    }
   }
 
   /**
@@ -181,14 +198,26 @@ export class DevToolsPlugin implements WirestatePlugin {
       return;
     }
 
-    this.hook.emit({
+    const event: DevtoolsEvent = {
       kind: "lifecycle",
       rootId: this.rootId,
       containerId: this.hook.idForContainer(container),
       timestamp: Date.now(),
       phase,
       instance: instance ? normalizeInstance(instance, this.hook.idForInstance(instance)) : undefined,
-    });
+    };
+
+    // Before the first registration there is no root to attribute the delta to. Afterwards the
+    // last id is kept even while deregistered, so teardown deltas stay attributable.
+    if (this.rootId === 0) {
+      this.pending.push(event);
+
+      if (this.pending.length > MAX_PENDING_DELTAS) {
+        this.pending.shift();
+      }
+    } else {
+      this.hook.emit(event);
+    }
   }
 
   /**
