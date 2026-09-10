@@ -3,8 +3,7 @@ import { getBindingType } from "../binding/binding-lifecycle";
 import { tokenToString } from "../binding/binding-tokens";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-
-import { collectDeclaredProvisionHandlers } from "./container-declared-lifecycle-handlers";
+import { collectDeclaredProvisionHandlers } from "../lifecycle/declared-lifecycle-handlers";
 
 /**
  * Rejects a value or factory binding whose class token declares a provision-phase

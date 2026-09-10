@@ -1,9 +1,9 @@
 import { type InstanceBindingDescriptor } from "../binding/binding";
 import { type Container } from "../container/container";
-import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
 import { type ContainerKernel } from "../container/container-kernel";
 import { type ActivationRecord } from "../container/container-storage";
 import { reportWirestateInternalError } from "../error/internal-error-handler";
+import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
 import { dispatchPluginActivate, dispatchPluginDeactivate } from "../plugin/plugin-registry";
 import { getContainerProvisionStatus } from "../provision/provision-state";
 import { type Optional, type Maybe } from "../types/general";

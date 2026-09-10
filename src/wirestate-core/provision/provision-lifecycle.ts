@@ -2,9 +2,9 @@ import { type InstanceRecord, type ProvisionId, getInstanceRecord, WireStatus } 
 import { type Binding, type ServiceToken, BindingType } from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
 import type { Container } from "../container/container";
-import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
+import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
 import { getMessagingPluginHandledKinds } from "../plugin/messaging-plugin";
 import { getMessagingRegistrations } from "../plugin/messaging-registration";
 import {

@@ -2,8 +2,7 @@ import { type InstanceBindingDescriptor } from "../binding/binding";
 import { tokenToString } from "../binding/binding-tokens";
 import { ERROR_CODE_INVALID_BINDING_SCOPE } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
-
-import { collectDeclaredLifecycleHandlers } from "./container-declared-lifecycle-handlers";
+import { collectDeclaredLifecycleHandlers } from "../lifecycle/declared-lifecycle-handlers";
 
 /**
  * Rejects a transient instance binding whose class declares any wirestate
