@@ -46,6 +46,12 @@ const name = useInjection(UserName, { fallback: "guest" });
 const logger = useInjection(FileLogger, { fallback: (container) => container.get(ConsoleLogger) });
 ```
 
+## Memoization
+
+`useInjection` memoizes the lookup on the active container, the token, and `optional`. Rebinding the same token on the
+same container does not refresh an already rendered component, and a `fallback` is captured on the first miss. Remount
+the provider with a React `key` when the component must re-resolve.
+
 ## Container
 
 `useContainer` returns the active container. Use it when a component needs container-level operations.

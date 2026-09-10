@@ -98,7 +98,8 @@ export function Application() {
 ```
 
 External containers are provisioned while the provider is mounted, but they are not disposed. Disposal remains the
-caller's responsibility.
+caller's responsibility. If provisioning throws, the provider deprovisions the container before surfacing the error, so
+a failed mount never leaves an external container half-provisioned.
 
 The same ownership rule applies during development: because the provider does not own an external container, it does not
 hot-swap one either. Prefer a managed `config` for containers holding services you edit often, or register the container

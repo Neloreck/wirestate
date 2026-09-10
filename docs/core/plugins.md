@@ -111,8 +111,9 @@ hydrate state a provision hook then reads, and how messaging handlers are live b
 ## Force-Activating and Tearing Down
 
 A plugin that needs to act on a service even when nothing injected it returns `true` from `participates(token)`; the
-container then force-activates that binding at provision and hands the instance to `onProvision`. Register teardown with
-`addDisposer`. Disposers run in reverse order at deprovision and are **failsafe** (a throw never aborts teardown).
+container then force-activates that binding at provision. `onProvision` still runs for every provisioned instance, not
+only the ones the plugin asked for, so guard on the type before acting. Register teardown with `addDisposer`. Disposers
+run in reverse order at deprovision and are **failsafe** (a throw never aborts teardown).
 
 ```ts
 import { Container, WirestatePlugin, ServiceToken } from "@wirestate/core";

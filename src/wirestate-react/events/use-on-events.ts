@@ -9,60 +9,57 @@ import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect
 type EventTypeSelector = Nullable<EventType | ReadonlyArray<EventType>>;
 
 /**
- * Subscribes the component to every event on the active {@link EventBus}.
- *
- * @param handler - Handler invoked for every event.
- */
-export function useOnEvents<E extends WireEvent = WireEvent>(handler: EventHandler<E>): void;
-
-/**
- * Subscribes the component to one event type on the active {@link EventBus}.
- *
- * @param type - Event type to listen for.
- * @param handler - Handler invoked for matching events.
- */
-export function useOnEvents<E extends WireEvent = WireEvent>(type: EventType, handler: EventHandler<E>): void;
-
-/**
- * Subscribes the component to several event types on the active {@link EventBus}.
- *
- * @param types - Event types to listen for.
- * @param handler - Handler invoked for matching events.
- */
-export function useOnEvents<E extends WireEvent = WireEvent>(
-  types: ReadonlyArray<EventType>,
-  handler: EventHandler<E>
-): void;
-
-/**
- * Subscribes the component to events on the active container's {@link EventBus}.
- *
- * @remarks
- * Pass a single event type, an array of types, or only a handler to receive
- * every event, mirroring {@link EventBus.subscribe}. The subscription is scoped
- * to the component and is removed automatically when it unmounts, the active
- * container changes, or the set of listened types changes.
- * Requires `EventBus` to be bound in the active container or an ancestor.
+ * Subscribes the component to every event on the active container's {@link EventBus}.
  *
  * @group Events
  *
- * @param typesOrHandler - The event type, an array of event types, or the handler itself to receive every event.
- * @param maybeHandler - The handler invoked for matching events. Omit it when the first argument is the handler.
+ * @param handler - Handler invoked for every event.
  *
  * @throws `WirestateError` if the active container cannot resolve `EventBus`.
  *
  * @example
  * ```tsx
- * // Listen to one event type.
- * useOnEvents("CART_ITEM_ADDED", (event) => console.info(event.payload));
- *
- * // Listen to several event types.
- * useOnEvents(["CART_ITEM_ADDED", "CART_VIEWED"], (event) => console.info(event.type));
- *
- * // Listen to every event.
  * useOnEvents((event) => console.info(event.type));
  * ```
  */
+export function useOnEvents<E extends WireEvent = WireEvent>(handler: EventHandler<E>): void;
+
+/**
+ * Subscribes the component to one event type on the active container's {@link EventBus}.
+ *
+ * @group Events
+ *
+ * @param type - Event type to listen for.
+ * @param handler - Handler invoked for matching events.
+ *
+ * @throws `WirestateError` if the active container cannot resolve `EventBus`.
+ *
+ * @example
+ * ```tsx
+ * useOnEvents("CART_ITEM_ADDED", (event) => console.info(event.payload));
+ * ```
+ */
+export function useOnEvents<E extends WireEvent = WireEvent>(type: EventType, handler: EventHandler<E>): void;
+
+/**
+ * Subscribes the component to several event types on the active container's {@link EventBus}.
+ *
+ * @group Events
+ *
+ * @param types - Event types to listen for.
+ * @param handler - Handler invoked for matching events.
+ *
+ * @throws `WirestateError` if the active container cannot resolve `EventBus`.
+ *
+ * @example
+ * ```tsx
+ * useOnEvents(["CART_ITEM_ADDED", "CART_VIEWED"], (event) => console.info(event.type));
+ * ```
+ */
+export function useOnEvents<E extends WireEvent = WireEvent>(
+  types: ReadonlyArray<EventType>,
+  handler: EventHandler<E>
+): void;
 export function useOnEvents(
   typesOrHandler: EventHandler | EventType | ReadonlyArray<EventType>,
   maybeHandler?: EventHandler
