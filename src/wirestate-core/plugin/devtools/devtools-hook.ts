@@ -73,6 +73,13 @@ class DevtoolsHookHost implements DevtoolsHook {
 
   public deregisterRoot(rootId: DevtoolsRootId): void {
     this.roots.delete(rootId);
+
+    // A root that left takes its backlog with it.
+    for (let index: number = this.recent.length - 1; index >= 0; index -= 1) {
+      if (this.recent[index].rootId === rootId) {
+        this.recent.splice(index, 1);
+      }
+    }
   }
 
   public idForContainer(container: object): DevtoolsContainerId {
@@ -116,13 +123,13 @@ class DevtoolsHookHost implements DevtoolsHook {
     }
 
     for (const listener of this.listeners) {
-      listener(event);
+      deliver(listener, event);
     }
   }
 
   public subscribe(listener: DevtoolsListener): () => void {
     for (const event of this.recent.slice(-MAX_REPLAY_EVENTS)) {
-      listener(event);
+      deliver(listener, event);
     }
 
     this.listeners.add(listener);
@@ -140,6 +147,20 @@ class DevtoolsHookHost implements DevtoolsHook {
       inspectBinding: register.inspectBinding,
       serviceRefOf: register.serviceRefOf,
     }));
+  }
+}
+
+/**
+ * Delivers one event to one listener, containing any failure.
+ *
+ * @param listener - Subscriber to notify.
+ * @param event - Event to deliver.
+ */
+function deliver(listener: DevtoolsListener, event: DevtoolsEvent): void {
+  try {
+    listener(event);
+  } catch (error) {
+    console.error("[wirestate] DevTools listener threw:", error);
   }
 }
 

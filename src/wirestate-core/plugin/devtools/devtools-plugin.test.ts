@@ -14,7 +14,7 @@ import { QueriesPlugin } from "../queries/queries-plugin";
 import { QueryBus } from "../queries/query-bus";
 
 import { DEVTOOLS_HOOK_KEY, getDevtoolsHook } from "./devtools-hook";
-import { type DevtoolsHook } from "./devtools-hook.types";
+import { type DevtoolsEvent, type DevtoolsHook } from "./devtools-hook.types";
 import { DevToolsPlugin } from "./devtools-plugin";
 
 @Injectable()
@@ -207,6 +207,62 @@ describe("DevToolsPlugin", () => {
 
     expect(seen.some((event) => event.phase === "deactivate")).toBe(true);
     expect(seen.every((event) => event.rootId === rootId)).toBe(true);
+  });
+
+  it("keeps application dispatch running when a listener throws", () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    @Injectable()
+    class Handler {
+      @OnCommand("PING")
+      public onPing(): string {
+        return "pong";
+      }
+    }
+
+    const container: Container = new Container({
+      bindings: [Handler],
+      plugins: [new CommandsPlugin(), new DevToolsPlugin()],
+    }).provision();
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+    const delivered: Array<string> = [];
+
+    hook.subscribe(() => {
+      throw new Error("listener boom");
+    });
+    hook.subscribe((event) => delivered.push(event.kind));
+
+    // The tap reports the message before the handler runs, so an unisolated listener would abort
+    // the command before the application ever saw it.
+    expect(container.get(CommandBus).execute("PING")).toBe("pong");
+    expect(delivered).toContain("message");
+    expect(consoleSpy).toHaveBeenCalledWith("[wirestate] DevTools listener threw:", expect.any(Error));
+
+    consoleSpy.mockRestore();
+  });
+
+  it("drops a root's backlog from replay once the root deregisters", () => {
+    const container: Container = new Container({
+      activate: true,
+      bindings: [Service],
+      plugins: [new EventsPlugin(), new DevToolsPlugin()],
+    }).provision();
+    const hook: DevtoolsHook = getDevtoolsHook() as DevtoolsHook;
+    const retained: object = { large: true };
+
+    container.get(EventBus).emit("PAYLOAD", retained, { source: container });
+    container.destroy();
+
+    const replayed: Array<DevtoolsEvent> = [];
+
+    hook.subscribe((event) => replayed.push(event));
+
+    // The message carrying the payload and the container-as-source left with the root, so the hook
+    // no longer pins them for a late subscriber. Only the deactivation deltas `destroy` emitted
+    // after the root deregistered remain, and those carry normalized records, not live objects.
+    expect(replayed.some((event) => event.kind === "message")).toBe(false);
+    expect(replayed.every((event) => event.kind === "lifecycle" && event.phase === "deactivate")).toBe(true);
+    expect(JSON.stringify(replayed)).not.toContain("large");
   });
 
   it("streams lifecycle deltas to a subscribed backend", () => {

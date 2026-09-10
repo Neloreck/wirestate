@@ -160,6 +160,73 @@ describe("DevtoolsHook replay buffer", () => {
   });
 });
 
+describe("DevtoolsHook listener isolation", () => {
+  afterEach(() => {
+    delete (globalThis as Record<string, unknown>)[DEVTOOLS_HOOK_KEY];
+    jest.restoreAllMocks();
+  });
+
+  it("delivers to the remaining listeners and the emitter when one listener throws", () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const hook = installDevtoolsHook();
+    const delivered: Array<number> = [];
+
+    hook.subscribe(() => {
+      throw new Error("listener boom");
+    });
+    hook.subscribe((event) => delivered.push(event.containerId));
+
+    // The hook is invoked from inside application dispatch, so a throwing observer must never
+    // propagate back into the emitter.
+    expect(() => hook.emit(mockLifecycleEvent(1))).not.toThrow();
+    expect(delivered).toEqual([1]);
+    expect(consoleSpy).toHaveBeenCalledWith("[wirestate] DevTools listener threw:", expect.any(Error));
+  });
+
+  it("contains a listener that throws during replay", () => {
+    jest.spyOn(console, "error").mockImplementation(() => {});
+
+    const hook = installDevtoolsHook();
+
+    hook.emit(mockLifecycleEvent(1));
+
+    expect(() =>
+      hook.subscribe(() => {
+        throw new Error("replay boom");
+      })
+    ).not.toThrow();
+  });
+});
+
+describe("DevtoolsHook root deregistration", () => {
+  afterEach(() => {
+    delete (globalThis as Record<string, unknown>)[DEVTOOLS_HOOK_KEY];
+  });
+
+  it("drops a deregistered root's events from the replay backlog and keeps the others", () => {
+    const hook = installDevtoolsHook();
+    const rootId: number = hook.registerRoot({
+      snapshot: () => ({ rootId: 0, protocolVersion: 1, label: undefined, containers: [] }),
+      inspect: () => undefined,
+      inspectBinding: () => undefined,
+      serviceRefOf: () => undefined,
+    });
+
+    hook.emit({ ...mockLifecycleEvent(1), rootId });
+    hook.emit({ ...mockLifecycleEvent(2), rootId: rootId + 1 });
+    hook.emit({ ...mockLifecycleEvent(3), rootId });
+
+    hook.deregisterRoot(rootId);
+
+    const replayed: Array<DevtoolsEvent> = [];
+
+    hook.subscribe((event) => replayed.push(event));
+
+    // Nothing of the departed root is retained or replayed; an unrelated root's backlog survives.
+    expect(replayed.map((event) => event.containerId)).toEqual([2]);
+  });
+});
+
 describe("DevtoolsHook id allocators", () => {
   afterEach(() => {
     delete (globalThis as Record<string, unknown>)[DEVTOOLS_HOOK_KEY];
