@@ -1,14 +1,6 @@
-import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
-import {
-  appendHandlerMetadata,
-  appendStandardHandlerMetadata,
-  collectHandlerMetadata,
-} from "../../metadata/metadata-handlers";
-import {
-  MESSAGING_REGISTRATION_KEY,
-  MESSAGING_REGISTRATIONS,
-  type MessagingRegistration,
-} from "../messaging-registration";
+import { collectHandlerMetadata } from "../../metadata/metadata-handlers";
+import { type MessagingHandlerDecorator, createMessagingDecorator } from "../messaging-decorator";
+import { type MessagingRegistration } from "../messaging-registration";
 
 import { type QueryHandler, type QueryHandlerMetadata, type QueryType } from "./queries";
 import { QUERY_HANDLER_METADATA, QUERY_METADATA_KEY } from "./queries-registry";
@@ -52,12 +44,14 @@ export const QUERY_REGISTRATION: MessagingRegistration = {
  *
  * @group Queries
  */
-export interface OnQueryDecorator {
-  // Standard (TC39):
-  <This>(value: (this: This, ...args: Array<never>) => unknown, context: ClassMethodDecoratorContext<This>): void;
-  // Legacy/experimental:
-  (target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor): void;
-}
+export type OnQueryDecorator = MessagingHandlerDecorator;
+
+const decorate = createMessagingDecorator<QueryHandlerMetadata>({
+  name: "OnQuery",
+  registry: QUERY_HANDLER_METADATA,
+  metadataKey: QUERY_METADATA_KEY,
+  registration: QUERY_REGISTRATION,
+});
 
 /**
  * Marks an injectable service method as a provision-scoped query handler.
@@ -91,20 +85,7 @@ export interface OnQueryDecorator {
  * ```
  */
 export function OnQuery(type: QueryType): OnQueryDecorator {
-  return ((target: object, nameOrContext: string | symbol | ClassMethodDecoratorContext): void => {
-    if (typeof nameOrContext === "object") {
-      // Standard decorators:
-      const metadata: DecoratorMetadataObject = validateStandardMethodContext("OnQuery", nameOrContext);
-
-      appendStandardHandlerMetadata(metadata, QUERY_METADATA_KEY, { methodName: nameOrContext.name, type });
-      appendStandardHandlerMetadata(metadata, MESSAGING_REGISTRATION_KEY, QUERY_REGISTRATION);
-    } else {
-      // Experimental legacy decorators:
-
-      appendHandlerMetadata(QUERY_HANDLER_METADATA, target.constructor, { methodName: nameOrContext, type });
-      appendHandlerMetadata(MESSAGING_REGISTRATIONS, target.constructor, QUERY_REGISTRATION);
-    }
-  }) as OnQueryDecorator;
+  return decorate((methodName: string | symbol): QueryHandlerMetadata => ({ methodName, type }));
 }
 
 /**

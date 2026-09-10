@@ -1,16 +1,11 @@
 import { type ContainerKernel } from "../../container/container-kernel";
-import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
-import { appendHandlerMetadata, appendStandardHandlerMetadata } from "../../metadata/metadata-handlers";
 import { type Nullable } from "../../types/general";
-import {
-  MESSAGING_REGISTRATION_KEY,
-  MESSAGING_REGISTRATIONS,
-  type MessagingRegistration,
-} from "../messaging-registration";
+import { type MessagingHandlerDecorator, createMessagingDecorator } from "../messaging-decorator";
+import { type MessagingRegistration } from "../messaging-registration";
 
 import { buildEventDispatchers } from "./build-event-dispatchers";
 import { EventBus } from "./event-bus";
-import { type EventType } from "./events";
+import { type EventHandlerMetadata, type EventType } from "./events";
 import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "./events-registry";
 
 /**
@@ -42,13 +37,14 @@ export const EVENT_REGISTRATION: MessagingRegistration = {
  *
  * @group Events
  */
-export interface OnEventDecorator {
-  // Standard (TC39). Parameters are `never[]`: contravariance keeps handlers with
-  // narrowed event payloads assignable, matching {@link OnCommand} and {@link OnQuery}.
-  <This>(value: (this: This, ...args: Array<never>) => unknown, context: ClassMethodDecoratorContext<This>): void;
-  // Legacy/experimental:
-  (target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor): void;
-}
+export type OnEventDecorator = MessagingHandlerDecorator;
+
+const decorate = createMessagingDecorator<EventHandlerMetadata>({
+  name: "OnEvent",
+  registry: EVENT_HANDLER_METADATA,
+  metadataKey: EVENT_METADATA_KEY,
+  registration: EVENT_REGISTRATION,
+});
 
 /**
  * Marks an injectable service method as a provision-scoped event handler.
@@ -92,24 +88,5 @@ export function OnEvent(types?: EventType | ReadonlyArray<EventType>): OnEventDe
         ? Array.from(new Set(types as ReadonlyArray<EventType>))
         : [types as EventType];
 
-  return ((target: object, nameOrContext: string | symbol | ClassMethodDecoratorContext): void => {
-    if (typeof nameOrContext === "object") {
-      // Standard decorators:
-      const metadata: DecoratorMetadataObject = validateStandardMethodContext("OnEvent", nameOrContext);
-
-      appendStandardHandlerMetadata(metadata, EVENT_METADATA_KEY, {
-        methodName: nameOrContext.name,
-        types: normalized,
-      });
-      appendStandardHandlerMetadata(metadata, MESSAGING_REGISTRATION_KEY, EVENT_REGISTRATION);
-    } else {
-      // Experimental legacy decorators:
-
-      appendHandlerMetadata(EVENT_HANDLER_METADATA, target.constructor, {
-        methodName: nameOrContext,
-        types: normalized,
-      });
-      appendHandlerMetadata(MESSAGING_REGISTRATIONS, target.constructor, EVENT_REGISTRATION);
-    }
-  }) as OnEventDecorator;
+  return decorate((methodName: string | symbol): EventHandlerMetadata => ({ methodName, types: normalized }));
 }

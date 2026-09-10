@@ -1,14 +1,6 @@
-import { validateStandardMethodContext } from "../../metadata/metadata-decorator-context";
-import {
-  appendHandlerMetadata,
-  appendStandardHandlerMetadata,
-  collectHandlerMetadata,
-} from "../../metadata/metadata-handlers";
-import {
-  MESSAGING_REGISTRATION_KEY,
-  MESSAGING_REGISTRATIONS,
-  type MessagingRegistration,
-} from "../messaging-registration";
+import { collectHandlerMetadata } from "../../metadata/metadata-handlers";
+import { type MessagingHandlerDecorator, createMessagingDecorator } from "../messaging-decorator";
+import { type MessagingRegistration } from "../messaging-registration";
 
 import { CommandBus } from "./command-bus";
 import { type CommandHandler, type CommandHandlerMetadata, type CommandType } from "./commands";
@@ -52,12 +44,14 @@ export const COMMAND_REGISTRATION: MessagingRegistration = {
  *
  * @group Commands
  */
-export interface OnCommandDecorator {
-  // Standard (TC39):
-  <This>(value: (this: This, ...args: Array<never>) => unknown, context: ClassMethodDecoratorContext<This>): void;
-  // Legacy/experimental:
-  (target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor): void;
-}
+export type OnCommandDecorator = MessagingHandlerDecorator;
+
+const decorate = createMessagingDecorator<CommandHandlerMetadata>({
+  name: "OnCommand",
+  registry: COMMAND_HANDLER_METADATA,
+  metadataKey: COMMAND_METADATA_KEY,
+  registration: COMMAND_REGISTRATION,
+});
 
 /**
  * Marks an injectable service method as a provision-scoped command handler.
@@ -90,20 +84,7 @@ export interface OnCommandDecorator {
  * ```
  */
 export function OnCommand(type: CommandType): OnCommandDecorator {
-  return ((target: object, nameOrContext: string | symbol | ClassMethodDecoratorContext): void => {
-    if (typeof nameOrContext === "object") {
-      // Standard decorators:
-      const metadata: DecoratorMetadataObject = validateStandardMethodContext("OnCommand", nameOrContext);
-
-      appendStandardHandlerMetadata(metadata, COMMAND_METADATA_KEY, { methodName: nameOrContext.name, type });
-      appendStandardHandlerMetadata(metadata, MESSAGING_REGISTRATION_KEY, COMMAND_REGISTRATION);
-    } else {
-      // Experimental legacy decorators:
-
-      appendHandlerMetadata(COMMAND_HANDLER_METADATA, target.constructor, { methodName: nameOrContext, type });
-      appendHandlerMetadata(MESSAGING_REGISTRATIONS, target.constructor, COMMAND_REGISTRATION);
-    }
-  }) as OnCommandDecorator;
+  return decorate((methodName: string | symbol): CommandHandlerMetadata => ({ methodName, type }));
 }
 
 /**
