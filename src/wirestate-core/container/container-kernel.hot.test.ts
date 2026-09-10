@@ -1,5 +1,7 @@
 import { getHotState, registerHotModule } from "../hot/hot-registry";
 import { Injectable } from "../metadata/metadata-injectable";
+import { OnDeprovision } from "../provision/on-deprovision";
+import { OnProvision } from "../provision/on-provision";
 import { type Newable } from "../types/general";
 
 import { Container } from "./container";
@@ -129,6 +131,40 @@ describe("ContainerKernel hot-reload token rewriting", () => {
     expect(container.has(stale)).toBe(false);
     expect(container.has(latest)).toBe(false);
     expect(container.getOwnBindings()).toHaveLength(1); // Container binds itself.
+  });
+
+  it("should deprovision a provisioned participant unbound through a stale reference", () => {
+    const events: Array<string> = [];
+
+    @Injectable()
+    class ServiceV1 {
+      @OnProvision()
+      public onProvision(): void {
+        events.push("provision");
+      }
+
+      @OnDeprovision()
+      public onDeprovision(): void {
+        events.push("deprovision");
+      }
+    }
+
+    @Injectable()
+    class ServiceV2 extends ServiceV1 {}
+
+    registerHotModule("services/lifecycle.ts", { Service: ServiceV1 });
+    registerHotModule("services/lifecycle.ts", { Service: ServiceV2 });
+
+    const container: Container = new Container({ bindings: [ServiceV1] }).provision();
+
+    expect(events).toEqual(["provision"]);
+
+    // The stale token is rewritten to the bound generation before the record is dropped, so the
+    // instance still leaves provider ownership ahead of its deactivation.
+    container.unbind(ServiceV1);
+
+    expect(events).toEqual(["provision", "deprovision"]);
+    expect(container.hasOwn(ServiceV2)).toBe(false);
   });
 
   it("should leave tokens that are not hot-replaced classes untouched", () => {

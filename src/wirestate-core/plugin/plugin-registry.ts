@@ -198,6 +198,11 @@ export function dispatchPluginDeactivate(container: ContainerKernel, instance: o
 /**
  * Dispatches `onProvision` to the effective plugins (setup: may throw, atomic).
  *
+ * @remarks
+ * If a hook throws, deprovisions the earlier hooks in reverse order before rethrowing the setup
+ * error, so every plugin that wired the instance gets its matching teardown. Disposers those
+ * plugins registered stay with the cycle and run when it unwinds.
+ *
  * @internal
  *
  * @param container - Container being provisioned.
@@ -209,8 +214,19 @@ export function dispatchPluginProvision(
   instance: object,
   addDisposer: (dispose: () => void) => void
 ): void {
+  const provisioned: Array<WirestatePlugin> = [];
+
   for (const plugin of getEffectivePlugins(container)) {
-    plugin.onProvision?.(instance, container as Container, addDisposer);
+    try {
+      plugin.onProvision?.(instance, container as Container, addDisposer);
+      provisioned.push(plugin);
+    } catch (error) {
+      for (const priorPlugin of reversed(provisioned)) {
+        runFailsafe(() => priorPlugin.onDeprovision?.(instance, container as Container));
+      }
+
+      throw error;
+    }
   }
 }
 

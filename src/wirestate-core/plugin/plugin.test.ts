@@ -416,6 +416,88 @@ describe("container plugins", () => {
     expect(log).toEqual(["unwire:Second", "unwire:First"]);
   });
 
+  it("pairs onDeprovision with onProvision for every wired instance when a later plugin throws", () => {
+    const log: Array<string> = [];
+
+    @Injectable()
+    class First {}
+
+    @Injectable()
+    class Second {}
+
+    class WiringPlugin implements WirestatePlugin {
+      public onProvision(instance: object): void {
+        log.push(`wire:${instance.constructor.name}`);
+      }
+
+      public onDeprovision(instance: object): void {
+        log.push(`unwire:${instance.constructor.name}`);
+      }
+    }
+
+    class FailingPlugin implements WirestatePlugin {
+      public onProvision(instance: object): void {
+        if (instance.constructor.name === "Second") {
+          throw new Error("wire error");
+        }
+      }
+    }
+
+    const container: Container = new Container({
+      activate: true,
+      bindings: [First, Second],
+      plugins: [new WiringPlugin(), new FailingPlugin()],
+    });
+
+    expect(() => container.provision()).toThrow("wire error");
+
+    // First was fully wired, so it unwinds with the cycle. Second was wired by WiringPlugin only,
+    // and that hook is unwound right where the later plugin failed. Neither `onProvision` is
+    // left without its `onDeprovision`, and the instances are still in flight when it runs.
+    expect(log).toEqual(["wire:First", "wire:Second", "unwire:Second", "unwire:First"]);
+  });
+
+  it("releases a plugin-wired non-participant from the cycle when it is unbound", () => {
+    const log: Array<string> = [];
+
+    @Injectable()
+    class PlainService {}
+
+    class BystanderPlugin implements WirestatePlugin {
+      public onProvision(instance: object, _container: Container, addDisposer: (dispose: () => void) => void): void {
+        log.push(`+${instance.constructor.name}`);
+        addDisposer(() => log.push(`dispose:${instance.constructor.name}`));
+      }
+
+      public onDeprovision(instance: object): void {
+        log.push(`-${instance.constructor.name}`);
+      }
+
+      public onDeactivate(instance: object): void {
+        log.push(`deactivate:${instance.constructor.name}`);
+      }
+    }
+
+    const container: Container = new Container({
+      activate: true,
+      bindings: [PlainService],
+      plugins: [new BystanderPlugin()],
+    });
+
+    container.provision();
+    container.unbind(PlainService);
+
+    // The instance leaves provider ownership before it deactivates, even though no decorator made
+    // it a participant: whatever a plugin wired at provision is unwound at unbind, in order.
+    expect(log).toEqual(["+PlainService", "-PlainService", "dispose:PlainService", "deactivate:PlainService"]);
+
+    log.length = 0;
+    container.deprovision();
+
+    // Nothing is owed twice.
+    expect(log).toEqual([]);
+  });
+
   it("unwinds every teardown phase in reverse across instances and disposers", () => {
     const log: Array<string> = [];
 

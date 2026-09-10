@@ -1,10 +1,13 @@
 import { type MutableWireStatus, type ProvisionId, getMutableStatus } from "../activation/wire-status";
 import { type Binding, type ServiceToken, BindingType } from "../binding/binding";
-import { getBindingToken } from "../binding/binding-tokens";
-import type { Container } from "../container/container";
+import { getBindingToken, tokenToString } from "../binding/binding-tokens";
+import { type Container } from "../container/container";
+import { type ContainerKernel } from "../container/container-kernel";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
+import { reportWirestateInternalError } from "../error/internal-error-handler";
 import { WirestateError } from "../error/wirestate-error";
 import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
+import { collectDeclaredProvisionHandlers } from "../lifecycle/declared-lifecycle-handlers";
 import { getMessagingPluginHandledKinds } from "../plugin/messaging-plugin";
 import { getMessagingRegistrations } from "../plugin/messaging-registration";
 import {
@@ -15,22 +18,28 @@ import {
   getEffectivePlugins,
   isPluginParticipant,
 } from "../plugin/plugin-registry";
-import { type Maybe, type Optional } from "../types/general";
+import { type Optional } from "../types/general";
 
 import { getDeprovisionHandlerMetadata } from "./on-deprovision";
 import { getProvisionHandlerMetadata } from "./on-provision";
-import { type CycleEntry, type ProvisionState, getOrCreateProvisionState, getProvisionState } from "./provision-state";
+import {
+  type ProvisionCycleEntry,
+  type ProvisionState,
+  getOrCreateProvisionState,
+  getProvisionState,
+} from "./provision-state";
 
 /**
  * Provisions a container for a framework provider.
  *
  * @remarks
- * Resolves lifecycle participants and calls `@OnProvision` once for this
- * provision cycle. It also updates instance lifecycle status so
- * {@link WireStatus} reflects provider ownership.
+ * One atomic cycle: plugins observe the boundary, the bindings are validated, every participant is
+ * resolved, plugins wire every active instance, and `@OnProvision` runs for each participant in
+ * creation order. A throw anywhere unwinds whatever the cycle reached, on the same axis a completed
+ * cycle tears down on, and leaves the container ready for another attempt.
  *
- * A container is provisioned by at most one provider at a time. Provisioning a
- * container that is already provisioned throws. Deprovision it first.
+ * A container is provisioned by at most one provider at a time. Provisioning a container that is
+ * already provisioned throws. Deprovision it first.
  *
  * @group Container
  * @internal
@@ -38,7 +47,8 @@ import { type CycleEntry, type ProvisionState, getOrCreateProvisionState, getPro
  * @param container - Container entering provider ownership.
  * @param bindings - Bindings controlled by the provider.
  *
- * @throws {@link WirestateError} If the container is already provisioned.
+ * @throws {@link WirestateError} If the container is already provisioned, provisioning, or
+ *   deprovisioning.
  */
 export function provisionContainer(
   container: Container,
@@ -46,32 +56,35 @@ export function provisionContainer(
 ): void {
   const state: ProvisionState = getOrCreateProvisionState(container);
 
-  if (state.status === true) {
-    throw new WirestateError(
-      "Container is already provisioned. Deprovision it before provisioning it again.",
-      ERROR_CODE_VALIDATION_ERROR
-    );
-  } else if (state.provisioning) {
-    throw new WirestateError(
-      "Container is already provisioning. A provision cycle cannot start another one, for example " +
-        "by calling provision() from an @OnProvision hook.",
-      ERROR_CODE_VALIDATION_ERROR
-    );
-  }
+  assertProvisionCanStart(state);
 
-  state.status = undefined;
-  state.provisioning = true;
+  state.phase = "provisioning";
 
+  // Plugins observe the boundary before any instance wiring. The dispatch unwinds its own earlier
+  // hooks when one of them throws, so nothing else has been set up yet that would need rolling back.
   try {
-    state.instances = provisionInstances(container, state, bindings);
-    state.status = true;
+    dispatchPluginContainerProvision(container);
   } catch (error) {
-    state.instances = null;
-    state.status = false;
+    state.phase = "idle";
 
     throw error;
-  } finally {
-    state.provisioning = false;
+  }
+
+  try {
+    validateBindings(container, bindings);
+
+    const participants: ReadonlyArray<object> = resolveParticipants(container, state, bindings);
+
+    markInFlight(container);
+    wirePlugins(container, state);
+    runProvisionHooks(container, participants);
+    markProvisioned(container);
+
+    state.phase = "provisioned";
+  } catch (error) {
+    releaseCycle(container, state);
+
+    throw error;
   }
 }
 
@@ -79,8 +92,10 @@ export function provisionContainer(
  * Deprovisions a container for a framework provider.
  *
  * @remarks
- * Idempotent: a second deprovision of an already deprovisioned (or never
- * provisioned) container is a no-op.
+ * Releases the whole cycle: every `@OnDeprovision` runs in reverse creation order while the buses
+ * are still live, then plugin teardown and disposers unwind in the same direction, then plugins
+ * observe the boundary. Idempotent: a container that is not currently provisioned is left alone,
+ * and so is one whose running provision cycle owns its own rollback.
  *
  * @group Container
  * @internal
@@ -90,194 +105,127 @@ export function provisionContainer(
 export function deprovisionContainer(container: Container): void {
   const state: Optional<ProvisionState> = getProvisionState(container);
 
-  if (!state || state.deprovisioning) {
+  if (!state || state.releasing || state.phase !== "provisioned") {
     return;
   }
 
-  const wasProvisioned: boolean = state.status === true;
-  const hadInstances: boolean = state.instances !== null;
-
-  state.status = false;
-
-  // Nothing to unwind for a container that was never provisioned, or already was.
-  if (!wasProvisioned && !hadInstances) {
-    return;
-  }
-
-  state.deprovisioning = true;
-
-  try {
-    // The cycle, not `state.instances`: unbinding the last participant clears that entry while the
-    // cycle still holds every non-participant a plugin wired, and those are owed an `onDeprovision`
-    // too. It unwinds on the same axis provision ran on, so teardown is its exact reverse - the
-    // first instance provisioned is the last one deprovisioned.
-    deprovisionInstances(container, state, orderByCreation(container, new Set(state.cycleByInstance.keys())));
-
-    markActiveInstancesDeprovisioned(container);
-
-    state.instances = null;
-
-    // Sweep any disposer a plugin parked on a non-participant instance, so deprovision never
-    // leaves a subscription behind, then drop the cycle: the next provision re-tracks it.
-    clearRemainingDisposers(state);
-    state.cycleByInstance.clear();
-
-    // Plugins observe the cycle boundary at the very end, once.
-    dispatchPluginContainerDeprovision(container);
-  } finally {
-    state.deprovisioning = false;
-  }
+  releaseCycle(container, state);
 }
 
 /**
- * Orders instances by the container's creation order, so provider lifecycle runs first-in /
- * last-out over them.
+ * Releases one instance from the current provision cycle, ahead of its deactivation.
  *
  * @remarks
- * The single ordering rule of the provider layer. Participants are resolved by walking the
- * binding list and calling `get`, which is a depth-first walk of the constructor-injection
- * graph, so the container's creation order is a topological order of it: a dependency is
- * committed before the dependent that injected it. Ordering by creation therefore runs
- * `@OnProvision` dependencies-first, and the reverse pass unwinds dependents-first - matching
- * `@OnActivation` / `@OnDeactivation`, which order on the same axis.
- *
- * Binding order is not that axis: it says only how the caller happened to write the list. Where
- * no dependency relates two participants the two orders coincide, so ordering by creation
- * changes nothing for them.
- *
- * It is a topological order for constructor injection only. A dependency first reached through
- * `inject(..., { lazy: true })`, through a `get` inside a provision hook, or from a parent
- * container is created outside this walk and is not ranked by it.
- *
- * @internal
- *
- * @param container - Container that owns the instances.
- * @param instances - Instances to order.
- * @returns The instances in creation order.
- */
-function orderByCreation(container: Container, instances: ReadonlySet<object>): Array<object> {
-  const ordered: Array<object> = [];
-
-  for (const instance of container.getActiveInstances()) {
-    if (instances.has(instance)) {
-      ordered.push(instance);
-    }
-  }
-
-  // An instance the container stopped listing as active - deactivated part-way through the cycle -
-  // has no creation rank left. Keep those ahead of the ranked ones, so a reverse pass still
-  // unwinds them last and an unrankable instance can never be dropped from the cycle.
-  if (ordered.length !== instances.size) {
-    const ranked: ReadonlySet<object> = new Set(ordered);
-
-    ordered.unshift(...[...instances].filter((instance: object): boolean => !ranked.has(instance)));
-  }
-
-  return ordered;
-}
-
-/**
- * Marks every active service instance of a container as deprovisioned.
- *
- * @param container - Container leaving provider ownership.
- */
-function markActiveInstancesDeprovisioned(container: Container): void {
-  for (const instance of container.getActiveInstances()) {
-    getMutableStatus(instance).isDeprovisioned = true;
-  }
-}
-
-/**
- * Deprovisions any provider lifecycle instance represented by a binding token.
+ * Runs for an instance the kernel is about to drop on `unbind`, so its `@OnDeprovision`, the
+ * plugin teardown it is owed, and its disposers run while the container is still provisioned and
+ * the buses still live. An instance the cycle never reached is left alone, and so is any instance
+ * while a deprovision transaction already owns teardown.
  *
  * @group Container
  * @internal
  *
- * @param container - Container losing the binding.
- * @param token - Binding token removed from the container.
+ * @param container - Container that owns the instance.
+ * @param instance - Instance leaving the container.
  */
-export function deprovisionContainerBinding(container: Container, token: ServiceToken): void {
+export function deprovisionContainerInstance(container: ContainerKernel, instance: object): void {
+  const state: Optional<ProvisionState> = getProvisionState(container);
+  const entry: Optional<ProvisionCycleEntry> = state?.cycle.get(instance);
+
+  if (!state || !entry || state.releasing) {
+    return;
+  }
+
+  state.releasing = true;
+
+  try {
+    deprovisionInstances(container, state, [instance]);
+
+    // A disposer may register another one while it runs. Drain until the entry is quiet, since
+    // nothing later sweeps an entry that leaves the cycle here.
+    while (entry.disposers.length > 0) {
+      runInstanceDisposers(entry);
+    }
+
+    state.cycle.delete(instance);
+  } finally {
+    state.releasing = false;
+  }
+}
+
+/**
+ * Guards against binding a handler-bearing service onto an already-provisioned container.
+ *
+ * @remarks
+ * Messaging handlers and `@OnProvision`/`@OnDeprovision` hooks are wired only during a provision
+ * cycle. Binding such a service after provision would leave its handlers silently dead until the
+ * next cycle, contrary to the fail-fast posture everywhere else, so this throws instead. Plain
+ * services (no messaging or provider-lifecycle hooks) bind freely - they activate lazily on the
+ * next resolution and need no cycle.
+ *
+ * @internal
+ *
+ * @param container - Container being bound onto.
+ * @param binding - Binding about to be registered.
+ * @throws {@link WirestateError} If the container is provisioned and the binding declares messaging
+ *   or provider-lifecycle handlers.
+ */
+export function assertBindableWhileProvisioned(container: ContainerKernel, binding: Binding): void {
   const state: Optional<ProvisionState> = getProvisionState(container);
 
-  if (!state || state.deprovisioning) {
+  // Fires while the container is provisioned and during a live provision cycle alike.
+  if (!state || state.phase === "idle") {
     return;
   }
 
-  const instances: ReadonlyArray<object> = state.instances ?? [...state.cycleByInstance.keys()];
+  const metadataToken: ServiceToken = getProviderLifecycleMetadataToken(binding);
+  const prototype: Optional<object> = getLifecyclePrototype(metadataToken);
 
-  const removed: Array<object> = [];
-  const remaining: Array<object> = [];
-
-  for (const instance of instances) {
-    if (isInstanceProvisionedForToken(state, instance, token)) {
-      removed.push(instance);
-    } else {
-      remaining.push(instance);
-    }
-  }
-
-  if (removed.length === 0) {
-    return;
-  }
-
-  state.deprovisioning = true;
-
-  try {
-    deprovisionInstances(container, state, removed);
-    untrackProvisionToken(state, removed, token);
-
-    if (state.instances) {
-      state.instances = remaining.length > 0 ? remaining : null;
-    }
-  } finally {
-    state.deprovisioning = false;
+  if (prototype && collectDeclaredProvisionHandlers(prototype).length > 0) {
+    throw new WirestateError(
+      `Cannot bind '${tokenToString(metadataToken)}' while the container is provisioned or provisioning: its ` +
+        `messaging or provider-lifecycle handlers would not wire until the next provision cycle. Bind it before ` +
+        `provisioning, or deprovision and reprovision the container.`,
+      ERROR_CODE_VALIDATION_ERROR
+    );
   }
 }
 
 /**
- * Resolves provider lifecycle participants and calls provision hooks.
+ * Rejects a provision attempt the container's current phase cannot accept.
  *
- * @group Container
- * @internal
+ * @param state - Provider lifecycle state of the container.
  *
- * @param container - Container that owns the bindings.
- * @param state - Provider lifecycle state for the container.
- * @param bindings - Bindings controlled by the provider.
- * @returns Instances that were resolved for provider lifecycle management.
+ * @throws {@link WirestateError} If a cycle is held, running, or being released.
  */
-export function provisionInstances(
-  container: Container,
-  state: ProvisionState,
-  bindings: ReadonlyArray<Binding>
-): Array<object> {
-  // Plugins observe the provision cycle boundary before any instance wiring.
-  dispatchPluginContainerProvision(container);
-
-  try {
-    validateBindings(container, bindings);
-
-    const instances: Array<object> = resolveParticipants(container, state, bindings);
-
-    markInFlight(container);
-    wirePlugins(container, state);
-    runProvisionHooks(container, instances);
-    markProvisioned(container);
-
-    return instances;
-  } catch (error) {
-    rollbackProvision(container, state);
-
-    throw error;
+function assertProvisionCanStart(state: ProvisionState): void {
+  if (state.phase === "provisioned") {
+    throw new WirestateError(
+      "Container is already provisioned. Deprovision it before provisioning it again.",
+      ERROR_CODE_VALIDATION_ERROR
+    );
+  } else if (state.phase === "provisioning") {
+    throw new WirestateError(
+      "Container is already provisioning. A provision cycle cannot start another one, for example " +
+        "by calling provision() from an @OnProvision hook.",
+      ERROR_CODE_VALIDATION_ERROR
+    );
+  } else if (state.releasing) {
+    throw new WirestateError(
+      "Container is deprovisioning. A deprovision cycle cannot start a provision cycle, for example " +
+        "by calling provision() from an @OnDeprovision hook.",
+      ERROR_CODE_VALIDATION_ERROR
+    );
   }
 }
 
 /**
- * Validates the bindings before provisioning: a provider-lifecycle participant must
- * be bound on this container, and every declared messaging handler must have a
- * registered plugin that handles its kind. Two passes, ordered so the ownership
- * error wins over the unhandled-kind error.
+ * Validates the bindings before provisioning: a provider-lifecycle participant must be bound on
+ * this container, and every declared messaging handler must have a registered plugin that handles
+ * its kind. Two passes, ordered so the ownership error wins over the unhandled-kind error.
  *
- * @internal
+ * @remarks
+ * Reading the lifecycle metadata here also validates it, so a class whose hierarchy declares
+ * conflicting hooks fails the cycle up front instead of failing its teardown later.
  *
  * @param container - Container being provisioned.
  * @param bindings - Bindings controlled by the provider.
@@ -309,15 +257,16 @@ function validateBindings(container: Container, bindings: ReadonlyArray<Binding>
 
   for (const binding of bindings) {
     const metadataToken: ServiceToken = getProviderLifecycleMetadataToken(binding);
+    const prototype: Optional<object> = getLifecyclePrototype(metadataToken);
 
-    if (typeof metadataToken !== "function" || !metadataToken.prototype) {
+    if (!prototype) {
       continue;
     }
 
-    for (const registration of getMessagingRegistrations(metadataToken.prototype as object)) {
+    for (const registration of getMessagingRegistrations(prototype)) {
       if (!handledKinds.has(registration.kind)) {
         throw new WirestateError(
-          `Service '${metadataToken.name}' declares a messaging handler but no registered plugin handles it. ` +
+          `Service '${tokenToString(metadataToken)}' declares a messaging handler but no registered plugin handles it. ` +
             `Register the matching messaging plugin (e.g. new EventsPlugin(), new CommandsPlugin(), or new QueriesPlugin()).`,
           ERROR_CODE_VALIDATION_ERROR
         );
@@ -327,16 +276,13 @@ function validateBindings(container: Container, bindings: ReadonlyArray<Binding>
 }
 
 /**
- * Resolves each distinct provider-lifecycle participant, forcing activation so
- * `@OnActivation` runs before any provision hook, and tracks the token that
- * provisioned it.
+ * Resolves each distinct provider-lifecycle participant, forcing activation so `@OnActivation`
+ * runs before any provision hook, and records it on the cycle.
  *
  * @remarks
  * Bindings are walked in registration order, which is what decides when each participant is
  * constructed. The participants are then returned in creation order, so provision hooks run
  * first-in and deprovision hooks last-out over the same axis. See {@link orderByCreation}.
- *
- * @internal
  *
  * @param container - Container being provisioned.
  * @param state - Provider lifecycle state for the container.
@@ -347,7 +293,7 @@ function resolveParticipants(
   container: Container,
   state: ProvisionState,
   bindings: ReadonlyArray<Binding>
-): Array<object> {
+): ReadonlyArray<object> {
   const participants: Set<object> = new Set();
   const visited: Set<ServiceToken> = new Set();
 
@@ -363,7 +309,7 @@ function resolveParticipants(
 
       const instance: object = container.get(token) as object;
 
-      trackProvisionToken(state, instance, token);
+      getOrCreateCycleEntry(state, instance).participant = true;
       participants.add(instance);
     }
   }
@@ -374,8 +320,6 @@ function resolveParticipants(
 /**
  * Resets every active instance to in-flight (deprovision/provisionId cleared)
  * before any provision hook observes them.
- *
- * @internal
  *
  * @param container - Container being provisioned.
  */
@@ -391,22 +335,26 @@ function markInFlight(container: Container): void {
 }
 
 /**
- * Runs every plugin's `onProvision` wiring for every active instance, before any
- * user `@OnProvision` (plugins bracket the user layer). Atomic: a throw unwinds the
- * whole cycle.
+ * Runs every plugin's `onProvision` wiring for every active instance, before any user
+ * `@OnProvision` (plugins bracket the user layer). Atomic: a throw unwinds the whole cycle.
  *
- * @internal
+ * @remarks
+ * An instance is recorded as wired only once every plugin accepted it. When a plugin throws
+ * part-way, the dispatch already unwound the plugins that ran before it, so the instance is owed
+ * no further plugin teardown, only its disposers.
  *
  * @param container - Container being provisioned.
  * @param state - Provider lifecycle state for the container.
  */
 function wirePlugins(container: Container, state: ProvisionState): void {
   for (const instance of container.getActiveInstances()) {
-    getOrCreateCycleEntry(state, instance);
+    const entry: ProvisionCycleEntry = getOrCreateCycleEntry(state, instance);
 
-    dispatchPluginProvision(container, instance, (dispose: () => void): void =>
-      appendDisposer(state, instance, dispose)
-    );
+    dispatchPluginProvision(container, instance, (dispose: () => void): void => {
+      entry.disposers.push(dispose);
+    });
+
+    entry.wired = true;
   }
 }
 
@@ -414,7 +362,9 @@ function wirePlugins(container: Container, state: ProvisionState): void {
  * Runs each participant's `@OnProvision` hook, stamping its provision id. Atomic: a
  * throw unwinds the whole cycle.
  *
- * @internal
+ * @remarks
+ * A participant is marked provisioned before its hook runs, so a hook that throws still receives
+ * the matching `@OnDeprovision` during rollback.
  *
  * @param container - Container being provisioned.
  * @param instances - Participant instances resolved this cycle.
@@ -428,7 +378,7 @@ function runProvisionHooks(container: Container, instances: ReadonlyArray<object
       continue;
     }
 
-    const methodName: Maybe<string | symbol> = getProvisionHandlerMetadata(instance);
+    const methodName: Optional<string | symbol> = getProvisionHandlerMetadata(instance);
     const provisionId: ProvisionId = nextProvisionId(status);
 
     status.isDeprovisioned = false;
@@ -459,8 +409,6 @@ function runProvisionHooks(container: Container, instances: ReadonlyArray<object
  * `null` reset {@link markInFlight} applies at the start of every cycle, which is what keeps a
  * reprovisioned instance from reusing the id its previous cycle handed out.
  *
- * @internal
- *
  * @param status - Lifecycle status of the instance entering the cycle.
  * @returns The id for this cycle.
  */
@@ -474,8 +422,6 @@ function nextProvisionId(status: MutableWireStatus): ProvisionId {
 
 /**
  * Marks every remaining active instance as provisioned after all hooks have run.
- *
- * @internal
  *
  * @param container - Container being provisioned.
  */
@@ -497,121 +443,166 @@ function markProvisioned(container: Container): void {
 }
 
 /**
- * Runs deprovision hooks then unsubscribes messaging handlers for provisioned instances.
+ * Releases the whole cycle a container holds, whether it completed or aborted part-way.
  *
  * @remarks
- * Two phases: every `@OnDeprovision` runs first (reverse provision
- * order, buses still live), then every handler is failsafe-unsubscribed.
+ * Marks the container released first, so anything activated by a teardown hook reads as
+ * deprovisioned and a bind attempted from one is not mistaken for a mid-cycle bind. The
+ * transaction then owns teardown until every hook and disposer has run: `unbind`, `unbindAll`,
+ * `destroy`, and `deprovision` called from inside it are no-ops.
  *
- * @group Container
- * @internal
- *
- * @param container - Container being deprovisioned (for plugin dispatch).
- * @param state - Provider lifecycle state holding the cycle's messaging disposers.
- * @param instances - Instances resolved during provider provisioning.
+ * @param container - Container leaving provider ownership.
+ * @param state - Provider lifecycle state for the container.
  */
-export function deprovisionInstances(
-  container: Container,
+function releaseCycle(container: Container, state: ProvisionState): void {
+  state.phase = "idle";
+  state.releasing = true;
+
+  try {
+    // Unwound on the axis provision ran on, so the first instance provisioned is the last one
+    // deprovisioned, and a partial cycle tears down in the order it would have completed in.
+    deprovisionInstances(container, state, orderByCreation(container, new Set(state.cycle.keys())));
+
+    markActiveInstancesDeprovisioned(container);
+
+    // Sweep any disposer registered during teardown itself, so a release never leaves a
+    // subscription behind, then drop the cycle: the next provision re-tracks it.
+    runRemainingDisposers(state);
+    state.cycle.clear();
+
+    // Plugins observe the cycle boundary at the very end, once.
+    dispatchPluginContainerDeprovision(container);
+  } finally {
+    state.releasing = false;
+  }
+}
+
+/**
+ * Tears down what the cycle set up for the given instances, in three reverse passes.
+ *
+ * @remarks
+ * Every `@OnDeprovision` runs first, while the buses are still live, then every plugin
+ * `onDeprovision`, then every disposer. Each pass walks the instances in reverse creation order.
+ * Teardown is failsafe: a throwing hook or disposer is contained and the remaining work still runs.
+ *
+ * @param container - Container being deprovisioned.
+ * @param state - Provider lifecycle state holding the cycle.
+ * @param instances - Instances to release, in creation order.
+ */
+function deprovisionInstances(
+  container: ContainerKernel,
   state: ProvisionState,
   instances: ReadonlyArray<object>
 ): void {
-  // User @OnDeprovision first (buses still live), then plugin teardown (reverse,
-  // failsafe), then unsubscribe every handler.
-  const deprovisioned: ReadonlyArray<object> = runDeprovisionHooks(container, instances);
-
-  for (const instance of deprovisioned) {
-    dispatchPluginDeprovision(container, instance);
+  for (let index: number = instances.length - 1; index >= 0; index -= 1) {
+    runDeprovisionHook(container, instances[index]);
   }
 
   for (let index: number = instances.length - 1; index >= 0; index -= 1) {
-    unsubscribeInstance(state, instances[index]);
+    const entry: Optional<ProvisionCycleEntry> = state.cycle.get(instances[index]);
+
+    if (entry?.wired) {
+      entry.wired = false;
+      dispatchPluginDeprovision(container, instances[index]);
+    }
+  }
+
+  for (let index: number = instances.length - 1; index >= 0; index -= 1) {
+    const entry: Optional<ProvisionCycleEntry> = state.cycle.get(instances[index]);
+
+    if (entry) {
+      runInstanceDisposers(entry);
+    }
   }
 }
 
 /**
- * Runs `@OnDeprovision` for every currently-provisioned instance in reverse
- * provision order, while buses are still live.
+ * Runs an instance's `@OnDeprovision` and marks it deprovisioned, when it is currently provisioned.
  *
  * @remarks
- * Callers pass the cycle in creation order, so this reverse pass is first-in / last-out: a
- * dependent's `@OnDeprovision` runs before the dependencies it injected tear down.
+ * The hook receives the id its `@OnProvision` received, and the status keeps that id afterwards so
+ * {@link WireStatus.isStale} keeps answering for work that cycle started.
  *
- * @internal
- *
- * @param container - Container releasing the instances.
- * @param instances - Instances resolved during provider provisioning, in creation order.
- * @returns The instances that were deprovisioned, in reverse provision order.
+ * @param container - Container releasing the instance.
+ * @param instance - Instance to release.
  */
-function runDeprovisionHooks(container: Container, instances: ReadonlyArray<object>): ReadonlyArray<object> {
-  const deprovisioned: Array<object> = [];
+function runDeprovisionHook(container: ContainerKernel, instance: object): void {
+  const status: MutableWireStatus = getMutableStatus(instance);
 
-  for (let index: number = instances.length - 1; index >= 0; index -= 1) {
-    const instance: object = instances[index];
-    const status: MutableWireStatus = getMutableStatus(instance);
-
-    // Only deprovision instances that are currently provisioned.
-    if (status.isDeprovisioned !== false) {
-      continue;
-    }
-
-    const methodName: Maybe<string | symbol> = getDeprovisionHandlerMetadata(instance);
-    const provisionId: Optional<ProvisionId> = status.lastProvisionId;
-
-    if (methodName) {
-      callLifecycleHandler({
-        args: provisionId === undefined ? [] : [provisionId],
-        container,
-        name: "@OnDeprovision",
-        details: [instance.constructor.name, String(methodName)],
-        instance,
-        instanceName: instance.constructor.name,
-        methodName,
-        rethrowSync: false,
-        source: "provider-deprovision",
-        syncFailureMessage: "@OnDeprovision failed for",
-      });
-    }
-
-    status.isDeprovisioned = true;
-
-    if (provisionId !== undefined) {
-      status.provisionId = provisionId;
-    }
-
-    deprovisioned.push(instance);
-  }
-
-  return deprovisioned;
-}
-
-/**
- * Runs and clears the provision-cycle messaging disposers for one instance.
- *
- * @remarks
- * Disposers run in reverse registration order, so a later disposer tears down before the earlier
- * ones it may depend on. Failsafe by contract: a disposer that throws never aborts deprovision, so
- * nested-provider teardown ordering can never error. No-op when the instance subscribed nothing
- * this cycle.
- *
- * @internal
- *
- * @param state - Provider lifecycle state holding the cycle's disposers.
- * @param instance - Instance whose handlers should be unsubscribed.
- */
-function unsubscribeInstance(state: ProvisionState, instance: object): void {
-  const entry: Optional<CycleEntry> = state.cycleByInstance.get(instance);
-
-  if (!entry || entry.disposers.length === 0) {
+  if (status.isDeprovisioned !== false) {
     return;
   }
 
-  // Detach before running so a re-entrant teardown cannot see or re-run them.
+  const methodName: Optional<string | symbol> = readDeprovisionHandler(container, instance);
+  const provisionId: Optional<ProvisionId> = status.lastProvisionId;
+
+  if (methodName) {
+    callLifecycleHandler({
+      args: provisionId === undefined ? [] : [provisionId],
+      container: container as Container,
+      name: "@OnDeprovision",
+      details: [instance.constructor.name, String(methodName)],
+      instance,
+      instanceName: instance.constructor.name,
+      methodName,
+      rethrowSync: false,
+      source: "provider-deprovision",
+      syncFailureMessage: "@OnDeprovision failed for",
+    });
+  }
+
+  status.isDeprovisioned = true;
+
+  if (provisionId !== undefined) {
+    status.provisionId = provisionId;
+  }
+}
+
+/**
+ * Reads an instance's `@OnDeprovision` method name without letting a metadata error abort teardown.
+ *
+ * @remarks
+ * Bound classes are validated long before this point, so a throw here means an instance reached
+ * the cycle by another route. It is reported like any other teardown failure and the instance is
+ * treated as declaring no hook.
+ *
+ * @param container - Container releasing the instance.
+ * @param instance - Instance to inspect.
+ * @returns The decorated method name, or `undefined` when there is none or the metadata is invalid.
+ */
+function readDeprovisionHandler(container: ContainerKernel, instance: object): Optional<string | symbol> {
+  try {
+    return getDeprovisionHandlerMetadata(instance);
+  } catch (error) {
+    reportWirestateInternalError({
+      container: container as Container,
+      error,
+      instance,
+      instanceName: instance.constructor.name,
+      message: "@OnDeprovision metadata is invalid",
+      source: "provider-deprovision",
+    });
+
+    return undefined;
+  }
+}
+
+/**
+ * Runs and clears the disposers an instance collected this cycle.
+ *
+ * @remarks
+ * Disposers run in reverse registration order, so a later disposer tears down before the earlier
+ * ones it may depend on. Failsafe by contract: a disposer that throws never aborts the rest. The
+ * list is detached before running, so a re-entrant registration lands in a fresh list that the
+ * caller's sweep reaches rather than in the one being drained.
+ *
+ * @param entry - Cycle entry whose disposers should run.
+ */
+function runInstanceDisposers(entry: ProvisionCycleEntry): void {
   const disposers: Array<() => void> = entry.disposers;
 
   entry.disposers = [];
 
-  // Reverse registration order, matching @OnDeprovision's reverse provision order and the
-  // reversed plugin dispatch: teardown unwinds setup.
   for (let index: number = disposers.length - 1; index >= 0; index -= 1) {
     try {
       disposers[index]();
@@ -622,144 +613,94 @@ function unsubscribeInstance(state: ProvisionState, instance: object): void {
 }
 
 /**
- * Unwinds a partially provisioned cycle after a provision-phase failure.
+ * Runs every disposer still parked on the cycle, in reverse across instances.
+ *
+ * @param state - Provider lifecycle state holding the cycle.
+ */
+function runRemainingDisposers(state: ProvisionState): void {
+  const entries: ReadonlyArray<ProvisionCycleEntry> = [...state.cycle.values()];
+
+  for (let index: number = entries.length - 1; index >= 0; index -= 1) {
+    runInstanceDisposers(entries[index]);
+  }
+}
+
+/**
+ * Marks every active service instance of a container as deprovisioned.
+ *
+ * @param container - Container leaving provider ownership.
+ */
+function markActiveInstancesDeprovisioned(container: Container): void {
+  for (const instance of container.getActiveInstances()) {
+    getMutableStatus(instance).isDeprovisioned = true;
+  }
+}
+
+/**
+ * Orders instances by the container's creation order, so provider lifecycle runs first-in /
+ * last-out over them.
  *
  * @remarks
- * Atomic provision: runs `@OnDeprovision` for instances that reached
- * the hook, failsafe-unsubscribes every handler wired this cycle, marks active
- * instances deprovisioned, and untracks the cycle's tokens.
+ * The single ordering rule of the provider layer. Participants are resolved by walking the
+ * binding list and calling `get`, which is a depth-first walk of the constructor-injection
+ * graph, so the container's creation order is a topological order of it: a dependency is
+ * committed before the dependent that injected it. Ordering by creation therefore runs
+ * `@OnProvision` dependencies-first, and the reverse pass unwinds dependents-first - matching
+ * `@OnActivation` / `@OnDeactivation`, which order on the same axis.
  *
- * @internal
+ * Binding order is not that axis: it says only how the caller happened to write the list. Where
+ * no dependency relates two participants the two orders coincide, so ordering by creation
+ * changes nothing for them.
  *
- * @param container - Container being provisioned.
- * @param state - Provider lifecycle state for the container.
+ * It is a topological order for constructor injection only. A dependency first reached through
+ * `inject(..., { lazy: true })`, through a `get` inside a provision hook, or from a parent
+ * container is created outside this walk and is not ranked by it.
+ *
+ * @param container - Container that owns the instances.
+ * @param instances - Instances to order.
+ * @returns The instances in creation order.
  */
-function rollbackProvision(container: Container, state: ProvisionState): void {
-  state.status = false;
+function orderByCreation(container: Container, instances: ReadonlySet<object>): Array<object> {
+  const ordered: Array<object> = [];
 
-  // Unwound on the same axis a completed cycle uses, so a partial cycle tears down in the same
-  // order it would have, just from wherever it got to.
-  const instances: ReadonlyArray<object> = orderByCreation(container, new Set(state.cycleByInstance.keys()));
-
-  deprovisionInstances(container, state, instances);
-
-  // Sweep any disposers a plugin parked on a non-participant instance this cycle,
-  // so an aborted provision never leaks a subscription.
-  clearRemainingDisposers(state);
-
-  for (const activeInstance of container.getActiveInstances()) {
-    getMutableStatus(activeInstance).isDeprovisioned = true;
+  for (const instance of container.getActiveInstances()) {
+    if (instances.has(instance)) {
+      ordered.push(instance);
+    }
   }
 
-  state.cycleByInstance.clear();
+  // An instance the container stopped listing as active - deactivated part-way through the cycle -
+  // has no creation rank left. Keep those ahead of the ranked ones, so a reverse pass still
+  // unwinds them last and an unrankable instance can never be dropped from the cycle.
+  if (ordered.length !== instances.size) {
+    const ranked: ReadonlySet<object> = new Set(ordered);
 
-  dispatchPluginContainerDeprovision(container);
-}
-
-/**
- * Appends a teardown callback for an instance to the current provision cycle.
- *
- * @internal
- *
- * @param state - Provider lifecycle state holding the cycle's disposers.
- * @param instance - Instance the disposer belongs to.
- * @param dispose - Teardown callback to run (reverse order, failsafe) at deprovision.
- */
-function appendDisposer(state: ProvisionState, instance: object, dispose: () => void): void {
-  getOrCreateCycleEntry(state, instance).disposers.push(dispose);
-}
-
-/**
- * Failsafe-runs and clears every remaining disposer in the cycle.
- *
- * @internal
- *
- * @param state - Provider lifecycle state holding the cycle's disposers.
- */
-function clearRemainingDisposers(state: ProvisionState): void {
-  const instances: ReadonlyArray<object> = [...state.cycleByInstance.keys()];
-
-  for (let index: number = instances.length - 1; index >= 0; index -= 1) {
-    unsubscribeInstance(state, instances[index]);
+    ordered.unshift(...[...instances].filter((instance: object): boolean => !ranked.has(instance)));
   }
-}
 
-/**
- * Tracks which binding token caused an instance to enter provider lifecycle state.
- *
- * @internal
- *
- * @param state - Provider lifecycle state for the owning container.
- * @param instance - Provisioned instance.
- * @param token - Binding token used to resolve the instance.
- */
-function trackProvisionToken(state: ProvisionState, instance: object, token: ServiceToken): void {
-  getOrCreateCycleEntry(state, instance).tokens.add(token);
+  return ordered;
 }
 
 /**
  * Returns the instance's provision-cycle entry, creating an empty one on first use.
  *
- * @internal
- *
  * @param state - Provider lifecycle state for the owning container.
  * @param instance - Instance the entry belongs to.
  * @returns The instance's cycle entry.
  */
-function getOrCreateCycleEntry(state: ProvisionState, instance: object): CycleEntry {
-  let entry: Optional<CycleEntry> = state.cycleByInstance.get(instance);
+function getOrCreateCycleEntry(state: ProvisionState, instance: object): ProvisionCycleEntry {
+  let entry: Optional<ProvisionCycleEntry> = state.cycle.get(instance);
 
   if (!entry) {
-    entry = { tokens: new Set(), disposers: [] };
-    state.cycleByInstance.set(instance, entry);
+    entry = { participant: false, wired: false, disposers: [] };
+    state.cycle.set(instance, entry);
   }
 
   return entry;
 }
 
 /**
- * Removes one provider lifecycle token from instances.
- *
- * @internal
- *
- * @param state - Provider lifecycle state for the owning container.
- * @param instances - Instances losing a lifecycle token.
- * @param token - Binding token to remove.
- */
-function untrackProvisionToken(state: ProvisionState, instances: ReadonlyArray<object>, token: ServiceToken): void {
-  for (const instance of instances) {
-    const entry: Optional<CycleEntry> = state.cycleByInstance.get(instance);
-
-    if (!entry) {
-      continue;
-    }
-
-    entry.tokens.delete(token);
-
-    if (entry.tokens.size === 0) {
-      state.cycleByInstance.delete(instance);
-    }
-  }
-}
-
-/**
- * Checks whether an instance lifecycle entry belongs to a binding token.
- *
- * @internal
- *
- * @param state - Provider lifecycle state for the owning container.
- * @param instance - Provisioned instance.
- * @param token - Binding token to inspect.
- * @returns True when the instance was provisioned for the token.
- */
-function isInstanceProvisionedForToken(state: ProvisionState, instance: object, token: ServiceToken): boolean {
-  return state.cycleByInstance.get(instance)?.tokens.has(token) ?? false;
-}
-
-/**
  * Resolves the constructor that can own provider lifecycle metadata.
- *
- * @internal
  *
  * @param binding - Binding registered on the provider container.
  * @returns The constructor for instance descriptors, otherwise the binding token.
@@ -773,63 +714,34 @@ function getProviderLifecycleMetadataToken(binding: Binding): ServiceToken {
 }
 
 /**
- * Checks whether an instance token should participate in provider lifecycle state.
- *
- * @internal
+ * Returns the prototype lifecycle metadata is read from, when the token is a class.
  *
  * @param token - Binding token to inspect.
- * @returns True when the token is an instance constructor with provider lifecycle metadata.
+ * @returns The class prototype, or `undefined` for a non-class token.
  */
-function isProviderLifecycleParticipant(token: ServiceToken): boolean {
-  if (typeof token !== "function") {
-    return false;
-  }
-
-  const prototype: Optional<object> = token.prototype as Optional<object>;
-
-  return prototype
-    ? Boolean(getProvisionHandlerMetadata(prototype) || getDeprovisionHandlerMetadata(prototype))
-    : false;
+function getLifecyclePrototype(token: ServiceToken): Optional<object> {
+  return typeof token === "function" ? (token.prototype as Optional<object>) : undefined;
 }
 
 /**
- * Guards against binding a handler-bearing service onto an already-provisioned container.
+ * Checks whether a token names a class declaring `@OnProvision` or `@OnDeprovision`.
  *
  * @remarks
- * Messaging handlers and `@OnProvision`/`@OnDeprovision` hooks are wired only during a provision
- * cycle. Binding such a service after provision would leave its handlers silently dead until the
- * next cycle, contrary to the fail-fast posture everywhere else, so this throws instead. Plain
- * services (no messaging or provider-lifecycle hooks) bind freely - they activate lazily on the
- * next resolution and need no cycle.
+ * Both hooks are read, not short-circuited, so a hierarchy conflict in either surfaces at
+ * validation time rather than during teardown.
  *
- * @internal
- *
- * @param container - Container being bound onto.
- * @param binding - Binding about to be registered.
- * @throws {@link WirestateError} If the container is provisioned and the binding declares messaging
- *   or provider-lifecycle handlers.
+ * @param token - Binding token to inspect.
+ * @returns True when the token is a class with a provider lifecycle hook.
  */
-export function assertBindableWhileProvisioned(container: Container, binding: Binding): void {
-  const state: Optional<ProvisionState> = getProvisionState(container);
+function isProviderLifecycleParticipant(token: ServiceToken): boolean {
+  const prototype: Optional<object> = getLifecyclePrototype(token);
 
-  // Fire while the container is provisioned AND during a live provision cycle.
-  if (!state || (state.status !== true && !state.provisioning)) {
-    return;
+  if (!prototype) {
+    return false;
   }
 
-  const metadataToken: ServiceToken = getProviderLifecycleMetadataToken(binding);
-  const prototype: Optional<object> =
-    typeof metadataToken === "function" ? (metadataToken.prototype as Optional<object>) : undefined;
-  const declaresMessaging: boolean = prototype !== undefined && getMessagingRegistrations(prototype).length > 0;
+  const provision: Optional<string | symbol> = getProvisionHandlerMetadata(prototype);
+  const deprovision: Optional<string | symbol> = getDeprovisionHandlerMetadata(prototype);
 
-  if (declaresMessaging || isProviderLifecycleParticipant(metadataToken)) {
-    const name: string = typeof metadataToken === "function" ? metadataToken.name : String(metadataToken);
-
-    throw new WirestateError(
-      `Cannot bind '${name}' while the container is provisioned or provisioning: its messaging or ` +
-        `provider-lifecycle handlers would not wire until the next provision cycle. Bind it before ` +
-        `provisioning, or deprovision and reprovision the container.`,
-      ERROR_CODE_VALIDATION_ERROR
-    );
-  }
+  return provision !== undefined || deprovision !== undefined;
 }

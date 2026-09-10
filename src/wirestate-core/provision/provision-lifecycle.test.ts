@@ -11,7 +11,7 @@ import { type Nullable } from "../types/general";
 import { OnDeprovision } from "./on-deprovision";
 import { OnProvision } from "./on-provision";
 import { deprovisionContainer, provisionContainer } from "./provision-lifecycle";
-import { getProvisionState } from "./provision-state";
+import { getProvisionParticipants, getProvisionState } from "./provision-state";
 
 describe("provision lifecycle", () => {
   it("should provision exactly the decorated services among infra bindings", () => {
@@ -45,7 +45,7 @@ describe("provision lifecycle", () => {
     provisionContainer(container);
 
     expect(events).toEqual(["provision"]);
-    expect(getProvisionState(container)?.instances).toEqual([container.get(ProvisionedService)]);
+    expect(getProvisionParticipants(container)).toEqual([container.get(ProvisionedService)]);
 
     deprovisionContainer(container);
 
@@ -470,7 +470,7 @@ describe("provision lifecycle", () => {
     expect(caught).toContain("Container is already provisioning");
 
     // The outer cycle still completes normally: the rejection is contained to the nested call.
-    expect(getProvisionState(container)?.status).toBe(true);
+    expect(getProvisionState(container)?.phase).toBe("provisioned");
 
     deprovisionContainer(container);
 

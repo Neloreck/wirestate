@@ -15,7 +15,7 @@ import { QueriesPlugin } from "../plugin/queries/queries-plugin";
 import { QueryBus } from "../plugin/queries/query-bus";
 import { OnDeprovision } from "../provision/on-deprovision";
 import { OnProvision } from "../provision/on-provision";
-import { getProvisionState } from "../provision/provision-state";
+import { getProvisionParticipants } from "../provision/provision-state";
 import { type Nullable } from "../types/general";
 
 import { Container } from "./container";
@@ -52,7 +52,7 @@ describe("Container provision", () => {
       container.provision();
 
       expect(events).toEqual(["provision"]);
-      expect(getProvisionState(container)?.instances).toEqual([container.get(LifecycleService)]);
+      expect(getProvisionParticipants(container)).toEqual([container.get(LifecycleService)]);
     });
 
     it("provisions in binding order and deprovisions in reverse order", () => {
@@ -156,7 +156,7 @@ describe("Container provision", () => {
 
       expect(() => container.deprovision()).not.toThrow();
       expect(events).toEqual([]);
-      expect(getProvisionState(container)?.instances ?? null).toBeNull();
+      expect(getProvisionParticipants(container)).toEqual([]);
     });
 
     it("reflects provider ownership on WireStatus", () => {

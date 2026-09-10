@@ -5,8 +5,9 @@ import { type ActivationRecord } from "../container/container-storage";
 import { reportWirestateInternalError } from "../error/internal-error-handler";
 import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
 import { dispatchPluginActivate, dispatchPluginDeactivate } from "../plugin/plugin-registry";
-import { getContainerProvisionStatus } from "../provision/provision-state";
-import { type Optional, type Maybe } from "../types/general";
+import { deprovisionContainerInstance } from "../provision/provision-lifecycle";
+import { type ProvisionPhase, getProvisionPhase } from "../provision/provision-state";
+import { type Maybe, type Nullable, type Optional } from "../types/general";
 
 import { type ActivationAdapter } from "./activation-adapter";
 import { getActivationHandlerMetadata } from "./on-activation";
@@ -64,6 +65,10 @@ export const wirestateActivationAdapter: ActivationAdapter = {
     const binding: InstanceBindingDescriptor<object> = record.binding as InstanceBindingDescriptor<object>;
     const instance: object = record.instance as object;
 
+    // Whole-container teardown has already released the cycle by the time it deactivates, so this
+    // only does work for an instance dropped on its own while the container stays provisioned.
+    deprovisionContainerInstance(container, instance);
+
     try {
       const methodName: Maybe<string | symbol> = getDeactivationHandlerMetadata(instance);
 
@@ -111,11 +116,10 @@ export const wirestateActivationAdapter: ActivationAdapter = {
  */
 export function initializeInstanceStatus(container: ContainerKernel, instance: object): void {
   const status: MutableWireStatus = trackMutableStatus(instance);
-  const isProvisioned: Optional<boolean> = getContainerProvisionStatus(container);
 
   status.container = container;
   status.isDeactivated = false;
-  status.isDeprovisioned = isProvisioned === undefined ? null : !isProvisioned;
+  status.isDeprovisioned = isDeprovisionedInPhase(getProvisionPhase(container));
   status.provisionId = null;
 }
 
@@ -133,4 +137,27 @@ export function finalizeInstanceStatus(instance: object): void {
 
   // Release the container ref so a user-held deactivated instance does not pin it.
   status.container = undefined;
+}
+
+/**
+ * Derives the provider-ownership flag of an instance activated in a given container phase.
+ *
+ * @remarks
+ * An instance activated inside a provisioned container is provider-owned right away. One activated
+ * while a cycle is still wiring is in flight, and the cycle stamps it when it completes. One
+ * activated after the container was released is deprovisioned. A container that never entered
+ * provider lifecycle leaves the flag unset.
+ *
+ * @param phase - Provider ownership phase of the container, or `undefined` when it has none.
+ * @returns The initial `isDeprovisioned` flag.
+ */
+function isDeprovisionedInPhase(phase: Optional<ProvisionPhase>): Nullable<boolean> {
+  switch (phase) {
+    case "provisioned":
+      return false;
+    case "idle":
+      return true;
+    default:
+      return null;
+  }
 }

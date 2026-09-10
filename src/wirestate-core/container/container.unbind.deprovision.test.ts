@@ -5,7 +5,7 @@ import { WireStatus, getMutableStatus } from "../activation/wire-status";
 import { Injectable } from "../metadata/metadata-injectable";
 import { OnDeprovision } from "../provision/on-deprovision";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
-import { getProvisionState } from "../provision/provision-state";
+import { getProvisionParticipants } from "../provision/provision-state";
 
 import { Container } from "./container";
 import { inject } from "./container-context";
@@ -76,7 +76,7 @@ describe("container unbind deprovision", () => {
     container.unbind(LifecycleService);
 
     expect(events).toEqual(["provision", "deprovision", "deactivation"]);
-    expect(getProvisionState(container)?.instances ?? null).toBeNull();
+    expect(getProvisionParticipants(container)).toEqual([]);
 
     deprovisionContainer(container);
 
@@ -104,7 +104,7 @@ describe("container unbind deprovision", () => {
     container.unbind(ServiceA);
 
     expect(events).toEqual(["provision-a", "provision-b", "deprovision-a", "deactivation-a"]);
-    expect(getProvisionState(container)?.instances).toHaveLength(1);
+    expect(getProvisionParticipants(container)).toHaveLength(1);
 
     deprovisionContainer(container);
 
@@ -154,7 +154,7 @@ describe("container unbind deprovision", () => {
     deprovisionContainer(container);
 
     expect(events).toEqual(["activated", "provision", "deprovision", "deactivation"]);
-    expect(getProvisionState(container)?.instances ?? null).toBeNull();
+    expect(getProvisionParticipants(container)).toEqual([]);
   });
 
   it("is a no-op when unbinding a non-participant token while a participant stays provisioned", () => {
@@ -176,7 +176,7 @@ describe("container unbind deprovision", () => {
 
     expect(events).toEqual(["provision"]);
     expect(container.hasOwn(PlainService)).toBe(false);
-    expect(getProvisionState(container)?.instances).toHaveLength(1);
+    expect(getProvisionParticipants(container)).toHaveLength(1);
 
     // A container deprovision runs @OnDeprovision (not @OnDeactivation, which is unbind-only).
     deprovisionContainer(container);
@@ -200,7 +200,7 @@ describe("container unbind deprovision", () => {
     // Unbinding the last lifecycle binding clears the container's instances entry.
     container.unbind(LifecycleService);
 
-    expect(getProvisionState(container)?.instances ?? null).toBeNull();
+    expect(getProvisionParticipants(container)).toEqual([]);
 
     deprovisionContainer(container);
 

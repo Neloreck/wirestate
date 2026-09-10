@@ -8,7 +8,7 @@ import { type WirestatePlugin } from "../plugin/plugin";
 import { OnDeprovision } from "./on-deprovision";
 import { OnProvision } from "./on-provision";
 import { provisionContainer } from "./provision-lifecycle";
-import { getProvisionState } from "./provision-state";
+import { getProvisionParticipants, getProvisionState } from "./provision-state";
 
 describe("provision lifecycle errors", () => {
   it("rolls back prior container hooks when a later container-provision plugin throws", () => {
@@ -38,7 +38,7 @@ describe("provision lifecycle errors", () => {
     expect(() => provisionContainer(container)).toThrow(error);
 
     expect(events).toEqual(["first-provision", "failing-provision", "first-deprovision"]);
-    expect(getProvisionState(container)?.status).toBe(false);
+    expect(getProvisionState(container)?.phase).toBe("idle");
   });
 
   it("rolls back container hooks when binding validation fails", () => {
@@ -70,7 +70,7 @@ describe("provision lifecycle errors", () => {
     );
 
     expect(events).toEqual(["container-provision", "container-deprovision"]);
-    expect(getProvisionState(container)?.status).toBe(false);
+    expect(getProvisionState(container)?.phase).toBe("idle");
   });
 
   it("rolls back resolved participants when a later participant fails activation", () => {
@@ -113,8 +113,8 @@ describe("provision lifecycle errors", () => {
 
     expect(events).toEqual(["container-provision", "container-deprovision"]);
     expect(WireStatus.for(container.get(FirstService)).isDeprovisioned).toBe(true);
-    expect(getProvisionState(container)?.cycleByInstance).toEqual(new Map());
-    expect(getProvisionState(container)?.status).toBe(false);
+    expect(getProvisionState(container)?.cycle).toEqual(new Map());
+    expect(getProvisionState(container)?.phase).toBe("idle");
   });
 
   it("should report provider lifecycle errors to container error handler", () => {
@@ -201,7 +201,7 @@ describe("provision lifecycle errors", () => {
 
     expect(() => provisionContainer(container)).toThrow(error);
     expect(events).toEqual(["provision-first", "provision-failing", "deprovision-failing", "deprovision-first"]);
-    expect(getProvisionState(container)?.instances ?? null).toBeNull();
+    expect(getProvisionParticipants(container)).toEqual([]);
     expect(onError).toHaveBeenCalledWith(
       expect.objectContaining({
         container,
@@ -311,7 +311,7 @@ describe("provision lifecycle errors", () => {
     // A throwing child @OnDeprovision is contained and never touches the parent's cycle.
     expect(() => child.deprovision()).not.toThrow();
     expect(events).toEqual(["parent-provision", "child-provision", "child-deprovision"]);
-    expect(getProvisionState(parent)?.status).toBe(true);
+    expect(getProvisionState(parent)?.phase).toBe("provisioned");
     expect(onError).toHaveBeenCalledWith(
       expect.objectContaining({ source: "provider-deprovision", instanceName: "ChildService" })
     );

@@ -15,7 +15,6 @@ import { installOwnPlugins, setContainerPlugins } from "../plugin/plugin-registr
 import {
   assertBindableWhileProvisioned,
   deprovisionContainer,
-  deprovisionContainerBinding,
   provisionContainer,
 } from "../provision/provision-lifecycle";
 import { isContainerDeprovisioning } from "../provision/provision-state";
@@ -250,12 +249,6 @@ export class Container extends ContainerKernel {
   public override unbind<T>(token: ServiceToken<T>): this {
     if (isContainerDeprovisioning(this)) {
       return this;
-    }
-
-    token = this.getHotToken(token);
-
-    if (this.hasOwn(token)) {
-      deprovisionContainerBinding(this, token);
     }
 
     return super.unbind(token);

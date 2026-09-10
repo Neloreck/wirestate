@@ -3,7 +3,7 @@ import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 import { Injectable } from "../metadata/metadata-injectable";
 import { OnProvision } from "../provision/on-provision";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
-import { getProvisionState } from "../provision/provision-state";
+import { getProvisionParticipants } from "../provision/provision-state";
 
 import { Container } from "./container";
 
@@ -17,7 +17,7 @@ describe("container operation edge cases", () => {
     expect(events).toEqual(["activated"]);
 
     expect(() => deprovisionContainer(container)).not.toThrow();
-    expect(getProvisionState(container)?.instances ?? null).toBeNull();
+    expect(getProvisionParticipants(container)).toEqual([]);
     expect(events).toEqual(["activated"]);
   });
 
@@ -27,7 +27,7 @@ describe("container operation edge cases", () => {
 
     provisionContainer(container, []);
 
-    expect(getProvisionState(container)?.instances).toEqual([]);
+    expect(getProvisionParticipants(container)).toEqual([]);
     expect(events).toEqual([]);
   });
 
@@ -52,7 +52,7 @@ describe("container operation edge cases", () => {
     const container: Container = new Container({ bindings: [PlainService] });
 
     expect(() => provisionContainer(container, [PlainService])).not.toThrow();
-    expect(getProvisionState(container)?.instances).toEqual([]);
+    expect(getProvisionParticipants(container)).toEqual([]);
   });
 
   it("treats unbinding a never-bound token as a no-op", () => {
