@@ -223,7 +223,7 @@ describe("container.bind instance", () => {
       const instance: GenericService = container.get(GenericService);
 
       expect(instance.isActivated).toBe(true);
-      expect(WireStatus.for(instance)).toEqual({
+      expect(WireStatus.for(instance)).toMatchObject({
         isDeactivated: false,
         isDeprovisioned: false,
         isInactive: false,
@@ -247,7 +247,7 @@ describe("container.bind instance", () => {
 
       expect(instance.isActivated).toBe(false);
       expect(instance.container.get(Container)).toBe(container);
-      expect(WireStatus.for(instance)).toEqual({
+      expect(WireStatus.for(instance)).toMatchObject({
         isDeactivated: true,
         isDeprovisioned: true,
         isInactive: true,
@@ -414,7 +414,7 @@ describe("container.bind instance", () => {
       expect(containerRef.current).not.toBeNull();
 
       expect((containerRef.current as Container).get(Container)).toBe(container);
-      expect(WireStatus.for(instanceRef.current as object)).toEqual({
+      expect(WireStatus.for(instanceRef.current as object)).toMatchObject({
         isDeactivated: true,
         isDeprovisioned: true,
         isInactive: true,
@@ -446,7 +446,7 @@ describe("container.bind instance", () => {
       expect(() => container.unbind(SyncFailDeactivationService)).not.toThrow();
 
       expect(instance.container.get(Container)).toBe(container);
-      expect(WireStatus.for(instance)).toEqual({
+      expect(WireStatus.for(instance)).toMatchObject({
         isDeactivated: true,
         isDeprovisioned: true,
         isInactive: true,

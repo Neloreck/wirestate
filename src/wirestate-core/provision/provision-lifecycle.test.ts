@@ -285,7 +285,7 @@ describe("provision lifecycle", () => {
 
     // No provider hook runs, but the service was owned for the cycle, so it carries its id.
     expect(events).toEqual(["activated"]);
-    expect(status).toEqual({
+    expect(status).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
@@ -295,7 +295,7 @@ describe("provision lifecycle", () => {
     deprovisionContainer(container);
 
     expect(events).toEqual(["activated"]);
-    expect(status).toEqual({
+    expect(status).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
@@ -316,7 +316,7 @@ describe("provision lifecycle", () => {
     const service: PlainService = container.get(PlainService);
     const status: WireStatus = WireStatus.for(service);
 
-    expect(status).toEqual({
+    expect(status).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
@@ -325,7 +325,7 @@ describe("provision lifecycle", () => {
 
     deprovisionContainer(container);
 
-    expect(status).toEqual({
+    expect(status).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
@@ -354,7 +354,7 @@ describe("provision lifecycle", () => {
     const service: PlainService = container.get(TOKEN);
     const status: WireStatus = WireStatus.for(service);
 
-    expect(status).toEqual({
+    expect(status).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
@@ -363,7 +363,7 @@ describe("provision lifecycle", () => {
 
     deprovisionContainer(container);
 
-    expect(status).toEqual({
+    expect(status).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
@@ -399,7 +399,7 @@ describe("provision lifecycle", () => {
 
     // Pulled in by a participant's @OnActivation, so it was active before the cycle finished
     // wiring and is stamped with it.
-    expect(status).toEqual({
+    expect(status).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
@@ -408,7 +408,7 @@ describe("provision lifecycle", () => {
 
     deprovisionContainer(container);
 
-    expect(status).toEqual({
+    expect(status).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,

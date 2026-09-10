@@ -21,7 +21,7 @@ describe("WireStatus", () => {
     expect(status).toBeInstanceOf(WireStatus);
     expect(WireStatus.for(instance)).toBe(status);
     expect(WireStatus.track(instance)).toBe(status);
-    expect(status).toEqual({
+    expect(status).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: null,
       isInactive: false,
@@ -42,7 +42,7 @@ describe("WireStatus", () => {
     const service: TestService = container.get(TestService);
 
     expect(WireStatus.for(service)).toBe(service.status);
-    expect(service.status).toEqual({
+    expect(service.status).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: null,
       isInactive: false,
@@ -63,7 +63,7 @@ describe("WireStatus", () => {
 
     expect(status).toBeInstanceOf(WireStatus);
     expect(WireStatus.for(service)).toBe(status);
-    expect(status).toEqual({
+    expect(status).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: null,
       isInactive: false,
@@ -75,7 +75,7 @@ describe("WireStatus", () => {
     // Declaring no hook does not keep a service out of the cycle, so it is stamped like any other
     // instance the container owns. Without an id, `isStale` could not tell a later cycle apart.
     expect(WireStatus.for(service)).toBe(status);
-    expect(WireStatus.for(service)).toEqual({
+    expect(WireStatus.for(service)).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
@@ -84,7 +84,7 @@ describe("WireStatus", () => {
 
     deprovisionContainer(container);
 
-    expect(WireStatus.for(service)).toEqual({
+    expect(WireStatus.for(service)).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
@@ -93,7 +93,7 @@ describe("WireStatus", () => {
 
     container.unbind(TestService);
 
-    expect(WireStatus.for(service)).toEqual({
+    expect(WireStatus.for(service)).toMatchObject({
       isDeactivated: true,
       isDeprovisioned: true,
       isInactive: true,
@@ -120,7 +120,7 @@ describe("WireStatus", () => {
 
     expect(status).toBeInstanceOf(WireStatus);
     expect(WireStatus.for(service)).toBe(status);
-    expect(status).toEqual({
+    expect(status).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: null,
       isInactive: false,
@@ -130,7 +130,7 @@ describe("WireStatus", () => {
     provisionContainer(container, [TestService]);
 
     expect(WireStatus.for(service)).toBe(status);
-    expect(WireStatus.for(service)).toEqual({
+    expect(WireStatus.for(service)).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
@@ -139,7 +139,7 @@ describe("WireStatus", () => {
 
     deprovisionContainer(container);
 
-    expect(WireStatus.for(service)).toEqual({
+    expect(WireStatus.for(service)).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
@@ -149,7 +149,7 @@ describe("WireStatus", () => {
     provisionContainer(container, [TestService]);
 
     expect(WireStatus.for(service)).toBe(status);
-    expect(WireStatus.for(service)).toEqual({
+    expect(WireStatus.for(service)).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: false,
       isInactive: false,
@@ -158,7 +158,7 @@ describe("WireStatus", () => {
 
     deprovisionContainer(container);
 
-    expect(WireStatus.for(service)).toEqual({
+    expect(WireStatus.for(service)).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: true,
       isInactive: true,
@@ -167,7 +167,7 @@ describe("WireStatus", () => {
 
     container.unbind(TestService);
 
-    expect(WireStatus.for(service)).toEqual({
+    expect(WireStatus.for(service)).toMatchObject({
       isDeactivated: true,
       isDeprovisioned: true,
       isInactive: true,

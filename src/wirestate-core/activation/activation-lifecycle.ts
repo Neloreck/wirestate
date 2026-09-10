@@ -11,7 +11,7 @@ import { type Optional, type Maybe } from "../types/general";
 import { type ActivationAdapter } from "./activation-adapter";
 import { getActivationHandlerMetadata } from "./on-activation";
 import { getDeactivationHandlerMetadata } from "./on-deactivation";
-import { getInstanceRecord, WireStatus } from "./wire-status";
+import { type MutableWireStatus, getMutableStatus, trackMutableStatus } from "./wire-status";
 
 /**
  * The Wirestate instance lifecycle layered on the pure-DI kernel.
@@ -110,14 +110,11 @@ export const wirestateActivationAdapter: ActivationAdapter = {
  * @internal
  */
 export function initializeInstanceStatus(container: ContainerKernel, instance: object): void {
-  const status: WireStatus = WireStatus.track(instance);
-
-  getInstanceRecord(status).container = container;
-
-  status.isDeactivated = false;
-
+  const status: MutableWireStatus = trackMutableStatus(instance);
   const isProvisioned: Optional<boolean> = getContainerProvisionStatus(container);
 
+  status.container = container;
+  status.isDeactivated = false;
   status.isDeprovisioned = isProvisioned === undefined ? null : !isProvisioned;
   status.provisionId = null;
 }
@@ -129,11 +126,11 @@ export function initializeInstanceStatus(container: ContainerKernel, instance: o
  * @internal
  */
 export function finalizeInstanceStatus(instance: object): void {
-  const status: WireStatus = WireStatus.for(instance);
+  const status: MutableWireStatus = getMutableStatus(instance);
 
   status.isDeactivated = true;
   status.isDeprovisioned = true;
 
   // Release the container ref so a user-held deactivated instance does not pin it.
-  getInstanceRecord(status).container = undefined;
+  status.container = undefined;
 }

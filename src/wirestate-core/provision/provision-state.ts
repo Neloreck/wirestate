@@ -152,16 +152,3 @@ export function getOrCreateProvisionState(container: ContainerKernel): Provision
 export function getContainerProvisionStatus(container: ContainerKernel): Optional<boolean> {
   return PROVISION_STATE.get(container)?.status;
 }
-
-/**
- * Stores the provider ownership state for a container.
- *
- * @group Container
- * @internal
- *
- * @param container - Container entering or leaving provider ownership.
- * @param provisioned - `true` when provisioned, `false` when deprovisioned.
- */
-export function setContainerProvisioned(container: ContainerKernel, provisioned: boolean): void {
-  getOrCreateProvisionState(container).status = provisioned;
-}

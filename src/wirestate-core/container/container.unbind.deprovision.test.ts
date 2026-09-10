@@ -1,7 +1,7 @@
 import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 
 import { OnDeactivation } from "../activation/on-deactivation";
-import { WireStatus } from "../activation/wire-status";
+import { WireStatus, getMutableStatus } from "../activation/wire-status";
 import { Injectable } from "../metadata/metadata-injectable";
 import { OnDeprovision } from "../provision/on-deprovision";
 import { deprovisionContainer, provisionContainer } from "../provision/provision-lifecycle";
@@ -228,7 +228,8 @@ describe("container unbind deprovision", () => {
 
     const { LifecycleService, events } = createLifecycleService();
     const container: Container = new Container({ bindings: [PlainService, LifecycleService] });
-    const plainStatus: WireStatus = WireStatus.for(container.get(PlainService));
+    const plainService: PlainService = container.get(PlainService);
+    const plainStatus: WireStatus = WireStatus.for(plainService);
 
     provisionContainer(container);
     container.unbind(LifecycleService);
@@ -238,7 +239,7 @@ describe("container unbind deprovision", () => {
 
     // Resurrect the flag to prove a second deprovision of an already
     // deprovisioned container does not re-mark active instances.
-    plainStatus.isDeprovisioned = false;
+    getMutableStatus(plainService).isDeprovisioned = false;
 
     deprovisionContainer(container);
 

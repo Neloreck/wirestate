@@ -9,12 +9,11 @@ import { EventBus } from "../plugin/events/event-bus";
 import { EventsPlugin } from "../plugin/events/events-plugin";
 import { QueriesPlugin } from "../plugin/queries/queries-plugin";
 import { QueryBus } from "../plugin/queries/query-bus";
-import { setContainerProvisioned } from "../provision/provision-state";
 
 import { finalizeInstanceStatus, initializeInstanceStatus } from "./activation-lifecycle";
 import { OnActivation } from "./on-activation";
 import { OnDeactivation } from "./on-deactivation";
-import { getInstanceContainer, WireStatus } from "./wire-status";
+import { type MutableWireStatus, WireStatus, getInstanceContainer, getMutableStatus } from "./wire-status";
 
 describe("instance lifecycle tracking", () => {
   it("should track activated instances by container at commit", () => {
@@ -239,7 +238,7 @@ describe("instance status", () => {
 
     initializeInstanceStatus(container, instance);
 
-    expect(WireStatus.for(instance)).toEqual({
+    expect(WireStatus.for(instance)).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: null,
       isInactive: false,
@@ -248,13 +247,10 @@ describe("instance status", () => {
   });
 
   it("should derive deprovisioned status from container provision state", () => {
-    const provisionedContainer: Container = new Container();
-    const deprovisionedContainer: Container = new Container();
+    const provisionedContainer: Container = new Container().provision();
+    const deprovisionedContainer: Container = new Container().provision().deprovision();
     const provisionedInstance: object = {};
     const deprovisionedInstance: object = {};
-
-    setContainerProvisioned(provisionedContainer, true);
-    setContainerProvisioned(deprovisionedContainer, false);
 
     initializeInstanceStatus(provisionedContainer, provisionedInstance);
     initializeInstanceStatus(deprovisionedContainer, deprovisionedInstance);
@@ -267,15 +263,16 @@ describe("instance status", () => {
     const container: Container = new Container();
     const instance: object = {};
     const status: WireStatus = WireStatus.track(instance);
+    const writable: MutableWireStatus = getMutableStatus(instance);
 
-    status.isDeactivated = true;
-    status.isDeprovisioned = true;
-    status.provisionId = 10;
+    writable.isDeactivated = true;
+    writable.isDeprovisioned = true;
+    writable.provisionId = 10;
 
     initializeInstanceStatus(container, instance);
 
     expect(WireStatus.for(instance)).toBe(status);
-    expect(status).toEqual({
+    expect(status).toMatchObject({
       isDeactivated: false,
       isDeprovisioned: null,
       isInactive: false,
@@ -290,7 +287,7 @@ describe("instance status", () => {
     initializeInstanceStatus(container, instance);
     finalizeInstanceStatus(instance);
 
-    expect(WireStatus.for(instance)).toEqual({
+    expect(WireStatus.for(instance)).toMatchObject({
       isDeactivated: true,
       isDeprovisioned: true,
       isInactive: true,

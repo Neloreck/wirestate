@@ -188,7 +188,8 @@ Get a status through either static on [`WireStatus`](/api/wirestate-core/classes
 Instances are tracked from activation onward, so `for()` works in any lifecycle hook and in any method reachable from
 one. A constructor runs before activation, which is why the field initializer above uses `track()`.
 
-The status exposes:
+The status is read-only. Wirestate updates it as the lifecycle progresses, and application code can only read it. It
+exposes:
 
 | Member                 | Meaning                                                                                                                       |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- |

@@ -12,35 +12,43 @@ import { type Nullable, type Optional } from "../types/general";
 const INSTANCE_STATUSES_BY_INSTANCE: WeakMap<object, WireStatus> = new WeakMap();
 
 /**
- * Module-private key for the internal lifecycle record carried on each {@link WireStatus}.
+ * Mutable view of a {@link WireStatus} for the lifecycle code that advances it.
  *
  * @remarks
- * The record is attached as a non-enumerable, symbol-keyed property so the public
- * `WireStatus` shape (and `toEqual` comparisons) are unaffected and the symbol is
- * unreachable outside this module.
+ * The same object as the status, typed writable. The public class exposes the flags as `readonly`
+ * and keeps the bookkeeping fields private, so a consumer holding a status cannot write it through
+ * the types. Lifecycle code obtains this view through {@link getMutableStatus} or
+ * {@link trackMutableStatus}, which is the only place a status is mutated.
  *
  * @internal
  */
-const INSTANCE_RECORD: unique symbol = Symbol("@wirestate/core/wire-status/record");
-
-/**
- * Internal per-instance lifecycle bookkeeping, carried on the instance's
- * {@link WireStatus} behind {@link INSTANCE_RECORD}.
- *
- * @internal
- */
-export interface InstanceRecord {
+export interface MutableWireStatus {
   /**
-   * Container that activated the instance. It is nulled on deactivation so a
+   * Container that activated the instance. It is cleared on deactivation so a
    * user-held deactivated instance does not pin its container.
    */
   container: Optional<ContainerKernel>;
 
   /**
-   * Monotonic provision-cycle counter for the instance. Survives the `null`
-   * reset of {@link WireStatus.provisionId} so reprovision keeps issuing unique IDs.
+   * Whether the instance was deactivated and removed from its container.
    */
-  provisionIdCounter: Optional<ProvisionId>;
+  isDeactivated: boolean;
+
+  /**
+   * Provider ownership of the instance. See {@link WireStatus.isDeprovisioned}.
+   */
+  isDeprovisioned: Nullable<boolean>;
+
+  /**
+   * Current provision cycle of the instance. See {@link WireStatus.provisionId}.
+   */
+  provisionId: Nullable<ProvisionId>;
+
+  /**
+   * Last provision id issued to the instance. Monotonic across cycles, so a reprovisioned instance
+   * never reuses the id its previous cycle handed out even though `provisionId` resets in between.
+   */
+  lastProvisionId: Optional<ProvisionId>;
 }
 
 /**
@@ -56,13 +64,13 @@ export interface InstanceRecord {
 export type ProvisionId = number;
 
 /**
- * Lifecycle status for one resolved service instance.
+ * Read-only lifecycle status for one resolved service instance.
  *
  * @remarks
- * Wirestate stores one stable `WireStatus` object per resolved service
- * instance. Container and provider lifecycle internals update that object over
- * time, so application code can keep a reference and read current lifecycle
- * flags without mutating the instance or requiring a base class.
+ * Wirestate keeps one stable `WireStatus` object per resolved service instance and updates it as
+ * the container and provider lifecycle progress. Application code can hold a reference and read
+ * the current flags without mutating the instance or requiring a base class. The flags are
+ * `readonly`: Wirestate advances them internally, and application code only reads them.
  *
  * @group Lifecycle
  */
@@ -127,7 +135,7 @@ export class WireStatus {
   /**
    * Whether the instance was deactivated and removed from its container.
    */
-  public isDeactivated: boolean = false;
+  public readonly isDeactivated: boolean = false;
 
   /**
    * Whether the instance has been removed from provider ownership.
@@ -137,15 +145,7 @@ export class WireStatus {
    * `false` means the instance is currently owned by a provider. `true` means
    * the provider deprovisioned it.
    */
-  public isDeprovisioned: Nullable<boolean> = null;
-
-  /**
-   * Whether the instance should stop work because its lifecycle ended.
-   *
-   * @remarks
-   * This is derived from `isDeactivated` and `isDeprovisioned`.
-   */
-  public isInactive!: boolean;
+  public readonly isDeprovisioned: Nullable<boolean> = null;
 
   /**
    * Current provider provision cycle ID for the instance.
@@ -159,27 +159,30 @@ export class WireStatus {
    * by a provisioned container, or it was resolved after the current cycle had already wired its
    * instances, in which case the next cycle stamps it.
    */
-  public provisionId: Nullable<ProvisionId> = null;
+  public readonly provisionId: Nullable<ProvisionId> = null;
 
   /**
-   * Creates an empty status object for internal lifecycle tracking.
-   *
-   * @internal
+   * Container that activated the instance. See {@link MutableWireStatus.container}.
    */
-  public constructor() {
-    Object.defineProperty(this, "isInactive", {
-      enumerable: true,
-      get() {
-        return this.isDeactivated || this.isDeprovisioned === true;
-      },
-    });
+  private container: Optional<ContainerKernel> = undefined;
 
-    // Non-enumerable so the public shape (and `toEqual`) ignore it; mutated in
-    // place (container set/cleared, counter bumped), never reassigned.
-    Object.defineProperty(this, INSTANCE_RECORD, {
-      enumerable: false,
-      value: { container: undefined, provisionIdCounter: undefined } satisfies InstanceRecord,
-    });
+  /**
+   * Last provision id issued to the instance. See {@link MutableWireStatus.lastProvisionId}.
+   */
+  private lastProvisionId: Optional<ProvisionId> = undefined;
+
+  private constructor() {}
+
+  /**
+   * Whether the instance should stop work because its lifecycle ended.
+   *
+   * @remarks
+   * Derived from `isDeactivated` and `isDeprovisioned`.
+   *
+   * @returns `true` once the instance was deactivated or deprovisioned.
+   */
+  public get isInactive(): boolean {
+    return this.isDeactivated || this.isDeprovisioned === true;
   }
 
   /**
@@ -238,15 +241,33 @@ export function tryGetWireStatus(instance: object): Optional<WireStatus> {
 }
 
 /**
- * Returns the internal lifecycle record carried on a status.
+ * Returns the mutable view of a tracked instance's status.
+ *
+ * @remarks
+ * The only write path into a {@link WireStatus}. The cast is sound because the status object carries
+ * exactly these fields, publicly as `readonly` and privately for the bookkeeping ones.
  *
  * @internal
  *
- * @param status - The status to read the internal record from.
- * @returns The instance's internal lifecycle record.
+ * @param instance - Resolved service instance to look up.
+ * @returns The instance's status, writable.
+ *
+ * @throws {@link WirestateError} If the object is not tracked by Wirestate.
  */
-export function getInstanceRecord(status: WireStatus): InstanceRecord {
-  return (status as unknown as { [INSTANCE_RECORD]: InstanceRecord })[INSTANCE_RECORD];
+export function getMutableStatus(instance: object): MutableWireStatus {
+  return WireStatus.for(instance) as unknown as MutableWireStatus;
+}
+
+/**
+ * Returns the mutable view of an instance's status, starting tracking on first use.
+ *
+ * @internal
+ *
+ * @param instance - Service instance to look up.
+ * @returns The instance's status, writable.
+ */
+export function trackMutableStatus(instance: object): MutableWireStatus {
+  return WireStatus.track(instance) as unknown as MutableWireStatus;
 }
 
 /**
@@ -260,5 +281,5 @@ export function getInstanceRecord(status: WireStatus): InstanceRecord {
 export function getInstanceContainer(instance: object): Optional<ContainerKernel> {
   const status: Optional<WireStatus> = INSTANCE_STATUSES_BY_INSTANCE.get(instance);
 
-  return status && getInstanceRecord(status).container;
+  return status && (status as unknown as MutableWireStatus).container;
 }

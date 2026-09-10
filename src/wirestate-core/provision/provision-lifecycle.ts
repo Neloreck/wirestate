@@ -1,4 +1,4 @@
-import { type InstanceRecord, type ProvisionId, getInstanceRecord, WireStatus } from "../activation/wire-status";
+import { type MutableWireStatus, type ProvisionId, getMutableStatus } from "../activation/wire-status";
 import { type Binding, type ServiceToken, BindingType } from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
 import type { Container } from "../container/container";
@@ -183,9 +183,7 @@ function orderByCreation(container: Container, instances: ReadonlySet<object>): 
  */
 function markActiveInstancesDeprovisioned(container: Container): void {
   for (const instance of container.getActiveInstances()) {
-    const status: WireStatus = WireStatus.for(instance);
-
-    status.isDeprovisioned = true;
+    getMutableStatus(instance).isDeprovisioned = true;
   }
 }
 
@@ -383,7 +381,7 @@ function resolveParticipants(
  */
 function markInFlight(container: Container): void {
   for (const instance of container.getActiveInstances()) {
-    const status: WireStatus = WireStatus.for(instance);
+    const status: MutableWireStatus = getMutableStatus(instance);
 
     if (!status.isDeactivated) {
       status.isDeprovisioned = null;
@@ -423,7 +421,7 @@ function wirePlugins(container: Container, state: ProvisionState): void {
  */
 function runProvisionHooks(container: Container, instances: ReadonlyArray<object>): void {
   for (const instance of instances) {
-    const status: WireStatus = WireStatus.for(instance);
+    const status: MutableWireStatus = getMutableStatus(instance);
 
     // Never run @OnProvision on (or bump the provision id of) a dead instance.
     if (status.isDeactivated) {
@@ -457,20 +455,19 @@ function runProvisionHooks(container: Container, instances: ReadonlyArray<object
  * Issues the next provision-cycle id for an instance.
  *
  * @remarks
- * Ids are per-instance and monotonic. The counter lives on the instance record so it survives the
+ * Ids are per-instance and monotonic. The last issued id lives on the status so it survives the
  * `null` reset {@link markInFlight} applies at the start of every cycle, which is what keeps a
  * reprovisioned instance from reusing the id its previous cycle handed out.
  *
  * @internal
  *
- * @param status - Status of the instance entering the cycle.
+ * @param status - Lifecycle status of the instance entering the cycle.
  * @returns The id for this cycle.
  */
-function nextProvisionId(status: WireStatus): ProvisionId {
-  const record: InstanceRecord = getInstanceRecord(status);
-  const provisionId: ProvisionId = (record.provisionIdCounter ?? 0) + 1;
+function nextProvisionId(status: MutableWireStatus): ProvisionId {
+  const provisionId: ProvisionId = (status.lastProvisionId ?? 0) + 1;
 
-  record.provisionIdCounter = provisionId;
+  status.lastProvisionId = provisionId;
 
   return provisionId;
 }
@@ -484,7 +481,7 @@ function nextProvisionId(status: WireStatus): ProvisionId {
  */
 function markProvisioned(container: Container): void {
   for (const instance of container.getActiveInstances()) {
-    const status: WireStatus = WireStatus.for(instance);
+    const status: MutableWireStatus = getMutableStatus(instance);
 
     if (status.isDeactivated) {
       continue;
@@ -550,7 +547,7 @@ function runDeprovisionHooks(container: Container, instances: ReadonlyArray<obje
 
   for (let index: number = instances.length - 1; index >= 0; index -= 1) {
     const instance: object = instances[index];
-    const status: WireStatus = WireStatus.for(instance);
+    const status: MutableWireStatus = getMutableStatus(instance);
 
     // Only deprovision instances that are currently provisioned.
     if (status.isDeprovisioned !== false) {
@@ -558,7 +555,7 @@ function runDeprovisionHooks(container: Container, instances: ReadonlyArray<obje
     }
 
     const methodName: Maybe<string | symbol> = getDeprovisionHandlerMetadata(instance);
-    const provisionId: Optional<ProvisionId> = getInstanceRecord(status).provisionIdCounter;
+    const provisionId: Optional<ProvisionId> = status.lastProvisionId;
 
     if (methodName) {
       callLifecycleHandler({
@@ -651,7 +648,7 @@ function rollbackProvision(container: Container, state: ProvisionState): void {
   clearRemainingDisposers(state);
 
   for (const activeInstance of container.getActiveInstances()) {
-    WireStatus.for(activeInstance).isDeprovisioned = true;
+    getMutableStatus(activeInstance).isDeprovisioned = true;
   }
 
   state.cycleByInstance.clear();
