@@ -19,10 +19,16 @@ const MESSAGING_HANDLER_NAME: string = "a messaging handler (@OnEvent/@OnCommand
  * lifecycle. Names are ordered by lifecycle phase, not by declaration order. Reads the
  * prototype chain, so an inherited handler counts as declared.
  *
+ * Reading every hook also validates the hierarchy: a class that declares two different methods
+ * for one single-method hook throws here, which is how `Container.bind` rejects such a class
+ * before it can reach activation or teardown.
+ *
  * @internal
  *
  * @param prototype - Class prototype to inspect.
  * @returns Decorator names found on the prototype, empty when the class declares none.
+ *
+ * @throws {@link WirestateError} If the hierarchy declares conflicting methods for one hook.
  */
 export function collectDeclaredLifecycleHandlers(prototype: object): Array<string> {
   const declared: Array<string> = [];
@@ -51,6 +57,8 @@ export function collectDeclaredLifecycleHandlers(prototype: object): Array<strin
  *
  * @param prototype - Class prototype to inspect.
  * @returns Decorator names found on the prototype, empty when the class declares none.
+ *
+ * @throws {@link WirestateError} If the hierarchy declares conflicting methods for one hook.
  */
 export function collectDeclaredProvisionHandlers(prototype: object): Array<string> {
   const declared: Array<string> = [];

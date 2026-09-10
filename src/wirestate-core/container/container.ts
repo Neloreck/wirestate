@@ -1,20 +1,15 @@
 import { setActivationAdapter } from "../activation/activation-adapter";
 import { wirestateActivationAdapter } from "../activation/activation-lifecycle";
-import {
-  BindingScope,
-  BindingType,
-  type Binding,
-  type BindingDescriptor,
-  type InstanceBindingDescriptor,
-  type ServiceToken,
-} from "../binding/binding";
+import { BindingScope, type Binding, type BindingDescriptor, type ServiceToken } from "../binding/binding";
+import { isInstanceDescriptor } from "../binding/binding-guards";
+import { getBindingScope } from "../binding/binding-lifecycle";
 import { getBindingToken } from "../binding/binding-tokens";
-import { validateBindingStructure } from "../binding/binding-validation";
 import {
   type InternalErrorHandler,
   getConfiguredInternalErrorHandler,
   setInternalErrorHandler,
 } from "../error/internal-error-handler";
+import { collectDeclaredLifecycleHandlers } from "../lifecycle/declared-lifecycle-handlers";
 import { type WirestatePlugin } from "../plugin/plugin";
 import { installOwnPlugins, setContainerPlugins } from "../plugin/plugin-registry";
 import {
@@ -24,7 +19,7 @@ import {
   provisionContainer,
 } from "../provision/provision-lifecycle";
 import { isContainerDeprovisioning } from "../provision/provision-state";
-import { type Newable, type Optional } from "../types/general";
+import { type Optional } from "../types/general";
 
 import { validateContainerConfig } from "./container-config-validation";
 import { ContainerKernel } from "./container-kernel";
@@ -201,54 +196,6 @@ export class Container extends ContainerKernel {
   }
 
   /**
-   * Binds a service class or a binding descriptor to this container.
-   *
-   * @remarks
-   * A bare service class binds as a singleton instance binding keyed by the
-   * class itself. Binding a descriptor lets you use an explicit token,
-   * implementation class, factory, value, or transient scope.
-   *
-   * A binding kind the container does not own is rejected when its class declares
-   * handlers that kind can never run: a transient instance binding declaring any
-   * lifecycle or messaging handler, or a value or factory binding whose class token
-   * declares `@OnProvision`, `@OnDeprovision`, or a messaging handler.
-   *
-   * @param binding - Service class or binding descriptor to register.
-   * @returns The same container for chaining.
-   *
-   * @throws {@link WirestateError} If the binding is invalid, or its class declares
-   * handlers the binding kind can never run.
-   */
-  public override bind<T>(binding: Newable<object> | BindingDescriptor<T>): this {
-    // Rewritten before validation so a hot-replaced class is validated as the class that will actually be registered.
-    binding = this.getHotBinding(binding);
-
-    // A bare class always binds as a singleton instance, so only descriptors need a kind check.
-    if (typeof binding !== "function") {
-      const descriptor: BindingDescriptor<T> = binding as BindingDescriptor<T>;
-
-      // Settle the shape first, so a malformed descriptor reports its own structural error
-      // instead of a lifecycle one. The kernel validates it again on the way in.
-      validateBindingStructure(descriptor?.token, descriptor);
-
-      if (descriptor.type === BindingType.Instance) {
-        if ((descriptor as InstanceBindingDescriptor<T>).scope === BindingScope.Transient) {
-          validateTransientInstanceBinding(descriptor as InstanceBindingDescriptor<T>);
-        }
-      } else {
-        // Every other kind is a value or factory binding, which produces nothing the
-        // container owns, so a class token declaring provision-phase handlers can never
-        // have them fire.
-        validateUnownedBinding(descriptor as BindingDescriptor);
-      }
-    }
-
-    assertBindableWhileProvisioned(this, binding as Binding);
-
-    return super.bind(binding);
-  }
-
-  /**
    * Provisions this container for a framework provider.
    *
    * @remarks
@@ -370,5 +317,37 @@ export class Container extends ContainerKernel {
     deprovisionContainer(this);
 
     return super.destroy();
+  }
+
+  /**
+   * Enforces the ownership rules of the Wirestate lifecycle layer on a binding.
+   *
+   * @remarks
+   * Runs after structural validation, so a malformed descriptor reports its own error instead of
+   * a lifecycle one. An instance binding has its lifecycle declarations read here, which rejects a
+   * class hierarchy declaring two methods for one hook before the class can activate. A transient
+   * instance binding and a value or factory binding are rejected when their class declares
+   * handlers the container could never run for them. Finally, a handler-bearing binding cannot
+   * join a container that is already provisioned.
+   *
+   * @param descriptor - Descriptor about to be registered.
+   *
+   * @throws {@link WirestateError} If the binding kind cannot run the handlers its class declares,
+   * the class declares conflicting lifecycle hooks, or the container is provisioned.
+   */
+  protected override assertBindable<T>(descriptor: BindingDescriptor<T>): void {
+    if (isInstanceDescriptor(descriptor)) {
+      collectDeclaredLifecycleHandlers(descriptor.value.prototype as object);
+
+      if (getBindingScope(descriptor) === BindingScope.Transient) {
+        validateTransientInstanceBinding(descriptor);
+      }
+    } else {
+      // A value or factory binding produces nothing the container owns, so a class token
+      // declaring provision-phase handlers can never have them fire.
+      validateUnownedBinding(descriptor);
+    }
+
+    assertBindableWhileProvisioned(this, descriptor);
   }
 }

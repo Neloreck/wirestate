@@ -20,6 +20,8 @@ import { OnEvent } from "../plugin/events/on-event";
 import { OnQuery } from "../plugin/queries/on-query";
 import { QueriesPlugin } from "../plugin/queries/queries-plugin";
 import { QueryBus } from "../plugin/queries/query-bus";
+import { OnDeprovision } from "../provision/on-deprovision";
+import { OnProvision } from "../provision/on-provision";
 import { type Nullable } from "../types/general";
 
 import { Container } from "./container";
@@ -467,7 +469,7 @@ describe("container.bind instance", () => {
       consoleSpy.mockRestore();
     });
 
-    it("should finish unbinding when inherited @OnDeactivation metadata conflicts", () => {
+    it("should reject binding a class whose inherited @OnDeactivation metadata conflicts", () => {
       class BaseService {
         @OnDeactivation()
         public onBaseDeactivation(): void {}
@@ -479,66 +481,36 @@ describe("container.bind instance", () => {
         public onDeactivation(): void {}
       }
 
-      const onError = jest.fn();
-      const container: Container = new Container({
-        bindings: [ConflictingService],
-        onError,
-      });
-      const instance: ConflictingService = container.get(ConflictingService);
+      const container: Container = new Container();
 
-      expect(() => container.unbind(ConflictingService)).not.toThrow();
-
-      expect(container.hasOwn(ConflictingService)).toBe(false);
-      expect(container.getActiveInstances()).toEqual([]);
-      expect(WireStatus.for(instance).isDeactivated).toBe(true);
-      expect(onError).toHaveBeenCalledWith(
-        expect.objectContaining({
-          container,
-          details: ["ConflictingService"],
-          instance,
-          instanceName: "ConflictingService",
-          message: "@OnDeactivation failed",
-          source: "instance-deactivation",
-        })
+      // A conflicting hierarchy can never run its hooks, so it is refused before it can activate
+      // rather than being discovered when the instance is torn down.
+      expect(() => container.bind(ConflictingService)).toThrow(
+        "Only one @OnDeactivation method can be declared across class hierarchy for 'ConflictingService'."
       );
+      expect(container.hasOwn(ConflictingService)).toBe(false);
     });
 
-    it("should continue bulk teardown when inherited @OnDeactivation metadata conflicts", () => {
-      const onHealthyDeactivation = jest.fn();
-
-      @Injectable()
-      class HealthyService {
-        @OnDeactivation()
-        public onDeactivation(): void {
-          onHealthyDeactivation();
-        }
-      }
-
+    it("should reject a conflicting @OnDeprovision hierarchy declared through container config", () => {
       class BaseService {
-        @OnDeactivation()
-        public onBaseDeactivation(): void {}
+        @OnDeprovision()
+        public onBaseDeprovision(): void {}
       }
 
       @Injectable()
       class ConflictingService extends BaseService {
-        @OnDeactivation()
-        public onDeactivation(): void {}
+        @OnProvision()
+        public onProvision(): void {}
+
+        @OnDeprovision()
+        public onDeprovision(): void {}
       }
 
-      const onError = jest.fn();
-      const container: Container = new Container({
-        activate: true,
-        bindings: [HealthyService, ConflictingService],
-        onError,
-      });
-
-      expect(() => container.unbindAll()).not.toThrow();
-
-      expect(onHealthyDeactivation).toHaveBeenCalledTimes(1);
-      expect(container.getActiveInstances()).toEqual([]);
-      expect(container.hasOwn(HealthyService)).toBe(false);
-      expect(container.hasOwn(ConflictingService)).toBe(false);
-      expect(onError).toHaveBeenCalledTimes(1);
+      // Without the bind-time check this container would provision fine and then fail its own
+      // teardown, because the conflict only surfaces when the deprovision hook is looked up.
+      expect(() => new Container({ bindings: [ConflictingService] })).toThrow(
+        "Only one @OnDeprovision method can be declared across provider hierarchy 'ConflictingService'."
+      );
     });
 
     it("should report async @OnActivation errors to container error handler", async () => {

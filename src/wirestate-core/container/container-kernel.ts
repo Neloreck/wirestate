@@ -69,24 +69,31 @@ export class ContainerKernel {
    * `container.bind(MyService)` is equivalent to
    * `container.bind({ token: MyService, type: "Instance", value: MyService })`.
    *
+   * The descriptor is validated structurally, then handed to the protected `assertBindable` hook so a
+   * composition root can add the ownership rules of its lifecycle layer.
+   *
    * @param binding - Service class or binding descriptor to register.
    * @returns The same container for chaining.
    *
-   * @throws {@link WirestateError} If the binding is invalid or the token's existing
-   * binding already constructed values.
+   * @throws {@link WirestateError} If the binding is invalid, the token's existing binding already
+   * constructed values, or a composition root rejects the binding kind.
    */
   public bind<T>(binding: Newable<object> | BindingDescriptor<T>): this {
     this.assertUsable();
 
+    // Rewritten before validation so a hot-replaced class is validated as the class that will
+    // actually be registered.
     binding = this.getHotBinding(binding);
 
     const descriptor: BindingDescriptor<T> =
       typeof binding === "function"
         ? ({ token: binding, type: "Instance", value: binding } as unknown as BindingDescriptor<T>)
         : binding;
-    const token = descriptor?.token;
+    const token: ServiceToken<T> = descriptor?.token;
 
     validateBinding(token, descriptor, this.hasConstructedBinding(token));
+
+    this.assertBindable(descriptor);
 
     this.bindings.set(token, descriptor);
 
@@ -310,6 +317,23 @@ export class ContainerKernel {
   }
 
   /**
+   * Accepts or rejects a structurally valid descriptor before it is registered.
+   *
+   * @remarks
+   * The extension point a composition root uses to enforce the rules of the lifecycle layer it
+   * adds on top of pure DI, such as rejecting a binding kind whose class declares handlers that
+   * kind can never run. The bare kernel accepts everything: it owns no lifecycle.
+   *
+   * @param descriptor - Descriptor about to be registered, already normalized and validated.
+   *
+   * @throws {@link WirestateError} If the composition root rejects the binding.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected assertBindable<T>(descriptor: BindingDescriptor<T>): void {
+    // A bare kernel has no lifecycle layer and therefore no ownership rules to enforce.
+  }
+
+  /**
    * Marks a token as container-owned, so {@link unbindAll} keeps its binding and instance.
    *
    * @remarks
@@ -374,6 +398,12 @@ export class ContainerKernel {
 
   /**
    * Throws when the container was destroyed.
+   *
+   * @remarks
+   * A destroyed container is a precondition failure rather than a structural miss, so this
+   * throws for `{ optional: true }` lookups too - the same rule `inject()` applies outside an
+   * injection context. Without it a destroyed child would silently resolve its parent's
+   * bindings, handing callers the wrong scope.
    *
    * @throws {@link WirestateError} If the container was destroyed.
    */

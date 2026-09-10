@@ -31,6 +31,7 @@ const TOKEN_FREE_METHODS: ReadonlyArray<string> = [
  * Internals reached only through the methods above, which receive already-rewritten tokens.
  */
 const INTERNAL_METHODS: ReadonlyArray<string> = [
+  "assertBindable",
   "assertUsable",
   "commit",
   "deactivate",
