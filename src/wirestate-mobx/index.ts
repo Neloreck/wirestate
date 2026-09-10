@@ -72,6 +72,8 @@ export {
  * @group MobX
  * @see {@link https://mobx.js.org/README.html}
  */
+export { ObservablePlugin } from "./plugin/observable-plugin";
+
 export {
   $mobx,
   FlowCancellationError,

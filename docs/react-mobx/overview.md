@@ -38,6 +38,16 @@ export class CounterService {
 }
 ```
 
+Alternatively, register `ObservablePlugin` on the root container. It calls `makeObservable` for every activated
+service that carries MobX decorators, so services skip the constructor call.
+
+```ts
+import { Container } from "@wirestate/core";
+import { ObservablePlugin } from "@wirestate/mobx";
+
+const container = new Container({ bindings: [CounterService], plugins: [new ObservablePlugin()] });
+```
+
 ## Component
 
 Wrap components that read observable state with `observer`.
@@ -81,6 +91,7 @@ export class CounterService {
 [`Observable`](/api/wirestate-mobx/functions/Observable), [`Action`](/api/wirestate-mobx/functions/Action),
 [`BoundAction`](/api/wirestate-mobx/functions/BoundAction), [`Computed`](/api/wirestate-mobx/functions/Computed),
 [`makeObservable`](/api/wirestate-mobx/functions/makeObservable),
+[`ObservablePlugin`](/api/wirestate-mobx/classes/ObservablePlugin),
 [`observer`](/api/wirestate-react-mobx/functions/observer).
 
 ## See Also

@@ -11,6 +11,7 @@ describe("Library exported API from wirestate/mobx", () => {
         "DeepObservable",
         "FlowCancellationError",
         "Observable",
+        "ObservablePlugin",
         "ObservableMap",
         "ObservableSet",
         "Reaction",
