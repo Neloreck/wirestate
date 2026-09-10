@@ -5,7 +5,7 @@
   "private": true,
   "author": "Syrotenko Igor",
   "license": "MIT",
-  "packageManager": "pnpm@11.9.0",
+  "packageManager": "pnpm@12.3.4",
   "scripts": {
     "build": "pnpm build:dts && pnpm build:esm && pnpm build:cjs && pnpm build:pkg",
     "build:cjs": "rolldown -c cli/build/rolldown.cjs.config.ts",
@@ -86,7 +86,6 @@
     "mobx": "^6.16.1",
     "mobx-react-lite": "^4.1.1",
     "ncp": "^2.0.0",
-    "pnpm": "^11.9.0",
     "prettier": "^3.8.4",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "react": "^19.2.8",
