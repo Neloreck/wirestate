@@ -136,22 +136,7 @@ export class ContainerKernel {
   public unbindAll(): this {
     this.assertUsable();
 
-    const kept: Array<ActivationRecord> = [];
-    const dropped: Array<ActivationRecord> = [];
-
-    for (const record of this.activated) {
-      (this.retained.has(record.token) ? kept : dropped).push(record);
-    }
-
-    // Detached before dispatching, not after: an `@OnDeactivation` that re-enters teardown would
-    // otherwise still find these records and run them a second time, and a hook re-entering
-    // `unbindAll` itself would recurse without end.
-    this.activated.length = 0;
-    this.activated.push(...kept);
-
-    for (let index: number = dropped.length - 1; index >= 0; index -= 1) {
-      this.deactivateRecord(dropped[index]);
-    }
+    this.drainRecords((record: ActivationRecord): boolean => !this.retained.has(record.token));
 
     for (const [token, binding] of [...this.bindings]) {
       if (!this.retained.has(token)) {
@@ -174,8 +159,8 @@ export class ContainerKernel {
    * hand callers the wrong scope.
    *
    * Inspection stays available so teardown code can still read the container: `has`, `hasOwn`,
-   * `getOwnBindings`, and `getActiveInstances` do not throw, and `has` reports `false` rather
-   * than an ancestor's binding. Idempotent, so teardown paths can call it freely - including
+   * `getOwnBindings`, and `getActiveInstances` do not throw, and `has` reports `false` rather than
+   * an ancestor's binding. Idempotent, so teardown paths can call it freely - including
    * re-entrantly from an `@OnDeactivation` hook this very call is running, where the nested call
    * returns without starting a second teardown.
    *
@@ -189,13 +174,7 @@ export class ContainerKernel {
     this.destroying = true;
 
     try {
-      // Drained before dispatching, not after: an `@OnDeactivation` that re-enters teardown would
-      // otherwise still find these records and run them a second time.
-      const records: ReadonlyArray<ActivationRecord> = this.activated.splice(0).reverse();
-
-      for (const record of records) {
-        this.deactivateRecord(record);
-      }
+      this.drainRecords((): boolean => true);
 
       this.bindings.clear();
       this.instances.clear();
@@ -250,9 +229,11 @@ export class ContainerKernel {
       return this.resolve(own);
     }
 
+    // The walk stops at a destroyed ancestor, exactly where `has` stops: a destroyed container
+    // resolves nothing, so the bindings above it are unreachable from this scope too.
     let current: Optional<ContainerKernel> = this.parent;
 
-    while (current) {
+    while (current && !current.destroyed) {
       const binding: Optional<BindingDescriptor<T>> = current.bindings.get(token);
 
       if (binding) {
@@ -266,16 +247,15 @@ export class ContainerKernel {
       return undefined;
     }
 
-    // If cannot find and have destroyed parent, surface the guess because it may be not as obvious otherwise.
-    if (this.findDestroyedAncestor()) {
+    if (current) {
       throw new WirestateError(
         `No binding(s) found for '${tokenToString(token)}': a parent container was destroyed, so the bindings it ` +
           `provided are gone. Destroy a container only once nothing resolves through it.`,
         ERROR_CODE_CONTAINER_DESTROYED
       );
-    } else {
-      throw new WirestateError(`No binding(s) found for '${tokenToString(token)}'.`, ERROR_CODE_NO_BINDING_FOUND);
     }
+
+    throw new WirestateError(`No binding(s) found for '${tokenToString(token)}'.`, ERROR_CODE_NO_BINDING_FOUND);
   }
 
   /**
@@ -297,26 +277,6 @@ export class ContainerKernel {
    */
   public hasOwn<T>(token: ServiceToken<T>): boolean {
     return this.bindings.has(this.getHotToken(token));
-  }
-
-  /**
-   * Checks the parent chain for a binding, without hot-reload rewriting.
-   *
-   * @remarks
-   * Separate from {@link ContainerKernel.has} so {@link ContainerKernel.getHotToken} can test a
-   * candidate token without recursing back through the rewrite.
-   *
-   * @param token - Token to look up as given.
-   * @returns Whether the token is bound on this container or an ancestor.
-   */
-  private hasBinding<T>(token: ServiceToken<T>): boolean {
-    // A destroyed container resolves nothing, so it must not report an ancestor's binding as its
-    // own answer. Introspection stays non-throwing, unlike `get`, so teardown code can still ask.
-    if (this.destroyed) {
-      return false;
-    }
-
-    return this.bindings.has(token) || (this.parent?.hasBinding(token) ?? false);
   }
 
   /**
@@ -347,6 +307,21 @@ export class ContainerKernel {
     }
 
     return instances;
+  }
+
+  /**
+   * Marks a token as container-owned, so {@link unbindAll} keeps its binding and instance.
+   *
+   * @remarks
+   * For composition roots to declare the infrastructure a reset must not take away. Only
+   * {@link destroy} removes a retained binding.
+   *
+   * @internal
+   *
+   * @param token - Token the container owns.
+   */
+  protected retainBinding(token: ServiceToken): void {
+    this.retained.add(token);
   }
 
   /**
@@ -395,6 +370,40 @@ export class ContainerKernel {
     } else {
       return remapHotBinding(binding as Binding) as Newable<object> | BindingDescriptor<T>;
     }
+  }
+
+  /**
+   * Throws when the container was destroyed.
+   *
+   * @throws {@link WirestateError} If the container was destroyed.
+   */
+  protected assertUsable(): void {
+    if (this.destroyed) {
+      throw new WirestateError(
+        "Container was destroyed and cannot be used again. Create a new container instead.",
+        ERROR_CODE_CONTAINER_DESTROYED
+      );
+    }
+  }
+
+  /**
+   * Checks the parent chain for a binding, without hot-reload rewriting.
+   *
+   * @remarks
+   * Separate from {@link ContainerKernel.has} so {@link ContainerKernel.getHotToken} can test a
+   * candidate token without recursing back through the rewrite.
+   *
+   * @param token - Token to look up as given.
+   * @returns Whether the token is bound on this container or an ancestor.
+   */
+  private hasBinding<T>(token: ServiceToken<T>): boolean {
+    // A destroyed container resolves nothing, so it must not report an ancestor's binding as its
+    // own answer. Introspection stays non-throwing, unlike `get`, so teardown code can still ask.
+    if (this.destroyed) {
+      return false;
+    }
+
+    return this.bindings.has(token) || (this.parent?.hasBinding(token) ?? false);
   }
 
   /**
@@ -484,7 +493,7 @@ export class ContainerKernel {
    * @remarks
    * A token holds at most one activation record - `commit` is guarded by the instance cache, and
    * `bind` rejects rebinding a token whose binding already constructed - so this needs no teardown
-   * ordering of its own. Ordering across several instances belongs to {@link unbindAll}.
+   * ordering of its own. Ordering across several instances belongs to {@link drainRecords}.
    *
    * @param token - Token to deactivate.
    */
@@ -504,18 +513,40 @@ export class ContainerKernel {
   }
 
   /**
-   * Marks a token as container-owned, so {@link unbindAll} keeps its binding and instance.
+   * Deactivates every matching activation record in reverse creation order, until none is left.
    *
    * @remarks
-   * For composition roots to declare the infrastructure a reset must not take away. Only
-   * {@link destroy} removes a retained binding.
+   * Records are detached before dispatching, not after: an `@OnDeactivation` that re-enters
+   * teardown would otherwise still find them and run them a second time, and a hook re-entering
+   * `unbindAll` itself would recurse without end.
    *
-   * @internal
+   * Teardown is a transaction over everything the container owns, including what teardown itself
+   * creates: a hook that resolves a lazy singleton commits a new record after the pass began. The
+   * loop keeps draining until a pass finds nothing new, so no instance is left active with its
+   * binding gone.
    *
-   * @param token - Token the container owns.
+   * @param matches - Selects the records to deactivate.
    */
-  protected retainBinding(token: ServiceToken): void {
-    this.retained.add(token);
+  private drainRecords(matches: (record: ActivationRecord) => boolean): void {
+    while (true) {
+      const kept: Array<ActivationRecord> = [];
+      const dropped: Array<ActivationRecord> = [];
+
+      for (const record of this.activated) {
+        (matches(record) ? dropped : kept).push(record);
+      }
+
+      if (dropped.length === 0) {
+        return;
+      }
+
+      this.activated.length = 0;
+      this.activated.push(...kept);
+
+      for (let index: number = dropped.length - 1; index >= 0; index -= 1) {
+        this.deactivateRecord(dropped[index]);
+      }
+    }
   }
 
   /**
@@ -541,49 +572,5 @@ export class ContainerKernel {
     const binding = this.bindings.get(token);
 
     return binding !== undefined && this.instances.has(binding);
-  }
-
-  /**
-   * Returns the nearest destroyed ancestor, if the parent chain holds one.
-   *
-   * @remarks
-   * Containers keep no child pointers by design, so `destroy` cannot cascade downwards. A
-   * descendant therefore stays live over a destroyed ancestor and only notices when a lookup that
-   * used to resolve through it misses.
-   *
-   * @returns The nearest destroyed ancestor, or `undefined` when the chain is intact.
-   */
-  private findDestroyedAncestor(): Optional<ContainerKernel> {
-    let current: Optional<ContainerKernel> = this.parent;
-
-    while (current) {
-      if (current.destroyed) {
-        return current;
-      }
-
-      current = current.parent;
-    }
-
-    return undefined;
-  }
-
-  /**
-   * Throws when the container was destroyed.
-   *
-   * @remarks
-   * A destroyed container is a precondition failure rather than a structural miss, so this
-   * throws for `{ optional: true }` lookups too - the same rule `inject()` applies outside an
-   * injection context. Without it a destroyed child would silently resolve its parent's
-   * bindings, handing callers the wrong scope.
-   *
-   * @throws {@link WirestateError} If the container was destroyed.
-   */
-  protected assertUsable(): void {
-    if (this.destroyed) {
-      throw new WirestateError(
-        "Container was destroyed and cannot be used again. Create a new container instead.",
-        ERROR_CODE_CONTAINER_DESTROYED
-      );
-    }
   }
 }

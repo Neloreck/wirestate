@@ -146,6 +146,23 @@ describe("Container reset and destroy", () => {
       expect(child.has(EventBus)).toBe(false);
     });
 
+    it("should agree with `has` when a destroyed ancestor shadows a live grandparent", () => {
+      const TOKEN: string = "TOKEN";
+      const root: Container = new Container({ bindings: [{ token: TOKEN, value: "root" }] });
+      const middle: Container = new Container({ parent: root, bindings: [{ token: TOKEN, value: "middle" }] });
+      const leaf: Container = new Container({ parent: middle });
+
+      expect(leaf.get(TOKEN)).toBe("middle");
+
+      middle.destroy();
+
+      // A destroyed container resolves nothing, so the chain ends there for lookups exactly as it
+      // does for `has`: the leaf must not skip over it and quietly resolve the root's value.
+      expect(leaf.has(TOKEN)).toBe(false);
+      expect(leaf.get(TOKEN, { optional: true })).toBeUndefined();
+      expect(() => leaf.get(TOKEN)).toThrow("a parent container was destroyed");
+    });
+
     it("should keep a reset child resolving its own scope rather than its parent's", () => {
       const parent: Container = new Container({ plugins: [new EventsPlugin()] });
       const child: Container = new Container({ parent, plugins: [new EventsPlugin()] });
@@ -158,6 +175,54 @@ describe("Container reset and destroy", () => {
 
       expect(child.get(Container)).toBe(child);
       expect(child.get(EventBus)).toBe(childBus);
+    });
+  });
+
+  // Teardown is a transaction over everything the container owns, including what teardown itself
+  // creates: a hook that resolves a lazy singleton commits a new record after the pass began.
+  describe("resolution during teardown", () => {
+    @Injectable()
+    class LazyService {
+      public static deactivations: number = 0;
+
+      @OnDeactivation()
+      public onDeactivation(): void {
+        LazyService.deactivations += 1;
+      }
+    }
+
+    @Injectable()
+    class EagerService {
+      public constructor(private readonly container: Container = inject(Container)) {}
+
+      @OnDeactivation()
+      public onDeactivation(): void {
+        // Reaches for a peer that nobody resolved before teardown started.
+        this.container.get(LazyService);
+      }
+    }
+
+    beforeEach(() => {
+      LazyService.deactivations = 0;
+    });
+
+    it("should deactivate an instance first resolved by an @OnDeactivation hook on destroy", () => {
+      const container: Container = new Container({ activate: [EagerService], bindings: [EagerService, LazyService] });
+
+      container.destroy();
+
+      expect(LazyService.deactivations).toBe(1);
+      expect(container.getActiveInstances()).toEqual([]);
+    });
+
+    it("should deactivate an instance first resolved by an @OnDeactivation hook on reset", () => {
+      const container: Container = new Container({ activate: [EagerService], bindings: [EagerService, LazyService] });
+
+      container.unbindAll();
+
+      expect(LazyService.deactivations).toBe(1);
+      expect(container.getActiveInstances()).toEqual([]);
+      expect(container.hasOwn(LazyService)).toBe(false);
     });
   });
 
