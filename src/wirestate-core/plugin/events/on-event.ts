@@ -1,4 +1,4 @@
-import { type ContainerKernel } from "../../container/container-kernel";
+import { type Container } from "../../container/container";
 import { type Nullable } from "../../types/general";
 import { type MessagingHandlerDecorator, createMessagingDecorator } from "../messaging-decorator";
 import { type MessagingRegistration } from "../messaging-registration";
@@ -20,7 +20,7 @@ import { EVENT_HANDLER_METADATA, EVENT_METADATA_KEY } from "./events-registry";
 export const EVENT_REGISTRATION: MessagingRegistration = {
   kind: Symbol("@wirestate/core/messaging/event"),
   token: EventBus,
-  register: (bus: object, instance: object, container: ContainerKernel): Array<() => void> => {
+  register: (bus: object, instance: object, container: Container): Array<() => void> => {
     const eventBus: EventBus = bus as EventBus;
 
     return buildEventDispatchers(instance, container).map((dispatch) =>

@@ -1,4 +1,4 @@
-import { type ContainerKernel } from "../../container/container-kernel";
+import { type Container } from "../../container/container";
 import { reportWirestateInternalError } from "../../error/internal-error-handler";
 import { type Maybe } from "../../types/general";
 
@@ -43,7 +43,7 @@ interface DispatcherPlan {
  * @template T - Type of the instance.
  *
  * @param instance - The instance to scan for handlers.
- * @param container - ContainerKernel that owns the instance.
+ * @param container - Container that owns the instance.
  * @returns One subscription descriptor per decorated method. Empty when none are declared.
  *
  * @example
@@ -55,7 +55,7 @@ interface DispatcherPlan {
  */
 export function buildEventDispatchers<T extends object>(
   instance: T,
-  container?: ContainerKernel
+  container?: Container
 ): ReadonlyArray<EventDispatch> {
   // Merge every @OnEvent decoration of the same method into one plan, keyed by
   // method name in parent-to-child first-seen order.

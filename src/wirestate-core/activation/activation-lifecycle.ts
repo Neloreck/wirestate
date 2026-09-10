@@ -1,4 +1,5 @@
 import { type InstanceBindingDescriptor } from "../binding/binding";
+import { type Container } from "../container/container";
 import { callLifecycleHandler } from "../container/container-call-lifecycle-handler";
 import { type ContainerKernel } from "../container/container-kernel";
 import { type ActivationRecord } from "../container/container-storage";
@@ -40,7 +41,7 @@ export const wirestateActivationAdapter: ActivationAdapter = {
 
       if (methodName) {
         callLifecycleHandler({
-          container,
+          container: container as Container,
           name: "@OnActivation",
           details: [binding.value.name, String(methodName)],
           instance,
@@ -68,7 +69,7 @@ export const wirestateActivationAdapter: ActivationAdapter = {
 
       if (methodName) {
         callLifecycleHandler({
-          container,
+          container: container as Container,
           name: "@OnDeactivation",
           details: [binding.value.name, String(methodName)],
           instance,
@@ -80,7 +81,7 @@ export const wirestateActivationAdapter: ActivationAdapter = {
       }
     } catch (error) {
       reportWirestateInternalError({
-        container,
+        container: container as Container,
         details: [binding.value.name],
         error,
         instance,

@@ -1,5 +1,5 @@
 import { type ServiceToken } from "../binding/binding";
-import { type ContainerKernel } from "../container/container-kernel";
+import { type Container } from "../container/container";
 import { collectHandlerMetadata } from "../metadata/metadata-handlers";
 
 /**
@@ -34,7 +34,7 @@ export interface MessagingRegistration {
    * @param container - Container that owns the instance.
    * @returns Teardown callbacks collected onto the activation record.
    */
-  readonly register: (bus: object, instance: object, container: ContainerKernel) => Array<() => void>;
+  readonly register: (bus: object, instance: object, container: Container) => Array<() => void>;
 }
 
 /**

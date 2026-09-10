@@ -1,7 +1,7 @@
 import { type InternalErrorSource, reportWirestateInternalError } from "../error/internal-error-handler";
 import { type MaybePromise } from "../types/general";
 
-import { type ContainerKernel } from "./container-kernel";
+import { type Container } from "./container";
 
 export interface CallLifecycleHandlerOptions {
   /**
@@ -10,9 +10,9 @@ export interface CallLifecycleHandlerOptions {
   readonly args?: ReadonlyArray<unknown>;
 
   /**
-   * ContainerKernel that owns the lifecycle handler.
+   * Container that owns the lifecycle handler.
    */
-  readonly container?: ContainerKernel;
+  readonly container?: Container;
 
   /**
    * Lifecycle name used in diagnostics.

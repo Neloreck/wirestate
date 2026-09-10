@@ -24,7 +24,7 @@ import {
   provisionContainer,
 } from "../provision/provision-lifecycle";
 import { isContainerDeprovisioning } from "../provision/provision-state";
-import { type Maybe, type Newable, type Optional } from "../types/general";
+import { type Newable, type Optional } from "../types/general";
 
 import { validateContainerConfig } from "./container-config-validation";
 import { ContainerKernel } from "./container-kernel";
@@ -124,6 +124,11 @@ export interface ContainerConfig {
  */
 export class Container extends ContainerKernel {
   /**
+   * Parent container when this container was created as a child container.
+   */
+  declare public readonly parent?: Container;
+
+  /**
    * Creates a Wirestate container.
    *
    * @param config - Container setup config.
@@ -135,7 +140,7 @@ export class Container extends ContainerKernel {
 
     super(config.parent);
 
-    const errorHandler: Maybe<InternalErrorHandler> =
+    const errorHandler: Optional<InternalErrorHandler> =
       config.onError ?? getConfiguredInternalErrorHandler(config.parent);
 
     if (errorHandler) {

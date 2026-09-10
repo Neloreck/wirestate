@@ -1,6 +1,6 @@
-import { type ContainerKernel } from "../container/container-kernel";
+import { type Container } from "../container/container";
 import { type WireEvent } from "../plugin/events/events";
-import { type Maybe } from "../types/general";
+import { type Optional } from "../types/general";
 
 /**
  * @remarks
@@ -31,7 +31,7 @@ export interface InternalErrorDescriptor {
   /**
    * Container that owns the failed work, when known.
    */
-  readonly container?: ContainerKernel;
+  readonly container?: Container;
 
   /**
    * Extra diagnostic values from the failing subsystem.
@@ -90,7 +90,7 @@ export type InternalErrorHandler = (descriptor: InternalErrorDescriptor) => void
 /**
  * Internal storage for container error handlers.
  */
-const WIRESTATE_INTERNAL_ERROR_HANDLERS: WeakMap<ContainerKernel, InternalErrorHandler> = new WeakMap();
+const WIRESTATE_INTERNAL_ERROR_HANDLERS: WeakMap<Container, InternalErrorHandler> = new WeakMap();
 
 /**
  * Reports isolated Wirestate errors to `console.error`.
@@ -122,11 +122,11 @@ export function defaultInternalErrorHandler(descriptor: InternalErrorDescriptor)
  *
  * @internal
  *
- * @param container - ContainerKernel to inspect.
+ * @param container - Container to inspect.
  * @returns Configured handler, or `undefined` when none is configured.
  */
-export function getConfiguredInternalErrorHandler(container?: ContainerKernel): Maybe<InternalErrorHandler> {
-  return container ? WIRESTATE_INTERNAL_ERROR_HANDLERS.get(container) : null;
+export function getConfiguredInternalErrorHandler(container?: Container): Optional<InternalErrorHandler> {
+  return container ? WIRESTATE_INTERNAL_ERROR_HANDLERS.get(container) : undefined;
 }
 
 /**
@@ -134,10 +134,10 @@ export function getConfiguredInternalErrorHandler(container?: ContainerKernel): 
  *
  * @internal
  *
- * @param container - ContainerKernel that owns the handler.
+ * @param container - Container that owns the handler.
  * @param handler - Handler to store.
  */
-export function setInternalErrorHandler(container: ContainerKernel, handler: InternalErrorHandler): void {
+export function setInternalErrorHandler(container: Container, handler: InternalErrorHandler): void {
   WIRESTATE_INTERNAL_ERROR_HANDLERS.set(container, handler);
 }
 

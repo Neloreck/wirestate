@@ -1,10 +1,4 @@
-import {
-  type InstanceRecord,
-  type ProvisionId,
-  getInstanceContainer,
-  getInstanceRecord,
-  WireStatus,
-} from "../activation/wire-status";
+import { type InstanceRecord, type ProvisionId, getInstanceRecord, WireStatus } from "../activation/wire-status";
 import { type Binding, type ServiceToken, BindingType } from "../binding/binding";
 import { getBindingToken } from "../binding/binding-tokens";
 import type { Container } from "../container/container";
@@ -445,7 +439,7 @@ function runProvisionHooks(container: Container, instances: ReadonlyArray<object
     if (methodName) {
       callLifecycleHandler({
         args: [provisionId],
-        container: getInstanceContainer(instance),
+        container,
         name: "@OnProvision",
         details: [instance.constructor.name, String(methodName)],
         instance,
@@ -526,7 +520,7 @@ export function deprovisionInstances(
 ): void {
   // User @OnDeprovision first (buses still live), then plugin teardown (reverse,
   // failsafe), then unsubscribe every handler.
-  const deprovisioned: ReadonlyArray<object> = runDeprovisionHooks(instances);
+  const deprovisioned: ReadonlyArray<object> = runDeprovisionHooks(container, instances);
 
   for (const instance of deprovisioned) {
     dispatchPluginDeprovision(container, instance);
@@ -547,10 +541,11 @@ export function deprovisionInstances(
  *
  * @internal
  *
+ * @param container - Container releasing the instances.
  * @param instances - Instances resolved during provider provisioning, in creation order.
  * @returns The instances that were deprovisioned, in reverse provision order.
  */
-function runDeprovisionHooks(instances: ReadonlyArray<object>): ReadonlyArray<object> {
+function runDeprovisionHooks(container: Container, instances: ReadonlyArray<object>): ReadonlyArray<object> {
   const deprovisioned: Array<object> = [];
 
   for (let index: number = instances.length - 1; index >= 0; index -= 1) {
@@ -568,7 +563,7 @@ function runDeprovisionHooks(instances: ReadonlyArray<object>): ReadonlyArray<ob
     if (methodName) {
       callLifecycleHandler({
         args: provisionId === undefined ? [] : [provisionId],
-        container: getInstanceContainer(instance),
+        container,
         name: "@OnDeprovision",
         details: [instance.constructor.name, String(methodName)],
         instance,
