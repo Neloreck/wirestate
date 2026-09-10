@@ -98,8 +98,28 @@ export class CommandBus extends HandlerStackBus<CommandType> {
   public execute<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,
     payload?: P,
-    options?: CommandDispatchOptions
+    options?: CommandDispatchOptions & { optional?: false }
   ): R;
+
+  /**
+   * Dispatches a command whose optionality is decided at runtime.
+   *
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Command type.
+   *
+   * @param type - Command token.
+   * @param payload - Command payload.
+   * @param options - Dispatch options with a runtime-decided `optional` flag.
+   * @returns The command result, or `undefined` when the dispatch is optional and no handler exists.
+   *
+   * @throws {@link WirestateError} If the dispatch is required and no handler is registered.
+   */
+  public execute<R = unknown, P = unknown, T extends CommandType = CommandType>(
+    type: T,
+    payload: Optional<P>,
+    options: CommandDispatchOptions
+  ): Optional<R>;
 
   public execute<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,
@@ -154,8 +174,32 @@ export class CommandBus extends HandlerStackBus<CommandType> {
   public executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,
     payload?: P,
-    options?: CommandDispatchOptions
+    options?: CommandDispatchOptions & { optional?: false }
   ): Promise<R>;
+
+  /**
+   * Dispatches a command whose optionality is decided at runtime and returns a Promise.
+   *
+   * @remarks
+   * Selected when `optional` is a plain `boolean`, as with an options object built elsewhere. The
+   * result is `Optional<R>` because the call may resolve to `undefined` for a miss. Pass a literal
+   * `{ optional: true }` or omit the option to select a narrower overload.
+   *
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Command type.
+   *
+   * @param type - Command token.
+   * @param payload - Command payload.
+   * @param options - Dispatch options with a runtime-decided `optional` flag.
+   * @returns A Promise resolving to the command result, or `undefined` when the dispatch is optional and
+   *   no handler exists, rejected with a {@link WirestateError} when it is required and no handler exists.
+   */
+  public executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
+    type: T,
+    payload: Optional<P>,
+    options: CommandDispatchOptions
+  ): Promise<Optional<R>>;
 
   public executeAsync<R = unknown, P = unknown, T extends CommandType = CommandType>(
     type: T,

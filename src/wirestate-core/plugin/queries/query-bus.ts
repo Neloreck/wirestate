@@ -94,8 +94,28 @@ export class QueryBus extends HandlerStackBus<QueryType> {
   public query<R = unknown, P = unknown, T extends QueryType = QueryType>(
     type: T,
     payload?: P,
-    options?: QueryDispatchOptions
+    options?: QueryDispatchOptions & { optional?: false }
   ): R;
+
+  /**
+   * Dispatches a query whose optionality is decided at runtime.
+   *
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Query type.
+   *
+   * @param type - Query token.
+   * @param payload - Query payload.
+   * @param options - Dispatch options with a runtime-decided `optional` flag.
+   * @returns The query result, or `undefined` when the dispatch is optional and no handler exists.
+   *
+   * @throws {@link WirestateError} If the dispatch is required and no handler is registered.
+   */
+  public query<R = unknown, P = unknown, T extends QueryType = QueryType>(
+    type: T,
+    payload: Optional<P>,
+    options: QueryDispatchOptions
+  ): Optional<R>;
 
   public query<R = unknown, P = unknown, T extends QueryType = QueryType>(
     type: T,
@@ -150,8 +170,27 @@ export class QueryBus extends HandlerStackBus<QueryType> {
   public queryAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(
     type: T,
     payload?: P,
-    options?: QueryDispatchOptions
+    options?: QueryDispatchOptions & { optional?: false }
   ): Promise<R>;
+
+  /**
+   * Dispatches a query whose optionality is decided at runtime and returns a Promise.
+   *
+   * @template R - Result type.
+   * @template P - Payload type.
+   * @template T - Query type.
+   *
+   * @param type - Query token.
+   * @param payload - Query payload.
+   * @param options - Dispatch options with a runtime-decided `optional` flag.
+   * @returns A Promise resolving to the query result, or `undefined` when the dispatch is optional and
+   *   no handler exists, rejected with a {@link WirestateError} when it is required and no handler exists.
+   */
+  public queryAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(
+    type: T,
+    payload: Optional<P>,
+    options: QueryDispatchOptions
+  ): Promise<Optional<R>>;
 
   public queryAsync<R = unknown, P = unknown, T extends QueryType = QueryType>(
     type: T,
