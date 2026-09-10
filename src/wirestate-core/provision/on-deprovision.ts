@@ -1,10 +1,16 @@
+import { type ProvisionId } from "../activation/wire-status";
 import {
   type LifecycleDecorator,
   createSingleMethodDecoratorDescriptor,
 } from "../metadata/metadata-single-method-decorator";
 import { type Optional } from "../types/general";
 
-const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
+/**
+ * Signature a provision-phase hook must be assignable to: zero parameters, or the cycle's `ProvisionId`.
+ */
+type ProvisionHook = (provisionId: ProvisionId) => unknown;
+
+const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor<ProvisionHook>({
   name: "OnDeprovision",
   registry: new WeakMap(),
   metadataKey: Symbol("@wirestate/core/lifecycle/deprovision"),
@@ -44,7 +50,7 @@ const { decorator, getMetadata } = createSingleMethodDecoratorDescriptor({
  * }
  * ```
  */
-export function OnDeprovision(): LifecycleDecorator {
+export function OnDeprovision(): LifecycleDecorator<ProvisionHook> {
   return decorator();
 }
 

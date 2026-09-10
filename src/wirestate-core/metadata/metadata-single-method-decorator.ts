@@ -9,13 +9,20 @@ import { getPrototypeChainMetadata } from "./metadata-prototype-chain";
  * Method decorator returned by the single-method lifecycle hooks:
  * `@OnActivation`, `@OnDeactivation`, `@OnProvision`, and `@OnDeprovision`.
  *
+ * @remarks
+ * The decorated method must accept the arguments its phase delivers and nothing more, so a hook
+ * declaring a parameter the runtime never passes is rejected at compile time. Activation hooks
+ * receive no arguments. Provision hooks may declare the `ProvisionId` of the cycle.
+ *
+ * @template Method - Signature the decorated method must be assignable to.
+ *
  * @group Lifecycle
  */
-export interface LifecycleDecorator {
+export interface LifecycleDecorator<Method extends (...args: Array<never>) => unknown = () => unknown> {
   // Standard (TC39):
-  <This>(value: (this: This, ...args: Array<never>) => unknown, context: ClassMethodDecoratorContext<This>): void;
+  <This>(value: (this: This, ...args: Parameters<Method>) => unknown, context: ClassMethodDecoratorContext<This>): void;
   // Legacy/experimental:
-  (target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor): void;
+  (target: object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<Method>): void;
 }
 
 /**
@@ -65,14 +72,16 @@ export interface SingleMethodDecoratorOptions {
 /**
  * The decorator and metadata reader produced for one single-method lifecycle hook.
  *
+ * @template Method - Signature the decorated method must be assignable to.
+ *
  * @group Lifecycle
  * @internal
  */
-export interface SingleMethodDecoratorDescriptor {
+export interface SingleMethodDecoratorDescriptor<Method extends (...args: Array<never>) => unknown = () => unknown> {
   /**
    * Method decorator factory that records the decorated method name.
    */
-  readonly decorator: () => LifecycleDecorator;
+  readonly decorator: () => LifecycleDecorator<Method>;
 
   /**
    * Resolves the decorated method name for an instance, or `undefined` when none exists.
@@ -86,16 +95,18 @@ export interface SingleMethodDecoratorDescriptor {
  * @group Lifecycle
  * @internal
  *
+ * @template Method - Signature the decorated method must be assignable to.
+ *
  * @param options - Registry, metadata key, name, and message builders for the hook.
  * @returns The hook's decorator factory and metadata reader.
  */
-export function createSingleMethodDecoratorDescriptor(
-  options: SingleMethodDecoratorOptions
-): SingleMethodDecoratorDescriptor {
+export function createSingleMethodDecoratorDescriptor<
+  Method extends (...args: Array<never>) => unknown = () => unknown,
+>(options: SingleMethodDecoratorOptions): SingleMethodDecoratorDescriptor<Method> {
   const { registry, metadataKey, name, duplicateMessage, hierarchyMessage } = options;
 
   return {
-    decorator: (): LifecycleDecorator => {
+    decorator: (): LifecycleDecorator<Method> => {
       return ((target: object, nameOrContext: string | symbol | ClassMethodDecoratorContext): void => {
         if (typeof nameOrContext === "object") {
           // Standard decorators:
@@ -131,7 +142,7 @@ export function createSingleMethodDecoratorDescriptor(
 
           registry.set(constructor, nameOrContext);
         }
-      }) as LifecycleDecorator;
+      }) as LifecycleDecorator<Method>;
     },
     getMetadata: (instance: object): Optional<string | symbol> => {
       let handler: Optional<string | symbol> = undefined;
