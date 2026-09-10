@@ -1,12 +1,8 @@
 import { Container } from "@wirestate/core";
 
-import {
-  type ReactContainerProvisionLifecycle,
-  retainContainer,
-  scheduleContainerDestruction,
-} from "./provision-lifecycle";
+import { type PendingDestructions, retainContainer, scheduleContainerDestruction } from "./managed-container";
 
-describe("react container provision lifecycle", () => {
+describe("react managed container destruction", () => {
   beforeEach(() => {
     jest.useFakeTimers();
   });
@@ -18,7 +14,7 @@ describe("react container provision lifecycle", () => {
   it("does not deprovision twice when destruction is already scheduled for a container", () => {
     const container: Container = new Container();
     const deprovision = jest.spyOn(container, "deprovision");
-    const pending: ReactContainerProvisionLifecycle = new Map();
+    const pending: PendingDestructions = new Map();
 
     scheduleContainerDestruction(container, pending);
     // A second schedule for the same still-pending container is a no-op.
@@ -31,7 +27,7 @@ describe("react container provision lifecycle", () => {
   it("cancels a pending destruction when the container is retained", () => {
     const container: Container = new Container();
     const unbindAll = jest.spyOn(container, "unbindAll");
-    const pending: ReactContainerProvisionLifecycle = new Map();
+    const pending: PendingDestructions = new Map();
 
     scheduleContainerDestruction(container, pending);
     retainContainer(container, pending);

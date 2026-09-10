@@ -1,17 +1,19 @@
-import { type ContainerConfig, Container, WirestateError } from "@wirestate/core";
+import { type Container, type ContainerConfig, WirestateError } from "@wirestate/core";
 import { type HotSwapOwner, registerHotSwapOwner } from "@wirestate/core/hot";
 import { type ReactElement, type ReactNode, createElement, useRef, useState } from "react";
 
 import { ContainerContext } from "../container/container-context";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
-import { type Maybe, type Nullable } from "../types/general";
+import { type Nullable, type Optional } from "../types/general";
 import { useIsomorphicLayoutEffect } from "../utils/use-isomorphic-layout-effect";
 
 import {
-  type ReactContainerProvisionLifecycle,
+  type PendingDestructions,
+  createManagedContainer,
   retainContainer,
   scheduleContainerDestruction,
-} from "./provision-lifecycle";
+} from "./managed-container";
+import { type ProviderMode, resolveProviderMode } from "./provider-mode";
 
 /**
  * Describes props for {@link ContainerProvider}.
@@ -111,67 +113,41 @@ interface ContainerProvisionError {
  * ```
  */
 export function ContainerProvider(props: ContainerProviderProps): ReactElement {
-  const configValue: unknown = props.config;
-  const hasConfig: boolean = configValue !== undefined;
+  const mode: ProviderMode = resolveProviderMode(props);
+  const modeRef = useRef<ProviderMode>(mode);
 
-  if (hasConfig && (configValue === null || typeof configValue !== "object" || Array.isArray(configValue))) {
-    throw new WirestateError(
-      "ContainerProvider requires a valid container instance or creation config.",
-      ERROR_CODE_INVALID_ARGUMENTS
-    );
-  } else if (!props.container && !hasConfig) {
-    throw new WirestateError(
-      "ContainerProvider requires a valid container instance or creation config.",
-      ERROR_CODE_INVALID_ARGUMENTS
-    );
-  } else if (props.container && hasConfig) {
-    throw new WirestateError(
-      "ContainerProvider requires only container or valid config object to be provided.",
-      ERROR_CODE_INVALID_ARGUMENTS
-    );
-  } else if (props.container !== undefined && !(props.container instanceof Container)) {
-    throw new WirestateError(
-      "ContainerProvider requires a valid container instance or creation config.",
-      ERROR_CODE_INVALID_ARGUMENTS
-    );
-  }
-
-  const managedSource: Maybe<ContainerConfig> = props.config;
-  const externalContainer: Maybe<Container> = props.container;
-  const owned: boolean = Boolean(managedSource);
-  const ownedRef = useRef<boolean>(owned);
-
-  const pendingDestructionRef = useRef<Nullable<ReactContainerProvisionLifecycle>>(null);
-
-  const [error, setError] = useState<Nullable<ContainerProvisionError>>(null);
-  const [managedContainer, setManagedContainer] = useState<Nullable<Container>>(() =>
-    managedSource ? new Container({ ...managedSource, activate: managedSource.activate ?? true }) : null
-  );
-
-  // Construction-only semantics: the config that built the managed container is the one
-  // a development hot swap rebuilds from, regardless of later prop changes.
-  const mountConfigRef = useRef<Maybe<ContainerConfig>>(managedSource);
-  const hotOwnerRef = useRef<Nullable<HotSwapOwner>>(null);
-
-  if (ownedRef.current !== owned) {
+  if (modeRef.current !== mode) {
     throw new WirestateError(
       "ContainerProvider cannot switch between external and managed container modes. Pass a React key to remount the provider.",
       ERROR_CODE_INVALID_ARGUMENTS
     );
   }
 
-  const activeContainer: Container = managedContainer ?? (externalContainer as Container);
+  // Construction-only semantics: the config that built the managed container is the one a
+  // development hot swap rebuilds from, regardless of later prop changes.
+  const mountConfigRef = useRef<Optional<ContainerConfig>>(props.config);
+  const pendingDestructionsRef = useRef<Nullable<PendingDestructions>>(null);
+  const hotOwnerRef = useRef<Nullable<HotSwapOwner>>(null);
+
+  const [error, setError] = useState<Nullable<ContainerProvisionError>>(null);
+  const [managedContainer, setManagedContainer] = useState<Nullable<Container>>(() =>
+    mode === "managed" ? createManagedContainer(props.config as ContainerConfig) : null
+  );
+
+  const activeContainer: Container = managedContainer ?? (props.container as Container);
 
   useIsomorphicLayoutEffect(() => {
-    const pendingDestruction: ReactContainerProvisionLifecycle = (pendingDestructionRef.current ??= new Map());
+    const owned: boolean = mode === "managed";
+    const pending: PendingDestructions = (pendingDestructionsRef.current ??= new Map());
 
-    retainContainer(activeContainer, pendingDestruction);
+    // A StrictMode re-run of this effect reclaims the container its cleanup just scheduled.
+    retainContainer(activeContainer, pending);
 
     try {
       activeContainer.provision();
     } catch (error) {
       if (owned) {
-        scheduleContainerDestruction(activeContainer, pendingDestruction);
+        scheduleContainerDestruction(activeContainer, pending);
       } else {
         // Expect container to be deprovisioned by this moment, but leaving deprovision as explicit operation.
         activeContainer.deprovision();
@@ -190,7 +166,7 @@ export function ContainerProvider(props: ContainerProviderProps): ReactElement {
       const hotOwner: HotSwapOwner = (hotOwnerRef.current ??= {
         container: activeContainer,
         config: mountConfigRef.current,
-        create: (config: ContainerConfig): Container => new Container({ ...config, activate: config.activate ?? true }),
+        create: createManagedContainer,
         commit: (container: Container): void => setManagedContainer(container),
       });
 
@@ -202,12 +178,12 @@ export function ContainerProvider(props: ContainerProviderProps): ReactElement {
       unregisterHotOwner?.();
 
       if (owned) {
-        scheduleContainerDestruction(activeContainer, pendingDestruction);
+        scheduleContainerDestruction(activeContainer, pending);
       } else {
         activeContainer.deprovision();
       }
     };
-  }, [activeContainer, owned]);
+  }, [activeContainer, mode]);
 
   if (error) {
     throw error.error;
