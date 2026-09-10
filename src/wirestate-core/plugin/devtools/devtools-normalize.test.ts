@@ -64,6 +64,17 @@ describe("normalizeBinding", () => {
       implementation: undefined,
     });
   });
+
+  it("normalizes a shorthand factory binding that omits its type as a factory", () => {
+    // Core classifies `{ token, factory }` as a factory binding; the panel must not show it as a value.
+    expect(normalizeBinding({ token: "MAKE", factory: () => 1 }, 9)).toEqual({
+      bindingId: 9,
+      token: { name: "MAKE", kind: "string" },
+      type: "Factory",
+      scope: "Singleton",
+      implementation: undefined,
+    });
+  });
 });
 
 describe("normalizePlugin", () => {

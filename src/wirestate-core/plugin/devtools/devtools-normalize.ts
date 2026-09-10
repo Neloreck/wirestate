@@ -3,7 +3,7 @@ import { getDeactivationHandlerMetadata } from "../../activation/on-deactivation
 import { type WireStatus, tryGetWireStatus } from "../../activation/wire-status";
 import { type BindingDescriptor, type ServiceToken } from "../../binding/binding";
 import { isInstanceDescriptor } from "../../binding/binding-guards";
-import { getBindingScope } from "../../binding/binding-lifecycle";
+import { getBindingScope, getBindingType } from "../../binding/binding-lifecycle";
 import { InjectionToken, getBindingToken, tokenToString } from "../../binding/binding-tokens";
 import { getDeprovisionHandlerMetadata } from "../../provision/on-deprovision";
 import { getProvisionHandlerMetadata } from "../../provision/on-provision";
@@ -79,7 +79,7 @@ export function normalizeBinding(binding: BindingDescriptor<unknown>, bindingId:
   return {
     bindingId,
     token: normalizeToken(getBindingToken(binding)),
-    type: binding.type ?? "Value",
+    type: getBindingType(binding),
     scope: getBindingScope(binding),
     implementation: isInstanceDescriptor(binding) ? binding.value.name : undefined,
   };
