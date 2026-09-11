@@ -36,9 +36,6 @@
     "dependency-injection",
     "typescript"
   ],
-  "dependencies": {
-    "@swc/core": "^1.15.43"
-  },
   "peerDependencies": {
     "@wirestate/core": "1.0.0-experimental.18"
   }

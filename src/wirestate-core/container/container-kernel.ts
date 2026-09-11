@@ -4,6 +4,7 @@ import { isInstanceDescriptor } from "../binding/binding-guards";
 import { getBindingScope } from "../binding/binding-lifecycle";
 import { tokenToString } from "../binding/binding-tokens";
 import { validateBinding } from "../binding/binding-validation";
+import { IS_PRODUCTION } from "../env";
 import { ERROR_CODE_CONTAINER_DESTROYED, ERROR_CODE_NO_BINDING_FOUND } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
 import { getLatestHotClass } from "../hot/hot-registry";
@@ -13,8 +14,6 @@ import { type Optional, type Newable } from "../types/general";
 import { injectionContext } from "./container-context";
 import { Factory } from "./container-factory";
 import { type ActivationRecord, type BindingMap, type InstanceMap } from "./container-storage";
-
-const IS_PRODUCTION: boolean = process.env.NODE_ENV === "production";
 
 /**
  * Internal dependency injection (DI) engine: tracks bindings and holds the

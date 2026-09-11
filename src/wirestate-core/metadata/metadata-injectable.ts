@@ -1,5 +1,7 @@
+import { IS_PRODUCTION } from "../env";
 import { ERROR_CODE_INVALID_ARGUMENTS } from "../error/error-code";
 import { WirestateError } from "../error/wirestate-error";
+import { registerHotClass } from "../hot/hot-registry";
 import { type Newable } from "../types/general";
 
 /**
@@ -43,6 +45,10 @@ export function Injectable(): InjectableDecorator {
   return (<T extends Newable<object>>(value: T, context?: ClassDecoratorContext): void => {
     if (context && context.kind !== "class") {
       throw new WirestateError("@Injectable() can only decorate classes.", ERROR_CODE_INVALID_ARGUMENTS);
+    }
+
+    if (!IS_PRODUCTION) {
+      registerHotClass(value);
     }
 
     INJECTABLE_CLASSES.add(value);

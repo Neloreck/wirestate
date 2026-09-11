@@ -1,5 +1,5 @@
 import { OnDeactivation } from "../activation/on-deactivation";
-import { Container } from "../container/container";
+import { Container, type ContainerConfig } from "../container/container";
 import { inject } from "../container/container-context";
 import { Injectable } from "../metadata/metadata-injectable";
 import { OnDeprovision } from "../provision/on-deprovision";
@@ -7,7 +7,14 @@ import { OnProvision } from "../provision/on-provision";
 import { type Newable } from "../types/general";
 
 import { type HotSwapOwner, registerHotSwapOwner } from "./hot-owner";
-import { getHotState, getLatestHotClass, isHotSwapping, registerHotModule } from "./hot-registry";
+import {
+  closeHotModule,
+  getHotState,
+  getLatestHotClass,
+  isHotSwapping,
+  openHotModule,
+  registerHotModule,
+} from "./hot-registry";
 import { isHotConfigOutdated, remapHotBinding, remapHotConfig } from "./hot-remap";
 import { requestHotSwap } from "./hot-swap";
 
@@ -28,6 +35,7 @@ function resetHotState(): void {
 
   state.latest.clear();
   state.modules.clear();
+  state.open.length = 0;
   state.dirty.clear();
   state.owners.clear();
   state.reloadRequired = false;
@@ -557,5 +565,166 @@ describe("hot swap", () => {
     await flushMicrotasks();
 
     expect(commits).toHaveLength(1);
+  });
+});
+
+describe("hot module markers", () => {
+  beforeEach(() => {
+    resetHotState();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it("should attribute classes decorated between open and close to the module", () => {
+    openHotModule("services/counter.ts");
+
+    @Injectable()
+    class CounterService {}
+
+    @Injectable()
+    class ClockService {}
+
+    expect(closeHotModule()).toBe(true);
+    expect(getHotState().open).toEqual([]);
+    expect(getHotState().modules.get("services/counter.ts")).toEqual(
+      new Set(["services/counter.ts#CounterService", "services/counter.ts#ClockService"])
+    );
+    expect(getLatestHotClass(CounterService)).toBe(CounterService);
+    expect(getLatestHotClass(ClockService)).toBe(ClockService);
+    expect(getHotState().dirty.size).toBe(0);
+  });
+
+  it("should ignore classes decorated while no module is open", () => {
+    @Injectable()
+    class Detached {}
+
+    expect(getHotState().latest.size).toBe(0);
+    expect(getHotState().classIds.has(Detached)).toBe(false);
+    expect(closeHotModule()).toBe(false);
+  });
+
+  it("should replace a class generation registered through markers", () => {
+    openHotModule("services/counter.ts");
+
+    @Injectable()
+    class CounterService {}
+
+    const first: Newable<object> = CounterService;
+
+    closeHotModule();
+    openHotModule("services/counter.ts");
+
+    {
+      @Injectable()
+      class CounterService {}
+
+      expect(closeHotModule()).toBe(true);
+      expect(getLatestHotClass(first)).toBe(CounterService);
+    }
+
+    expect(getHotState().dirty.has("services/counter.ts#CounterService")).toBe(true);
+  });
+
+  it("should report participation for a module that lost all of its classes", () => {
+    openHotModule("services/removed.ts");
+
+    @Injectable()
+    class RemovedService {}
+
+    closeHotModule();
+    openHotModule("services/removed.ts");
+
+    expect(closeHotModule()).toBe(true);
+    expect(getHotState().reloadRequired).toBe(true);
+    expect(getLatestHotClass(RemovedService)).toBe(RemovedService);
+  });
+
+  it("should not report participation for a module without decorated classes", () => {
+    openHotModule("constants.ts");
+
+    expect(closeHotModule()).toBe(false);
+    expect(getHotState().modules.get("constants.ts")).toEqual(new Set());
+  });
+
+  it("should give same-named classes of one module ordinal ids", () => {
+    openHotModule("services/pair.ts");
+
+    const [First, Second] = [1, 2].map(() => {
+      @Injectable()
+      class Service {}
+
+      return Service;
+    });
+
+    closeHotModule();
+
+    expect(getHotState().classIds.get(First)).toBe("services/pair.ts#Service");
+    expect(getHotState().classIds.get(Second)).toBe("services/pair.ts#Service#2");
+  });
+
+  it("should register anonymous default classes under a default name", () => {
+    openHotModule("services/default.ts");
+
+    // An array literal defeats name inference, so the class really is anonymous.
+    const Anonymous: Newable<object> = [class {}][0];
+
+    Injectable()(Anonymous);
+    closeHotModule();
+
+    expect(Anonymous.name).toBe("");
+
+    expect(getHotState().classIds.get(Anonymous)).toBe("services/default.ts#default");
+  });
+
+  it("should attribute classes of a nested module to the innermost open module", () => {
+    openHotModule("outer.ts");
+    openHotModule("inner.ts");
+
+    @Injectable()
+    class InnerService {}
+
+    expect(closeHotModule()).toBe(true);
+
+    @Injectable()
+    class OuterService {}
+
+    expect(closeHotModule()).toBe(true);
+    expect(getHotState().classIds.get(InnerService)).toBe("inner.ts#InnerService");
+    expect(getHotState().classIds.get(OuterService)).toBe("outer.ts#OuterService");
+  });
+
+  it("should swap a managed container after a marker-registered replacement", async () => {
+    jest.spyOn(console, "info").mockImplementation(() => {});
+    openHotModule("services/service.ts");
+
+    @Injectable()
+    class Service {}
+
+    closeHotModule();
+
+    const config: ContainerConfig = { bindings: [Service] };
+    const owner: HotSwapOwner = {
+      container: new Container(config).provision(),
+      config,
+      create: (next: ContainerConfig) => new Container(next),
+      commit: jest.fn(),
+    };
+
+    registerHotSwapOwner(owner);
+    openHotModule("services/service.ts");
+
+    {
+      @Injectable()
+      class Service {}
+
+      closeHotModule();
+      requestHotSwap();
+      await flushMicrotasks();
+
+      expect(owner.commit).toHaveBeenCalledTimes(1);
+      expect(owner.container.get(Service)).toBeInstanceOf(Service);
+    }
   });
 });

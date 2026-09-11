@@ -43,10 +43,12 @@ Editing a service now reports the swap instead of reloading the page:
 
 ## How It Works
 
-Wirestate keys bindings by class identity, and a hot update replaces the class. The plugin appends a footer to every
-module declaring `@Injectable()` classes that registers each class generation under a stable id and accepts the module's
-own hot updates. The update stops propagating up the import graph, and the Wirestate runtime rebuilds the containers
-bound to the previous class: teardown deepest-first, then replacements root-first, as one synchronous step.
+Wirestate keys bindings by class identity, and a hot update replaces the class. The plugin wraps every module mentioning
+`Injectable` in two markers: a header that opens the module in the Wirestate hot runtime and a footer that closes it.
+While the module body evaluates, `@Injectable()` registers each decorated class under a stable id derived from the
+module path and the class name, so nothing is parsed. A module that declares such classes accepts its own hot updates.
+The update stops propagating up the import graph, and the runtime rebuilds the containers bound to the previous class:
+teardown deepest-first, then replacements root-first, as one synchronous step.
 
 React state, DOM state, scroll position, and form inputs survive. Services are constructed fresh, so resource work
 belongs in `@OnProvision` and cleanup in `@OnDeprovision`.
@@ -55,18 +57,18 @@ belongs in `@OnProvision` and cleanup in `@OnDeprovision`.
 
 - `@wirestate/dev/vite`: the `wirestate()` Vite plugin, with `include` and `exclude` options for projects using
   different file conventions.
-- The package root: `transformHotModule`, `findInjectableClassNames`, and `createHotFooter`, the bundler-agnostic
-  transform the adapters build on.
+- The package root: `transformHotModule`, `createHotHeader`, and `createHotFooter`, the bundler-agnostic transform the
+  adapters build on.
 
 By default `.ts`, `.mts`, `.js`, and `.mjs` files are transformed, skipping `node_modules`, declaration files, test
 files, and server-side transforms. Component files (`.tsx`, `.jsx`) are excluded because React Fast Refresh already owns
 them, so keep services in their own modules.
 
-The transform recognizes `Injectable` imported directly from `@wirestate/core` or `wirestate`, including aliased
-imports. It ignores same-named decorators from other packages and imports through local re-exports.
+Every module-scope class decorated with `@Injectable()` participates, whatever name the decorator is imported under.
+Classes created later at runtime, for example inside a factory function, are not registered.
 
-Requires [`@wirestate/core`](https://www.npmjs.com/package/@wirestate/core) in the application: the injected footer
-imports the `@wirestate/core/hot` runtime that performs the swap.
+Requires [`@wirestate/core`](https://www.npmjs.com/package/@wirestate/core) in the application: the injected markers
+import the `@wirestate/core/hot` runtime that performs the swap. The package has no other dependencies.
 
 ## Learn More
 

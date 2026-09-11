@@ -120,10 +120,12 @@ external container leaves the old instance running, and resolution keeps answeri
 not in a class. Editing that module is an ordinary hot update: it re-runs the config and, when the provider remounts,
 builds a fresh container from it.
 
-**Only named module-scope classes declared with `@Injectable()` participate.** The plugin parses JavaScript and
-TypeScript modules before inspecting their top-level declarations. It ignores comments, strings, template text, and
-classes nested inside functions or blocks. Import `Injectable` directly from `@wirestate/core` or `wirestate`; aliases
-are supported. Imports through a local re-export are not detected.
+**Only classes decorated with `@Injectable()` while their module evaluates participate.** The plugin does not parse
+sources. It wraps a module mentioning `Injectable` in a header and a footer, and `@Injectable()` registers every class
+decorated between them under an id derived from the module path and the class name. Aliased imports and local
+re-exports work, since detection happens at runtime. A class created later, for example by a factory function called
+from a component, is not registered. Two same-named classes in one module get ordinal ids, so reordering them reads as
+a rename and triggers a page reload.
 
 **A handler that forces synchronous rendering breaks the swap.** Calling `flushSync` from `@OnDeprovision` or
 `@OnDeactivation` renders while containers are being replaced. Wirestate detects this and throws a message naming the

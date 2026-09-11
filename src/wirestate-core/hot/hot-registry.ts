@@ -10,6 +10,18 @@ import { type HotSwapOwner } from "./hot-owner";
 const HOT_STATE_KEY: symbol = Symbol.for("wirestate.hot.state");
 
 /**
+ * A hot module whose body is evaluating right now, collecting the classes it declares.
+ *
+ * @internal
+ */
+export interface HotModuleFrame {
+  /** Stable module identifier passed to {@link openHotModule}. */
+  readonly moduleId: string;
+  /** Classes decorated while the module was open, keyed by their registration name. */
+  readonly classes: Map<string, Newable<object>>;
+}
+
+/**
  * Process-wide hot-reload state shared by every copy of this module.
  *
  * @internal
@@ -21,6 +33,8 @@ export interface HotState {
   readonly latest: Map<string, Newable<object>>;
   /** Stable ids registered by each module's latest generation. */
   modules: Map<string, Set<string>>;
+  /** Modules currently evaluating, innermost last. */
+  open: Array<HotModuleFrame>;
   /** Stable ids whose class changed since the last swap. */
   readonly dirty: Set<string>;
   /** Live provider registrations able to rebuild their containers. */
@@ -31,6 +45,17 @@ export interface HotState {
   scheduled: boolean;
   /** Whether a swap is executing right now. */
   swapping: boolean;
+}
+
+/**
+ * Returns the process-wide hot-reload state when something already created it.
+ *
+ * @internal
+ *
+ * @returns Shared hot-reload state, or `undefined` before the first {@link getHotState} call.
+ */
+export function peekHotState(): Optional<HotState> {
+  return (globalThis as Record<symbol, Optional<HotState>>)[HOT_STATE_KEY];
 }
 
 /**
@@ -46,6 +71,7 @@ export function getHotState(): HotState {
     classIds: new WeakMap(),
     latest: new Map(),
     modules: new Map(),
+    open: [],
     dirty: new Set(),
     owners: new Set(),
     reloadRequired: false,
@@ -57,9 +83,78 @@ export function getHotState(): HotState {
   // process-wide state. Backfill new fields so both copies continue sharing one registry.
   state.classIds ??= new WeakMap();
   state.modules ??= new Map();
+  state.open ??= [];
   state.reloadRequired ??= false;
 
   return state;
+}
+
+/**
+ * Marks the start of a hot module's evaluation.
+ *
+ * @group Hot
+ *
+ * @param moduleId - Stable module identifier, usually the root-relative path.
+ */
+export function openHotModule(moduleId: string): void {
+  getHotState().open.push({ moduleId, classes: new Map() });
+}
+
+/**
+ * Attributes a decorated class to the hot module currently evaluating.
+ *
+ * Classes register under their name. A second class with the same name in one module
+ * gets an ordinal suffix, so reordering same-named classes reads as a rename.
+ *
+ * @internal
+ *
+ * @param clazz - Class decorated during module evaluation.
+ */
+export function registerHotClass(clazz: Newable<object>): void {
+  const frame: Optional<HotModuleFrame> = peekHotState()?.open?.at(-1);
+
+  if (!frame) {
+    return;
+  }
+
+  const classes: Map<string, Newable<object>> = frame.classes;
+  const name: string = clazz.name || "default";
+
+  let key: string = name;
+
+  for (let ordinal: number = 2; classes.has(key); ordinal++) {
+    key = `${name}#${ordinal}`;
+  }
+
+  classes.set(key, clazz);
+}
+
+/**
+ * Marks the end of a hot module's evaluation and registers the classes it declared.
+ *
+ * @remarks
+ * Injected by the dev bundler plugin as the last statement of a module. Registration
+ * follows {@link registerHotModule}, so a replaced class becomes available to the next
+ * {@link requestHotSwap} and a disappeared class requests a page reload.
+ *
+ * @group Hot
+ *
+ * @returns Whether the module declares, or previously declared, hot-swappable classes.
+ * The plugin footer accepts the module's own hot updates only in that case.
+ */
+export function closeHotModule(): boolean {
+  const state: HotState = getHotState();
+  const frame: Optional<HotModuleFrame> = state.open.pop();
+
+  if (!frame) {
+    return false;
+  }
+
+  const participated: boolean = (state.modules.get(frame.moduleId)?.size ?? 0) > 0;
+
+  registerHotModule(frame.moduleId, Object.fromEntries(frame.classes));
+
+  return participated || frame.classes.size > 0;
 }
 
 /**
@@ -71,10 +166,13 @@ export function getHotState(): HotState {
  * If a registered name disappears, the next request reloads the page because retained
  * configs may still refer to it. Registration does not modify the constructors.
  *
+ * This is the explicit form. Transformed modules register through {@link openHotModule}
+ * and {@link closeHotModule} instead, letting `@Injectable()` collect the classes.
+ *
  * @group Hot
  *
  * @param moduleId - Stable module identifier, usually the root-relative path.
- * @param classes - Exported classes keyed by their local declaration name.
+ * @param classes - Classes keyed by their registration name.
  */
 export function registerHotModule(moduleId: string, classes: Record<string, unknown>): void {
   const state: HotState = getHotState();

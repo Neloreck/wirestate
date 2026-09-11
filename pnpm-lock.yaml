@@ -350,11 +350,7 @@ importers:
         specifier: ^0.5.23
         version: 0.5.23
 
-  src/wirestate-dev:
-    dependencies:
-      '@swc/core':
-        specifier: ^1.15.43
-        version: 1.15.43(@swc/helpers@0.5.23)
+  src/wirestate-dev: {}
 
   src/wirestate-lit: {}
 
