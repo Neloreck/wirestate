@@ -24,6 +24,7 @@ jobs:
     env:
       ROOT_MANIFEST_PATHSPEC: "package.json"
       PACKAGE_MANIFEST_PATHSPEC: ":(glob)src/**/package.json"
+      CHANGELOG_PATHSPEC: "CHANGELOG.md"
 
     steps:
       - name: Require repository admin permissions
@@ -69,7 +70,7 @@ jobs:
       - name: Detect manifest changes
         id: manifest-changes
         run: |
-          if git diff --quiet -- "${ROOT_MANIFEST_PATHSPEC}" "${PACKAGE_MANIFEST_PATHSPEC}"; then
+          if git diff --quiet -- "${ROOT_MANIFEST_PATHSPEC}" "${PACKAGE_MANIFEST_PATHSPEC}" "${CHANGELOG_PATHSPEC}"; then
             echo "changed=false" >> "${GITHUB_OUTPUT}"
           else
             echo "changed=true" >> "${GITHUB_OUTPUT}"
@@ -83,7 +84,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "${ROOT_MANIFEST_PATHSPEC}" "${PACKAGE_MANIFEST_PATHSPEC}"
+          git add -- "${ROOT_MANIFEST_PATHSPEC}" "${PACKAGE_MANIFEST_PATHSPEC}" "${CHANGELOG_PATHSPEC}"
           git commit -m "chore: bump wirestate packages to ${TARGET_VERSION}"
           git push origin "HEAD:${TARGET_BRANCH}"
 

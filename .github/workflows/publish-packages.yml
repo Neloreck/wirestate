@@ -66,6 +66,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Check release notes before publishing
+        if: ${{ !inputs.experimental }}
+        run: pnpm tsx cli/deploy/print-release-notes.ts > /dev/null
+
       - name: Publish packages
         run: pnpm ${{ env.PUBLISH_SCRIPT }} ${{ env.PUBLISH_ARGS }}
 
