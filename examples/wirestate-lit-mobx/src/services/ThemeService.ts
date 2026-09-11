@@ -1,5 +1,13 @@
-import { Injectable, OnActivated, OnDeactivation, OnDeprovision, OnProvision, inject, EventBus } from "@wirestate/core";
-import { Action, makeObservable, Observable } from "@wirestate/mobx";
+import {
+  Injectable,
+  OnActivation,
+  OnDeactivation,
+  OnDeprovision,
+  OnProvision,
+  inject,
+  EventBus,
+} from "@wirestate/core";
+import { Action, Observable } from "@wirestate/mobx";
 
 import { EGlobalEvent } from "@/constants/events";
 import { Theme } from "@/types";
@@ -10,13 +18,12 @@ export class ThemeService {
   public theme: Theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 
   public constructor(private readonly eventBus: EventBus = inject(EventBus)) {
-    makeObservable(this);
     document.documentElement.dataset.theme = this.theme;
   }
 
-  @OnActivated()
-  public onActivated(): void {
-    console.info(`[${this.constructor.name}] Activated`);
+  @OnActivation()
+  public onActivation(): void {
+    console.info(`[${this.constructor.name}] Activation`);
   }
 
   @OnDeactivation()

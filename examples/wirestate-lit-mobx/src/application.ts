@@ -7,6 +7,7 @@ import "@/components/queries-data";
 import { BindingType, BindingScope, EventsPlugin, CommandsPlugin, QueriesPlugin } from "@wirestate/core";
 import { DevToolsPlugin } from "@wirestate/core/devtools";
 import { ContainerProvider, provideContainer } from "@wirestate/lit";
+import { ObservablePlugin } from "@wirestate/mobx";
 import { LitElement, html, CSSResult, TemplateResult, css } from "lit";
 import { customElement } from "lit/decorators.js";
 
@@ -103,6 +104,7 @@ export class Application extends LitElement {
         },
       ],
       plugins: [
+        new ObservablePlugin(),
         new EventsPlugin(),
         new CommandsPlugin(),
         new QueriesPlugin(),

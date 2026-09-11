@@ -1,6 +1,6 @@
 import {
   Injectable,
-  OnActivated,
+  OnActivation,
   OnDeactivation,
   WireEvent,
   OnEvent,
@@ -51,9 +51,9 @@ export class LoggerService {
     });
   }
 
-  @OnActivated()
-  public onActivated(): void {
-    console.info(`[${this.constructor.name}] Activated`);
+  @OnActivation()
+  public onActivation(): void {
+    console.info(`[${this.constructor.name}] Activation`);
   }
 
   @OnDeactivation()

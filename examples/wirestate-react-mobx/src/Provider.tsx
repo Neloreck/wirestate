@@ -7,6 +7,7 @@ import {
   QueriesPlugin,
 } from "@wirestate/core";
 import { DevToolsPlugin } from "@wirestate/core/devtools";
+import { ObservablePlugin } from "@wirestate/mobx";
 import { ContainerProvider } from "@wirestate/react";
 import { type PropsWithChildren, useMemo } from "react";
 
@@ -35,6 +36,7 @@ export function Provider({ children }: PropsWithChildren) {
         },
       ],
       plugins: [
+        new ObservablePlugin(),
         new EventsPlugin(),
         new CommandsPlugin(),
         new QueriesPlugin(),

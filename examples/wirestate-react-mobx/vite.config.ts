@@ -2,6 +2,7 @@ import { fileURLToPath } from "node:url";
 
 import babel from "@rolldown/plugin-babel";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
+import { wirestate } from "@wirestate/dev/vite";
 import { default as observerPlugin } from "mobx-react-observer/vite-plugin";
 import { defineConfig, type Plugin } from "vite";
 
@@ -35,6 +36,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    wirestate(),
     mobxObserverPlugin(),
     react(),
     babel({

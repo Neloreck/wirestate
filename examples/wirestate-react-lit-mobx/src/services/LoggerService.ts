@@ -1,6 +1,6 @@
 import {
   Injectable,
-  OnActivated,
+  OnActivation,
   OnCommand,
   OnDeactivation,
   OnDeprovision,
@@ -12,7 +12,7 @@ import {
   Container,
   EventBus,
 } from "@wirestate/core";
-import { Action, ShallowObservable, makeObservable, BoundAction } from "@wirestate/mobx";
+import { Action, BoundAction, ShallowObservable } from "@wirestate/mobx";
 
 import { EGlobalCommand } from "@/constants/commands";
 import { EGlobalEvent } from "@/constants/events";
@@ -45,8 +45,6 @@ export class LoggerService {
       optional: true,
     }),
   ) {
-    makeObservable(this);
-
     console.info(`[${this.constructor.name}] Constructing with constant global configs:`, {
       globalConfig,
       globalDynamicConfig,
@@ -54,9 +52,9 @@ export class LoggerService {
     });
   }
 
-  @OnActivated()
-  public onActivated(): void {
-    console.info(`[${this.constructor.name}] Activated:`);
+  @OnActivation()
+  public onActivation(): void {
+    console.info(`[${this.constructor.name}] Activation:`);
   }
 
   @OnDeactivation()

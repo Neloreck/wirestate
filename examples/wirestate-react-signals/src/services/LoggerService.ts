@@ -2,7 +2,7 @@ import {
   Container,
   EventBus,
   Injectable,
-  OnActivated,
+  OnActivation,
   OnCommand,
   OnDeactivation,
   OnDeprovision,
@@ -51,9 +51,9 @@ export class LoggerService {
     });
   }
 
-  @OnActivated()
+  @OnActivation()
   public onActivated(): void {
-    console.info(`[${this.constructor.name}] Activated:`);
+    console.info(`[${this.constructor.name}] Activation:`);
   }
 
   @OnDeactivation()

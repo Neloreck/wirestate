@@ -1,4 +1,12 @@
-import { Injectable, OnActivated, OnDeactivation, OnDeprovision, OnProvision, inject, EventBus } from "@wirestate/core";
+import {
+  Injectable,
+  OnActivation,
+  OnDeactivation,
+  OnDeprovision,
+  OnProvision,
+  inject,
+  EventBus,
+} from "@wirestate/core";
 import { Signal, signal } from "@wirestate/signals";
 
 import { EGlobalEvent } from "@/constants/events";
@@ -12,9 +20,9 @@ export class ThemeService {
     document.documentElement.dataset.theme = this.theme.value;
   }
 
-  @OnActivated()
-  public onActivated(): void {
-    console.info(`[${this.constructor.name}] Activated`);
+  @OnActivation()
+  public OnActivation(): void {
+    console.info(`[${this.constructor.name}] Activation`);
   }
 
   @OnDeactivation()

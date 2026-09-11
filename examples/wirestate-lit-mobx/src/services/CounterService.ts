@@ -1,6 +1,6 @@
 import {
   Injectable,
-  OnActivated,
+  OnActivation,
   OnDeactivation,
   OnEvent,
   WireEvent,
@@ -10,7 +10,7 @@ import {
   inject,
   EventBus,
 } from "@wirestate/core";
-import { Observable, Computed, Action, makeObservable } from "@wirestate/mobx";
+import { Action, Computed, Observable } from "@wirestate/mobx";
 
 import { EGlobalEvent } from "@/constants/events";
 import { ECounterServiceQuery, ICounterSnapshot, ICounterSummary } from "@/services/CounterService.query";
@@ -31,13 +31,11 @@ export class CounterService {
   public constructor(
     private readonly eventBus: EventBus = inject(EventBus),
     private readonly loggerService: LoggerService = inject(LoggerService)
-  ) {
-    makeObservable(this);
-  }
+  ) {}
 
-  @OnActivated()
-  public onActivated(): void {
-    console.log(`[${this.constructor.name}] Activated`);
+  @OnActivation()
+  public onActivation(): void {
+    console.info(`[${this.constructor.name}] Activation`);
   }
 
   @OnDeactivation()
