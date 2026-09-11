@@ -21,8 +21,13 @@ import { getPrototypeChainMetadata } from "./metadata-prototype-chain";
 export interface LifecycleDecorator<Method extends (...args: Array<never>) => unknown = () => unknown> {
   // Standard (TC39):
   <This>(value: (this: This, ...args: Parameters<Method>) => unknown, context: ClassMethodDecoratorContext<This>): void;
-  // Legacy/experimental:
-  (target: object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<Method>): void;
+  // Legacy/experimental. `TypedPropertyDescriptor` is invariant in its type argument, so the concrete
+  // method type is inferred and only checked against `Method`, instead of having to equal it.
+  <Actual extends Method>(
+    target: object,
+    propertyKey: string | symbol,
+    descriptor: TypedPropertyDescriptor<Actual>
+  ): void;
 }
 
 /**
