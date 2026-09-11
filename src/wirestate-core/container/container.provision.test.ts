@@ -212,9 +212,16 @@ describe("Container provision", () => {
         }
       }
 
-      const container: Container = new Container({ bindings: [ProvisioningService] });
+      const onError = jest.fn();
+      const container: Container = new Container({ bindings: [ProvisioningService], onError });
 
       expect(() => container.provision()).toThrow(expect.objectContaining({ code: ERROR_CODE_VALIDATION_ERROR }));
+
+      // The hook failure is reported before it is rethrown; a spied handler keeps it out of the console.
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(onError).toHaveBeenCalledWith(
+        expect.objectContaining({ instanceName: "ProvisioningService", source: "provider-provision" })
+      );
     });
 
     it("throws when binding a messaging-handler service onto a provisioned container", () => {

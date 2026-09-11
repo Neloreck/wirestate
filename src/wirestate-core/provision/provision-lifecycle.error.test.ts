@@ -76,6 +76,7 @@ describe("provision lifecycle errors", () => {
   it("rolls back resolved participants when a later participant fails activation", () => {
     const error = new Error("activation-fail");
     const events: Array<string> = [];
+    const onError = jest.fn();
 
     class ObserverPlugin implements WirestatePlugin {
       public onContainerProvision(): void {
@@ -107,10 +108,15 @@ describe("provision lifecycle errors", () => {
     const container: Container = new Container({
       bindings: [FirstService, FailingActivationService],
       plugins: [new ObserverPlugin()],
+      onError,
     });
 
     expect(() => provisionContainer(container)).toThrow(error);
 
+    expect(onError).toHaveBeenCalledTimes(1);
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({ error, instanceName: "FailingActivationService", source: "instance-activation" })
+    );
     expect(events).toEqual(["container-provision", "container-deprovision"]);
     expect(WireStatus.for(container.get(FirstService)).isDeprovisioned).toBe(true);
     expect(getProvisionState(container)?.cycle).toEqual(new Map());
