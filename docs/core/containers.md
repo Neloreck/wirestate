@@ -58,10 +58,10 @@ Pass `onError` to send isolated internal errors to application logging. Without 
 ```ts
 const container = new Container({
   bindings: [AuthService],
-  onError: (descriptor) => {
-    reportError(descriptor.error, {
-      source: descriptor.source,
-      name: descriptor.instanceName,
+  onError: (context) => {
+    reportError(context.error, {
+      source: context.source,
+      name: context.instanceName,
     });
   },
 });

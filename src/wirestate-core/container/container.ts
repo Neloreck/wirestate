@@ -5,10 +5,10 @@ import { isInstanceDescriptor } from "../binding/binding-guards";
 import { getBindingScope } from "../binding/binding-lifecycle";
 import { getBindingToken } from "../binding/binding-tokens";
 import {
-  type InternalErrorHandler,
-  getConfiguredInternalErrorHandler,
-  setInternalErrorHandler,
-} from "../error/internal-error-handler";
+  type WirestateErrorHandler,
+  getConfiguredWirestateErrorHandler,
+  setWirestateErrorHandler,
+} from "../error/wirestate-error-handler";
 import { collectDeclaredLifecycleHandlers } from "../lifecycle/declared-lifecycle-handlers";
 import { type WirestatePlugin } from "../plugin/plugin";
 import { installOwnPlugins, setContainerPlugins } from "../plugin/plugin-registry";
@@ -73,7 +73,7 @@ export interface ContainerConfig {
    * Child containers inherit the nearest parent handler when they do not
    * provide their own.
    */
-  readonly onError?: InternalErrorHandler;
+  readonly onError?: WirestateErrorHandler;
 
   /**
    * Plugins registered on this container.
@@ -134,11 +134,11 @@ export class Container extends ContainerKernel {
 
     super(config.parent);
 
-    const errorHandler: Optional<InternalErrorHandler> =
-      config.onError ?? getConfiguredInternalErrorHandler(config.parent);
+    const errorHandler: Optional<WirestateErrorHandler> =
+      config.onError ?? getConfiguredWirestateErrorHandler(config.parent);
 
     if (errorHandler) {
-      setInternalErrorHandler(this, errorHandler);
+      setWirestateErrorHandler(this, errorHandler);
     }
 
     // Installed before any binding activates: the Wirestate instance lifecycle

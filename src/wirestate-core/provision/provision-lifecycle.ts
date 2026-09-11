@@ -4,8 +4,8 @@ import { getBindingToken, tokenToString } from "../binding/binding-tokens";
 import { type Container } from "../container/container";
 import { type ContainerKernel } from "../container/container-kernel";
 import { ERROR_CODE_VALIDATION_ERROR } from "../error/error-code";
-import { reportWirestateInternalError } from "../error/internal-error-handler";
 import { WirestateError } from "../error/wirestate-error";
+import { reportWirestateError } from "../error/wirestate-error-handler";
 import { callLifecycleHandler } from "../lifecycle/call-lifecycle-handler";
 import { collectDeclaredProvisionHandlers } from "../lifecycle/declared-lifecycle-handlers";
 import { getMessagingPluginHandledKinds } from "../plugin/messaging-plugin";
@@ -574,7 +574,7 @@ function readDeprovisionHandler(container: ContainerKernel, instance: object): O
   try {
     return getDeprovisionHandlerMetadata(instance);
   } catch (error) {
-    reportWirestateInternalError({
+    reportWirestateError({
       container: container as Container,
       error,
       instance,

@@ -34,11 +34,11 @@ export { inject } from "./container/container-context";
 export { validateContainerConfig } from "./container/container-config-validation";
 
 export {
-  type InternalErrorDescriptor,
-  type InternalErrorHandler,
-  type InternalErrorSource,
-} from "./error/internal-error-handler";
-export { defaultInternalErrorHandler } from "./error/internal-error-handler";
+  type WirestateErrorContext,
+  type WirestateErrorHandler,
+  type WirestateErrorSource,
+} from "./error/wirestate-error-handler";
+export { defaultWirestateErrorHandler } from "./error/wirestate-error-handler";
 export { WirestateError } from "./error/wirestate-error";
 
 export { type InjectableDecorator } from "./metadata/metadata-injectable";

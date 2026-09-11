@@ -1,5 +1,5 @@
 import { type Container } from "../../container/container";
-import { reportWirestateInternalError } from "../../error/internal-error-handler";
+import { reportWirestateError } from "../../error/wirestate-error-handler";
 import { type Maybe } from "../../types/general";
 
 import { type EventDispatch, type EventHandler, type EventType, type WireEvent } from "./events";
@@ -93,7 +93,7 @@ export function buildEventDispatchers<T extends object>(
 
   for (const plan of plans.values()) {
     const report = (error: unknown, event: WireEvent, message: string): void =>
-      reportWirestateInternalError({
+      reportWirestateError({
         container,
         error,
         event,

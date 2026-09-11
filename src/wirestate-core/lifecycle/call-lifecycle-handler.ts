@@ -1,5 +1,5 @@
 import { type Container } from "../container/container";
-import { type InternalErrorSource, reportWirestateInternalError } from "../error/internal-error-handler";
+import { type WirestateErrorSource, reportWirestateError } from "../error/wirestate-error-handler";
 import { type MaybePromise } from "../types/general";
 
 export interface CallLifecycleHandlerOptions {
@@ -46,7 +46,7 @@ export interface CallLifecycleHandlerOptions {
   /**
    * Internal error source used for sync failures and async rejections.
    */
-  readonly source: InternalErrorSource;
+  readonly source: WirestateErrorSource;
 
   /**
    * Message used when the handler throws synchronously.
@@ -86,7 +86,7 @@ export function callLifecycleHandler(options: CallLifecycleHandlerOptions): void
 
     if (result && typeof (result as Promise<void>).then === "function") {
       Promise.resolve(result).catch((error) => {
-        reportWirestateInternalError({
+        reportWirestateError({
           container,
           details,
           error,
@@ -99,7 +99,7 @@ export function callLifecycleHandler(options: CallLifecycleHandlerOptions): void
       });
     }
   } catch (error) {
-    reportWirestateInternalError({
+    reportWirestateError({
       container,
       details,
       error,

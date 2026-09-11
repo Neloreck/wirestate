@@ -3,7 +3,7 @@ import { createLifecycleService } from "@/fixtures/services/lifecycle-service";
 import { OnActivation } from "../activation/on-activation";
 import { OnDeactivation } from "../activation/on-deactivation";
 import { BindingType } from "../binding/binding";
-import { getConfiguredInternalErrorHandler } from "../error/internal-error-handler";
+import { getConfiguredWirestateErrorHandler } from "../error/wirestate-error-handler";
 import { Injectable } from "../metadata/metadata-injectable";
 import { CommandBus } from "../plugin/commands/command-bus";
 import { EventBus } from "../plugin/events/event-bus";
@@ -21,7 +21,7 @@ describe("Container", () => {
     expect(container.hasOwn(EventBus)).toBe(false);
     expect(container.hasOwn(QueryBus)).toBe(false);
     expect(container.hasOwn(CommandBus)).toBe(false);
-    expect(getConfiguredInternalErrorHandler(container)).toBeUndefined();
+    expect(getConfiguredWirestateErrorHandler(container)).toBeUndefined();
   });
 
   it("should bind composed buses as singletons", () => {
@@ -85,7 +85,7 @@ describe("Container", () => {
     const onError = jest.fn();
     const container: Container = new Container({ onError });
 
-    expect(getConfiguredInternalErrorHandler(container)).toBe(onError);
+    expect(getConfiguredWirestateErrorHandler(container)).toBe(onError);
   });
 
   it("should inherit parent error handler when none is configured", () => {
@@ -93,7 +93,7 @@ describe("Container", () => {
     const parent: Container = new Container({ onError });
     const container: Container = new Container({ parent });
 
-    expect(getConfiguredInternalErrorHandler(container)).toBe(onError);
+    expect(getConfiguredWirestateErrorHandler(container)).toBe(onError);
   });
 
   it("should isolate messaging from its parent", () => {

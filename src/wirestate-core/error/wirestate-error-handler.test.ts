@@ -1,10 +1,10 @@
 import { Container } from "../container/container";
 
 import {
-  type InternalErrorDescriptor,
-  defaultInternalErrorHandler,
-  reportWirestateInternalError,
-} from "./internal-error-handler";
+  type WirestateErrorContext,
+  defaultWirestateErrorHandler,
+  reportWirestateError,
+} from "./wirestate-error-handler";
 
 describe("internal error handler", () => {
   let consoleErrorSpy: jest.SpyInstance;
@@ -17,10 +17,10 @@ describe("internal error handler", () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it("defaultInternalErrorHandler prints the message, source, and error", () => {
+  it("defaultWirestateErrorHandler prints the message, source, and error", () => {
     const error: Error = new Error("boom");
 
-    defaultInternalErrorHandler({ error, message: "Something failed", source: "event-handler" });
+    defaultWirestateErrorHandler({ error, message: "Something failed", source: "event-handler" });
 
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
     expect(consoleErrorSpy.mock.calls[0][0]).toContain("Something failed");
@@ -28,7 +28,7 @@ describe("internal error handler", () => {
   });
 
   it("falls back to the default handler when no container handler is configured", () => {
-    reportWirestateInternalError({ error: new Error("boom"), message: "No handler", source: "event-handler" });
+    reportWirestateError({ error: new Error("boom"), message: "No handler", source: "event-handler" });
 
     expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
   });
@@ -37,17 +37,17 @@ describe("internal error handler", () => {
     const onError = jest.fn();
 
     const container: Container = new Container({ onError });
-    const descriptor: InternalErrorDescriptor = {
+    const context: WirestateErrorContext = {
       container,
       error: new Error("boom"),
       message: "Routed",
       source: "event-handler",
     };
 
-    reportWirestateInternalError(descriptor);
+    reportWirestateError(context);
 
     expect(onError).toHaveBeenCalledTimes(1);
-    expect(onError).toHaveBeenCalledWith(descriptor);
+    expect(onError).toHaveBeenCalledWith(context);
     expect(consoleErrorSpy).not.toHaveBeenCalled();
   });
 
@@ -60,7 +60,7 @@ describe("internal error handler", () => {
 
     const container: Container = new Container({ onError });
 
-    reportWirestateInternalError({
+    reportWirestateError({
       container,
       error: new Error("original"),
       message: "Original failure",

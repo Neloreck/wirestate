@@ -1,6 +1,6 @@
 import { Container } from "../../container/container";
 import { inject } from "../../container/container-context";
-import { reportWirestateInternalError } from "../../error/internal-error-handler";
+import { reportWirestateError } from "../../error/wirestate-error-handler";
 import { Injectable } from "../../metadata/metadata-injectable";
 import { type Maybe, type Nullable } from "../../types/general";
 
@@ -336,7 +336,7 @@ export class EventBus {
 
         if (result && typeof (result as Promise<void>).then === "function") {
           Promise.resolve(result).catch((error) => {
-            reportWirestateInternalError({
+            reportWirestateError({
               container: this.container,
               error,
               event,
@@ -347,7 +347,7 @@ export class EventBus {
         }
       } catch (error) {
         // Prevent one failing listener from stalling the entire bus.
-        reportWirestateInternalError({
+        reportWirestateError({
           container: this.container,
           error,
           event,

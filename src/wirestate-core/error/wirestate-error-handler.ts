@@ -9,7 +9,7 @@ import { type Optional } from "../types/general";
  *
  * @group Error
  */
-export type InternalErrorSource =
+export type WirestateErrorSource =
   | "event-handler"
   | "instance-event-handler"
   | "instance-activation"
@@ -21,13 +21,13 @@ export type InternalErrorSource =
  * Describes an isolated failure reported through a container error handler.
  *
  * @remarks
- * The descriptor carries the original thrown or rejected value plus the
- * Wirestate context known at the catch site. Some fields are present only for
- * specific sources, such as `event` for event handler failures.
+ * Carries the original thrown or rejected value plus what Wirestate knew at
+ * the catch site. Some fields are present only for specific sources, such as
+ * `event` for event handler failures.
  *
  * @group Error
  */
-export interface InternalErrorDescriptor {
+export interface WirestateErrorContext {
   /**
    * Container that owns the failed work, when known.
    */
@@ -71,7 +71,7 @@ export interface InternalErrorDescriptor {
   /**
    * Subsystem that caught the failure.
    */
-  readonly source: InternalErrorSource;
+  readonly source: WirestateErrorSource;
 }
 
 /**
@@ -79,18 +79,18 @@ export interface InternalErrorDescriptor {
  *
  * @remarks
  * Register it as `new Container({ onError })`. If it throws, Wirestate falls
- * back to {@link defaultInternalErrorHandler} and reports both failures.
+ * back to {@link defaultWirestateErrorHandler} and reports both failures.
  *
- * @param descriptor - Isolated failure descriptor.
+ * @param context - Isolated failure context.
  *
  * @group Error
  */
-export type InternalErrorHandler = (descriptor: InternalErrorDescriptor) => void;
+export type WirestateErrorHandler = (context: WirestateErrorContext) => void;
 
 /**
  * Internal storage for container error handlers.
  */
-const WIRESTATE_INTERNAL_ERROR_HANDLERS: WeakMap<Container, InternalErrorHandler> = new WeakMap();
+const WIRESTATE_ERROR_HANDLERS: WeakMap<Container, WirestateErrorHandler> = new WeakMap();
 
 /**
  * Reports isolated Wirestate errors to `console.error`.
@@ -101,19 +101,19 @@ const WIRESTATE_INTERNAL_ERROR_HANDLERS: WeakMap<Container, InternalErrorHandler
  *
  * @group Error
  *
- * @param descriptor - Internal error descriptor.
+ * @param context - Isolated failure context.
  */
-export function defaultInternalErrorHandler(descriptor: InternalErrorDescriptor): void {
+export function defaultWirestateErrorHandler(context: WirestateErrorContext): void {
   console.error(
-    `[wirestate] ${descriptor.message}:`,
+    `[wirestate] ${context.message}:`,
     {
-      source: descriptor.source,
-      ...(descriptor.instanceName ? { instanceName: descriptor.instanceName } : {}),
-      ...(descriptor.methodName !== undefined ? { methodName: descriptor.methodName } : {}),
-      ...(descriptor.event ? { event: descriptor.event } : {}),
+      source: context.source,
+      ...(context.instanceName ? { instanceName: context.instanceName } : {}),
+      ...(context.methodName !== undefined ? { methodName: context.methodName } : {}),
+      ...(context.event ? { event: context.event } : {}),
     },
-    ...(descriptor.details ?? []),
-    descriptor.error
+    ...(context.details ?? []),
+    context.error
   );
 }
 
@@ -125,8 +125,8 @@ export function defaultInternalErrorHandler(descriptor: InternalErrorDescriptor)
  * @param container - Container to inspect.
  * @returns Configured handler, or `undefined` when none is configured.
  */
-export function getConfiguredInternalErrorHandler(container?: Container): Optional<InternalErrorHandler> {
-  return container ? WIRESTATE_INTERNAL_ERROR_HANDLERS.get(container) : undefined;
+export function getConfiguredWirestateErrorHandler(container?: Container): Optional<WirestateErrorHandler> {
+  return container ? WIRESTATE_ERROR_HANDLERS.get(container) : undefined;
 }
 
 /**
@@ -137,29 +137,29 @@ export function getConfiguredInternalErrorHandler(container?: Container): Option
  * @param container - Container that owns the handler.
  * @param handler - Handler to store.
  */
-export function setInternalErrorHandler(container: Container, handler: InternalErrorHandler): void {
-  WIRESTATE_INTERNAL_ERROR_HANDLERS.set(container, handler);
+export function setWirestateErrorHandler(container: Container, handler: WirestateErrorHandler): void {
+  WIRESTATE_ERROR_HANDLERS.set(container, handler);
 }
 
 /**
- * Reports an isolated internal error and protects against handler failures.
+ * Reports an isolated error and protects against handler failures.
  *
  * @internal
  *
- * @param descriptor - Internal error descriptor.
+ * @param context - Isolated failure context.
  */
-export function reportWirestateInternalError(descriptor: InternalErrorDescriptor): void {
-  const handler: InternalErrorHandler =
-    getConfiguredInternalErrorHandler(descriptor.container) ?? defaultInternalErrorHandler;
+export function reportWirestateError(context: WirestateErrorContext): void {
+  const handler: WirestateErrorHandler =
+    getConfiguredWirestateErrorHandler(context.container) ?? defaultWirestateErrorHandler;
 
   try {
-    handler(descriptor);
+    handler(context);
   } catch (handlerError) {
-    defaultInternalErrorHandler(descriptor);
-    defaultInternalErrorHandler({
+    defaultWirestateErrorHandler(context);
+    defaultWirestateErrorHandler({
       error: handlerError,
       message: "Internal error handler threw",
-      source: descriptor.source,
+      source: context.source,
     });
   }
 }
