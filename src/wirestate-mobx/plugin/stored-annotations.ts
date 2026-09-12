@@ -10,6 +10,10 @@ const STORED_ANNOTATIONS_DESCRIPTION: string = "mobx-stored-annotations";
 /**
  * Returns whether any class in the instance's hierarchy recorded MobX decorator annotations.
  *
+ * @remarks
+ * Only legacy experimental decorators record annotations. TC39 standard decorators apply themselves
+ * during instance initialization and store nothing, so they always answer `false`.
+ *
  * @param instance - Service instance to inspect.
  * @returns Whether `makeObservable` has annotations to apply.
  */

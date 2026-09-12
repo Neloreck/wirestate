@@ -17,7 +17,7 @@ npm install @wirestate/core @wirestate/mobx @wirestate/lit @wirestate/lit-mobx
 
 ## Service
 
-MobX decorators need `makeObservable(this)`.
+Legacy MobX decorators only record annotations, so they need `makeObservable(this)`.
 
 ```ts
 import { Injectable } from "@wirestate/core";
@@ -40,7 +40,7 @@ export class CounterService {
 ```
 
 Alternatively, register `ObservablePlugin` on the root container. It calls `makeObservable` for every activated
-service that carries MobX decorators, so services skip the constructor call.
+service that carries legacy MobX decorator annotations, so services skip the constructor call.
 
 ```ts
 import { Container } from "@wirestate/core";
@@ -48,6 +48,31 @@ import { ObservablePlugin } from "@wirestate/mobx";
 
 const container = new Container({ bindings: [CounterService], plugins: [new ObservablePlugin()] });
 ```
+
+### Standard Decorators
+
+The snippets above use legacy experimental decorators (`experimentalDecorators: true`). With TC39 standard decorators
+MobX applies annotations itself while the instance initializes: observable fields are declared with `accessor`, no
+`makeObservable` call is needed, and `ObservablePlugin` is a no-op that can be left out of the container.
+
+```ts
+import { Injectable } from "@wirestate/core";
+import { Action, Observable } from "@wirestate/mobx";
+
+@Injectable()
+export class CounterService {
+  @Observable()
+  public accessor count: number = 0;
+
+  @Action()
+  public increment(): void {
+    this.count += 1;
+  }
+}
+```
+
+The `accessor` keyword is required for observable fields in this mode: MobX rejects `@Observable()` on a plain field.
+Getters and methods are declared the same way in both modes.
 
 ## Element
 

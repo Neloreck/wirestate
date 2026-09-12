@@ -7,14 +7,19 @@ import { hasStoredAnnotations } from "./stored-annotations";
  * Applies MobX decorator annotations to every service the container activates.
  *
  * @remarks
- * Optional shortcut. Legacy MobX decorators such as `@Observable()` only record annotations, and the
- * regular way to apply them is `makeObservable(this)` in the service constructor. Register this
- * plugin once on a container and the call happens at activation instead: after construction and
- * field initializers, before the service's own `@OnActivation`, and for every container in the
- * subtree.
+ * Optional shortcut for legacy experimental decorators only. Legacy MobX decorators such as
+ * `@Observable()` record annotations on the prototype and apply nothing, so the regular way to apply
+ * them is `makeObservable(this)` in the service constructor. Register this plugin once on a container
+ * and the call happens at activation instead: after construction and field initializers, before the
+ * service's own `@OnActivation`, and for every container in the subtree.
+ *
+ * Under TC39 standard decorators the plugin is a no-op and can be left out of the container. MobX
+ * applies `@Observable() accessor`, `@Computed()` and `@Action()` itself while the instance
+ * initializes and records no annotations to defer, so no `makeObservable` call is needed and the
+ * plugin finds nothing to apply. Registering it anyway is harmless.
  *
  * A service that still calls `makeObservable(this)` itself keeps working. A service without
- * annotations, or one decorated with TC39 decorators, which MobX applies immediately, is left alone.
+ * annotations is left alone.
  *
  * @group Plugins
  *
